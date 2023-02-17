@@ -1736,15 +1736,15 @@ window.onload = function () {
                                 showContactMessage();
                             }
                         };
-                        document.oncontextmenu = function () {
-                            return false;
-                        }
-                        document.onmousedown = function (e) {
-                            if (e.button === 2) {
-                                showContactMessage();
-                                return false;
-                            }
-                        }
+                        // document.oncontextmenu = function () {
+                        //     return false;
+                        // }
+                        // document.onmousedown = function (e) {
+                        //     if (e.button === 2) {
+                        //         showContactMessage();
+                        //         return false;
+                        //     }
+                        // }
                     })();
 
                     // Clear Console
