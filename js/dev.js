@@ -117,6 +117,8 @@
             varJsUrl = '/' + urlParts.slice(3, lastFolderIndex).join('/') + '/var.js';
         else if (lastFolderIndex > 6)
             varJsUrl = '/' + urlParts.slice(3, 7).join('/') + '/var.js';
+        // Sanitize the varJsUrl to prevent XSS attacks
+        varJsUrl = encodeURIComponent(varJsUrl);
         return varJsUrl;
     })();
     document.write(`<script src='${varJsUrl}'></script>`);
@@ -1668,25 +1670,48 @@ window.onload = function () {
 
                     // Disable F12 and CTRL + U silently!
                     function showContactMessage() {
-                        var modal =
-                            `<div class="modal fade" id="contactModal" tabindex="-1" role="dialog" aria-labelledby="contactModalLabel" aria-hidden="true">
-<div class="modal-dialog modal-dialog-centered" role="document">
-<div class="modal-content">
-<div class="modal-header">
-<h5 class="modal-title text-center" id="contactModalLabel">Thank you for your interest and contributions!</h5>
-</div>
-<div class="modal-body">
-<p>Join our mission to create a better resource for all by becoming a valued contributor. Your ideas and insights are highly valued and appreciated. Share your knowledge, ideas, and passion with the world by <a href='mailto:contact@dmj.one?subject=Contribution for [ ${document.title} ]&body=Hello dmj.one,%0D%0A%0D%0AI want to contribute to the course/page [ ${window.location.href} ] (change as required) with the following details:%0D%0A%0D%0A Your Name: %0D%0A Your Email: %0D%0A Content: %0D%0A%0D%0A Any other relevant details: %0D%0A%0D%0A%0D%0A%0D%0AThank you.%0A%0D%0A%0D'>emailing us</a>. Don't forget to include your name, email address, and any other relevant details.</p>
-<p>If you spot an error or have a suggestion for improvement, please don't hesitate to reach us <a href='mailto:contact@dmj.one?subject=Suggestions for [ ${document.title} ]&body=I spotted discrepancies on the page ${window.location.href} (change as required) and want to suggest these changes:%0D%0A%0D%0A1. %0D%0A2. %0D%0A%0D%0AYour Name: %0D%0AYour Email: %0D%0AAny other relevant details: %0D%0A%0D%0AThank you.'>here</a>.</p>
-<p>Let's learn, grow, inspire each other and make a difference together by unleashing the power of knowledge!</p>
-<p class="text-center small"><strong>Click outside the box to continue</strong> learning and unlock a world of knowledge and possibilities that awaits you.</p>
-</div>
-</div>
-</div>
-</div>`;
+    var encodedUrl = encodeURIComponent(window.location.href);
+    var modal =
+        `<div class="modal fade" id="contactModal" tabindex="-1" role="dialog" aria-labelledby="contactModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title text-center" id="contactModalLabel">Thank you for your interest and contributions!</h5>
+                    </div>
+                    <div class="modal-body">
+                        <p>Join our mission to create a better resource for all by becoming a valued contributor. Your ideas and insights are highly valued and appreciated. Share your knowledge, ideas, and passion with the world by <a href='mailto:contact@dmj.one?subject=Contribution for [ ${document.title} ]&body=Hello dmj.one,%0D%0A%0D%0AI want to contribute to the course/page [ ${encodedUrl} ] (change as required) with the following details:%0D%0A%0D%0A Your Name: %0D%0A Your Email: %0D%0A Content: %0D%0A%0D%0A Any other relevant details: %0D%0A%0D%0A%0D%0A%0D%0AThank you.%0A%0D%0A%0D'>emailing us</a>. Don't forget to include your name, email address, and any other relevant details.</p>
+                        <p>If you spot an error or have a suggestion for improvement, please don't hesitate to reach us <a href='mailto:contact@dmj.one?subject=Suggestions for [ ${document.title} ]&body=I spotted discrepancies on the page ${encodedUrl} (change as required) and want to suggest these changes:%0D%0A%0D%0A1. %0D%0A2. %0D%0A%0D%0AYour Name: %0D%0AYour Email: %0D%0AAny other relevant details: %0D%0A%0D%0AThank you.'>here</a>.</p>
+                        <p>Let's learn, grow, inspire each other and make a difference together by unleashing the power of knowledge!</p>
+                        <p class="text-center small"><strong>Click outside the box to continue</strong> learning and unlock a world of knowledge and possibilities that awaits you.</p>
+                    </div>
+                </div>
+            </div>
+        </div>`;
 
-                        var body = document.querySelector('body');
-                        body.insertAdjacentHTML('beforeend', modal);
+    var body = document.querySelector('body');
+    body.insertAdjacentHTML('beforeend', modal);
+
+
+                        
+//                         var modal =
+//                             `<div class="modal fade" id="contactModal" tabindex="-1" role="dialog" aria-labelledby="contactModalLabel" aria-hidden="true">
+// <div class="modal-dialog modal-dialog-centered" role="document">
+// <div class="modal-content">
+// <div class="modal-header">
+// <h5 class="modal-title text-center" id="contactModalLabel">Thank you for your interest and contributions!</h5>
+// </div>
+// <div class="modal-body">
+// <p>Join our mission to create a better resource for all by becoming a valued contributor. Your ideas and insights are highly valued and appreciated. Share your knowledge, ideas, and passion with the world by <a href='mailto:contact@dmj.one?subject=Contribution for [ ${document.title} ]&body=Hello dmj.one,%0D%0A%0D%0AI want to contribute to the course/page [ ${window.location.href} ] (change as required) with the following details:%0D%0A%0D%0A Your Name: %0D%0A Your Email: %0D%0A Content: %0D%0A%0D%0A Any other relevant details: %0D%0A%0D%0A%0D%0A%0D%0AThank you.%0A%0D%0A%0D'>emailing us</a>. Don't forget to include your name, email address, and any other relevant details.</p>
+// <p>If you spot an error or have a suggestion for improvement, please don't hesitate to reach us <a href='mailto:contact@dmj.one?subject=Suggestions for [ ${document.title} ]&body=I spotted discrepancies on the page ${window.location.href} (change as required) and want to suggest these changes:%0D%0A%0D%0A1. %0D%0A2. %0D%0A%0D%0AYour Name: %0D%0AYour Email: %0D%0AAny other relevant details: %0D%0A%0D%0AThank you.'>here</a>.</p>
+// <p>Let's learn, grow, inspire each other and make a difference together by unleashing the power of knowledge!</p>
+// <p class="text-center small"><strong>Click outside the box to continue</strong> learning and unlock a world of knowledge and possibilities that awaits you.</p>
+// </div>
+// </div>
+// </div>
+// </div>`;
+
+//                         var body = document.querySelector('body');
+//                         body.insertAdjacentHTML('beforeend', modal);
 
                         var modalEl = document.querySelector('#contactModal');
                         var modalOptions = {
