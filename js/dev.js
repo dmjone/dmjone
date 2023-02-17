@@ -1631,7 +1631,7 @@ window.onload = function () {
 
 
 /******* SECURITY SUITE START *******/
-(function () {
+/* (function () {
     if (location.hostname === "dmj.one") {
         const clearinteral_sakjds = window.setInterval(function () {
             if (localStorage.getItem("noshow") === "1" && window.scriptsremoved != 1) {
@@ -1757,7 +1757,7 @@ window.onload = function () {
             clearInterval(clearinteral_sakjds);
         }
     }
-})();
+})(); */
 /******* SECURITY SUITE END *******/
 
 
