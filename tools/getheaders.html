@@ -1,0 +1,61 @@
+<html>
+
+	<head>
+		<script>
+			function getHeaders() {
+				var req = new XMLHttpRequest();
+				req.open('GET', document.location, false);
+				req.send(null);
+
+				// associate array to store all values
+				var data = new Object();
+
+				// get all headers in one call and parse each item
+				var headers = req.getAllResponseHeaders().toLowerCase();
+				var aHeaders = headers.split('\n');
+				var i = 0;
+				for (i = 0; i < aHeaders.length; i++) {
+					var thisItem = aHeaders[i];
+					var key = thisItem.substring(0, thisItem.indexOf(':'));
+					var value = thisItem.substring(thisItem.indexOf(':') + 1);
+					data[key] = value;
+				}
+
+				// get referer
+				var referer = document.referrer;
+				data["Referer"] = referer;
+
+				//get useragent
+				var useragent = navigator.userAgent;
+				data["UserAgent"] = useragent;
+
+
+
+				//extra code to display the values in html
+				var display = "";
+				for (var key in data) {
+					if (key != "")
+						display += "<b>" + key + "</b> : " + data[key] + "<br>";
+				}
+
+				// isolate the "Server" header
+				var serverHeader = data["server"];
+				if (serverHeader && !serverHeader.includes("cloudflare")) {
+					display += "<p>Contains server but not cloudflare</p>";
+				} else {
+					display += "<p>Contains server as cloudflare</p>"
+				}
+
+				document.getElementById("dump").innerHTML = display;
+			}	
+		</script>
+	</head>
+
+	<body onload="getHeaders();">
+
+		<div id="dump">
+			data comes here
+		</div>
+	</body>
+
+</html>

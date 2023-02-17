@@ -1,0 +1,279 @@
+
+<!doctype html public "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1">
+<meta name="Author" content="Brian Gosselin">
+<title>HTML & JavaScript Encoder/Decoder</title>
+
+<style>
+body{
+	scrollbar-base-color:#333333;
+	scrollbar-arrow-color:#AAAAAA;	
+	font-size:8pt;
+	font-family: verdana;
+	padding:0 10% 0 10%;
+	margin:0px;
+	background-color:#fbfbfb;	
+	background-attachment:fixed;
+
+}
+
+
+.bodycontent{
+	padding:10 20 10 20;
+	background-color:transparent;
+/*	border-left:3px outset #DDDDDD;
+	border-right:3px outset #DDDDDD;	
+	border-bottom:3px outset #DDDDDD;	*/
+}
+
+.hilite{
+	color:#660000;
+}
+
+pre.code{
+	background-color:#DDDDDD;
+	font-family:courier;
+	font-size:6pt;
+	color:#9c0003;
+	padding:5px;
+	border: 2px outset;
+}
+
+span.code{
+	font-size:2px;
+	font-family:courier;
+	color:#9c0003;
+}
+
+div.code{
+	background-color:#DDDDDD;
+	font-family:courier;
+	font-size:6pt;
+	color:#9c0003;
+	padding:5px;
+	border: 2px outset;
+}
+
+textarea.code{
+	background-color:#DDDDDD;
+	font-family:courier;
+	font-size:14px;
+	color:#9c0003;
+	padding:5px;
+	border: 2px inset;
+}
+
+td{
+	font-size:8pt;
+}
+
+.donate{
+	font-size:7pt;
+}
+
+a, a:link, a:active {
+	color:#000000;
+	font-weight:bold;
+	text-decoration:none;
+}
+
+a:hover {
+	color:#9c0003;
+	font-weight:bold;
+	text-decoration:none;
+}
+
+
+h1{
+	color:#9c0003;
+	font-weight:bold;
+	font-size:30px;
+}
+
+h2{
+	color:#9c0003;
+	font-weight:bold;
+	font-size:20px;
+}
+
+h3{
+	color:#9c0003;
+	font-weight:bold;
+	font-size:15px;
+}
+
+
+li{
+	padding-bottom:15px;
+}
+
+.inpB{
+	font-family:verdana;
+	font-size:8pt;
+	background-color:#DDDDDD;
+}
+
+.inpS{
+	font-family:verdana;
+	font-size:8pt;
+	background-color:#DDDDDD;
+}
+</style>
+
+
+<script language="javascript">
+
+
+var encN=1;
+
+// DECODES AND UNESCAPES ALL TEXT.
+function decodeTxt(s){
+	var s1=unescape(s.substr(0,s.length-1));
+	var t='';
+	for(i=0;i<s1.length;i++)t+=String.fromCharCode(s1.charCodeAt(i)-s.substr(s.length-1,1));
+	return unescape(t);
+}
+
+// ENCODES, IN UNICODE FORMAT, ALL TEXT AND THEN ESCAPES THE OUTPUT
+function encodeTxt(s){
+	s=escape(s);
+	var ta=new Array();
+	for(i=0;i<s.length;i++)ta[i]=s.charCodeAt(i)+encN;
+	return ""+escape(eval("String.fromCharCode("+ta+")"))+encN;
+}
+
+
+// CONVERTS *ALL* CHARACTERS INTO ESCAPED VERSIONS.
+function escapeTxt(os){
+	var ns='';
+	var t;
+	var chr='';
+	var cc='';
+	var tn='';
+	for(i=0;i<256;i++){
+		tn=i.toString(16);
+		if(tn.length<2)tn="0"+tn;
+		cc+=tn;
+		chr+=unescape('%'+tn);
+	}
+	cc=cc.toUpperCase();
+	os.replace(String.fromCharCode(13)+'',"%13");
+	for(q=0;q<os.length;q++){
+		t=os.substr(q,1);
+		for(i=0;i<chr.length;i++){
+			if(t==chr.substr(i,1)){
+				t=t.replace(chr.substr(i,1),"%"+cc.substr(i*2,2));
+				i=chr.length;
+			}
+		}
+	ns+=t;
+	}
+	return ns;
+}
+
+
+// SIMPLY UNESCAPES TEXT (ONLY INCLUDED TO MAKE A COMPLEMENTARY FUNCTION FOR escapeTxt()
+function unescapeTxt(s){
+	return unescape(s);
+}
+
+// WRITES THE DECODED STRING (s) TO THE DOCUMENT WHEREVER THIS FUNCTION IS CALLED
+function wF(s){
+	document.write(decodeTxt(s));
+}
+
+</script>
+
+</head>
+<body>
+
+<div class="bodycontent">
+<center><h2>HTML/text/JavaSript Escaping/Encoding Script</h2></center><br />
+
+The two textboxes below will let you fully escape and unescape any text you want. Just type whatever text/HTML/JavaScript you want in the left box and click the <span class="codeB">--&gt;</span> button to fully escape it. Likewise, click the <span class="codeB">&lt;--</span> button to convert it back to normal text to verify that it is the same as the original. You can copy & paste the escaped code into your page (don't forget to use the <span class="code">unescape()</span> and <span class="code">document.write()</span> methods).<br /><br />
+
+
+<center>
+<form name="fA">
+<table cellpadding="5" cellspacing=0 border=0>
+	<tr align="center" valign="top">
+		<td class="tblc">
+			Normal Text/HTML/JavaScript &nbsp; (<a href="javascript:document.forms['fA'].f1.focus();document.forms['fA'].f1.select();">Select all...</a>)
+			<br /><br />
+			<textarea id="f1" cols=40 rows=10 wrap="off">
+<script language="javascript">
+</script>
+			</textarea>
+		</td>
+		<td>
+			<br /><br /><br /><br />
+			<input class="inpB" type="button" value="  -->  " onclick="document.fA.c1.value=escapeTxt(document.fA.f1.value)"><br /><br />
+			<input class="inpB" type="button" value="  <--  " onclick="document.fA.f1.value=unescapeTxt(document.fA.c1.value)">
+		</td>
+		<td class="tblc">
+			Escaped Text/HTML/JavaScript &nbsp; (<a href="javascript:document.forms['fA'].c1.focus();document.forms['fA'].c1.select();">Select all...</a>)
+			<br /><br />
+			<textarea id="c1" cols=40 rows=10>
+			</textarea>
+		</td>
+	</tr>
+</table>
+
+</form>
+</center>
+
+
+<hr><br />
+
+<h3>Encoding/Decoding</h3>
+
+Now, you probably have figured out that you <i>could</i> hide an entire HTML page using the above method; but there are two disadvantages to doing that: Size and ease of &quot;cracking&quot; your code.<br /><br />
+When you fully escape an entire page, every single character becomes 3 characters. This will triple the size of your page. Not a big deal if the page is only about 1-5 KBytes in size; but when you have a fairly large page (>10 KBytes), the filesize increases rapidly. This would slow the load time for the dial-up connection surfers out there.<br /><br />
+Also, if someone were to look at your source code, it would be pretty easy to figure out what you are doing. Then they can simply copy & paste the code and make a small script to display the normal content. There is no absolute foolproof way (client-side) to foil someone from viewing your source if they are determined enough; the best you can hope for is to make it as inconvenient as possible.<br /><br />
+So, to address both concerns you could encode/decode the text. Again, it won't be foolproof to keep people from stealing your source content if they really want it. I am really using the terms &quot;encode&quot; and &quot;decode&quot; loosely here; what the following script does is not considered actual encoding, but it's easier to say it that way. The encoded output will be a bit longer than the original text, but a lot less than if you had simply escaped it all.<br /><br />
+The above section just escapes the text. The section below actually <i>shifts</i> the Unicode values so the result looks like gibberish. Give it a try and you'll see; don't forget to try different <span class="code">Code Key</span> values from the drop-down box.<center>
+<br /><br />
+
+<form name="fB">
+<table cellpadding="5" cellspacing=0 border=0>
+	<tr valign="top" align="center">
+		<td>
+			Normal Text/HTML/JavaScript &nbsp; (<a href="javascript:document.forms['fB'].f2.focus();document.forms['fB'].f2.select();">Select all...</a>)
+			<br /><br />
+			<textarea id="f2" cols=40 rows=10 wrap="off">
+<script language="javascript">
+</script>
+			</textarea>
+		</td>
+		<td>
+			<br /><br />
+			<input class="inpB" type="button" value="  -->  " onclick="document.fB.c2.value=encodeTxt(document.fB.f2.value)"><br /><br />
+			<input class="inpB" type="button" value="  <--  " onclick="document.fB.f2.value=decodeTxt(document.fB.c2.value)"><br /><br />
+			Code Key:<br />
+			<select name="et" onchange="encN=this.selectedIndex+1" class="inpS">
+				<option selected>E82HHA3C</option>
+				<option> 2 </option>
+				<option> 3 </option>
+				<option> 4 </option>
+				<option> 5 </option>
+				</select>
+		</td>
+		<td>
+			Encoded Text/HTML/JavaScript &nbsp; (<a href="javascript:document.forms['fB'].c2.focus();document.forms['fB'].c2.select();">Select all...</a>)
+			<br /><br />
+			<textarea id="c2" cols=40 rows=10>
+			</textarea>
+		</td>
+	</tr>
+</table>
+</form>
+
+</center>
+<br />
+The following steps are what the script does to accomplish this effect when you click the <span class="codeB">--></span> (encode) button:
+
+</div>
+</body>
+</html>

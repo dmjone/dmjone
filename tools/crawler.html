@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Crawler</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.3/jquery.min.js" integrity="sha512-STof4xm1wgkfm7heWqFJVn58Hm3EtS31XFaagaa8VMReCXAkQnJZ+jEy8PCC/iT18dFy95WcExNHFTqLyp72eQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.3/jquery.min.js" integrity="sha512-STof4xm1wgkfm7heWqFJVn58Hm3EtS31XFaagaa8VMReCXAkQnJZ+jEy8PCC/iT18dFy95WcExNHFTqLyp72eQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+            // async function generateSitemap(url) {
+            //     // Fetch the page
+            //     const response = await fetch(url);
+            //     const html = await response.text();
+
+            //     // Parse the HTML using the DOMParser API
+            //     const parser = new DOMParser();
+            //     const doc = parser.parseFromString(html, 'text/html');
+
+            //     // Find all the links on the page
+            //     const links = doc.querySelectorAll('a');
+
+            //     // Create the sitemap XML
+            //     let sitemap = '<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
+
+            //     // Add each link to the sitemap
+            //     links.forEach(link => {
+            //         const href = link.getAttribute('href');
+            //         sitemap += `<url><loc>${href}</loc></url>`;
+            //     });
+
+            //     // Close the sitemap
+            //     sitemap += '</urlset>';
+
+            //     return sitemap;
+            // }
+
+            const visited = new Set();
+
+            async function generateSitemap(url) {
+                if (visited.has(url)) {
+                    return '';
+                }
+                visited.add(url);
+
+                // Fetch the page
+                const response = await fetch(url);
+                const html = await response.text();
+
+                // Parse the HTML using the DOMParser API
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+
+                // Wait for 5 seconds after the page finishes loading
+                await new Promise(resolve => setTimeout(resolve, 5000));
+
+                // Find all the links on the page
+                const links = Array.from(doc.querySelectorAll('a'))
+                    .map(a => a.href)
+                    .filter(href => href.startsWith('http'));
+
+                // Create the sitemap XML for the current URL
+                let sitemap = `<url><loc>${url}</loc></url>`;
+
+                // Crawl the links
+                for (const link of links) {
+                    sitemap += await generateSitemap(link);
+                }
+
+                // Close the sitemap
+                sitemap = `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${sitemap}</urlset>`;
+
+                return sitemap;
+            }
+
+        </script>
+        <script>
+            // generateSitemap('https://su.dmj.one').then(sitemap => {
+            //     console.log(sitemap);
+            // });
+
+            const startingURL = 'https://dmj.one/edu/su/';
+            generateSitemap(startingURL)
+                .then(sitemap => {
+                    console.log(sitemap);
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+
+        </script>
+    </head>
+
+    <body>
+
+    </body>
+
+</html>
