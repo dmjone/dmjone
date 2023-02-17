@@ -382,9 +382,10 @@ function head_FormatAuthor(...args) {
 } */
 
 function header_author(...args) {
+    if (args[0] === "off") { return null; }
     /* USAGE - header_author("authorinitials || name", "email", "author1 details", "authorinitials || name2" ... ) */
     window["loaded_header_author"] = 1;
-    if (args[0] === "off") { return null; }
+
 
     var pathParts = window.location.pathname.split("/");
     var mainspace = pathParts[2];
