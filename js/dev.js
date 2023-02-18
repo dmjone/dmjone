@@ -175,6 +175,7 @@
         { rel: pr, href: "https://fonts.googleapis.com" },
         { rel: pr, href: "https://cdnjs.cloudflare.com" },
         { rel: pr, href: "https://dmj.one" },
+        { rel: pr, href: "https://dev.dmj.one" },
         { rel: pr, href: "https://fonts.gstatic.com" },
         { rel: pr, href: "https://picsum.photos" },
         { rel: pr, href: "https://type.fit" },
@@ -924,7 +925,7 @@ function gen_blockquote() {
 
             const p = document.createElement("p");
             p.classList.add("p-2");
-            p.innerHTML = `This website uses cookies so that we can provide you with the best website experience. By <strong>clicking</strong> <em>“I Accept”</em> or<strong> by scrolling</strong> to view the contents of this website you acknowledge the use of cookies and to our <a href='/tos'>Terms and Conditions</a> and <a href='/privacy'>Privacy Policy</a>.`;
+            p.innerHTML = `This website uses cookies so that we can provide you with the best website experience. By <strong>clicking</strong> I Accept or<strong> by scrolling</strong> to view the contents of this website you acknowledge the use of cookies and to our <a href='/tos'>Terms and Conditions</a> and <a href='/privacy'>Privacy Policy</a>.`;
 
             col1.appendChild(p);
 
@@ -1631,7 +1632,7 @@ window.onload = function () {
 
 
 /******* SECURITY SUITE START *******/
-/* (function () {
+(function () {
     if (location.hostname === "dmj.one") {
         const clearinteral_sakjds = window.setInterval(function () {
             if (localStorage.getItem("noshow") === "1" && window.scriptsremoved != 1) {
@@ -1757,7 +1758,7 @@ window.onload = function () {
             clearInterval(clearinteral_sakjds);
         }
     }
-})(); */
+})();
 /******* SECURITY SUITE END *******/
 
 
