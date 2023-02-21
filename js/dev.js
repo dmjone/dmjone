@@ -176,6 +176,7 @@
         { rel: pr, href: "https://cdnjs.cloudflare.com" },
         { rel: pr, href: "https://dmj.one" },
         { rel: pr, href: "https://dev.dmj.one" },
+        { rel: pr, href: "https://cdn.dmj.one" },
         { rel: pr, href: "https://fonts.gstatic.com" },
         { rel: pr, href: "https://picsum.photos" },
         { rel: pr, href: "https://type.fit" },
@@ -224,7 +225,7 @@ function header_navbar() {
                 var nav_filename = url.pathname.substring(url.pathname.lastIndexOf('/') + 1);
          */
 
-        var nav_home = `<a href="//${window.location.host}/edu/su/" data-toggle="tooltip" data-placement="top" title="Home" data-original-title="Home"><i class="bi bi-house-fill text-light"></i></a>`;
+        var nav_home = `<a href="//${window.location.host}" data-toggle="tooltip" data-placement="top" title="Home" data-original-title="Home"><i class="bi bi-house-fill text-light"></i></a>`;
         var nav_path = `<a href="${nav_folder}/" data-toggle="tooltip" data-placement="top" title="${nav_folder}" data-original-title="${nav_folder}"><i class="bi bi-journals text-light"></i></a>`;
         var nav_subpath = `<a href="${nav_folder}/${nav_subfolder}/" data-toggle="tooltip" data-placement="top" title="${nav_subfolder}" data-original-title="${nav_subfolder}"><i class="bi bi-card-list text-light"></i></a>`;
         var nav_file = `<a href="${nav_filename}" data-toggle="tooltip" data-placement="top" title="${nav_filename}" data-original-title="${nav_filename}"><i class="bi bi-journal-code text-light"></i></a>`;
@@ -338,7 +339,7 @@ function head_FormatAuthor(...args) {
     }
     let authorText;
     if (authorTextArr.length === 0) {
-        authorText = "author";
+        authorText = "";
     } else if (authorTextArr.length === 1) {
         authorText = authorTextArr[0];
     } else if (authorTextArr.length === 2) {
@@ -350,178 +351,21 @@ function head_FormatAuthor(...args) {
     return authorText;
 }
 
-
-/* function header_author(author_init) {
-    window.loaded_header_author = 1;
-
-    var authorData = {
-        "csu1128": {
-            prof: "Dr. Pankaj Vaidya",
-            prof_bio: "<p>Dr. Pankaj Vaidya is the Head of the Yogananda School of AI, Computers and Data Sciences. He holds 22 years of teaching experience and is conducting research in Machine Learning and Drug Discovery using Machine Learning. He completed his M Tech (2005) and received PhD (2020) in Computer Science Engineering from Shoolini University.</p>",
-            prof_href: "mailto:pankaj.vaidya@shooliniuniversity.com?subject=referred%20from%3A%20dmj.one",
-            course: "CSU1128",
-            course_detail: "Logic Building with Computer Programming"
-        },
-        "csu1128p": {
-            prof: "Dr. Pankaj Vaidya",
-            prof_bio: "<p>Dr. Pankaj Vaidya is the Head of the Yogananda School of AI, Computers and Data Sciences. He holds 22 years of teaching experience and is conducting research in Machine Learning and Drug Discovery using Machine Learning. He completed his M Tech (2005) and received PhD (2020) in Computer Science Engineering from Shoolini University.</p>",
-            prof_href: "mailto:pankaj.vaidya@shooliniuniversity.com?subject=referred%20from%3A%20dmj.one",
-            course: "CSU1128(P)",
-            course_detail: "Logic Building with Computer Programming Lab"
-        },
-        ...
-  };
-
-    var author = authorData[folder] || {};
-    var prof = author.prof || "";
-    var prof_bio = author.prof_bio || "";
-    var prof_href = author.prof_href || "";
-    var course = author.course || "";
-    var course_detail = author.course_detail || "";
-
-  ...
-} */
-
 function header_author(...args) {
+    // Ensure safety: If 'Off' is passed as a function argument, no header will be displayed. If 'WriteManually' is passed, the corresponding HTML code in the next value will be sent for manual header composition.
     if (args[0] === "off") { return null; }
+    if (args[0] === "WriteManually") { const finalheaders = "<header>" + args[1] + "</header>" + header_navbar(); document.body.insertAdjacentHTML('afterbegin', finalheaders); return null; }
+    if (args[0] === "NavOnly") { document.body.insertAdjacentHTML('afterbegin', header_navbar()); return null; }
+
     /* USAGE - header_author("authorinitials || name", "email", "author1 details", "authorinitials || name2" ... ) */
     window["loaded_header_author"] = 1;
 
-
-    var pathParts = window.location.pathname.split("/");
-    var mainspace = pathParts[2];
-    var secondary = pathParts[3];
-    var folder = pathParts[4];
-    var file = pathParts[5];
-    // console.log(folder.length + folder);
-    // console.log(file.length + file);
-
-    let { pA_author, pA_bio } = processAuthors(args);
+    const { pA_author, pA_bio } = processAuthors(args);
     const allAuthors = `<span id="authorlist">${pA_author}</span>`, author_bio = pA_bio;
 
+    const { line1, line2, line3, line4 } = processFolder(allAuthors, author_bio);
 
-    let prof, prof_href, prof_bio, course, course_detail;
-    switch (secondary) {
-        case "course":
-            switch (folder) {
-                case "csu1128":
-                    prof = "Dr. Pankaj Vaidya";
-                    prof_bio = "<p>Dr. Pankaj Vaidya is the Head of the Yogananda School of AI, Computers and Data Sciences. He holds 22 years of teaching experience and is conducting research in Machine Learning and Drug Discovery using Machine Learning. He completed his M Tech (2005) and received PhD (2020) in Computer Science Engineering from Shoolini University.</p>";
-                    prof_href = "pankaj.vaidya@shooliniuniversity.com";
-                    course = "CSU1128";
-                    course_detail = "Logic Building with Computer Programming";
-                    break;
-                case "csu1128p":
-                    prof = "Dr. Pankaj Vaidya";
-                    prof_bio = "<p>Dr. Pankaj Vaidya is the Head of the Yogananda School of AI, Computers and Data Sciences. He holds 22 years of teaching experience and is conducting research in Machine Learning and Drug Discovery using Machine Learning. He completed his M Tech (2005) and received PhD (2020) in Computer Science Engineering from Shoolini University.</p>";
-                    prof_href = "pankaj.vaidya@shooliniuniversity.com";
-                    course = "CSU1128(P)";
-                    course_detail = "Logic Building with Computer Programming Lab";
-                    break;
-                case "csu953":
-                    prof = "Dr. Bharti Thakur";
-                    prof_bio = "<p>Bharti Thakur is an Assistant Professor at the Yogananda School of Artificial Intelligence, Computing and Data Science, Shoolini University of Biotechnology and Management Sciences, Solan (HP) India. She is doing her research on ‘Data Mining and Machine Learning’. She holds 10 years of teaching experience.</p>";
-                    prof_href = "bhartithakur@shooliniuniversity.com";
-                    course = "CSU953";
-                    course_detail = "Front End Development Lab";
-                    break;
-                case "fsu030":
-                    prof = "Dr. Pawan Kumar";
-                    prof_bio = "<p>Dr. Pawan Kumar is a assistant Professor at Shoolini University. He has more than 20 years of experience in teaching, research, and administration. He completed his Ph.D.in 2019 from Amity University, Noida with the collaboration of Punjab University, Chandigarh. He is currently working on Optical, Thermal and Electrical Properties of Chalcogenide Glasses/Thin Films.</p>";
-                    prof_href = "pawankumarsu783@shooliniuniversity.com";
-                    course = "FSU030";
-                    course_detail = "Engineering Physics";
-                    break;
-                case "csu951":
-                    prof = "Dr. Ravinder Thakur";
-                    prof_bio = "<p>Dr. Ravinder Thakur is an assistant professor at Shoolini University.</p>";
-                    prof_href = "contact@dmj.one";
-                    prof_href += "?subject=Want%20to%20contact%20Dr.%20Ravinder%20Thakur&body=Hello%2C%20I%20want%20to%20contact%20Dr.%20Ravinder%20Thakur.%20Please%20provide%20his%20contact%20details.%0AThanks";
-                    course = "CSU951";
-                    course_detail = "Basic Mathematics";
-                    break;
-                case "csu730":
-                    prof = "Rajesh Williams";
-                    prof_bio = "<p>Rajesh Williams is an English Language professional from Faculty of Liberal Arts.</p>";
-                    prof_href = "contact@dmj.one";
-                    prof_href += "?subject=Want%20to%20contact%20Dr.%20Ravinder%20Thakur&body=Hello%2C%20I%20want%20to%20contact%20Rajesh%20Williams.%20Please%20provide%20his%20contact%20details.%0AThanks";
-                    course = "CSU730";
-                    course_detail = "Functional English - 1";
-                    break;
-                default:
-                    prof = "";
-                    prof_bio = "";
-                    prof_href = "";
-                    course = "Study @ Shoolini University";
-                    course_detail = "2026";
-                    break;
-            }
-            break;
-        case "life":
-            switch (folder) {
-                case "events":
-                    var details = "test";
-                    break;
-                case "photos":
-                    var defaultsd = "testffrd";
-                    break;
-                default:
-                    var slse = "ds";
-                    break;
-            }
-            break;
-        default:
-            prof = "";
-            prof_bio = "";
-            prof_href = "";
-            course = "B. Tech CSE @ Shoolini University";
-            course_detail = "Education should be free. Our initiative is to educate the section of people who can not access the educational services.";
-            break;
-    }
-
-
-
-
-    var row_button_start = '<div class="row" style="padding-bottom:30px;">';
-    var row_button_end = "</div>";
-    // Just write the content in the vars
-    var csu1128_button = '<div class="col"><a href="//dmj.one/edu/su/course/csu1128/"><button type="button" class="btn btn-light w-100" data-toggle="tooltip" data-placement="top" title="Logic Building with Computer Programming">CSU1128</button></a></div>';
-    var csu1128p_button = '<div class="col"><a href="//dmj.one/edu/su/course/csu1128p/"><button type="button" class="btn btn-light w-100" data-toggle="tooltip" data-placement="top" title="Logic Building with Computer Programming Lab!">CSU1128(P)</button></a></div>';
-    var fsu030_button = "";
-    var csu953_button = "";
-
-
-    // switch the course and store the value in bottons which is then returned to button through arrow function. usage:-  course_code: things to load if that course code matches. 
-    const button = (() => {
-        const buttons = {
-            "": csu1128_button || csu1128p_button ? row_button_start + csu1128_button + csu1128p_button + row_button_end : null,
-            "CSU1128": csu1128_button || csu1128p_button ? row_button_start + csu1128_button + csu1128p_button + row_button_end : null,
-            "CSU1128(P)": csu1128_button || csu1128p_button ? row_button_start + csu1128_button + csu1128p_button + row_button_end : null,
-            "FSU030": fsu030_button ? row_button_start + fsu030_button + row_button_end : null,
-            "CSU953": csu953_button ? row_button_start + csu953_button + row_button_end : null
-        }
-        return buttons[course] || ""
-    })();
-
-    profname = `<strong>${prof}</strong>`;
-    prof_link = `<a href="${prof_href}" data-toggle="tooltip" data-placement="top" title="Get in touch with ${prof}" data-original-title="Get in touch with ${prof}"> <i class="bi bi-envelope-plus text-light"></i></a>`;
-    // authorname = `<strong>${author}</strong>`;
-    //    author_link = `<a href="${author_href}" data-toggle="tooltip" data-placement="top" title="Get in touch with ${author}" data-original-title="Get in touch with ${author}"> <i class="bi bi-envelope-plus text-light"></i></a>`;
-
-
-    prof_bio = file && file.length ? "" : prof_bio;
-    // var author_bio = file && file.length ? "" : "";
-
-    course_detail = secondary ? " (" + course_detail + ")" : "";
-    course = `<h1>${course} ${course_detail}</h1>`;
-    under_guidance = prof ? " under the guidance of " : "";
-    prof_link = prof ? prof_link : "";
-
-
-    // var allAuthors = `<span id="authorlist">${head_FormatAuthor(...authorTextArr)}</span>`;
-    // document.write("<header>" + course + "<p>Summarized by " + authorname + author_link + under_guidance + profname + prof_link + "</p>" + prof_bio + author_bio + button + "</header>" + header_navbar());
-    // finalheaders = "<header>" + course + "<p>Summarized by " + authorname + author_link + under_guidance + profname + prof_link + "</p>" + prof_bio + author_bio + button + "</header>" + header_navbar();
-    finalheaders = "<header>" + course + "<p>Summarized by " + allAuthors + under_guidance + profname + prof_link + "</p>" + prof_bio + author_bio + button + "</header>" + header_navbar();
+    const finalheaders = "<header>" + line1 + line2 + line3 + line4 + "</header>" + header_navbar();
     document.body.insertAdjacentHTML('afterbegin', finalheaders);
 }
 
@@ -587,27 +431,7 @@ function body_genmenu(course) {
     // Substituted document.write(body_generated); by DOMContentLoaded for automation
 
     const datetogen = "February 2, 2023"; // Change this date to reflect it everywhere.
-    if (course) {
-        switch (course) {
-            case "csu953":
-            case "csu1128":
-            case "csu1128p":
-            case "csu730":
-            case "csu951":
-            case "fsu030":
-                get_menu_list(datetogen);
-                break;
-            default:
-                link = "#";
-                date = "Not Applicable";
-                title = "The current " + course + " has not been defined.";
-                desc = "Please define an hierchy in js for the course " + course + ".";
-                codetype = "#CourseNotDefined";
-                readtime = "0";
-                body_blockcards(link, date, title, desc, codetype, readtime, 1);
-                break;
-        }
-    } else { get_menu_list(datetogen) };
+    get_menu_list(datetogen);
     // Substitution for document.write(gen_end); due to automation
     // document.addEventListener("DOMContentLoaded", function () {
     agenmenu.innerHTML += gen_end;
@@ -1598,26 +1422,6 @@ function gen_blockquote() {
 
 
 /******** Include all the Google ad / analytics and Microsoft Clarity codes. *******/
-/* (function () {
-    var script1 = document.createElement('script');
-    script1.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9436488945721774";
-    document.head.appendChild(script1);
-
-    var script2 = document.createElement('script');
-    script2.src = "https://www.googletagmanager.com/gtag/js?id=G-GYE73EC1RV";
-    document.head.appendChild(script2);
-
-    script1.onload = function () { }
-
-    script2.onload = function () {
-        window.dataLayer = window.dataLayer || []; function gtag() { dataLayer.push(arguments); } gtag('js', new Date()); gtag('config', 'G-GYE73EC1RV');
-        (function (w, d, s, l, i) { w[l] = w[l] || []; w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' }); var f = d.getElementsByTagName(s)[0], j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f); })(window, document, 'script', 'dataLayer', 'GTM-N7J6QJX');
-        (function (w, d, s, l, i) { w[l] = w[l] || []; w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' }); var f = d.getElementsByTagName(s)[0], j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f); })(window, document, 'script', 'dataLayer', 'GTM-PQ4VPSD');
-        (function (c, l, a, r, i, t, y) { c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments) }; t = l.createElement(r); t.async = 1; t.src = "https://www.clarity.ms/tag/" + i; y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y); })(window, document, "clarity", "script", "fhsj5p7qsd");
-    }
-})();
- */
-// Another way 
 (function () {
     // Microsoft Clarity
     var microsoftClarity = document.createElement('script');
@@ -1662,8 +1466,6 @@ function gen_blockquote() {
     document.head.appendChild(googleAdsenseErrorProtection);
     /* Adsense End */
 })();
-
-
 
 /******* get reading time required *******/
 window.onload = function () {
