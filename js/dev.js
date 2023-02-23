@@ -500,7 +500,7 @@ function body_blockcards(link, date, title, desc, codetype, readtime, author, se
     var color = ["yellow", "blue", "red", "green"];
     var getcolor = color[randomNum(0, 3)];
     // https://picsum.photos/
-    body_generated += `<div class="m-4 my-5 postcard light shadow ${getcolor}">`;
+    body_generated += `<div class="m-0 my-5 postcard light shadow ${getcolor}">`;
     body_generated += `<a class="postcard__img_link" href="${link}">${imgTag}</a>`;
     body_generated += `<div class="postcard__text t-dark"><h1 class="postcard__title blue"><a href="${link}">${title}</a></h1>`;
     body_generated += `<div class="postcard__subtitle small"><i class="bi bi-calendar3"></i>&nbsp;&nbsp;${date}</div>`;
