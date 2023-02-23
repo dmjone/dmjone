@@ -870,23 +870,30 @@ function gen_blockquote() {
     }
 })();
 
-/*** Birthday Baloons ***/
+/*** Birthday Balloons ***/
 (function () {
     const isBirthday = () => {
-        const today = new Date();
-        const birthdate = new Date("2023-02-23");
-        return today.getMonth() === birthdate.getMonth() && today.getDate() === birthdate.getDate();
+        const date = new Date();
+        const day = date.getDate();
+        const month = date.getMonth() + 1;
+        return day === 25 && month === 2; // Change the date to the birthday date you want to celebrate
     };
 
     if (isBirthday()) {
         function createBalloon() {
-            const balloon = document.createElement("div");
+            const balloon = document.createElement("img");
+            const randomNumber = Math.floor(Math.random() * 5) + 1; // generate a random number between 1 and 5
+            const url = `/img/balloon${randomNumber}.png`; // generate the balloon URL based on the random number
+            const hue = Math.floor(Math.random() * 360); // Generate a random hue value between 0 and 360
+            balloon.src = url;
             balloon.classList.add("balloon");
+            balloon.style.filter = `hue-rotate(${hue}deg)`; // Apply the random hue rotation to the image
             balloon.style.left = Math.random() * window.innerWidth + "px";
             balloon.style.top = window.innerHeight + "px";
-            balloon.style.width = (Math.random() * 100 + 50) + "px";
+            balloon.style.width = (Math.random() * 20 + 10) + "px";
             balloon.style.height = balloon.style.width;
-            balloon.speed = Math.random() * 2 + 1;
+            balloon.speed = Math.random() * 0.01 + 0.01;
+            balloon.easing = Math.random() * 0.2 + 0.1;
             document.body.appendChild(balloon);
             return balloon;
         }
@@ -895,6 +902,7 @@ function gen_blockquote() {
             const top = parseFloat(balloon.style.top);
             const newTop = top - balloon.speed;
             balloon.style.top = newTop + "px";
+            balloon.speed += balloon.easing; // Ease In
             if (newTop < 0) {
                 balloon.remove();
             }
@@ -904,14 +912,15 @@ function gen_blockquote() {
             const balloon = createBalloon();
             setInterval(() => {
                 moveBalloon(balloon);
-            }, Math.floor(Math.random() * 100) + 10);
-        }, Math.floor(Math.random() * 300) + 50);
+            }, Math.floor(Math.random() * 30) + 10);
+        }, Math.floor(Math.random() * 100) + 10);
 
         setTimeout(() => {
             clearInterval(balloonInterval);
-        }, Math.floor(Math.random() * 3000) + 2000);
+        }, Math.floor(Math.random() * 4000) + 1000);
     }
 })();
+
 
 /** Fireworks **/
 (function () {
