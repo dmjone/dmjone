@@ -50,22 +50,31 @@ function get_menu_list(datetogen) {
                 semester: "Semester 1"
             },
             {
-                /* link: "csu951/",
+                link: "csu951/",
                 title: "Engineering Mathematics",
-                desc: "<strong>WIP: Work in Progress! </strong> No content uploaded",
+                desc: "Unlock your potential in mathematics and excel in your academic pursuits with Engineering Mathematics by Dr. Ravinder Thakur. This course will equip you with the fundamental concepts of mathematics and provide you with the tools necessary to succeed in the subject.",
                 codetype: "CSU951",
-                semester: 1 */
+                semester: 1
+            },
+            {
+                link: "csu585/",
+                title: "Design Thinking",
+                desc: "Approach problems with a new perspective in CSU585: Design Thinking by Dr. Namita Gandotra. Develop an innovative, creative and problem-solving mindset.",
+                codetype: "CSU585",
+                semester: 2,
+                date: "Fri February 24, 2023"
             }
         ];
 
-        // Fisher-Yates shuffle algorithm to randomly shuffle an array
-        arr = (function (array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-            return array;
-        })(arr);
+        arr.reverse(); // For semester to come at top. 
+        // // Fisher-Yates shuffle algorithm to randomly shuffle an array
+        // arr = (function (array) {
+        //     for (let i = array.length - 1; i > 0; i--) {
+        //         const j = Math.floor(Math.random() * (i + 1));
+        //         [array[i], array[j]] = [array[j], array[i]];
+        //     }
+        //     return array;
+        // })(arr);
 
         for (let i = 0; i < arr.length; i++) { // display in ascendening order
             // for (let i = arr.length - 1; i >= 0; i--) { // display in reverse order. 

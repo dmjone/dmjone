@@ -146,7 +146,7 @@
         script.onload = function () {
             loaded++; // Increment the counter
             if (loaded === scripts.length) { // Check if all scripts have finished loading. If it is then Execute the onload code here                
-                window.addEventListener("load", function () {
+                // window.addEventListener("load", function () {
                     hljs.highlightAll(); // Highlight js init - single line code. 
 
                     // KaTex Math js START
@@ -163,7 +163,7 @@
                         throwOnError: false
                     });
                     // KaTex Math js END
-                });
+               //  });
             }
         };
         document.head.appendChild(script); // Append the script element to the head of the document

@@ -3,10 +3,10 @@ function get_menu_list(datetogen) {
     function get_main(def_date, def_author) {
         const arr = [
             {
-                link: "praxis/",
-                title: "Theories and Activities",
+                link: "insight/",
+                title: "Exploring the World of Design Thinking",
                 desc: "Get ready to unlock the power of creative problem-solving with Design Thinking! Discover innovative theories and approaches that can help you design effective solutions to complex problems. With Design Thinking, you can turn your ideas into reality and achieve your goals. Let's explore the possibilities!",
-                codetype: "Praxis"
+                codetype: "Insight"
             },
             /* {
                 link: "misc/",
@@ -27,7 +27,7 @@ function get_menu_list(datetogen) {
             body_blockcards(link, date, title, desc, codetype, readtime, author);
         }
     }
-    function get_praxis(def_date, def_author) {
+    function get_insight(def_date, def_author) {
         const arr = [
             {
                 title: "What is Design Thinking",
@@ -45,7 +45,7 @@ function get_menu_list(datetogen) {
             link = _data.link || `s${i + 1}`;
             date = _data.date ? _data.date : `${gendate(def_date)}`;
             desc = _data.desc || `${title} ${i}`;
-            codetype = _data.codetype ? `Physics | ${_data.codetype}` : `Physics | Section`;
+            codetype = _data.codetype ? `Design Thinking | ${_data.codetype}` : `Design Thinking | Introduction`;
             readtime = _data.readtime || r(14);
             author = _data.author || def_author;
             body_blockcards(link, date, title, desc, codetype, readtime, author);
@@ -110,10 +110,9 @@ function get_menu_list(datetogen) {
         return outputDate;
     }
     function r(t) { return Math.floor(Math.random() * 10) + t };
-    var dated = "December 25, 2022";
     var title, desc, codetype, readtime, author = 1, link;
     const functions = {
-        praxis: get_praxis,
+        insight: get_insight,
         // seminar: get_seminar,
         // assignment: get_assignment,
         default: get_main
