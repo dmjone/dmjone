@@ -151,15 +151,15 @@
                 autorender.innerHTML = `
 hljs.highlightAll(); // Highlight js init - single line code. 
 // renderMathInElement(document.body); // KaTex Math js
-renderMathInElement(document.body, {
-    delimiters: [
-        { left: '$$', right: '$$', display: true },
-        { left: '$', right: '$', display: false },
-        { left: '\\(', right: '\\)', display: false },
-        { left: '\\[', right: '\\]', display: true }
-    ],
-    throwOnError: false
-});
+// renderMathInElement(document.body, {
+//     delimiters: [
+//         { left: '$$', right: '$$', display: true },
+//         { left: '$', right: '$', display: false },
+//         { left: '\\(', right: '\\)', display: false },
+//         { left: '\\[', right: '\\]', display: true }
+//     ],
+//     throwOnError: false
+// });
                 `;
                 document.head.appendChild(autorender);
 
