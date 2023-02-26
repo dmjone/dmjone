@@ -146,22 +146,24 @@
         script.onload = function () {
             loaded++; // Increment the counter
             if (loaded === scripts.length) { // Check if all scripts have finished loading. If it is then Execute the onload code here                
-                hljs.highlightAll(); // Highlight js init - single line code. 
+                window.addEventListener("load", function () {
+                    hljs.highlightAll(); // Highlight js init - single line code. 
 
-                // KaTex Math js START
-                renderMathInElement(document.body, {
-                    // customised options
-                    // • auto-render specific keys, e.g.:
-                    delimiters: [
-                        { left: '$$', right: '$$', display: true },
-                        { left: '$', right: '$', display: false },
-                        { left: '\\(', right: '\\)', display: false },
-                        { left: '\\[', right: '\\]', display: true }
-                    ],
-                    // • rendering keys, e.g.:
-                    throwOnError: false
+                    // KaTex Math js START
+                    renderMathInElement(document.body, {
+                        // customised options
+                        // • auto-render specific keys, e.g.:
+                        delimiters: [
+                            { left: '$$', right: '$$', display: true },
+                            { left: '$', right: '$', display: false },
+                            { left: '\\(', right: '\\)', display: false },
+                            { left: '\\[', right: '\\]', display: true }
+                        ],
+                        // • rendering keys, e.g.:
+                        throwOnError: false
+                    });
+                    // KaTex Math js END
                 });
-                // KaTex Math js END
             }
         };
         document.head.appendChild(script); // Append the script element to the head of the document
@@ -265,7 +267,7 @@ function header_navbar() {
             } else {
                 var linkactive = ' active" aria-current="page"';
             }
-            if (links[i] == "csu951" || links[i] == "csu934") {
+            if (links[i] == "csu5543" || links[i] == "csu934") {
                 li_link += `<li><a class="dropdown-item ${linkactive} href="/edu/su/course/${links[i]}/" data-toggle="tooltip" data-placement="top" title="Work In Progress. Section will be available soon." data-original-title="Work In Progress. Section will be available soon.">${links[i].toUpperCase()} <strong>[WIP]</strong></a></li>`;
             } else {
                 li_link += `<li><a class="dropdown-item ${linkactive} href="/edu/su/course/${links[i]}/">${links[i].toUpperCase()}</a></li>`;
@@ -319,8 +321,8 @@ function header_navbar() {
     var common_nav_end = '</ul><!--- <form class="d-flex" role="search"><input class="form-control me-2" type="search" placeholder="Search" aria-label="Search"><button class="btn btn-outline-light" type="submit">Search</button></form> --></div></div></nav>';
 
     // Send array of links to create link for dropdown
-    var year1_links = ["1<sup>st</sup> Year", "csu1128p", "csu1128", "csu953", "fsu030", "csu730", "csu951"];
-    var visible_links = ["csu1128p", "csu1128", "csu953", "fsu030", "csu730"].sort();
+    var year1_links = ["1<sup>st</sup> Year", "csu1128p", "csu1128", "csu953", "fsu030", "csu730", "csu951", "csu585"];
+    var visible_links = ["csu585"].sort();
 
     var alllinks = nav_createDropdown(year1_links) + nav_createMainNav(visible_links);
 
@@ -913,7 +915,7 @@ function gen_blockquote() {
             setInterval(() => {
                 moveBalloon(balloon);
             }, Math.floor(Math.random() * 30) + 10);
-        }, Math.floor(Math.random() * 100) + 10);
+        }, Math.floor(Math.random() * 400) + 10);
 
         setTimeout(() => {
             clearInterval(balloonInterval);

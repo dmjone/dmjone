@@ -173,6 +173,13 @@ function processFolder(allAuthors, author_bio) {
                                     course = "CSU730";
                                     course_detail = "Functional English - 1";
                                     break;
+                                case "csu585":
+                                    prof = "Dr. Namita Gandotra";
+                                    prof_bio = "<p>Dr Namita Gandotra has been working with Shoolini University from 2012. Her field of specialisation is Soft Computing and its Applications in Decision Making. She worked at IITT Kala Amb, Sirmour (HP) from 2009 to 2011. She teaches Computer Architecture, Software Engineering, Unix Internals and Programming, etc. She holds nine years of teaching experience.</p>";
+                                    prof_href = "namita@shooliniuniversity.com";
+                                    course = "CSU585";
+                                    course_detail = "Design Thinking";
+                                    break;
                                 default:
                                     prof = "";
                                     prof_bio = "";
