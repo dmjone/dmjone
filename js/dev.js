@@ -145,21 +145,37 @@
         script.defer = true;
         script.onload = function () {
             loaded++; // Increment the counter
-            if (loaded === scripts.length) { // Check if all scripts have finished loading. If it is then Execute the onload code here                
+            if (loaded === scripts.length) { // Check if all scripts have finished loading. If it is then Execute the onload code here
 
-                hljs.highlightAll(); // Highlight js init - single line code. 
+                var autorender = document.createElement('script');
+                autorender.innerHTML = `
+hljs.highlightAll(); // Highlight js init - single line code. 
+// renderMathInElement(document.body); // KaTex Math js
+renderMathInElement(document.body, {
+    delimiters: [
+        { left: '$$', right: '$$', display: true },
+        { left: '$', right: '$', display: false },
+        { left: '\\(', right: '\\)', display: false },
+        { left: '\\[', right: '\\]', display: true }
+    ],
+    throwOnError: false
+});
+                `;
+                document.head.appendChild(autorender);
 
-                // KaTex Math js START
-                renderMathInElement(document.body, {
-                    delimiters: [{ left: '$$', right: '$$', display: true },
-                    { left: '$', right: '$', display: false },
-                    { left: '\\(', right: '\\)', display: false },
-                    { left: '\\[', right: '\\]', display: true }],
-                    throwOnError: false
-                });
-                // KaTex Math js END
-                
-            }            
+                // hljs.highlightAll(); // Highlight js init - single line code. 
+                // renderMathInElement(document.body); // KaTex Math js
+
+                /*                 // KaTex Math js START
+                                renderMathInElement(document.body, {
+                                    delimiters: [{ left: '$$', right: '$$', display: true },
+                                    { left: '$', right: '$', display: false },
+                                    { left: '\\(', right: '\\)', display: false },
+                                    { left: '\\[', right: '\\]', display: true }],
+                                    throwOnError: false
+                                });
+                                // KaTex Math js END */
+            }
         };
         document.head.appendChild(script); // Append the script element to the head of the document
     }
