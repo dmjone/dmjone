@@ -132,8 +132,8 @@
     var cdnjs_jquery = "https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js";
     var cdnjs_bootstrap = "https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0-alpha1/js/bootstrap.bundle.min.js";
     var cdnjs_highlightjs = "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/highlight.min.js";
-    var cdnjs_katex = "https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.3/katex.min.js";
-    var cdnjs_katex_autorender = "https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.3/contrib/auto-render.min.js";
+    var cdnjs_katex = "https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js";
+    var cdnjs_katex_autorender = "https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js";
 
     // Create an array of script URLs
     var scripts = [cdnjs_jquery, cdnjs_bootstrap, cdnjs_highlightjs, cdnjs_katex, cdnjs_katex_autorender];
@@ -146,25 +146,20 @@
         script.onload = function () {
             loaded++; // Increment the counter
             if (loaded === scripts.length) { // Check if all scripts have finished loading. If it is then Execute the onload code here                
-                // window.addEventListener("load", function () {
-                    hljs.highlightAll(); // Highlight js init - single line code. 
 
-                    // KaTex Math js START
-                    renderMathInElement(document.body, {
-                        // customised options
-                        // • auto-render specific keys, e.g.:
-                        delimiters: [
-                            { left: '$$', right: '$$', display: true },
-                            { left: '$', right: '$', display: false },
-                            { left: '\\(', right: '\\)', display: false },
-                            { left: '\\[', right: '\\]', display: true }
-                        ],
-                        // • rendering keys, e.g.:
-                        throwOnError: false
-                    });
-                    // KaTex Math js END
-               //  });
-            }
+                hljs.highlightAll(); // Highlight js init - single line code. 
+
+                // KaTex Math js START
+                renderMathInElement(document.body, {
+                    delimiters: [{ left: '$$', right: '$$', display: true },
+                    { left: '$', right: '$', display: false },
+                    { left: '\\(', right: '\\)', display: false },
+                    { left: '\\[', right: '\\]', display: true }],
+                    throwOnError: false
+                });
+                // KaTex Math js END
+                
+            }            
         };
         document.head.appendChild(script); // Append the script element to the head of the document
     }
