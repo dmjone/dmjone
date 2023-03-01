@@ -4,9 +4,9 @@ function get_menu_list(datetogen) {
         const arr = [
             {
                 link: "differential/",
-                title: "Matrix",
-                desc: "Dive into the exciting world of matrices! Discover how these powerful mathematical tools are used to solve linear equations, analyze data, and more. Explore basic and advanced concepts, including matrix properties, operations, and applications. Get ready to transform your understanding of mathematics!",
-                codetype: "Matrix"
+                title: "Differential Equations",
+                desc: "Dive into the exciting world of Differentials! Discover how these powerful mathematical tools are used to solve linear equations, analyze data, and more. Explore basic and advanced concepts, including properties, operations, and applications. Get ready to transform your understanding of mathematics!",
+                codetype: "Differentiation"
             },
             /* {
                 link: "seminar/",
@@ -33,11 +33,11 @@ function get_menu_list(datetogen) {
             body_blockcards(link, date, title, desc, codetype, readtime, author);
         }
     }
-    function get_matrix(def_date, def_author) {
+    function get_differential(def_date, def_author) {
         const arr = [
             {
                 title: "Concepts of Differential",
-                desc: "Step into the world of matrices! Discover the fundamental tools used in fields like engineering, physics, and computer science. This topic covers everything from basic operations to advanced concepts like eigenvalues and eigenvectors. Unleash the power of matrices and unlock new dimensions in problem-solving. Get ready to matrix your way to success!",
+                desc: "Step into the world of differentials! Discover the fundamental tools used in fields like engineering, physics, and computer science. This topic covers everything from basic operations to advanced concepts. Unleash the power of differentials and unlock new dimensions in problem-solving. Get ready to differentiate your way to success!",
                 link: "concepts"
             },
             /* {
@@ -119,7 +119,7 @@ function get_menu_list(datetogen) {
     var dated = "December 25, 2022";
     var title, desc, codetype, readtime, author = 1, link;
     const functions = {
-        matrix: get_matrix,
+        differential: get_differential,
         default: get_main
     };
     (functions[window.urlpart5] || functions.default)(datetogen, author);

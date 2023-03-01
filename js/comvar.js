@@ -194,6 +194,13 @@ function processFolder(allAuthors, author_bio) {
                                     course = "CSU1287p";
                                     course_detail = "OOPS Using C++ Language Lab";
                                     break;
+                                case "fsu013":
+                                    prof = "Dr. Ravinder Thakur";
+                                    prof_bio = "<p>Dr. Ravinder Thakur is an assistant professor at Shoolini University.</p>";
+                                    prof_href = "contact@dmj.one";
+                                    course = "FSU013";
+                                    course_detail = "Advanced Mathematics";
+                                    break;
                                 default:
                                     prof = "";
                                     prof_bio = "";
