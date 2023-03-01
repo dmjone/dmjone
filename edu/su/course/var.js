@@ -63,7 +63,22 @@ function get_menu_list(datetogen) {
                 codetype: "CSU585",
                 semester: 2,
                 date: "Fri February 24, 2023"
-            }
+            },
+            // {
+            //     link: "csu1287/",
+            //     title: "OOPS Using C++ Language",
+            //     desc: "Approach problems with a new perspective in CSU585: Design Thinking by Dr. Namita Gandotra. Develop an innovative, creative and problem-solving mindset.",
+            //     codetype: "CSU1287 | CSU1287(P)",
+            //     semester: 2,
+            //     date: "Tue February 28, 2023"
+            // },
+            // {
+            //     link: "fsu013/",
+            //     title: "Engineering Mathematics 2",
+            //     desc: "Unlock your potential in mathematics and excel in your academic pursuits with Engineering Mathematics by Dr. Ravinder Thakur. This course will equip you with the fundamental concepts of mathematics and provide you with the tools necessary to succeed in the subject.",
+            //     codetype: "FSU013",
+            //     semester: 2
+            // },
         ];
 
         arr.reverse(); // For semester to come at top. 

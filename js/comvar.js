@@ -180,6 +180,20 @@ function processFolder(allAuthors, author_bio) {
                                     course = "CSU585";
                                     course_detail = "Design Thinking";
                                     break;
+                                case "csu1287":
+                                    prof = "Dr. Pankaj Vaidya";
+                                    prof_bio = "<p>Dr. Pankaj Vaidya is the Head of the Yogananda School of AI, Computers and Data Sciences. He holds 22 years of teaching experience and is conducting research in Machine Learning and Drug Discovery using Machine Learning. He completed his M Tech (2005) and received PhD (2020) in Computer Science Engineering from Shoolini University.</p>";
+                                    prof_href = "pankaj.vaidya@shooliniuniversity.com";
+                                    course = "CSU1287";
+                                    course_detail = "OOPS Using C++ Language";
+                                    break;
+                                case "csu1287p":
+                                    prof = "Dr. Pankaj Vaidya";
+                                    prof_bio = "<p>Dr. Pankaj Vaidya is the Head of the Yogananda School of AI, Computers and Data Sciences. He holds 22 years of teaching experience and is conducting research in Machine Learning and Drug Discovery using Machine Learning. He completed his M Tech (2005) and received PhD (2020) in Computer Science Engineering from Shoolini University.</p>";
+                                    prof_href = "pankaj.vaidya@shooliniuniversity.com";
+                                    course = "CSU1287p";
+                                    course_detail = "OOPS Using C++ Language Lab";
+                                    break;
                                 default:
                                     prof = "";
                                     prof_bio = "";
