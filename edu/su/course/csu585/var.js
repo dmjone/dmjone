@@ -34,10 +34,11 @@ function get_menu_list(datetogen) {
                 desc: "Discover the innovative problem-solving approach of Design Thinking. Explore its core principles, stages, and methods to create effective solutions.",
                 link: "introduction"
             },
-            // {
-            //     title: "Section B: Electricity and Magnetism",
-            //     desc: "Get ready to explore Electricity & Magnetism! Learn about electric field & potential, dielectric polarization, displacement current, Maxwell's equations, velocity of EM waves, electromagnetic spectrum, magnetic materials, superconductivity, ultrasonic waves, Type I & Type II superconductors and more. Get ready to electrify your knowledge!"
-            // }
+            {
+                title: "Why Design Thinking",
+                desc: "Discover the powerful human-centered approach of design thinking that fosters creativity, empathy, and experimentation in problem-solving. Click to learn how it can transform the way you work and create value for people.",
+                link: "whydesignthinking"
+            }
         ];
         for (let i = 0; i < arr.length; i++) {
             const _data = arr[i];

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Screen Recorder</title>
+        <style>
+            body {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                margin: 0;
+            }
+
+            button {
+                font-size: 1.5em;
+                padding: 10px;
+                cursor: pointer;
+                margin: 5px;
+            }
+        </style>
+    </head>
+
+    <body>
+        <button id="recordBtn">Record</button>
+        <button id="stopBtn" disabled>Stop</button>
+        <script>
+            const recordBtn = document.getElementById("recordBtn");
+            const stopBtn = document.getElementById("stopBtn");
+            let chunks = [];
+            let recorder, stream, audioStream, audioCtx, gainNode;
+
+            recordBtn.addEventListener("click", async () => {
+                let audioChoice = prompt("Please select an option from the menu below:\n\n1. System audio\n2. Microphone audio\n3. Both system and microphone audio\n\nEnter the corresponding number of your choice:");
+
+                switch (audioChoice) {
+                    case "1":
+                        audioChoice = "system"; // Code to handle system audio
+                        break;
+                    case "2":
+                        audioChoice = "microphone"; // Code to handle microphone audio
+                        break;
+                    case "3":
+                        audioChoice = "both"; // Code to handle both system and microphone audio
+                        break;
+                    default:
+                        alert("Invalid input. Only 1, 2, and 3 for 'system', 'microphone', or 'both' are allowed."); // Code to handle invalid input
+                        break;
+                }
+
+                // const audioChoice = prompt("Enter 'system' for system audio, 'microphone' for microphone audio, or 'both' for both.");
+
+                let audioConstraints;
+
+                if (audioChoice === "microphone" || audioChoice === "both") {
+                    audioConstraints = { audio: true };
+                } else if (audioChoice === "system") {
+                    audioConstraints = { audio: { mandatory: { chromeMediaSource: "desktop" } } };
+                } else {
+                    alert("Invalid input. Only 'system', 'microphone', or 'both' are allowed.");
+                    return;
+                }
+
+                try {
+                    stream = await navigator.mediaDevices.getDisplayMedia({
+                        video: {
+                            width: { ideal: 1920 },
+                            height: { ideal: 1080 },
+                        },
+                        audio: audioConstraints.audio === true ? false : audioConstraints,
+                    });
+
+                    if (audioChoice === "microphone" || audioChoice === "both") {
+                        audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+                        if (audioChoice === "microphone") {
+                            audioCtx = new AudioContext();
+                            const source = audioCtx.createMediaStreamSource(audioStream);
+                            gainNode = audioCtx.createGain();
+                            source.connect(gainNode);
+                            gainNode.connect(audioCtx.destination);
+                            gainNode.gain.value = 2;
+                        }
+
+                        stream.addTrack(audioStream.getAudioTracks()[0]);
+                    }
+
+                    recorder = new MediaRecorder(stream, { mimeType: "video/webm; codecs=vp9" });
+                    recorder.ondataavailable = (e) => chunks.push(e.data);
+                    recorder.onstop = () => {
+                        const blob = new Blob(chunks, { type: "video/webm" });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement("a");
+                        a.href = url;
+                        a.download = "screen-recording.webm";
+                        a.click();
+                        URL.revokeObjectURL(url);
+                        chunks = [];
+                    };
+                    recorder.start();
+                    stopBtn.disabled = false;
+                    recordBtn.disabled = true;
+                } catch (err) {
+                    console.error("Error: " + err);
+                }
+            });
+
+            stopBtn.addEventListener("click", () => {
+                recorder.stop();
+                stream.getTracks().forEach(track => track.stop());
+                if (audioStream) {
+                    audioStream.getTracks().forEach(track => track.stop());
+                    if (gainNode) {
+                        gainNode.disconnect(audioCtx.destination);
+                    }
+                }
+                recordBtn.disabled = false;
+                stopBtn.disabled = true;
+            });
+        </script>
+    </body>
+
+</html>
