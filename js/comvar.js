@@ -201,6 +201,22 @@ function processFolder(allAuthors, author_bio) {
                                     course = "FSU013";
                                     course_detail = "Advanced Mathematics";
                                     break;
+                                case "csu1051":
+                                    switch (urlpart5) {
+                                        case 'lab':
+                                            prof = "Archit Joshi";
+                                            prof_bio = "<p>Dr. Ravinder Thakur is an assistant professor at Shoolini University.</p>";
+                                            prof_href = "contact@dmj.one";
+                                            course = "CSU1051";
+                                            course_detail = "Algorithms and Data Structure";
+                                            break;
+                                    }
+                                    prof = "Archit Joshi";
+                                    prof_bio = "<p>Archit Joshi is an assistant professor at Shoolini University.</p>";
+                                    prof_href = "contact@dmj.one";
+                                    course = "CSU1051";
+                                    course_detail = "Algorithms and Data Structure";
+                                    break;
                                 default:
                                     prof = "";
                                     prof_bio = "";
