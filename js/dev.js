@@ -332,8 +332,8 @@ function header_navbar() {
     var common_nav_end = '</ul><!--- <form class="d-flex" role="search"><input class="form-control me-2" type="search" placeholder="Search" aria-label="Search"><button class="btn btn-outline-light" type="submit">Search</button></form> --></div></div></nav>';
 
     // Send array of links to create link for dropdown
-    var year1_links = ["1<sup>st</sup> Year", "csu1128p", "csu1128", "csu953", "fsu030", "csu730", "csu951", "csu585"];
-    var visible_links = ["csu585"].sort();
+    var year1_links = ["1<sup>st</sup> Year", "csu1128p", "csu1128", "csu953", "fsu030", "csu730", "csu951", "csu585", "csu1051"];
+    var visible_links = ["csu585", "csu1051"].sort();
 
     var alllinks = nav_createDropdown(year1_links) + nav_createMainNav(visible_links);
 

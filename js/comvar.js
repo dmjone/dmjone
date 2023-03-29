@@ -204,18 +204,20 @@ function processFolder(allAuthors, author_bio) {
                                 case "csu1051":
                                     switch (urlpart5) {
                                         case 'lab':
-                                            prof = "Archit Joshi";
-                                            prof_bio = "<p>Dr. Ravinder Thakur is an assistant professor at Shoolini University.</p>";
+                                            prof = "Aarchit Joshi";
+                                            prof_bio = "<p>Aarchit Joshi is an assistant professor at Shoolini University.</p>";
+                                            prof_href = "contact@dmj.one";
+                                            course = "CSU1051";
+                                            course_detail = "Algorithms and Data Structure";
+                                            break;
+                                        default:
+                                            prof = "Dr. Laxman Kathait";
+                                            prof_bio = "<p>Dr. Laxman Kathait is an assistant professor at Shoolini University.</p>";
                                             prof_href = "contact@dmj.one";
                                             course = "CSU1051";
                                             course_detail = "Algorithms and Data Structure";
                                             break;
                                     }
-                                    prof = "Archit Joshi";
-                                    prof_bio = "<p>Archit Joshi is an assistant professor at Shoolini University.</p>";
-                                    prof_href = "contact@dmj.one";
-                                    course = "CSU1051";
-                                    course_detail = "Algorithms and Data Structure";
                                     break;
                                 default:
                                     prof = "";

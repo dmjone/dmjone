@@ -4,14 +4,14 @@ function get_menu_list(datetogen) {
         const arr = [
             {
                 link: "class/",
-                title: "All the topics done in class",
-                desc: "All the topics done in class.",
+                title: "📚 Master Data Structures & Algorithms with Our Class Topics!",
+                desc: "Explore a comprehensive collection of Data Structures & Algorithms class topics.",
                 codetype: "CSU1051 | Class"
             },
             {
                 link: "lab/",
-                title: "All the practicals done in Lab",
-                desc: "All the practicals done in Lab",
+                title: "🔬 Get Hands-On Experience with Data Structures & Algorithms Lab Practicals!",
+                desc: "Discover practical and hands-on learning for Data Structures & Algorithms.",
                 codetype: "CSU1051P | Lab"
             }
         ];
@@ -30,8 +30,8 @@ function get_menu_list(datetogen) {
     function get_class(def_date, def_author) {
         const arr = [
             {
-                title: "DSA Introduction",
-                desc: "Introductory Topics",
+                title: "DSA Introduction: Key Concepts and Differences",
+                desc: "This introduction to Data Structures and Algorithms will cover the distinctions between unions and structures, as well as the differences between primitive and non-primitive data structures, and linear and non-linear data structures.",
                 codetype: "Introduction"
             },
             // {
@@ -54,18 +54,18 @@ function get_menu_list(datetogen) {
     function get_lab(def_date, def_author) {
         const arr = [
             {
-                title: "Lab 1",
-                desc: "To verify the truth table of various basic Logic Gates."
+                title: "Lab 1: Introduction to Data Structure",
+                desc: "This lab will provide an overview of key concepts related to data and information management. You will learn about databases, big data, data warehouses, different types of data structures, and the importance of data structures and algorithms. Additionally, you will explore the differences between data structures and algorithms."
             },
-            {
-                title: "Lab 2",
-                desc: "Description"
-            }
+            // {
+            //     title: "Lab 2",
+            //     desc: "Description"
+            // }
         ];
         for (let i = 0; i < arr.length; i++) {
             const _data = arr[i];
             title = _data.title || null; if (!title) continue; // Set the title and if thats not possible, skip the loop
-            link = _data.link || `lab${i + 1}`;
+            link = _data.link || `p${i + 1}`;
             date = _data.date ? _data.date : `${gendate(def_date)}`;
             desc = _data.desc || `${title} ${i}`;
             codetype = _data.codetype ? `CSU1051P | ${_data.codetype}` : `CSU1051P | Lab`;
