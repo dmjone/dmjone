@@ -333,7 +333,7 @@ function header_navbar() {
 
     // Send array of links to create link for dropdown
     var year1_links = ["1<sup>st</sup> Year", "csu1128p", "csu1128", "csu953", "fsu030", "csu730", "csu951", "csu585", "csu1051"];
-    var visible_links = ["csu585", "csu1051"].sort();
+    var visible_links = ["csu585", "csu1051", "csu1287"].sort();
 
     var alllinks = nav_createDropdown(year1_links) + nav_createMainNav(visible_links);
 

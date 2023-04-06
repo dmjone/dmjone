@@ -34,6 +34,16 @@ function get_menu_list(datetogen) {
                 desc: "This introduction to Data Structures and Algorithms will cover the distinctions between unions and structures, as well as the differences between primitive and non-primitive data structures, and linear and non-linear data structures.",
                 codetype: "Introduction"
             },
+            {
+                title: "DSA Introduction: getchar vs putchar",
+                desc: "This introduction to Data Structures and Algorithms will cover the distinctions between getchar and putchar.",
+                codetype: "Introduction"
+            },
+            {
+                title: "DSA Introduction: Arrays, Pointers and Multi Pointers",
+                desc: "This introduction to Data Structures and Algorithms will cover the details of Arrays, Pointers and Multi Pointers.",
+                codetype: "Introduction"
+            },
             // {
             //     title: "Section B: Electricity and Magnetism",
             //     desc: "Get ready to explore Electricity & Magnetism! Learn about electric field & potential, dielectric polarization, displacement current, Maxwell's equations, velocity of EM waves, electromagnetic spectrum, magnetic materials, superconductivity, ultrasonic waves, Type I & Type II superconductors and more. Get ready to electrify your knowledge!"
