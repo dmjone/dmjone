@@ -62,7 +62,23 @@ function get_menu_list(datetogen) {
                 desc: "Approach problems with a new perspective in CSU585: Design Thinking by Dr. Namita Gandotra. Develop an innovative, creative and problem-solving mindset.",
                 codetype: "CSU585",
                 semester: 2,
-                date: "Fri February 24, 2023"
+                date: "Thu April 6, 2023"
+            },
+            {
+                link: "csu1051/",
+                title: "Algorithms and Data Structure",
+                desc: "Unlock the secrets of effective problem-solving in CSU1051: Algorithms and Data Structures by Dr. Laxman Singh. Learn to craft elegant solutions while optimizing the performance of your programs using advanced techniques and data organization strategies.",
+                codetype: "CSU1051",
+                semester: 2,
+                date: "Thu April 6, 2023"
+            },
+            {
+                link: "csu1287/",
+                title: "OOPS using C++ Language",
+                desc: "Dive into the world of object-oriented programming in CSU1287: OOPS using C++ Language by Prof. Dr. Pankaj Vaidya. Master the art of designing efficient, reusable, and robust code with this powerful language.",
+                codetype: "CSU1287",
+                semester: 2,
+                date: "Thu April 6, 2023"
             },
             // {
             //     link: "csu1287/",
