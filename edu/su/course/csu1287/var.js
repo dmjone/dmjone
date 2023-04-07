@@ -104,6 +104,10 @@ function get_menu_list(datetogen) {
                 title: "Array Equality Program",
                 desc: "Check if two arrays are equal regardless of their position with this C++ program. This program compares two arrays entered by the user and determines if they contain the same elements, regardless of their position in the array. This program is a useful exercise for beginner programmers to practice array manipulation and logical operations in C++."
             },
+            {
+                title: "Word Validation Program",
+                desc: "Validate a word entered by the user to ensure it meets specific criteria with this C++ program. This program checks if a word has at least one vowel, one digit, and one uppercase letter, and its length does not exceed 8 characters. This program is a useful exercise for beginner programmers to practice string manipulation and logical operations in C++."
+            },
 
         ];
         for (let i = 0; i < arr.length; i++) {
