@@ -100,6 +100,10 @@ function get_menu_list(datetogen) {
                 title: "Sentence Parsing Program",
                 desc: "Parse a sentence entered by the user and print each of its words on a new line with this C++ program. This program is a useful exercise for beginner programmers to practice string manipulation and input/output operations in C++."
             },
+            {
+                title: "Array Equality Program",
+                desc: "Check if two arrays are equal regardless of their position with this C++ program. This program compares two arrays entered by the user and determines if they contain the same elements, regardless of their position in the array. This program is a useful exercise for beginner programmers to practice array manipulation and logical operations in C++."
+            },
 
         ];
         for (let i = 0; i < arr.length; i++) {
