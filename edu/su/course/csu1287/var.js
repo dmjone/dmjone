@@ -4,14 +4,14 @@ function get_menu_list(datetogen) {
         const arr = [
             {
                 link: "program/",
-                title: "All the programs done in class",
-                desc: "All the programs done in class.",
-                codetype: "CSU1287 | Programs"
+                title: "Key C++ Concepts Covered in Class",
+                desc: "Explore essential concepts in C++ programming covered in class, including object-oriented programming, templates, smart pointers, operator overloading, virtual functions, advanced data structures, inheritance, encapsulation and much more. Gain a deeper understanding of these concepts through hands-on examples and learn how to apply them to solve real-world problems in C++ programming.",
+                codetype: "CSU1287 | Concepts and Programs"
             },
             {
                 link: "lab/",
-                title: "All the programs done in Lab",
-                desc: "All the programs done in Lab",
+                title: "C++ Programming Covered in Lab",
+                desc: "Get practical experience with C++ programming assignments covered in the lab section. Work on a variety of programming assignments covering essential and advanced C++ concepts, such as object-oriented programming, memory management, exception handling, templates, and data structures. Gain a deeper understanding of these concepts through hands-on examples and learn how to apply them to solve real-world problems in C++ programming.",
                 codetype: "CSU1287P | Lab"
             }
         ];
@@ -27,11 +27,47 @@ function get_menu_list(datetogen) {
             body_blockcards(link, date, title, desc, codetype, readtime, author);
         }
     }
+
     function get_program(def_date, def_author) {
         const arr = [
             {
-                title: "Program 1",
-                desc: "Hello World "
+                title: "Object Oriented vs Procedure Oriented Programming",
+                desc: "Discover the Differences Between Object-Oriented and Procedure-Oriented Programming: Which One is Right for Your Project?"
+            },
+            {
+                title: "Class and its methods",
+                desc: "Learn how to define classes in object-oriented programming and explore the methods that can be defined within them.",
+                codetype: "Class"
+            },
+            {
+                title: "Class: Constructors",
+                desc: "Explore how constructors are used in object-oriented programming to initialize objects when they are created.",
+                codetype: "Methods of Class"
+            },
+            {
+                title: "Class: Destructors",
+                desc: "Discover the role of destructors in object-oriented programming and how they can be used to clean up resources when an object is destroyed.",
+                codetype: "Methods of Class"
+            },
+            {
+                title: "Class: Member Functions",
+                desc: "Learn how to define member functions within classes in object-oriented programming and how they can be used to manipulate object state.",
+                codetype: "Methods of Class"
+            },
+            {
+                title: "Class: Access Specifiers",
+                desc: "Explore the different access specifiers available in object-oriented programming, such as public, private, and protected, and learn how they are used to control access to class members.",
+                codetype: "Methods of Class"
+            },
+            {
+                title: "Class: Operator Overloading",
+                desc: "Discover how operator overloading works in object-oriented programming and how it can be used to define custom behaviors for operators on class objects.",
+                codetype: "Methods of Class"
+            },
+            {
+                title: "Class: Friend Functions",
+                desc: "Learn how friend functions work in object-oriented programming and how they can be used to grant external functions access to private members of a class.",
+                codetype: "Methods of Class"
             },
             // {
             //     title: "Section B: Electricity and Magnetism",
@@ -44,7 +80,7 @@ function get_menu_list(datetogen) {
             link = _data.link || `p${i + 1}`;
             date = _data.date ? _data.date : `${gendate(def_date)}`;
             desc = _data.desc || `${title} ${i}`;
-            codetype = _data.codetype ? `Design Thinking | ${_data.codetype}` : `Design Thinking | Introduction`;
+            codetype = _data.codetype ? `OOPS using C++ | ${_data.codetype}` : `OOPS Using C++ | Concepts`;
             readtime = _data.readtime || r(4);
             author = _data.author || def_author;
             body_blockcards(link, date, title, desc, codetype, readtime, author);
