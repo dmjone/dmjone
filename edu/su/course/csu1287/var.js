@@ -87,12 +87,16 @@ function get_menu_list(datetogen) {
                 desc: "Learn how to work with strings in C++ with this program. Strings are an important data type in C++ programming and this program will show you how to create, initialize, and manipulate strings using various string manipulation functions. This program is a useful exercise for beginner programmers to learn how to work with strings in C++ and gain practical experience with string manipulation functions."
             },
             {
+                title: "Functions in C++",
+                desc: "Learn about functions in C++ with this program. Functions are a fundamental building block of C++ programs and are used to group related code, improve code organization, and make code more modular and easier to read. This program is a useful exercise for beginner programmers to learn how to define, call, and pass arguments to functions in C++."
+            },
+            {
                 title: "Function Overloading in C++",
                 desc: "Learn about function overloading in C++ with this program. Function overloading allows multiple functions to have the same name, but with different parameters. This program is a useful exercise for beginner programmers to learn how to define and use function overloading to make their code more concise and efficient."
             },
             {
-                title: "Operator Overloading in C++",
-                desc: "Learn about operator overloading in C++ with this program. Operator overloading allows operators, such as +, -, *, /, and %, to be redefined for user-defined data types, such as classes and structures. This program is a useful exercise for beginner programmers to learn how to define and use operator overloading to make their code more concise and efficient."
+                title: "Objects and Classes in C++",
+                desc: "Learn about objects and classes in C++ with this program. Object-oriented programming is a powerful paradigm that allows programmers to create modular, reusable code by encapsulating data and functions into objects. This program is a useful exercise for beginner programmers to learn how to define and use classes and objects in C++, and understand the principles of encapsulation, inheritance, and polymorphism."
             },
             {
                 title: "Encapsulation in C++",
@@ -102,6 +106,24 @@ function get_menu_list(datetogen) {
                 title: "Inheritance in C++",
                 desc: "Learn about inheritance in C++ with this program. Inheritance is a fundamental concept of object-oriented programming that allows one class to inherit properties and methods from another class. This program is a useful exercise for beginner programmers to learn how to use inheritance to improve code organization, code reuse, and create more efficient, modular code in their C++ programs."
             },
+            {
+                title: "Operator Overloading in C++",
+                desc: "Learn about operator overloading in C++ with this program. Operator overloading allows operators, such as +, -, *, /, and %, to be redefined for user-defined data types, such as classes and structures. This program is a useful exercise for beginner programmers to learn how to define and use operator overloading to make their code more concise and efficient."
+            },
+            {
+                title: "Aggregation in C++",
+                desc: "Learn about aggregation in C++ with this program. Aggregation is a form of object composition that allows one object to contain and use another object as a member. This program is a useful exercise for beginner programmers to learn how to use aggregation to create more modular, reusable code in their C++ programs."
+            },
+            {
+                title: "Pointers in C++",
+                desc: "Learn about pointers in C++ with this program. A pointer is a variable that stores the memory address of another variable. Pointers are an important concept in C++ programming and are used extensively for memory management and dynamic allocation. This program is a useful exercise for beginner programmers to learn how to declare, initialize, and use pointers in their C++ programs."
+            },
+            {
+                title: "Virtual Functions in C++",
+                desc: "Learn about virtual functions in C++ with this program. Virtual functions are a fundamental concept of object-oriented programming that allows a function to be redefined in a derived class while retaining its base class implementation. This program is a useful exercise for beginner programmers to learn how to use virtual functions to achieve polymorphism and create more flexible, modular code in their C++ programs."
+            },
+
+
 
 
 
