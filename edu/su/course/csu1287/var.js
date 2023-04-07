@@ -94,6 +94,15 @@ function get_menu_list(datetogen) {
                 title: "Operator Overloading in C++",
                 desc: "Learn about operator overloading in C++ with this program. Operator overloading allows operators, such as +, -, *, /, and %, to be redefined for user-defined data types, such as classes and structures. This program is a useful exercise for beginner programmers to learn how to define and use operator overloading to make their code more concise and efficient."
             },
+            {
+                title: "Encapsulation in C++",
+                desc: "Learn about encapsulation in C++ with this program. Encapsulation is a fundamental concept of object-oriented programming that combines data and the functions that manipulate that data into a single unit, called a class. This program is a useful exercise for beginner programmers to learn how to use encapsulation to improve code organization, data security, and code reuse in their C++ programs."
+            },
+            {
+                title: "Inheritance in C++",
+                desc: "Learn about inheritance in C++ with this program. Inheritance is a fundamental concept of object-oriented programming that allows one class to inherit properties and methods from another class. This program is a useful exercise for beginner programmers to learn how to use inheritance to improve code organization, code reuse, and create more efficient, modular code in their C++ programs."
+            },
+
 
 
 
