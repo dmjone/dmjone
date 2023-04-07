@@ -89,13 +89,18 @@ function get_menu_list(datetogen) {
     function get_lab(def_date, def_author) {
         const arr = [
             {
-                title: "Lab 1",
-                desc: "Description"
+                title: "Number Conversion Program",
+                desc: "Convert a decimal number to binary, decimal, octal, and hexadecimal formats with this C++ program using bitwise operators and mathematical operations. Practice your understanding of number systems and data representation with this practical programming exercise."
             },
             {
-                title: "Lab 2",
-                desc: "Description"
-            }
+                title: "Password Retrieval Program",
+                desc: "Retrieve lost passwords with this C++ program that uses object-oriented programming algorithms to securely recover passwords. This program is a practical application of OOPS concepts and is useful for anyone interested in cybersecurity and data protection."
+            },
+            {
+                title: "Sentence Parsing Program",
+                desc: "Parse a sentence entered by the user and print each of its words on a new line with this C++ program. This program is a useful exercise for beginner programmers to practice string manipulation and input/output operations in C++."
+            },
+
         ];
         for (let i = 0; i < arr.length; i++) {
             const _data = arr[i];
