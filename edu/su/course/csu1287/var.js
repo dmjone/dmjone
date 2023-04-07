@@ -69,6 +69,24 @@ function get_menu_list(datetogen) {
                 desc: "Learn how friend functions work in object-oriented programming and how they can be used to grant external functions access to private members of a class.",
                 codetype: "Methods of Class"
             },
+            {
+                title: "Scope Resolution Operator",
+                desc: "Learn about the scope resolution operator in C++ with this program. The scope resolution operator (::) is used to access a global variable or function, or a member variable or function of a class, outside its scope. This program is a useful exercise for beginner programmers to learn how to access and modify variables and functions in different scopes using the scope resolution operator in C++."
+            },
+            {
+                title: "Arrays in C++",
+                desc: "Learn about arrays in C++ with this program. An array is a collection of elements of the same data type, stored in contiguous memory locations. This program is a useful exercise for beginner programmers to learn how to declare, initialize, and manipulate arrays in C++.",
+                codetype: "Advanced Arrays"
+            },
+            {
+                title: "Strings in C++",
+                desc: "Learn about strings in C++ with this program. A string is a collection of characters, stored in a sequential memory location. This program is a useful exercise for beginner programmers to learn how to declare, initialize, and manipulate strings in C++."
+            },
+            {
+                title: "Working with Strings in C++",
+                desc: "Learn how to work with strings in C++ with this program. Strings are an important data type in C++ programming and this program will show you how to create, initialize, and manipulate strings using various string manipulation functions. This program is a useful exercise for beginner programmers to learn how to work with strings in C++ and gain practical experience with string manipulation functions."
+            },
+
             // {
             //     title: "Section B: Electricity and Magnetism",
             //     desc: "Get ready to explore Electricity & Magnetism! Learn about electric field & potential, dielectric polarization, displacement current, Maxwell's equations, velocity of EM waves, electromagnetic spectrum, magnetic materials, superconductivity, ultrasonic waves, Type I & Type II superconductors and more. Get ready to electrify your knowledge!"
