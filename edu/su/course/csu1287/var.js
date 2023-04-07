@@ -108,7 +108,10 @@ function get_menu_list(datetogen) {
                 title: "Word Validation Program",
                 desc: "Validate a word entered by the user to ensure it meets specific criteria with this C++ program. This program checks if a word has at least one vowel, one digit, and one uppercase letter, and its length does not exceed 8 characters. This program is a useful exercise for beginner programmers to practice string manipulation and logical operations in C++."
             },
-
+            {
+                title: "Counter Class Program",
+                desc: "Define a Counter class with overloaded increment and decrement operators to modify and display its count value with this C++ program. This program is a practical application of operator overloading concepts and is useful for anyone interested in learning how to define and use classes in C++."
+            },
         ];
         for (let i = 0; i < arr.length; i++) {
             const _data = arr[i];
