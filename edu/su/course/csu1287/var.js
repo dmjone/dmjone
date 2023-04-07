@@ -122,16 +122,10 @@ function get_menu_list(datetogen) {
                 title: "Virtual Functions in C++",
                 desc: "Learn about virtual functions in C++ with this program. Virtual functions are a fundamental concept of object-oriented programming that allows a function to be redefined in a derived class while retaining its base class implementation. This program is a useful exercise for beginner programmers to learn how to use virtual functions to achieve polymorphism and create more flexible, modular code in their C++ programs."
             },
-
-
-
-
-
-
-            // {
-            //     title: "Section B: Electricity and Magnetism",
-            //     desc: "Get ready to explore Electricity & Magnetism! Learn about electric field & potential, dielectric polarization, displacement current, Maxwell's equations, velocity of EM waves, electromagnetic spectrum, magnetic materials, superconductivity, ultrasonic waves, Type I & Type II superconductors and more. Get ready to electrify your knowledge!"
-            // }
+            {
+                title: "Streams and Files in C++",
+                desc: "Learn about streams and files in C++ with this program. Streams and files are an important part of C++ programming that allow data to be read from or written to external sources such as files or other devices. This program is a useful exercise for beginner programmers to learn how to use streams and files in C++ to manipulate data and create more versatile, dynamic programs."
+            },
         ];
         for (let i = 0; i < arr.length; i++) {
             const _data = arr[i];
@@ -140,7 +134,7 @@ function get_menu_list(datetogen) {
             date = _data.date ? _data.date : `${gendate(def_date)}`;
             desc = _data.desc || `${title} ${i}`;
             codetype = _data.codetype ? `OOPS using C++ | ${_data.codetype}` : `OOPS Using C++ | Concepts`;
-            readtime = _data.readtime || r(4);
+            readtime = _data.readtime || r(10);
             author = _data.author || def_author;
             body_blockcards(link, date, title, desc, codetype, readtime, author);
         }
