@@ -46,7 +46,8 @@ function get_menu_list(datetogen) {
             },
             {
                 title: "Basic Concepts and Notions",
-                desc: "Learn about the basic concepts and notions of data structures and algorithms. Data structures and algorithms are fundamental to computer science and are used to store and manipulate data, solve problems, and make decisions. This concept is useful for beginner programmers to learn the basics of data structures and algorithms and gives a brief knowhow about their application in the programs."
+                desc: "Learn about the basic concepts and notions of data structures and algorithms. Data structures and algorithms are fundamental to computer science and are used to store and manipulate data, solve problems, and make decisions. This concept is useful for beginner programmers to learn the basics of data structures and algorithms and gives a brief knowhow about their application in the programs.",
+                readtime: r(20)
             },
             {
                 title: "Data Structures and Operations",
@@ -66,7 +67,8 @@ function get_menu_list(datetogen) {
             },
             {
                 title: "Array Representation in Memory",
-                desc: "Learn about array representation in memory in data structures and algorithms. Arrays are a fundamental data structure in programming and are used to store a collection of elements of the same data type. Understanding how arrays are represented in memory is important for optimizing memory usage and accessing elements efficiently. This concept is a useful exercise for beginner programmers to learn how to represent arrays in memory, understand the benefits and limitations of arrays, and apply this knowledge to create efficient and effective programs."
+                desc: "Learn about array representation in memory in data structures and algorithms. Arrays are a fundamental data structure in programming and are used to store a collection of elements of the same data type. Understanding how arrays are represented in memory is important for optimizing memory usage and accessing elements efficiently. This concept is a useful exercise for beginner programmers to learn how to represent arrays in memory, understand the benefits and limitations of arrays, and apply this knowledge to create efficient and effective programs.",
+                readtime: r(15)
             },
             // {
             //     title: "Operations on Arrays",
@@ -83,7 +85,8 @@ function get_menu_list(datetogen) {
             {
                 title: "Parallel Algorithms",
                 desc: "Learn about parallel algorithms in data structures and algorithms. Parallel algorithms are a class of algorithms that can be executed in parallel on multiple processors or cores, and are commonly used in domains such as scientific computing, data mining, and machine learning. Understanding how to design and analyze parallel algorithms is important for achieving better performance and scalability in modern computing environments. This concept is useful for intermediate programmers to learn how to parallelize algorithms, understand the different types of parallelism, and apply this knowledge to create faster and more efficient programs.",
-                link: "c13"
+                link: "c13",
+                readtime: r(30)
             },
             {
                 title: "Stacks and Queues Representations, Implementations & Applications",
