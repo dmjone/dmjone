@@ -443,7 +443,10 @@ function body_genmenu(course) {
     // });
     // Substituted document.write(body_generated); by DOMContentLoaded for automation
 
-    const datetogen = "April 1, 2023"; // Change this date to reflect it everywhere.
+    // const datetogen = "April 1, 2023"; // Manual Date - Change this date to reflect it everywhere.
+    const datetogen = new Date(new Date().setDate(new Date().getDate() - 7)).toDateString(); // Get Date automatically. Change the number with days to minus the date. Number 7 or 10 denotes days to substract from current date.
+    // var offset = Math.floor(Math.random() * 10) * -1 * 24 * 60 * 60 * 1000; // Change this in the specific var.js if you dont want to generate future dates and only past date. supplied date - 10th date.
+
     get_menu_list(datetogen);
     // Substitution for document.write(gen_end); due to automation
     // document.addEventListener("DOMContentLoaded", function () {

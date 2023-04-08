@@ -177,6 +177,7 @@ function get_menu_list(datetogen) {
     function gendate(date) {
         var inputDate = new Date(date);
         var offset = Math.floor(Math.random() * 20 - 10) * 24 * 60 * 60 * 1000;
+        // var offset = Math.floor(Math.random() * 10) * -1 * 24 * 60 * 60 * 1000; // This is if you dont want to generate future dates and only past date. supplied date - 10th date.
         var newDate = new Date(inputDate.getTime() + offset);
         var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
         var weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
