@@ -68,6 +68,47 @@ function get_menu_list(datetogen) {
                 title: "Array Representation in Memory",
                 desc: "Learn about array representation in memory in data structures and algorithms. Arrays are a fundamental data structure in programming and are used to store a collection of elements of the same data type. Understanding how arrays are represented in memory is important for optimizing memory usage and accessing elements efficiently. This concept is a useful exercise for beginner programmers to learn how to represent arrays in memory, understand the benefits and limitations of arrays, and apply this knowledge to create efficient and effective programs."
             },
+            // {
+            //     title: "Operations on Arrays",
+            //     desc: "Learn about operations on arrays in data structures and algorithms. Arrays are a fundamental data structure in programming and are used to store a collection of elements of the same data type. Operations on arrays include sorting, searching, insertion, deletion, and merging, and are important for manipulating and analyzing data efficiently. This concept is a useful exercise for beginner programmers to learn how to perform operations on arrays, understand the different types of operations, and apply this knowledge to solve real-world problems in their programs."
+            // },
+            // {
+            //     title: "Multidimensional Arrays",
+            //     desc: "Learn about multidimensional arrays in data structures and algorithms. Multidimensional arrays are a useful extension of arrays that allow data to be stored in more than one dimension, such as matrices or grids. Understanding how multidimensional arrays work and how to manipulate them efficiently is important for solving problems in various domains such as image processing, computer graphics, and scientific computing. This concept is a useful exercise for beginner programmers to learn how to declare, initialize, and use multidimensional arrays, and how to apply this knowledge to solve real-world problems in their programs."
+            // },
+            // {
+            //     title: "Sparse Matrices",
+            //     desc: "Learn about sparse matrices in data structures and algorithms with this concept. Sparse matrices are a special type of matrix that contains mostly zeros, and are commonly used in domains such as graph theory, scientific computing, and machine learning. Understanding how to store and manipulate sparse matrices efficiently is important for solving problems that involve large datasets and complex computations. This is a useful exercise for beginner programmers to learn how to represent sparse matrices, understand the different types of sparse matrix formats, and apply this knowledge to create efficient and scalable programs."
+            // },
+            {
+                title: "Parallel Algorithms",
+                desc: "Learn about parallel algorithms in data structures and algorithms. Parallel algorithms are a class of algorithms that can be executed in parallel on multiple processors or cores, and are commonly used in domains such as scientific computing, data mining, and machine learning. Understanding how to design and analyze parallel algorithms is important for achieving better performance and scalability in modern computing environments. This concept is useful for intermediate programmers to learn how to parallelize algorithms, understand the different types of parallelism, and apply this knowledge to create faster and more efficient programs.",
+                link: "c13"
+            },
+            {
+                title: "Stacks and Queues Representations, Implementations & Applications",
+                desc: "Learn about stacks and queues representations, implementations and applications in data structures and algorithms. Stacks and queues are fundamental data structures in programming that are used to store and manipulate data based on a last-in-first-out (LIFO) or first-in-first-out (FIFO) policy, respectively. Understanding the different representations of stacks and queues and how to manipulate them efficiently is important for solving problems in various domains such as operating systems, computer networks, and simulation. This concept is useful for beginner programmers to learn how to represent stacks and queues, understand the different operations on them, and apply this knowledge to create efficient and effective programs.",
+                link: "c14"
+            },
+            // {
+            //     title: "Singly Linked Lists and Their Representations",
+            //     desc: "Learn about singly linked lists and their representations in data structures and algorithms. Singly linked lists are a fundamental data structure in programming that are used to store and manipulate data in a linear and dynamic way. Understanding how singly linked lists work and how to represent them efficiently is important for solving problems in various domains such as data processing, artificial intelligence, and game development. This is useful for beginner programmers to learn how to represent singly linked lists, understand their operations, and apply this knowledge to create efficient and effective programs."
+            // },
+            // {
+            //     title: "Doubly Linked Lists and Circularly Linked Lists",
+            //     desc: "Learn about doubly linked lists and circularly linked lists in data structures and algorithms. Doubly linked lists and circularly linked lists are extensions of singly linked lists that provide additional functionality such as bidirectional traversal and circular data structures. Understanding how doubly linked lists and circularly linked lists work and how to manipulate them efficiently is important for solving problems in various domains such as network routing, computer graphics, and memory management. This is a useful concept for intermediate programmers to learn how to represent doubly linked lists and circularly linked lists, understand their operations, and apply this knowledge to create efficient and effective programs."
+            // },
+            // {
+            //     title: "Operations on Linked Lists - Insertion, Deletion, and Traversal",
+            //     desc: "Learn about operations on linked lists - insertion, deletion, and traversal - in data structures and algorithms with this article. Linked lists are a fundamental data structure in programming that are used to store and manipulate data in a dynamic and flexible way. Understanding how to perform operations such as insertion, deletion, and traversal on linked lists efficiently is important for solving problems in various domains such as database management, machine learning, and web development. This program is a useful for beginner programmers to learn how to perform operations on linked lists, understand their time and space complexities, and apply this knowledge to create efficient and effective programs."
+            // },
+
+
+
+
+
+
+
         ];
         for (let i = 0; i < arr.length; i++) {
             const _data = arr[i];
