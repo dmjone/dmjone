@@ -133,7 +133,7 @@ function get_menu_list(datetogen) {
             link = _data.link || `p${i + 1}`;
             date = _data.date ? _data.date : `${gendate(def_date)}`;
             desc = _data.desc || `${title} ${i}`;
-            codetype = _data.codetype ? `OOPS using C++ | ${_data.codetype}` : `OOPS Using C++ | Concepts`;
+            codetype = _data.codetype ? `CSU1287 | ${_data.codetype}` : `CSU1287 | Concepts`;
             readtime = _data.readtime || r(10);
             author = _data.author || def_author;
             body_blockcards(link, date, title, desc, codetype, readtime, author);

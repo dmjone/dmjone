@@ -30,24 +30,44 @@ function get_menu_list(datetogen) {
     function get_class(def_date, def_author) {
         const arr = [
             {
-                title: "DSA Introduction: Key Concepts and Differences",
+                title: "Key Concepts and Differences",
                 desc: "This introduction to Data Structures and Algorithms will cover the distinctions between unions and structures, as well as the differences between primitive and non-primitive data structures, and linear and non-linear data structures.",
                 codetype: "Introduction"
             },
             {
-                title: "DSA Introduction: getchar vs putchar",
+                title: "getchar vs putchar",
                 desc: "This introduction to Data Structures and Algorithms will cover the distinctions between getchar and putchar.",
                 codetype: "Introduction"
             },
             {
-                title: "DSA Introduction: Arrays, Pointers and Multi Pointers",
+                title: "Arrays, Pointers and Multi Pointers",
                 desc: "This introduction to Data Structures and Algorithms will cover the details of Arrays, Pointers and Multi Pointers.",
                 codetype: "Introduction"
             },
-            // {
-            //     title: "Section B: Electricity and Magnetism",
-            //     desc: "Get ready to explore Electricity & Magnetism! Learn about electric field & potential, dielectric polarization, displacement current, Maxwell's equations, velocity of EM waves, electromagnetic spectrum, magnetic materials, superconductivity, ultrasonic waves, Type I & Type II superconductors and more. Get ready to electrify your knowledge!"
-            // }
+            {
+                title: "Basic Concepts and Notions",
+                desc: "Learn about the basic concepts and notions of data structures and algorithms. Data structures and algorithms are fundamental to computer science and are used to store and manipulate data, solve problems, and make decisions. This concept is useful for beginner programmers to learn the basics of data structures and algorithms and gives a brief knowhow about their application in the programs."
+            },
+            {
+                title: "Data Structures and Operations",
+                desc: "Learn about data structures and their operations in data structures and algorithms with this conceptual article. Data structures are a fundamental part of computer science and are used to organize, store, and manipulate data efficiently. This article is a useful exercise for beginner programmers to learn about different types of data structures and their operations, such as traversal, insertion, deletion, and searching, and how to use them to solve real-world problems in their programs."
+            },
+            {
+                title: "Mathematical Notation and Functions",
+                desc: "Learn about mathematical notation and functions. Mathematical notation is a language used to express mathematical ideas and concepts, while mathematical functions are a fundamental part of mathematics that map inputs to outputs based on a set of defined rules. This concept is a useful exercise for beginner programmers to learn how to use mathematical notation and functions in their programs to solve real-world problems and improve their mathematical skills."
+            },
+            {
+                title: "Complexity of Algorithms",
+                desc: "Learn about the complexity of algorithms in data structures and algorithms. The complexity of an algorithm is a measure of its efficiency, in terms of time and space, and is an important factor to consider when designing and analyzing algorithms. This concept is a useful exercise for beginner programmers to learn how to measure the complexity of algorithms, understand the different types of complexity (such as time complexity and space complexity), and apply this knowledge to optimize their algorithms for improved performance and efficiency."
+            },
+            {
+                title: "Running Time and Storage Cost of Algorithms",
+                desc: "Learn about the running time and storage cost of algorithms in data structures and algorithms. The running time and storage cost of an algorithm are important factors to consider when designing and analyzing algorithms, as they directly impact the efficiency and performance of the algorithm. This concept is a useful exercise for beginner programmers to learn how to measure and optimize the running time and storage cost of algorithms, and how to apply this knowledge to create more efficient and scalable programs."
+            },
+            {
+                title: "Array Representation in Memory",
+                desc: "Learn about array representation in memory in data structures and algorithms. Arrays are a fundamental data structure in programming and are used to store a collection of elements of the same data type. Understanding how arrays are represented in memory is important for optimizing memory usage and accessing elements efficiently. This concept is a useful exercise for beginner programmers to learn how to represent arrays in memory, understand the benefits and limitations of arrays, and apply this knowledge to create efficient and effective programs."
+            },
         ];
         for (let i = 0; i < arr.length; i++) {
             const _data = arr[i];
