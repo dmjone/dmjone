@@ -61,24 +61,28 @@ function get_menu_list(datetogen) {
                 title: "Design Thinking",
                 desc: "Approach problems with a new perspective in CSU585: Design Thinking by Dr. Namita Gandotra. Develop an innovative, creative and problem-solving mindset.",
                 codetype: "CSU585",
-                semester: 2,
-                date: "Thu April 6, 2023"
+                semester: 2
             },
             {
                 link: "csu1051/",
                 title: "Algorithms and Data Structure",
                 desc: "Unlock the secrets of effective problem-solving in CSU1051: Algorithms and Data Structures by Dr. Laxman Singh. Learn to craft elegant solutions while optimizing the performance of your programs using advanced techniques and data organization strategies.",
-                codetype: "CSU1051",
-                semester: 2,
-                date: "Thu April 6, 2023"
+                codetype: "CSU1051 | CSU1051P",
+                semester: 2
             },
             {
                 link: "csu1287/",
                 title: "OOPS using C++ Language",
-                desc: "Dive into the world of object-oriented programming in CSU1287: OOPS using C++ Language by Prof. Dr. Pankaj Vaidya. Master the art of designing efficient, reusable, and robust code with this powerful language.",
-                codetype: "CSU1287",
-                semester: 2,
-                date: "Thu April 6, 2023"
+                desc: "Get ready to become a programming master with CSU1287: OOPS using C++ Language by Prof. Dr. Pankaj Vaidya. This cutting-edge course covers the latest object-oriented programming concepts, design patterns, and best practices using the powerful C++ language. Whether you're a beginner or an experienced programmer, this course will help you take your skills to the next level and design efficient, reusable, and robust code.",
+                codetype: "CSU1287 | CSU1287P",
+                semester: 2
+            },
+            {
+                link: "csu1289/",
+                title: "Digital Electronics",
+                desc: "Explore the fascinating world of Digital Electronics with Dr. Brijbhushan Sharma. This comprehensive course covers the fundamental principles of digital circuits, logic gates, and microprocessors, and how they are used to power modern electronic devices. With Dr. Sharma's expert guidance, you'll gain the knowledge and skills to design and build complex digital systems from scratch.",
+                codetype: "CSU1289 | CSU1289P",
+                semester: 2
             },
             // {
             //     link: "csu1287/",

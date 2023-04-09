@@ -39,10 +39,10 @@ function get_menu_list() {
             switch (cases[i]) {
                 case 1:
                     link = "course/";
-                    date = "Mon February 13, 2023";
-                    title = "Study @ Shoolini";
+                    date = new Date(Date.now() - (Math.floor(Math.random() * 10) + 1) * 86400000).toLocaleDateString('en-US', { weekday: 'short', month: 'long', day: 'numeric', year: 'numeric' }).replace(',', '');
+                    title = "Explore the World of B.Tech CSE";
                     desc = "Ready to Level Up Your Computer Science and Engineering Game? Say Goodbye to Snooze-Worthy Study Sessions and Hello to a Comprehensive Course List Packed with Knowledge and Skills. Impress the World with Your In-Demand Expertise and Soar to New Heights - Join dmj.one's Edutainment Initiative Today and Get Ready to Graduate with Flying Colors (and Maybe a Few Jokes Along the Way)!";
-                    codetype = "study@shoolini";
+                    codetype = "btech@cse";
                     body_blockcards(link, date, title, desc, codetype, readtime, author);
                     break;
                 case 2:

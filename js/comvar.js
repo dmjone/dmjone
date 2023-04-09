@@ -241,8 +241,8 @@ function processFolder(allAuthors, author_bio) {
                                     prof = "";
                                     prof_bio = "";
                                     prof_href = "";
-                                    course = "Study @ Shoolini University";
-                                    course_detail = "2026";
+                                    course = "Course Selection";
+                                    course_detail = "Select a subject below to explore its concepts";
                                     break;
                             }
                             break;
@@ -263,7 +263,7 @@ function processFolder(allAuthors, author_bio) {
                             prof = "";
                             prof_bio = "";
                             prof_href = "";
-                            course = "B. Tech CSE @ Shoolini University";
+                            course = "Educational Initiative In Collaboration with Shoolini University";
                             course_detail = "Education should be free. Our initiative is to educate the section of people who can not access the educational services.";
                             break;
                     }
