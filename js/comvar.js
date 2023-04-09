@@ -160,7 +160,7 @@ function processFolder(allAuthors, author_bio) {
                                 case "csu951":
                                     prof = "Dr. Ravinder Thakur";
                                     prof_bio = "<p>Dr. Ravinder Thakur is an assistant professor at Shoolini University.</p>";
-                                    prof_href = "contact@dmj.one";
+                                    prof_href = "ravinderthakur@shooliniuniversity.com";
                                     prof_href += "?subject=Want%20to%20contact%20Dr.%20Ravinder%20Thakur&body=Hello%2C%20I%20want%20to%20contact%20Dr.%20Ravinder%20Thakur.%20Please%20provide%20his%20contact%20details.%0AThanks";
                                     course = "CSU951";
                                     course_detail = "Basic Mathematics";
@@ -176,7 +176,7 @@ function processFolder(allAuthors, author_bio) {
                                 case "csu585":
                                     prof = "Dr. Ruchika Sharma";
                                     prof_bio = "<p>Dr. Ruchika Sharma is an assistant professor at Shoolini University.</p>";
-                                    prof_href = "namita@shooliniuniversity.com";
+                                    prof_href = "ruchika@shooliniuniversity.com";
                                     course = "CSU585";
                                     course_detail = "Design Thinking";
                                     break;
@@ -194,10 +194,28 @@ function processFolder(allAuthors, author_bio) {
                                     course = "CSU1287p";
                                     course_detail = "OOPS Using C++ Language Lab";
                                     break;
+                                case "csu1289":
+                                    switch (urlpart5) {
+                                        case 'lab':
+                                            prof = "Abhishek Tomar";
+                                            prof_bio = "<p>Abhishek Tomar is an assistant professor at Shoolini University.</p>";
+                                            prof_href = "abhishektomar@shooliniuniversity.com";
+                                            course = "CSU1289P";
+                                            course_detail = "Digital Electronics Lab";
+                                            break;
+                                        default:
+                                            prof = "Dr. Brijbhushan Sharma";
+                                            prof_bio = "<p>Brij Bhushan Sharma has an M Tech in Electronics and Communication (2015) and is pursuing a PhD in Smart Agriculture. He has 8 years of teaching experience and has contributed to numerous academic publications. His research focuses on developing an IoT-based Indirect Solar Dryer and a digital system to check soil fertility using AI.</p>";
+                                            prof_href = "brijbhushansharma@shooliniouniversity.com";
+                                            course = "CSU1289";
+                                            course_detail = "Digital Electronics";
+                                            break;
+                                    }
+                                    break;
                                 case "fsu013":
                                     prof = "Dr. Ravinder Thakur";
                                     prof_bio = "<p>Dr. Ravinder Thakur is an assistant professor at Shoolini University.</p>";
-                                    prof_href = "contact@dmj.one";
+                                    prof_href = "ravinderthakur@shooliniuniversity.com";
                                     course = "FSU013";
                                     course_detail = "Advanced Mathematics";
                                     break;

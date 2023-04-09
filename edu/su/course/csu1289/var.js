@@ -4,16 +4,16 @@ function get_menu_list(datetogen) {
         const arr = [
             {
                 link: "class/",
-                title: "All the topics done in class",
-                desc: "All the topics done in class.",
-                codetype: "CSU1289 | Class"
+                title: "Explore the Fascinating World of Digital Electronics: A Comprehensive Guide",
+                desc: "Unlock the full potential of digital electronics with our in-depth guide to all the concepts. Take your tech skills to the next level and discover a world of endless possibilities. Click now to begin your digital journey.",
+                codetype: "CSU1289 | Concepts"
             },
-            {
-                link: "lab/",
-                title: "All the practicals done in Lab",
-                desc: "All the practicals done in Lab",
-                codetype: "CSU1289P | Lab"
-            }
+            // {
+            //     link: "lab/",
+            //     title: "Elevate Your Digital Electronics Skills: A Comprehensive Guide for Lab Enthusiasts",
+            //     desc: "Unleash your potential in the digital electronics lab with our comprehensive guide covering all the essential concepts. Discover the magic of electronics and take your tech skills to the next level. Click now to begin your digital journey.",
+            //     codetype: "CSU1289P | Lab"
+            // }
         ];
         for (let i = 0; i < arr.length; i++) {
             const _data = arr[i];
@@ -21,7 +21,7 @@ function get_menu_list(datetogen) {
             link = _data.link || null;
             date = _data.date ? _data.date : `${gendate(def_date)}`;
             desc = _data.desc || `${title}`;
-            codetype = _data.codetype ? `${_data.codetype}` : `CSU1287`;
+            codetype = _data.codetype ? `${_data.codetype}` : `CSU1289`;
             readtime = _data.readtime || r(4); readtime = null; // Null readtime - Special Case
             author = _data.author || def_author; author = null; // Null author - Special Case
             body_blockcards(link, date, title, desc, codetype, readtime, author);
@@ -30,9 +30,16 @@ function get_menu_list(datetogen) {
     function get_class(def_date, def_author) {
         const arr = [
             {
-                title: "Modulation",
-                desc: "Modulation Topics",
-                codetype: "Modulation"
+                title: "The Digital Revolution: A Thrilling Introduction to Digital Electronics",
+                desc: "Join the revolution and discover the magic of digital electronics with our exciting introduction to the world of digital circuits and systems. From binary code to microprocessors, our guide covers all the essentials. Click now to embark on an electrifying journey into the digital realm!",
+                codetype: "Introduction",
+                readtime: r(15)
+            },
+            {
+                title: "Cracking the Code: Demystifying the Fascinating World of Number Systems",
+                desc: "Uncover the secrets of the number system and explore the amazing world of numerical codes with our comprehensive guide. From binary to hexadecimal, our guide covers it all. Click now to embark on a mind-bending journey through the world of numbers!",
+                codetype: "Number Systems",
+                readtime: r(50)
             },
             // {
             //     title: "Section B: Electricity and Magnetism",
@@ -42,10 +49,10 @@ function get_menu_list(datetogen) {
         for (let i = 0; i < arr.length; i++) {
             const _data = arr[i];
             title = _data.title || null; if (!title) continue; // Set the title and if thats not possible, skip the loop
-            link = _data.link || `p${i + 1}`;
+            link = _data.link || `c${i + 1}`;
             date = _data.date ? _data.date : `${gendate(def_date)}`;
             desc = _data.desc || `${title} ${i}`;
-            codetype = _data.codetype ? `Digital Electronics | ${_data.codetype}` : `Digital Electronics | Topics`;
+            codetype = _data.codetype ? `CSU1289 | ${_data.codetype}` : `CSU1289 | Concepts`;
             readtime = _data.readtime || r(4);
             author = _data.author || def_author;
             body_blockcards(link, date, title, desc, codetype, readtime, author);
