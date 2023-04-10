@@ -59,7 +59,7 @@ function get_menu_list(datetogen) {
             {
                 link: "csu585/",
                 title: "Design Thinking",
-                desc: "Approach problems with a new perspective in CSU585: Design Thinking by Dr. Namita Gandotra. Develop an innovative, creative and problem-solving mindset.",
+                desc: "Approach problems with a new perspective in CSU585: Design Thinking by Mrs. Ruchika Sharma. Develop an innovative, creative and problem-solving mindset.",
                 codetype: "CSU585",
                 semester: 2
             },

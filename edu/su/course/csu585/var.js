@@ -38,7 +38,18 @@ function get_menu_list(datetogen) {
                 title: "Why Design Thinking",
                 desc: "Discover the powerful human-centered approach of design thinking that fosters creativity, empathy, and experimentation in problem-solving. Click to learn how it can transform the way you work and create value for people.",
                 link: "whydesignthinking"
-            }
+            },
+            {
+                title: "Enterprise Design Thinking",
+                desc: "Enterprise Design Thinking is a customer-focused problem-solving approach for large-scale organizations. It combines the principles of Design Thinking with the needs of the enterprise to drive innovation and transformation. Click to learn more.",
+                link: "enterprisedesignthinking"
+            },
+            {
+                title: "Empathy Map",
+                desc: "The Empathy Map is a powerful tool used in Design Thinking to help understand the needs and experiences of a target user or customer. By creating a visual representation of their thoughts, feelings, and behaviors, you can gain insights that will inform the development of effective solutions. Click to learn more about how to use Empathy Maps in your design process.",
+                link: "empathymap"
+            },
+
         ];
         for (let i = 0; i < arr.length; i++) {
             const _data = arr[i];

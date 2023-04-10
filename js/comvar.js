@@ -204,8 +204,8 @@ function processFolder(allAuthors, author_bio) {
                                             course_detail = "Digital Electronics Lab";
                                             break;
                                         default:
-                                            prof = "Dr. Brijbhushan Sharma";
-                                            prof_bio = "<p>Brij Bhushan Sharma has an M Tech in Electronics and Communication (2015) and is pursuing a PhD in Smart Agriculture. He has 8 years of teaching experience and has contributed to numerous academic publications. His research focuses on developing an IoT-based Indirect Solar Dryer and a digital system to check soil fertility using AI.</p>";
+                                            prof = "Dr. Brij Bhushan Sharma";
+                                            prof_bio = "<p>Dr. Brij Bhushan Sharma has an M Tech in Electronics and Communication (2015) and is pursuing a PhD in Smart Agriculture. He has 8 years of teaching experience and has contributed to numerous academic publications. His research focuses on developing an IoT-based Indirect Solar Dryer and a digital system to check soil fertility using AI.</p>";
                                             prof_href = "brijbhushansharma@shooliniouniversity.com";
                                             course = "CSU1289";
                                             course_detail = "Digital Electronics";
