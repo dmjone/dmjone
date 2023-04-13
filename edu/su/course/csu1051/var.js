@@ -89,9 +89,14 @@ function get_menu_list(datetogen) {
                 readtime: r(30)
             },
             {
+                title: "Stacks: Data Structure Representations, Implementations & Applications",
+                desc: "Learn about stacks, a fundamental data structure in programming, which follows the last-in-first-out (LIFO) policy. This article covers the different representations and implementations of stacks, including array-based and linked-list-based implementations, and their applications in various domains such as operating systems, computer networks, and simulation. Whether you're a beginner programmer or an experienced developer, understanding the concepts of stacks is crucial to creating efficient and effective programs. By the end of this article, you'll have a solid foundation in representing stacks, performing various operations on them, and applying this knowledge to solve problems in programming.",
+                link: "c14"
+            },
+            {
                 title: "Stacks and Queues Representations, Implementations & Applications",
                 desc: "Learn about stacks and queues representations, implementations and applications in data structures and algorithms. Stacks and queues are fundamental data structures in programming that are used to store and manipulate data based on a last-in-first-out (LIFO) or first-in-first-out (FIFO) policy, respectively. Understanding the different representations of stacks and queues and how to manipulate them efficiently is important for solving problems in various domains such as operating systems, computer networks, and simulation. This concept is useful for beginner programmers to learn how to represent stacks and queues, understand the different operations on them, and apply this knowledge to create efficient and effective programs.",
-                link: "c14"
+                link: "c15"
             },
             // {
             //     title: "Singly Linked Lists and Their Representations",
