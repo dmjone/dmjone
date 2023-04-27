@@ -136,10 +136,7 @@ function get_menu_list(datetogen) {
                 title: "Lab 1: Introduction to Data Structure",
                 desc: "This lab will provide an overview of key concepts related to data and information management. You will learn about databases, big data, data warehouses, different types of data structures, and the importance of data structures and algorithms. Additionally, you will explore the differences between data structures and algorithms."
             },
-            {
-                title: "Lab 2: Verify truth table of all logic gates in Proteus",
-                desc: "This lab will provide a verification of truth table using Proteus software."
-            }
+            
             // {
             //     title: "Lab 2",
             //     desc: "Description"

@@ -61,18 +61,14 @@ function get_menu_list(datetogen) {
     function get_lab(def_date, def_author) {
         const arr = [
             {
-                title: "Lab 1",
-                desc: "To verify the truth table of various basic Logic Gates."
+                title: "Lab 1: Verify truth table of all logic gates in Proteus",
+                desc: "This lab will provide a verification of truth table using Proteus software."
             },
-            {
-                title: "Lab 2",
-                desc: "Description"
-            }
         ];
         for (let i = 0; i < arr.length; i++) {
             const _data = arr[i];
             title = _data.title || null; if (!title) continue; // Set the title and if thats not possible, skip the loop
-            link = _data.link || `lab${i + 1}`;
+            link = _data.link || `p${i + 1}`;
             date = _data.date ? _data.date : `${gendate(def_date)}`;
             desc = _data.desc || `${title} ${i}`;
             codetype = _data.codetype ? `CSU1289P | ${_data.codetype}` : `CSU1289P | Lab`;
