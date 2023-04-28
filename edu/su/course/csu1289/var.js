@@ -8,12 +8,12 @@ function get_menu_list(datetogen) {
                 desc: "Unlock the full potential of digital electronics with our in-depth guide to all the concepts. Take your tech skills to the next level and discover a world of endless possibilities. Click now to begin your digital journey.",
                 codetype: "CSU1289 | Concepts"
             },
-            // {
-            //     link: "lab/",
-            //     title: "Elevate Your Digital Electronics Skills: A Comprehensive Guide for Lab Enthusiasts",
-            //     desc: "Unleash your potential in the digital electronics lab with our comprehensive guide covering all the essential concepts. Discover the magic of electronics and take your tech skills to the next level. Click now to begin your digital journey.",
-            //     codetype: "CSU1289P | Lab"
-            // }
+            {
+                link: "lab/",
+                title: "Elevate Your Digital Electronics Skills: A Comprehensive Guide for Lab Enthusiasts",
+                desc: "Unleash your potential in the digital electronics lab with our comprehensive guide covering all the essential concepts. Discover the magic of electronics and take your tech skills to the next level. Click now to begin your digital journey.",
+                codetype: "CSU1289P | Lab"
+            }
         ];
         for (let i = 0; i < arr.length; i++) {
             const _data = arr[i];
