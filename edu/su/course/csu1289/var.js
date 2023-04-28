@@ -62,7 +62,11 @@ function get_menu_list(datetogen) {
         const arr = [
             {
                 title: "Lab 1: Verify truth table of all logic gates in Proteus",
-                desc: "This lab will provide a verification of truth table using Proteus software."
+                desc: "This lab will provide a verification of truth table of logic gates using Proteus software."
+            },
+            {
+                title: "Lab 2: Verify truth table of half adder and full adder in Proteus",
+                desc: "This lab will provide a verification of truth table of half adder and full adder using Proteus software."
             },
         ];
         for (let i = 0; i < arr.length; i++) {
