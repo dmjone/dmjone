@@ -134,9 +134,10 @@
     var cdnjs_highlightjs = "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/highlight.min.js";
     var cdnjs_katex = "https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js";
     var cdnjs_katex_autorender = "https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js";
+    var cdnjs_font_awesome = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js";
 
     // Create an array of script URLs
-    var scripts = [cdnjs_jquery, cdnjs_bootstrap, cdnjs_highlightjs, cdnjs_katex, cdnjs_katex_autorender];
+    var scripts = [cdnjs_jquery, cdnjs_bootstrap, cdnjs_highlightjs, cdnjs_katex, cdnjs_katex_autorender, cdnjs_font_awesome];
     var loaded = 0; // Create a counter to keep track of the number of scripts that have finished loading
 
     for (var i = 0; i < scripts.length; i++) { // Iterate through the array of scripts
@@ -601,6 +602,299 @@ function footer_getHeaderValue(keyName) {
     var headerValue = headers.match(new RegExp(keyName + ":\\s*([^\\n]+)", "i")) ? headers.match(new RegExp(keyName + ":\\s*([^\\n]+)", "i"))[1].trim() : false;
     return headerValue;
 }
+/* 
+function createSharingButton(text, url, iconName, btnClass) {
+    var button = document.createElement("a");
+    button.href = url;
+    button.target = "_blank";
+    button.rel = "noopener noreferrer";
+    button.classList.add("btn", btnClass);
+    button.innerHTML = `<i class="${iconName}"></i> ${text}`;
+
+    return button;
+}
+
+function createSharingButtons() {
+    const sharingContainer = document.createElement("div");
+    sharingContainer.classList.add("sharing-buttons-container");
+
+    const currentUrl = encodeURIComponent(window.location.href);
+    const pageTitle = encodeURIComponent(document.title);
+    const shareMessage = `Check out this link: ${pageTitle} ${currentUrl}`;
+
+    const socialSites = [
+        { name: "WhatsApp", icon: "bi bi-whatsapp", url: `https://api.whatsapp.com/send?text=${shareMessage}` },
+        { name: "Facebook", icon: "bi bi-facebook", url: `https://www.facebook.com/sharer/sharer.php?u=${currentUrl}&quote=${shareMessage}` },
+        { name: "Twitter", icon: "bi bi-twitter", url: `https://twitter.com/intent/tweet?url=${currentUrl}&text=${shareMessage}` },
+        { name: "LinkedIn", icon: "bi bi-linkedin", url: `https://www.linkedin.com/sharing/share-offsite/?url=${currentUrl}` },
+        { name: "Pinterest", icon: "bi bi-pinterest", url: `https://pinterest.com/pin/create/button/?url=${currentUrl}&description=${shareMessage}` },
+    ];
+
+    const label = document.createElement("span");
+    label.textContent = "Share the love: ";
+    label.classList.add("sharing-buttons-label");
+    sharingContainer.appendChild(label);
+
+    socialSites.forEach((site) => {
+        const button = createSharingButton("", site.url, site.icon, `btn-${site.name.toLowerCase()}`);
+        sharingContainer.appendChild(button);
+    });
+
+    return sharingContainer;
+}  */
+
+/* function createSharingButtons(text, url, iconName, btnClass) {
+    const sharingContainer = document.createElement("div");
+    sharingContainer.classList.add("sharing-buttons-container");
+
+    const currentUrl = encodeURIComponent(window.location.href);
+    const pageTitle = encodeURIComponent(document.title);
+    const shareMessage = `Check out this link: ${pageTitle} ${currentUrl}`;
+
+    const socialSites = [
+        { name: "WhatsApp", icon: "bi bi-whatsapp", url: `https://api.whatsapp.com/send?text=${shareMessage}` },
+        { name: "Facebook", icon: "bi bi-facebook", url: `https://www.facebook.com/sharer/sharer.php?u=${currentUrl}&quote=${shareMessage}` },
+        { name: "Twitter", icon: "bi bi-twitter", url: `https://twitter.com/intent/tweet?url=${currentUrl}&text=${shareMessage}` },
+        { name: "LinkedIn", icon: "bi bi-linkedin", url: `https://www.linkedin.com/sharing/share-offsite/?url=${currentUrl}` },
+        { name: "Pinterest", icon: "bi bi-pinterest", url: `https://pinterest.com/pin/create/button/?url=${currentUrl}&description=${shareMessage}` },
+    ];
+
+    const label = document.createElement("span");
+    label.textContent = text || "Share this page: ";
+    label.classList.add("sharing-buttons-label");
+    sharingContainer.appendChild(label);
+
+    socialSites.forEach((site) => {
+        const button = document.createElement("a");
+        button.href = site.url;
+        button.target = "_blank";
+        button.rel = "noopener noreferrer";
+        button.classList.add("btn", `${btnClass}-${site.name.toLowerCase()}`);
+        button.innerHTML = `<i class="${site.icon}"></i>`;
+        sharingContainer.appendChild(button);
+    });
+
+    return sharingContainer;
+} */
+
+/* function createSharingButtons(text, url, iconName, btnClass) {
+    const sharingContainer = document.createElement("div");
+    sharingContainer.classList.add("sharing-buttons-container");
+
+    const currentUrl = encodeURIComponent(window.location.href);
+    const pageTitle = encodeURIComponent(document.title);
+    const shareMessage = `Check out this link: ${pageTitle} ${currentUrl}`;
+
+    const socialSites = [
+        { name: "WhatsApp", icon: "bi bi-whatsapp", url: `https://api.whatsapp.com/send?text=${shareMessage}` },
+        { name: "Facebook", icon: "bi bi-facebook", url: `https://www.facebook.com/sharer/sharer.php?u=${currentUrl}&quote=${shareMessage}` },
+        { name: "Twitter", icon: "bi bi-twitter", url: `https://twitter.com/intent/tweet?url=${currentUrl}&text=${shareMessage}` },
+        { name: "LinkedIn", icon: "bi bi-linkedin", url: `https://www.linkedin.com/sharing/share-offsite/?url=${currentUrl}` },
+        { name: "Pinterest", icon: "bi bi-pinterest", url: `https://pinterest.com/pin/create/button/?url=${currentUrl}&description=${shareMessage}` },
+    ];
+
+    const label = document.createElement("span");
+    label.textContent = text || "Share this page: ";
+    label.classList.add("sharing-buttons-label");
+    sharingContainer.appendChild(label);
+
+    const buttonGroup = document.createElement("div");
+    buttonGroup.classList.add("sharing-buttons-group");
+    sharingContainer.appendChild(buttonGroup);
+
+    socialSites.slice(0, 3).forEach((site) => {
+        const button = createButton(site);
+        buttonGroup.appendChild(button);
+    });
+
+    if (socialSites.length > 3) {
+        const moreButton = document.createElement("button");
+        moreButton.classList.add("btn", "btn-link", "bi", "bi-share");
+        moreButton.setAttribute("type", "button");
+        moreButton.setAttribute("data-bs-toggle", "collapse");
+        moreButton.setAttribute("data-bs-target", "#sharing-buttons-collapse");
+        sharingContainer.appendChild(moreButton);
+
+        const hiddenGroup = document.createElement("div");
+        hiddenGroup.classList.add("sharing-buttons-group", "collapse");
+        hiddenGroup.setAttribute("id", "sharing-buttons-collapse");
+        sharingContainer.appendChild(hiddenGroup);
+
+        socialSites.slice(3).forEach((site) => {
+            const button = createButton(site);
+            hiddenGroup.appendChild(button);
+        });
+    }
+
+    function createButton(site) {
+        const button = document.createElement("a");
+        button.href = site.url;
+        button.target = "_blank";
+        button.rel = "noopener noreferrer";
+        button.classList.add("btn", `${btnClass}-${site.name.toLowerCase()}`);
+        button.innerHTML = `<i class="${site.icon}"></i>`;
+        return button;
+    }
+
+    return sharingContainer;
+} */
+
+function createSharingButtons(text, url, iconName, btnClass) {
+    const sharingContainer = document.createElement("div");
+    sharingContainer.classList.add("sharing-buttons-container");
+    sharingContainer.style.maxWidth = "100%";
+    sharingContainer.style.overflowX = "auto";
+    sharingContainer.style.padding = "0";
+
+    const currentUrl = encodeURIComponent(window.location.href);
+    const pageTitle = encodeURIComponent(document.title);
+    const shareMessage = `${pageTitle} ${currentUrl}`;
+
+    const socialSites = [
+        { name: "WhatsApp", icon: "bi bi-whatsapp", url: `https://api.whatsapp.com/send?text=${shareMessage}` },
+        { name: "Facebook", icon: "bi bi-facebook", url: `https://www.facebook.com/sharer/sharer.php?u=${currentUrl}&quote=${pageTitle}` },
+        { name: "Twitter", icon: "bi bi-twitter", url: `https://twitter.com/intent/tweet?url=${currentUrl}&text=${pageTitle}` },
+        { name: "LinkedIn", icon: "bi bi-linkedin", url: `https://www.linkedin.com/sharing/share-offsite/?url=${currentUrl}` },
+        { name: "Pinterest", icon: "bi bi-pinterest", url: `https://pinterest.com/pin/create/button/?url=${currentUrl}&description=${pageTitle}` },
+        { name: "Reddit", icon: "bi bi-reddit", url: `https://www.reddit.com/submit?url=${currentUrl}&title=${pageTitle}` },
+        { name: "Tumblr", icon: "fa-brands fa-tumblr", url: `https://www.tumblr.com/widgets/share/tool?canonicalUrl=${currentUrl}&title=${pageTitle}&caption=${shareMessage}` },
+        { name: "Telegram", icon: "bi bi-telegram", url: `https://t.me/share/url?url=${currentUrl}&text=${pageTitle}` },
+        { name: "VK", icon: "fa-brands fa-vk", url: `https://vk.com/share.php?url=${currentUrl}&title=${pageTitle}&description=${shareMessage}` },
+        { name: "Xing", icon: "fa-brands fa-xing", url: `https://www.xing.com/app/user?op=share&url=${currentUrl}` },
+    ];
+
+    const label = document.createElement("span");
+    label.textContent = text || "Share this page: ";
+    label.style.fontSize = "1.25rem";
+    label.style.color = "#0d6efd";
+    label.style.display = "inline-block";
+    label.style.verticalAlign = "middle";
+    label.style.marginRight = "10px";
+    sharingContainer.appendChild(label);
+
+    const buttonGroup = document.createElement("div");
+    buttonGroup.style.display = "inline-block";
+    buttonGroup.style.verticalAlign = "middle";
+    sharingContainer.appendChild(buttonGroup);
+
+    socialSites.slice(0, 3).forEach((site) => {
+        const button = createButton(site);
+        buttonGroup.appendChild(button);
+    });
+
+    if (socialSites.length > 3) {
+        const moreButton = document.createElement("button");
+        moreButton.classList.add("btn", "btn-link", "bi", "bi-plus-square");
+        moreButton.setAttribute("type", "button");
+        sharingContainer.appendChild(moreButton);
+
+        const hiddenGroup = document.createElement("div");
+        hiddenGroup.classList.add("sharing-buttons-group", "collapse");
+        hiddenGroup.style.display = "none";
+        hiddenGroup.style.marginLeft = "5px";
+        sharingContainer.appendChild(hiddenGroup);
+
+        socialSites.slice(3).forEach((site) => {
+            const button = createButton(site);
+            hiddenGroup.appendChild(button);
+        });
+
+        moreButton.addEventListener("click", function () {
+            if (hiddenGroup.style.display === "none") {
+                hiddenGroup.style.display = "inline-block";
+                moreButton.classList.remove("bi-plus-square");
+                moreButton.classList.add("bi-x-square");
+            } else {
+                hiddenGroup.style.display = "none";
+                moreButton.classList.remove("bi-x-square");
+                moreButton.classList.add("bi-plus-square");
+            }
+        });
+    }
+
+    function createButton(site) {
+        const button = document.createElement("a");
+        button.href = site.url;
+        button.target = "_blank";
+        button.rel = "noopener noreferrer";
+        button.classList.add("btn", `${btnClass}-${site.name.toLowerCase()}`);
+        button.style.marginRight = "5px";
+        button.innerHTML = `<i class="${site.icon}"></i>`;
+        return button;
+    }
+
+    return sharingContainer;
+}
+
+
+
+/* 
+function createSharingButtons(text, url, iconName, btnClass) {
+    const sharingContainer = document.createElement("div");
+    sharingContainer.classList.add("sharing-buttons-container");
+
+    const currentUrl = encodeURIComponent(window.location.href);
+    const pageTitle = encodeURIComponent(document.title);
+    const shareMessage = `Check out this link: ${pageTitle} ${currentUrl}`;
+
+    const socialSites = [
+        { name: "WhatsApp", icon: "bi bi-whatsapp", url: `https://api.whatsapp.com/send?text=${shareMessage}` },
+        { name: "Facebook", icon: "bi bi-facebook", url: `https://www.facebook.com/sharer/sharer.php?u=${currentUrl}&quote=${shareMessage}` },
+        { name: "Twitter", icon: "bi bi-twitter", url: `https://twitter.com/intent/tweet?url=${currentUrl}&text=${shareMessage}` },
+        { name: "LinkedIn", icon: "bi bi-linkedin", url: `https://www.linkedin.com/sharing/share-offsite/?url=${currentUrl}` },
+        { name: "Pinterest", icon: "bi bi-pinterest", url: `https://pinterest.com/pin/create/button/?url=${currentUrl}&description=${shareMessage}` },
+    ];
+
+    const label = document.createElement("span");
+    label.textContent = text || "Share this page: ";
+    label.classList.add("sharing-buttons-label");
+    sharingContainer.appendChild(label);
+
+    const buttonGroup = document.createElement("div");
+    buttonGroup.classList.add("sharing-buttons-group");
+    sharingContainer.appendChild(buttonGroup);
+
+    socialSites.slice(0, 3).forEach((site) => {
+        const button = createButton(site);
+        buttonGroup.appendChild(button);
+    });
+
+    if (socialSites.length > 3) {
+        const moreButton = document.createElement("button");
+        moreButton.classList.add("btn", "btn-link", "bi", "bi-share");
+        moreButton.setAttribute("type", "button");
+        moreButton.setAttribute("data-bs-toggle", "collapse");
+        moreButton.setAttribute("data-bs-target", "#sharing-buttons-collapse");
+        sharingContainer.appendChild(moreButton);
+
+        const hiddenGroup = document.createElement("div");
+        hiddenGroup.classList.add("sharing-buttons-group", "collapse");
+        hiddenGroup.setAttribute("id", "sharing-buttons-collapse");
+        hiddenGroup.style.display = 'inline-block';
+        sharingContainer.appendChild(hiddenGroup);
+
+        socialSites.slice(3).forEach((site) => {
+            const button = createButton(site);
+            hiddenGroup.appendChild(button);
+        });
+    }
+
+    function createButton(site) {
+        const button = document.createElement("a");
+        button.href = site.url;
+        button.target = "_blank";
+        button.rel = "noopener noreferrer";
+        button.classList.add("btn", `${btnClass}-${site.name.toLowerCase()}`);
+        button.innerHTML = `<i class="${site.icon}"></i>`;
+        return button;
+    }
+
+    return sharingContainer;
+} */
+
+
+
+
 
 function copyright(rights) {
     window["loaded_copyright"] = 1;
@@ -619,6 +913,8 @@ function copyright(rights) {
     } else { rights = ""; }
 
     var footer = document.createElement("footer");
+    var sharingButtons = createSharingButtons();
+    footer.appendChild(sharingButtons);
     var span = document.createElement("span");
     var strong = document.createElement("strong");
 

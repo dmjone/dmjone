@@ -63,7 +63,8 @@ function get_menu_list(datetogen) {
             },
             {
                 title: "Running Time and Storage Cost of Algorithms",
-                desc: "Learn about the running time and storage cost of algorithms in data structures and algorithms. The running time and storage cost of an algorithm are important factors to consider when designing and analyzing algorithms, as they directly impact the efficiency and performance of the algorithm. This concept is a useful exercise for beginner programmers to learn how to measure and optimize the running time and storage cost of algorithms, and how to apply this knowledge to create more efficient and scalable programs."
+                desc: "Learn about the running time and storage cost of algorithms in data structures and algorithms. The running time and storage cost of an algorithm are important factors to consider when designing and analyzing algorithms, as they directly impact the efficiency and performance of the algorithm. This concept is a useful exercise for beginner programmers to learn how to measure and optimize the running time and storage cost of algorithms, and how to apply this knowledge to create more efficient and scalable programs.",
+                link: "running-time-storage-cost-algorithms"
             },
             {
                 title: "Array Representation in Memory",
