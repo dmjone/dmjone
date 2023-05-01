@@ -62,7 +62,8 @@ function get_menu_list(datetogen) {
         const arr = [
             {
                 title: "Lab 1: Verify truth table of all logic gates in Proteus",
-                desc: "This lab will provide a verification of truth table of logic gates using Proteus software."
+                desc: "This lab will provide a verification of truth table of logic gates using Proteus software.",
+                date: "March 3, 2023"
             },
             {
                 title: "Lab 2: Verify truth table of half adder and full adder in Proteus",
