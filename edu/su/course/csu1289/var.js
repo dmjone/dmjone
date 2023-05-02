@@ -63,7 +63,8 @@ function get_menu_list(datetogen) {
             {
                 title: "Lab 1: Verify truth table of all logic gates in Proteus",
                 desc: "This lab will provide a verification of truth table of logic gates using Proteus software.",
-                date: "March 3, 2023"
+                date: "Fri March 3, 2023",
+                link: "verification-of-logic-gates-in-proteus"
             },
             {
                 title: "Lab 2: Verify truth table of half adder and full adder in Proteus",
