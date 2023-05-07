@@ -80,7 +80,7 @@ function get_menu_list(datetogen) {
             {
                 link: "csu1289/",
                 title: "Digital Electronics",
-                desc: "Explore the fascinating world of Digital Electronics with Dr. Brijbhushan Sharma. This comprehensive course covers the fundamental principles of digital circuits, logic gates, and microprocessors, and how they are used to power modern electronic devices. With Dr. Sharma's expert guidance, you'll gain the knowledge and skills to design and build complex digital systems from scratch.",
+                desc: "Explore the fascinating world of Digital Electronics with Dr. Brij Bhushan Sharma. This comprehensive course covers the fundamental principles of digital circuits, logic gates, and microprocessors, and how they are used to power modern electronic devices. With Dr. Sharma's expert guidance, you'll gain the knowledge and skills to design and build complex digital systems from scratch.",
                 codetype: "CSU1289 | CSU1289P",
                 semester: 2
             },

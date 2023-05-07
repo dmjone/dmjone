@@ -114,15 +114,9 @@ function get_menu_list(datetogen) {
             {
                 title: "Frequently Asked Questions 1",
                 desc: "Learn about some of the frequently asked questions in data structures and algorithms. Understanding these questions will give you a better understanding and is a useful exercise for beginner programmers to learn how to test their knowledge.",
-                readtime: r(15),
+                readtime: r(10),
                 link: "faq1"
             },
-
-
-
-
-
-
         ];
         for (let i = 0; i < arr.length; i++) {
             const _data = arr[i];
