@@ -111,7 +111,12 @@ function get_menu_list(datetogen) {
             //     title: "Operations on Linked Lists - Insertion, Deletion, and Traversal",
             //     desc: "Learn about operations on linked lists - insertion, deletion, and traversal - in data structures and algorithms with this article. Linked lists are a fundamental data structure in programming that are used to store and manipulate data in a dynamic and flexible way. Understanding how to perform operations such as insertion, deletion, and traversal on linked lists efficiently is important for solving problems in various domains such as database management, machine learning, and web development. This program is a useful for beginner programmers to learn how to perform operations on linked lists, understand their time and space complexities, and apply this knowledge to create efficient and effective programs."
             // },
-
+            {
+                title: "Frequently Asked Questions 1",
+                desc: "Learn about some of the frequently asked questions in data structures and algorithms. Understanding these questions will give you a better understanding and is a useful exercise for beginner programmers to learn how to test their knowledge.",
+                readtime: r(15),
+                link: "faq1"
+            },
 
 
 
@@ -137,7 +142,7 @@ function get_menu_list(datetogen) {
                 title: "Lab 1: Introduction to Data Structure",
                 desc: "This lab will provide an overview of key concepts related to data and information management. You will learn about databases, big data, data warehouses, different types of data structures, and the importance of data structures and algorithms. Additionally, you will explore the differences between data structures and algorithms."
             },
-            
+
             // {
             //     title: "Lab 2",
             //     desc: "Description"
