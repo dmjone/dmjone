@@ -39,8 +39,16 @@ function get_menu_list(datetogen) {
                 title: "Cracking the Code: Demystifying the Fascinating World of Number Systems",
                 desc: "Uncover the secrets of the number system and explore the amazing world of numerical codes with our comprehensive guide. From binary to hexadecimal, our guide covers it all. Click now to embark on a mind-bending journey through the world of numbers!",
                 codetype: "Number Systems",
-                readtime: r(50)
+                readtime: r(20),
+                link: "number-systems"
             },
+            {
+                title: "Adders Unleashed: Unraveling the Magic of Addition in Digital Electronics",
+                desc: "Dive into the spellbinding world of digital electronics with our comprehensive guide on Adders. From the simplicity of Half Adders to the sophistication of Full Adders, our guide illuminates every nook and cranny of this fascinating subject. Click now to join this extraordinary adventure in the world of bits and gates!",
+                codetype: "Adders",
+                readtime: r(10),
+                link: "adders"
+            }
             // {
             //     title: "Section B: Electricity and Magnetism",
             //     desc: "Get ready to explore Electricity & Magnetism! Learn about electric field & potential, dielectric polarization, displacement current, Maxwell's equations, velocity of EM waves, electromagnetic spectrum, magnetic materials, superconductivity, ultrasonic waves, Type I & Type II superconductors and more. Get ready to electrify your knowledge!"
