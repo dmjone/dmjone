@@ -40,15 +40,29 @@ function get_menu_list(datetogen) {
                 desc: "Uncover the secrets of the number system and explore the amazing world of numerical codes with our comprehensive guide. From binary to hexadecimal, our guide covers it all. Click now to embark on a mind-bending journey through the world of numbers!",
                 codetype: "Number Systems",
                 readtime: r(20),
-                link: "number-systems"
+                link: "number-system"
             },
             {
                 title: "Adders Unleashed: Unraveling the Magic of Addition in Digital Electronics",
                 desc: "Dive into the spellbinding world of digital electronics with our comprehensive guide on Adders. From the simplicity of Half Adders to the sophistication of Full Adders, our guide illuminates every nook and cranny of this fascinating subject. Click now to join this extraordinary adventure in the world of bits and gates!",
                 codetype: "Adders",
                 readtime: r(10),
-                link: "adders"
-            }
+                link: "adder"
+            },
+            {
+                title: "Subtractors Decoded: Navigating the Intricacies of Subtraction in Digital Electronics",
+                desc: "Embark on a captivating journey through the realm of digital electronics with our comprehensive guide on Subtractors. From Half Subtractors to Full Subtractors, we delve deep into this intriguing topic. Click now to explore this exciting universe of digital computation and logic gates!",
+                codetype: "Subtractors",
+                readtime: r(10),
+                link: "subtractor"
+            },
+            {
+                title: "Binary Arithmetic Unveiled: A Deep Dive into the Mathematical Logic of the Digital World",
+                desc: "Step into the astonishing world of digital computation with our all-encompassing guide on Binary Arithmetic. From addition and subtraction to multiplication and division, we explore it all in the binary realm. Click now to unlock the mysteries of the mathematical operations in the binary number system!",
+                codetype: "Binary Arithmetic",
+                readtime: r(15),
+                link: "binary-arithmetic"
+            },
             // {
             //     title: "Section B: Electricity and Magnetism",
             //     desc: "Get ready to explore Electricity & Magnetism! Learn about electric field & potential, dielectric polarization, displacement current, Maxwell's equations, velocity of EM waves, electromagnetic spectrum, magnetic materials, superconductivity, ultrasonic waves, Type I & Type II superconductors and more. Get ready to electrify your knowledge!"
