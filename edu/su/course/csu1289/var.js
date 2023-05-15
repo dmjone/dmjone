@@ -63,6 +63,13 @@ function get_menu_list(datetogen) {
                 readtime: r(15),
                 link: "binary-arithmetic"
             },
+            {
+                title: "Logic Gates Exposed: A Journey into the Heart of Digital Electronics",
+                desc: "Venture into the fascinating world of digital electronics with our comprehensive guide on Logic Gates. From the fundamental AND, OR, NOT gates to the complex XOR, XNOR, NAND, NOR gates, we dissect every aspect of these digital building blocks. Click now to uncover the magic behind the circuitry!",
+                codetype: "Logic Gates",
+                readtime: r(17),
+                link: "logic-gates"
+            }
             // {
             //     title: "Section B: Electricity and Magnetism",
             //     desc: "Get ready to explore Electricity & Magnetism! Learn about electric field & potential, dielectric polarization, displacement current, Maxwell's equations, velocity of EM waves, electromagnetic spectrum, magnetic materials, superconductivity, ultrasonic waves, Type I & Type II superconductors and more. Get ready to electrify your knowledge!"
