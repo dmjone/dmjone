@@ -1805,8 +1805,6 @@ window.onload = function () {
 /******* SECURITY SUITE START *******/
 (function () {
     if (location.hostname === "dmj.one") {
-        document.body.classList.add('prod_dmj-domain');
-
         const clearinteral_sakjds = window.setInterval(function () {
             if (localStorage.getItem("noshow") === "1" && window.scriptsremoved != 1) {
                 (function () {
