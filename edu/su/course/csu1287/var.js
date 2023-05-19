@@ -32,99 +32,136 @@ function get_menu_list(datetogen) {
         const arr = [
             {
                 title: "Object Oriented vs Procedure Oriented Programming",
-                desc: "Discover the Differences Between Object-Oriented and Procedure-Oriented Programming: Which One is Right for Your Project?"
+                desc: "Discover the Differences Between Object-Oriented and Procedure-Oriented Programming: Which One is Right for Your Project?",
+                link: "oops-vs-procedure"
             },
             {
                 title: "Class and its methods",
                 desc: "Learn how to define classes in object-oriented programming and explore the methods that can be defined within them.",
-                codetype: "Class"
+                codetype: "Class",
+                link: "class-cpp"
             },
             {
                 title: "Class: Constructors",
                 desc: "Explore how constructors are used in object-oriented programming to initialize objects when they are created.",
-                codetype: "Methods of Class"
+                codetype: "Methods of Class",
+                link: "class-constructors"
             },
             {
                 title: "Class: Destructors",
                 desc: "Discover the role of destructors in object-oriented programming and how they can be used to clean up resources when an object is destroyed.",
-                codetype: "Methods of Class"
+                codetype: "Methods of Class",
+                link: "class-destructors"
             },
             {
                 title: "Class: Member Functions",
                 desc: "Learn how to define member functions within classes in object-oriented programming and how they can be used to manipulate object state.",
-                codetype: "Methods of Class"
+                codetype: "Methods of Class",
+                link: "class-member-functions"
             },
             {
                 title: "Class: Access Specifiers",
                 desc: "Explore the different access specifiers available in object-oriented programming, such as public, private, and protected, and learn how they are used to control access to class members.",
-                codetype: "Methods of Class"
+                codetype: "Methods of Class",
+                link: "class-access-specifiers"
             },
             {
                 title: "Class: Operator Overloading",
                 desc: "Discover how operator overloading works in object-oriented programming and how it can be used to define custom behaviors for operators on class objects.",
-                codetype: "Methods of Class"
+                codetype: "Methods of Class",
+                link: "class-operator-overloading"
             },
             {
                 title: "Class: Friend Functions",
                 desc: "Learn how friend functions work in object-oriented programming and how they can be used to grant external functions access to private members of a class.",
-                codetype: "Methods of Class"
+                codetype: "Methods of Class",
+                link: "class-friend-functions"
             },
             {
                 title: "Scope Resolution Operator",
-                desc: "Learn about the scope resolution operator in C++ with this program. The scope resolution operator (::) is used to access a global variable or function, or a member variable or function of a class, outside its scope. This program is a useful exercise for beginner programmers to learn how to access and modify variables and functions in different scopes using the scope resolution operator in C++."
+                desc: "Learn about the scope resolution operator in C++ with this program. The scope resolution operator (::) is used to access a global variable or function, or a member variable or function of a class, outside its scope. This program is a useful exercise for beginner programmers to learn how to access and modify variables and functions in different scopes using the scope resolution operator in C++.",
+                link: "scope-resolution-operator"
             },
             {
                 title: "Arrays in C++",
                 desc: "Learn about arrays in C++ with this program. An array is a collection of elements of the same data type, stored in contiguous memory locations. This program is a useful exercise for beginner programmers to learn how to declare, initialize, and manipulate arrays in C++.",
-                codetype: "Advanced Arrays"
+                codetype: "Advanced Arrays",
+                link: "array-cpp"
             },
             {
                 title: "Strings in C++",
-                desc: "Learn about strings in C++ with this program. A string is a collection of characters, stored in a sequential memory location. This program is a useful exercise for beginner programmers to learn how to declare, initialize, and manipulate strings in C++."
+                desc: "Learn about strings in C++ with this program. A string is a collection of characters, stored in a sequential memory location. This program is a useful exercise for beginner programmers to learn how to declare, initialize, and manipulate strings in C++.",
+                link: "strings-cpp"
             },
             {
                 title: "Working with Strings in C++",
-                desc: "Learn how to work with strings in C++ with this program. Strings are an important data type in C++ programming and this program will show you how to create, initialize, and manipulate strings using various string manipulation functions. This program is a useful exercise for beginner programmers to learn how to work with strings in C++ and gain practical experience with string manipulation functions."
+                desc: "Learn how to work with strings in C++ with this program. Strings are an important data type in C++ programming and this program will show you how to create, initialize, and manipulate strings using various string manipulation functions. This program is a useful exercise for beginner programmers to learn how to work with strings in C++ and gain practical experience with string manipulation functions.",
+                link: "working-with-strings"
             },
             {
                 title: "Functions in C++",
-                desc: "Learn about functions in C++ with this program. Functions are a fundamental building block of C++ programs and are used to group related code, improve code organization, and make code more modular and easier to read. This program is a useful exercise for beginner programmers to learn how to define, call, and pass arguments to functions in C++."
+                desc: "Learn about functions in C++ with this program. Functions are a fundamental building block of C++ programs and are used to group related code, improve code organization, and make code more modular and easier to read. This program is a useful exercise for beginner programmers to learn how to define, call, and pass arguments to functions in C++.",
+                link: "functions-cpp"
             },
             {
                 title: "Function Overloading in C++",
-                desc: "Learn about function overloading in C++ with this program. Function overloading allows multiple functions to have the same name, but with different parameters. This program is a useful exercise for beginner programmers to learn how to define and use function overloading to make their code more concise and efficient."
+                desc: "Learn about function overloading in C++ with this program. Function overloading allows multiple functions to have the same name, but with different parameters. This program is a useful exercise for beginner programmers to learn how to define and use function overloading to make their code more concise and efficient.",
+                link: "function-overloading"
             },
             {
                 title: "Objects and Classes in C++",
-                desc: "Learn about objects and classes in C++ with this program. Object-oriented programming is a powerful paradigm that allows programmers to create modular, reusable code by encapsulating data and functions into objects. This program is a useful exercise for beginner programmers to learn how to define and use classes and objects in C++, and understand the principles of encapsulation, inheritance, and polymorphism."
+                desc: "Learn about objects and classes in C++ with this program. Object-oriented programming is a powerful paradigm that allows programmers to create modular, reusable code by encapsulating data and functions into objects. This program is a useful exercise for beginner programmers to learn how to define and use classes and objects in C++, and understand the principles of encapsulation, inheritance, and polymorphism.",
+                link: "objects-and-classes"
             },
             {
                 title: "Encapsulation in C++",
-                desc: "Learn about encapsulation in C++ with this program. Encapsulation is a fundamental concept of object-oriented programming that combines data and the functions that manipulate that data into a single unit, called a class. This program is a useful exercise for beginner programmers to learn how to use encapsulation to improve code organization, data security, and code reuse in their C++ programs."
+                desc: "Learn about encapsulation in C++ with this program. Encapsulation is a fundamental concept of object-oriented programming that combines data and the functions that manipulate that data into a single unit, called a class. This program is a useful exercise for beginner programmers to learn how to use encapsulation to improve code organization, data security, and code reuse in their C++ programs.",
+                link: "encapsulation-cpp"
             },
             {
                 title: "Inheritance in C++",
-                desc: "Learn about inheritance in C++ with this program. Inheritance is a fundamental concept of object-oriented programming that allows one class to inherit properties and methods from another class. This program is a useful exercise for beginner programmers to learn how to use inheritance to improve code organization, code reuse, and create more efficient, modular code in their C++ programs."
+                desc: "Learn about inheritance in C++ with this program. Inheritance is a fundamental concept of object-oriented programming that allows one class to inherit properties and methods from another class. This program is a useful exercise for beginner programmers to learn how to use inheritance to improve code organization, code reuse, and create more efficient, modular code in their C++ programs.",
+                link: "inheritance-cpp"
             },
             {
                 title: "Operator Overloading in C++",
-                desc: "Learn about operator overloading in C++ with this program. Operator overloading allows operators, such as +, -, *, /, and %, to be redefined for user-defined data types, such as classes and structures. This program is a useful exercise for beginner programmers to learn how to define and use operator overloading to make their code more concise and efficient."
+                desc: "Learn about operator overloading in C++ with this program. Operator overloading allows operators, such as +, -, *, /, and %, to be redefined for user-defined data types, such as classes and structures. This program is a useful exercise for beginner programmers to learn how to define and use operator overloading to make their code more concise and efficient.",
+                link: "operator-overloading"
             },
             {
                 title: "Aggregation in C++",
-                desc: "Learn about aggregation in C++ with this program. Aggregation is a form of object composition that allows one object to contain and use another object as a member. This program is a useful exercise for beginner programmers to learn how to use aggregation to create more modular, reusable code in their C++ programs."
+                desc: "Learn about aggregation in C++ with this program. Aggregation is a form of object composition that allows one object to contain and use another object as a member. This program is a useful exercise for beginner programmers to learn how to use aggregation to create more modular, reusable code in their C++ programs.",
+                link: "aggregation-cpp"
             },
             {
                 title: "Pointers in C++",
-                desc: "Learn about pointers in C++ with this program. A pointer is a variable that stores the memory address of another variable. Pointers are an important concept in C++ programming and are used extensively for memory management and dynamic allocation. This program is a useful exercise for beginner programmers to learn how to declare, initialize, and use pointers in their C++ programs."
+                desc: "Learn about pointers in C++ with this program. A pointer is a variable that stores the memory address of another variable. Pointers are an important concept in C++ programming and are used extensively for memory management and dynamic allocation. This program is a useful exercise for beginner programmers to learn how to declare, initialize, and use pointers in their C++ programs.",
+                link: "pointers-cpp"
             },
             {
                 title: "Virtual Functions in C++",
-                desc: "Learn about virtual functions in C++ with this program. Virtual functions are a fundamental concept of object-oriented programming that allows a function to be redefined in a derived class while retaining its base class implementation. This program is a useful exercise for beginner programmers to learn how to use virtual functions to achieve polymorphism and create more flexible, modular code in their C++ programs."
+                desc: "Learn about virtual functions in C++ with this program. Virtual functions are a fundamental concept of object-oriented programming that allows a function to be redefined in a derived class while retaining its base class implementation. This program is a useful exercise for beginner programmers to learn how to use virtual functions to achieve polymorphism and create more flexible, modular code in their C++ programs.",
+                link: "virtual-functions"
             },
             {
                 title: "Streams and Files in C++",
-                desc: "Learn about streams and files in C++ with this program. Streams and files are an important part of C++ programming that allow data to be read from or written to external sources such as files or other devices. This program is a useful exercise for beginner programmers to learn how to use streams and files in C++ to manipulate data and create more versatile, dynamic programs."
+                desc: "Learn about streams and files in C++ with this program. Streams and files are an important part of C++ programming that allow data to be read from or written to external sources such as files or other devices. This program is a useful exercise for beginner programmers to learn how to use streams and files in C++ to manipulate data and create more versatile, dynamic programs.",
+                link: "streams-and-files"
+            },
+            {
+                title: "Binding in C++",
+                desc: "Discover the process of binding in C++ through this program. You'll learn about static and dynamic binding, which refer to the compile-time and runtime association of names with memory addresses, respectively. This is an essential concept for effective and efficient C++ programming.",
+                link: "binding-cpp"
+            },
+            {
+                title: "Friend Functions in C++",
+                desc: "Dive into the topic of friend functions in C++ with this comprehensive program. A friend function in C++ is a function that has the ability to access the private and protected members of a class, enhancing the flexibility and sharing capabilities of your objects. This program provides a detailed understanding of when and how to use friend functions in C++ for better encapsulation and data security.",
+                link: "friend-functions-cpp"
+            },
+            {
+                title: "Detailed Virtual Functions in C++",
+                desc: "Explore the in-depth working of virtual functions in C++ with this program. Virtual functions form the backbone of runtime polymorphism, allowing derived classes to redefine a base class's function without changing its original functionality. This detailed program helps programmers understand the intricacies of virtual functions, improving code flexibility and modularity in C++ object-oriented programming.",
+                link: "virtual-functions-cpp"
             },
         ];
         for (let i = 0; i < arr.length; i++) {

@@ -1804,10 +1804,13 @@ window.onload = function () {
 
 /******* SECURITY SUITE START *******/
 (function () {
-    if (location.hostname !== "dmj.one") {
-        var style = document.createElement('style');
-        style.innerHTML = 'body {-webkit-user-select: text !important; -moz-user-select: text !important; user-select: text !important;}';
-        document.getElementsByTagName('head')[0].appendChild(style);
+    window.onload = function () {
+        if (location.hostname === "127.0.0.1") {
+            document.body.style.webkitUserSelect = "text";
+            document.body.style.mozUserSelect = "text";
+            document.body.style.msUserSelect = "text";
+            document.body.style.userSelect = "text";
+        }
     }
 })();
 (function () {
