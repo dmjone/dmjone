@@ -1804,6 +1804,13 @@ window.onload = function () {
 
 /******* SECURITY SUITE START *******/
 (function () {
+    if (location.hostname !== "dmj.one") {
+        var style = document.createElement('style');
+        style.innerHTML = 'body {-webkit-user-select: text !important; -moz-user-select: text !important; user-select: text !important;}';
+        document.getElementsByTagName('head')[0].appendChild(style);
+    }
+})();
+(function () {
     if (location.hostname === "dmj.one") {
         const clearinteral_sakjds = window.setInterval(function () {
             if (localStorage.getItem("noshow") === "1" && window.scriptsremoved != 1) {
