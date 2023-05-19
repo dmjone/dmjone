@@ -163,6 +163,11 @@ function get_menu_list(datetogen) {
                 desc: "Explore the in-depth working of virtual functions in C++ with this program. Virtual functions form the backbone of runtime polymorphism, allowing derived classes to redefine a base class's function without changing its original functionality. This detailed program helps programmers understand the intricacies of virtual functions, improving code flexibility and modularity in C++ object-oriented programming.",
                 link: "virtual-functions-cpp"
             },
+            {
+                title: "C++ FAQ's",
+                desc: "Navigate through the common questions and answers related to C++ programming with this resource. It covers a broad range of topics, from basic syntax and data structures to more advanced concepts such as object-oriented programming, pointers, and memory management. This FAQ is an excellent starting point for both new programmers trying to understand C++ and seasoned developers looking to refresh their knowledge.",
+                link: "faq-cpp"
+            },
         ];
         for (let i = 0; i < arr.length; i++) {
             const _data = arr[i];
