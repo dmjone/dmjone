@@ -117,6 +117,12 @@ function get_menu_list(datetogen) {
                 readtime: r(10),
                 link: "faq1"
             },
+            {
+                title: "Frequently Asked Questions 2",
+                desc: "Learn about some of the frequently asked questions in data structures and algorithms. Understanding these questions will give you a better understanding and is a useful exercise for beginner programmers to learn how to test their knowledge.",
+                readtime: r(10),
+                link: "faq2"
+            },
         ];
         for (let i = 0; i < arr.length; i++) {
             const _data = arr[i];
