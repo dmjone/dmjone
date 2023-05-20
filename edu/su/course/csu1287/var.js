@@ -170,9 +170,9 @@ function get_menu_list(datetogen) {
                 link: "revision-cpp"
             },
             {
-                title: "C++ FAQ's (WIP)",
+                title: "C++ FAQ's",
                 desc: "Navigate through the common questions and answers related to C++ programming with this resource. It covers a broad range of topics, from basic syntax and data structures to more advanced concepts such as object-oriented programming, pointers, and memory management. This FAQ is an excellent starting point for both new programmers trying to understand C++ and seasoned developers looking to refresh their knowledge.",
-                link: "#" //faq-cpp
+                link: "faq-cpp"
             },
         ];
         for (let i = 0; i < arr.length; i++) {
