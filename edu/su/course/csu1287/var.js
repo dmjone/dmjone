@@ -143,7 +143,7 @@ function get_menu_list(datetogen) {
                 desc: "Learn about inheritance in C++ with this program. Inheritance is a fundamental concept of object-oriented programming that allows one class to inherit properties and methods from another class. This program is a useful exercise for beginner programmers to learn how to use inheritance to improve code organization, code reuse, and create more efficient, modular code in their C++ programs.",
                 link: "inheritance-cpp"
             },
-            
+
             {
                 title: "Aggregation in C++",
                 desc: "Learn about aggregation in C++ with this program. Aggregation is a form of object composition that allows one object to contain and use another object as a member. This program is a useful exercise for beginner programmers to learn how to use aggregation to create more modular, reusable code in their C++ programs.",
@@ -165,9 +165,14 @@ function get_menu_list(datetogen) {
                 link: "binding-cpp"
             },
             {
-                title: "C++ FAQ's",
+                title: "C++ Concepts Revision",
+                desc: "Revisit and reinforce your knowledge of C++ with this comprehensive revision program. It provides a quick refresher on key C++ topics, from basic syntax, data structures, and control flow to advanced topics like object-oriented programming, pointers, and memory management. This revision guide is perfect for programmers who want to solidify their understanding or prepare for examinations or interviews.",
+                link: "revision-cpp"
+            },
+            {
+                title: "C++ FAQ's (WIP)",
                 desc: "Navigate through the common questions and answers related to C++ programming with this resource. It covers a broad range of topics, from basic syntax and data structures to more advanced concepts such as object-oriented programming, pointers, and memory management. This FAQ is an excellent starting point for both new programmers trying to understand C++ and seasoned developers looking to refresh their knowledge.",
-                link: "faq-cpp"
+                link: "#" //faq-cpp
             },
         ];
         for (let i = 0; i < arr.length; i++) {
