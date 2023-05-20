@@ -36,6 +36,11 @@ function get_menu_list(datetogen) {
                 link: "oops-vs-procedure"
             },
             {
+                title: "Objects and Classes in C++",
+                desc: "Learn about objects and classes in C++ with this program. Object-oriented programming is a powerful paradigm that allows programmers to create modular, reusable code by encapsulating data and functions into objects. This program is a useful exercise for beginner programmers to learn how to define and use classes and objects in C++, and understand the principles of encapsulation, inheritance, and polymorphism.",
+                link: "objects-and-classes"
+            },
+            {
                 title: "Class and its methods",
                 desc: "Learn how to define classes in object-oriented programming and explore the methods that can be defined within them.",
                 codetype: "Class",
@@ -83,6 +88,36 @@ function get_menu_list(datetogen) {
                 link: "scope-resolution-operator"
             },
             {
+                title: "Functions in C++",
+                desc: "Learn about functions in C++ with this program. Functions are a fundamental building block of C++ programs and are used to group related code, improve code organization, and make code more modular and easier to read. This program is a useful exercise for beginner programmers to learn how to define, call, and pass arguments to functions in C++.",
+                link: "functions-cpp"
+            },
+            {
+                title: "Virtual Functions in C++",
+                desc: "Learn about virtual functions in C++ with this program. Virtual functions are a fundamental concept of object-oriented programming that allows a function to be redefined in a derived class while retaining its base class implementation. This program is a useful exercise for beginner programmers to learn how to use virtual functions to achieve polymorphism and create more flexible, modular code in their C++ programs.",
+                link: "virtual-functions"
+            },
+            {
+                title: "Detailed Virtual Functions in C++",
+                desc: "Explore the in-depth working of virtual functions in C++ with this program. Virtual functions form the backbone of runtime polymorphism, allowing derived classes to redefine a base class's function without changing its original functionality. This detailed program helps programmers understand the intricacies of virtual functions, improving code flexibility and modularity in C++ object-oriented programming.",
+                link: "virtual-functions-cpp"
+            },
+            {
+                title: "Friend Functions in C++",
+                desc: "Dive into the topic of friend functions in C++ with this comprehensive program. A friend function in C++ is a function that has the ability to access the private and protected members of a class, enhancing the flexibility and sharing capabilities of your objects. This program provides a detailed understanding of when and how to use friend functions in C++ for better encapsulation and data security.",
+                link: "friend-functions-cpp"
+            },
+            {
+                title: "Function Overloading in C++",
+                desc: "Learn about function overloading in C++ with this program. Function overloading allows multiple functions to have the same name, but with different parameters. This program is a useful exercise for beginner programmers to learn how to define and use function overloading to make their code more concise and efficient.",
+                link: "function-overloading"
+            },
+            {
+                title: "Operator Overloading in C++",
+                desc: "Learn about operator overloading in C++ with this program. Operator overloading allows operators, such as +, -, *, /, and %, to be redefined for user-defined data types, such as classes and structures. This program is a useful exercise for beginner programmers to learn how to define and use operator overloading to make their code more concise and efficient.",
+                link: "operator-overloading"
+            },
+            {
                 title: "Arrays in C++",
                 desc: "Learn about arrays in C++ with this program. An array is a collection of elements of the same data type, stored in contiguous memory locations. This program is a useful exercise for beginner programmers to learn how to declare, initialize, and manipulate arrays in C++.",
                 codetype: "Advanced Arrays",
@@ -99,21 +134,6 @@ function get_menu_list(datetogen) {
                 link: "working-with-strings"
             },
             {
-                title: "Functions in C++",
-                desc: "Learn about functions in C++ with this program. Functions are a fundamental building block of C++ programs and are used to group related code, improve code organization, and make code more modular and easier to read. This program is a useful exercise for beginner programmers to learn how to define, call, and pass arguments to functions in C++.",
-                link: "functions-cpp"
-            },
-            {
-                title: "Function Overloading in C++",
-                desc: "Learn about function overloading in C++ with this program. Function overloading allows multiple functions to have the same name, but with different parameters. This program is a useful exercise for beginner programmers to learn how to define and use function overloading to make their code more concise and efficient.",
-                link: "function-overloading"
-            },
-            {
-                title: "Objects and Classes in C++",
-                desc: "Learn about objects and classes in C++ with this program. Object-oriented programming is a powerful paradigm that allows programmers to create modular, reusable code by encapsulating data and functions into objects. This program is a useful exercise for beginner programmers to learn how to define and use classes and objects in C++, and understand the principles of encapsulation, inheritance, and polymorphism.",
-                link: "objects-and-classes"
-            },
-            {
                 title: "Encapsulation in C++",
                 desc: "Learn about encapsulation in C++ with this program. Encapsulation is a fundamental concept of object-oriented programming that combines data and the functions that manipulate that data into a single unit, called a class. This program is a useful exercise for beginner programmers to learn how to use encapsulation to improve code organization, data security, and code reuse in their C++ programs.",
                 link: "encapsulation-cpp"
@@ -123,11 +143,7 @@ function get_menu_list(datetogen) {
                 desc: "Learn about inheritance in C++ with this program. Inheritance is a fundamental concept of object-oriented programming that allows one class to inherit properties and methods from another class. This program is a useful exercise for beginner programmers to learn how to use inheritance to improve code organization, code reuse, and create more efficient, modular code in their C++ programs.",
                 link: "inheritance-cpp"
             },
-            {
-                title: "Operator Overloading in C++",
-                desc: "Learn about operator overloading in C++ with this program. Operator overloading allows operators, such as +, -, *, /, and %, to be redefined for user-defined data types, such as classes and structures. This program is a useful exercise for beginner programmers to learn how to define and use operator overloading to make their code more concise and efficient.",
-                link: "operator-overloading"
-            },
+            
             {
                 title: "Aggregation in C++",
                 desc: "Learn about aggregation in C++ with this program. Aggregation is a form of object composition that allows one object to contain and use another object as a member. This program is a useful exercise for beginner programmers to learn how to use aggregation to create more modular, reusable code in their C++ programs.",
@@ -139,11 +155,6 @@ function get_menu_list(datetogen) {
                 link: "pointers-cpp"
             },
             {
-                title: "Virtual Functions in C++",
-                desc: "Learn about virtual functions in C++ with this program. Virtual functions are a fundamental concept of object-oriented programming that allows a function to be redefined in a derived class while retaining its base class implementation. This program is a useful exercise for beginner programmers to learn how to use virtual functions to achieve polymorphism and create more flexible, modular code in their C++ programs.",
-                link: "virtual-functions"
-            },
-            {
                 title: "Streams and Files in C++",
                 desc: "Learn about streams and files in C++ with this program. Streams and files are an important part of C++ programming that allow data to be read from or written to external sources such as files or other devices. This program is a useful exercise for beginner programmers to learn how to use streams and files in C++ to manipulate data and create more versatile, dynamic programs.",
                 link: "streams-and-files"
@@ -152,16 +163,6 @@ function get_menu_list(datetogen) {
                 title: "Binding in C++",
                 desc: "Discover the process of binding in C++ through this program. You'll learn about static and dynamic binding, which refer to the compile-time and runtime association of names with memory addresses, respectively. This is an essential concept for effective and efficient C++ programming.",
                 link: "binding-cpp"
-            },
-            {
-                title: "Friend Functions in C++",
-                desc: "Dive into the topic of friend functions in C++ with this comprehensive program. A friend function in C++ is a function that has the ability to access the private and protected members of a class, enhancing the flexibility and sharing capabilities of your objects. This program provides a detailed understanding of when and how to use friend functions in C++ for better encapsulation and data security.",
-                link: "friend-functions-cpp"
-            },
-            {
-                title: "Detailed Virtual Functions in C++",
-                desc: "Explore the in-depth working of virtual functions in C++ with this program. Virtual functions form the backbone of runtime polymorphism, allowing derived classes to redefine a base class's function without changing its original functionality. This detailed program helps programmers understand the intricacies of virtual functions, improving code flexibility and modularity in C++ object-oriented programming.",
-                link: "virtual-functions-cpp"
             },
             {
                 title: "C++ FAQ's",
