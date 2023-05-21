@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <title>Online Test</title>
+        <style>
+            #content {
+                margin: 50px;
+            }
+
+            #watermark {
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                font-size: 250px;
+                color: rgba(0, 0, 0, 0.1);
+                z-index: 9999;
+                pointer-events: none;
+            }
+        </style>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    </head>
+
+    <body>
+        <div id="content">
+            <h1>Online Test</h1>
+            <button id="start">Start Test</button>
+            <p>Duration: <span id="timer">0</span> seconds</p>
+            <textarea id="testArea" rows="10"></textarea>
+        </div>
+        <script>
+            (function () {
+                document.getElementById('start').addEventListener('click', function () {
+                    // Enable textarea
+                    document.getElementById('testArea').disabled = false;
+
+                    // Request full-screen
+                    if (document.documentElement.requestFullscreen) {
+                        document.documentElement.requestFullscreen();
+                    }
+
+                    // 1. Detect when a user changes tabs or windows
+                    var inFocus = true;
+
+                    window.onfocus = function () {
+                        inFocus = true;
+                    };
+
+                    window.onblur = function () {
+                        inFocus = false;
+                    };
+
+                    setInterval(function () {
+                        if (!inFocus) {
+                            console.log('User is not focused on the test');
+                        }
+                    }, 1000);
+
+                    // 2. Block clipboard events (Copy, Paste, Cut)
+                    document.oncut = document.oncopy = document.onpaste = function (event) {
+                        console.log('User tried to cut/copy/paste');
+                        event.preventDefault();
+                    };
+
+                    // 3. Restrict keyboard events to only allow certain keys
+                    document.onkeydown = function (e) {
+                        var allowedKeys = [8, 9, 13, 16, 20, 46, 33, 34, 35, 36, 37, 38, 39, 40, 110]; // backspace, tab, enter, shift, caps, delete, page up, page down, home, end, left, up, right, down, numpad del
+                        for (var i = 48; i <= 90; i++) { // 0-9, a-z, A-Z
+                            allowedKeys.push(i);
+                        }
+                        for (var i = 96; i <= 105; i++) { // numpad 0-9
+                            allowedKeys.push(i);
+                        }
+                        for (var i = 186; i <= 192; i++) { // ;, =, ,, -, ., /, `
+                            allowedKeys.push(i);
+                        }
+                        for (var i = 219; i <= 222; i++) { // [, \, ], ', ", |, ~
+                            allowedKeys.push(i);
+                        }
+                        // Additional keys for specific symbols
+                        allowedKeys.push(32); // space
+                        allowedKeys.push(222); // single quote (') and double quote (")
+                        allowedKeys.push(188); // comma (,) and less than (<)
+                        allowedKeys.push(190); // period (.) and greater than (>)
+                        allowedKeys.push(191); // slash (/) and question mark (?)
+                        allowedKeys.push(189); // dash (-) and underscore (_)
+                        allowedKeys.push(187); // equal (=) and plus (+)
+                        allowedKeys.push(220); // backslash (\) and pipe (|)
+                        allowedKeys.push(192); // grave accent (`) and tilde (~)
+
+                        if (allowedKeys.indexOf(e.which) === -1) {
+                            console.log('User pressed disallowed key');
+                            e.preventDefault();
+                        }
+                    };
+
+
+                    // 4. Disable right click
+                    window.oncontextmenu = function (event) {
+                        console.log('User tried to right click');
+                        event.preventDefault();
+                    };
+
+                    // 5. Detect developer tools opening
+                    var width = window.outerWidth;
+                    var height = window.outerHeight;
+
+                    setInterval(function () {
+                        if (window.outerWidth != width || window.outerHeight != height) {
+                            console.log('User tried to open Developer Tools');
+                            width = window.outerWidth;
+                            height = window.outerHeight;
+                        }
+                    }, 1000);
+
+                    // 6. Full-screen mode
+                    document.onfullscreenchange = function (event) {
+                        if (!document.fullscreenElement) {
+                            console.log('User exited full screen mode');
+                        }
+                    };
+
+                    // 7. Basic timer function to show the test's duration
+                    var time = 0;
+                    setInterval(function () {
+                        document.getElementById('timer').innerText = ++time;
+                    }, 1000);
+
+                    // Create the watermark div
+                    var watermark = document.createElement('div');
+                    watermark.id = 'watermark';
+
+                    // Set the watermark text (replace 'USER_ID' with the actual user ID)
+                    watermark.textContent = 'USER_ID';
+
+                    // Add the watermark to the body
+                    document.body.appendChild(watermark);
+                });
+            })();
+        </script>
+    </body>
+
+</html>
