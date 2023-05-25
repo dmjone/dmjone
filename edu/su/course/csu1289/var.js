@@ -69,7 +69,70 @@ function get_menu_list(datetogen) {
                 codetype: "Logic Gates",
                 readtime: r(17),
                 link: "logic-gates"
-            }
+            },
+            {
+                title: "Clock Cycles Demystified: Understanding the Pulse of Digital Systems",
+                desc: "Enter the exciting world of digital timing with our comprehensive guide on Clock Cycles. From the simple tick-tock of a digital clock to the lightning-fast pulses powering modern computers, we delve into the heart of what makes digital systems tick. Click now to unravel the rhythm of the digital world!",
+                codetype: "Clock Cycle",
+                readtime: r(18),
+                link: "clock-cycle"
+            },
+            {
+                title: "Clock Pulses Uncovered: The Hidden Beat of Digital Electronics",
+                desc: "Immerse yourself in the rhythmic world of digital electronics with our detailed guide on Clock Pulses. We shed light on the invisible beats that drive everything from pocket calculators to advanced microprocessors. Click now to explore the pulse that drives digital innovation!",
+                codetype: "Clock Pulse",
+                readtime: r(16),
+                link: "clock-pulse"
+            },
+            {
+                title: "Multiple Access Techniques Unveiled: Sharing the Digital Spectrum",
+                desc: "Dive into the collaborative world of digital communication with our exhaustive guide on Multiple Access Techniques. From TDMA to CDMA, FDMA to OFDMA, we scrutinize every method used to share our digital world. Click now to discover the techniques behind seamless digital sharing!",
+                codetype: "Multiple Access Techniques",
+                readtime: r(19),
+                link: "multiple-access-techniques"
+            },
+            {
+                title: "Multiplexers Explained: Routing the Paths of Digital Information",
+                desc: "Step into the complex world of digital routing with our all-encompassing guide on Multiplexers. Uncover how multiple signals are combined into one to streamline digital communication. Click now to grasp the wizardry behind data routing!",
+                codetype: "Multiplexer",
+                readtime: r(16),
+                link: "multiplexer"
+            },
+            {
+                title: "Demultiplexers Exposed: Untangling the Web of Digital Information",
+                desc: "Venture into the realm of digital signal separation with our complete guide on Demultiplexers. Explore how we transform a single signal back into its original multiple signals, unfolding the magic of digital communication. Click now to demystify the intricacies of signal separation!",
+                codetype: "Demultiplexer",
+                readtime: r(18),
+                link: "demultiplexer"
+            },
+            {
+                title: "Time Division Multiplexing Unleashed: Slicing Time for Efficient Communication",
+                desc: "Step into the world of efficient digital communication with our guide on Time Division Multiplexing. From the basic principles to its implementation in modern networks, we dissect every facet of this vital communication technique. Click now to understand the marvel of time slicing!",
+                codetype: "Time Division Multiplexer",
+                readtime: r(18),
+                link: "time-division-multiplexing"
+            },
+            {
+                title: "Frequency Division Multiplexing Unlocked: Mastering the Art of Signal Separation",
+                desc: "Discover the high-frequency world of digital communication with our comprehensive guide on Frequency Division Multiplexing. From the core principles to the latest advancements, we explore all aspects of this essential communication tool. Click now to tune into the frequency of digital communication!",
+                codetype: "Frequency Division Multiplexer",
+                readtime: r(17),
+                link: "frequency-division-multiplexing"
+            },
+            {
+                title: "Wavelength Division Multiplexing Explored: Illuminating the Spectrum of Digital Communication",
+                desc: "Illuminate your understanding of digital communication with our guide on Wavelength Division Multiplexing. Delve into the wonders of light-based communication, and explore how data is transmitted over fiber-optic cables. Click now to shine a light on the future of data transmission!",
+                codetype: "Wavelength Division Multiplexer",
+                readtime: r(20),
+                link: "wavelength-division-multiplexing"
+            },
+            {
+                title: "Code Division Multiplexing Decoded: Cracking the Code of Digital Communication",
+                desc: "Unravel the intricacies of coded communication with our guide on Code Division Multiplexing. Learn how different data streams can coexist on the same channel without interfering with each other. Click now to unlock the secrets of coded communication!",
+                codetype: "Code Division Multiplexer",
+                readtime: r(19),
+                link: "code-division-multiplexing"
+            },
             // {
             //     title: "Section B: Electricity and Magnetism",
             //     desc: "Get ready to explore Electricity & Magnetism! Learn about electric field & potential, dielectric polarization, displacement current, Maxwell's equations, velocity of EM waves, electromagnetic spectrum, magnetic materials, superconductivity, ultrasonic waves, Type I & Type II superconductors and more. Get ready to electrify your knowledge!"

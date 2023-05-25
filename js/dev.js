@@ -489,10 +489,13 @@ function body_blockcards(link, date, title, desc, codetype, readtime, author, se
     sitemap_links.push(resolvedLink);
 
     // Generate Random
-    const randomNum01 = (function () {
+    const randomNum01 = function (val) {
+        val = val ? val : 7;
         var randomNum = Math.floor(Math.random() * 10) + 1;
-        return (randomNum <= 7) ? 1 : 0; // gives chance 7 = 70%
-    })();
+        return (randomNum <= val) ? 1 : 0;
+    };
+
+    randomNum01(5);
 
     // Generate QR if qr_link is available or generate the picsum.photo image
     var qrcode_data = (function () {
@@ -504,7 +507,12 @@ function body_blockcards(link, date, title, desc, codetype, readtime, author, se
         return qr.createDataURL(4, "");
     })();
 
-    var imgsrc = randomNum01 === 0 ? qrcode_data : `https://picsum.photos/${randomNum(200, 400)}`;
+    let unsplash_categories = ["programming", "robot", "space", "script", "tech", "network", "electronic", "server", "code"];
+    unsplash_categories = unsplash_categories[randomNum(0, unsplash_categories.length - 1)];
+
+    // var imgsrc = randomNum01 === 0 ? qrcode_data : `https://picsum.photos/${randomNum(200, 400)}`;
+    var imgsrc = randomNum01(7) === 0 ? `https://picsum.photos/${randomNum(200, 400)}` : `https://source.unsplash.com/${randomNum(200, 500)}x${randomNum(200, 500)}/?${unsplash_categories}`;
+    imgsrc = randomNum01(3) === 0 ? imgsrc : qrcode_data;
     var is_qr = Number(imgsrc === qrcode_data);
     var imgAlt = is_qr ? "QR code of the URL" : "A Random Image from picsum.photo";
     var imgStyle = is_qr ? 'object-fit:contain;padding:2.5rem' : "";

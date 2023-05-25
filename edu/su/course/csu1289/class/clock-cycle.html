@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+  <!--<![endif]-->
+
+  <head>
+    <script src="/js/edu_su_common.js"></script>
+    <noscript>
+      <style>
+        html,
+        body {
+          margin: 0;
+          overflow: hidden;
+        }
+      </style>
+      <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+    </noscript>
+
+    <title>Clock Cycle - CSU1289 - CSE 2026 - Shoolini University</title>
+    <meta name="description" content="Know more about clock cycle in digital electronics. Tailored for the level from basic to computer science students.">
+
+    <meta property="og:image" content="/logo.png">
+    <meta property="og:type" content="article">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="@divyamohan1993">
+    <meta name="twitter:creator" content="@divyamohan1993">
+    <meta name="twitter:image" content="/logo.png">
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js" integrity="sha512-sHSNLECRJSK+BFs7E8DiFc6pf6n90bLI85Emiw1jhreduZhK3VXgq9l4kAt9eTIHYAcuQBKHL01QKs4/3Xgl8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js" integrity="sha512-iWiuBS5nt6r60fCz26Nd0Zqe0nbk1ZTIQbl3Kv7kYsX+yKMUFHzjaH2+AnM6vp2Xs+gNmaBAVWJjSmuPw76Efg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        renderMathInElement(document.body, {
+          // customised options
+          // • auto-render specific keys, e.g.:
+          delimiters: [
+            { left: '$$', right: '$$', display: true },
+            { left: '$', right: '$', display: false },
+            { left: '\\(', right: '\\)', display: false },
+            { left: '\\[', right: '\\]', display: true }
+          ],
+          // • rendering keys, e.g.:
+          throwOnError: false
+        });
+      });
+    </script>
+  </head>
+
+  <body>
+
+    <script>header_author("dm");</script>
+
+    <main>
+      <article>
+        <h2 class="text-center">
+          Clock Cycle
+        </h2>
+        <div class="container mt-4 w-100 w-xl-75">
+          <div class="accordion" id="toc">
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="h1">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#c1" aria-controls="c1" aria-expanded="false">
+                  <i class="fas fa-book"></i> <strong>&nbsp;Table of Contents</strong>
+                </button>
+              </h2>
+              <div id="c1" class="accordion-collapse collapse" aria-labelledby="h1" data-bs-parent="#toc">
+                <div class="accordion-body">
+                  <ol class="list-unstyled p-0 m-0">
+                    <li class="p-1"><a href="#executive-summary"><i class="fas fa-chevron-circle-right"></i> Executive Summary</a> - Low on Time? Get the most important concepts within seconds.</li>
+                    <li class="p-1"><a href="#clock-cycle"><i class="fas fa-chevron-circle-right"></i> Introduction</a></li>
+                    <li class="p-1"><a href="#clock-rate"><i class="fas fa-chevron-circle-right"></i> Clock Rate</a></li>
+                    <li class="p-1"><a href="#clock-cycle-in-practice"><i class="fas fa-chevron-circle-right"></i> Clock Cycle in Practice</a></li>
+                    <li class="p-1"><a href="#multiplexer"><i class="fas fa-chevron-circle-right"></i> Multiplexer and its Relation with Clock Cycle</a></li>
+                    <li class="p-1"><a href="#demultiplexer"><i class="fas fa-chevron-circle-right"></i> Demultiplexer and its Relation with Clock Cycle</a></li>
+                    <li class="p-1"><a href="#implementation"><i class="fas fa-chevron-circle-right"></i> Implementation of Clock Cycle, Multiplexer, and Demultiplexer</a></li>
+                    <li class="p-1"><a href="#conclusion"><i class="fas fa-chevron-circle-right"></i> Conclusion</a></li>
+                    </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+      <article id="executive-summary">
+        <h3>Tick-Tock of Digital Symphony: An Abridged Odyssey</h3>
+        <p>
+          Our digital journey commences with the clock cycle, the essential rhythm of digital electronics. These pulsating beats synchronize data processing and transmission, setting the pace of our digital symphony. Clock rate, measured in megahertz or gigahertz, denotes the frequency of these beats, but it's not the sole determinant of system performance; factors like processor architecture and instruction complexity play equally pivotal roles.
+        </p>
+        <p>
+          Next, we unravel the art of managing traffic in the digital world with multiplexers and demultiplexers. Multiplexers, akin to traffic signals, take multiple input signals, and based on control signals, relay the selected one to a single line, all in harmony with the clock cycle. Demultiplexers perform a converse role, taking a single input signal and routing it to one of many outputs.
+        </p>
+        <p>
+          Finally, we delve into a practical demonstration, showcasing the beautiful orchestration of clock cycles, multiplexers, and demultiplexers in a C++ implementation. This simulated scenario illustrates how these concepts intertwine, forming the backbone of digital systems.
+        </p>
+        <p>
+          So, are you ready to dive into the mesmerizing rhythm of the digital universe, where every beat, every signal, and every route holds a tale of its own? Let's embark on this enlightening expedition together!
+        </p>
+      </article>
+      <article id="clock-cycle">
+        <h3>1. Clock Cycle</h3>
+        <p>
+          Imagine you're running a relay race, where every participant waits for the baton before they can start running. The handoff of the baton acts as a synchronization point ensuring that the next runner doesn't start too early or too late. Similarly, in digital electronics, data processing and transmission need a synchronization mechanism, and one way to achieve this is through the concept of a clock cycle. But what exactly is a clock cycle?
+        </p>
+      </article>
+      <article>
+        <h4>1.1 Defining Clock Cycle</h4>
+        <p>
+          A clock cycle is one complete cycle of a digital system's clock, ranging from zero, rising to one, and falling back to zero. It's like the ticking of a clock, except it happens at incredible speeds in digital electronics. The clock's speed (frequency) dictates how fast a system can process data, much like how quickly our relay team can complete the race depends on the speed of the runners.
+        </p>
+
+        <article>
+          <h5>1.1.1 Importance of Clock Cycle</h5>
+          <p>
+            The clock cycle is essentially the heartbeat of digital electronic devices, synchronizing all activities. It governs when data is transferred, processed, and stored. Understanding the clock cycle helps to optimize digital systems for speed and efficiency. A faster clock rate (measured in cycles per second, or Hertz) usually means quicker processing times, but also poses challenges in design and power consumption.
+          </p>
+        </article>
+      </article>
+      <article id="clock-rate">
+        <h4>1.2 Clock Rate</h4>
+        <p>
+          The clock rate, commonly measured in megahertz (MHz) or gigahertz (GHz), signifies the number of clock cycles a digital system can execute per second. A system with a 2 GHz clock rate can process 2 billion cycles per second! However, it doesn't mean that a higher clock rate always translates into superior system performance.
+        </p>
+        <article>
+          <h5>1.2.1 The Myth of Clock Rate</h5>
+          <p>
+            It's important to dispel a common myth: higher clock rates don't always lead to better performance. It's like assuming a team of faster individual runners will always win the relay. This isn't necessarily true if the handoffs are inefficient, or if the runners can't maintain their pace. Similarly, other factors, such as processor architecture, pipeline depth, and instruction set complexity, can influence a system's performance as much as, if not more than, the clock rate.
+          </p>
+        </article>
+      </article>
+      <article id="clock-cycle-in-practice">
+        <h4>1.3 Clock Cycle in Practice</h4>
+        <p>
+          A clock signal is usually generated by an oscillator circuit. Each 'tick' or 'tock' of the clock represents one clock cycle. During each cycle, digital circuits can move data or perform an operation. As the complexity of operations increases, the cycle might be divided into multiple stages, leading to concepts like clock division and pipelining.
+        </p>
+        <article>
+          <h5>1.3.1 Clock Division</h5>
+          <p>
+            Clock division is a way to slow down the clock signal for parts of a system that don't need to run at full speed. This technique can be helpful in managing power consumption and synchronizing subsystems with differing speed requirements. Clock division circuits often involve flip-flops or counter circuits.
+          </p>
+        </article>
+        <article>
+          <h5>1.3.2 Pipelining</h5>
+          <p>
+            Pipelining is a technique where multiple instructions are overlapped in execution. It's akin to an assembly line in a factory where different stages of a product are worked on simultaneously. Each stage completes a part of an instruction in one clock cycle. Hence, for an n-stage pipeline, up to n instructions can be executed at once, improving the instruction throughput.
+          </p>
+        </article>
+      </article>
+      <article id="multiplexer">
+        <h3>2. Multiplexer and its Relation with Clock Cycle</h3>
+        <p>
+          Consider a traffic control system where roads from several directions merge into one, and the signal decides which road's traffic can proceed. Similarly, in digital electronics, a multiplexer (MUX) is a device that takes multiple input signals and forwards the selected one into a single line. But what does this have to do with clock cycles?
+        </p>
+      </article>
+      <article>
+        <h4>2.1 Multiplexer Operation and Clock Cycle</h4>
+        <p>
+          A multiplexer works in sync with the clock cycle. In every clock cycle, it can select and forward an input based on the control signals. The selection of different inputs in successive clock cycles enables time-division multiplexing, allowing multiple signals to share a single transmission line efficiently.
+        </p>
+        <article>
+          <h5>2.1.1 Multiplexer in Computer Systems</h5>
+          <p>
+            Multiplexers play a significant role in computer systems, contributing to the system's overall efficiency. They are involved in routing data to and from memory, controlling the flow of data between different subsystems, and implementing functions like parallel-to-serial conversion, which is crucial for data transmission over serial interfaces.
+          </p>
+        </article>
+      </article>
+      <article id="demultiplexer">
+        <h3>3. Demultiplexer and its Relation with Clock Cycle</h3>
+        <p>
+          Going back to our traffic control system analogy, imagine a single road splitting into several ones, and the signal decides which road the incoming traffic should be directed to. In digital electronics, a demultiplexer (DEMUX) performs this role. It takes a single input signal and routes it to one of several outputs based on control signals. And this process also works in harmony with the clock cycle.
+        </p>
+      </article>
+      <article>
+        <h4>3.1 Demultiplexer Operation and Clock Cycle</h4>
+        <p>
+          Like a multiplexer, a demultiplexer operates within the rhythm of the clock cycle. It switches the input to a selected output in each clock cycle, dictated by the control signals. This technique allows for time-division demultiplexing, which is vital in communications systems where signals need to be separated after being transmitted over a shared line.
+        </p>
+        <article>
+          <h5>3.1.1 Demultiplexer in Computer Systems</h5>
+          <p>
+            Demultiplexers have numerous applications in computer systems, such as routing data to correct locations in memory and controlling which peripheral devices receive data. Moreover, they help in serial-to-parallel conversion, a crucial step when receiving data from serial interfaces.
+          </p>
+        </article>
+      </article>
+      <article id="implementation">
+        <h3>4. Clock Cycle, Multiplexer, and Demultiplexer: A C++ Implementation</h3>
+        <p>
+          To illustrate how the clock cycle, multiplexer, and demultiplexer work together, let's consider an example. Imagine a simple communication system where multiple sensors send data to a microcontroller, and then the processed data is forwarded to various actuators. The microcontroller can't read all sensors or write to all actuators at once; it has to do it sequentially, one sensor or actuator per clock cycle. Multiplexers and demultiplexers can be utilized to manage this data flow efficiently.
+        </p>
+        <pre><code class="language-cpp">#include &lt;iostream>
+#include &lt;vector>
+#include &lt;algorithm>
+
+// Represents a clock cycle
+class Clock {
+public:
+    Clock(int frequency) : freq(frequency), current_cycle(0) {}
+
+    // Simulates the passing of time
+    void tick() { current_cycle = (current_cycle + 1) % freq; }
+
+    int getCurrentCycle() { return current_cycle; }
+
+private:
+    int freq;
+    int current_cycle;
+};
+
+// Simulates a multiplexer
+class Multiplexer {
+public:
+    Multiplexer(int inputs) : input_values(inputs, 0) {}
+
+    void setInput(int index, int value) { input_values[index] = value; }
+
+    // Returns the value of the selected input
+    int getOutput(int selected_input) { return input_values[selected_input]; }
+
+private:
+    std::vector&lt;int> input_values;
+};
+
+// Simulates a demultiplexer
+class Demultiplexer {
+public:
+    Demultiplexer(int outputs) : output_values(outputs, 0) {}
+
+    // Routes the input to the selected output
+    void routeInput(int input, int selected_output) { output_values[selected_output] = input; }
+
+    int getOutput(int index) { return output_values[index]; }
+
+private:
+    std::vector&lt;int> output_values;
+};
+
+int main() {
+    Clock clock(4); // 4 clock cycles
+    Multiplexer mux(4); // 4 input lines
+    Demultiplexer demux(4); // 4 output lines
+
+    // Simulating the input from sensors
+    mux.setInput(0, 10);
+    mux.setInput(1, 20);
+    mux.setInput(2, 30);
+    mux.setInput(3, 40);
+
+    // Running the system for 4 clock cycles
+    for(int i=0; i < 4; ++i) {
+        int cycle = clock.getCurrentCycle();
+
+        // Reading from a sensor
+        int sensor_data = mux.getOutput(cycle);
+
+        // Process the sensor data (dummy operation here)
+        int processed_data = sensor_data * 2;
+
+        // Sending the data to an actuator
+        demux.routeInput(processed_data, cycle);
+
+        clock.tick();
+    }
+
+    // Print the data received by each actuator
+    for(int i=0; i < 4; ++i)
+        std::cout << "Actuator " << i << " received data: " << demux.getOutput(i) << std::endl;
+
+    return 0;
+}</code></pre>
+      </article>
+      <article id="conclusion">
+        <h3>5. As the Clock Ticks...</h3>
+        <p>
+          We've embarked on a fascinating journey, from understanding the rhythm of digital electronics—the clock cycle, through the intersection and distribution points—multiplexers and demultiplexers, to exploring a practical implementation in C++. The interplay of these concepts forms the bedrock of digital systems, driving the colossal digital universe's clockwork.
+        </p>
+        <p>
+          But the adventure doesn't end here! As the clock keeps ticking, more layers unfold, revealing the intricacies and marvels of digital electronics. In our next rendezvous, we will plunge into the depths of processor architectures, uncovering the secrets of pipeline processing, and parallelism. So, gear up, for the best is yet to come!
+        </p>
+      </article>
+    </main>
+
+    <script>copyright("all");</script>
+  </body>
+
+</html>
