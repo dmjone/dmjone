@@ -1,4 +1,5 @@
 /* A Messy Playground! - This file contains all the js combined for experiments. NOT FOR PRODUCTION USE. */
+// To Minify Visit https://codebeautify.org/minify-js?url=https://dmj.one/js/dev.js
 /*************** Fixed Functions and Variables START **************/
 
 // Generate URL in parts and store in the automated variable inside the window os the user. 
@@ -549,6 +550,7 @@ function body_blockcards(link, date, title, desc, codetype, readtime, author, se
 }
 
 function sitemap_var_gen_clipboard() {
+    // function called at around line 700 in the footer block
     // maintenance_mode();
     // Get the folder hierarchy after "/edu/su/" from the URL
     var url = new URL(location.href);
@@ -703,7 +705,7 @@ function createSharingButtons(text, url, iconName, btnClass) {
 
 function copyright(rights) {
     window["loaded_copyright"] = 1;
-    sitemap_var_gen_clipboard();
+    // sitemap_var_gen_clipboard(); // uncomment this line to get the sitemap generation link copier 
     if (rights === "off") { return null; }
 
     var footer_all_rights = ' &#8226; All rights reserved';
@@ -1408,143 +1410,143 @@ function gen_blockquote() {
 
 
 /******** Fetch updated content from the server automatically ********/
-// (function () {
-//     let refreshCounter = 0; // Counter for refresh attempts
-//     const maxRefreshAttempts = 5; // Maximum number of refresh attempts
-//     let rtime = 12 * 60 * 60 * 1000; // 24 hours
+(function () {
+    let refreshCounter = 0; // Counter for refresh attempts
+    const maxRefreshAttempts = 5; // Maximum number of refresh attempts
+    let rtime = 12 * 60 * 60 * 1000; // 24 hours
 
-//     const currentTime = new Date().getTime(); // Get current time in milliseconds    
-//     const storedTime = localStorage.getItem(`pageLoadTime-${location.pathname}`); // Get time from local storage for this page
-//     // If there's no stored time, set it to the current time
-//     if (!storedTime) {
-//         localStorage.setItem(`pageLoadTime-${location.pathname}`, currentTime);
-//     } else {
-//         // If the stored time is more than 24 hours ago, hard reload the page
-//         if (currentTime - storedTime >= rtime) {
-//             if (refreshCounter >= maxRefreshAttempts) {
-//                 console.error('Too many refresh attempts. Stopping refresh.');
-//                 return;
-//             }
-//             refreshCounter++;
-//             localStorage.setItem(`pageLoadTime-${location.pathname}`, currentTime);
-//             location.reload(true);
-//         }
-//     }
-//     (async function () {
-//         let currentCachedVersion;
+    const currentTime = new Date().getTime(); // Get current time in milliseconds    
+    const storedTime = localStorage.getItem(`pageLoadTime-${location.pathname}`); // Get time from local storage for this page
+    // If there's no stored time, set it to the current time
+    if (!storedTime) {
+        localStorage.setItem(`pageLoadTime-${location.pathname}`, currentTime);
+    } else {
+        // If the stored time is more than 24 hours ago, hard reload the page
+        if (currentTime - storedTime >= rtime) {
+            if (refreshCounter >= maxRefreshAttempts) {
+                console.error('Too many refresh attempts. Stopping refresh.');
+                return;
+            }
+            refreshCounter++;
+            localStorage.setItem(`pageLoadTime-${location.pathname}`, currentTime);
+            location.reload(true);
+        }
+    }
+    (async function () {
+        let currentCachedVersion;
 
-//         try {
-//             // retrieve the current cached version of fs.js
-//             const response = await fetch('/js/edu_su_common.js');
-//             if (!response.ok) {
-//                 throw new Error('Network response was not ok');
-//             }
-//             currentCachedVersion = await response.text();
-//         } catch (error) {
-//             console.error('Error while retrieving cached version:', error);
-//         }
+        try {
+            // retrieve the current cached version of fs.js
+            const response = await fetch('/js/edu_su_common.js');
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            currentCachedVersion = await response.text();
+        } catch (error) {
+            console.error('Error while retrieving cached version:', error);
+        }
 
-//         try {
-//             // make the request with cache-busting to retrieve the latest version
-//             const response = await fetch(`/js/edu_su_common.js?v=${Date.now()}`);
-//             if (!response.ok) {
-//                 throw new Error('Network response was not ok');
-//             }
-//             const latestVersion = await response.text();
+        try {
+            // make the request with cache-busting to retrieve the latest version
+            const response = await fetch(`/js/edu_su_common.js?v=${Date.now()}`);
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const latestVersion = await response.text();
 
-//             if (latestVersion !== currentCachedVersion) {
-//                 // reload the page if the latest version is different from the cached version
-//                 if (refreshCounter >= maxRefreshAttempts) {
-//                     console.error('Too many refresh attempts. Stopping refresh.');
-//                     return;
-//                 }
-//                 refreshCounter++;
-//                 caches.keys().then(function (cacheNames) {
-//                     if (cacheNames.length > 0) {
-//                         // if (confirm("Currently you viewing the cached version of page. Do you want to get the current version of the website? \nPlease make sure you have internet connectivity before clicking Yes.")) {
-//                         cacheNames.forEach(function (cacheName) {
-//                             caches.delete(cacheName);
-//                         });
+            if (latestVersion !== currentCachedVersion) {
+                // reload the page if the latest version is different from the cached version
+                if (refreshCounter >= maxRefreshAttempts) {
+                    console.error('Too many refresh attempts. Stopping refresh.');
+                    return;
+                }
+                refreshCounter++;
+                caches.keys().then(function (cacheNames) {
+                    if (cacheNames.length > 0) {
+                        // if (confirm("Currently you viewing the cached version of page. Do you want to get the current version of the website? \nPlease make sure you have internet connectivity before clicking Yes.")) {
+                        cacheNames.forEach(function (cacheName) {
+                            caches.delete(cacheName);
+                        });
 
-//                         // Delete all cookies
-//                         if (document.cookie) {
-//                             document.cookie.split(";").forEach(function (c) {
-//                                 document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
-//                             });
-//                         }
+                        // Delete all cookies
+                        if (document.cookie) {
+                            document.cookie.split(";").forEach(function (c) {
+                                document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+                            });
+                        }
 
-//                         // Delete local storage data
-//                         if (window.localStorage) {
-//                             localStorage.clear();
-//                         }
+                        // Delete local storage data
+                        if (window.localStorage) {
+                            localStorage.clear();
+                        }
 
-//                         // Delete session storage data
-//                         if (window.sessionStorage) {
-//                             sessionStorage.clear();
-//                         }
+                        // Delete session storage data
+                        if (window.sessionStorage) {
+                            sessionStorage.clear();
+                        }
 
-//                         // Delete IndexedDB data
-//                         if (window.indexedDB) {
-//                             indexedDB.databases().then(function (dbs) {
-//                                 dbs.forEach(function (db) {
-//                                     indexedDB.deleteDatabase(db.name);
-//                                 });
-//                             });
-//                         }
+                        // Delete IndexedDB data
+                        if (window.indexedDB) {
+                            indexedDB.databases().then(function (dbs) {
+                                dbs.forEach(function (db) {
+                                    indexedDB.deleteDatabase(db.name);
+                                });
+                            });
+                        }
 
-//                         // Delete WebSQL data (deprecated)
-//                         if (window.openDatabase) {
-//                             var db = openDatabase('mydb', '1.0', 'Test DB', 2 * 1024 * 1024);
-//                             db.transaction(function (tx) {
-//                                 tx.executeSql('DROP TABLE mytable');
-//                             });
-//                         }
+                        // Delete WebSQL data (deprecated)
+                        if (window.openDatabase) {
+                            var db = openDatabase('mydb', '1.0', 'Test DB', 2 * 1024 * 1024);
+                            db.transaction(function (tx) {
+                                tx.executeSql('DROP TABLE mytable');
+                            });
+                        }
 
-//                         // Unregister service worker
-//                         if ('serviceWorker' in navigator) {
-//                             navigator.serviceWorker.getRegistrations().then(function (registrations) {
-//                                 registrations.forEach(function (registration) {
-//                                     registration.unregister(); // registration.update();
-//                                 });
-//                             });
-//                         }
+                        // Unregister service worker
+                        if ('serviceWorker' in navigator) {
+                            navigator.serviceWorker.getRegistrations().then(function (registrations) {
+                                registrations.forEach(function (registration) {
+                                    registration.unregister(); // registration.update();
+                                });
+                            });
+                        }
 
-//                         // Delete Cache API data
-//                         if ('caches' in window) {
-//                             caches.keys().then(function (cacheNames) {
-//                                 cacheNames.forEach(function (cacheName) {
-//                                     caches.delete(cacheName);
-//                                 });
-//                             });
-//                         }
+                        // Delete Cache API data
+                        if ('caches' in window) {
+                            caches.keys().then(function (cacheNames) {
+                                cacheNames.forEach(function (cacheName) {
+                                    caches.delete(cacheName);
+                                });
+                            });
+                        }
 
-//                         // Clear Web notifications
-//                         Notification.get().then(function (notifications) {
-//                             notifications.forEach(function (notification) {
-//                                 notification.close();
-//                             });
-//                         });
+                        // Clear Web notifications
+                        Notification.get().then(function (notifications) {
+                            notifications.forEach(function (notification) {
+                                notification.close();
+                            });
+                        });
 
-//                         // Clear Broadcast channels
-//                         if ('BroadcastChannel' in window) {
-//                             var bc = new BroadcastChannel('mychannel');
-//                             bc.close();
-//                         }
+                        // Clear Broadcast channels
+                        if ('BroadcastChannel' in window) {
+                            var bc = new BroadcastChannel('mychannel');
+                            bc.close();
+                        }
 
-//                         // Perform a hard refresh
-//                         location.reload(true);
-//                         // }
-//                     } else {
-//                         console.log("No cache available to delete.");
-//                     }
-//                 });
+                        // Perform a hard refresh
+                        location.reload(true);
+                        // }
+                    } else {
+                        console.log("No cache available to delete.");
+                    }
+                });
 
-//             }
-//         } catch (error) {
-//             console.error('Error while fetching latest version:', error);
-//         }
-//     })();
-// })();
+            }
+        } catch (error) {
+            console.error('Error while fetching latest version:', error);
+        }
+    })();
+})();
 
 
 /******** Include all the Google ad / analytics and Microsoft Clarity codes. *******/
@@ -1610,7 +1612,7 @@ window.onload = function () {
 /******* SECURITY SUITE START *******/
 (function () {
     window.onload = function () {
-        if (location.hostname === "127.0.0.1") {
+        if (location.hostname != "dmj.one") {
             document.body.style.webkitUserSelect = "text";
             document.body.style.mozUserSelect = "text";
             document.body.style.msUserSelect = "text";
