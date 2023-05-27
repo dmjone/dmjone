@@ -139,9 +139,95 @@ function get_menu_list(datetogen) {
     function get_lab(def_date, def_author) {
         const arr = [
             {
-                title: "Lab 1: Introduction to Data Structure",
-                desc: "This lab will provide an overview of key concepts related to data and information management. You will learn about databases, big data, data warehouses, different types of data structures, and the importance of data structures and algorithms. Additionally, you will explore the differences between data structures and algorithms."
+                title: "General Instructions For Lab File",
+                desc: "General instructions for making of a Lab File. ",
+                codetype: "Lab File Instructions",
+                link: "instructions"
             },
+            {
+                title: "Lab 1: Introduction to Data Structures",
+                desc: "This lab provides an introduction to the basic data structures in computer science.",
+                codetype: "Introduction",
+                link: "introduction-to-data-structures"
+            },
+            {
+                title: "Lab 2: Array Implementation",
+                desc: "This lab focuses on the practical implementation of arrays.",
+                date: "Fri March 10, 2023",
+                codetype: "Array",
+                link: "array-implementation"
+            },
+            {
+                title: "Lab 3: Understanding Pointers",
+                desc: "In this lab, we will understand and implement pointers.",
+                // "date": "Fri March 17, 2023",
+                codetype: "Pointers",
+                link: "implementation-of-pointers"
+            },
+            {
+                title: "Lab 4: Working with Multi Pointers",
+                desc: "This lab provides an understanding and practical implementation of multi pointers.",
+                // "date": "Fri March 24, 2023",
+                codetype: "Multi Pointers",
+                link: "implementation-of-multi-pointers"
+            },
+            {
+                title: "Lab 5: Stack Implementation using Queue",
+                desc: "In this lab, we will implement a stack using a queue.",
+                // "date": "Fri March 31, 2023",
+                codetype: "Stack Using Queue",
+                link: "stack-implementation-using-queue"
+            },
+            {
+                title: "Lab 6: Stack Implementation using Array",
+                desc: "This lab will involve implementing a stack using an array.",
+                // "date": "Fri April 7, 2023",
+                codetype: "Stack Using Array",
+                link: "stack-implementation-using-array"
+            },
+            {
+                title: "Lab 7: Stack Implementation using Circular Queue",
+                desc: "In this lab, we will implement a stack using a circular queue.",
+                // "date": "Fri April 14, 2023",
+                codetype: "Stack Using Circular Queue",
+                link: "stack-implementation-using-circular-queue"
+            },
+            {
+                title: "Lab 8: Stack Implementation using Linked List",
+                desc: "This lab will cover how to implement a stack using a linked list.",
+                // "date": "Fri April 21, 2023",
+                codetype: "Stack Using Linked List",
+                link: "stack-implementation-using-linked-list"
+            },
+            {
+                title: "Lab 9: Stack Implementation using Double Ended Queue",
+                desc: "In this lab, we will implement a stack using a double ended queue.",
+                date: "Fri April 28, 2023",
+                codetype: "Stack Using Deque",
+                link: "stack-implementation-using-deque"
+            },
+            {
+                title: "Lab 10: Queue Implementation using Linked List",
+                desc: "This lab will involve implementing a queue using a linked list.",
+                date: "Fri May 5, 2023",
+                codetype: "Queue Using Linked List",
+                link: "queue-implementation-using-linked-list"
+            },
+            {
+                title: "Lab 11: Queue Implementation using Double Ended Queue",
+                desc: "In this lab, we will implement a queue using a double ended queue.",
+                date: "Fri May 12, 2023",
+                codetype: "Queue Using Deque",
+                link: "queue-implementation-using-deque"
+            },
+            {
+                title: "Lab 12: Queue Implementation using Array",
+                desc: "This lab will cover how to implement a queue using an array.",
+                date: "Fri May 19, 2023",
+                codetype: "Queue Using Array",
+                link: "queue-implementation-using-array"
+            }
+
 
             // {
             //     title: "Lab 2",
