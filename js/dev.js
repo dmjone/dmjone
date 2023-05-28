@@ -1,5 +1,7 @@
-/* A Messy Playground! - This file contains all the js combined for experiments. NOT FOR PRODUCTION USE. */
-// To Minify Visit https://codebeautify.org/minify-js?url=https://dmj.one/js/dev.js
+/* A Messy Playground! - This file contains all the js combined for experiments. NOT FOR PRODUCTION USE.
+ * To Minify Visit https://codebeautify.org/minify-js?url=https://dmj.one/js/dev.js
+*/
+
 /*************** Fixed Functions and Variables START **************/
 
 // Generate URL in parts and store in the automated variable inside the window os the user. 
