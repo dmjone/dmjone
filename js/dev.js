@@ -219,7 +219,8 @@ hljs.highlightAll(); // Highlight js init - single line code.
 // if (!hljs) { document.write('<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/highlight.min.js" integrity="sha512-gU7kztaQEl7SHJyraPfZLQCNnrKdaQi5ndOyt4L4UPL/FHDd/uB9Je6KDARIqwnNNE27hnqoWLBq+Kpe4iHfeQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>'); }
 
 /******** Header ***********/
-function header_navbar() {
+function header_navbar(flags) {
+    if (flags) { return 0 };
 
     // Get current URL
     function header_nav() {
