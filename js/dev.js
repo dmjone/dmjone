@@ -1618,16 +1618,6 @@ window.onload = function () {
 
 /******* SECURITY SUITE START *******/
 (function () {
-    window.onload = function () {
-        if (location.hostname != "dmj.one") {
-            document.body.style.webkitUserSelect = "text";
-            document.body.style.mozUserSelect = "text";
-            document.body.style.msUserSelect = "text";
-            document.body.style.userSelect = "text";
-        }
-    }
-})();
-(function () {
     if (location.hostname === "dmj.one") {
         const clearinteral_sakjds = window.setInterval(function () {
             if (localStorage.getItem("noshow") === "1" && window.scriptsremoved != 1) {
@@ -1752,7 +1742,14 @@ window.onload = function () {
         if (window.scriptsremoved === 1) {
             clearInterval(clearinteral_sakjds);
         }
+    } else { // window.location.hostname is not === dmj.one
+        (function () {
+            document.addEventListener("DOMContentLoaded", function () {
+                document.body.classList.add('allow-select');
+            });
+        })();
     }
+
 })();
 /******* SECURITY SUITE END *******/
 
