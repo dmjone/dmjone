@@ -133,6 +133,20 @@ function get_menu_list(datetogen) {
                 readtime: r(19),
                 link: "code-division-multiplexing"
             },
+            {
+                title: "555 Timer Revealed: The Ubiquitous Little Device That Keeps Time",
+                desc: "Enter the world of timing and control with our detailed guide on the 555 Timer. This small, versatile device is at the heart of countless electronics, providing accurate time delays or oscillations. Click now to understand the timekeeper of the digital realm!",
+                codetype: "555 Timer",
+                readtime: r(10),
+                link: "555-timer"
+            },
+            {
+                title: "Mastering the 555 Timer: From Novice to Expert",
+                desc: "Join us on a journey from beginner to expert in the world of the 555 Timer. We'll take you from understanding its basic operation to crafting advanced circuits and devices. Click now to become a master of timing and control in the world of electronics!",
+                codetype: "Mastering 555 Timer",
+                readtime: r(20),
+                link: "mastering-555-timer"
+            }
             // {
             //     title: "Section B: Electricity and Magnetism",
             //     desc: "Get ready to explore Electricity & Magnetism! Learn about electric field & potential, dielectric polarization, displacement current, Maxwell's equations, velocity of EM waves, electromagnetic spectrum, magnetic materials, superconductivity, ultrasonic waves, Type I & Type II superconductors and more. Get ready to electrify your knowledge!"
