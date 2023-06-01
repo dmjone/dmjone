@@ -146,7 +146,14 @@ function get_menu_list(datetogen) {
                 codetype: "Mastering 555 Timer",
                 readtime: r(20),
                 link: "mastering-555-timer"
-            }
+            },
+            {
+                title: "Flip-Flops Decoded: The Building Blocks of Digital Memory",
+                desc: "Immerse yourself in the captivating world of digital memory with our comprehensive guide on Flip-Flops. These pivotal devices store binary data and serve as the foundation for all digital memory. Click now to understand the core element of digital storage!",
+                codetype: "Flip-Flops",
+                readtime: r(17),
+                link: "flip-flops"
+            },
             // {
             //     title: "Section B: Electricity and Magnetism",
             //     desc: "Get ready to explore Electricity & Magnetism! Learn about electric field & potential, dielectric polarization, displacement current, Maxwell's equations, velocity of EM waves, electromagnetic spectrum, magnetic materials, superconductivity, ultrasonic waves, Type I & Type II superconductors and more. Get ready to electrify your knowledge!"
