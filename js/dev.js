@@ -1612,110 +1612,6 @@ function gen_blockquote() {
 })();
 
 /********** Add-On: Bing Search Button **********/
-// (function () {
-//     document.addEventListener('DOMContentLoaded', function () {
-//         const htmlContent = `
-//         <div class="btn_focus-class_search position-fixed">
-//             <button id="common-message-us-button" type="button" class="btn bg-opacity-10 button_slide slide_right" data-bs-toggle="modal" data-bs-target="#searchbox"><i class="bi bi-search"></i> Search</button>
-//         </div>
-
-//         <div class="modal fade shadow-lg" id="searchbox" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
-//             <div class="modal-dialog modal-dialog-centered" role="document">
-//                 <div class="modal-content ">
-//                     <div class="modal-header bg-light">
-//                         <h5 class="modal-title" id="searchModalLabel">Search with Bing</h5>
-//                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-//                     </div>
-//                     <div class="modal-body bg-light">
-//                         <form>
-//                             <div class="form-group mb-3">
-//                                 <input class="form-control px-4" type="search" placeholder="Search" aria-label="Search">
-//                             </div>
-//                             <hr>
-//                             <div class="row">
-//                                 <div class="col d-grid">
-//                                     <button type="submit" class="btn btn-primary px-4" onclick="performSearch()">Search</button>
-//                                 </div>
-//                                 <div class="col d-grid">
-//                                     <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Close</button>
-//                                 </div>
-//                             </div>
-//                             <!-- <div class="d-flex justify-content-center">
-//                                 <button type="submit" class="btn btn-primary px-4" onclick="performSearch()">Search</button>
-//                             </div> -->
-//                         </form>
-//                     </div>
-//                 </div>
-//             </div>
-//         </div>`;
-
-//         const styles = `.button_slide {
-//                 border: 2px solid rgb(216, 2, 134);
-//                 cursor: pointer;
-//                 color: #d80286;
-//                 animation: leave 0.4s forwards;
-//                 backdrop-filter: blur(3px);
-//                 -webkit-backdrop-filter: blur(3px);
-//                 transition: right 0.4s;
-//             }
-
-//             .btn_focus-class_search {
-//                 right: -62px;
-//                 bottom: 37%;
-//             }
-
-//             .btn_focus-class_search:hover {
-//                 right: -5px;
-//             }
-
-//             .slide_right:hover {
-//                 animation: hover 0.4s forwards;
-//             }
-
-//             @keyframes hover {
-//                 from {
-//                     box-shadow: inset 0 0 0 0.01px #d80286;
-//                 }
-
-//                 to {
-//                     box-shadow: inset 8.79928em 0 0 0.01px #d80286;
-//                     color: #fff;
-//                 }
-//             }
-
-//             @keyframes leave {
-//                 from {
-//                     box-shadow: inset -8.79928em 0 0 0.01px #d80286;
-//                     color: #fff;
-//                 }
-
-//                 to {
-//                     box-shadow: inset 0 0 0 0.01px #d80286;
-//                 }
-//             }`;
-
-
-//         const container = document.createElement('div');
-//         container.innerHTML = htmlContent;
-//         document.body.appendChild(container);
-
-//         const styleSheet = document.createElement('style');
-//         styleSheet.innerText = styles;
-//         document.head.appendChild(styleSheet);
-//     });
-
-//     function openSearchModal() {
-//         $('#searchbox').modal('show');
-//     }
-
-//     function performSearch() {
-//         var searchText = document.querySelector('#searchbox input[type="search"]').value;
-//         var searchUrl = 'https://www.bing.com/search?q=' + encodeURIComponent(searchText + ' site:dmj.one');
-//         window.open(searchUrl, '_blank');
-//         $('#searchbox').modal('hide');
-//     }
-// })();
-
 (function () {
     let showSearchButton = false;
 
@@ -2124,8 +2020,8 @@ window.onload = function () {
                         <h5 class="modal-title text-center" id="contactModalLabel">Thank you for your interest and contributions!</h5>
                     </div>
                     <div class="modal-body">
-                        <p>Join our mission to create a better resource for all by becoming a valued contributor. Your ideas and insights are highly valued and appreciated. Share your knowledge, ideas, and passion with the world by <a href='mailto:contact@dmj.one?subject=Contribution for [ ${document.title} ]&body=Hello dmj.one,%0D%0A%0D%0AI want to contribute to the course/page [ ${encodedUrl} ] (change as required) with the following details:%0D%0A%0D%0A Your Name: %0D%0A Your Email: %0D%0A Content: %0D%0A%0D%0A Any other relevant details: %0D%0A%0D%0A%0D%0A%0D%0AThank you.%0A%0D%0A%0D'>emailing us</a>. Don't forget to include your name, email address, and any other relevant details.</p>
-                        <p>If you spot an error or have a suggestion for improvement, please don't hesitate to reach us <a href='mailto:contact@dmj.one?subject=Suggestions for [ ${document.title} ]&body=I spotted discrepancies on the page ${encodedUrl} (change as required) and want to suggest these changes:%0D%0A%0D%0A1. %0D%0A2. %0D%0A%0D%0AYour Name: %0D%0AYour Email: %0D%0AAny other relevant details: %0D%0A%0D%0AThank you.'>here</a>.</p>
+                        <p>Join our mission to create a better resource for all by becoming a valued contributor. Your ideas and insights are highly valued and appreciated. Share your knowledge, ideas, and passion with the world by <a href='mailto:contact@dmj.one?subject=Contribution for [ ${document.title} ]&body=Hello dmj.one,%0D%0A%0D%0AI want to contribute to the course/page [ ${encodedUrl} ] (change as required) with the following details:%0D%0A%0D%0A Your Name: %0D%0A Your Email: %0D%0A Content: %0D%0A%0D%0A Any other relevant details: %0D%0A%0D%0A%0D%0A%0D%0AThank you.%0A%0D%0A%0D'>emailing us</a> directly or <a href="" id="common-message-us-button-caller" data-bs-toggle="modal" data-bs-target="#common_msg_us_model">messaging us</a>. Don't forget to include your name, email address, and any other relevant details.</p>
+                        <p>If you spot an error or have a suggestion for improvement, please don't hesitate to reach us <a href='mailto:contact@dmj.one?subject=Suggestions for [ ${document.title} ]&body=I spotted discrepancies on the page ${encodedUrl} (change as required) and want to suggest these changes:%0D%0A%0D%0A1. %0D%0A2. %0D%0A%0D%0AYour Name: %0D%0AYour Email: %0D%0AAny other relevant details: %0D%0A%0D%0AThank you.'>on email</a> directly or <a href="" id="common-message-us-button-caller" data-bs-toggle="modal" data-bs-target="#common_msg_us_model">message us</a>.</p>
                         <p>Let's learn, grow, inspire each other and make a difference together by unleashing the power of knowledge!</p>
                         <p class="text-center small"><strong>Click outside the box to continue</strong> learning and unlock a world of knowledge and possibilities that awaits you.</p>
                     </div>
