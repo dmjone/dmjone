@@ -954,7 +954,7 @@ function gen_blockquote() {
     const isSummer = () => {
         const date = new Date();
         const month = date.getMonth() + 1;
-        return month === 6 || month === 7 || month === 8;
+        // return month === 6 || month === 7 || month === 8;
     };
 
     if (isSummer()) {
