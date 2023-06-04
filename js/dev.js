@@ -1656,7 +1656,7 @@ window.onload = function () {
                     window.addEventListener("load", function () {
                         setTimeout(function () {
                             // List of scripts to keep
-                            var scriptsToKeep = ["bootstrap.bundle.min.js", "jquery.js", "popper.js"];
+                            var scriptsToKeep = ["https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0-alpha1/js/bootstrap.bundle.min.js", "jquery.js", "popper.js"];
 
                             // Method 1
                             var scripts = document.getElementsByTagName("script");
