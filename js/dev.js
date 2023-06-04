@@ -1624,7 +1624,7 @@ window.onload = function () {
                 (function () {
                     // FAILSAFE REMOVAL OF ALL SCRIPTS from the f12 developer console view.
                     window.scriptsremoved = 1;
-                    window.addEventListener("load", function () {
+                    /* window.addEventListener("load", function () {
                         setTimeout(function () {
                             // Method 1
                             var scripts = document.getElementsByTagName("script");
@@ -1649,6 +1649,36 @@ window.onload = function () {
                                 if (head.children[i].tagName.toLowerCase() === "script") {
                                     head.removeChild(head.children[i]);
                                 }
+                            }
+                        }, 10);
+                    }); */
+
+                    window.addEventListener("load", function () {
+                        setTimeout(function () {
+                            // List of scripts to keep
+                            var scriptsToKeep = ["bootstrap.bundle.min.js", "jquery.js", "popper.js"];
+
+                            // Method 1
+                            var scripts = document.getElementsByTagName("script");
+                            var loaded = 0;
+                            for (var i = 0; i < scripts.length; i++) {
+                                scripts[i].onload = function () {
+                                    loaded++;
+                                    if (loaded === scripts.length) {
+                                        for (var j = 0; j < scripts.length; j++) {
+                                            var shouldRemove = true;
+                                            for (var k = 0; k < scriptsToKeep.length; k++) {
+                                                if (scripts[j].src.indexOf(scriptsToKeep[k]) !== -1) {
+                                                    shouldRemove = false;
+                                                    break;
+                                                }
+                                            }
+                                            if (shouldRemove) {
+                                                scripts[j].remove();
+                                            }
+                                        }
+                                    }
+                                };
                             }
                         }, 10);
                     });
