@@ -959,46 +959,171 @@ function gen_blockquote() {
 
 /*** Summer Bubbles ***/
 (function () {
+    // Function to check if the current month is summer (June or July)
     const isSummer = () => {
         const date = new Date();
-        const month = date.getMonth() + 1;
-        // return month === 6 || month === 7 || month === 8;
+        const month = date.getMonth() + 1; // JavaScript months range from 0 to 11
+        return month === 6 || month === 7;
     };
 
-    if (isSummer()) {
-        function createBubble() {
-            const bubble = document.createElement("div");
-            bubble.classList.add("bubble");
-            bubble.style.left = Math.random() * window.innerWidth + "px";
-            bubble.style.top = window.innerHeight + "px";
-            bubble.style.width = (Math.random() * 20 + 10) + "px";
-            bubble.style.height = bubble.style.width;
-            bubble.speed = Math.random() * 2 + 1;
-            document.body.appendChild(bubble);
-            return bubble;
-        }
-
-        function moveBubble(bubble) {
-            const top = parseFloat(bubble.style.top);
-            const newTop = top - bubble.speed;
-            bubble.style.top = newTop + "px";
-            if (newTop < 0) {
-                bubble.remove();
-            }
-        }
-
-        let bubbleInterval = setInterval(() => {
-            const bubble = createBubble();
-            setInterval(() => {
-                moveBubble(bubble);
-            }, Math.floor(Math.random() * 100) + 20);
-        }, Math.floor(Math.random() * 300) + 70);
-
-        setTimeout(() => {
-            clearInterval(bubbleInterval);
-        }, Math.floor(Math.random() * 3000) + 2000);
+    // If it's not summer, immediately exit
+    if (!isSummer()) {
+        return;
     }
+
+    // Singleton to ensure this only runs once per user
+    if (window.hasRunSummerEasterEgg) {
+        return;
+    }
+    window.hasRunSummerEasterEgg = true;
+
+    // function changeBackground() {
+    //     // sunset colors
+    //     const colors = ["#FFDAB9", "#EECFA1", "#CDAA7D", "#8B7355", "#FFD700"];
+    //     const randomColor = colors[Math.floor(Math.random() * colors.length)];
+    //     document.body.style.backgroundColor = randomColor;
+    // }
+
+    let isUserInteracted = false;
+
+    // Listen for any interaction
+    window.addEventListener('click', () => {
+        isUserInteracted = true;
+    });
+
+    window.addEventListener('keydown', () => {
+        isUserInteracted = true;
+    });
+
+    function playSound() {
+        if (!isUserInteracted) {
+            // Do not play sound if the user hasn't interacted with the page
+            return;
+        }
+        const audio = new Audio('https://cdn.dmj.one/media/music/summer-sounds.mp3');
+        audio.play();
+    }
+
+    function random_summer() {
+        const shouldDisplayObject = () => {
+            // Higher probability of not displaying
+            return Math.random() < 0.7; // Adjust this to increase/decrease the chance
+        };
+
+        if (shouldDisplayObject()) {
+            function createObject() {
+                const object = document.createElement("img");
+                object.src = "/img/summer-object.png";
+                object.classList.add("object");
+                object.style.position = "absolute";
+                object.style.left = Math.random() * window.innerWidth + "px";
+                object.style.top = window.innerHeight + "px";
+                object.style.width = (Math.random() * 20 + 10) + "px";
+                object.style.height = object.style.width;
+                object.speed = Math.random() * 0.01 + 0.2;
+                object.easing = Math.random() * 0.2 + 0.1;
+                document.body.appendChild(object);
+
+                // Make the object 'pop' on click
+                object.addEventListener("click", () => {
+                    object.remove();
+                });
+
+                return object;
+            }
+
+            function moveObject(object) {
+                const top = parseFloat(object.style.top);
+                const newTop = top - object.speed;
+                object.style.top = newTop + "px";
+                object.speed += object.easing; // Ease In
+                if (newTop < 0) {
+                    object.remove();
+                }
+            }
+
+            let objectInterval = setInterval(() => {
+                const object = createObject();
+                setInterval(() => {
+                    moveObject(object);
+                }, Math.floor(Math.random() * 30) + 10);
+            }, Math.floor(Math.random() * 400) + 10);
+
+            setTimeout(() => {
+                clearInterval(objectInterval);
+            }, Math.floor(Math.random() * 3000) + 2000);
+        }
+    }
+
+    function randomEffect() {
+        // Chance to show nothing at all
+        if (Math.random() < 0.8) { // Adjust this to control the chance of showing nothing
+            return;
+        }
+        let effectNumber = Math.floor(Math.random() * 3) + 1;
+
+        switch (effectNumber) {
+            case 1:
+                // Implement Interactive Summer Objects
+                // random_summer();
+                break;
+            case 2:
+                // Implement Summer Sounds
+                playSound();
+                break;
+            case 3:
+                // Implement Sunset/Sunrise Effect
+                //changeBackground();
+                break;
+        }
+    }
+
+    // Call the function at the beginning
+    randomEffect();
 })();
+
+
+// (function () {
+//     const isSummer = () => {
+//         const date = new Date();
+//         const month = date.getMonth() + 1;
+//         return month === 6 || month === 7 || month === 8;
+//     };
+
+//     if (isSummer()) {
+//         function createBubble() {
+//             const bubble = document.createElement("div");
+//             bubble.classList.add("bubble");
+//             bubble.style.left = Math.random() * window.innerWidth + "px";
+//             bubble.style.top = window.innerHeight + "px";
+//             bubble.style.width = (Math.random() * 20 + 10) + "px";
+//             bubble.style.height = bubble.style.width;
+//             bubble.speed = Math.random() * 2 + 1;
+//             document.body.appendChild(bubble);
+//             return bubble;
+//         }
+
+//         function moveBubble(bubble) {
+//             const top = parseFloat(bubble.style.top);
+//             const newTop = top - bubble.speed;
+//             bubble.style.top = newTop + "px";
+//             if (newTop < 0) {
+//                 bubble.remove();
+//             }
+//         }
+
+//         let bubbleInterval = setInterval(() => {
+//             const bubble = createBubble();
+//             setInterval(() => {
+//                 moveBubble(bubble);
+//             }, Math.floor(Math.random() * 100) + 20);
+//         }, Math.floor(Math.random() * 300) + 70);
+
+//         setTimeout(() => {
+//             clearInterval(bubbleInterval);
+//         }, Math.floor(Math.random() * 3000) + 2000);
+//     }
+// })();
 
 /*** Birthday Balloons ***/
 (function () {
@@ -1006,7 +1131,7 @@ function gen_blockquote() {
         const date = new Date();
         const day = date.getDate();
         const month = date.getMonth() + 1;
-        return day === 25 && month === 2; // Change the date to the birthday date you want to celebrate
+        return day === 20 && month === 4; // Change the date to the birthday date you want to celebrate
     };
 
     if (isBirthday()) {
@@ -1058,14 +1183,14 @@ function gen_blockquote() {
         const date = new Date();
         const day = date.getDate();
         const month = date.getMonth() + 1;
-        return day === 12 && month === 11;
+        return day === 5 && month === 6;
     };
     if (isDiwali()) {
         const FIREWORKS_DISPLAYED_KEY = 'fireworks_displayed';
         const fireworksDisplayed = localStorage.getItem(FIREWORKS_DISPLAYED_KEY);
 
         if (!fireworksDisplayed) {
-            document.write(`<canvas id="fireworks"></canvas><div class="message"><p class="text-center">Congratulations!<br>Happy Diwali!</p></div>`);
+            document.write(`<canvas id="fireworks"></canvas><div class="message"><p class="text-center">33<sup>rd</sup> Congratulations!<br>Happy Birthday!</p></div>`);
             window.addEventListener('load', function () {
                 const canvas = document.getElementById('fireworks');
                 const ctx = canvas.getContext('2d');
@@ -1335,7 +1460,7 @@ function gen_blockquote() {
         const month = date.getMonth() + 1;
         return day === 14 && month === 2;
     };
-
+ 
     if (isValentine()) {
         const url = "/img/heart.png";
         function createHeart() {
@@ -1358,14 +1483,14 @@ function gen_blockquote() {
                 heart.remove();
             }
         }
-
+ 
         let heartInterval = setInterval(() => {
             const heart = createHeart();
             setInterval(() => {
                 moveHeart(heart);
             }, Math.floor(Math.random() * 30) + 21);
         }, Math.floor(Math.random() * 300) + 50);
-
+ 
         setTimeout(() => {
             clearInterval(heartInterval);
         }, Math.floor(Math.random() * 3000) + 2000);
@@ -1377,7 +1502,7 @@ function gen_blockquote() {
         const date = new Date();
         const day = date.getDate();
         const month = date.getMonth() + 1;
-        return day === 14 && month === 2;
+        return day === 5 && month === 6;
     };
 
     if (isValentine()) {
