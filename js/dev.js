@@ -1424,9 +1424,9 @@ function gen_blockquote() {
     document.addEventListener('DOMContentLoaded', function () {
         const htmlContent = `
        <div class="btn_focus-class position-fixed">
-            <button id="contact-button" type="button" class="btn bg-gradient bg-warning bg-opacity-25 button_slide slide_right" data-bs-toggle="modal" data-bs-target="#contactModal"><i class="bi bi-envelope-plus-fill"></i> Message Us</button>
+            <button id="contact-button" type="button" class="btn bg-gradient bg-warning bg-opacity-25 button_slide slide_right" data-bs-toggle="modal" data-bs-target="#common_msg_us_model"><i class="bi bi-envelope-plus-fill"></i> Message Us</button>
         </div>
-        <div class="modal fade" id="contactModal" tabindex="-1" aria-hidden="true">
+        <div class="modal fade" id="common_msg_us_model" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -1533,8 +1533,8 @@ function gen_blockquote() {
         styleSheet.innerText = styles;
         document.head.appendChild(styleSheet);
 
-        const ids = ['anonymousSwitch', 'name', 'name-field', 'email', 'email-field', 'message-type', 'message', 'contact-form', 'submit-button', 'success-message', 'error-message', 'contactModal'];
-        const [anonymousSwitch, nameField, nameContainer, emailField, emailContainer, messageTypeElement, messageElement, form, submitButton, successMessage, errorMessage, contactModal] = ids.map(id => document.getElementById(id));
+        const ids = ['anonymousSwitch', 'name', 'name-field', 'email', 'email-field', 'message-type', 'message', 'contact-form', 'submit-button', 'success-message', 'error-message', 'common_msg_us_model'];
+        const [anonymousSwitch, nameField, nameContainer, emailField, emailContainer, messageTypeElement, messageElement, form, submitButton, successMessage, errorMessage, CommonMessageUsModel] = ids.map(id => document.getElementById(id));
 
         anonymousSwitch.onchange = function () {
             [nameField, emailField].forEach((field, i) => {
@@ -1543,6 +1543,17 @@ function gen_blockquote() {
                 [nameContainer, emailContainer][i].style.display = anonymousSwitch.checked ? 'none' : 'block';
             });
         };
+
+        CommonMessageUsModel.addEventListener('hidden.bs.modal', function () {
+            if (!document.querySelector('.modal.show')) {
+                const backDrop = document.querySelector('.modal-backdrop');
+                if (backDrop) {
+                    backDrop.remove();
+                }
+
+                document.body.classList.remove('modal-open');
+            }
+        });
 
         form.onsubmit = async function (event) {
             event.preventDefault();
@@ -1567,7 +1578,7 @@ function gen_blockquote() {
                 errorMessage.classList.toggle('d-none', response.ok);
 
                 if (response.ok) {
-                    setTimeout(() => bootstrap.Modal.getInstance(contactModal).hide(), 2000);
+                    setTimeout(() => bootstrap.Modal.getInstance(CommonMessageUsModel).hide(), 2000);
                     setTimeout(() => {
                         successMessage.classList.add('d-none');
                         form.reset();
@@ -1581,16 +1592,8 @@ function gen_blockquote() {
             }
 
             submitButton.disabled = false;
-            
-            contactModal.addEventListener('hidden.bs.modal', function () {
-                const backDrop = document.querySelector('.modal-backdrop');
-                if (backDrop) {
-                    backDrop.remove();
-                }
-            });
         };
     });
-
 })();
 
 /******** Fetch updated content from the server automatically ********/
@@ -1875,7 +1878,7 @@ window.onload = function () {
                     function showContactMessage() {
                         var encodedUrl = encodeURIComponent(window.location.href);
                         var modal =
-                            `<div class="modal fade" id="contactModal" tabindex="-1" role="dialog" aria-labelledby="contactModalLabel" aria-hidden="true">
+                            `<div class="modal fade" id="nosourcecode" tabindex="-1" role="dialog" aria-labelledby="contactModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -1916,7 +1919,7 @@ window.onload = function () {
                         //                         var body = document.querySelector('body');
                         //                         body.insertAdjacentHTML('beforeend', modal);
 
-                        var modalEl = document.querySelector('#contactModal');
+                        var modalEl = document.querySelector('#nosourcecode');
                         var modalOptions = {
                             backdrop: 'static',
                             keyboard: false
