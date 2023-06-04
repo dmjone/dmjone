@@ -3,6 +3,14 @@
 */
 
 /*************** Fixed Functions and Variables START **************/
+const cdnjs_jquery = "https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js";
+const cdnjs_bootstrap = "https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0-alpha1/js/bootstrap.bundle.min.js";
+const cdnjs_highlightjs = "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/highlight.min.js";
+const cdnjs_katex = "https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js";
+const cdnjs_katex_autorender = "https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js";
+const cdnjs_font_awesome = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js";
+
+
 
 // Generate URL in parts and store in the automated variable inside the window os the user. 
 (function () {
@@ -132,12 +140,12 @@
 
     //var edu_var = "https://dmj.one/js/edu_su_var.js";
     //var edu_js = "https://dmj.one/js/edu_su_common.js";
-    var cdnjs_jquery = "https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js";
-    var cdnjs_bootstrap = "https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0-alpha1/js/bootstrap.bundle.min.js";
-    var cdnjs_highlightjs = "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/highlight.min.js";
-    var cdnjs_katex = "https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js";
-    var cdnjs_katex_autorender = "https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js";
-    var cdnjs_font_awesome = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js";
+    // const cdnjs_jquery = "https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js";
+    // const cdnjs_bootstrap = "https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0-alpha1/js/bootstrap.bundle.min.js";
+    // const cdnjs_highlightjs = "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/highlight.min.js";
+    // const cdnjs_katex = "https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js";
+    // const cdnjs_katex_autorender = "https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js";
+    // const cdnjs_font_awesome = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js";
 
     // Create an array of script URLs
     var scripts = [cdnjs_jquery, cdnjs_bootstrap, cdnjs_highlightjs, cdnjs_katex, cdnjs_katex_autorender, cdnjs_font_awesome];
@@ -1411,6 +1419,179 @@ function gen_blockquote() {
     }
 })();
 
+/********** Add-On: Message Us Button **********/
+(function () {
+    document.addEventListener('DOMContentLoaded', function () {
+        const htmlContent = `
+       <div class="btn_focus-class position-fixed">
+            <button id="contact-button" type="button" class="btn bg-gradient bg-warning bg-opacity-25 button_slide slide_right" data-bs-toggle="modal" data-bs-target="#contactModal"><i class="bi bi-envelope-plus-fill"></i> Message Us</button>
+        </div>
+        <div class="modal fade" id="contactModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Message Us</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="contact-form" class="mt-1 needs-validation" novalidate>
+                            <div class="d-flex justify-content-center mb-3">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="anonymousSwitch">
+                                    <label class="form-check-label" for="anonymousSwitch">Send Anonymously</label>
+                                </div>
+                            </div>
+                            <div id="name-field" class="mb-3">
+                                <label for="name" class="form-label">Name*</label>
+                                <input type="text" class="form-control" id="name" required>
+                            </div>
+                            <div id="email-field" class="mb-3">
+                                <label for="email" class="form-label">Email*</label>
+                                <input type="email" class="form-control" id="email" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="message-type" class="form-label">Message Type*</label>
+                                <select class="form-select" id="message-type" required>
+                                    <option selected disabled value="">Choose...</option>
+                                    <option>Course-related Inquiry</option>
+                                    <option>Collaboration Request</option>
+                                    <option>Volunteering</option>
+                                    <option>General Inquiry</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="message" class="form-label">Message*</label>
+                                <textarea class="form-control" id="message" required></textarea>
+                            </div>
+                            <hr>
+                            <div class="row">
+                                <div class="col d-grid">
+                                    <button type="submit" class="btn btn-primary" id="submit-button">Submit</button>
+                                </div>
+                                <div class="col d-grid">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </form>
+                        <div id="success-message" class="alert alert-success mt-4 d-none">
+                            Your message was submitted successfully.
+                        </div>
+                        <div id="error-message" class="alert alert-danger mt-4 d-none">
+                            There was an error submitting your message.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>`;
+
+        const styles = `.button_slide {
+                border: 2px solid rgb(216, 2, 134);
+                cursor: pointer;
+                color: #d80286;
+                animation: leave 0.4s forwards;
+            }
+
+            .btn_focus-class {
+                right: -100px;
+                bottom: 30%;
+            }
+
+            .btn_focus-class:hover {
+                right: -5px;
+            }
+
+            .slide_right:hover {
+                animation: hover 0.4s forwards;
+            }
+
+            @keyframes hover {
+                from {
+                    box-shadow: inset 0 0 0 0.01px #d80286;
+                }
+
+                to {
+                    box-shadow: inset 8.79928em 0 0 0.01px #d80286;
+                    color: #fff;
+                }
+            }
+
+            @keyframes leave {
+                from {
+                    box-shadow: inset -8.79928em 0 0 0.01px #d80286;
+                    color: #fff;
+                }
+
+                to {
+                    box-shadow: inset 0 0 0 0.01px #d80286;
+                }
+            }`;
+        const container = document.createElement('div');
+        container.innerHTML = htmlContent;
+        document.body.appendChild(container);
+
+        const styleSheet = document.createElement('style');
+        styleSheet.innerText = styles;
+        document.head.appendChild(styleSheet);
+
+        const ids = ['anonymousSwitch', 'name', 'name-field', 'email', 'email-field', 'message-type', 'message', 'contact-form', 'submit-button', 'success-message', 'error-message', 'contactModal'];
+        const [anonymousSwitch, nameField, nameContainer, emailField, emailContainer, messageTypeElement, messageElement, form, submitButton, successMessage, errorMessage, contactModal] = ids.map(id => document.getElementById(id));
+
+        anonymousSwitch.onchange = function () {
+            [nameField, emailField].forEach((field, i) => {
+                if (anonymousSwitch.checked) field.removeAttribute('required');
+                else field.setAttribute('required', '');
+                [nameContainer, emailContainer][i].style.display = anonymousSwitch.checked ? 'none' : 'block';
+            });
+        };
+
+        form.onsubmit = async function (event) {
+            event.preventDefault();
+            form.classList.add('was-validated');
+
+            if (!form.checkValidity()) return;
+
+            submitButton.disabled = true;
+            const name = anonymousSwitch.checked ? '' : nameField.value;
+            const email = anonymousSwitch.checked ? '' : emailField.value;
+            const message = messageElement.value;
+            const messageType = messageTypeElement.value;
+
+            try {
+                const response = await fetch('https://submit.dmj.one', {
+                    method: 'POST',
+                    headers: { 'content-type': 'application/json' },
+                    body: JSON.stringify({ name, email, message, messageType })
+                });
+
+                successMessage.classList.toggle('d-none', !response.ok);
+                errorMessage.classList.toggle('d-none', response.ok);
+
+                if (response.ok) {
+                    setTimeout(() => bootstrap.Modal.getInstance(contactModal).hide(), 2000);
+                    setTimeout(() => {
+                        successMessage.classList.add('d-none');
+                        form.reset();
+                    }, 3000);
+                } else {
+                    setTimeout(() => errorMessage.classList.add('d-none'), 2000);
+                }
+            } catch (error) {
+                errorMessage.classList.remove('d-none');
+                setTimeout(() => errorMessage.classList.add('d-none'), 2000);
+            }
+
+            submitButton.disabled = false;
+            
+            contactModal.addEventListener('hidden.bs.modal', function () {
+                const backDrop = document.querySelector('.modal-backdrop');
+                if (backDrop) {
+                    backDrop.remove();
+                }
+            });
+        };
+    });
+
+})();
 
 /******** Fetch updated content from the server automatically ********/
 (function () {
@@ -1614,8 +1795,6 @@ window.onload = function () {
     // console.log("Total time to read the webpage: " + totalTime + " minutes");
 };
 
-
-
 /******* SECURITY SUITE START *******/
 (function () {
     if (location.hostname === "dmj.one") {
@@ -1653,35 +1832,44 @@ window.onload = function () {
                         }, 10);
                     }); */
 
+                    var preservedScripts = [cdnjs_bootstrap, cdnjs_jquery, 'src3']; // replace with actual src values
+
                     window.addEventListener("load", function () {
                         setTimeout(function () {
-                            // List of scripts to keep
-                            var scriptsToKeep = ["bootstrap.bundle.min.js", "jquery.js", "popper.js"];
-
                             // Method 1
-                            var scripts = document.getElementsByTagName("script");
+                            var scripts = Array.from(document.getElementsByTagName("script"));
                             var loaded = 0;
                             for (var i = 0; i < scripts.length; i++) {
+                                if (preservedScripts.includes(scripts[i].src)) continue;
                                 scripts[i].onload = function () {
                                     loaded++;
                                     if (loaded === scripts.length) {
                                         for (var j = 0; j < scripts.length; j++) {
-                                            var shouldRemove = true;
-                                            for (var k = 0; k < scriptsToKeep.length; k++) {
-                                                if (scripts[j].src.indexOf(scriptsToKeep[k]) !== -1) {
-                                                    shouldRemove = false;
-                                                    break;
-                                                }
-                                            }
-                                            if (shouldRemove) {
+                                            if (!preservedScripts.includes(scripts[j].src)) {
                                                 scripts[j].remove();
                                             }
                                         }
                                     }
                                 };
                             }
+                            // Method 2
+                            $(document).ready(function () {
+                                $("script").each(function () {
+                                    if (!preservedScripts.includes(this.src)) {
+                                        $(this).remove();
+                                    }
+                                });
+                            });
+                            // Method 3 
+                            var head = document.head;
+                            for (var i = 0; i < head.children.length; i++) {
+                                if (head.children[i].tagName.toLowerCase() === "script" && !preservedScripts.includes(head.children[i].src)) {
+                                    head.removeChild(head.children[i]);
+                                }
+                            }
                         }, 10);
                     });
+
 
                     // Disable F12 and CTRL + U silently!
                     function showContactMessage() {
