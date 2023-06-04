@@ -1423,9 +1423,10 @@ function gen_blockquote() {
 (function () {
     document.addEventListener('DOMContentLoaded', function () {
         const htmlContent = `
-       <div class="btn_focus-class position-fixed">
-            <button id="contact-button" type="button" class="btn bg-gradient bg-warning bg-opacity-25 button_slide slide_right" data-bs-toggle="modal" data-bs-target="#common_msg_us_model"><i class="bi bi-envelope-plus-fill"></i> Message Us</button>
+        <div id="btn_focus-class-message" class="btn_focus-class-message position-fixed">
+            <button id="common-message-us-button" type="button" class="btn bg-opacity-10 button_slide slide_right" data-bs-toggle="modal" data-bs-target="#common_msg_us_model"><i class="bi bi-envelope-plus-fill"></i> Message Us</button>
         </div>
+        
         <div class="modal fade" id="common_msg_us_model" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -1489,14 +1490,17 @@ function gen_blockquote() {
                 cursor: pointer;
                 color: #d80286;
                 animation: leave 0.4s forwards;
+                backdrop-filter: blur(3px);
+                -webkit-backdrop-filter: blur(3px);
+                transition: right 0.4s;
             }
 
-            .btn_focus-class {
-                right: -100px;
+            .btn_focus-class-message {
+                right: -97px;
                 bottom: 30%;
             }
 
-            .btn_focus-class:hover {
+            .btn_focus-class-message:hover {
                 right: -5px;
             }
 
@@ -1525,6 +1529,8 @@ function gen_blockquote() {
                     box-shadow: inset 0 0 0 0.01px #d80286;
                 }
             }`;
+
+
         const container = document.createElement('div');
         container.innerHTML = htmlContent;
         document.body.appendChild(container);
@@ -1533,8 +1539,13 @@ function gen_blockquote() {
         styleSheet.innerText = styles;
         document.head.appendChild(styleSheet);
 
-        const ids = ['anonymousSwitch', 'name', 'name-field', 'email', 'email-field', 'message-type', 'message', 'contact-form', 'submit-button', 'success-message', 'error-message', 'common_msg_us_model'];
-        const [anonymousSwitch, nameField, nameContainer, emailField, emailContainer, messageTypeElement, messageElement, form, submitButton, successMessage, errorMessage, CommonMessageUsModel] = ids.map(id => document.getElementById(id));
+        const ids = ['anonymousSwitch', 'name', 'name-field', 'email', 'email-field', 'message-type', 'message', 'contact-form', 'submit-button', 'success-message', 'error-message', 'common_msg_us_model', 'btn_focus-class-message'];
+        const [anonymousSwitch, nameField, nameContainer, emailField, emailContainer, messageTypeElement, messageElement, form, submitButton, successMessage, errorMessage, CommonMessageUsModel, message_button] = ids.map(id => document.getElementById(id));
+
+        message_button.classList.add('d-none');
+        window.addEventListener('scroll', function () {
+            message_button.classList.toggle('d-none', window.scrollY < 150);
+        });
 
         anonymousSwitch.onchange = function () {
             [nameField, emailField].forEach((field, i) => {
@@ -1550,7 +1561,6 @@ function gen_blockquote() {
                 if (backDrop) {
                     backDrop.remove();
                 }
-
                 document.body.classList.remove('modal-open');
             }
         });
@@ -1575,10 +1585,15 @@ function gen_blockquote() {
                 });
 
                 successMessage.classList.toggle('d-none', !response.ok);
+                form.classList.toggle('d-none', !response.ok);
                 errorMessage.classList.toggle('d-none', response.ok);
 
                 if (response.ok) {
-                    setTimeout(() => bootstrap.Modal.getInstance(CommonMessageUsModel).hide(), 2000);
+                    setTimeout(() => {
+                        bootstrap.Modal.getInstance(CommonMessageUsModel).hide();
+                        document.body.classList.remove('modal-open');
+                    }, 2000);
+
                     setTimeout(() => {
                         successMessage.classList.add('d-none');
                         form.reset();
@@ -1594,6 +1609,230 @@ function gen_blockquote() {
             submitButton.disabled = false;
         };
     });
+})();
+
+/********** Add-On: Bing Search Button **********/
+// (function () {
+//     document.addEventListener('DOMContentLoaded', function () {
+//         const htmlContent = `
+//         <div class="btn_focus-class_search position-fixed">
+//             <button id="common-message-us-button" type="button" class="btn bg-opacity-10 button_slide slide_right" data-bs-toggle="modal" data-bs-target="#searchbox"><i class="bi bi-search"></i> Search</button>
+//         </div>
+
+//         <div class="modal fade shadow-lg" id="searchbox" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+//             <div class="modal-dialog modal-dialog-centered" role="document">
+//                 <div class="modal-content ">
+//                     <div class="modal-header bg-light">
+//                         <h5 class="modal-title" id="searchModalLabel">Search with Bing</h5>
+//                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+//                     </div>
+//                     <div class="modal-body bg-light">
+//                         <form>
+//                             <div class="form-group mb-3">
+//                                 <input class="form-control px-4" type="search" placeholder="Search" aria-label="Search">
+//                             </div>
+//                             <hr>
+//                             <div class="row">
+//                                 <div class="col d-grid">
+//                                     <button type="submit" class="btn btn-primary px-4" onclick="performSearch()">Search</button>
+//                                 </div>
+//                                 <div class="col d-grid">
+//                                     <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Close</button>
+//                                 </div>
+//                             </div>
+//                             <!-- <div class="d-flex justify-content-center">
+//                                 <button type="submit" class="btn btn-primary px-4" onclick="performSearch()">Search</button>
+//                             </div> -->
+//                         </form>
+//                     </div>
+//                 </div>
+//             </div>
+//         </div>`;
+
+//         const styles = `.button_slide {
+//                 border: 2px solid rgb(216, 2, 134);
+//                 cursor: pointer;
+//                 color: #d80286;
+//                 animation: leave 0.4s forwards;
+//                 backdrop-filter: blur(3px);
+//                 -webkit-backdrop-filter: blur(3px);
+//                 transition: right 0.4s;
+//             }
+
+//             .btn_focus-class_search {
+//                 right: -62px;
+//                 bottom: 37%;
+//             }
+
+//             .btn_focus-class_search:hover {
+//                 right: -5px;
+//             }
+
+//             .slide_right:hover {
+//                 animation: hover 0.4s forwards;
+//             }
+
+//             @keyframes hover {
+//                 from {
+//                     box-shadow: inset 0 0 0 0.01px #d80286;
+//                 }
+
+//                 to {
+//                     box-shadow: inset 8.79928em 0 0 0.01px #d80286;
+//                     color: #fff;
+//                 }
+//             }
+
+//             @keyframes leave {
+//                 from {
+//                     box-shadow: inset -8.79928em 0 0 0.01px #d80286;
+//                     color: #fff;
+//                 }
+
+//                 to {
+//                     box-shadow: inset 0 0 0 0.01px #d80286;
+//                 }
+//             }`;
+
+
+//         const container = document.createElement('div');
+//         container.innerHTML = htmlContent;
+//         document.body.appendChild(container);
+
+//         const styleSheet = document.createElement('style');
+//         styleSheet.innerText = styles;
+//         document.head.appendChild(styleSheet);
+//     });
+
+//     function openSearchModal() {
+//         $('#searchbox').modal('show');
+//     }
+
+//     function performSearch() {
+//         var searchText = document.querySelector('#searchbox input[type="search"]').value;
+//         var searchUrl = 'https://www.bing.com/search?q=' + encodeURIComponent(searchText + ' site:dmj.one');
+//         window.open(searchUrl, '_blank');
+//         $('#searchbox').modal('hide');
+//     }
+// })();
+
+(function () {
+    let showSearchButton = false;
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const htmlContent = `
+            <div class="btn_focus-class_search position-fixed">
+            <button id="common-message-us-button" type="button" class="btn bg-opacity-10 button_slide slide_right" data-bs-toggle="modal" data-bs-target="#searchbox"><i class="bi bi-search"></i> Search</button>
+        </div>
+        
+        <div class="modal fade shadow-lg" id="searchbox" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content ">
+                    <div class="modal-header bg-light">
+                        <h5 class="modal-title" id="searchModalLabel">Search with Bing</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body bg-light">
+                        <form>
+                            <div class="form-group mb-3">
+                                <input class="form-control px-4" type="search" placeholder="Search" aria-label="Search">
+                            </div>
+                            <hr>
+                            <div class="row">
+                                <div class="col d-grid">
+                                    <button type="submit" class="btn btn-primary px-4" onclick="performSearch()">Search</button>
+                                </div>
+                                <div class="col d-grid">
+                                    <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                            <!-- <div class="d-flex justify-content-center">
+                                <button type="submit" class="btn btn-primary px-4" onclick="performSearch()">Search</button>
+                            </div> -->
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        `;
+
+        const styles = `.button_slide {
+                border: 2px solid rgb(216, 2, 134);
+                cursor: pointer;
+                color: #d80286;
+                animation: leave 0.4s forwards;
+                backdrop-filter: blur(3px);
+                -webkit-backdrop-filter: blur(3px);
+                transition: right 0.4s;
+            }
+
+            .btn_focus-class_search {
+                right: -62px;
+                bottom: 37%;
+            }
+
+            .btn_focus-class_search:hover {
+                right: -5px;
+            }
+
+            .slide_right:hover {
+                animation: hover 0.4s forwards;
+            }
+
+            @keyframes hover {
+                from {
+                    box-shadow: inset 0 0 0 0.01px #d80286;
+                }
+
+                to {
+                    box-shadow: inset 8.79928em 0 0 0.01px #d80286;
+                    color: #fff;
+                }
+            }
+
+            @keyframes leave {
+                from {
+                    box-shadow: inset -8.79928em 0 0 0.01px #d80286;
+                    color: #fff;
+                }
+
+                to {
+                    box-shadow: inset 0 0 0 0.01px #d80286;
+                }
+            }`;
+
+        const container = document.createElement('div');
+        container.innerHTML = htmlContent;
+        document.body.appendChild(container);
+
+        const styleSheet = document.createElement('style');
+        styleSheet.innerText = styles;
+        document.head.appendChild(styleSheet);
+
+        const searchButton = document.querySelector('.btn_focus-class_search');
+        searchButton.style.display = 'none';
+
+        window.addEventListener('scroll', function () {
+            if (window.scrollY > 100) {
+                if (!showSearchButton) {
+                    showSearchButton = true;
+                    searchButton.style.display = 'block';
+                }
+            } else {
+                if (showSearchButton) {
+                    showSearchButton = false;
+                    searchButton.style.display = 'none';
+                }
+            }
+        });
+    });
+
+    window.performSearch = function () {
+        var searchText = document.querySelector('#searchbox input[type="search"]').value;
+        var searchUrl = 'https://www.bing.com/search?q=' + encodeURIComponent(searchText + ' site:dmj.one');
+        window.open(searchUrl, '_blank');
+        $('#searchbox').modal('hide');
+    }
 })();
 
 /******** Fetch updated content from the server automatically ********/
