@@ -1065,7 +1065,7 @@ function gen_blockquote() {
         switch (effectNumber) {
             case 1:
                 // Implement Interactive Summer Objects
-                // random_summer();
+                random_summer();
                 break;
             case 2:
                 // Implement Summer Sounds
