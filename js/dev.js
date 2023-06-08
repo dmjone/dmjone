@@ -540,21 +540,44 @@ function body_blockcards(link, date, title, desc, codetype, readtime, author, se
     var getcolor = color[randomNum(0, color.length)];
     // https://picsum.photos/
 
-    /**** Backup ***/
-    body_generated += `<div class="m-0 my-5 postcard light shadow ${getcolor}">`;
-    body_generated += `<a class="postcard__img_link" href="${link}">${imgTag}</a>`;
-    body_generated += `<a href="${link}"><div class="postcard__text t-dark"><h1 class="postcard__title blue"><a href="${link}">${title}</a></h1>`;
-    body_generated += `<div class="postcard__subtitle small"><i class="bi bi-calendar3"></i>&nbsp;&nbsp;${date}</div>`;
-    body_generated += `<div class="postcard__bar"></div><div class="postcard__preview-txt">${desc}</div>`;
-    body_generated += `<ul class="postcard__tagbox tagbox-tags">`;
-    body_generated += semester ? `<li class="tag__item"><i class="bi bi-collection"></i>  ${semester}</li>` : "";
-    body_generated += codetype ? `<li class="tag__item"><i class="bi bi-file-earmark-code"></i>  ${codetype}</li>` : "";
-    body_generated += readtime ? `<li class="tag__item"><i class="bi bi-clock"></i>  ${readtime} minute read</li>` : "";
-    body_generated += author ? `<li class="tag__item"><i class="bi bi-pencil-square"></i>  ${author} </li>` : "";
     const continueReading = body_blockcards_continuereading_options[Math.floor(Math.random() * body_blockcards_continuereading_options.length)]; // Gets the options list from the global variable.
-    body_generated += `</ul><ul class="postcard__tagbox tagtox-read"><a href="${link}" data-toggle="tooltip" data-placement="top" title="Click to continue reading." data-original-title="Click to continue reading."><li class="tag__item read-more play ${getcolor} fw-bold text-center" style="cursor: inherit;"><i class="bi bi-book"></i>  ${continueReading}</li></a></ul></div></div>`;
 
-    body_generated += gen_end;
+    /**** Backup ***/
+    // body_generated += `<div class="m-0 my-5 postcard light shadow ${getcolor}">`;
+    // body_generated += `<a class="postcard__img_link" href="${link}">${imgTag}</a>`;
+    // body_generated += `<div class="postcard__text t-dark"><h1 class="postcard__title blue"><a href="${link}">${title}</a></h1>`;
+    // body_generated += `<div class="postcard__subtitle small"><i class="bi bi-calendar3"></i>&nbsp;&nbsp;${date}</div>`;
+    // body_generated += `<div class="postcard__bar"></div><div class="postcard__preview-txt">${desc}</div>`;
+    // body_generated += `<ul class="postcard__tagbox tagbox-tags">`;
+    // body_generated += semester ? `<li class="tag__item"><i class="bi bi-collection"></i>  ${semester}</li>` : "";
+    // body_generated += codetype ? `<li class="tag__item"><i class="bi bi-file-earmark-code"></i>  ${codetype}</li>` : "";
+    // body_generated += readtime ? `<li class="tag__item"><i class="bi bi-clock"></i>  ${readtime} minute read</li>` : "";
+    // body_generated += author ? `<li class="tag__item"><i class="bi bi-pencil-square"></i>  ${author} </li>` : "";
+
+    // // const continueReading = body_blockcards_continuereading_options[Math.floor(Math.random() * body_blockcards_continuereading_options.length)]; // Gets the options list from the global variable.
+    // body_generated += `</ul><ul class="postcard__tagbox tagtox-read"><a href="${link}" data-toggle="tooltip" data-placement="top" title="Click to continue reading." data-original-title="Click to continue reading."><li class="tag__item read-more play ${getcolor} fw-bold text-center" style="cursor: inherit;"><i class="bi bi-book"></i>  ${continueReading}</li></a></ul></div></div>`;
+
+    // body_generated += gen_end;
+
+    body_generated += `<div class="m-0 my-5 postcard light shadow ${getcolor}">
+                            <a class="postcard__img_link" href="${link}">${imgTag}</a>
+                            <div class="postcard__text t-dark">
+                                <h1 class="postcard__title blue"><a href="${link}">${title}</a></h1>
+                                <div class="postcard__subtitle small"><i class="bi bi-calendar3"></i>&nbsp;&nbsp;${date}</div>
+                                <div class="postcard__bar"></div><div class="postcard__preview-txt">${desc}</div>
+                                <ul class="postcard__tagbox tagbox-tags">
+                                    ${semester ? `<li class="tag__item"><i class="bi bi-collection"></i>  ${semester}</li>` : ""}
+                                    ${codetype ? `<li class="tag__item"><i class="bi bi-file-earmark-code"></i>  ${codetype}</li>` : ""}
+                                    ${readtime ? `<li class="tag__item"><i class="bi bi-clock"></i>  ${readtime} minute read</li>` : ""}
+                                    ${author ? `<li class="tag__item"><i class="bi bi-pencil-square"></i>  ${author} </li>` : ""}
+                                </ul>
+                                <ul class="postcard__tagbox tagtox-read">
+                                    <a href="${link}" data-toggle="tooltip" data-placement="top" title="Click to continue reading." data-original-title="Click to continue reading.">
+                                        <li class="tag__item read-more play ${getcolor} fw-bold text-center" style="cursor: inherit;"><i class="bi bi-book"></i>  ${continueReading}</li>
+                                    </a>
+                                </ul>
+                            </div>
+                        </div>`;
 
     let finaltowrite = body_generated + gen_end;
     // document.write(body_generated + m + m1 + m2 + m3 + m4 + m5 + m6 + m7 + m8 + m9 + gen_end);

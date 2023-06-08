@@ -177,21 +177,21 @@ function get_menu_list(datetogen) {
                 title: "Lab 1: Verify truth table of all logic gates in Proteus",
                 desc: "This lab will provide a verification of truth table of logic gates using Proteus software.",
                 date: "Fri March 3, 2023",
-                author: "Asmi Goyal, Divya Mohan, Prithak Thapa, and Vinayak Awasthi",
+                author: "Asmi Goyal",
                 link: "verification-of-logic-gates-in-proteus"
             },
             {
                 title: "Lab 2: Verify truth table of half adder and full adder in Proteus",
                 desc: "This lab will provide a verification of truth table of half adder and full adder using Proteus software.",
                 date: "Fri March 28, 2023",
-                author: "Asmi Goyal, Divya Mohan, Prithak Thapa, and Vinayak Awasthi",
+                author: "Divya Mohan",
                 link: "verification-of-half-and-full-adder-in-proteus"
             },
             {
                 title: "Lab 3: Verify truth table of half subtractor and full subtractor in Proteus",
                 desc: "This lab will provide a verification of truth tables for both a half subtractor and a full subtractor using Proteus software.",
                 date: "Fri May 5, 2023",
-                author: "Asmi Goyal, Divya Mohan, Prithak Thapa, and Vinayak Awasthi",
+                author: "Prithak Thapa",
                 link: "verification-of-half-and-full-subtractor-in-proteus"
             },
             {
