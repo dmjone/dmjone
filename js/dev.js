@@ -3,6 +3,8 @@
 */
 
 /*************** Fixed Functions and Variables START **************/
+const body_blockcards_continuereading_options = ['Expand Your Knowledge', 'Keep Learning', 'Feed Your Curiosity', 'Keep Your Mind Active', 'Learn More With Us', 'Stay Curious', 'Keep Discovering', 'Feed Your Brain', "Don't Stop Learning", 'Keep Exploring', 'Keep Absorbing', 'Continue Your Learning Journey', 'Unlock More Learning', 'Keep Developing Your Understanding', 'Expand Your Perspective', 'Keep Your Mind Engaged', 'The Learning Continues', 'Stay Inquisitive', 'Keep Your Brain Engaged', 'Keep Your Intellectual Fire Burning', 'Keep Challenging Yourself', 'Stay On The Learning Path', 'The Adventure Continues', 'Keep Your Mind Open', 'Stay Focused On Learning', 'Keep Your Learning Moving', 'Keep Expanding Your Mind', 'Keep Progressing In Your Learning', 'The Learning Never Stops', 'Keep Your Intellect Fueled', 'Keep Your Brain Buzzing', 'Keep Your Learning Journey Thriving', 'Keep Your Curiosity Alive', 'Keep Your Mind Alert', 'Keep Building Your Knowledge', 'Stay Invested In Your Learning', 'Keep Building Your Expertise', 'The Learning Journey Continues', 'Keep Your Understanding Evolving', 'Keep Your Learning Momentum Going', 'Keep Pushing Your Limits', 'Stay On The Path To Learning', 'Keep Unleashing Your Potential', 'Unlock More Insights', 'Dive Deeper Into Knowledge', 'Embrace the Learning Adventure', 'Ignite Your Intellectual Spark', 'Pursue Your Quest for Knowledge', 'Embark on Your Learning Voyage', 'Unearth More Wisdom', 'Uncover More Learning Treasures', 'Boost Your Brainpower', 'Elevate Your Understanding', 'Experience the Joy of Learning', 'Extend Your Intellectual Horizons', 'Accelerate Your Learning Journey', 'Illuminate Your Mind', 'Foster Your Learning Growth', 'Cultivate Your Knowledge Garden', 'Propel Your Learning Forward', 'Stoke Your Curiosity', 'Nurture Your Thirst for Knowledge', 'Enrich Your Learning Experience', 'Amplify Your Knowledge', 'Advance Your Learning Expedition', 'Expand Your Learning Universe', 'Sharpen Your Intellect', 'Reveal More Knowledge Mysteries', 'Bolster Your Learning Power', 'Invigorate Your Mind', 'Fuel Your Learning Journey', 'Boost Your Educational Enthusiasm', 'Extend Your Learning Odyssey', 'Broaden Your Knowledge Base', 'Deepen Your Understanding', 'Unfold More Learning Secrets', 'Unravel More Learning Mysteries', 'Explore Further into Knowledge', 'Progress Along Your Learning Path', 'Supercharge Your Learning', 'Venture Deeper into Knowledge', 'Advance Your Knowledge Quest', 'Quench Your Knowledge Thirst', 'Continue Your Intellectual Journey', 'Further Your Learning Adventure', 'Magnify Your Learning Experience', 'Dive Into the Knowledge Ocean', 'Illuminate Your Learning Path', 'Pioneer Your Learning Journey', 'Elevate Your Learning Endeavor', 'Enhance Your Learning Expedition', 'Galvanize Your Learning Pursuit', 'Deepen Your Knowledge Dive'];
+
 const cdnjs_jquery = "https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js";
 const cdnjs_bootstrap = "https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0-alpha1/js/bootstrap.bundle.min.js";
 const cdnjs_highlightjs = "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/highlight.min.js";
@@ -534,22 +536,24 @@ function body_blockcards(link, date, title, desc, codetype, readtime, author, se
     // qrblock = qr_link ? `<div id="qrcode"></div> ${imgsrc}` : "";
 
     // Get color and start generating the block.
-    var color = ["yellow", "blue", "red", "green"];
-    var getcolor = color[randomNum(0, 3)];
+    var color = ["yellow", "blue", "red", "green", "cyan", "orange", "pink", "purple"];
+    var getcolor = color[randomNum(0, color.length)];
     // https://picsum.photos/
+
+    /**** Backup ***/
     body_generated += `<div class="m-0 my-5 postcard light shadow ${getcolor}">`;
     body_generated += `<a class="postcard__img_link" href="${link}">${imgTag}</a>`;
-    body_generated += `<div class="postcard__text t-dark"><h1 class="postcard__title blue"><a href="${link}">${title}</a></h1>`;
+    body_generated += `<a href="${link}"><div class="postcard__text t-dark"><h1 class="postcard__title blue"><a href="${link}">${title}</a></h1>`;
     body_generated += `<div class="postcard__subtitle small"><i class="bi bi-calendar3"></i>&nbsp;&nbsp;${date}</div>`;
     body_generated += `<div class="postcard__bar"></div><div class="postcard__preview-txt">${desc}</div>`;
-    body_generated += `<ul class="postcard__tagbox">`;
+    body_generated += `<ul class="postcard__tagbox tagbox-tags">`;
     body_generated += semester ? `<li class="tag__item"><i class="bi bi-collection"></i>  ${semester}</li>` : "";
     body_generated += codetype ? `<li class="tag__item"><i class="bi bi-file-earmark-code"></i>  ${codetype}</li>` : "";
     body_generated += readtime ? `<li class="tag__item"><i class="bi bi-clock"></i>  ${readtime} minute read</li>` : "";
     body_generated += author ? `<li class="tag__item"><i class="bi bi-pencil-square"></i>  ${author} </li>` : "";
-    const options = ['Expand Your Knowledge', 'Keep Learning', 'Feed Your Curiosity', 'Keep Your Mind Active', 'Learn More With Us', 'Stay Curious', 'Keep Discovering', 'Feed Your Brain', "Don't Stop Learning", 'Keep Exploring', 'Keep Absorbing', 'Continue Your Learning Journey', 'Unlock More Learning', 'Keep Developing Your Understanding', 'Expand Your Perspective', 'Keep Your Mind Engaged', 'The Learning Continues', 'Stay Inquisitive', 'Keep Your Brain Engaged', 'Keep Your Intellectual Fire Burning', 'Keep Challenging Yourself', 'Stay On The Learning Path', 'The Adventure Continues', 'Keep Your Mind Open', 'Stay Focused On Learning', 'Keep Your Learning Moving', 'Keep Expanding Your Mind', 'Keep Progressing In Your Learning', 'The Learning Never Stops', 'Keep Your Intellect Fueled', 'Keep Your Brain Buzzing', 'Keep Your Learning Journey Thriving', 'Keep Your Curiosity Alive', 'Keep Your Mind Alert', 'Keep Building Your Knowledge', 'Stay Invested In Your Learning', 'Keep Building Your Expertise', 'The Learning Journey Continues', 'Keep Your Understanding Evolving', 'Keep Your Learning Momentum Going', 'Keep Pushing Your Limits', 'Stay On The Path To Learning', 'Keep Unleashing Your Potential'];
-    const continueReading = options[Math.floor(Math.random() * options.length)];
-    body_generated += `<a href="${link}" data-toggle="tooltip" data-placement="top" title="Click to continue reading." data-original-title="Click to continue reading."><li class="tag__item play ${getcolor} fw-bold text-center" style="cursor: inherit;"><i class="bi bi-book"></i>  ${continueReading}</li></a></ul></div></div>`;
+    const continueReading = body_blockcards_continuereading_options[Math.floor(Math.random() * body_blockcards_continuereading_options.length)]; // Gets the options list from the global variable.
+    body_generated += `</ul><ul class="postcard__tagbox tagtox-read"><a href="${link}" data-toggle="tooltip" data-placement="top" title="Click to continue reading." data-original-title="Click to continue reading."><li class="tag__item read-more play ${getcolor} fw-bold text-center" style="cursor: inherit;"><i class="bi bi-book"></i>  ${continueReading}</li></a></ul></div></div>`;
+
     body_generated += gen_end;
 
     let finaltowrite = body_generated + gen_end;

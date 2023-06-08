@@ -177,6 +177,7 @@ function get_menu_list(datetogen) {
                 title: "Lab 1: Verify truth table of all logic gates in Proteus",
                 desc: "This lab will provide a verification of truth table of logic gates using Proteus software.",
                 date: "Fri March 3, 2023",
+                author: "Asmi Goyal, Divya Mohan, Prithak Thapa, and Vinayak Awasthi",
                 link: "verification-of-logic-gates-in-proteus"
             },
             {
@@ -192,19 +193,19 @@ function get_menu_list(datetogen) {
                 "link": "verification-of-half-and-full-subtractor-in-proteus"
             },
             {
-                "title": "Lab 4: Implement and Verify truth table of SR Flip Flop in Proteus",
+                "title": "Lab 4: Implement and Verify the truth table of SR Flip Flop in Proteus",
                 "desc": "This lab will provide a verification of truth tables for both an Active Low and an Active High SR Flip Flop using Proteus software.",
                 "date": "Fri May 12, 2023",
                 "link": "verification-of-sr-flip-flop-in-proteus"
             },
             {
-                "title": "Lab 5: Implement and Verify truth table of JK Flip Flop in Proteus",
+                "title": "Lab 5: Implement and Verify the truth table of JK Flip Flop in Proteus",
                 "desc": "This lab will provide a verification of truth tables for both a JK Flip Flop using Proteus software.",
                 "date": "Fri May 19, 2023",
                 "link": "verification-of-jk-flip-flop-in-proteus"
             },
             {
-                "title": "Lab 6: Implement and Verify truth table of D Flip Flop in Proteus",
+                "title": "Lab 6: Implement and Verify the truth table of D Flip Flop in Proteus",
                 "desc": "This lab will provide a verification of truth tables for both a D Flip Flop using Proteus software.",
                 "date": "Fri May 26, 2023",
                 "link": "verification-of-d-flip-flop-in-proteus"
