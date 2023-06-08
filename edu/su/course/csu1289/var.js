@@ -191,6 +191,24 @@ function get_menu_list(datetogen) {
                 "date": "Fri May 5, 2023",
                 "link": "verification-of-half-and-full-subtractor-in-proteus"
             },
+            {
+                "title": "Lab 4: Implement and Verify truth table SR Flip Flop in Proteus",
+                "desc": "This lab will provide a verification of truth tables for both an Active Low and an Active High SR Flip Flop using Proteus software.",
+                "date": "Fri May 12, 2023",
+                "link": "verification-of-sr-flip-flop-in-proteus"
+            },
+            {
+                "title": "Lab 5: Implement and Verify truth table JK Flip Flop in Proteus",
+                "desc": "This lab will provide a verification of truth tables for both a JK Flip Flop using Proteus software.",
+                "date": "Fri May 19, 2023",
+                "link": "verification-of-jk-flip-flop-in-proteus"
+            },
+            {
+                "title": "Lab 6: Implement and Verify truth table D Flip Flop in Proteus",
+                "desc": "This lab will provide a verification of truth tables for both a D Flip Flop using Proteus software.",
+                "date": "Fri May 26, 2023",
+                "link": "verification-of-d-flip-flop-in-proteus"
+            },
         ];
         for (let i = 0; i < arr.length; i++) {
             const _data = arr[i];
