@@ -476,7 +476,7 @@ function body_genmenu(course) {
 
 // Original Code
 var sitemap_links = [];
-function body_blockcards(link, date, title, desc, codetype, readtime, author, semester, qr_link) {
+function body_blockcards(link, date, title, desc, codetype, readtime, author, semester, cardimage) {
 
     // USAGE - body_blockcards("/csu953/c1", "Thursday, September 29th 2022", "Lab 1 fn", "An introduction to HTML.", "HTML", "2");
 
@@ -484,18 +484,19 @@ function body_blockcards(link, date, title, desc, codetype, readtime, author, se
         return Math.floor(Math.random() * (max - min)) + min;
     }
 
-    if (!title && !desc) { return }; // Do not Remove. Else it will waste the time in processing and give incomplete blocks
-    if (link) { } else link = "#";
-    if (date) { } else var date = new Date().toDateString();
-    if (title) { } else title = "Unknown Title";
-    if (desc) { } else desc = "No desc provided";
-    var include_generator = 2;
-    if (include_generator == 1) { var body_generated = '<article>'; var gen_end = '</article>'; } else { body_generated = ""; gen_end = ""; }
-    if (author) {
-        if (author == "vp") { author = "Vanshika Painuly"; }
-        else if (author == 1) { author = "Divya Mohan"; }
-        else { author = author; }
-    }
+    if (!title && !desc) { return }; // Exit early if no title and desc provided. Do NOT Remove. Else it will waste the time in processing and give incomplete blocks
+    title = title || "Unknown Title";
+    desc = desc || "No desc provided";
+    link = link || "#";
+    date = date || new Date().toDateString();
+
+    let body_generated = "", gen_end = "";
+
+    const authors = {
+        "vp": "Vanshika Painuly",
+        "1": "Divya Mohan"
+    };
+    author = authors[author] || author;
 
     // Auxillary functions for blockcards
     // Append the current URL to the link - for sitemap generation easy. - Copy paste the generated url's.
@@ -559,32 +560,84 @@ function body_blockcards(link, date, title, desc, codetype, readtime, author, se
 
     // body_generated += gen_end;
 
-    body_generated += `<div class="m-0 my-5 postcard light shadow ${getcolor}">
-                            <a class="postcard__img_link" href="${link}">${imgTag}</a>
-                            <div class="postcard__text t-dark">
-                                <h1 class="postcard__title blue"><a href="${link}">${title}</a></h1>
-                                <div class="postcard__subtitle small"><i class="bi bi-calendar3"></i>&nbsp;&nbsp;${date}</div>
-                                <div class="postcard__bar"></div><div class="postcard__preview-txt">${desc}</div>
-                                <ul class="postcard__tagbox tagbox-tags">
-                                    ${semester ? `<li class="tag__item"><i class="bi bi-collection"></i>  ${semester}</li>` : ""}
-                                    ${codetype ? `<li class="tag__item"><i class="bi bi-file-earmark-code"></i>  ${codetype}</li>` : ""}
-                                    ${readtime ? `<li class="tag__item"><i class="bi bi-clock"></i>  ${readtime} minute read</li>` : ""}
-                                    ${author ? `<li class="tag__item"><i class="bi bi-pencil-square"></i>  ${author} </li>` : ""}
-                                </ul>
-                                <ul class="postcard__tagbox tagtox-read">
-                                    <a href="${link}" data-toggle="tooltip" data-placement="top" title="Click to continue reading." data-original-title="Click to continue reading.">
-                                        <li class="tag__item read-more play ${getcolor} fw-bold text-center" style="cursor: inherit;"><i class="bi bi-book"></i>  ${continueReading}</li>
-                                    </a>
-                                </ul>
-                            </div>
-                        </div>`;
+    /*  body_generated += `<div class="m-0 my-5 postcard light shadow ${getcolor}">
+                             <a class="postcard__img_link" href="${link}">${imgTag}</a>
+                             <div class="postcard__text t-dark">
+                                 <h1 class="postcard__title blue"><a href="${link}">${title}</a></h1>
+                                 <div class="postcard__subtitle small">
+                                     <i class="bi bi-calendar3"></i>&nbsp;&nbsp;${date}
+                                     <ul class="postcard__tagbox tagbox-tags">
+                                         ${semester ? `<li class="tag__item"><i class="bi bi-collection"></i>  ${semester}</li>` : ""}
+                                         ${codetype ? `<li class="tag__item"><i class="bi bi-file-earmark-code"></i>  ${codetype}</li>` : ""}
+                                         ${readtime ? `<li class="tag__item"><i class="bi bi-clock"></i>  ${readtime} minute read</li>` : ""}
+                                         ${author ? `<li class="tag__item"><i class="bi bi-pencil-square"></i>  ${author} </li>` : ""}
+                                     </ul>
+                                 </div>
+                                 <div class="postcard__bar"></div><div class="postcard__preview-txt">${desc}</div>
+                                 
+                                 <ul class="postcard__tagbox tagtox-read my-3">
+                                     <a href="${link}" data-toggle="tooltip" data-placement="top" title="Click to continue reading." data-original-title="Click to continue reading.">
+                                         <li class="tag__item read-more play ${getcolor} fw-bold text-center" style="cursor: inherit;"><i class="bi bi-book"></i>  ${continueReading}</li>
+                                     </a>
+                                 </ul>
+                             </div>
+                         </div>`;     */
+    // body_generated += `
+    //     <div class="m-0 my-5 shadow rounded bg-light text-dark">
+    //     <a class="d-block" href="${link}">${imgTag}</a>
+    //     <div class="p-3">
+    //         <h1 class="h1 text-primary mb-2"><a href="${link}">${title}</a></h1>
+    //         <div class="small">
+    //             <ul class="list-inline">
+    //                 ${date ? `<li class="list-inline-item text-muted"><i class="bi bi-calendar3"></i> ${date}</li>` : ""}
+    //                 ${semester ? `<li class="list-inline-item text-muted"><i class="bi bi-collection"></i>  ${semester}</li>` : ""}
+    //                 ${codetype ? `<li class="list-inline-item text-muted"><i class="bi bi-file-earmark-code"></i>  ${codetype}</li>` : ""}
+    //                 ${readtime ? `<li class="list-inline-item text-muted"><i class="bi bi-clock"></i>  ${readtime} minute read</li>` : ""}
+    //                 ${author ? `<li class="list-inline-item text-muted"><i class="bi bi-pencil-square"></i>  ${author}</li>` : ""}
+    //             </ul>
+    //         </div>
+    //         <div class="mt-2 mb-2" style="height: 10px; background-color: #424242;"></div>
+    //         <div>${desc}</div>
+    //         <ul class="list-inline my-3">
+    //             <li class="list-inline-item text-center" style="cursor: inherit;" data-toggle="tooltip" data-placement="top" title="Click to continue reading." data-original-title="Click to continue reading.">
+    //                 <a href="${link}" class="text-primary"><i class="bi bi-book"></i>  ${continueReading}</a>
+    //             </li>
+    //         </ul>
+    //     </div>
+    // </div>
+    // `;
+    body_generated += `<div class="m-0 my-5 postcard light shadow-lg ${getcolor}">
+    <a class="postcard__img_link" href="${link}">${imgTag}</a>
+    <div class="postcard__text t-dark">
+        <h2 class="postcard__title ${getcolor}"><a href="${link}">${title}</a></h2>
+        <div class="small postcard__subtitle d-none d-sm-inline-block">
+            <ul class="postcard__tagbox tagbox-tags d-flex flex-wrap list-inline">
+                ${date ? `<li class="tag__item text-muted d-none d-sm-inline-block list-inline-item"><time class="bi bi-calendar3" datetime="${date}"> ${date}</time></li>` : ""}
+                ${semester ? `<li class="tag__item text-muted d-none d-sm-inline-block list-inline-item"><i class="bi bi-collection"></i>  ${semester}</li>` : ""}
+                ${codetype ? `<li class="tag__item text-muted d-none d-lg-inline-block list-inline-item"><i class="bi bi-file-earmark-code"></i>  ${codetype}</li>` : ""}
+                ${readtime ? `<li class="tag__item text-muted d-none d-lg-inline-block list-inline-item"><i class="bi bi-clock"></i>  ${readtime} minute read</li>` : ""}
+                ${author ? `<li class="tag__item tag__item_author text-muted d-none d-sm-inline-block list-inline-item"><i class="bi bi-pencil-square"></i>  ${author}</li>` : ""}
+            </ul>
+        </div>
+        <div class="postcard__bar"></div>
+        <div class="postcard__preview-txt"><p>${desc}</p></div>
+        <ul class="postcard__tagbox tagtox-read my-3">
+            <a href="${link}">
+                <li class="tag__item read-more play ${getcolor} fw-bold text-center" style="cursor: inherit;" data-toggle="tooltip" data-placement="top" title="Click to continue reading." data-original-title="Click to continue reading."><i class="bi bi-book"></i>  ${continueReading}</li>
+            </a>
+        </ul>
+    </div>
+</div>
 
-    let finaltowrite = body_generated + gen_end;
+    `;
+
+    let finaltowrite = body_generated
     // document.write(body_generated + m + m1 + m2 + m3 + m4 + m5 + m6 + m7 + m8 + m9 + gen_end);
     // document.addEventListener("DOMContentLoaded", function () {
     var genclass = document.querySelector(".genmenu");
     genclass.innerHTML += finaltowrite;
     // });
+
 }
 
 function sitemap_var_gen_clipboard() {
