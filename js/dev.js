@@ -742,7 +742,7 @@ function createSharingButtons(text, url, iconName, btnClass) {
     label.style.color = "#0d6efd";
     label.style.display = "inline-block";
     label.style.verticalAlign = "middle";
-    label.style.marginRight = "10px";
+    label.style.marginRight = "1px";
     sharingContainer.appendChild(label);
 
     const buttonGroup = document.createElement("div");
@@ -764,7 +764,7 @@ function createSharingButtons(text, url, iconName, btnClass) {
         const hiddenGroup = document.createElement("div");
         hiddenGroup.classList.add("sharing-buttons-group", "collapse");
         hiddenGroup.style.display = "none";
-        hiddenGroup.style.marginLeft = "5px";
+        hiddenGroup.style.marginLeft = "1px";
         sharingContainer.appendChild(hiddenGroup);
 
         socialSites.slice(3).forEach((site) => {
