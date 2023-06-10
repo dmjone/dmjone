@@ -490,6 +490,7 @@ function body_blockcards(link, date, title, desc, codetype, readtime, author, se
     link = link || "#";
     date = date || new Date().toDateString();
 
+
     let body_generated = "", gen_end = "";
 
     const authors = {
@@ -500,23 +501,31 @@ function body_blockcards(link, date, title, desc, codetype, readtime, author, se
 
     // Auxillary functions for blockcards
     // Append the current URL to the link - for sitemap generation easy. - Copy paste the generated url's.
-    var resolvedLink = new URL(link, location.href).toString();
-    sitemap_links.push(resolvedLink);
+    // var resolvedLink = new URL(link, location.href).toString();
+    // sitemap_links.push(resolvedLink);
+    sitemap_links.push(new URL(link, location.href).toString());
+
 
     // Generate Random
-    const randomNum01 = function (val) {
-        val = val ? val : 7;
-        var randomNum = Math.floor(Math.random() * 10) + 1;
-        return (randomNum <= val) ? 1 : 0;
-    };
-
+    // const randomNum01 = function (val) {
+    //     val = val ? val : 7;
+    //     var randomNum = Math.floor(Math.random() * 10) + 1;
+    //     return (randomNum <= val) ? 1 : 0;
+    // };
+    const randomNum01 = (val = 7) => Math.random() * 10 + 1 <= val ? 1 : 0;
     randomNum01(5);
 
     // Generate QR if qr_link is available or generate the picsum.photo image
+    // var qrcode_data = (function () {
+    //     var typeNumber = 0;
+    //     var errorCorrectionLevel = 'H';
+    //     var qr = qrcode(typeNumber, errorCorrectionLevel);
+    //     qr.addData(window.location.href + link);
+    //     qr.make();
+    //     return qr.createDataURL(4, "");
+    // })();
     var qrcode_data = (function () {
-        var typeNumber = 0;
-        var errorCorrectionLevel = 'H';
-        var qr = qrcode(typeNumber, errorCorrectionLevel);
+        var qr = qrcode(0, 'H');
         qr.addData(window.location.href + link);
         qr.make();
         return qr.createDataURL(4, "");
@@ -528,6 +537,7 @@ function body_blockcards(link, date, title, desc, codetype, readtime, author, se
     // var imgsrc = randomNum01 === 0 ? qrcode_data : `https://picsum.photos/${randomNum(200, 400)}`;
     var imgsrc = randomNum01(7) === 0 ? `https://picsum.photos/${randomNum(200, 400)}` : `https://source.unsplash.com/${randomNum(200, 300)}x${randomNum(200, 300)}/?${unsplash_categories}`;
     imgsrc = randomNum01(3) === 0 ? imgsrc : qrcode_data;
+    imgsrc = cardimage || imgsrc; // forces to choose supplied image
     var is_qr = Number(imgsrc === qrcode_data);
     var imgAlt = is_qr ? "QR code of the URL" : "A Random Image from picsum.photo";
     var imgStyle = is_qr ? 'object-fit:contain;padding:2.5rem' : "";
@@ -610,7 +620,7 @@ function body_blockcards(link, date, title, desc, codetype, readtime, author, se
     <a class="postcard__img_link" href="${link}">${imgTag}</a>
     <div class="postcard__text t-dark">
         <h2 class="postcard__title ${getcolor}"><a href="${link}">${title}</a></h2>
-        <div class="small postcard__subtitle d-none d-sm-inline-block">
+        <div class="small d-none d-sm-inline-block ">
             <ul class="postcard__tagbox tagbox-tags d-flex flex-wrap list-inline">
                 ${date ? `<li class="tag__item text-muted d-none d-sm-inline-block list-inline-item"><time class="bi bi-calendar3" datetime="${date}"> ${date}</time></li>` : ""}
                 ${semester ? `<li class="tag__item text-muted d-none d-sm-inline-block list-inline-item"><i class="bi bi-collection"></i>  ${semester}</li>` : ""}
@@ -623,13 +633,11 @@ function body_blockcards(link, date, title, desc, codetype, readtime, author, se
         <div class="postcard__preview-txt"><p>${desc}</p></div>
         <ul class="postcard__tagbox tagtox-read my-3">
             <a href="${link}">
-                <li class="tag__item read-more play ${getcolor} fw-bold text-center" style="cursor: inherit;" data-toggle="tooltip" data-placement="top" title="Click to continue reading." data-original-title="Click to continue reading."><i class="bi bi-book"></i>  ${continueReading}</li>
+                <li class="tag__item read-more play ${getcolor} fw-bold text-center" id="article_userclickguide" style="cursor: inherit;" data-toggle="tooltip" data-placement="top" title="Click here to continue reading." data-original-title="Click to continue reading."><i class="bi bi-book"></i>  ${continueReading}...</li>
             </a>
         </ul>
     </div>
-</div>
-
-    `;
+</div>`;
 
     let finaltowrite = body_generated
     // document.write(body_generated + m + m1 + m2 + m3 + m4 + m5 + m6 + m7 + m8 + m9 + gen_end);
@@ -1935,6 +1943,20 @@ function gen_blockquote() {
         $('#searchbox').modal('hide');
     }
 })();
+
+/********** Add-On: User Click Guide **********/
+// (function () {
+//     document.addEventListener('DOMContentLoaded', function () {
+//         $(document).ready(function () {
+//             $('#article_userclickguide').tooltip('show');   // Show the tooltip as soon as document loads
+
+//             setTimeout(function () {
+//                 $('#article_userclickguide').tooltip('hide');  // Hide the tooltip after 5 seconds
+//             }, 2000);  // 5000 milliseconds = 5 seconds
+//         });
+//     });
+// })();
+
 
 /******** Fetch updated content from the server automatically ********/
 (function () {

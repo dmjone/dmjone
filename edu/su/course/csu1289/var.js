@@ -178,7 +178,8 @@ function get_menu_list(datetogen) {
                 desc: "This lab will provide a verification of truth table of logic gates using Proteus software.",
                 date: "Fri March 3, 2023",
                 author: "Asmi Goyal",
-                link: "verification-of-logic-gates-in-proteus"
+                link: "verification-of-logic-gates-in-proteus",
+                // cardimage: "_url_"
             },
             {
                 title: "Lab 2: Verify truth table of half adder and full adder in Proteus",
@@ -221,8 +222,9 @@ function get_menu_list(datetogen) {
             desc = _data.desc || `${title} ${i}`;
             codetype = _data.codetype ? `CSU1289P | ${_data.codetype}` : `CSU1289P | Lab`;
             readtime = _data.readtime || r(5);
+            cardimage = _data.cardimage || null;
             author = _data.author || def_author;
-            body_blockcards(link, date, title, desc, codetype, readtime, author);
+            body_blockcards(link, date, title, desc, codetype, readtime, author, semester, cardimage);
         }
     }
     function get_assignment(def_date, def_author) {
@@ -261,7 +263,7 @@ function get_menu_list(datetogen) {
         return outputDate;
     }
     function r(t) { return Math.floor(Math.random() * 10) + t };
-    var title, desc, codetype, readtime, author = 1, link;
+    var title, desc, codetype, readtime, author = 1, link, semester, cardimage;
     const functions = {
         class: get_class,
         lab: get_lab,
