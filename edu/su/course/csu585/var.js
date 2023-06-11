@@ -49,6 +49,11 @@ function get_menu_list(datetogen) {
                 desc: "The Empathy Map is a powerful tool used in Design Thinking to help understand the needs and experiences of a target user or customer. By creating a visual representation of their thoughts, feelings, and behaviors, you can gain insights that will inform the development of effective solutions. Click to learn more about how to use Empathy Maps in your design process.",
                 link: "empathymap"
             },
+            {
+                title: "FAQ - 1",
+                desc: "Frequently asked questions - Part 1",
+                link: "faq1"
+            },
 
         ];
         for (let i = 0; i < arr.length; i++) {

@@ -1958,38 +1958,6 @@ function gen_blockquote() {
 
 /******** Fetch updated content from the server automatically ********/
 (function () {
-    const lastModified = new Date(document.lastModified);  // Gets the last modified date of the document
-    const now = new Date();  // Current time
-    const diffMs = now - lastModified;  // Milliseconds between now and the last modified date
-    const hoursSinceModified = diffMs / (1000 * 60 * 60);  // Convert milliseconds to hours
-
-    if (hoursSinceModified > 24) {
-        // If more than 24 hours have passed since the last modification, force a refresh
-
-        if ('caches' in window) {
-            // Check for browser support
-
-            caches.keys().then(function (cacheNames) {
-                // Loop through all cache names
-
-                return Promise.all(
-                    cacheNames.map(function (cacheName) {
-                        // Delete the caches
-                        return caches.delete(cacheName);
-                    })
-                );
-            }).then(function () {
-                // Once all old caches have been deleted, refresh the page
-                window.location.reload(true);
-            });
-        } else {
-            // If the browser doesn't support the Cache API, simply refresh the page
-            window.location.reload(true);
-        }
-    }
-})();
-
-(function () {
     let refreshCounter = 0; // Counter for refresh attempts
     const maxRefreshAttempts = 5; // Maximum number of refresh attempts
     let rtime = 12 * 60 * 60 * 1000; // 24 hours
