@@ -112,6 +112,13 @@ function get_menu_list(datetogen) {
             //     desc: "Learn about operations on linked lists - insertion, deletion, and traversal - in data structures and algorithms with this article. Linked lists are a fundamental data structure in programming that are used to store and manipulate data in a dynamic and flexible way. Understanding how to perform operations such as insertion, deletion, and traversal on linked lists efficiently is important for solving problems in various domains such as database management, machine learning, and web development. This program is a useful for beginner programmers to learn how to perform operations on linked lists, understand their time and space complexities, and apply this knowledge to create efficient and effective programs."
             // },
             {
+                title: "Unveiling the Magic of Insertion Sort",
+                desc: "Embark on a thrilling journey through the world of algorithms, where we unravel the intricacies of Insertion Sort. Let C++ be your language of choice as you decipher this fundamental sorting technique and transform lines of code into efficient solutions.",
+                date: "Mon May 29, 2023",                
+                readtime: r(15),
+                link: "insertion-sort"
+            },
+            {
                 title: "Frequently Asked Questions 1",
                 desc: "Learn about some of the frequently asked questions in data structures and algorithms. Understanding these questions will give you a better understanding and is a useful exercise for beginner programmers to learn how to test their knowledge.",
                 readtime: r(10),
