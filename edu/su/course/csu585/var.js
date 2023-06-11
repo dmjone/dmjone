@@ -50,9 +50,9 @@ function get_menu_list(datetogen) {
                 link: "empathymap"
             },
             {
-                title: "FAQ - 1",
-                desc: "Frequently asked questions - Part 1",
-                link: "faq1"
+                title: "FAQ - Part 1",
+                desc: "Frequently asked questions - Part 1 of the Design Thinking. Find the best, shortest, concrete, concise definition here without wasting any time.",
+                link: "faq"
             },
 
         ];
