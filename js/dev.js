@@ -1269,14 +1269,14 @@ function gen_blockquote() {
         const date = new Date();
         const day = date.getDate();
         const month = date.getMonth() + 1;
-        return day === 5 && month === 6;
+        return day === 15 && month === 6;
     };
     if (isDiwali()) {
         const FIREWORKS_DISPLAYED_KEY = 'fireworks_displayed';
         const fireworksDisplayed = localStorage.getItem(FIREWORKS_DISPLAYED_KEY);
 
         if (!fireworksDisplayed) {
-            document.write(`<canvas id="fireworks"></canvas><div class="message"><p class="text-center">33<sup>rd</sup> Congratulations!<br>Happy Birthday!</p></div>`);
+            document.write(`<canvas id="fireworks"></canvas><div class="message"><p class="text-center">56<sup>th</sup> Congratulations!<br>Happy Birthday!</p></div>`);
             window.addEventListener('load', function () {
                 const canvas = document.getElementById('fireworks');
                 const ctx = canvas.getContext('2d');
@@ -1588,7 +1588,7 @@ function gen_blockquote() {
         const date = new Date();
         const day = date.getDate();
         const month = date.getMonth() + 1;
-        return day === 5 && month === 6;
+        return day === 15 && month === 6;
     };
 
     if (isValentine()) {
