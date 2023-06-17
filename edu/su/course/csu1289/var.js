@@ -202,16 +202,16 @@ function get_menu_list(datetogen) {
                 link: "verification-of-sr-flip-flop-in-proteus"
             },
             {
-                title: "Lab 5: Implement and Verify the truth table of JK Flip Flop in Proteus",
-                desc: "This lab will provide a verification of truth tables for both a JK Flip Flop using Proteus software.",
-                date: "Fri May 19, 2023",
-                link: "verification-of-jk-flip-flop-in-proteus"
-            },
-            {
-                title: "Lab 6: Implement and Verify the truth table of D Flip Flop in Proteus",
+                title: "Lab 5: Implement and Verify the truth table of D Flip Flop in Proteus",
                 desc: "This lab will provide a verification of truth tables for both a D Flip Flop using Proteus software.",
                 date: "Fri May 26, 2023",
                 link: "verification-of-d-flip-flop-in-proteus"
+            },
+            {
+                title: "Lab 6: Implement and Verify the truth table of JK Flip Flop in Proteus",
+                desc: "This lab will provide a verification of truth tables for both a JK Flip Flop using Proteus software.",
+                date: "Fri May 19, 2023",
+                link: "verification-of-jk-flip-flop-in-proteus"
             },
         ];
         for (let i = 0; i < arr.length; i++) {
