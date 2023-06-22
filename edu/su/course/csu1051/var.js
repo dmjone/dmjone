@@ -248,6 +248,13 @@ function get_menu_list(datetogen) {
                 codetype: "Binary Tree",
                 link: "binary-tree"
             },
+            {
+                title: "Lab 15: Binary Search Tree",
+                desc: "This lab covers the Binary Search Tree and explains how to implement them in C++ with its flowdiagram and dry run and output.",
+                date: "Fri May 25, 2023",
+                codetype: "Binary Search Tree",
+                link: "binary-search-tree"
+            },
 
 
             // {
