@@ -114,7 +114,7 @@ function get_menu_list(datetogen) {
             {
                 title: "Unveiling the Magic of Insertion Sort",
                 desc: "Embark on a thrilling journey through the world of algorithms, where we unravel the intricacies of Insertion Sort. Let C++ be your language of choice as you decipher this fundamental sorting technique and transform lines of code into efficient solutions.",
-                date: "Mon May 29, 2023",                
+                date: "Mon May 29, 2023",
                 readtime: r(15),
                 link: "insertion-sort"
             },
@@ -233,6 +233,13 @@ function get_menu_list(datetogen) {
                 date: "Fri May 19, 2023",
                 codetype: "Queue Using Array",
                 link: "queue-implementation-using-array"
+            },
+            {
+                title: "Lab 13: Tree vs Graph",
+                desc: "This lab cover the differences between tree vs graph and explains how to implement them in C++.",
+                date: "Fri May 19, 2023",
+                codetype: "Tree vs Graph",
+                link: "tree-vs-graph"
             }
 
 
