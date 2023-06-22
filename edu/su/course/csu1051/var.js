@@ -240,7 +240,14 @@ function get_menu_list(datetogen) {
                 date: "Fri May 19, 2023",
                 codetype: "Tree vs Graph",
                 link: "tree-vs-graph"
-            }
+            },
+            {
+                title: "Lab 14: Binary Tree",
+                desc: "This lab covers the Binary Tree and explains how to implement them in C++ with its flowdiagram and dry run and output.",
+                date: "Fri May 25, 2023",
+                codetype: "Binary Tree",
+                link: "binary-tree"
+            },
 
 
             // {
