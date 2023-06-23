@@ -69,58 +69,78 @@
                 <pre><code class="language-cpp">#include &lt;bits/stdc++.h>
 using namespace std;
 
-#define INF 0x3f3f3f3f
+struct Edge {
+    int src, dest, weight;
+};
 
-void addEdge(vector &lt;pair&lt;int, int>> adj[], int u, int v, int wt) {
-    adj[u].push_back(make_pair(v, wt));
-    adj[v].push_back(make_pair(u, wt));
+struct Graph {
+    int V, E;
+    struct Edge* edge;
+};
+
+struct Graph* createGraph(int V, int E) {
+    struct Graph* graph = new Graph;
+    graph->V = V;
+    graph->E = E;
+    graph->edge = new Edge[E];
+    return graph;
 }
 
-void dijkstra(vector<pair&lt;int,int>> adj[], int V, int src) {
-    priority_queue&lt;pair&lt;int, int>, vector&lt;pair&lt;int, int>>, greater&lt;pair&lt;int, int>>> pq;
+void printArr(int dist[], int n) {
+    cout << "\nVertex |  Distance from Source\n";
+    for (int i = 0; i < n; ++i)
+        cout<< i <<" \t | \t\t "<< dist[i]<< "\n";
+}
 
-    vector<int> dist(V, INF);
+void BellmanFord(struct Graph* graph, int src) {
+    int V = graph->V;
+    int E = graph->E;
+    int dist[V];
 
-    pq.push(make_pair(0, src));
+    for (int i = 0; i < V; i++)
+        dist[i] = INT_MAX;
     dist[src] = 0;
 
-    while(!pq.empty()) {
-        int u = pq.top().second;
-        pq.pop();
-
-        for(auto x : adj[u]) {
-            int v = x.first;
-            int weight = x.second;
-
-            if(dist[v] > dist[u] + weight) {
+    for (int i = 1; i <= V-1; i++) {
+        for (int j = 0; j < E; j++) {
+            int u = graph->edge[j].src;
+            int v = graph->edge[j].dest;
+            int weight = graph->edge[j].weight;
+            if (dist[u] != INT_MAX && dist[u] + weight < dist[v])
                 dist[v] = dist[u] + weight;
-                pq.push(make_pair(dist[v], v));
-            }
         }
     }
 
-    cout << "Vertex | Distance from Source" << endl;
-    for(int i = 0; i < V; ++i) {
-        cout << i << "\t | \t\t" << dist[i] << endl;
+    for (int i = 0; i < E; i++) {
+        int u = graph->edge[i].src;
+        int v = graph->edge[i].dest;
+        int weight = graph->edge[i].weight;
+        if (dist[u] != INT_MAX && dist[u] + weight < dist[v]) {
+            cout<<"Graph contains negative weight cycle";
+            return;
+        }
     }
+
+    printArr(dist, V);
+
+    return;
 }
 
 int main() {
-    int V = 5;
-    vector&lt;pair&lt;int, int>> adj[V];
+    int V, E;
+    cout << "Enter number of vertices: ";
+    cin>>V;
+    cout<< "Enter number of edges: ";
+    cin>>E;
 
-    addEdge(adj, 0, 1, 10);
-    addEdge(adj, 0, 4, 5);
-    addEdge(adj, 1, 2, 1);
-    addEdge(adj, 1, 4, 2);
-    addEdge(adj, 2, 3, 4);
-    addEdge(adj, 3, 0, 7);
-    addEdge(adj, 3, 2, 6);
-    addEdge(adj, 4, 1, 3);
-    addEdge(adj, 4, 2, 9);
-    addEdge(adj, 4, 3, 2);
+    struct Graph* graph = createGraph(V, E);
 
-    dijkstra(adj, V, 0);
+    for(int i=0; i < E; i++) {
+        cout << "Enter source vertex, destination vertex and weight for edge "<< i+1<<": ";
+        cin>>graph->edge[i].src>>graph->edge[i].dest>>graph->edge[i].weight;
+    }
+
+    BellmanFord(graph, 0);
 
     return 0;
 }</code></pre>
@@ -130,35 +150,19 @@ int main() {
                 <h3 class="text-center"><strong>Left Page</strong></h3>
                 <h4>Flowchart</h4>
                 <ol>
-                    <li>
-                        Set the source vertex distance as 0, and all other vertices as infinity
-                    </li>
-                    <li>
-                        Add the source vertex to a priority queue
-                    </li>
-                    <li>
-                        While the priority queue is not empty:
-                        <ul>
-                            <li>Extract the vertex with the smallest distance</li>
-                            <li>For each vertex v connected to u:</li>
-                            <ul>
-                                <li>If dist[u] + weight(u, v) < dist[v], update dist[v] to dist[u] + weight(u, v)</li>
-                            </ul>
-                        </ul>
-                    </li>
-                    <li>
-                        Output the shortest distance from the source to all vertices
-                    </li>
-                    <li>
-                        End
-                    </li>
+                    <li>Start</li>
+                    <li>Set the distance of the source vertex to 0 and all other vertices to infinity.</li>
+                    <li>For each vertex, apply relaxation for all the edges.</li>
+                    <li>Repeat step 3 for V-1 times.</li>
+                    <li>Perform step 3 one more time and if any distance is updated then the graph has a negative cycle.</li>
+                    <li>End</li>
                 </ol>
                 <hr>
                 <h4>Representation using Flow Diagram</h4>
                 <pre>   +----------------------------------+
    |                                  |
    |            Start                 |
-   |              |                   |
+   |            |                     |
    +----------------------------------+
                   |
                   V
@@ -166,49 +170,42 @@ int main() {
    |                                  |
    |      Initialize variables        |
    |        and data structures       |
-   |              |                   |
+   |             |                    |
    +----------------------------------+
                   |
                   V
    +----------------------------------+
    |                                  |
-   |    Add edges to the graph        |
-   |              |                   |
+   |    Create the graph structure    |
+   |       and input the data         |
+   |                                  |
+   |    Allocate memory for the graph |
+   |    Set the number of vertices    |
+   |    and edges                     |
+   |    Allocate memory for the edges |
+   |    Input the edge information    |
+   |                                  |
    +----------------------------------+
                   |
                   V
    +----------------------------------+
    |                                  |
-   |      Dijkstra's Algorithm        |
-   |       (Shortest Path)            |
+   |    Bellman-Ford Algorithm        |
+   |    (Single Source Shortest Path) |
    |                                  |
-   |    Initialize priority queue     |
    |    Initialize distance array     |
-   |    Set source distance to 0      |
-   |    Push source node to the queue |
+   |    Set the source distance to 0  |
+   |    Perform relaxation steps      |
+   |    Check for negative weight     |
+   |    cycles                        |
    |                                  |
    +----------------------------------+
                   |
                   V
    +----------------------------------+
    |                                  |
-   |      Process nodes in the        |
-   |      priority queue              |
-   |                                  |
-   |    Pop node from the queue       |
-   |    Update distances for adjacent |
-   |    nodes if a shorter path is    |
-   |    found                         |
-   |    Push updated nodes to the     |
-   |    queue                         |
-   |                                  |
-   +----------------------------------+
-                  |
-                  V
-   +----------------------------------+
-   |                                  |
-   |       Print the distances        |
-   |       from the source node       |
+   |    Print the distances           |
+   |    from the source vertex        |
    |                                  |
    +----------------------------------+
                   |
@@ -218,54 +215,74 @@ int main() {
    |             Exit                 |
    |              |                   |
    +----------------------------------+
-
 </pre>
                 <hr>
                 <h4>Tabular Dry Run</h4>
                 <table class="table table-striped table-bordered table-hover">
                     <thead class="thead-dark">
                         <tr>
-                            <th scope="col">Current Node</th>
-                            <th scope="col">Visited Nodes</th>
-                            <th scope="col">Distance from Source</th>
+                            <th scope="col">Iteration</th>
+                            <th scope="col">Distance</th>
+                            <th scope="col">Updated Distance</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td>0</td>
+                            <td>1</td>
                             <td>0</td>
                             <td>0</td>
                         </tr>
                         <tr>
                             <td>1</td>
-                            <td>0, 1</td>
-                            <td>10</td>
+                            <td>1</td>
+                            <td>-1</td>
                         </tr>
                         <tr>
+                            <td>1</td>
+                            <td>2</td>
                             <td>4</td>
-                            <td>0, 1, 4</td>
-                            <td>5</td>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>3</td>
+                            <td>2</td>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>4</td>
+                            <td>2</td>
                         </tr>
                         <tr>
                             <td>2</td>
-                            <td>0, 1, 2, 4</td>
-                            <td>7</td>
+                            <td>2</td>
+                            <td>2</td>
                         </tr>
                         <tr>
+                            <td>2</td>
                             <td>3</td>
-                            <td>0, 1, 2, 3, 4</td>
-                            <td>9</td>
+                            <td>-1</td>
                         </tr>
                     </tbody>
                 </table>
                 <hr>
                 <h4>Output</h4>
-                <pre>Vertex | Distance from Source
+                <pre>Enter number of vertices: 5
+Enter number of edges: 8
+Enter source vertex, destination vertex and weight for edge 1: 0 1 -1
+Enter source vertex, destination vertex and weight for edge 2: 0 2 4
+Enter source vertex, destination vertex and weight for edge 3: 1 2 3
+Enter source vertex, destination vertex and weight for edge 4: 1 3 2
+Enter source vertex, destination vertex and weight for edge 5: 1 4 2
+Enter source vertex, destination vertex and weight for edge 6: 3 2 5
+Enter source vertex, destination vertex and weight for edge 7: 3 1 1
+Enter source vertex, destination vertex and weight for edge 8: 4 3 -3
+
+Vertex | Distance from Source
 0      |         0
-1      |         8
-2      |         9
-3      |         7
-4      |         5
+1      |         -1
+2      |         2
+3      |         -2
+4      |         1
 </pre>
             </article>
         </main>
