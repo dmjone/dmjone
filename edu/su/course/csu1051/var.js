@@ -286,9 +286,9 @@ function get_menu_list(datetogen) {
             {
                 title: "Lab 19: Bellman-Ford's Algorithm",
                 desc: "This lab covers the Bellman Ford's Algorithm and explains how to implement them in C++ with its flowdiagram and dry run and output.",
-                date: "Wed June 14, 2023",
+                date: "Wed June 21, 2023",
                 codetype: "Bellman-Ford's Algorithm",
-                link: "bellmanford-algorithm"
+                link: "bellmanfords-algorithm"
             },
 
 
