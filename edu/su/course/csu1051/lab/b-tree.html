@@ -69,116 +69,314 @@
                 <pre><code class="language-cpp">#include &lt;iostream>
 using namespace std;
 
-class Node {
+// BTree node
+class BTreeNode {
+    int *keys;  // An array of keys
+    int t;      // Minimum degree (defines the range for number of keys)
+    BTreeNode **C; // An array of child pointers
+    int n;     // Current number of keys
+    bool leaf; // Is true when node is leaf. Otherwise false
 public:
-    int key;
-    Node* left;
-    Node* right;
-    int height;
+    BTreeNode(int _t, bool _leaf);   // Constructor
+ 
+    // Function to traverse all nodes in a subtree rooted with this node
+    void traverse();
+ 
+    // Function to search key k in subtree rooted with this node
+    BTreeNode *search(int k);
+ 
+    // A utility function that returns the index of the first key that is greater
+    // or equal to k
+    int findKey(int k);
+ 
+    // A function to insert a new key in this node
+    // The assumption is, the node must be non-full when this function is called
+    void insertNonFull(int k);
+ 
+    // A function to split the child y of this node
+    // i is index of y in child array C[]
+    // The Child y must be full when this function is called
+    void splitChild(int i, BTreeNode *y);
+ 
+    // A wrapper function to remove the key k in subtree rooted with this node.
+    void remove(int k);
+ 
+    // A function to remove the key present in idx-th position in this node
+    void removeFromLeaf(int idx);
+ 
+    // A function to remove the key present in idx-th position in this node
+    // which is a non-leaf node
+    void removeFromNonLeaf(int idx);
+ 
+    // A function to get the predecessor of the key- where the key
+    // is present in the idx-th position in the node
+    int getPred(int idx);
+ 
+    // A function to get the successor of the key- where the key
+    // is present in the idx-th position in the node
+    int getSucc(int idx);
+ 
+    // A function to fill up the child node present in the idx-th
+    // position in the C[] array if that child has less than t-1 keys
+    void fill(int idx);
+ 
+    // A function to borrow a key from the C[idx-1]-th node and place
+    // it in C[idx]th node
+    void borrowFromPrev(int idx);
+ 
+    // A function to borrow a key from the C[idx+1]-th node and place it
+    // in C[idx]th node
+    void borrowFromNext(int idx);
+ 
+    // A function to merge idx-th child of the node with (idx+1)th child of
+    // the node
+    void merge(int idx);
+ 
+    // Make BTree friend of this so that we can access private members of this
+    // class in BTree functions
+    friend class BTree;
 };
-
-int height(Node* N) {
-    if (N == NULL)
-        return 0;
-    return N->height;
-}
-
-Node* newNode(int key) {
-    Node* node = new Node();
-    node->key = key;
-    node->left = NULL;
-    node->right = NULL;
-    node->height = 1; // new node is initially added at leaf
-    return(node);
-}
-
-Node* rightRotate(Node* y) {
-    Node* x = y->left;
-    Node* T2 = x->right;
-    x->right = y;
-    y->left = T2;
-    y->height = max(height(y->left), height(y->right)) + 1;
-    x->height = max(height(x->left), height(x->right)) + 1;
-    return x;
-}
-
-Node* leftRotate(Node* x) {
-    Node* y = x->right;
-    Node* T2 = y->left;
-    y->left = x;
-    x->right = T2;
-    x->height = max(height(x->left), height(x->right)) + 1;
-    y->height = max(height(y->left), height(y->right)) + 1;
-    return y;
-}
-
-int getBalanceFactor(Node* N) {
-    if (N == NULL)
-        return 0;
-    return height(N->left) - height(N->right);
-}
-
-Node* insertNode(Node* node, int key) {
-    // Perform the normal BST insertion
-    if (node == NULL)
-        return(newNode(key));
-
-    if (key < node->key)
-        node->left = insertNode(node->left, key);
-    else if (key > node->key)
-        node->right = insertNode(node->right, key);
-    else // Equal keys are not allowed in BST
-        return node;
-
-    node->height = 1 + max(height(node->left),
-                           height(node->right));
-
-    // Get the balance factor
-    int balance = getBalanceFactor(node);
-    
-    // If unbalanced, then there are 4 cases
-
-    // Left Left Case
-    if (balance > 1 && key < node->left->key)
-        return rightRotate(node);
-
-    // Right Right Case
-    if (balance < -1 && key > node->right->key)
-        return leftRotate(node);
-
-    // Left Right Case
-    if (balance > 1 && key > node->left->key) {
-        node->left = leftRotate(node->left);
-        return rightRotate(node);
+ 
+// BTree
+class BTree {
+    BTreeNode *root; // Pointer to root node
+    int t;  // Minimum degree
+public:
+    // Constructor (Initializes tree as empty)
+    BTree(int _t) {
+        root = NULL;
+        t = _t;
     }
-
-    // Right Left Case
-    if (balance < -1 && key < node->right->key) {
-        node->right = rightRotate(node->right);
-        return leftRotate(node);
+ 
+    // function to traverse the tree
+    void traverse() {
+        if (root != NULL) root->traverse();
     }
-    return node;
+ 
+    // function to search a key in this tree
+    BTreeNode* search(int k) {
+        return (root == NULL)? NULL : root->search(k);
+    }
+ 
+    // The main function that inserts a new key in this B-Tree
+    void insert(int k);
+ 
+    // The main function that removes a new key in thie B-Tree
+    void remove(int k);
+};
+ 
+// Constructor for BTreeNode class
+BTreeNode::BTreeNode(int t1, bool leaf1) {
+    // Copy the given minimum degree and leaf property
+    t = t1;
+    leaf = leaf1;
+ 
+    // Allocate memory for maximum number of possible keys
+    // and child pointers
+    keys = new int[2*t-1];
+    C = new BTreeNode *[2*t];
+ 
+    // Initialize the number of keys as 0
+    n = 0;
 }
-
-void printInOrder(Node* node) {
-    if(node != NULL) {
-        printInOrder(node->left);
-        cout << node->key << " ";
-        printInOrder(node->right);
+ 
+// Function to traverse all nodes in a subtree rooted with this node
+void BTreeNode::traverse() {
+    // There are n keys and n+1 children, travers through n keys
+    // and first n children
+    int i;
+    for (i = 0; i < n; i++) {
+        // If this is not leaf, then before printing key[i],
+        // traverse the subtree rooted with child C[i].
+        if (leaf == false) {
+            C[i]->traverse();
+        }
+        cout << " " << keys[i];
     }
+ 
+    // Print the subtree rooted with last child
+    if (leaf == false) {
+        C[i]->traverse();
+    }
+}
+ 
+// Function to search key k in subtree rooted with this node
+BTreeNode *BTreeNode::search(int k) {
+    // Find the first key greater than or equal to k
+    int i = 0;
+    while (i < n && k > keys[i]) {
+        i++;
+    }
+ 
+    // If the found key is equal to k, return this node
+    if (keys[i] == k) {
+        return this;
+    }
+ 
+    // If the key is not found here and this is a leaf node
+    if (leaf == true) {
+        return NULL;
+    }
+ 
+    // Go to the appropriate child
+    return C[i]->search(k);
+}
+ 
+// The main function that inserts a new key in this B-Tree
+void BTree::insert(int k) {
+    // If tree is empty
+    if (root == NULL) {
+        // Allocate memory for root
+        root = new BTreeNode(t, true);
+        root->keys[0] = k;  // Insert key
+        root->n = 1;  // Update number of keys in root
+    }
+    else {  // If tree is not empty
+        // If root is full, then tree grows in height
+        if (root->n == 2*t-1) {
+            // Allocate memory for new root
+            BTreeNode *s = new BTreeNode(t, false);
+ 
+            // Make old root as child of new root
+            s->C[0] = root;
+ 
+            // Split the old root and move 1 key to the new root
+            s->splitChild(0, root);
+ 
+            // New root has two children now.  Decide which of the
+            // two children is going to have new key
+            int i = 0;
+            if (s->keys[0] < k) {
+                i++;
+            }
+            s->C[i]->insertNonFull(k);
+ 
+            // Change root
+            root = s;
+        }
+        else {  // If root is not full, call insertNonFull for root
+            root->insertNonFull(k);
+        }
+    }
+}
+ 
+// A utility function that returns the index of the first key that is greater
+// or equal to k
+int BTreeNode::findKey(int k) {
+    int idx=0;
+    while (idx&lt;n && keys[idx] < k) {
+        ++idx;
+    }
+    return idx;
+}
+ 
+// A function to insert a new key in this node. The assumption is, the node
+// must be non-full when this function is called
+void BTreeNode::insertNonFull(int k) {
+    // Initialize index as index of rightmost element
+    int i = n-1;
+ 
+    // If this is a leaf node
+    if (leaf == true) {
+        // The following loop does two things
+        // a) Finds the location of new key to be inserted
+        // b) Moves all greater keys to one place ahead
+        while (i >= 0 && keys[i] > k) {
+            keys[i+1] = keys[i];
+            i--;
+        }
+ 
+        // Insert the new key at found location
+        keys[i+1] = k;
+        n = n+1;
+    }
+    else {  // If this node is not leaf
+        // Find the child which is going to have the new key
+        while (i >= 0 && keys[i] > k) {
+            i--;
+        }
+ 
+        // See if the found child is full
+        if (C[i+1]->n == 2*t-1) {
+            // If the child is full, then split it
+            splitChild(i+1, C[i+1]);
+ 
+            // After split, the middle key of C[i] goes up and
+            // C[i] is splitted into two.  See which of the two
+            // is going to have the new key
+            if (keys[i+1] < k) {
+                i++;
+            }
+        }
+        C[i+1]->insertNonFull(k);
+    }
+}
+ 
+// A function to split the child y of this node. i is index of y in
+// child array C[].  The Child y must be full when this function is called
+void BTreeNode::splitChild(int i, BTreeNode *y) {
+    // Create a new node which is going to store (t-1) keys
+    // of y
+    BTreeNode *z = new BTreeNode(y->t, y->leaf);
+    z->n = t - 1;
+ 
+    // Copy the last (t-1) keys of y to z
+    for (int j = 0; j < t-1; j++) {
+        z->keys[j] = y->keys[j+t];
+    }
+ 
+    // Copy the last t children of y to z
+    if (y->leaf == false) {
+        for(int j = 0; j < t; j++) {
+            z->C[j] = y->C[j+t];
+        }
+    }
+ 
+    // Reduce the number of keys in y
+    y->n = t - 1;
+ 
+    // Since this node is going to have a new child,
+    // create space of new child
+    for (int j = n; j >= i+1; j--) {
+        C[j+1] = C[j];
+    }
+ 
+    // Link the new child to this node
+    C[i+1] = z;
+ 
+    // A key of y will move to this node. Find the location of
+    // new key and move all greater keys one space ahead
+    for (int j = n-1; j >= i; j--) {
+        keys[j+1] = keys[j];
+    }
+ 
+    // Copy the middle key of y to this node
+    keys[i] = y->keys[t-1];
+ 
+    // Increment count of keys in this node
+    n = n + 1;
 }
 
 int main() {
-    Node* root = NULL;
-    
-    root = insertNode(root, 10);
-    root = insertNode(root, 20);
-    root = insertNode(root, 30);
-    root = insertNode(root, 15);
-    root = insertNode(root, 5);
-    
-    printInOrder(root);
-
+    BTree t(3);  // A B-Tree with minium degree 3
+    t.insert(10);
+    t.insert(20);
+    t.insert(5);
+    t.insert(6);
+    t.insert(12);
+    t.insert(30);
+    t.insert(7);
+    t.insert(17);
+ 
+    cout << "Traversal of the constucted tree is ";
+    t.traverse();
+ 
+    int k = 6;
+    (t.search(k) != NULL)? cout << "\nPresent" : cout << "\nNot Present";
+ 
+    k = 15;
+    (t.search(k) != NULL)? cout << "\nPresent" : cout << "\nNot Present";
+ 
     return 0;
 }</code></pre>
             </article>
@@ -187,128 +385,147 @@ int main() {
                 <h3 class="text-center"><strong>Left Page</strong></h3>
                 <h4>Flowchart</h4>
                 <ol>
-                    <li>Start.</li>
-                    <li>Create a new node with the value.</li>
-                    <li>Check if the tree is empty. If it is, the new node is the root.</li>
-                    <li>If the tree is not empty, compare the new value with the current node value.</li>
-                    <li>If the new value is less than the current node value, go to the left child. If the left child is null, insert here. If not, repeat step 4.</li>
-                    <li>If the new value is greater than the current node value, go to the right child. If the right child is null, insert here. If not, repeat step 4.</li>
-                    <li>After the new node is inserted, update the height of the affected nodes.</li>
-                    <li>Check the balance factor of the affected nodes. If it is more than 1 or less than -1, rotations are required to balance the tree.</li>
-                    <li>If the balance factor is more than 1, and the key of the node to be inserted is less than the key of the left child, perform a right rotation (Left-Left Case).</li>
-                    <li>If the balance factor is less than -1, and the key of the node to be inserted is more than the key of the right child, perform a left rotation (Right-Right Case).</li>
-                    <li>If the balance factor is more than 1, and the key of the node to be inserted is more than the key of the left child, perform a left rotation on the left child, followed by a right rotation on the current node (Left-Right Case).</li>
-                    <li>If the balance factor is less than -1, and the key of the node to be inserted is less than the key of the right child, perform a right rotation on the right child, followed by a left rotation on the current node (Right-Left Case).</li>
-                    <li>Return the new root node.</li>
-                    <li>End.</li>
+                    <li>
+                        Check if tree is empty
+                        <ul>
+                            <li>Yes: create root node, insert key into root, go to End</li>
+                            <li>No: proceed to next step</li>
+                        </ul>
+                    </li>
+                    <li>
+                        Check if root is full
+                        <ul>
+                            <li>Yes: create new root, split old root, go to Step 5</li>
+                            <li>No: go to Step 5</li>
+                        </ul>
+                    </li>
+                    <li>
+                        Find the appropriate child node for the key
+                    </li>
+                    <li>Check if the child node is full
+                        <ul>
+                            <li>Yes: split the child node, redistribute keys, repeat Step 5</li>
+                            <li>No: insert key into the child node</li>
+                        </ul>
+                        </ul>
+                    </li>
+                    <li>End</li>
                 </ol>
                 <hr>
                 <h4>Representation using Flow Diagram</h4>
                 <pre>   +----------------------------------+
    |                                  |
-   |             Start                |
-   |             |                    |
-   +----------------------------------+
-                  |
-                  V
-   +----------------------------------+
-   |                                  |
-   |    Declare Node pointer root     |
-   |             |                    |
-   +----------------------------------+
-                  |
-                  V
-   +----------------------------------+
-   |                                  |
-   |    Insert Node 10 into root      |
-   |             |                    |
-   +----------------------------------+
-                  |
-                  V
-   +----------------------------------+
-   |                                  |
-   |    Insert Node 20 into root      |
-   |             |                    |
-   +----------------------------------+
-                  |
-                  V
-   +----------------------------------+
-   |                                  |
-   |    Insert Node 30 into root      |
-   |             |                    |
-   +----------------------------------+
-                  |
-                  V
-   +----------------------------------+
-   |                                  |
-   |    Insert Node 15 into root      |
-   |             |                    |
-   +----------------------------------+
-                  |
-                  V
-   +----------------------------------+
-   |                                  |
-   |    Insert Node 5 into root       |
-   |             |                    |
-   +----------------------------------+
-                  |
-                  V
-   +----------------------------------+
-   |                                  |
-   |   Get Balance Factor             |
-   |             |                    |
-   +----------------------------------+
-                  |
-                  V
-   +----------------------------------+
-   |                                  |
-   |   Left Left Case                 |
-   |             |                    |
-   +----------------------------------+
-                  |
-                  V
-   +----------------------------------+
-   |                                  |
-   |   Right Right Case               |
-   |             |                    |
-   +----------------------------------+
-                  |
-                  V
-   +----------------------------------+
-   |                                  |
-   |   Left Right Case                |
-   |             |                    |
-   +----------------------------------+
-                  |
-                  V
-   +----------------------------------+
-   |                                  |
-   |   Right Left Case                |
+   |            Start                 |
    |              |                   |
    +----------------------------------+
                   |
                   V
    +----------------------------------+
    |                                  |
-   |   Print In-order traversal       |
+   |   Create BTree object t with     |
+   |   minimum degree 3               |
    |              |                   |
    +----------------------------------+
                   |
                   V
    +----------------------------------+
    |                                  |
-   |             Exit                 |
+   |      Insert key 10 in t          |
    |              |                   |
    +----------------------------------+
+                  |
+                  V
+   +----------------------------------+
+   |                                  |
+   |      Insert key 20 in t          |
+   |              |                   |
+   +----------------------------------+
+                  |
+                  V
+   +----------------------------------+
+   |                                  |
+   |      Insert key 5 in t           |
+   |              |                   |
+   +----------------------------------+
+                  |
+                  V
+   +----------------------------------+
+   |                                  |
+   |      Insert key 6 in t           |
+   |              |                   |
+   +----------------------------------+
+                  |
+                  V
+   +----------------------------------+
+   |                                  |
+   |      Insert key 12 in t          |
+   |              |                   |
+   +----------------------------------+
+                  |
+                  V
+   +----------------------------------+
+   |                                  |
+   |      Insert key 30 in t          |
+   |              |                   |
+   +----------------------------------+
+                  |
+                  V
+   +----------------------------------+
+   |                                  |
+   |      Insert key 7 in t           |
+   |              |                   |
+   +----------------------------------+
+                  |
+                  V
+   +----------------------------------+
+   |                                  |
+   |      Insert key 17 in t          |
+   |              |                   |
+   +----------------------------------+
+                  |
+                  V
+   +----------------------------------+
+   |                                  |
+   |    Print the traversal of t      |
+   |              |                   |
+   +----------------------------------+
+                  |
+                  V
+   +----------------------------------+
+   |                                  |
+   |     Search for key 6 in t        |
+   |              |                   |
+   +----------------------------------+
+                  |
+                  V
+   +----------------------------------+
+   |                                  |
+   |      Print "Present"             |
+   |              |                   |
+   +----------------------------------+
+                  |
+                  V
+   +----------------------------------+
+   |                                  |
+   |    Search for key 15 in t        |
+   |              |                   |
+   +----------------------------------+
+                  |
+                  V
+   +----------------------------------+
+   |                                  |
+   |      Print "Not Present"         |
+   |              |                   |
+   +----------------------------------+
+                  |
+                  V
+   +----------------------------------+
+   |                                  |
+   |            Exit                  |
+   |             |                    |
+   +----------------------------------+
+
 </pre>
-                <hr>
-                <h4>Dry Run</h4>
-                <ol>
-                    <li>Create a Stack object</li>
-                    <li>Push values 1, 2, 3 into the stack</li>
-                    <li>Pop a value from the stack</li>
-                    <li>view the top value of the stack</li>
-                </ol>
                 <hr>
                 <h4>Tabular Dry Run</h4>
                 <table class="table table-striped table-bordered table-hover">
@@ -330,32 +547,50 @@ int main() {
                         <tr>
                             <td>Insert</td>
                             <td>20</td>
-                            <td>20 > 10, insert to the right of 10. Tree is unbalanced, perform right rotation at 10</td>
-                            <td>20 &larr; 10</td>
-                        </tr>
-                        <tr>
-                            <td>Insert</td>
-                            <td>30</td>
-                            <td>30 > 20, insert to the right of 20. Tree is unbalanced, perform left rotation at 20</td>
-                            <td>30 &larr; 20 &larr; 10</td>
-                        </tr>
-                        <tr>
-                            <td>Insert</td>
-                            <td>15</td>
-                            <td>15 &lt; 30 and 15 &gt; 20, insert to the right of 20. Tree is unbalanced, perform right rotation at 30</td>
-                            <td>20 &larr; 10, 30 &larr; 15</td>
+                            <td>Insert to the right of 10</td>
+                            <td>10, 20</td>
                         </tr>
                         <tr>
                             <td>Insert</td>
                             <td>5</td>
-                            <td>5 &lt; 20 and 5 &lt; 10, insert to the left of 10. Tree is unbalanced, perform right rotation at 20</td>
-                            <td>10 &larr; 5, 20 &larr; 15 &larr; 30</td>
+                            <td>5 &lt; 10, insert to the left of 10. Split root</td>
+                            <td>10</td>
+                        </tr>
+                        <tr>
+                            <td>Insert</td>
+                            <td>6</td>
+                            <td>Insert 6 to the right of 5</td>
+                            <td>10</td>
+                        </tr>
+                        <tr>
+                            <td>Insert</td>
+                            <td>12</td>
+                            <td>Insert 12 to the right of 10</td>
+                            <td>10</td>
+                        </tr>
+                        <tr>
+                            <td>Insert</td>
+                            <td>30</td>
+                            <td>30 &gt; 20, insert to the right of 20. Split 10</td>
+                            <td>12</td>
+                        </tr>
+                        <tr>
+                            <td>Insert</td>
+                            <td>7</td>
+                            <td>7 &gt; 6 and 7 &lt; 10, insert to the right of 6</td>
+                            <td>12</td>
+                        </tr>
+                        <tr>
+                            <td>Insert</td>
+                            <td>17</td>
+                            <td>17 &gt; 12 and 17 &lt; 20, insert to the right of 12. Split 12</td>
+                            <td>10, 17</td>
                         </tr>
                     </tbody>
                 </table>
                 <hr>
                 <h4>Output</h4>
-                <pre>5 10 15 20 30</pre>
+                <pre>5 6 7 10 12 17 20 30</pre>
             </article>
         </main>
 

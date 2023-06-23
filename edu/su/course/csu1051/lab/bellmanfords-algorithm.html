@@ -17,7 +17,7 @@
             <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
         </noscript>
 
-        <title>Implementation of Binary Search Tree - CSU1051 - CSE 2026 - Shoolini University</title>
+        <title>Implementation of Bellman Ford's Algorithm - CSU1051 - CSE 2026 - Shoolini University</title>
         <meta name="description" content="Algorithm and Data Structure Classes held in the Computer Science Engineering at Shoolini University for the Session 2022-2026.">
 
         <meta property="og:image" content="/logo.png">
@@ -38,7 +38,7 @@
 
         <main>
             <article>
-                <h2 class="text-center">Implementation of Binary Search Tree</h2>
+                <h2 class="text-center">Implementation of Bellman Ford's Algorithm</h2>
                 <div class="container mt-4 w-100 w-xl-75">
                     <div class="accordion" id="toc">
                         <div class="accordion-item">
@@ -65,62 +65,63 @@
             </article>
             <article>
                 <h4>Objective</h4>
-                <p>To understand the implementation of a binary search tree using structures in C++</p>
-                <pre><code class="language-cpp">#include &lt;iostream>
+                <p>To understand the implementation of Bellman Ford's Algorithm using C++</p>
+                <pre><code class="language-cpp">#include &lt;bits/stdc++.h>
 using namespace std;
 
-struct Node {
-    int val;
-    Node* left;
-    Node* right;
-};
+#define INF 0x3f3f3f3f
 
-Node* createNode(int val) {
-    Node* newNode = new Node();
-    if (!newNode) {
-        cout << "Memory allocation failed";
-        return NULL;
-    }
-    newNode->val = val;
-    newNode->left = newNode->right = NULL;
-    return newNode;
+void addEdge(vector &lt;pair&lt;int, int>> adj[], int u, int v, int wt) {
+    adj[u].push_back(make_pair(v, wt));
+    adj[v].push_back(make_pair(u, wt));
 }
 
-Node* insertNode(Node* root, int val) {
-    if (root == NULL) {
-        root = createNode(val);
-        return root;
+void dijkstra(vector<pair&lt;int,int>> adj[], int V, int src) {
+    priority_queue&lt;pair&lt;int, int>, vector&lt;pair&lt;int, int>>, greater&lt;pair&lt;int, int>>> pq;
+
+    vector<int> dist(V, INF);
+
+    pq.push(make_pair(0, src));
+    dist[src] = 0;
+
+    while(!pq.empty()) {
+        int u = pq.top().second;
+        pq.pop();
+
+        for(auto x : adj[u]) {
+            int v = x.first;
+            int weight = x.second;
+
+            if(dist[v] > dist[u] + weight) {
+                dist[v] = dist[u] + weight;
+                pq.push(make_pair(dist[v], v));
+            }
+        }
     }
 
-    if (val < root->val)
-        root->left = insertNode(root->left, val);
-
-    else if (val > root->val)
-        root->right = insertNode(root->right, val);
-
-    else 
-        cout << "Duplicate value! Node not added." << endl;
-
-    return root;
-}
-
-void printInOrder(Node* root) {
-    if (root == NULL)
-        return;
-    printInOrder(root->left);
-    cout << root->val << " ";
-    printInOrder(root->right);
+    cout << "Vertex | Distance from Source" << endl;
+    for(int i = 0; i < V; ++i) {
+        cout << i << "\t | \t\t" << dist[i] << endl;
+    }
 }
 
 int main() {
-    Node* root = NULL;
-    root = insertNode(root, 10);
-    insertNode(root, 20);
-    insertNode(root, 30);
-    insertNode(root, 15);
-    insertNode(root, 5);
+    int V = 5;
+    vector&lt;pair&lt;int, int>> adj[V];
 
-    printInOrder(root);
+    addEdge(adj, 0, 1, 10);
+    addEdge(adj, 0, 4, 5);
+    addEdge(adj, 1, 2, 1);
+    addEdge(adj, 1, 4, 2);
+    addEdge(adj, 2, 3, 4);
+    addEdge(adj, 3, 0, 7);
+    addEdge(adj, 3, 2, 6);
+    addEdge(adj, 4, 1, 3);
+    addEdge(adj, 4, 2, 9);
+    addEdge(adj, 4, 3, 2);
+
+    dijkstra(adj, V, 0);
+
     return 0;
 }</code></pre>
             </article>
@@ -129,14 +130,28 @@ int main() {
                 <h3 class="text-center"><strong>Left Page</strong></h3>
                 <h4>Flowchart</h4>
                 <ol>
-                    <li>Start.</li>
-                    <li>Create a new node with the value.</li>
-                    <li>Check if the tree is empty. If it is, the new node is the root.</li>
-                    <li>If the tree is not empty, compare the new value with the current node value.</li>
-                    <li>If the new value is less than the current node value, go to the left child. If the left child is null, insert here. If not, repeat step 4.</li>
-                    <li>If the new value is greater than the current node value, go to the right child. If the right child is null, insert here. If not, repeat step 4.</li>
-                    <li>If the new value is equal to the current value, return an error or simply ignore.</li>
-                    <li>End.</li>
+                    <li>
+                        Set the source vertex distance as 0, and all other vertices as infinity
+                    </li>
+                    <li>
+                        Add the source vertex to a priority queue
+                    </li>
+                    <li>
+                        While the priority queue is not empty:
+                        <ul>
+                            <li>Extract the vertex with the smallest distance</li>
+                            <li>For each vertex v connected to u:</li>
+                            <ul>
+                                <li>If dist[u] + weight(u, v) < dist[v], update dist[v] to dist[u] + weight(u, v)</li>
+                            </ul>
+                        </ul>
+                    </li>
+                    <li>
+                        Output the shortest distance from the source to all vertices
+                    </li>
+                    <li>
+                        End
+                    </li>
                 </ol>
                 <hr>
                 <h4>Representation using Flow Diagram</h4>
@@ -149,39 +164,59 @@ int main() {
                   V
    +----------------------------------+
    |                                  |
-   |         Node* root               |
+   |      Initialize variables        |
+   |        and data structures       |
    |              |                   |
    +----------------------------------+
                   |
                   V
    +----------------------------------+
    |                                  |
-   |  root = insertNode(root, 10);    |
+   |    Add edges to the graph        |
    |              |                   |
    +----------------------------------+
                   |
                   V
    +----------------------------------+
    |                                  |
-   |    insertNode(root, 20);         |
-   |    insertNode(root, 30);         |
-   |    insertNode(root, 15);         |
-   |    insertNode(root, 5);          |
-   |              |                   |
+   |      Dijkstra's Algorithm        |
+   |       (Shortest Path)            |
+   |                                  |
+   |    Initialize priority queue     |
+   |    Initialize distance array     |
+   |    Set source distance to 0      |
+   |    Push source node to the queue |
+   |                                  |
    +----------------------------------+
                   |
                   V
    +----------------------------------+
    |                                  |
-   |        printInOrder(root)        |
-   |              |                   |
+   |      Process nodes in the        |
+   |      priority queue              |
+   |                                  |
+   |    Pop node from the queue       |
+   |    Update distances for adjacent |
+   |    nodes if a shorter path is    |
+   |    found                         |
+   |    Push updated nodes to the     |
+   |    queue                         |
+   |                                  |
    +----------------------------------+
                   |
                   V
    +----------------------------------+
    |                                  |
-   |            Exit                  |
-   |             |                    |
+   |       Print the distances        |
+   |       from the source node       |
+   |                                  |
+   +----------------------------------+
+                  |
+                  V
+   +----------------------------------+
+   |                                  |
+   |             Exit                 |
+   |              |                   |
    +----------------------------------+
 
 </pre>
@@ -190,81 +225,49 @@ int main() {
                 <table class="table table-striped table-bordered table-hover">
                     <thead class="thead-dark">
                         <tr>
-                            <th scope="col">Action</th>
-                            <th scope="col">Node Value</th>
-                            <th scope="col">Operation</th>
-                            <th scope="col">Output Tree</th>
+                            <th scope="col">Current Node</th>
+                            <th scope="col">Visited Nodes</th>
+                            <th scope="col">Distance from Source</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td>Insert</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>0</td>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>0, 1</td>
                             <td>10</td>
-                            <td>Tree is empty, insert 10 at root</td>
-                            <td>10</td>
                         </tr>
                         <tr>
-                            <td>Insert</td>
-                            <td>20</td>
-                            <td>20 > 10, insert to the right of 10</td>
-                            <td>10 &#8594; 20</td>
-                        </tr>
-                        <tr>
-                            <td>Insert</td>
-                            <td>30</td>
-                            <td>30 > 10 and 30 > 20, insert to the right of 20</td>
-                            <td>10 &#8594; 20 &#8594; 30</td>
-                        </tr>
-                        <tr>
-                            <td>Insert</td>
-                            <td>15</td>
-                            <td>15 > 10 and 15 < 20, insert to the left of 20</td>
-                            <td>10 &#8594; (15, 20 &#8594; 30)</td>
-                        </tr>
-                        <tr>
-                            <td>Insert</td>
+                            <td>4</td>
+                            <td>0, 1, 4</td>
                             <td>5</td>
-                            <td>5 < 10, insert to the left of 10</td>
-                            <td>(5, 10) &#8594; (15, 20 &#8594; 30)</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>0, 1, 2, 4</td>
+                            <td>7</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>0, 1, 2, 3, 4</td>
+                            <td>9</td>
                         </tr>
                     </tbody>
                 </table>
-
-                <tbody>
-                    <tr>
-                        <td>10</td>
-                        <td>Insert 10 at root</td>
-                        <td>10</td>
-                    </tr>
-                    <tr>
-                        <td>20</td>
-                        <td>Insert 20, greater than 10, insert right</td>
-                        <td>10 (20)</td>
-                    </tr>
-                    <tr>
-                        <td>30</td>
-                        <td>Insert 30, greater than 10 and 20, insert right</td>
-                        <td>10 (20 (30))</td>
-                    </tr>
-                    <tr>
-                        <td>15</td>
-                        <td>Insert 15 - 10 > 15 < 20, insert left to 20</td>
-                        <td>10 (20 (15, 30))</td>
-                    </tr>
-                    <tr>
-                        <td>5</td>
-                        <td>Insert 5, less than 10, insert left to 10</td>
-                        <td>10 (5, 20 (15, 30))</td>
-                    </tr>
-                </tbody>
-                </table>
                 <hr>
                 <h4>Output</h4>
-                <pre>5 10 15 20 30</pre>
+                <pre>Vertex | Distance from Source
+0      |         0
+1      |         8
+2      |         9
+3      |         7
+4      |         5
+</pre>
             </article>
-
-
-
         </main>
 
         <script> copyright("all"); </script>

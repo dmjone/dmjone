@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+    <!--<![endif]-->
+
+    <head>
+        <script src="/js/edu_su_common.js"></script>
+        <noscript>
+            <style>
+                html,
+                body {
+                    margin: 0;
+                    overflow: hidden;
+                }
+            </style>
+            <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+        </noscript>
+
+        <title>Implementation of B+ Tree - CSU1051 - CSE 2026 - Shoolini University</title>
+        <meta name="description" content="Algorithm and Data Structure Classes held in the Computer Science Engineering at Shoolini University for the Session 2022-2026.">
+
+        <meta property="og:image" content="/logo.png">
+        <meta property="og:type" content="article">
+
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:site" content="@divyamohan1993">
+        <meta name="twitter:creator" content="@divyamohan1993">
+        <meta name="twitter:image" content="/logo.png">
+
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+    </head>
+
+    <body>
+
+        <script> header_author("dm"); </script>
+
+        <main>
+            <article>
+                <h2 class="text-center">Implementation of B+ Tree</h2>
+                <div class="container mt-4 w-100 w-xl-75">
+                    <div class="accordion" id="toc">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="h1">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#c1" aria-controls="c1" aria-expanded="false">
+                                    <i class="fas fa-book"></i> <strong>&nbsp;Table of Contents</strong>
+                                </button>
+                            </h2>
+                            <div id="c1" class="accordion-collapse collapse" aria-labelledby="h1" data-bs-parent="#toc">
+                                <div class="accordion-body">
+                                    <ol class="list-unstyled p-0 m-0">
+                                        <li class="p-1"><a href="#left-page"><i class="fas fa-chevron-circle-right"></i> Left Side (Blank Side)</a></li>
+                                        <li class="p-1"><a href="#right-page"><i class="fas fa-chevron-circle-right"></i> Right Side (Ruled Side)</a></li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <article id="right-page">
+                <h3 class="text-center"><strong>Right Page</strong></h3>
+            </article>
+            <article>
+                <h4>Objective</h4>
+                <p>To understand the implementation of a B+ tree using C++</p>
+                <pre><code class="language-cpp">#include &lt;bits/stdc++.h>
+using namespace std;
+
+struct BPTreeNode {
+    int *data;
+    BPTreeNode **child_ptr;
+    bool leaf;
+    int n;
+}*root = NULL, *np = NULL, *x = NULL;
+
+BPTreeNode* init() {
+    int i;
+    np = new BPTreeNode;
+    np->data = new int[5];
+    np->child_ptr = new BPTreeNode *[6];
+    np->leaf = true;
+    np->n = 0;
+    for (i = 0; i < 6; i++) {
+        np->child_ptr[i] = NULL;
+    }
+    return np;
+}
+
+void traverse(BPTreeNode *p) {
+    cout << endl;
+    int i;
+    for (i = 0; i < p->n; i++) {
+        if (p->leaf == false) {
+            traverse(p->child_ptr[i]);
+        }
+        cout << " " << p->data[i];
+    } 
+    if (p->leaf == false) {
+        traverse(p->child_ptr[i]);
+    }
+    cout << endl;
+}
+
+void sort(int *p, int n) {
+    int i, j, temp;
+    for (i = 0; i < n; i++) {
+        for (j = i; j <= n; j++) {
+            if (p[i] > p[j]) {
+                temp = p[i];
+                p[i] = p[j];
+                p[j] = temp;
+            }
+        }
+    }
+}
+
+int split_child(BPTreeNode *x, int i) {
+    int j, mid;
+    BPTreeNode *np1, *np3, *y;
+    np3 = init();
+    np3->leaf = true;
+    if (i == -1) {
+        mid = x->data[2];
+        x->data[2] = 0;
+        x->n--;
+        np1 = init();
+        np1->leaf = false;
+        x->leaf = true;
+        for (j = 3; j < 5; j++) {
+            np3->data[j - 3] = x->data[j];
+            np3->child_ptr[j - 3] = x->child_ptr[j];
+            np3->n++;
+            x->data[j] = 0;
+            x->n--;
+        }
+        for(j = 0; j < 6; j++) {
+            x->child_ptr[j] = NULL;
+        }
+        np1->data[0] = mid;
+        np1->child_ptr[np1->n] = x;
+        np1->child_ptr[np1->n + 1] = np3;
+        np1->n++;
+        root = np1;
+    } else {
+        y = x->child_ptr[i];
+        mid = y->data[2];
+        y->data[2] = 0;
+        y->n--;
+        for (j = 3; j < 5; j++) {
+            np3->data[j - 3] = y->data[j];
+            np3->n++;
+            y->data[j] = 0;
+            y->n--;
+        }
+        x->child_ptr[i] = y;
+        x->child_ptr[i + 1] = np3; 
+    }
+    return mid;
+}
+
+void insert(int a) {
+    int i, temp;
+    x = root;
+    if (x == NULL) {
+        root = init();
+        x = root;
+    } else {
+        if (x->leaf == true && x->n == 5) {
+            temp = split_child(x, -1);
+            x = root;
+            for (i = 0; i < (x->n); i++) {
+                if ((a > x->data[i]) && (a < x->data[i + 1])) {
+                    i++;
+                    break;
+                } else if (a < x->data[0]) {
+                    break;
+                } else {
+                    continue;
+                }
+            }
+            x = x->child_ptr[i];
+        } else {
+            while (x->leaf == false) {
+                for (i = 0; i < (x->n); i++) {
+                    if ((a > x->data[i]) && (a < x->data[i + 1])) {
+                        i++;
+                        break;
+                    } else if (a < x->data[0]) {
+                        break;
+                    } else {
+                        continue;
+                    }
+                }
+                if ((x->child_ptr[i])->n == 5) {
+                    temp = split_child(x, i);
+                    x->data[x->n] = temp;
+                    x->n++;
+                    continue;
+                } else {
+                    x = x->child_ptr[i];
+                }
+            }
+        }
+    }
+    x->data[x->n] = a;
+    sort(x->data, x->n);
+    x->n++;
+}
+
+int main() {
+    int i, n, t;
+    cout << "Enter the no of elements to be inserted ";
+    cin>>n;
+    for(i = 0; i < n; i++) {
+        cout << "Enter the element ";
+        cin>>t;
+        insert(t);
+    }
+    cout << "Traversal of constructed B+ tree is ";
+    traverse(root);
+    return 0;
+}</code></pre>
+            </article>
+
+            <article id="left-page">
+                <h3 class="text-center"><strong>Left Page</strong></h3>
+                <h4>Flowchart</h4>
+                <ol>
+                    <li>
+                        Is the tree empty?
+                        <ul>
+                            <li>Yes: create root node, insert key into root, go to End</li>
+                            <li>No: Proceed to the next step</li>
+                        </ul>
+                    </li>
+                    <li>
+                        Is the root full?
+                        <ul>
+                            <li>Yes: split the root, create a new root, link the new root to the split parts, and proceed to Step 5</li>
+                            <li>No: Proceed to Step 5</li>
+                        </ul>
+                    </li>
+                    <li>Find the appropriate child node to insert the key</li>
+                    <li>Is the child node full?
+                        <ul>
+                            <li>Yes: split the child node, distribute the keys, repeat Step 5</li>
+                            <li>No: insert key into the child node</li>
+                        </ul>
+                    </li>
+                    <li>End</li>
+                </ol>
+                <hr>
+                <h4>Representation using Flow Diagram</h4>
+                <pre>   +----------------------------------+
+   |                                  |
+   |            Start                 |
+   |            |                     |
+   +----------------------------------+
+                  |
+                  V
+   +----------------------------------+
+   |                                  |
+   |        Initialize root           |
+   |             |                    |
+   +----------------------------------+
+                  |
+                  V
+   +----------------------------------+
+   |                                  |
+   |       Enter number of elements    |
+   |       to be inserted              |
+   |             |                    |
+   +----------------------------------+
+                  |
+                  V
+   +----------------------------------+
+   |                                  |
+   |        Loop (n iterations)        |
+   |                                  |
+   |     Enter the element             |
+   |     Insert the element            |
+   |             |                    |
+   +----------------------------------+
+                  |
+                  V
+   +----------------------------------+
+   |                                  |
+   |   Print the traversal of the      |
+   |   constructed B+ tree             |
+   |             |                    |
+   +----------------------------------+
+                  |
+                  V
+   +----------------------------------+
+   |                                  |
+   |             Exit                 |
+   |             |                    |
+   +----------------------------------+
+
+</pre>
+                <hr>
+                <h4>Tabular Dry Run</h4>
+                <table class="table table-striped table-bordered table-hover">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th scope="col">Action</th>
+                            <th scope="col">Node Value</th>
+                            <th scope="col">Operation</th>
+                            <th scope="col">Output Tree</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Insert</td>
+                            <td>10</td>
+                            <td>Tree is empty, insert 10 at root</td>
+                            <td>10</td>
+                        </tr>
+                        <tr>
+                            <td>Insert</td>
+                            <td>20</td>
+                            <td>Insert to the right of 10</td>
+                            <td>10, 20</td>
+                        </tr>
+                        <tr>
+                            <td>Insert</td>
+                            <td>5</td>
+                            <td>5 &lt; 10, insert to the left of 10. Split root</td>
+                            <td>10</td>
+                        </tr>
+                        <tr>
+                            <td>Insert</td>
+                            <td>15</td>
+                            <td>15 &gt; 10 and 15 &lt; 20, insert to the right of 10</td>
+                            <td>10</td>
+                        </tr>
+                        <tr>
+                            <td>Insert</td>
+                            <td>30</td>
+                            <td>30 &gt; 20, insert to the right of 20</td>
+                            <td>10</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <hr>
+                <h4>Output</h4>
+                <pre>Enter the no of elements to be inserted 5
+Enter the element 10 20 5 15 30
+Traversal of constructed B+ tree is 5 10 15 20 30
+</pre>
+            </article>
+        </main>
+
+        <script> copyright("all"); </script>
+
+    </body>
+
+</html>

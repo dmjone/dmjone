@@ -262,6 +262,34 @@ function get_menu_list(datetogen) {
                 codetype: "AVL Tree",
                 link: "avl-tree"
             },
+            {
+                title: "Lab 16: B Tree",
+                desc: "This lab covers the B Tree and explains how to implement them in C++ with its flowdiagram and dry run and output.",
+                date: "Wed June 7, 2023",
+                codetype: "B Tree",
+                link: "b-tree"
+            },
+            {
+                title: "Lab 17: B+ Tree",
+                desc: "This lab covers the B+ Tree and explains how to implement them in C++ with its flowdiagram and dry run and output.",
+                date: "Wed June 7, 2023",
+                codetype: "B+ Tree",
+                link: "bplus-tree"
+            },
+            {
+                title: "Lab 18: Dijkstra's Algorithm",
+                desc: "This lab covers the Dijkstra's Algorithm and explains how to implement them in C++ with its flowdiagram and dry run and output.",
+                date: "Wed June 14, 2023",
+                codetype: "Dijkstra's Algorithm",
+                link: "dijkstras-algorithm"
+            },
+            {
+                title: "Lab 19: Bellman-Ford's Algorithm",
+                desc: "This lab covers the Bellman Ford's Algorithm and explains how to implement them in C++ with its flowdiagram and dry run and output.",
+                date: "Wed June 14, 2023",
+                codetype: "Bellman-Ford's Algorithm",
+                link: "bellmanford-algorithm"
+            },
 
 
             // {
