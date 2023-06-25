@@ -30,6 +30,12 @@ function get_menu_list(datetogen) {
     function get_class(def_date, def_author) {
         const arr = [
             {
+                title: "Teacher-Provided Study Resources: Data Structures & Algorithms",
+                description: "Find comprehensive documents and resources on data structures and algorithms, provided by Dr. Laxman for enhanced learning. These materials include FAQs that assist beginners in assessing their knowledge and understanding of these key programming concepts.",
+                estimatedReadTime: r(10),
+                resourceLink: "resources"
+            },
+            {
                 title: "Key Concepts and Differences",
                 desc: "This introduction to Data Structures and Algorithms will cover the distinctions between unions and structures, as well as the differences between primitive and non-primitive data structures, and linear and non-linear data structures.",
                 codetype: "Introduction"
@@ -138,13 +144,7 @@ function get_menu_list(datetogen) {
                 desc: "Learn about some of the frequently asked questions in data structures and algorithms. Understanding these questions will give you a better understanding and is a useful exercise for beginner programmers to learn how to test their knowledge.",
                 readtime: r(10),
                 link: "faq2"
-            },
-            {
-                title: "Shared Notes and Frequently Asked Questions 3",
-                desc: "Learn about some of the frequently asked questions in data structures and algorithms. Understanding these questions will give you a better understanding and is a useful exercise for beginner programmers to learn how to test their knowledge.",
-                readtime: r(10),
-                link: "faq3"
-            },
+            },            
         ];
         for (let i = 0; i < arr.length; i++) {
             const _data = arr[i];
