@@ -32,8 +32,9 @@ function get_menu_list(datetogen) {
             {
                 title: "Teacher-Provided Study Resources: Data Structures & Algorithms",
                 desc: "Find comprehensive documents and resources on data structures and algorithms, provided by Dr. Laxman for enhanced learning. These materials include FAQs that assist beginners in assessing their knowledge and understanding of these key programming concepts.",
-                estimatedReadTime: r(10),
-                resourceLink: "resources"
+                readtime: r(10),
+                link: "resources",
+                date: "Fri March 10, 2023",
             },
             {
                 title: "Key Concepts and Differences",
