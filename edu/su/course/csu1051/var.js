@@ -4,14 +4,14 @@ function get_menu_list(datetogen) {
         const arr = [
             {
                 link: "class/",
-                title: "📚 Master Data Structures & Algorithms with Our Class Topics!",
-                desc: "Explore a comprehensive collection of Data Structures & Algorithms class topics.",
+                title: "📚 Theory of DSA",
+                desc: " Master Data Structures & Algorithms with our comprehensive collection of Data Structures & Algorithms Class Topics!",
                 codetype: "CSU1051 | Class"
             },
             {
                 link: "lab/",
-                title: "🔬 Get Hands-On Experience with Data Structures & Algorithms Lab Practicals!",
-                desc: "Discover practical and hands-on learning for Data Structures & Algorithms.",
+                title: "🔬 Practicals: Hands-On Learning with DSA Lab!",
+                desc: "Discover practical and hands-on learning experience for Data Structures & Algorithms through Lab.",
                 codetype: "CSU1051P | Lab"
             }
         ];
@@ -144,7 +144,7 @@ function get_menu_list(datetogen) {
                 desc: "Learn about some of the frequently asked questions in data structures and algorithms. Understanding these questions will give you a better understanding and is a useful exercise for beginner programmers to learn how to test their knowledge.",
                 readtime: r(10),
                 link: "faq2"
-            },            
+            },
         ];
         for (let i = 0; i < arr.length; i++) {
             const _data = arr[i];
