@@ -31,7 +31,7 @@ function get_menu_list(datetogen) {
         const arr = [
             {
                 title: "Teacher-Provided Study Resources: Data Structures & Algorithms",
-                description: "Find comprehensive documents and resources on data structures and algorithms, provided by Dr. Laxman for enhanced learning. These materials include FAQs that assist beginners in assessing their knowledge and understanding of these key programming concepts.",
+                desc: "Find comprehensive documents and resources on data structures and algorithms, provided by Dr. Laxman for enhanced learning. These materials include FAQs that assist beginners in assessing their knowledge and understanding of these key programming concepts.",
                 estimatedReadTime: r(10),
                 resourceLink: "resources"
             },
