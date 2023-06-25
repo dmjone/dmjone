@@ -103,14 +103,23 @@ function get_menu_list(datetogen) {
             //     title: "Singly Linked Lists and Their Representations",
             //     desc: "Learn about singly linked lists and their representations in data structures and algorithms. Singly linked lists are a fundamental data structure in programming that are used to store and manipulate data in a linear and dynamic way. Understanding how singly linked lists work and how to represent them efficiently is important for solving problems in various domains such as data processing, artificial intelligence, and game development. This is useful for beginner programmers to learn how to represent singly linked lists, understand their operations, and apply this knowledge to create efficient and effective programs."
             // },
-            // {
-            //     title: "Doubly Linked Lists and Circularly Linked Lists",
-            //     desc: "Learn about doubly linked lists and circularly linked lists in data structures and algorithms. Doubly linked lists and circularly linked lists are extensions of singly linked lists that provide additional functionality such as bidirectional traversal and circular data structures. Understanding how doubly linked lists and circularly linked lists work and how to manipulate them efficiently is important for solving problems in various domains such as network routing, computer graphics, and memory management. This is a useful concept for intermediate programmers to learn how to represent doubly linked lists and circularly linked lists, understand their operations, and apply this knowledge to create efficient and effective programs."
-            // },
-            // {
-            //     title: "Operations on Linked Lists - Insertion, Deletion, and Traversal",
-            //     desc: "Learn about operations on linked lists - insertion, deletion, and traversal - in data structures and algorithms with this article. Linked lists are a fundamental data structure in programming that are used to store and manipulate data in a dynamic and flexible way. Understanding how to perform operations such as insertion, deletion, and traversal on linked lists efficiently is important for solving problems in various domains such as database management, machine learning, and web development. This program is a useful for beginner programmers to learn how to perform operations on linked lists, understand their time and space complexities, and apply this knowledge to create efficient and effective programs."
-            // },
+            {
+                title: "Doubly Linked Lists and Circularly Linked Lists",
+                desc: "Learn about doubly linked lists and circularly linked lists in data structures and algorithms. Doubly linked lists and circularly linked lists are extensions of singly linked lists that provide additional functionality such as bidirectional traversal and circular data structures. Understanding how doubly linked lists and circularly linked lists work and how to manipulate them efficiently is important for solving problems in various domains such as network routing, computer graphics, and memory management. This is a useful concept for intermediate programmers to learn how to represent doubly linked lists and circularly linked lists, understand their operations, and apply this knowledge to create efficient and effective programs.",
+                link: "dll-cll"
+            },
+            {
+                title: "Operations on Linked Lists - Insertion, Deletion, and Traversal",
+                desc: "Learn about operations on linked lists - insertion, deletion, and traversal - in data structures and algorithms with this article. Linked lists are a fundamental data structure in programming that are used to store and manipulate data in a dynamic and flexible way. Understanding how to perform operations such as insertion, deletion, and traversal on linked lists efficiently is important for solving problems in various domains such as database management, machine learning, and web development. This program is a useful for beginner programmers to learn how to perform operations on linked lists, understand their time and space complexities, and apply this knowledge to create efficient and effective programs.",
+                readtime: r(15),
+                link: "linkedlist-operations"
+            },
+            {
+                title: "Memory Allocation of the Linked Lists",
+                desc: "Learn about memory allocation of linked lists - in data structures and algorithms with this article. Linked lists are a fundamental data structure in programming that are used to store and manipulate data in a dynamic and flexible way. Understanding how memory is allocated to linked lists efficiently is important for solving problems in various domains such as database management, machine learning, and web development. This program is a useful for beginner programmers to learn how we allocate the memory to linked lists, understand their time and space complexities, and apply this knowledge to create efficient and effective programs.",
+                readtime: r(15),
+                link: "linkedlist-memory-allocation"
+            },
             {
                 title: "Unveiling the Magic of Insertion Sort",
                 desc: "Embark on a thrilling journey through the world of algorithms, where we unravel the intricacies of Insertion Sort. Let C++ be your language of choice as you decipher this fundamental sorting technique and transform lines of code into efficient solutions.",
@@ -130,6 +139,12 @@ function get_menu_list(datetogen) {
                 readtime: r(10),
                 link: "faq2"
             },
+            {
+                title: "Shared Notes and Frequently Asked Questions 3",
+                desc: "Learn about some of the frequently asked questions in data structures and algorithms. Understanding these questions will give you a better understanding and is a useful exercise for beginner programmers to learn how to test their knowledge.",
+                readtime: r(10),
+                link: "faq3"
+            },
         ];
         for (let i = 0; i < arr.length; i++) {
             const _data = arr[i];
@@ -147,7 +162,7 @@ function get_menu_list(datetogen) {
         const arr = [
             {
                 title: "General Instructions For Lab File",
-                desc: "General instructions for making of a Lab File. ",
+                desc: "General instructions for making of a Lab File.",
                 codetype: "Lab File Instructions",
                 link: "instructions"
             },
