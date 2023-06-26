@@ -180,7 +180,7 @@ function get_menu_list(datetogen) {
                 title: "1 Line C++ Concepts",
                 desc: "<strong>In hurry?</strong> We have 1 line concepts for you! Revisit and reinforce your knowledge of C++ with these 1 liners. It provides a quick refresher on key C++ topics. This revision is perfect for programmers who want to solidify their understanding but in just 2 minutes for examinations or interviews! <p><strong>Got Time?</strong> We strongly recommend that you <a href=\"revision-cpp\" class=\"text-primary\">visit this</a> instead.",
                 link: "one-line-concepts",
-                readtime: 2
+                readtime: 7
             },
             {
                 title: "C++ FAQ's",
@@ -240,12 +240,32 @@ function get_menu_list(datetogen) {
         }
     }
     function get_misc(def_date, def_author) {
+
+        let download_link;
+        if (navigator.platform.startsWith('Win')) {
+            // Windows
+            download_link = "project.exe"
+        } else if (navigator.platform.startsWith('Linux')) {
+            // Linux
+            download_link = "project";
+        } else {
+            // Other OS or unable to determine
+            download_link = "#";
+        }
+
+
         const arr = [
             {
                 title: "100 Programs in C++",
                 desc: "Section contains 100 Programs written in CPP",
                 link: "100programs",
                 codetype: "100 Programs in C++"
+            },
+            {
+                title: "Download C++ Project File's Executable",
+                desc: "The project is based on the inventory which takes part names, and issues them to employee when required.<br><br><a href=\"project.exe\" class=\"text-primary\"><strong>Click here </strong></a> to download <mark>For Windows</mark><br><a href=\"project\" class=\"text-primary\"><strong>Click here</strong> </a> to download <mark>For Linux</mark>",
+                link: download_link,
+                codetype: "CSU1287 | Project Executable"
             },
         ];
         for (let i = 0; i < arr.length; i++) {
