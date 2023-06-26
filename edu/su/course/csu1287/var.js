@@ -265,7 +265,8 @@ function get_menu_list(datetogen) {
                 title: "Download C++ Project File's Executable",
                 desc: "The project is based on the inventory which takes part names, and issues them to employee when required.<br><br><a href=\"project.exe\" class=\"text-primary\"><strong>Click here </strong></a> to download <mark>For Windows</mark><br><a href=\"project\" class=\"text-primary\"><strong>Click here</strong> </a> to download <mark>For Linux</mark>",
                 link: download_link,
-                codetype: "CSU1287 | Project Executable"
+                codetype: "Project Executable",
+                readtime: "off"
             },
         ];
         for (let i = 0; i < arr.length; i++) {
@@ -275,7 +276,7 @@ function get_menu_list(datetogen) {
             date = _data.date ? _data.date : `${gendate(def_date)}`;
             desc = _data.desc || `${title} ${i}`;
             codetype = _data.codetype ? `CSU1287 | ${_data.codetype}` : `CSU1287 | Miscelleneous`;
-            readtime = _data.readtime || r(6);
+            _data.readtime == "off" ? readtime = null : readtime = _data.readtime || r(6);
             author = _data.author || def_author;
             body_blockcards(link, date, title, desc, codetype, readtime, author);
         }
