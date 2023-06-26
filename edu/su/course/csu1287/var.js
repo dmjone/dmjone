@@ -244,10 +244,10 @@ function get_menu_list(datetogen) {
         let download_link;
         if (navigator.platform.startsWith('Win')) {
             // Windows
-            download_link = "project.exe"
+            download_link = "https://cdn.dmj.one/edu/su/course/csu1287/misc/project.exe"
         } else if (navigator.platform.startsWith('Linux')) {
             // Linux
-            download_link = "project";
+            download_link = "https://cdn.dmj.one/edu/su/course/csu1287/misc/project";
         } else {
             // Other OS or unable to determine
             download_link = "#";
@@ -263,7 +263,7 @@ function get_menu_list(datetogen) {
             },
             {
                 title: "Download C++ Project File's Executable",
-                desc: "The project is based on the inventory which takes part names, and issues them to employee when required.<br><br><a href=\"project.exe\" class=\"text-primary\"><strong>Click here </strong></a> to download <mark>For Windows</mark><br><a href=\"project\" class=\"text-primary\"><strong>Click here</strong> </a> to download <mark>For Linux</mark>",
+                desc: "The project is based on the inventory which takes part names, and issues them to employee when required.<br><br><a href=\"https://cdn.dmj.one/edu/su/course/csu1287/misc/project.exe\" class=\"text-primary\"><strong>Click here </strong></a> to download <mark>For Windows</mark><br><a href=\"https://cdn.dmj.one/edu/su/course/csu1287/misc/project\" class=\"text-primary\"><strong>Click here</strong> </a> to download <mark>For Linux</mark>",
                 link: download_link,
                 codetype: "Project Executable",
                 readtime: "off"
