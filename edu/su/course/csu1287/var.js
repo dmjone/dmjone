@@ -6,14 +6,21 @@ function get_menu_list(datetogen) {
                 link: "program/",
                 title: "Key C++ Concepts Covered in Class",
                 desc: "Explore essential concepts in C++ programming covered in class, including object-oriented programming, templates, smart pointers, operator overloading, virtual functions, advanced data structures, inheritance, encapsulation and much more. Gain a deeper understanding of these concepts through hands-on examples and learn how to apply them to solve real-world problems in C++ programming.",
-                codetype: "CSU1287 | Concepts and Programs"
+                codetype: "CSU1287 | Concepts"
             },
             {
                 link: "lab/",
                 title: "C++ Programming Covered in Lab",
                 desc: "Get practical experience with C++ programming assignments covered in the lab section. Work on a variety of programming assignments covering essential and advanced C++ concepts, such as object-oriented programming, memory management, exception handling, templates, and data structures. Gain a deeper understanding of these concepts through hands-on examples and learn how to apply them to solve real-world problems in C++ programming.",
                 codetype: "CSU1287P | Lab"
-            }
+            },
+            {
+                link: "misc/",
+                title: "Miscellaneous Section",
+                desc: "Learn new programs and then put Your Coding Skills to the Test with Our Collection of Miscellaneous Programs! Work on a variety of programming assignments covering essential and advanced C++ concepts, such as object-oriented programming, memory management, exception handling, templates, and data structures. Brush Up Your Knowledge and Perfect Your Craft with Our Challenging Selection. Get Ready to Prove Your Mastery - Let's Get Testing! Gain a deeper understanding of these concepts through hands-on examples and learn how to apply them to solve real-world problems in C++ programming.",
+                codetype: "CSU1287P | ",
+                readtime: r(30)
+            },
         ];
         for (let i = 0; i < arr.length; i++) {
             const _data = arr[i];
@@ -226,24 +233,22 @@ function get_menu_list(datetogen) {
             body_blockcards(link, date, title, desc, codetype, readtime, author);
         }
     }
-    function get_assignment(def_date, def_author) {
+    function get_misc(def_date, def_author) {
         const arr = [
             {
-                title: "Assignment 1: Application of Fundamental Mechanics on Saturn V Rocket",
-                desc: "This assignment is based on the fundamental mechanics of Saturn V Rocket"
+                title: "100 Programs in C++",
+                desc: "Section contains 100 Programs written in CPP",
+                link: "100programs",
+                codetype: "100 Programs in C++"
             },
-            {
-                title: "Assignment 2: Types of Magnetic Materials and Application of Lasers",
-                desc: "Dive into Magnetic Materials & Laser Applications! Learn about different types of magnetic materials, their properties, and the cutting-edge applications of laser technology. Get ready to be amazed by the power of magnetism and light!"
-            }
         ];
         for (let i = 0; i < arr.length; i++) {
             const _data = arr[i];
             title = _data.title || null; if (!title) continue; // Set the title and if thats not possible, skip the loop
-            link = _data.link || `a${i + 1}`;
+            link = _data.link || `p${i + 1}`;
             date = _data.date ? _data.date : `${gendate(def_date)}`;
             desc = _data.desc || `${title} ${i}`;
-            codetype = _data.codetype ? `Physics | ${_data.codetype}` : `Physics | Assignment`;
+            codetype = _data.codetype ? `CSU1287 | ${_data.codetype}` : `CSU1287 | Miscelleneous`;
             readtime = _data.readtime || r(6);
             author = _data.author || def_author;
             body_blockcards(link, date, title, desc, codetype, readtime, author);
@@ -266,7 +271,7 @@ function get_menu_list(datetogen) {
     const functions = {
         program: get_program,
         lab: get_lab,
-        // assignment: get_assignment,
+        misc: get_misc,
         default: get_main
     };
     (functions[window.urlpart5] || functions.default)(datetogen, author);
