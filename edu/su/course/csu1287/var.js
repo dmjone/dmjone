@@ -177,6 +177,12 @@ function get_menu_list(datetogen) {
                 link: "revision-cpp"
             },
             {
+                title: "1 Line C++ Concepts",
+                desc: "<strong>In hurry?</strong> We have 1 line concepts for you! Revisit and reinforce your knowledge of C++ with these 1 liners. It provides a quick refresher on key C++ topics. This revision is perfect for programmers who want to solidify their understanding but in just 2 minutes for examinations or interviews! <p><strong>Got Time?</strong> We strongly suggest you <a href=\"revision-cpp\" class=\"text-primary\">visit this instead.</a>",
+                link: "one-line-concepts",
+                readtime: 2
+            },
+            {
                 title: "C++ FAQ's",
                 desc: "Navigate through the common questions and answers related to C++ programming with this resource. It covers a broad range of topics, from basic syntax and data structures to more advanced concepts such as object-oriented programming, pointers, and memory management. This FAQ is an excellent starting point for both new programmers trying to understand C++ and seasoned developers looking to refresh their knowledge.",
                 link: "faq-cpp"
