@@ -219,6 +219,13 @@ function processFolder(allAuthors, author_bio) {
                                     course = "FSU013";
                                     course_detail = "Advanced Mathematics";
                                     break;
+                                case "seaws002":
+                                    prof = "Ms. Sakshi Gautam";
+                                    prof_bio = "<p>Ms. Sakshi Gautam is an assistant professor at Shoolini University.</p>";
+                                    prof_href = "contact@dmj.one";
+                                    course = "SEA-WS002";
+                                    course_detail = "English Writing Seminar";
+                                    break;
                                 case "csu1051":
                                     switch (urlpart5) {
                                         case 'lab':

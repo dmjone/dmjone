@@ -57,6 +57,13 @@ function get_menu_list(datetogen) {
                 semester: 1
             },
             {
+                link: "seaws002/",
+                title: "English Writing Seminar",
+                desc: "English Writing Seminar with Ms. Sakshi Gautam.",
+                codetype: "SEA-WS002",
+                semester: 2
+            },
+            {
                 link: "csu585/",
                 title: "Design Thinking",
                 desc: "Approach problems with a new perspective in CSU585: Design Thinking by Mrs. Ruchika Sharma. Develop an innovative, creative and problem-solving mindset.",
