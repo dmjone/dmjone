@@ -18,7 +18,7 @@ function get_menu_list(datetogen) {
                 link: "misc/",
                 title: "Miscellaneous Section",
                 desc: "Learn new programs and then put Your Coding Skills to the Test with Our Collection of Miscellaneous Programs! Work on a variety of programming assignments covering essential and advanced C++ concepts, such as object-oriented programming, memory management, exception handling, templates, and data structures. Brush Up Your Knowledge and Perfect Your Craft with Our Challenging Selection. Get Ready to Prove Your Mastery - Let's Get Testing! Gain a deeper understanding of these concepts through hands-on examples and learn how to apply them to solve real-world problems in C++ programming.",
-                codetype: "CSU1287P | ",
+                codetype: "CSU1287P | Miscellaneous",
                 readtime: r(30)
             },
         ];
