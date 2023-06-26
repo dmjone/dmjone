@@ -178,7 +178,7 @@ function get_menu_list(datetogen) {
             },
             {
                 title: "1 Line C++ Concepts",
-                desc: "<strong>In hurry?</strong> We have 1 line concepts for you! Revisit and reinforce your knowledge of C++ with these 1 liners. It provides a quick refresher on key C++ topics. This revision is perfect for programmers who want to solidify their understanding but in just 2 minutes for examinations or interviews! <p><strong>Got Time?</strong> We strongly suggest you <a href=\"revision-cpp\" class=\"text-primary\">visit this instead.</a>",
+                desc: "<strong>In hurry?</strong> We have 1 line concepts for you! Revisit and reinforce your knowledge of C++ with these 1 liners. It provides a quick refresher on key C++ topics. This revision is perfect for programmers who want to solidify their understanding but in just 2 minutes for examinations or interviews! <p><strong>Got Time?</strong> We strongly recommend that you <a href=\"revision-cpp\" class=\"text-primary\">visit this</a> instead.",
                 link: "one-line-concepts",
                 readtime: 2
             },
