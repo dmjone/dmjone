@@ -314,6 +314,14 @@ function get_menu_list(datetogen) {
                 codetype: "Bellman-Ford's Algorithm",
                 link: "bellmanfords-algorithm"
             },
+            {
+                title: "Revision of All Topics",
+                desc: "Revision of all the topics covered in lab in brief details as possible.",
+                date: "Wed June 27, 2023",
+                codetype: "Revision",
+                readtime: r(5),
+                link: "revision"
+            },
 
 
             // {
