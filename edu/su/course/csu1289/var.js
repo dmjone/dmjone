@@ -154,6 +154,20 @@ function get_menu_list(datetogen) {
                 readtime: r(17),
                 link: "flip-flops"
             },
+            {
+                title: "Revision - What, Why, and, How",
+                desc: "Get the concepts in 3 ways - What, Why, and How. Get to know the applications of all topics as a bonus.",
+                codetype: "Revision - What, Why, How",
+                readtime: r(5),
+                link: "revision-what-why-how"
+            },
+            {
+                title: "Revision",
+                desc: "Revise the concepts of Digital Electronics.",
+                codetype: "Revision",
+                readtime: r(5),
+                link: "revision"
+            },
             // {
             //     title: "Section B: Electricity and Magnetism",
             //     desc: "Get ready to explore Electricity & Magnetism! Learn about electric field & potential, dielectric polarization, displacement current, Maxwell's equations, velocity of EM waves, electromagnetic spectrum, magnetic materials, superconductivity, ultrasonic waves, Type I & Type II superconductors and more. Get ready to electrify your knowledge!"
@@ -212,6 +226,12 @@ function get_menu_list(datetogen) {
                 desc: "This lab will provide a verification of truth tables for both a JK Flip Flop using Proteus software.",
                 date: "Fri May 26, 2023",
                 link: "verification-of-jk-flip-flop-in-proteus"
+            },
+            {
+                title: "Revision of Labwork",
+                desc: "Revision of all the concepts and topics of Lab. Additionally challenge yourself with a unique set of questions.",
+                date: "Thu June 29, 2023",
+                link: "revision"
             },
         ];
         for (let i = 0; i < arr.length; i++) {
