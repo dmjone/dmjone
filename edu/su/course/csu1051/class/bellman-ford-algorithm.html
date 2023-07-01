@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+  <!--<![endif]-->
+
+  <head>
+    <script src="/js/edu_su_common.js"></script>
+    <noscript>
+      <style>
+        html,
+        body {
+          margin: 0;
+          overflow: hidden;
+        }
+      </style>
+      <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+    </noscript>
+
+    <title>Bellman-Ford Algorithm: CSU1051 - Shoolini U </title>
+    <meta name="description" content="Discover the Bellman-Ford algorithm for finding shortest paths in graphs at Shoolini University. Learn the implementation and analysis of this powerful algorithm with dmj.one's educational initiative.">
+
+    <meta property="og:image" content="/logo.png">
+    <meta property="og:type" content="article">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="@divyamohan1993">
+    <meta name="twitter:creator" content="@divyamohan1993">
+    <meta name="twitter:image" content="/logo.png">
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js" integrity="sha512-sHSNLECRJSK+BFs7E8DiFc6pf6n90bLI85Emiw1jhreduZhK3VXgq9l4kAt9eTIHYAcuQBKHL01QKs4/3Xgl8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js" integrity="sha512-iWiuBS5nt6r60fCz26Nd0Zqe0nbk1ZTIQbl3Kv7kYsX+yKMUFHzjaH2+AnM6vp2Xs+gNmaBAVWJjSmuPw76Efg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        renderMathInElement(document.body, {
+          // customised options
+          // • auto-render specific keys, e.g.:
+          delimiters: [
+            { left: '$$', right: '$$', display: true },
+            { left: '$', right: '$', display: false },
+            { left: '\\(', right: '\\)', display: false },
+            { left: '\\[', right: '\\]', display: true }
+          ],
+          // • rendering keys, e.g.:
+          throwOnError: false
+        });
+      });
+    </script>
+  </head>
+
+  <body>
+
+    <script>header_author("dm");</script>
+
+    <main>
+      <article>
+        <h2 class="text-center">
+          Bellman-Ford's Algorithm
+        </h2>
+        <div class="container mt-4 w-100 w-xl-75">
+          <div class="accordion" id="toc">
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="h1">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#c1" aria-controls="c1" aria-expanded="false">
+                  <i class="fas fa-book"></i> <strong>&nbsp;Table of Contents</strong>
+                </button>
+              </h2>
+              <div id="c1" class="accordion-collapse collapse" aria-labelledby="h1" data-bs-parent="#toc">
+                <div class="accordion-body">
+                  <ol class="list-unstyled p-0 m-0">
+                    <li class="p-1"><a href="#intro"><i class="fas fa-chevron-circle-right"></i> Introduction</a></li>
+                    <li class="p-1"><a href="#implementation"><i class="fas fa-chevron-circle-right"></i> Implementation</a></li>
+                    <li class="p-1"><a href="#complexity"><i class="fas fa-chevron-circle-right"></i> Complexity Analysis</a></li>
+                    <li class="p-1"><a href="#conclusion"><i class="fas fa-chevron-circle-right"></i> Conclusion</a></li>
+                  </ol>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article id="intro">
+        <h3>1. Introducing the Bellman-Ford Algorithm</h3>
+        <p>Named after its developers Richard Bellman and Lester Ford, the Bellman-Ford algorithm solves the single-source problem in the general case where edges of the graph can have negative weight. However, the graph must not contain negative cycles, as they result in undefined shortest paths.</p>
+
+        <p>While Dijkstra's algorithm provides a fast and efficient solution for graphs with non-negative weights, the Bellman-Ford algorithm handles negative weights, making it versatile for a wider variety of scenarios.</p>
+      </article>
+
+      <article>
+        <h4>1.1 Theoretical Framework of Bellman-Ford </h4>
+        <p>Like Dijkstra's algorithm, the Bellman-Ford algorithm operates in a step-by-step fashion, with each iteration improving upon the estimation of the shortest paths. The fundamental difference, however, lies in the way they handle edges and update distances.</p>
+
+        <p>The central idea behind the Bellman-Ford algorithm is to relax each edge of the graph $|V|-1$ times, where $|V|$ is the number of vertices. The algorithm assumes the shortest path to any vertex can have at most $|V|-1$ edges. Hence, the number of times we relax each edge.</p>
+
+        <p>Let's represent our graph as $G = (V, E)$ where $V$ is the set of vertices and $E$ is the set of edges. Bellman-Ford uses the following formula to update the distances:</p>
+
+        <p>$D_t = min(D_t, D_s + w(s,t))$</p>
+        <p>Where, $D_t$ is the shortest path from $s$ to $t$, and $w(s,t)$ is the weight of edge from $s$ to $t$.</p>
+      </article>
+
+      <article>
+        <h5>1.1.1 Understanding the Algorithm</h5>
+        <p>The algorithm initializes the distance to the source vertex as 0 and to all other vertices as infinity. It then relaxes all the edges $|V|-1$ times. Relaxing an edge means minimizing the distance to the vertices it's connected to.</p>
+
+        <p>Finally, the algorithm performs a last iteration over all edges to detect any negative cycles. If it's able to further minimize any distance, it means there's a negative cycle, and the algorithm returns false, indicating that no solution exists.</p>
+      </article>
+
+      <article id="implementation">
+        <h3>2. Implementing Bellman-Ford Algorithm in C++</h3>
+        <p>Let's see how we can translate the theory into practice with a C++ implementation of the Bellman-Ford algorithm. We'll create a function named `BellmanFord` that calculates the shortest distances to all vertices from a given source.</p>
+      </article>
+
+      <article>
+        <h4>2.1 Detailed Code</h4>
+        <p>Below is the C++ code for Bellman-Ford algorithm:</p>
+
+        <pre><code class="language-cpp">
+#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+#define INF 1000000000
+
+struct Edge {
+    int a, b, cost;
+};
+
+vector&lt;int&gt; BellmanFord(int n, int s, vector&lt;Edge&gt; &edges) {
+    vector&lt;int&gt; d(n, INF);
+    d[s] = 0;
+    for (int i = 0; i < n-1; ++i) {
+        for (Edge e : edges) {
+            if (d[e.a] < INF)
+                if (d[e.a] + e.cost < d[e.b])
+                    d[e.b] = d[e.a] + e.cost;
+        }
+    }
+    return d;
+}
+</code></pre>
+      </article>
+
+      <article>
+        <h5>2.1.1 Code Explanation</h5>
+        <p>The function `BellmanFord` takes as input the number of vertices `n`, the source vertex `s`, and a list of `edges`. Each edge is a struct containing two vertices `a` and `b`, and the cost of the edge `cost`.</p>
+
+        <p>The distance from the source vertex to itself is set to 0, while the distance to all other vertices is set to infinity (`INF`). The algorithm then performs $n-1$ iterations. In each iteration, it goes through all the edges and tries to relax them.</p>
+
+        <p>Relaxing an edge means checking if we can improve the shortest distance to a vertex by taking that edge. If so, we update the distance. After $n-1$ iterations, we have the shortest distances to all vertices from the source `s`.</p>
+      </article>
+
+      <article id="complexity">
+        <h3>3. Complexity Analysis of Bellman-Ford</h3>
+        <p>The Bellman-Ford algorithm has a time complexity of $O(|V| \cdot |E|)$ due to the fact that it needs to relax all edges $|V|-1$ times. This makes it slower than Dijkstra's algorithm for sparse graphs. However, it is more versatile as it can handle graphs with negative weights.</p>
+
+        <p>In space complexity, it uses $O(|V|)$ space for maintaining the distance array, thus, the space complexity is linear.</p>
+      </article>
+
+      <article id="conclusion">
+        <h3>4. Conclusion</h3>
+        <p>The Bellman-Ford algorithm, despite being slower than Dijkstra's algorithm, has its unique use-cases. By allowing negative weights, it is applicable to a variety of real-world problems that involve loss or reduction. Furthermore, it can detect negative cycles, adding another layer of utility.</p>
+      </article>
+
+      <article id="further-bellman-ford">
+        <h3>5. In the Next Unfolding...</h3>
+        <p>As we continue our journey through the landscape of graph algorithms, we'll step into the fascinating world of "Floyd-Warshall Algorithm: Finding All Pairs of Shortest Paths".</p>
+
+        <p>Ready to discover how to calculate the shortest path between every pair of vertices in a graph? Then prepare yourself for the next exploration as we demystify the dynamic programming approach used by the Floyd-Warshall algorithm. Stay tuned!</p>
+      </article>
+
+    </main>
+
+    <script>copyright("all");</script>
+  </body>
+
+</html>
