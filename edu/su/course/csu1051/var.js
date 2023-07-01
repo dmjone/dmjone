@@ -40,40 +40,39 @@ function get_menu_list(datetogen) {
                 title: "Key Concepts and Differences",
                 desc: "This introduction to Data Structures and Algorithms will cover the distinctions between unions and structures, as well as the differences between primitive and non-primitive data structures, and linear and non-linear data structures.",
                 codetype: "Introduction",
-                link: "c1"
+                link: "introduction"
             },
             {
                 title: "getchar vs putchar",
                 desc: "This introduction to Data Structures and Algorithms will cover the distinctions between getchar and putchar.",
                 codetype: "Introduction",
-                link: "c2"
+                link: "getchar-vs-putchar"
             },
             {
                 title: "Arrays, Pointers and Multi Pointers",
                 desc: "This introduction to Data Structures and Algorithms will cover the details of Arrays, Pointers and Multi Pointers.",
                 codetype: "Introduction",
-                link: "c3"
+                link: "array-pointer-multipointer"
             },
             {
                 title: "Basic Concepts and Notions",
                 desc: "Learn about the basic concepts and notions of data structures and algorithms. Data structures and algorithms are fundamental to computer science and are used to store and manipulate data, solve problems, and make decisions. This concept is useful for beginner programmers to learn the basics of data structures and algorithms and gives a brief knowhow about their application in the programs.",
-                readtime: r(20),
-                link: "c4"
+                link: "basic-concepts"
             },
             {
                 title: "Data Structures and Operations",
                 desc: "Learn about data structures and their operations in data structures and algorithms with this conceptual article. Data structures are a fundamental part of computer science and are used to organize, store, and manipulate data efficiently. This article is a useful exercise for beginner programmers to learn about different types of data structures and their operations, such as traversal, insertion, deletion, and searching, and how to use them to solve real-world problems in their programs.",
-                link: "c5"
+                link: "data-structure-operations"
             },
             {
                 title: "Mathematical Notation and Functions",
                 desc: "Learn about mathematical notation and functions. Mathematical notation is a language used to express mathematical ideas and concepts, while mathematical functions are a fundamental part of mathematics that map inputs to outputs based on a set of defined rules. This concept is a useful exercise for beginner programmers to learn how to use mathematical notation and functions in their programs to solve real-world problems and improve their mathematical skills.",
-                link: "c6"
+                link: "mathematical-notations"
             },
             {
                 title: "Complexity of Algorithms",
                 desc: "Learn about the complexity of algorithms in data structures and algorithms. The complexity of an algorithm is a measure of its efficiency, in terms of time and space, and is an important factor to consider when designing and analyzing algorithms. This concept is a useful exercise for beginner programmers to learn how to measure the complexity of algorithms, understand the different types of complexity (such as time complexity and space complexity), and apply this knowledge to optimize their algorithms for improved performance and efficiency.",
-                link: "c7"
+                link: "algorithm-complexity"
             },
             {
                 title: "Running Time and Storage Cost of Algorithms",
@@ -84,7 +83,7 @@ function get_menu_list(datetogen) {
                 title: "Array Representation in Memory",
                 desc: "Learn about array representation in memory in data structures and algorithms. Arrays are a fundamental data structure in programming and are used to store a collection of elements of the same data type. Understanding how arrays are represented in memory is important for optimizing memory usage and accessing elements efficiently. This concept is a useful exercise for beginner programmers to learn how to represent arrays in memory, understand the benefits and limitations of arrays, and apply this knowledge to create efficient and effective programs.",
                 readtime: r(15),
-                link: "c9"
+                link: "array-memory-representation"
             },
             // {
             //     title: "Operations on Arrays",
@@ -101,18 +100,18 @@ function get_menu_list(datetogen) {
             {
                 title: "Parallel Algorithms",
                 desc: "Learn about parallel algorithms in data structures and algorithms. Parallel algorithms are a class of algorithms that can be executed in parallel on multiple processors or cores, and are commonly used in domains such as scientific computing, data mining, and machine learning. Understanding how to design and analyze parallel algorithms is important for achieving better performance and scalability in modern computing environments. This concept is useful for intermediate programmers to learn how to parallelize algorithms, understand the different types of parallelism, and apply this knowledge to create faster and more efficient programs.",
-                link: "c13",
-                readtime: r(30)
+                link: "parallel-algorithms",
+                readtime: r(10)
             },
             {
                 title: "Stacks: Data Structure Representations, Implementations & Applications",
                 desc: "Learn about stacks, a fundamental data structure in programming, which follows the last-in-first-out (LIFO) policy. This article covers the different representations and implementations of stacks, including array-based and linked-list-based implementations, and their applications in various domains such as operating systems, computer networks, and simulation. Whether you're a beginner programmer or an experienced developer, understanding the concepts of stacks is crucial to creating efficient and effective programs. By the end of this article, you'll have a solid foundation in representing stacks, performing various operations on them, and applying this knowledge to solve problems in programming.",
-                link: "c14"
+                link: "stack"
             },
             {
                 title: "Stacks and Queues Representations, Implementations & Applications",
                 desc: "Learn about stacks and queues representations, implementations and applications in data structures and algorithms. Stacks and queues are fundamental data structures in programming that are used to store and manipulate data based on a last-in-first-out (LIFO) or first-in-first-out (FIFO) policy, respectively. Understanding the different representations of stacks and queues and how to manipulate them efficiently is important for solving problems in various domains such as operating systems, computer networks, and simulation. This concept is useful for beginner programmers to learn how to represent stacks and queues, understand the different operations on them, and apply this knowledge to create efficient and effective programs.",
-                link: "c15"
+                link: "stack-and-queue"
             },
             {
                 title: "Singly Linked Lists and Their Representations",

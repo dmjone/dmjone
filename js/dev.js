@@ -802,7 +802,7 @@ function createSharingButtons(text, url, iconName, btnClass) {
 
 function copyright(rights) {
     window["loaded_copyright"] = 1;
-    // sitemap_var_gen_clipboard(); // uncomment this line to get the sitemap generation link copier 
+    sitemap_var_gen_clipboard(); // uncomment this line to get the sitemap generation link copier 
     if (rights === "off") { return null; }
 
     var footer_all_rights = ' &#8226; All rights reserved';

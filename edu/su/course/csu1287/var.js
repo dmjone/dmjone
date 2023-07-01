@@ -204,27 +204,33 @@ function get_menu_list(datetogen) {
         const arr = [
             {
                 title: "Number Conversion Program",
-                desc: "Convert a decimal number to binary, decimal, octal, and hexadecimal formats with this C++ program using bitwise operators and mathematical operations. Practice your understanding of number systems and data representation with this practical programming exercise."
+                desc: "Convert a decimal number to binary, decimal, octal, and hexadecimal formats with this C++ program using bitwise operators and mathematical operations. Practice your understanding of number systems and data representation with this practical programming exercise.",
+                link: "num-conversion"
             },
             {
                 title: "Password Retrieval Program",
-                desc: "Retrieve lost passwords with this C++ program that uses object-oriented programming algorithms to securely recover passwords. This program is a practical application of OOPS concepts and is useful for anyone interested in cybersecurity and data protection."
+                desc: "Retrieve lost passwords with this C++ program that uses object-oriented programming algorithms to securely recover passwords. This program is a practical application of OOPS concepts and is useful for anyone interested in cybersecurity and data protection.",
+                link: "retrieve-password"
             },
             {
                 title: "Sentence Parsing Program",
-                desc: "Parse a sentence entered by the user and print each of its words on a new line with this C++ program. This program is a useful exercise for beginner programmers to practice string manipulation and input/output operations in C++."
+                desc: "Parse a sentence entered by the user and print each of its words on a new line with this C++ program. This program is a useful exercise for beginner programmers to practice string manipulation and input/output operations in C++.",
+                link: "word-to-line"
             },
             {
                 title: "Array Equality Program",
-                desc: "Check if two arrays are equal regardless of their position with this C++ program. This program compares two arrays entered by the user and determines if they contain the same elements, regardless of their position in the array. This program is a useful exercise for beginner programmers to practice array manipulation and logical operations in C++."
+                desc: "Check if two arrays are equal regardless of their position with this C++ program. This program compares two arrays entered by the user and determines if they contain the same elements, regardless of their position in the array. This program is a useful exercise for beginner programmers to practice array manipulation and logical operations in C++.",
+                link: "equal-array"
             },
             {
                 title: "Word Validation Program",
-                desc: "Validate a word entered by the user to ensure it meets specific criteria with this C++ program. This program checks if a word has at least one vowel, one digit, and one uppercase letter, and its length does not exceed 8 characters. This program is a useful exercise for beginner programmers to practice string manipulation and logical operations in C++."
+                desc: "Validate a word entered by the user to ensure it meets specific criteria with this C++ program. This program checks if a word has at least one vowel, one digit, and one uppercase letter, and its length does not exceed 8 characters. This program is a useful exercise for beginner programmers to practice string manipulation and logical operations in C++.",
+                link: "validate-word"
             },
             {
                 title: "Counter Class Program",
-                desc: "Define a Counter class with overloaded increment and decrement operators to modify and display its count value with this C++ program. This program is a practical application of operator overloading concepts and is useful for anyone interested in learning how to define and use classes in C++."
+                desc: "Define a Counter class with overloaded increment and decrement operators to modify and display its count value with this C++ program. This program is a practical application of operator overloading concepts and is useful for anyone interested in learning how to define and use classes in C++.",
+                link: "operator-overloading"
             },
         ];
         for (let i = 0; i < arr.length; i++) {
