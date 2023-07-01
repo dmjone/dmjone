@@ -3,10 +3,10 @@ function get_menu_list(datetogen) {
     function get_main(def_date, def_author) {
         const arr = [
             {
-                link: "differential/",
-                title: "Differential Equations",
-                desc: "Dive into the exciting world of Differentials! Discover how these powerful mathematical tools are used to solve linear equations, analyze data, and more. Explore basic and advanced concepts, including properties, operations, and applications. Get ready to transform your understanding of mathematics!",
-                codetype: "Differentiation"
+                link: "concepts/",
+                title: "Concepts of Mathematics",
+                desc: "Dive into the exciting world of Mathematics! Discover how these powerful mathematical concepts are used. Explore basic and advanced concepts, including properties, operations, and applications. Get ready to transform your understanding of mathematics!",
+                codetype: "Concepts"
             },
             /* {
                 link: "seminar/",
@@ -33,12 +33,12 @@ function get_menu_list(datetogen) {
             body_blockcards(link, date, title, desc, codetype, readtime, author);
         }
     }
-    function get_differential(def_date, def_author) {
+    function get_concepts(def_date, def_author) {
         const arr = [
             {
-                title: "Concepts of Differential",
+                title: "Differential",
                 desc: "Step into the world of differentials! Discover the fundamental tools used in fields like engineering, physics, and computer science. This topic covers everything from basic operations to advanced concepts. Unleash the power of differentials and unlock new dimensions in problem-solving. Get ready to differentiate your way to success!",
-                link: "concepts"
+                link: "differential"
             },
             /* {
                 title: "Section B: Electricity and Magnetism",
@@ -119,7 +119,7 @@ function get_menu_list(datetogen) {
     var dated = "December 25, 2022";
     var title, desc, codetype, readtime, author = 1, link;
     const functions = {
-        differential: get_differential,
+        concepts: get_concepts,
         default: get_main
     };
     (functions[window.urlpart5] || functions.default)(datetogen, author);
