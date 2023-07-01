@@ -189,9 +189,75 @@ function get_menu_list(datetogen) {
             },
             {
                 title: "Exploring Sequential and Linked Representations of Graphs",
-                desc: "Embark on a comprehensive exploration of sequential and linked representations of graphs, uncovering the strengths and applications of each approach. Delve into the sequential representation, where graphs are stored using adjacency matrices or adjacency lists, and discover how this method facilitates efficient operations on dense graphs. Explore the linked representation, where graphs are represented using linked lists or adjacency lists, and understand how it handles sparse graphs with ease. Through practical examples and comparisons in different scenarios, you'll gain a deep understanding of the trade-offs and considerations involved in choosing between sequential and linked representations for graph data structures.",              
+                desc: "Embark on a comprehensive exploration of sequential and linked representations of graphs, uncovering the strengths and applications of each approach. Delve into the sequential representation, where graphs are stored using adjacency matrices or adjacency lists, and discover how this method facilitates efficient operations on dense graphs. Explore the linked representation, where graphs are represented using linked lists or adjacency lists, and understand how it handles sparse graphs with ease. Through practical examples and comparisons in different scenarios, you'll gain a deep understanding of the trade-offs and considerations involved in choosing between sequential and linked representations for graph data structures.",
                 readtime: r(5),
                 link: "sequential-linked-graph-representations"
+            },
+            {
+                title: "Unveiling the Power of Adjacency Matrices in Graph Representation",
+                desc: "Embark on a journey to uncover the hidden potential of adjacency matrices in graph representation. Dive deep into the intricacies of adjacency matrices, a powerful data structure that captures the connectivity between vertices in a graph. Learn how to construct adjacency matrices and explore their applications in various graph operations such as edge existence, neighbor determination, and graph traversal. Through practical examples and step-by-step explanations, you'll gain a solid understanding of adjacency matrices and how they can be leveraged to efficiently represent and analyze graphs in your programming endeavors.",
+                readtime: r(5),
+                link: "adjacency-matrix"
+            },
+            {
+                title: "Mastering Graph Operations: Unleashing the Power of Graph Algorithms",
+                desc: "Embark on a journey to master graph operations and unleash the power of graph algorithms. Explore a wide range of essential operations on graphs, including traversals (such as depth-first search and breadth-first search), pathfinding algorithms (like Dijkstra's algorithm and A* search), cycle detection, connectivity analysis, and more. Delve into the intricacies of these algorithms, understand their principles, and witness how they can be applied to solve real-world problems. Through hands-on examples and practical exercises, you'll develop a strong foundation in graph operations, empowering you to tackle complex graph-based challenges with confidence.",
+                readtime: r(5),
+                link: "graph-operations"
+            },
+            {
+                title: "Demystifying Dijkstra's Algorithm: The Pathfinding Powerhouse",
+                desc: "Embark on a captivating exploration of Dijkstra's algorithm, a powerful pathfinding technique that has revolutionized graph-based navigation. Dive into the inner workings of Dijkstra's algorithm, understanding its step-by-step process for finding the shortest path between two vertices in a weighted graph. Learn how to implement Dijkstra's algorithm efficiently using data structures such as priority queues and adjacency lists. Through detailed explanations, visualizations, and hands-on coding examples in a language of your choice, you'll gain a deep understanding of Dijkstra's algorithm and its applications in solving real-world routing and optimization problems.",
+                readtime: r(10),
+                link: "dijkstras-algorithm"
+            },
+            {
+                title: "Unleashing the Power of the Bellman-Ford Algorithm: Solving Shortest Path Problems",
+                desc: "Embark on an exciting journey into the world of the Bellman-Ford algorithm, a versatile technique for solving shortest path problems in graphs. Delve into the intricacies of the algorithm, understanding its iterative process for finding the shortest path from a source vertex to all other vertices in a weighted graph, even in the presence of negative edge weights. Explore the implementation details and optimizations of the Bellman-Ford algorithm, and witness how it can be applied to solve real-world routing and optimization problems. Through hands-on examples and practical exercises, you'll gain a deep understanding of the Bellman-Ford algorithm and its applications in various domains.",
+                readtime: r(7),
+                link: "bellman-ford-algorithm"
+            },
+            {
+                title: "Essential Data Structures for Searching and Sorting",
+                desc: "Embark on a comprehensive exploration of essential data structures for searching and sorting, unlocking the key tools for efficient algorithmic problem-solving. Discover the power of data structures such as arrays, linked lists, binary search trees, hash tables, and heaps. Learn how these structures enable fast search and efficient sorting operations. Explore various searching algorithms like linear search, binary search, and interpolation search, as well as sorting algorithms like bubble sort, insertion sort, merge sort, and quicksort. Through practical examples and hands-on exercises, you'll develop a strong foundation in data structures for searching and sorting, equipping you with the skills to tackle complex problems and optimize your code.",
+                readtime: r(4),
+                link: "data-structure-for-searching-sorting"
+            },
+            {
+                title: "Mastering Linear and Binary Search: Unleashing the Power of Search Algorithms",
+                desc: "Embark on a journey to master linear and binary search algorithms, unlocking the power to efficiently find elements in a collection of data. Dive into the simplicity and effectiveness of linear search, understanding its step-by-step process for sequentially scanning through an array or list. Explore the elegance and efficiency of binary search, learning how to leverage the divide-and-conquer technique to quickly locate elements in a sorted array. Through practical examples and interactive exercises, you'll gain a deep understanding of both search algorithms and their applications in solving various searching problems. Armed with these essential tools, you'll be equipped to navigate and retrieve data with speed and precision.",
+                readtime: r(2),
+                link: "linear-binary-search"
+            },
+            {
+                title: "Unveiling the Magic of Insertion Sort: Transforming Chaos into Order",
+                desc: "Embark on a thrilling journey through the world of sorting algorithms as we unravel the intricacies of Insertion Sort. Join us as we explore the elegance and efficiency of this fundamental sorting technique. Dive into the step-by-step process of Insertion Sort, where elements are iteratively inserted into their correct positions in a partially sorted array. Witness how Insertion Sort can transform chaos into order, bringing clarity to unsorted data. Through practical examples and hands-on exercises, you'll gain a deep understanding of Insertion Sort and its applications in efficiently arranging elements. Let C++ be your language of choice as you decipher this sorting technique and transform lines of code into efficient solutions.",
+                readtime: r(2),
+                link: "insertion-sort"
+            },
+            {
+                title: "Mastering Bubble Sort: Sorting with Bubbling Precision",
+                desc: "Embark on a journey to master the art of Bubble Sort, a simple yet effective sorting algorithm. Delve into the step-by-step process of Bubble Sort, where adjacent elements are compared and swapped if they are in the wrong order, gradually \"bubbling\" the largest elements to the end of the array. Explore the intricacies of this sorting technique, understanding its time complexity and performance characteristics. Witness how Bubble Sort can efficiently arrange elements, bringing order to unsorted data. Through practical examples and interactive exercises, you'll gain a deep understanding of Bubble Sort and its applications in sorting algorithms. With your preferred programming language, you'll be able to implement Bubble Sort and transform lines of code into elegant and efficient solutions using this technique.",
+                readtime: r(6),
+                link: "bubble-sort"
+            },
+            {
+                title: "Unlocking the Efficiency of Merge Sort: Sorting with Divide and Conquer",
+                desc: "Embark on a journey to unlock the efficiency of Merge Sort, a powerful sorting algorithm that operates with a divide and conquer strategy. Dive into the step-by-step process of Merge Sort, understanding how it divides the array into smaller subarrays, sorts them individually, and then merges them to create a fully sorted array. Explore the elegance and efficiency of Merge Sort, as well as its stable sorting property. Witness how Merge Sort can handle large datasets and outperform other sorting algorithms in terms of time complexity. Through practical examples and hands-on exercises, you'll gain a deep understanding of Merge Sort and its applications in efficiently sorting arrays. With your preferred programming language, you'll be able to implement Merge Sort and leverage its sorting power.",
+                readtime: r(3),
+                link: "merge-sort"
+            },
+            {
+                title: "Demystifying Radix Sort: Sorting with Digit-by-Digit Precision",
+                desc: "Embark on an enlightening journey into the world of Radix Sort, a powerful sorting algorithm that operates with digit-by-digit precision. Discover how Radix Sort efficiently arranges elements by sorting them based on their individual digits, from the least significant to the most significant. Dive into the step-by-step process of Radix Sort, understanding its inner workings and time complexity. Witness how Radix Sort can handle numbers of various lengths and effectively sort them. Through practical examples and hands-on exercises, you'll gain a deep understanding of Radix Sort and its applications in efficiently sorting numbers and other data types. With your preferred programming language, you'll be able to implement Radix Sort and harness its sorting power.",
+                readtime: r(8),
+                link: "radix-sort"
+            },
+            {
+                title: "Mastering Selection Sort: Sorting with Precision and Efficiency",
+                desc: "Embark on a journey to master the art of Selection Sort, a simple yet powerful sorting algorithm. Explore the step-by-step process of Selection Sort, where the algorithm repeatedly selects the smallest element from the unsorted part of the array and places it in its correct position. Delve into the intricacies of this sorting technique, understanding its efficiency and trade-offs. Witness how Selection Sort can efficiently arrange elements, bringing order to chaotic data. Through practical examples and interactive exercises, you'll gain a deep understanding of Selection Sort and its applications in sorting algorithms. With C++ as your tool of choice, you'll transform lines of code into elegant and efficient solutions using Selection Sort.",
+                readtime: r(10),
+                link: "selection-sort"
             },
             {
                 title: "Frequently Asked Questions 1",
