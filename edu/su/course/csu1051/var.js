@@ -114,10 +114,11 @@ function get_menu_list(datetogen) {
                 desc: "Learn about stacks and queues representations, implementations and applications in data structures and algorithms. Stacks and queues are fundamental data structures in programming that are used to store and manipulate data based on a last-in-first-out (LIFO) or first-in-first-out (FIFO) policy, respectively. Understanding the different representations of stacks and queues and how to manipulate them efficiently is important for solving problems in various domains such as operating systems, computer networks, and simulation. This concept is useful for beginner programmers to learn how to represent stacks and queues, understand the different operations on them, and apply this knowledge to create efficient and effective programs.",
                 link: "c15"
             },
-            // {
-            //     title: "Singly Linked Lists and Their Representations",
-            //     desc: "Learn about singly linked lists and their representations in data structures and algorithms. Singly linked lists are a fundamental data structure in programming that are used to store and manipulate data in a linear and dynamic way. Understanding how singly linked lists work and how to represent them efficiently is important for solving problems in various domains such as data processing, artificial intelligence, and game development. This is useful for beginner programmers to learn how to represent singly linked lists, understand their operations, and apply this knowledge to create efficient and effective programs."
-            // },
+            {
+                title: "Singly Linked Lists and Their Representations",
+                desc: "Learn about singly linked lists and their representations in data structures and algorithms. Singly linked lists are a fundamental data structure in programming that are used to store and manipulate data in a linear and dynamic way. Understanding how singly linked lists work and how to represent them efficiently is important for solving problems in various domains such as data processing, artificial intelligence, and game development. This is useful for beginner programmers to learn how to represent singly linked lists, understand their operations, and apply this knowledge to create efficient and effective programs.",
+                link: "singly-linked-list"
+            },
             {
                 title: "Doubly Linked Lists and Circularly Linked Lists",
                 desc: "Learn about doubly linked lists and circularly linked lists in data structures and algorithms. Doubly linked lists and circularly linked lists are extensions of singly linked lists that provide additional functionality such as bidirectional traversal and circular data structures. Understanding how doubly linked lists and circularly linked lists work and how to manipulate them efficiently is important for solving problems in various domains such as network routing, computer graphics, and memory management. This is a useful concept for intermediate programmers to learn how to represent doubly linked lists and circularly linked lists, understand their operations, and apply this knowledge to create efficient and effective programs.",
@@ -126,32 +127,82 @@ function get_menu_list(datetogen) {
             {
                 title: "Operations on Linked Lists - Insertion, Deletion, and Traversal",
                 desc: "Learn about operations on linked lists - insertion, deletion, and traversal - in data structures and algorithms with this article. Linked lists are a fundamental data structure in programming that are used to store and manipulate data in a dynamic and flexible way. Understanding how to perform operations such as insertion, deletion, and traversal on linked lists efficiently is important for solving problems in various domains such as database management, machine learning, and web development. This program is a useful for beginner programmers to learn how to perform operations on linked lists, understand their time and space complexities, and apply this knowledge to create efficient and effective programs.",
-                readtime: r(15),
+                readtime: r(3),
                 link: "linkedlist-operations"
             },
             {
                 title: "Memory Allocation of the Linked Lists",
                 desc: "Learn about memory allocation of linked lists - in data structures and algorithms with this article. Linked lists are a fundamental data structure in programming that are used to store and manipulate data in a dynamic and flexible way. Understanding how memory is allocated to linked lists efficiently is important for solving problems in various domains such as database management, machine learning, and web development. This program is a useful for beginner programmers to learn how we allocate the memory to linked lists, understand their time and space complexities, and apply this knowledge to create efficient and effective programs.",
-                readtime: r(15),
+                readtime: r(7),
                 link: "linkedlist-memory-allocation"
             },
             {
                 title: "Unveiling the Magic of Insertion Sort",
                 desc: "Embark on a thrilling journey through the world of algorithms, where we unravel the intricacies of Insertion Sort. Let C++ be your language of choice as you decipher this fundamental sorting technique and transform lines of code into efficient solutions.",
                 date: "Mon May 29, 2023",
-                readtime: r(15),
+                readtime: r(5),
                 link: "insertion-sort"
+            },
+            {
+                title: "Unleashing the Power of Tree",
+                desc: "Embark on an enlightening journey through the fascinating realm of trees, where we unravel the fundamental concepts and applications of Trees. Harness the potential of trees as you delve into the intricacies of data organization and traversal using C++, and witness how these powerful structures can revolutionize your coding solutions.",
+                date: "Fri June 16, 2023",
+                readtime: r(6),
+                link: "tree-basics"
+            },
+            {
+                title: "Unlocking the Secrets of Linked Tree Representation",
+                desc: "Embark on an exhilarating exploration into the world of linked tree representation, where we unveil the hidden depths of this powerful data structure. Join us as we dive deep into the intricacies of linking nodes to form trees and discover how this representation can revolutionize your understanding and manipulation of hierarchical data. Through insightful examples and practical exercises in C++, you'll gain the tools to master linked tree representation and unleash its potential in your coding endeavors.",
+                date: "Tue June 4, 2023",
+                readtime: r(4),
+                link: "linked-tree"
+            },
+            {
+                title: "Exploring Contiguous Storage Representations",
+                desc: "Embark on a fascinating journey into the realm of contiguous storage representations, where we delve into the various techniques used to efficiently store data structures in memory. Join us as we uncover the intricacies of representations such as arrays and matrices, and how they can be leveraged to optimize storage and access of elements. Through insightful examples and practical demonstrations in C++, you'll gain a deep understanding of contiguous storage representations and their applications in solving complex problems.",
+                readtime: r(7),
+                link: "representations-contiguous-storage"
+            },
+            {
+                title: "Binary Trees and Traversal Techniques",
+                desc: "Explore binary trees and traversal techniques, unraveling their secrets and mastering their applications. Learn pre-order, in-order, and post-order traversal methods in C++.",
+                readtime: r(5),
+                link: "binary-tree"
+            },
+            {
+                title: "Unveiling the Magic of Binary Search Trees",
+                desc: "Embark on a captivating journey into the world of binary search trees, where we unravel the secrets of these powerful data structures. Discover how binary search trees enable efficient searching, insertion, and deletion operations. Learn about their key properties and the principles behind maintaining the binary search tree property. Dive into practical examples and coding exercises in C++, allowing you to master the art of working with binary search trees and leverage their potential to solve a wide range of algorithmic problems.",
+                readtime: r(10),
+                link: "binary-search-trees"
+            },
+            {
+                title: "Exploring Heap Trees and the Heap Sort Algorithm",
+                desc: "Embark on a fascinating exploration of heap trees and the heap sort algorithm, uncovering their inner workings and practical applications. Dive into the intricacies of heap data structures, understanding their properties and the heapify operation. Discover how the heap sort algorithm utilizes heap trees to efficiently sort elements in an array. Through hands-on examples and step-by-step explanations in C++, you'll gain a deep understanding of heap trees and the heap sort algorithm, equipping you with a powerful sorting technique to optimize your code.",
+                readtime: r(5),
+                link: "heap-tree-sort"
+            },
+            {
+                title: "Demystifying Graph Theory Terminologies",
+                desc: "Embark on a comprehensive exploration of graph theory terminology, unraveling the intricate language used to describe and analyze graphs. From vertices and edges to paths, cycles, and connectivity, delve into the fundamental concepts that form the backbone of graph theory. Gain a deep understanding of terms like degree, adjacency, weighted graphs, directed graphs, and more. Through illustrative examples and clear explanations, you'll become fluent in the language of graph theory, enabling you to tackle complex graph-based problems with confidence.",
+                readtime: r(4),
+                link: "graph-theory"
+            },
+            {
+                title: "Exploring Sequential and Linked Representations of Graphs",
+                desc: "Embark on a comprehensive exploration of sequential and linked representations of graphs, uncovering the strengths and applications of each approach. Delve into the sequential representation, where graphs are stored using adjacency matrices or adjacency lists, and discover how this method facilitates efficient operations on dense graphs. Explore the linked representation, where graphs are represented using linked lists or adjacency lists, and understand how it handles sparse graphs with ease. Through practical examples and comparisons in different scenarios, you'll gain a deep understanding of the trade-offs and considerations involved in choosing between sequential and linked representations for graph data structures.",              
+                readtime: r(5),
+                link: "sequential-linked-graph-representations"
             },
             {
                 title: "Frequently Asked Questions 1",
                 desc: "Learn about some of the frequently asked questions in data structures and algorithms. Understanding these questions will give you a better understanding and is a useful exercise for beginner programmers to learn how to test their knowledge.",
-                readtime: r(10),
+                readtime: r(5),
                 link: "faq1"
             },
             {
                 title: "Frequently Asked Questions 2",
                 desc: "Learn about some of the frequently asked questions in data structures and algorithms. Understanding these questions will give you a better understanding and is a useful exercise for beginner programmers to learn how to test their knowledge.",
-                readtime: r(10),
+                readtime: r(6),
                 link: "faq2"
             },
         ];
