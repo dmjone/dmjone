@@ -38,7 +38,14 @@ function get_menu_list(datetogen) {
             {
                 title: "Differential",
                 desc: "Step into the world of differentials! Discover the fundamental tools used in fields like engineering, physics, and computer science. This topic covers everything from basic operations to advanced concepts. Unleash the power of differentials and unlock new dimensions in problem-solving. Get ready to differentiate your way to success!",
-                link: "differential"
+                link: "differential",
+                codetype: "Differential Equations"
+            },
+            {
+                title: "Random Variables",
+                desc: "All the formulas for the Random Variables including Mathematical Expectations, SD, Variance, Moment Generating Function, Probablity Generating Function, Characterstic Equations",
+                link: "random-variables",
+                codetype: "Random Variables"
             },
             /* {
                 title: "Section B: Electricity and Magnetism",
@@ -51,7 +58,7 @@ function get_menu_list(datetogen) {
             link = _data.link || `s${i + 1}`;
             date = _data.date ? _data.date : `${gendate(def_date)}`;
             desc = _data.desc || `${title} ${i}`;
-            codetype = _data.codetype ? `Maths | ${_data.codetype}` : `Maths | Matrix`;
+            codetype = _data.codetype ? `Maths | ${_data.codetype}` : `Maths | Concepts`;
             readtime = _data.readtime || r(14);
             author = _data.author || def_author;
             body_blockcards(link, date, title, desc, codetype, readtime, author);
