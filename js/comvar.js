@@ -14,7 +14,27 @@ const arr_author = {
         name: "Harshal Khajuria",
         bio: "<p>Harshal Khajuria is currently a student of Shoolini University pursuing B.Tech Cyber Security</p>",
         href: "harshalkotakhajuria@gmail.com"
-    }
+    },
+    shrestha: {
+        name: "Shrestha Shrivastav",
+        bio: "<p>Shrestha Shrivastav is a focused student from India, currently advancing in his Bachelor's degree in Computer Science and Engineering. He is a dedicated CSE student who takes pleasure in coding and generating inventive solutions to address real-world problems.</p>",
+        href: "contact@dmj.one"
+    },
+    asmi: {
+        name: "Asmi Goyal",
+        bio: "<p>Asmi Goyal is an up-and-coming technology enthusiast and computer science student from India. With a passion for innovation, she spends her time exploring new ways to utilize technology to transform the world. Through hard work and dedication, she has developed a strong foundation in coding and is committed to utilizing her skills to create meaningful solutions to complex problems.</p>",
+        href: "contact@dmj.one"
+    },
+    vinayak: {
+        name: "Vinayak Awasthi",
+        bio: "<p>Vinayak Awasti is a student from India who is currently pursuing his Bachelor's degree in Computer Science and Engineering. He is a dedicated CSE student who enjoys coding and developing innovative solutions to real-world problems.</p>",
+        href: "contact@dmj.one"
+    },
+    prithak: {
+        name: "Prithak Thapa",
+        bio: "<p>Prithak is a student from Nepal who is currently pursuing a Bachelor's degree in Computer Science and Engineering at Shoolini University in India. As a CSE student, he is passionate about programming and enjoys building projects that utilize cutting-edge technologies to solve complex problems.</p>",
+        href: "contact@dmj.one"
+    },
 };
 
 function processAuthors(args) {
@@ -225,6 +245,13 @@ function processFolder(allAuthors, author_bio) {
                                     prof_href = "contact@dmj.one";
                                     course = "SEA-WS002";
                                     course_detail = "English Writing Seminar";
+                                    break;
+                                case "seaap002":
+                                    prof = "Mr. Raghav Sharma";
+                                    prof_bio = "<p>Mr. Raghav Sharma is an assistant professor at Shoolini University.</p>";
+                                    prof_href = "contact@dmj.one";
+                                    course = "SEA-AP002";
+                                    course_detail = "Aptitude Development Seminar";
                                     break;
                                 case "csu1051":
                                     switch (urlpart5) {

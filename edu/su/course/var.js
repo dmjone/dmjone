@@ -64,6 +64,13 @@ function get_menu_list(datetogen) {
                 semester: 2
             },
             {
+                link: "seaap002/",
+                title: "Aptitude Development Seminar",
+                desc: "Aptitude Development Seminar with Mr. Raghav Sharma.",
+                codetype: "SEA-AP002",
+                semester: 2
+            },
+            {
                 link: "csu585/",
                 title: "Design Thinking",
                 desc: "Approach problems with a new perspective in CSU585: Design Thinking by Mrs. Ruchika Sharma. Develop an innovative, creative and problem-solving mindset.",
