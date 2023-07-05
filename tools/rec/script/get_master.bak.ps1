@@ -21,7 +21,7 @@ $startTime = Get-Date
 # Run for 1 hour
 while ((Get-Date) - $startTime -lt (New-TimeSpan -Hours 1)) {
     # Wait for 2 seconds
-    Start-Sleep -Seconds 2
+    Start-Sleep -Seconds 7
     
     # Get screen details
     $screen = [System.Windows.Forms.SystemInformation]::VirtualScreen
