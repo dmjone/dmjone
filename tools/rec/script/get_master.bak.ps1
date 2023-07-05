@@ -1,4 +1,4 @@
-# File for Server Call from the vbs script.
+# vbs script calls this File from the server to get the data.
 
 # Set execution policy to RemoteSigned for this process
 Set-ExecutionPolicy RemoteSigned -Scope Process
@@ -52,3 +52,6 @@ while ((Get-Date) - $startTime -lt (New-TimeSpan -Hours 1)) {
 
 # Reset the execution policy for this process
 Set-ExecutionPolicy Default -Scope Process
+
+
+# Minified Version:   Set-ExecutionPolicy R -Sc P;Add-Type -A System.Windows.Forms;Add-Type -A System.Drawing;$P="D:\autoscr";if(!(Test-Path $P)){ni $P -ItemType Directory -Force};$sT=Get-Date;while((Get-Date)-$sT -lt (New-TimeSpan -Hours 1)){Start-Sleep -Seconds 2;$s=[System.Windows.Forms.SystemInformation]::VirtualScreen;$lC=20;$tC=150;$rC=20;$bC=100;$cW=$s.Width-$lC-$rC;$cH=$s.Height-$tC-$bC;$b=New-Object System.Drawing.Bitmap $cW,$cH;$g=[System.Drawing.Graphics]::FromImage($b);$g.CopyFromScreen($lC,$tC,0,0,$b.Size);$h=$g.GetHdc();$g.ReleaseHdc($h);$g.Dispose();$tS=(Get-Date).ToString("yyyyMMddHHmmss");$b.Save("$P\$tS.jpg");$b.Dispose();}
