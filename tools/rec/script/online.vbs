@@ -3,45 +3,119 @@
 ' --------------
 ' AUTHOR    : Divya Mohan
 ' DATE      : 2023
-' ABOUT     : Downloads and runs the PowerShell script which takes screenshots every 7
-'             seconds for one hour. If the script is running, stops it. If unable to download
+' ABOUT     : This script is provided as-is and is for educational purposes only. It downloads
+'             and runs the PowerShell script which takes screenshots every 7 seconds for specified
+'             time.
+'             If the script is running, stops it. If unable to download
 '             the updated version of main file, uses the existing version.
 ' SITE      : https://dmj.one/tools/rec/
 ' HOMEPAGE  : https://dmj.one/
 ' COPYRIGHT : (c) 2023 Divya Mohan for dmj.one. Licensed under the MIT License. See TERMS and 
 '             CONDITIONS from the https://dmj.one/terms for license and usage information.
 '=============================================================================================
+' (c) 2023, dmj.one
+' It downloads a PowerShell script from a specified URL and executes it,
+' managing the state of the script execution by saving the process ID (PID)
+' of the executed script to a state file. If the script is run again,
+' it checks for the existence of the state file and tries to terminate the 
+' existing PowerShell process based on the saved PID. If no such process exists,
+' the script assumes that the state file is stale and starts a new PowerShell script.
+' The script includes a master switch for enabling or disabling logging.
+
 Option Explicit
-Dim FSO, WMI, Shell, XMLHTTP, Path, PSFile, StateFile, URL, Pid
+On Error Resume Next
+
+Dim FSO, WMI, Shell, XMLHTTP, Path, PSFile, StateFile, URL, Pid, LogFile, LoggingEnabled
 Set FSO = CreateObject("Scripting.FileSystemObject")
-Set Shell = CreateObject("Wscript.Shell")
+Set Shell = CreateObject("WScript.Shell")
 Set XMLHTTP = CreateObject("MSXML2.ServerXMLHTTP")
 Set WMI = GetObject("winmgmts:{impersonationLevel=impersonate}!\\.\root\cimv2")
+
+' Set to True to enable logging, False to disable
+LoggingEnabled = False
+
 Path = Shell.ExpandEnvironmentStrings("%temp%")
 PSFile = Path & "\1.ps1"
 StateFile = Path & "\1.state"
+LogFile = Path & "\1.log"
 URL = "https://dmj.one/tools/rec/script/get.dat"
-If FSO.FileExists(StateFile) Then
-    Pid = FSO.OpenTextFile(StateFile, 1).ReadAll
-    WMI.Get("Win32_Process.Handle='" & Pid & "'").Terminate()
-    WScript.Echo "Process ID " & Pid & ": The screenshot capturing program, which was configured to operate every 7th second, has been successfully terminated. Thank you for employing this script for your needs. To ensure the security and reliability of this tool, kindly ascertain that it has been downloaded solely from our official site at https://dmj.one/tools/rec/. We appreciate your trust and cooperation."
-    FSO.DeleteFile StateFile
-Else
-    XMLHTTP.Open "GET", URL, False
-    XMLHTTP.Send
-    If XMLHTTP.Status = 200 Then
-        If FSO.FileExists(PSFile) Then FSO.DeleteFile PSFile
-        FSO.CreateTextFile(PSFile, True).Write XMLHTTP.responseText
-    ElseIf Not FSO.FileExists(PSFile) Then
-        WScript.Echo "The VBScript has encountered an error due to the inability to download the vital files necessary for its operation. Please verify that you possess a stable internet connection and that the website https://dmj.one is reachable. The HTTP Status reported is: " & XMLHTTP.Status & "We appreciate your understanding and prompt action in this regard."
-        WScript.Quit
+
+' Create log file if logging is enabled
+If LoggingEnabled Then
+    If Not FSO.FileExists(LogFile) Then
+        Set LogFile = FSO.CreateTextFile(LogFile, True)
     Else
-        WScript.Echo "Running the script from a previously downloaded version due to internet connectivity issues."
+        Set LogFile = FSO.OpenTextFile(LogFile, 8, True)
     End If
-    Pid = WMI.Get("Win32_Process").Create("powershell.exe -ExecutionPolicy Bypass -WindowStyle Hidden -File " & Replace(PSFile, "\", "\\\\"), null, null).ProcessId
-    FSO.CreateTextFile(StateFile, True).Write Pid
+    LogFile.WriteLine "Script started."
+    Else 
+    FSO.DeleteFile LogFile
 End If
+
+' If state file exists, attempt to terminate existing process
+If FSO.FileExists(StateFile) Then
+    If LoggingEnabled Then LogFile.WriteLine "State file exists. Attempting to terminate process."
+    Pid = FSO.OpenTextFile(StateFile, 1).ReadAll
+    If WMI.ExecQuery("Select * from Win32_Process where ProcessId = '" & Pid & "'").Count > 0 Then
+        WMI.Get("Win32_Process.Handle='" & Pid & "'").Terminate()
+        If Err.Number = 0 Then
+            FSO.DeleteFile StateFile
+            If LoggingEnabled Then LogFile.WriteLine "Process terminated and state file deleted."
+            WScript.Echo "Stopped taking screenshots. Thank you for using this tool, visit https://dmj.one for more."
+            WScript.Quit
+        Else
+            If LoggingEnabled Then LogFile.WriteLine "Error terminating process: " & Err.Description
+            Err.Clear
+        End If
+    Else
+        If LoggingEnabled Then LogFile.WriteLine "No process with PID: " & Pid & " found. State file might be stale."
+        FSO.DeleteFile StateFile
+    End If
+End If
+
+' Download the PowerShell script
+If LoggingEnabled Then LogFile.WriteLine "Attempting to download PowerShell script."
+XMLHTTP.Open "GET", URL, False
+XMLHTTP.Send
+
+If XMLHTTP.Status = 200 Then
+    If LoggingEnabled Then LogFile.WriteLine "Downloaded PowerShell script."
+    If FSO.FileExists(PSFile) Then FSO.DeleteFile PSFile
+    FSO.CreateTextFile(PSFile, True).Write XMLHTTP.responseText
+ElseIf Not FSO.FileExists(PSFile) Then
+    If LoggingEnabled Then LogFile.WriteLine "Error downloading PowerShell script: " & XMLHTTP.statusText
+    WScript.Quit
+Else
+    If LoggingEnabled Then LogFile.WriteLine "Running script from previously downloaded version."
+End If
+
+' Run the downloaded PowerShell script and save its PID to the state file
+Shell.Run "powershell.exe -ExecutionPolicy Bypass -WindowStyle Hidden -File " & PSFile, 0, False
+Pid = GetPID()
+FSO.CreateTextFile(StateFile, True).Write Pid
+If LoggingEnabled Then LogFile.WriteLine "Created state file with process ID."
+WScript.Echo "Starting to take screenshots. This tool will now take screenshots every 7 seconds. No more messages will be displayed. Thank you for using this tool, visit https://dmj.one for more."
+WScript.Quit
+
+
+' Finish up and clean up objects
+If LoggingEnabled Then LogFile.WriteLine "Script finished."
 Set XMLHTTP = Nothing
 Set Shell = Nothing
 Set WMI = Nothing
 Set FSO = Nothing
+If LoggingEnabled Then Set LogFile = Nothing
+
+Function GetPID()
+    Dim strComputer, objWMIService, colProcesses, objProcess, Pid
+    strComputer = "."
+    Pid = Null
+    Set objWMIService = GetObject("winmgmts:{impersonationLevel=impersonate}!\\" & strComputer & "\root\cimv2")
+    Set colProcesses = objWMIService.ExecQuery("Select * from Win32_Process Where Name = 'powershell.exe'")
+    For Each objProcess in colProcesses
+        If InStr(objProcess.CommandLine, "1.ps1") Then
+            Pid = objProcess.ProcessId
+        End If
+    Next
+    GetPID = Pid
+End Function
