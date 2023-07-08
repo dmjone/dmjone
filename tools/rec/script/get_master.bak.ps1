@@ -1,49 +1,49 @@
 # MASTER FILE FOR STORAGE OF get.dat DATA
 # # vbs script calls get.dat File from the server to get the data. - WITHOUT CROP 
 
-# # Load necessary .NET assemblies
-# Add-Type -AssemblyName System.Windows.Forms
-# Add-Type -AssemblyName System.Drawing
+# Load necessary .NET assemblies
+Add-Type -AssemblyName System.Windows.Forms
+Add-Type -AssemblyName System.Drawing
 
-# # Add execution capability to the powershell
-# Set-ExecutionPolicy RemoteSigned -Scope Process
+# Add execution capability to the powershell
+Set-ExecutionPolicy RemoteSigned -Scope Process
 
-# $Path = "D:\autoscr"
-# if (!(Test-Path -Path $Path)) {
-#     New-Item -ItemType Directory -Force -Path $Path
-# }
+$Path = "C:\autoscr"
+if (!(Test-Path -Path $Path)) {
+    New-Item -ItemType Directory -Force -Path $Path
+}
 
-# $startTime = Get-Date
+$startTime = Get-Date
 
-# while ((Get-Date) - $startTime -lt (New-TimeSpan -Hours 1)) {
-#     Start-Sleep -Seconds 10
+while ((Get-Date) - $startTime -lt (New-TimeSpan -Hours 1)) {
+    Start-Sleep -Seconds 10
 
-#     $screen = [System.Windows.Forms.SystemInformation]::VirtualScreen
-#     $width = $screen.Width
-#     $height = $screen.Height
-#     $left = $screen.Left
-#     $top = $screen.Top
+    $screen = [System.Windows.Forms.SystemInformation]::VirtualScreen
+    $width = $screen.Width
+    $height = $screen.Height
+    $left = $screen.Left
+    $top = $screen.Top
 
-#     $bitmap = New-Object System.Drawing.Bitmap $width, $height
+    $bitmap = New-Object System.Drawing.Bitmap $width, $height
 
-#     $graphics = [System.Drawing.Graphics]::FromImage($bitmap)
+    $graphics = [System.Drawing.Graphics]::FromImage($bitmap)
 
-#     $graphics.CopyFromScreen($left, $top, 0, 0, $bitmap.Size)
+    $graphics.CopyFromScreen($left, $top, 0, 0, $bitmap.Size)
 
-#     $hdc = $graphics.GetHdc()
+    $hdc = $graphics.GetHdc()
 
-#     $graphics.ReleaseHdc($hdc)
+    $graphics.ReleaseHdc($hdc)
 
-#     $graphics.Dispose()
+    $graphics.Dispose()
 
-#     $timeStamp = (Get-Date).ToString("yyyyMMddHHmmss")
-#     $bitmap.Save("$Path\$timeStamp.jpg")
+    $timeStamp = (Get-Date).ToString("yyyyMMddHHmmss")
+    $bitmap.Save("$Path\$timeStamp.jpg")
 
-#     $bitmap.Dispose()
-# }
+    $bitmap.Dispose()
+}
 
-# # Reset the execution policy
-# Set-ExecutionPolicy Default -Scope Process
+# Reset the execution policy
+Set-ExecutionPolicy Default -Scope Process
 
 # Minified FULL SCREEN Version:     Set-ExecutionPolicy Rem -Sc P;Add-Type -A System.Windows.Forms;Add-Type -A System.Drawing;$P="D:\autoscr";if(!(Test-Path $P)){ni $P -ItemType Directory -Force};$sT=Get-Date;while((Get-Date)-$sT -lt (New-TimeSpan -Hours 1)){Start-Sleep -Seconds 10;$s=[System.Windows.Forms.SystemInformation]::VirtualScreen;$w=$s.Width;$h=$s.Height;$l=$s.Left;$t=$s.Top;$b=New-Object System.Drawing.Bitmap $w,$h;$g=[System.Drawing.Graphics]::FromImage($b);$g.CopyFromScreen($l,$t,0,0,$b.Size);$h=$g.GetHdc();$g.ReleaseHdc($h);$g.Dispose();$tS=(Get-Date).ToString("yyyyMMddHHmmss");$b.Save("$P\$tS.jpg");$b.Dispose();}
 

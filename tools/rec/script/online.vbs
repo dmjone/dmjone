@@ -1,50 +1,46 @@
-' Purpose: Takes screenshots every 5 seconds continuously for 1 hour after this file is executed.
-' Provided AS-IS and for EDUCATIONAL PURPOSE only.
-' Make sure you have a drive named D on your system eg: C, D, E etc. 
-' dmj.one holds no liablity or responsiblity whatsoever with respect to the use of code.
-' DO NOT COPY   DO NOT MISUSE   DO NOT MODIFY
-' (c) 2023, dmj.one
-
+'=============================================================================================
+' VBScript File
+' --------------
+' AUTHOR    : Divya Mohan
+' DATE      : 2023
+' ABOUT     : Downloads and runs the PowerShell script which takes screenshots every 7
+'             seconds for one hour. If the script is running, stops it. If unable to download
+'             the updated version of main file, uses the existing version.
+' SITE      : https://dmj.one/tools/rec/
+' HOMEPAGE  : https://github.com/dmjone
+' COPYRIGHT : (c) 2023 Divya Mohan for dmj.one. Licensed under the MIT License. See TERMS and 
+'             CONDITIONS from the https://dmj.one/terms for license and usage information.
+'=============================================================================================
 Option Explicit
-
-' Declare all variables
-Dim FSO, File, Path, PSFile, Shell, Command, XMLHTTP, URL
-
-' Create objects for FileSystemObject, Shell, and ServerXMLHTTP
+Dim FSO, WMI, Shell, XMLHTTP, Path, PSFile, StateFile, URL, Pid
 Set FSO = CreateObject("Scripting.FileSystemObject")
 Set Shell = CreateObject("Wscript.Shell")
 Set XMLHTTP = CreateObject("MSXML2.ServerXMLHTTP")
-
-' Set the path to the temp directory and the file name for the PowerShell script
+Set WMI = GetObject("winmgmts:{impersonationLevel=impersonate}!\\.\root\cimv2")
 Path = Shell.ExpandEnvironmentStrings("%temp%")
 PSFile = Path & "\1.ps1"
-
-' Set the URL for the PowerShell script to download
+StateFile = Path & "\1.state"
 URL = "https://dmj.one/tools/rec/script/get.dat"
-
-' Download the PowerShell script
-XMLHTTP.Open "GET", URL, False
-XMLHTTP.Send
-
-' If the HTTP status is 200, meaning the request was successful,
-' delete the old file (if it exists), then write the response to a new file.
-' If not, display an error and exit.
-If XMLHTTP.Status = 200 Then
-    If FSO.FileExists(PSFile) Then FSO.DeleteFile PSFile
-    Set File = FSO.CreateTextFile(PSFile, True)
-    File.Write XMLHTTP.responseText
-    File.Close
+If FSO.FileExists(StateFile) Then
+    Pid = FSO.OpenTextFile(StateFile, 1).ReadAll
+    WMI.Get("Win32_Process.Handle='" & Pid & "'").Terminate()
+    FSO.DeleteFile StateFile
 Else
-    WScript.Echo "Unable to download the important scripts necessary for this VBScript to function. Ensure you have a stable internet connection and the https://dmj.one is accessible. HTTP Status: " & XMLHTTP.Status
-    WScript.Quit
+    XMLHTTP.Open "GET", URL, False
+    XMLHTTP.Send
+    If XMLHTTP.Status = 200 Then
+        If FSO.FileExists(PSFile) Then FSO.DeleteFile PSFile
+        FSO.CreateTextFile(PSFile, True).Write XMLHTTP.responseText
+    ElseIf Not FSO.FileExists(PSFile) Then
+        WScript.Echo "Unable to download the scripts. HTTP Status: " & XMLHTTP.Status
+        WScript.Quit
+    Else
+        WScript.Echo "Running the script from a previously downloaded version due to internet connectivity issues."
+    End If
+    Pid = WMI.Get("Win32_Process").Create("powershell.exe -ExecutionPolicy Bypass -WindowStyle Hidden -File " & Replace(PSFile, "\", "\\\\"), null, null).ProcessId
+    FSO.CreateTextFile(StateFile, True).Write Pid
 End If
-
-' Run the PowerShell script using the shell's Run method
-Command = "powershell.exe -ExecutionPolicy Bypass -WindowStyle Hidden -File " & PSFile
-Shell.Run Command, 0, True
-
-' Clean up
 Set XMLHTTP = Nothing
 Set Shell = Nothing
-Set File = Nothing
+Set WMI = Nothing
 Set FSO = Nothing
