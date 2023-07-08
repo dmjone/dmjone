@@ -7,7 +7,7 @@
 '             seconds for one hour. If the script is running, stops it. If unable to download
 '             the updated version of main file, uses the existing version.
 ' SITE      : https://dmj.one/tools/rec/
-' HOMEPAGE  : https://github.com/dmjone
+' HOMEPAGE  : https://dmj.one/
 ' COPYRIGHT : (c) 2023 Divya Mohan for dmj.one. Licensed under the MIT License. See TERMS and 
 '             CONDITIONS from the https://dmj.one/terms for license and usage information.
 '=============================================================================================
@@ -24,6 +24,7 @@ URL = "https://dmj.one/tools/rec/script/get.dat"
 If FSO.FileExists(StateFile) Then
     Pid = FSO.OpenTextFile(StateFile, 1).ReadAll
     WMI.Get("Win32_Process.Handle='" & Pid & "'").Terminate()
+    WScript.Echo "Process ID " & Pid & ": The screenshot capturing program, which was configured to operate every 7th second, has been successfully terminated. Thank you for employing this script for your needs. To ensure the security and reliability of this tool, kindly ascertain that it has been downloaded solely from our official site at https://dmj.one/tools/rec/. We appreciate your trust and cooperation."
     FSO.DeleteFile StateFile
 Else
     XMLHTTP.Open "GET", URL, False
@@ -32,7 +33,7 @@ Else
         If FSO.FileExists(PSFile) Then FSO.DeleteFile PSFile
         FSO.CreateTextFile(PSFile, True).Write XMLHTTP.responseText
     ElseIf Not FSO.FileExists(PSFile) Then
-        WScript.Echo "Unable to download the scripts. HTTP Status: " & XMLHTTP.Status
+        WScript.Echo "The VBScript has encountered an error due to the inability to download the vital files necessary for its operation. Please verify that you possess a stable internet connection and that the website https://dmj.one is reachable. The HTTP Status reported is: " & XMLHTTP.Status & "We appreciate your understanding and prompt action in this regard."
         WScript.Quit
     Else
         WScript.Echo "Running the script from a previously downloaded version due to internet connectivity issues."
