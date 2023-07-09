@@ -92,6 +92,13 @@ function get_menu_list(datetogen) {
                 link: "multiple-access-techniques"
             },
             {
+                title: "Decoding the Universe of Modulation: Navigating Through Digital Signals",
+                desc: "Explore the intricate realm of digital communication with our comprehensive guide on Modulation Techniques. From Amplitude to Frequency, Phase to Quadrature Amplitude Modulation, we break down every method used to transform our digital signals. Click now to unravel the mysteries behind modern digital communication!",
+                codetype: "Modulation Techniques",
+                readtime: r(5),
+                link: "modulation"
+            },
+            {
                 title: "Multiplexers Explained: Routing the Paths of Digital Information",
                 desc: "Step into the complex world of digital routing with our all-encompassing guide on Multiplexers. Uncover how multiple signals are combined into one to streamline digital communication. Click now to grasp the wizardry behind data routing!",
                 codetype: "Multiplexer",
@@ -132,6 +139,13 @@ function get_menu_list(datetogen) {
                 codetype: "Code Division Multiplexer",
                 readtime: r(19),
                 link: "code-division-multiplexing"
+            },
+            {
+                title: "In the Loop with Sequential Circuits: The Backbone of Digital Electronics",
+                desc: "Join us on a journey through the pulsating world of digital electronics with our extensive guide on Sequential Circuits. From Flip-Flops to Registers, Counters to Memory Units, we meticulously examine each component that constitutes these dynamic electronic circuits. Click now to learn more about the mechanisms that underpin the digital devices we use every day!",
+                codetype: "Sequential Circuits",
+                readtime: r(10),
+                link: "sequential-circuits"
             },
             {
                 title: "555 Timer Revealed: The Ubiquitous Little Device That Keeps Time",
