@@ -462,7 +462,7 @@ function cryptoJS_decryption(cryptojs_encrypted_data) {
                     </div>
                 </div>`;
 
-    let tries = 2;
+    let tries = 3;
 
     function cryptojs_dec(cryptojs_encrypted_data, password) {
         try {
