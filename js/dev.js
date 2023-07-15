@@ -454,7 +454,7 @@ function cryptoJS_decryption(cryptojs_encrypted_data) {
                             <h2><b>Enter the password to view content:</b></h2>
                         </div>
                         <div class="input-group w-auto w-sm-75">
-                            <input type="password" id="password" name="password" class="form-control" placeholder="Requires Password">
+                            <input type="password" id="password" name="password" class="form-control" placeholder="Requires Password" autocomplete="off" maxlength="30" size="30" required autofocus>
                             <button id="submit-button" class="btn btn-primary ml-2">Submit</button>
                         </div>
                         <div id="error-message" class="text-danger d-none mt-2"></div>
