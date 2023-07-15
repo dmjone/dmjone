@@ -478,7 +478,7 @@ function cryptoJS_decryption(cryptojs_encrypted_data) {
                 document.body.innerHTML = `
                                 <div class="no-color d-flex flex-column justify-content-center align-items-center vh-100 text-center text-danger bg-light">
                                     <h3 class="p-3 px-md-2"><strong>Authentication Failed: The decryption process was unsuccessful due to an incorrect password.</strong></h3>
-                                    <p class="text-warning py-2 text-muted">Please refresh the page and provide the correct password to access the content.</p>
+                                    <p class="text-warning py-2 text-muted p-3 px-md-2"><strong>Please refresh the page and provide the correct password to access the content.</strong></p>
                                 </div>`;
                 console.clear();
             }
