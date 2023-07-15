@@ -467,7 +467,7 @@ function cryptoJS_decryption(cryptojs_encrypted_data) {
 
     function handleResize() {
         let passwordPrompt = document.getElementById('password-prompt');
-        if (window.matchMedia("(orientation: landscape)").matches) {
+        if (window.matchMedia("screen and (max-device-width: 1024px) and (orientation: landscape)").matches) {
             passwordPrompt.style.height = "calc(100vh + 25vh)";
         } else {
             passwordPrompt.style.height = "calc(100vh - 35vh)";
