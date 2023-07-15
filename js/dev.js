@@ -384,6 +384,7 @@ function header_author(...args) {
     // Ensure safety: If 'Off' is passed as a function argument, no header will be displayed. If 'WriteManually' is passed, the corresponding HTML code in the next value will be sent for manual header composition.
     if (args[0] === "off") { return null; }
     if (args[0] === "WriteManually") { const finalheaders = "<header>" + args[1] + "</header>" + header_navbar(); document.body.insertAdjacentHTML('afterbegin', finalheaders); return null; }
+    if (args[0] === "WriteManuallyNoNav") { const finalheaders = "<header>" + args[1] + "</header>"; document.body.insertAdjacentHTML('afterbegin', finalheaders); return null; }
     if (args[0] === "NavOnly") { document.body.insertAdjacentHTML('afterbegin', header_navbar()); return null; }
 
     /* USAGE - header_author("authorinitials || name", "email", "author1 details", "authorinitials || name2" ... ) */
@@ -448,13 +449,13 @@ function cryptoJS_decryption(cryptojs_encrypted_data) {
     // const app = document.getElementById('app');
     document.body.innerHTML += `
                 <div class="bg-light">
-                    <div id="cryptojs_decrypted-content"></div>
-                    <div id="password-prompt" class="container no-color d-flex flex-column justify-content-center align-items-center vh-100 text-center">
+                    <div id="cryptojs_decrypted-content" class="py-5 d-none"></div>
+                    <div id="password-prompt" class="container no-color d-flex flex-column justify-content-center align-items-center text-center" style="height: calc(100vh - 35vh);">
                         <div class="alert w-auto w-sm-50 bg-warning bg-opacity-25 bg-gradient">
                             <h2><b>Enter the password to view content:</b></h2>
                         </div>
                         <div class="input-group w-auto w-sm-75">
-                            <input type="password" id="password" name="password" class="form-control" placeholder="Requires Password" autocomplete="off" maxlength="30" size="30" required autofocus>
+                            <input type="password" id="password" name="password" class="form-control" placeholder="Requires Password" autocomplete="off" maxlength="30" size="30" data-lpignore="true" required autofocus>
                             <button id="submit-button" class="btn btn-primary ml-2">Submit</button>
                         </div>
                         <div id="error-message" class="text-danger d-none mt-2"></div>
@@ -467,8 +468,11 @@ function cryptoJS_decryption(cryptojs_encrypted_data) {
         try {
             const originalText = CryptoJS.AES.decrypt(cryptojs_encrypted_data, password).toString(CryptoJS.enc.Utf8);
             document.getElementById("cryptojs_decrypted-content").innerHTML = originalText;
-            document.getElementById('password-prompt').style.display = 'none';
+            // document.getElementById('password-prompt').style.display = 'none';
             document.getElementById('password-prompt').classList.add('d-none');
+            document.getElementById('cryptojs_decrypted-content').classList.remove('d-none');
+            document.querySelector('header').classList.add('d-none');
+            // document.querySelector('footer').classList.add('d-none');
         } catch (e) {
             tries--;
             if (tries >= 1) {
@@ -476,9 +480,9 @@ function cryptoJS_decryption(cryptojs_encrypted_data) {
                 document.getElementById('error-message').classList.remove('d-none');
             } else {
                 document.body.innerHTML = `
-                                <div class="no-color d-flex flex-column justify-content-center align-items-center vh-100 text-center text-danger bg-light">
-                                    <h3 class="p-3 px-md-2"><strong>Authentication Failed: The decryption process was unsuccessful due to an incorrect password.</strong></h3>
-                                    <p class="text-warning py-2 text-muted p-3 px-md-2"><strong>Please refresh the page and provide the correct password to access the content.</strong></p>
+                                <div class="no-color d-flex flex-column justify-content-center align-items-center vh-100 text-danger bg-light">
+                                    <h3 class="p-2 px-md-2 text-sm-center"><strong>Authentication Failed: The decryption process was unsuccessful due to an incorrect password.</strong></h3>
+                                    <p class="py-2 text-muted p-2 px-md-2"><strong>Please refresh the page and provide the correct password to access the content.</strong></p>
                                 </div>`;
                 console.clear();
             }
