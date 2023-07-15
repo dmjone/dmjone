@@ -11,6 +11,7 @@ const cdnjs_highlightjs = "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/1
 const cdnjs_katex = "https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js";
 const cdnjs_katex_autorender = "https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js";
 const cdnjs_font_awesome = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js";
+const cdnjs_cryptoJS = "https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js";
 
 
 
@@ -150,7 +151,7 @@ const cdnjs_font_awesome = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/
     // const cdnjs_font_awesome = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js";
 
     // Create an array of script URLs
-    var scripts = [cdnjs_jquery, cdnjs_bootstrap, cdnjs_highlightjs, cdnjs_katex, cdnjs_katex_autorender, cdnjs_font_awesome];
+    var scripts = [cdnjs_jquery, cdnjs_bootstrap, cdnjs_highlightjs, cdnjs_katex, cdnjs_katex_autorender, cdnjs_font_awesome, cdnjs_cryptoJS];
     var loaded = 0; // Create a counter to keep track of the number of scripts that have finished loading
 
     for (var i = 0; i < scripts.length; i++) { // Iterate through the array of scripts
@@ -441,6 +442,61 @@ function dcevars(s) {
     div.innerHTML = decoded;
     document.body.appendChild(div);
 }
+function cryptoJS_decryption(cryptojs_encrypted_data) {
+    // Requires CryptoJS to be loaded for running. 
+
+    // const app = document.getElementById('app');
+    document.body.innerHTML += `
+                <div class="bg-light">
+                    <div id="cryptojs_decrypted-content"></div>
+                    <div id="password-prompt" class="container no-color d-flex flex-column justify-content-center align-items-center vh-100 text-center">
+                        <div class="alert w-auto w-sm-50 bg-warning bg-opacity-25 bg-gradient">
+                            <h2><b>Enter the password to view content:</b></h2>
+                        </div>
+                        <div class="input-group w-auto w-sm-75">
+                            <input type="password" id="password" name="password" class="form-control" placeholder="Requires Password">
+                            <button id="submit-button" class="btn btn-primary ml-2">Submit</button>
+                        </div>
+                        <div id="error-message" class="text-danger d-none mt-2"></div>
+                    </div>
+                </div>`;
+
+    let tries = 2;
+
+    function cryptojs_dec(cryptojs_encrypted_data, password) {
+        try {
+            const originalText = CryptoJS.AES.decrypt(cryptojs_encrypted_data, password).toString(CryptoJS.enc.Utf8);
+            document.getElementById("cryptojs_decrypted-content").innerHTML = originalText;
+            document.getElementById('password-prompt').style.display = 'none';
+            document.getElementById('password-prompt').classList.add('d-none');
+        } catch (e) {
+            tries--;
+            if (tries >= 1) {
+                document.getElementById('error-message').innerHTML = 'Authentication Failed. Please try again. You may try ' + tries + ' more time.';
+                document.getElementById('error-message').classList.remove('d-none');
+            } else {
+                document.body.innerHTML = `
+                                <div class="no-color d-flex flex-column justify-content-center align-items-center vh-100 text-center text-danger bg-light">
+                                    <h3 class="p-3 px-md-2">Authentication Failed: The decryption process was unsuccessful due to an incorrect password.</h3>
+                                    <p class="text-warning py-2 text-muted">Please refresh the page and provide the correct password to access the content.</p>
+                                </div>`;
+                console.clear();
+            }
+        }
+    }
+
+    document.getElementById('password').addEventListener('keypress', function (event) {
+        if (event.key === 'Enter') {
+            const password = document.getElementById('password').value;
+            cryptojs_dec(cryptojs_encrypted_data, password);
+        }
+    });
+
+    document.getElementById('submit-button').addEventListener('click', () => {
+        const password = document.getElementById('password').value;
+        cryptojs_dec(cryptojs_encrypted_data, password);
+    });
+}
 
 
 function body_genmenu(course) {
@@ -700,6 +756,8 @@ function maintenance_mode() {
         }
     }
 }());
+
+
 
 /******** Footer ***********/
 function footer_getHeaderValue(keyName) {

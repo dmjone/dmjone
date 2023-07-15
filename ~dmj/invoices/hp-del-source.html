@@ -20,7 +20,7 @@
 
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" integrity="sha512-t4GWSVZO1eC8BM339Xd7Uphw5s17a86tIZIj8qRxhnKub6WoyhnrxeCIMeAqBPgdZGlCcG2PrZjMc+Wr78+5Xg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
         <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js" integrity="sha512-E8QSvWZ0eCLGk4km3hxSsNmGWbLtSCSUcewDQPQWZF6pEU8GlT8a5fF32wOl1i8ftdMhssTrF/OhyGWwonTcXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-        
+
         <link rel="shortcut icon" href="/logo.png">
     </head>
 
@@ -32,7 +32,7 @@
 
                 <div class="card shadow-lg">
                     <div class="card-body">
-                        <h5 class="card-title text-primary">Hello Kumkum and Vinayak,</h5>
+                        <h5 class="card-title text-primary">Dear Kumkum and Vinayak,</h5>
                         <p class="card-text" style="text-align: justify; text-justify: inter-word;">Welcome Home! What a journey we've shared, from Shoolini to Delhi, painted with unexpected landslides and last-minute plans. I'm so thrilled that we've all made it home safely and reunited with our families! We navigated through a unique adventure we embarked on together, supporting each other every step of the way, creating precious memories despite the challenges. I believe these trials only brought us closer together, making our bond even stronger.</p>
                         <p class="card-text" style="text-align: justify; text-justify: inter-word;">Now, as we bask in the warmth of our families, it's wonderful to look back at what we've overcome together. In this spirit, I have compiled an overview of our shared expenditures. The total amount comes to &#8377; 13,019.97, and dividing this equally, our individual contributions stand at &#8377; 4,339.99 each. It's only a small detail amidst our grand adventure, but transparency helps us continue our journey with the same trust we've built.</p>
 
@@ -161,16 +161,19 @@
         </div>
 
         <script>
+            //////// ENCRYPTION
             var htmlString = document.getElementById("encryptedcontent").innerHTML;
-            var secretKey = "ourtrip";
-            var encrypted = CryptoJS.AES.encrypt(htmlString, secretKey).toString(); // Encrypt
-            console.log(encrypted);
-            navigator.clipboard.writeText(encrypted)
-                .then(() => { console.log('Encryption copied to clipboard successfully.') })
-                .catch(err => { console.error('Failed to copy encryption: ', err) });
+            function cryptojs_enc(htmlString) {
+                var secretKey = prompt("Please enter the password to encrypt the page and copy the encrypted var to clipboard.");
+                const crypto_enc_data = CryptoJS.AES.encrypt(htmlString, secretKey).toString(); // Encrypt
+                console.log(crypto_enc_data);
+                navigator.clipboard.writeText("const cryptojs_enc_data = `" + crypto_enc_data + "`;");
+            }
+            cryptojs_enc(htmlString);
         </script>
 
         <script>
+            //// DECRYPTION
             // // Ask the user for the secret key
             // var secretKey = prompt("Please enter the secret key");
 
@@ -185,13 +188,83 @@
 
 
             /*******  SHORTER VERSION ******/
-            // try {
-            //     var originalText = CryptoJS.AES.decrypt(enc_data, prompt("Please enter the password to see the page.")).toString(CryptoJS.enc.Utf8);
-            //     document.body.innerHTML = originalText; // Or whatever you want to do with originalText
-            // } catch (e) {
-            //     document.body.innerHTML = '<div style="display: flex; justify-content: center; align-items: center; height: 100vh;" class="text-center"><h1>Could not decrypt the content due to wrong password.</h1></div>';
-            // }
+
+            function cryptojs_dec(cryptojs_enc_data) {
+                try {
+                    const originalText = CryptoJS.AES.decrypt(cryptojs_enc_data, prompt("Please enter the password to see the page.")).toString(CryptoJS.enc.Utf8);
+                    document.getElementById("cryptojs_decrypted-content").innerHTML = originalText;
+                } catch (e) {
+                    document.body.innerHTML = '<div style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh;" class="text-center text-danger bg-light">' +
+                        '<h3 class="p-3 px-md-2">Authentication Failed: The decryption process was unsuccessful due to an incorrect password.</h3>' +
+                        '<p class="text-warning py-2 text-muted">Please refresh the page and provide the correct password to access the content.</p>' +
+                        '</div>';
+                    console.clear();
+                }
+            }
         </script>
+
+
+
+
+<!-- Entire body for reference -->
+<!-- <div id="app"></div>
+
+        <script>
+            function cryptoJS_decryption(cryptojs_encrypted_data) {
+                // Create the HTML elements
+                // const app = document.getElementById('app');
+                document.body.innerHTML += `
+                <div class="bg-light">
+                    <div id="cryptojs_decrypted-content"></div>
+                    <div id="password-prompt" class="container d-flex flex-column justify-content-center align-items-center vh-100 text-center">
+                        <div class="alert alert-info w-auto w-sm-50">
+                            <h4>Enter password to view content:</h4>
+                        </div>
+                        <div class="input-group w-auto w-sm-50">
+                            <input type="password" id="password" name="password" class="form-control">
+                            <button id="submit-button" class="btn btn-primary ml-2">Submit</button>
+                        </div>
+                        <div id="error-message" class="text-danger d-none mt-2"></div>
+                    </div>
+                </div>`;
+
+                let tries = 2;
+
+                function cryptojs_dec(cryptojs_encrypted_data, password) {
+                    try {
+                        const originalText = CryptoJS.AES.decrypt(cryptojs_encrypted_data, password).toString(CryptoJS.enc.Utf8);
+                        document.getElementById("cryptojs_decrypted-content").innerHTML = originalText;
+                        document.getElementById('password-prompt').style.display = 'none';
+                        document.getElementById('password-prompt').classList.add('d-none');
+                    } catch (e) {
+                        tries--;
+                        if (tries >= 1) {
+                            document.getElementById('error-message').innerHTML = 'Authentication Failed. Please try again. You may try ' + tries + ' more time.';
+                            document.getElementById('error-message').classList.remove('d-none');
+                        } else {
+                            document.body.innerHTML = `
+                                <div class="d-flex flex-column justify-content-center align-items-center vh-100 text-center text-danger bg-light">
+                                    <h3 class="p-3 px-md-2">Authentication Failed: The decryption process was unsuccessful due to an incorrect password.</h3>
+                                    <p class="text-warning py-2 text-muted">Please refresh the page and provide the correct password to access the content.</p>
+                                </div>`;
+                            console.clear();
+                        }
+                    }
+                }
+
+                document.getElementById('password').addEventListener('keypress', function (event) {
+                    if (event.key === 'Enter') {
+                        const password = document.getElementById('password').value;
+                        cryptojs_dec(cryptojs_encrypted_data, password);
+                    }
+                });
+
+                document.getElementById('submit-button').addEventListener('click', () => {
+                    const password = document.getElementById('password').value;
+                    cryptojs_dec(cryptojs_encrypted_data, password);
+                });
+            }
+        </script> -->
 
     </body>
 
