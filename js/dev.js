@@ -452,12 +452,13 @@ function cryptoJS_decryption(cryptojs_encrypted_data) {
                     <div id="cryptojs_decrypted-content" class="py-5 d-none"></div>
                     <div id="password-prompt" class="container no-color d-flex flex-column justify-content-center align-items-center text-center" style="height: calc(100vh - 35vh);">
                         <div class="alert w-auto w-sm-50 bg-warning bg-opacity-25 bg-gradient">
-                            <h2><b>Enter the password to view content:</b></h2>
-                        </div>
-                        <div class="input-group w-auto w-sm-75">
+                            <h2 class="py-3"><b>Enter the password to view content:</b></h2>
                             <input type="password" id="password" name="password" class="form-control" placeholder="Requires Password" autocomplete="off" maxlength="30" size="30" data-lpignore="true" required autofocus>
-                            <button id="submit-button" class="btn btn-primary ml-2">Submit</button>
                         </div>
+                        <div class="input-group w-auto w-sm-50">                            
+                            <button id="submit-button" class="btn btn-outline-success ml-2 border-right"><strong><i class="bi bi-send"></i> Submit</strong></button>
+                            <button id="get-password" class="btn btn-outline-danger ml-2" data-bs-toggle="modal" data-bs-target="#common_msg_us_model"><strong><i class="bi bi-cloud-arrow-down"></i> Get Password</strong></button>                            
+                        </div>                                                
                         <div id="error-message" class="text-danger d-none mt-2"></div>
                     </div>
                 </div>`;
