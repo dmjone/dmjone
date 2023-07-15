@@ -450,18 +450,30 @@ function cryptoJS_decryption(cryptojs_encrypted_data) {
     document.body.innerHTML += `
                 <div class="bg-light">
                     <div id="cryptojs_decrypted-content" class="py-5 d-none"></div>
-                    <div id="password-prompt" class="container no-color d-flex flex-column justify-content-center align-items-center text-center" style="height: calc(100vh - 35vh);">
-                        <div class="alert w-auto w-sm-50 bg-warning bg-opacity-25 bg-gradient">
-                            <h2 class="py-3"><b>Enter the password to view content:</b></h2>
-                            <input type="password" id="password" name="password" class="form-control" placeholder="Requires Password" autocomplete="off" maxlength="30" size="30" data-lpignore="true" required autofocus>
+                    <div id="password-prompt" class="container no-color d-flex flex-column justify-content-center align-items-center text-center"  style="height: calc(100vh - 35vh);">
+                        <div class="shadow alert w-auto w-sm-50 bg-warning bg-opacity-25 bg-gradient">
+                            <h2 class="fw-bold">Enter the password to view content:</h2>                            
                         </div>
-                        <div class="input-group w-auto w-sm-50">                            
-                            <button id="submit-button" class="btn btn-outline-success ml-2 border-right"><strong><i class="bi bi-send"></i> Submit</strong></button>
-                            <button id="get-password" class="btn btn-outline-danger ml-2" data-bs-toggle="modal" data-bs-target="#common_msg_us_model"><strong><i class="bi bi-cloud-arrow-down"></i> Get Password</strong></button>                            
-                        </div>                                                
-                        <div id="error-message" class="text-danger d-none mt-2"></div>
+                        <input type="password" id="password" name="password" class="shadow-lg mt-3 mb-2 form-control w-auto w-sm-50 border-info" placeholder="Password Required*" autocomplete="off" maxlength="40" size="30" data-lpignore="true" required autofocus>
+                        <div class="input-group w-auto w-sm-50 mt-4 justify-content-center align-items-center text-center">                                                        
+                            <button id="submit-button" class="shadow m-2 btn btn-outline-success rounded btn-lg fw-bold"><i class="bi bi-key-fill"></i> Submit</button>
+                            <button id="get-password" class="shadow m-2 btn btn-outline-danger rounded btn-lg fw-bold" data-bs-toggle="modal" data-bs-target="#common_msg_us_model"><i class="bi bi-question-circle-fill"></i> Get Password</button>
+                        </div>                                                                        
+                        <div id="error-message" class="text-danger d-none mt-4 fw-bold"></div>
                     </div>
                 </div>`;
+    window.addEventListener("resize", handleResize);
+    handleResize(); // Initial call
+
+    function handleResize() {
+        let passwordPrompt = document.getElementById('password-prompt');
+        if (window.matchMedia("(orientation: landscape)").matches) {
+            passwordPrompt.style.height = "calc(100vh + 25vh)";
+        } else {
+            passwordPrompt.style.height = "calc(100vh - 35vh)";
+        }
+    }
+
 
     let tries = 3;
 
@@ -474,16 +486,19 @@ function cryptoJS_decryption(cryptojs_encrypted_data) {
             document.getElementById('cryptojs_decrypted-content').classList.remove('d-none');
             document.querySelector('header').classList.add('d-none');
             // document.querySelector('footer').classList.add('d-none');
+            setTimeout(function () { location.reload(); }, 120000);
         } catch (e) {
             tries--;
             if (tries >= 1) {
-                document.getElementById('error-message').innerHTML = '<strong>Authentication Failed. Please try again. You may try ' + tries + ' more time.</strong>';
+                document.getElementById('error-message').innerHTML = 'Authentication Failed. Please try again. You may try ' + tries + ' more time.';
                 document.getElementById('error-message').classList.remove('d-none');
+                document.getElementById('password').classList.add('border-danger');
             } else {
                 document.body.innerHTML = `
-                                <div class="no-color d-flex flex-column justify-content-center align-items-center vh-100 text-danger bg-light">
-                                    <h3 class="p-2 px-md-2 text-sm-center"><strong>Authentication Failed: The decryption process was unsuccessful due to an incorrect password.</strong></h3>
-                                    <p class="py-2 text-muted p-2 px-md-2"><strong>Please refresh the page and provide the correct password to access the content.</strong></p>
+                                <div class="no-color d-flex flex-column justify-content-center align-items-center vh-100 bg-light text-center">
+                                    <h1 class="py-2 p-5 px-md-2 text-sm-center fw-bold text-danger">Authentication Failed</h1>
+                                    <h4 class="py-2 p-3 px-md-4 text-sm-center fw-bold text-primary">The decryption process was unsuccessful due to an incorrect password.</h4>
+                                    <p class="py-2 text-secondary text-center p-3 px-md-4 fw-bold">Please refresh the page and provide the correct password to access the content.</p>
                                 </div>`;
                 console.clear();
             }
