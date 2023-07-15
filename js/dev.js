@@ -472,12 +472,12 @@ function cryptoJS_decryption(cryptojs_encrypted_data) {
         } catch (e) {
             tries--;
             if (tries >= 1) {
-                document.getElementById('error-message').innerHTML = 'Authentication Failed. Please try again. You may try ' + tries + ' more time.';
+                document.getElementById('error-message').innerHTML = '<strong>Authentication Failed. Please try again. You may try ' + tries + ' more time.</strong>';
                 document.getElementById('error-message').classList.remove('d-none');
             } else {
                 document.body.innerHTML = `
                                 <div class="no-color d-flex flex-column justify-content-center align-items-center vh-100 text-center text-danger bg-light">
-                                    <h3 class="p-3 px-md-2">Authentication Failed: The decryption process was unsuccessful due to an incorrect password.</h3>
+                                    <h3 class="p-3 px-md-2"><strong>Authentication Failed: The decryption process was unsuccessful due to an incorrect password.</strong></h3>
                                     <p class="text-warning py-2 text-muted">Please refresh the page and provide the correct password to access the content.</p>
                                 </div>`;
                 console.clear();
