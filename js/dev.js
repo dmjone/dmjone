@@ -443,80 +443,538 @@ function dcevars(s) {
     div.innerHTML = decoded;
     document.body.appendChild(div);
 }
-function cryptoJS_decryption(cryptojs_encrypted_data) {
-    // Requires CryptoJS to be loaded for running. 
 
-    // const app = document.getElementById('app');
-    document.body.innerHTML += `
+/******** CryptoJS Encryption System ********/
+
+////////////////////////////// Version 1.0 - Working
+////////////// function cryptoJS_decryption(cryptojs_encrypted_data) {
+// function cryptoJS_decryption(cryptojs_encrypted_data) {
+//     // Requires CryptoJS to be loaded for running.
+
+//     cryptojs_encrypted_data = cryptojs_encrypted_data || window["cryptojs_enc_data"];
+//     // Disable normal header and give a protected header.
+//     window["loaded_header_author"] = 1;
+//     header_author("WriteManuallyNoNav", "<h1 class='text-light text-center'>Password Protected Content</h1>");
+//     // const app = document.getElementById('app');
+//     document.body.innerHTML += `
+//                 <div class="bg-light">
+//                     <div id="cryptojs_decrypted-content" class="py-10 d-none"></div>
+//                     <div id="password-prompt" class="container no-color d-flex flex-column justify-content-center align-items-center text-center"  style="height: calc(100vh - 35vh);">
+//                         <div class="shadow alert w-auto w-sm-50 bg-warning bg-opacity-25 bg-gradient">
+//                             <h2 class="fw-bold">Enter the password to view content:</h2>
+//                         </div>
+//                         <input type="password" id="password" name="password" class="shadow-lg mt-3 mb-2 form-control w-auto w-sm-50 border-info" placeholder="Password Required*" autocomplete="off" maxlength="40" size="30" data-lpignore="true" required autofocus>
+//                         <div class="input-group w-auto w-sm-50 mt-4 justify-content-center align-items-center text-center">
+//                             <button id="submit-button" class="shadow m-2 btn btn-outline-success rounded btn-lg fw-bold"><i class="bi bi-key-fill"></i> Submit</button>
+//                             <button id="get-password" class="shadow m-2 btn btn-outline-danger rounded btn-lg fw-bold" data-bs-toggle="modal" data-bs-target="#common_msg_us_model"><i class="bi bi-question-circle-fill"></i> Get Password</button>
+//                         </div>
+//                         <div id="error-message" class="text-danger d-none mt-4 fw-bold"></div>
+//                     </div>
+//                 </div>`;
+//     window.addEventListener("resize", handleResize);
+//     handleResize(); // Initial call
+
+//     function handleResize() {
+//         let passwordPrompt = document.getElementById('password-prompt');
+//         if (window.matchMedia("screen and (max-device-width: 1024px) and (orientation: landscape)").matches) {
+//             passwordPrompt.style.height = "calc(100vh + 25vh)";
+//         } else {
+//             passwordPrompt.style.height = "calc(100vh - 35vh)";
+//         }
+//     }
+
+
+//     let tries = 3;
+
+//     function cryptojs_dec(cryptojs_encrypted_data, password) {
+
+//         function addtoast() { // support function stat
+//             const toastHTML = `
+//     <div class="toast position-absolute top-50 start-50 translate-middle m-3 shadow-lg"
+//          style="z-index: 99999;" role="alert" aria-live="assertive" aria-atomic="true">
+//         <div class="d-flex align-items-center text-white bg-danger border-0">
+//             <div class="toast-body">
+//                 <strong>Note:</strong> For security, this content will auto re-encrypt in 120s. Re-enter password to view again.
+//             </div>
+//             <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+//         </div>
+//     </div>`;
+//             document.body.insertAdjacentHTML('beforeend', toastHTML);
+//             const toastElement = document.querySelector('.toast');
+//             const toast = new bootstrap.Toast(toastElement, { autohide: true, delay: 2500 });
+//             toast.show();
+//         } // support function end
+
+
+//         try {
+// const originalText = CryptoJS.AES.decrypt(cryptojs_encrypted_data, password).toString(CryptoJS.enc.Utf8);
+// const decryptedContentElement = document.getElementById("cryptojs_decrypted-content");
+// decryptedContentElement.innerHTML = originalText;
+// addtoast();
+
+// document.getElementById('password-prompt').classList.add('d-none');
+// document.getElementById('cryptojs_decrypted-content').classList.remove('d-none');
+// document.querySelector('header').classList.add('d-none');
+// // document.querySelector('footer').classList.add('d-none');
+// setTimeout(function () { location.reload(); }, 120000);
+// header_author("NavOnly");
+//         } catch (e) {
+//             tries--;
+//             if (tries >= 1) {
+//                 document.getElementById('error-message').innerHTML = 'Authentication Failed. Please try again. You may try ' + tries + ' more time.';
+//                 document.getElementById('error-message').classList.remove('d-none');
+//                 document.getElementById('password').classList.add('border-danger');
+//             } else {
+//                 document.body.innerHTML = `
+//                                 <div class="no-color d-flex flex-column justify-content-center align-items-center vh-100 bg-light text-center">
+//                                     <h1 class="py-2 p-5 px-md-2 text-sm-center fw-bold text-danger">Authentication Failed</h1>
+//                                     <h4 class="py-2 p-3 px-md-4 text-sm-center fw-bold text-primary">The decryption process was unsuccessful due to an incorrect password.</h4>
+//                                     <p class="py-2 text-secondary text-center p-3 px-md-4 fw-bold">Please refresh the page and provide the correct password to access the content.</p>
+//                                 </div>`;
+//                 console.clear();
+//             }
+//         }
+//     }
+
+//     document.getElementById('password').addEventListener('keypress', function (event) {
+//         if (event.key === 'Enter') {
+//             const password = document.getElementById('password').value;
+//             cryptojs_dec(cryptojs_encrypted_data, password);
+//         }
+//     });
+
+//     document.getElementById('submit-button').addEventListener('click', () => {
+//         const password = document.getElementById('password').value;
+//         cryptojs_dec(cryptojs_encrypted_data, password);
+//     });
+// }
+
+
+//////////////// Version 1.1 - Working. 
+
+// function GLOBAL_server_refresh_createAndPlaySound() {
+//     let GLOBAL_server_refresh_toastAlert_sound;
+//     if (!GLOBAL_server_refresh_toastAlert_sound) { // Create audio element only if it doesn't exist
+//         GLOBAL_server_refresh_toastAlert_sound = document.createElement("audio");
+//         GLOBAL_server_refresh_toastAlert_sound.id = 'toastAlert1';
+//         GLOBAL_server_refresh_toastAlert_sound.src = '/media/music/click-sound.mp3';
+//         document.body.appendChild(GLOBAL_server_refresh_toastAlert_sound);
+//     }
+//     GLOBAL_server_refresh_toastAlert_sound.play(); // Play alert sound
+// }
+// const GLOBAL_server_refresh = (sentenceType, timedcall) => {
+//     timedcall = timedcall || 1000;
+//     setTimeout(function () {
+//         // Toast message generator
+//         const generateToast = (id, headerClass, headerIcon, headerText, bodyClass, bodyText) => {
+//             return `<div id="${id}-toast" class="toast position-fixed bottom-0 end-0 m-5 mx-2 shadow-lg" style="z-index: 99999;" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true" data-bs-delay="5000">
+//                     <div class="${headerClass}">
+//                         <i class="${headerIcon} me-2"></i>
+//                         <strong class="me-auto">${headerText}</strong>
+//                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+//                     </div>
+//                     <div class="${bodyClass}">
+//                         ${bodyText}
+//                     </div>
+//                 </div>`;
+//         }
+
+//         // Function to show toast and play alert sound
+//         const showToast = (toastId, autohide, delay, toastAlert) => {
+//             const toast = new bootstrap.Toast(document.querySelector(`#${toastId}-toast`), { autohide, delay });
+//             toast.show();
+//             if (toastAlert) { GLOBAL_server_refresh_createAndPlaySound(); }
+//         }
+
+//         let sentence;
+//         switch (sentenceType) {
+//             case 'encryption':
+//                 sentence = 'For added security, this page will refresh in 10s to encrypt the contents again. After the refresh, please re-enter your password to continue viewing the content.';
+//                 break;
+//             case 'decryption':
+//                 sentence = 'The page will refresh in 10s to complete the decryption process. Please re-enter the password to view this content again.';
+//                 break;
+//             case 'update':
+//                 sentence = 'This page is about to refresh in 10 seconds to update its cache and keep you updated with new changes. Please stay with us, it\'ll only take a few seconds.';
+//                 break;
+//             default:
+//                 sentence = 'This page will refresh in 10 seconds. Please stay seated and you can continue your work right after the refresh.';
+//         }
+
+//         const secondToastHTML = generateToast('second', 'toast-header fw-bold text-white bg-success bg-gradient border-0', 'bi bi-shield-lock', 'Refreshing Alert', 'toast-body fw-bold bg-success bg-gradient bg-opacity-25', sentence);
+//         document.body.insertAdjacentHTML('beforeend', secondToastHTML);
+//         showToast('second', true, 7000, true);
+
+//         setTimeout(() => {
+//             const thirdToastHTML = `<div id="third-toast" class="toast position-fixed top-50 start-50 translate-middle shadow-lg" style="z-index: 99999;" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false" data-bs-delay="7000">
+//                                     <div class="d-flex flex-column align-items-center justify-content-center h1 text-center bg-danger bg-gradient bg-opacity-75 shadow-lg text-light p-5" style="min-height: 200px;">
+//                                         <div class="spinner-border text-light mb-3" role="status" style="width: 3rem; height: 3rem;"></div>
+//                                         <div>Refreshing...</div>
+//                                     </div>
+//                                 </div>`;
+
+//             const backdropHTML = `<div id="backdrop" class="position-fixed top-0 start-0 w-100 h-100 bg-dark" style="z-index: 99998; opacity: 0; transition: opacity 0.3s;"></div>`; // Create a backdrop element
+//             document.body.insertAdjacentHTML('beforeend', thirdToastHTML + backdropHTML);
+//             showToast('third', false, 500, true);
+
+//             // Show the backdrop after a brief delay for a more gradual appearance
+//             setTimeout(function () {
+//                 document.querySelector('#backdrop').style.opacity = '0.75';
+//             }, 100);
+
+//             document.body.style.overflow = 'hidden'; // Disable scrolling
+
+//             setTimeout(function () {
+//                 location.reload(true);
+//             }, 500); // Refresh the page
+//         }, 9000);
+//     }, timedcall);
+// };
+// function cryptoJS_decryption(cryptojs_encrypted_data) {
+//     /********* Dependency: CryptoJS || Usage: Call the function directly (it will get from window.cryptojs_enc_data encrypted data var) or pass the encrypted var to it.   *********/
+
+//     cryptojs_encrypted_data = cryptojs_encrypted_data || window.cryptojs_enc_data;
+
+//     function hidebody() {
+//         const childrenToHide = document.querySelectorAll( // Select all direct children of the body, excluding specific elements and descendants of specific ids
+//             'body > *:not([role="dialog"], .modal-parent, #common-msg-us-container, #searchbox-container, #common-msg-us-container *, #searchbox-container *, script, .google-ads, iframe)'
+//         );
+
+//         childrenToHide.forEach((child) => { // Iterate over each selected first-child and add 'd-none' class
+//             // child.classList.add('d-none'); // passive
+//             child.remove(); //aggressive
+//         });
+//     }
+
+//     hidebody();
+//     window.loaded_header_author = 1;
+//     window.has_password_protection = 1;
+//     header_author("WriteManuallyNoNav", "<h1 class='text-light text-center'>Password Protected Content</h1>");
+
+//     document.body.insertAdjacentHTML('beforeend', `
+//                 <div class="bg-light">
+//                     <div id="cryptojs_decrypted-content" class="py-10 d-none"></div>
+//                     <div id="crypto-password-prompt" class="container no-color d-flex flex-column justify-content-center align-items-center text-center"  style="height: calc(100vh - 35vh);">
+//                         <div class="shadow alert w-auto w-sm-50 bg-warning bg-opacity-25 bg-gradient">
+//                             <h2 class="fw-bold">Enter the password to view content:</h2>                            
+//                         </div>
+//                         <input type="password" id="crypto-password" name="password" class="shadow-lg mt-3 mb-2 form-control w-auto w-sm-50 border-info" placeholder="Password Required*" autocomplete="off" maxlength="40" size="30" data-lpignore="true" required autofocus>
+//                         <div class="input-group w-auto w-sm-50 mt-4 justify-content-center align-items-center text-center">                                                        
+//                             <button id="crypto-submit-button" class="shadow m-2 btn btn-outline-success rounded btn-lg fw-bold"><i class="bi bi-key-fill"></i> Submit</button>
+//                             <button id="get-password" class="shadow m-2 btn btn-outline-danger rounded btn-lg fw-bold" data-bs-toggle="modal" data-bs-target="#common_msg_us_model"><i class="bi bi-question-circle-fill"></i> Get Password</button>
+//                         </div>                                                                        
+//                         <div id="crypto-error-message" class="text-danger d-none mt-4 fw-bold"></div>
+//                     </div>
+//                 </div>`);
+
+//     window.addEventListener("resize", handleResize);
+//     handleResize();
+//     copyright("all");
+
+//     let tries = 3;
+
+//     document.getElementById('crypto-password').addEventListener('keypress', function (event) {
+//         if (event.key === 'Enter') {
+//             const password = event.target.value;
+//             cryptojs_dec(cryptojs_encrypted_data, password);
+//         }
+//     });
+
+//     document.getElementById('crypto-submit-button').addEventListener('click', () => {
+//         const password = document.getElementById('crypto-password').value;
+//         cryptojs_dec(cryptojs_encrypted_data, password);
+//     });
+
+//     function handleResize() {
+//         let passwordPrompt = document.getElementById('crypto-password-prompt');
+//         if (window.matchMedia("screen and (max-device-width: 1024px) and (orientation: landscape)").matches) {
+//             passwordPrompt.style.height = "calc(100vh + 25vh)";
+//         } else {
+//             passwordPrompt.style.height = "calc(100vh - 35vh)";
+//         }
+//     }
+
+//     function addtoast() {
+//         const toastHTML = `<div id="first-toast" class="toast position-fixed bottom-0 end-0 m-5 mx-2 shadow-lg" style="z-index: 99999;" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true" data-bs-delay="10000">
+//                                 <div class="toast-header text-white fw-bold bg-danger bg-gradient border-0">
+//                                     <i class="bi bi-exclamation-triangle-fill me-2"></i>
+//                                     <strong class="me-auto">Security Alert</strong>
+//                                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+//                                 </div>
+//                                 <div class="toast-body fw-bold bg-danger bg-gradient bg-opacity-25">
+//                                     This page uses AES-256 encryption, which, unless you know the key, will need nearly impenetrable 1.1 x 10^77 potential key combinations, making it nearly impossible to break. To ensure enhanced and uninterrupted protection, this page will be refreshed and re-encrypted in 120 seconds.
+//                                 </div>
+//                             </div>`;
+//         document.body.insertAdjacentHTML('beforeend', toastHTML);
+//         const toast = new bootstrap.Toast(document.querySelector('#first-toast'), { autohide: true, delay: 10000 });
+//         toast.show();
+//         GLOBAL_server_refresh_createAndPlaySound();
+//         setTimeout(function () { GLOBAL_server_refresh("encryption"); }, 10000);
+//     }
+
+//     function cryptojs_dec(cryptojs_encrypted_data, password) {
+//         try {
+//             document.getElementById("cryptojs_decrypted-content").innerHTML += CryptoJS.AES.decrypt(cryptojs_encrypted_data, password).toString(CryptoJS.enc.Utf8);
+//             [document.getElementById('crypto-password-prompt'), document.querySelector('header'), document.querySelector('footer-dummy')].forEach(el => el?.classList.add('d-none'));
+//             document.getElementById('cryptojs_decrypted-content')?.classList.remove('d-none');
+//             addtoast();
+//             header_author("NavOnly");
+//         } catch (e) {
+//             tries--;
+//             if (tries >= 1) {
+//                 document.getElementById('crypto-error-message').innerHTML = `Authentication Failed. Please try again. You may try ${tries} more time(s).`;
+//                 document.getElementById('crypto-error-message').classList.remove('d-none');
+//                 document.getElementById('crypto-password').classList.add('border-danger');
+//             } else {
+//                 if (!window.cryptojs_enc_data) {
+//                     document.body.innerHTML = null;
+//                     document.body.innerHTML = `
+//                     <div class="no-color d-flex flex-column justify-content-center align-items-center vh-100 bg-light text-center">
+//                         <h1 class="py-2 p-5 px-md-2 text-sm-center fw-bold text-danger">Authentication Failed</h1>
+//                         <h4 class="py-2 p-3 px-md-4 text-sm-center fw-bold text-primary">The decryption process was unsuccessful due to insufficient information.</h4>
+//                         <p class="py-2 text-secondary text-center p-3 px-md-4 fw-bold">Kindly bring this incidence to <a href="mailto:contact@dmj.one">our attention</a> as we could not find anything to decrypt. The page might be undergoing enhancements, and we appreciate your patience.</p>
+//                     </div>`;
+//                     console.clear();
+//                 } else {
+//                     // hidebody();
+//                     document.body.innerHTML = null;
+//                     document.body.innerHTML = `
+//                     <div class="no-color d-flex flex-column justify-content-center align-items-center vh-100 bg-light text-center">
+//                         <h1 class="py-2 p-5 px-md-2 text-sm-center fw-bold text-danger">Authentication Failed</h1>
+//                         <h4 class="py-2 p-3 px-md-4 text-sm-center fw-bold text-primary">The decryption process was unsuccessful due to an incorrect password.</h4>
+//                         <p class="py-2 text-secondary text-center p-3 px-md-4 fw-bold">Please refresh the page and provide the correct password to access the content.</p>
+//                     </div>`;
+//                     console.clear();
+//                 }
+//             }
+//         }
+//     }
+// }
+
+
+////////////// Version 1.2 - Beta
+function ContentEncryptionManager(cryptojs_encrypted_data) {
+
+    let alertSound;
+    const createAndPlaySound = (play) => {
+        if (!alertSound) {
+            alertSound = document.createElement("audio");
+            alertSound.id = 'toastAlert1';
+            alertSound.src = '/media/music/click-sound.mp3';
+            document.body.appendChild(alertSound);
+        }
+        if (play) alertSound.play();
+    }
+
+    const showToast = (toastId, autohide, delay, toastAlert) => {
+        const toast = new bootstrap.Toast(document.querySelector(`#${toastId}-toast`), { autohide, delay });
+        toast.show();
+        if (toastAlert) createAndPlaySound(true);
+    }
+
+    const generateToast = (id, headerClass, headerIcon, headerText, bodyClass, bodyText) => {
+        return `<div id="${id}-toast" class="toast position-fixed bottom-0 end-0 m-5 mx-2 shadow-lg" style="z-index: 99999;" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true" data-bs-delay="5000">
+                <div class="${headerClass}">
+                    <i class="${headerIcon} me-2"></i>
+                    <strong class="me-auto">${headerText}</strong>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="${bodyClass}">
+                    ${bodyText}
+                </div>
+            </div>`;
+    }
+
+    const serverRefresh = (sentenceType, timedcall = 1000) => {
+        setTimeout(function () {
+            let sentence;
+            switch (sentenceType) {
+                case 'encryption':
+                    sentence = 'For added security, this page will refresh in 10s to encrypt the contents again. After the refresh, please re-enter your password to continue viewing the content.';
+                    break;
+                case 'decryption':
+                    sentence = 'The page will refresh in 10s to complete the decryption process. Please re-enter the password to view this content again.';
+                    break;
+                case 'update':
+                    sentence = 'This page is about to refresh in 10 seconds to update its cache and keep you updated with new changes. Please stay with us, it\'ll only take a few seconds.';
+                    break;
+                default:
+                    sentence = 'This page will refresh in 10 seconds. Please stay seated and you can continue your work right after the refresh.';
+            }
+
+            const secondToastHTML = generateToast('second', 'toast-header fw-bold text-white bg-success bg-gradient border-0', 'bi bi-shield-lock', 'Refreshing Alert', 'toast-body fw-bold bg-success bg-gradient bg-opacity-25', sentence);
+            document.body.insertAdjacentHTML('beforeend', secondToastHTML);
+            showToast('second', true, 7000, true);
+
+            setTimeout(() => {
+                const thirdToastHTML = `<div id="third-toast" class="toast position-fixed top-50 start-50 translate-middle shadow-lg" style="z-index: 99999;" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false" data-bs-delay="7000">
+                                        <div class="d-flex flex-column align-items-center justify-content-center h1 text-center bg-danger bg-gradient bg-opacity-75 shadow-lg text-light p-5" style="min-height: 200px;">
+                                            <div class="spinner-border text-light mb-3" role="status" style="width: 3rem; height: 3rem;"></div>
+                                            <div>Refreshing...</div>
+                                        </div>
+                                    </div>`;
+
+                const backdropHTML = `<div id="backdrop" class="position-fixed top-0 start-0 w-100 h-100 bg-dark" style="z-index: 99998; opacity: 0; transition: opacity 0.3s;"></div>`;
+                document.body.insertAdjacentHTML('beforeend', thirdToastHTML + backdropHTML);
+                showToast('third', false, 500, true);
+
+                setTimeout(function () {
+                    document.querySelector('#backdrop').style.opacity = '0.75';
+                }, 100);
+
+                document.body.style.overflow = 'hidden';
+
+                setTimeout(function () {
+                    location.reload(true);
+                }, 500);
+            }, 9000);
+        }, timedcall);
+    };
+
+    const cryptoJSDecryption = (cryptojs_encrypted_data) => {
+        /********* Dependency: CryptoJS || Usage: Call the function directly (it will get from window.cryptojs_enc_data encrypted data var) or pass the encrypted var to it.   *********/
+
+        cryptojs_encrypted_data = cryptojs_encrypted_data || window.cryptojs_enc_data;
+
+        function hidebody(h_mode) {
+            const childrenToHide = document.querySelectorAll( // Select all direct children of the body, excluding specific elements and descendants of specific ids
+                'body > *:not([role="dialog"], .modal-parent, #common-msg-us-container, #searchbox-container, #common-msg-us-container *, #searchbox-container *, script, .google-ads, iframe)'
+            );
+
+            childrenToHide.forEach((child) => { // Iterate over each selected first-child and add 'd-none' class
+                switch (h_mode) {
+                    case "passive":
+                        child.classList.add('d-none'); // passive:
+                        break;
+                    case "active":
+                        child.remove(); //aggressive
+                        break;
+                    default:
+                        child.remove();
+                        break;
+                }
+            });
+        }
+
+        hidebody();
+        window.loaded_header_author = 1;
+        window.has_password_protection = 1;
+        header_author("WriteManuallyNoNav", "<h1 class='text-light text-center'>Password Protected Content</h1>");
+
+        document.body.insertAdjacentHTML('beforeend', `
                 <div class="bg-light">
-                    <div id="cryptojs_decrypted-content" class="py-5 d-none"></div>
-                    <div id="password-prompt" class="container no-color d-flex flex-column justify-content-center align-items-center text-center"  style="height: calc(100vh - 35vh);">
+                    <div id="cryptojs_decrypted-content" class="py-10 d-none"></div>
+                    <div id="crypto-password-prompt" class="container no-color d-flex flex-column justify-content-center align-items-center text-center"  style="height: calc(100vh - 35vh);">
                         <div class="shadow alert w-auto w-sm-50 bg-warning bg-opacity-25 bg-gradient">
                             <h2 class="fw-bold">Enter the password to view content:</h2>                            
                         </div>
-                        <input type="password" id="password" name="password" class="shadow-lg mt-3 mb-2 form-control w-auto w-sm-50 border-info" placeholder="Password Required*" autocomplete="off" maxlength="40" size="30" data-lpignore="true" required autofocus>
+                        <input type="password" id="crypto-password" name="password" class="shadow-lg mt-3 mb-2 form-control w-auto w-sm-50 border-info" placeholder="Password Required*" autocomplete="off" maxlength="40" size="30" data-lpignore="true" required autofocus>
                         <div class="input-group w-auto w-sm-50 mt-4 justify-content-center align-items-center text-center">                                                        
-                            <button id="submit-button" class="shadow m-2 btn btn-outline-success rounded btn-lg fw-bold"><i class="bi bi-key-fill"></i> Submit</button>
+                            <button id="crypto-submit-button" class="shadow m-2 btn btn-outline-success rounded btn-lg fw-bold"><i class="bi bi-key-fill"></i> Submit</button>
                             <button id="get-password" class="shadow m-2 btn btn-outline-danger rounded btn-lg fw-bold" data-bs-toggle="modal" data-bs-target="#common_msg_us_model"><i class="bi bi-question-circle-fill"></i> Get Password</button>
                         </div>                                                                        
-                        <div id="error-message" class="text-danger d-none mt-4 fw-bold"></div>
+                        <div id="crypto-error-message" class="text-danger d-none mt-4 fw-bold"></div>
                     </div>
-                </div>`;
-    window.addEventListener("resize", handleResize);
-    handleResize(); // Initial call
+                </div>`);
 
-    function handleResize() {
-        let passwordPrompt = document.getElementById('password-prompt');
-        if (window.matchMedia("screen and (max-device-width: 1024px) and (orientation: landscape)").matches) {
-            passwordPrompt.style.height = "calc(100vh + 25vh)";
-        } else {
-            passwordPrompt.style.height = "calc(100vh - 35vh)";
-        }
-    }
+        window.addEventListener("resize", handleResize);
+        handleResize();
+        copyright("all");
 
+        let tries = 3;
 
-    let tries = 3;
+        document.getElementById('crypto-password').addEventListener('keypress', function (event) {
+            if (event.key === 'Enter') {
+                const password = event.target.value;
+                cryptojs_dec(cryptojs_encrypted_data, password);
+            }
+        });
 
-    function cryptojs_dec(cryptojs_encrypted_data, password) {
-        try {
-            const originalText = CryptoJS.AES.decrypt(cryptojs_encrypted_data, password).toString(CryptoJS.enc.Utf8);
-            document.getElementById("cryptojs_decrypted-content").innerHTML = originalText;
-            // document.getElementById('password-prompt').style.display = 'none';
-            document.getElementById('password-prompt').classList.add('d-none');
-            document.getElementById('cryptojs_decrypted-content').classList.remove('d-none');
-            document.querySelector('header').classList.add('d-none');
-            // document.querySelector('footer').classList.add('d-none');
-            setTimeout(function () { location.reload(); }, 120000);
-        } catch (e) {
-            tries--;
-            if (tries >= 1) {
-                document.getElementById('error-message').innerHTML = 'Authentication Failed. Please try again. You may try ' + tries + ' more time.';
-                document.getElementById('error-message').classList.remove('d-none');
-                document.getElementById('password').classList.add('border-danger');
+        document.getElementById('crypto-submit-button').addEventListener('click', () => {
+            const password = document.getElementById('crypto-password').value;
+            cryptojs_dec(cryptojs_encrypted_data, password);
+        });
+
+        function handleResize() {
+            let passwordPrompt = document.getElementById('crypto-password-prompt');
+            if (window.matchMedia("screen and (max-device-width: 1024px) and (orientation: landscape)").matches) {
+                passwordPrompt.style.height = "calc(100vh + 25vh)";
             } else {
-                document.body.innerHTML = `
-                                <div class="no-color d-flex flex-column justify-content-center align-items-center vh-100 bg-light text-center">
-                                    <h1 class="py-2 p-5 px-md-2 text-sm-center fw-bold text-danger">Authentication Failed</h1>
-                                    <h4 class="py-2 p-3 px-md-4 text-sm-center fw-bold text-primary">The decryption process was unsuccessful due to an incorrect password.</h4>
-                                    <p class="py-2 text-secondary text-center p-3 px-md-4 fw-bold">Please refresh the page and provide the correct password to access the content.</p>
-                                </div>`;
-                console.clear();
+                passwordPrompt.style.height = "calc(100vh - 35vh)";
             }
         }
-    }
 
-    document.getElementById('password').addEventListener('keypress', function (event) {
-        if (event.key === 'Enter') {
-            const password = document.getElementById('password').value;
-            cryptojs_dec(cryptojs_encrypted_data, password);
+        function addtoast() {
+            const toastHTML = `<div id="first-toast" class="toast position-fixed bottom-0 end-0 m-5 mx-2 shadow-lg" style="z-index: 99999;" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true" data-bs-delay="10000">
+                                <div class="toast-header text-white fw-bold bg-danger bg-gradient border-0">
+                                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                    <strong class="me-auto">Security Alert</strong>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+                                </div>
+                                <div class="toast-body fw-bold bg-danger bg-gradient bg-opacity-25">
+                                    This page uses AES-256 encryption, which, unless you know the key, will need nearly impenetrable 1.1 x 10^77 potential key combinations, making it nearly impossible to break. To ensure enhanced and uninterrupted protection, this page will be refreshed and re-encrypted in 120 seconds.
+                                </div>
+                            </div>`;
+            document.body.insertAdjacentHTML('beforeend', toastHTML);
+            const toast = new bootstrap.Toast(document.querySelector('#first-toast'), { autohide: true, delay: 10000 });
+            toast.show();
+            createAndPlaySound();
+            setTimeout(function () { serverRefresh("encryption"); }, 10000);
         }
-    });
 
-    document.getElementById('submit-button').addEventListener('click', () => {
-        const password = document.getElementById('password').value;
-        cryptojs_dec(cryptojs_encrypted_data, password);
-    });
+        function cryptojs_dec(cryptojs_encrypted_data, password) {
+            try {
+                document.getElementById("cryptojs_decrypted-content").innerHTML += CryptoJS.AES.decrypt(cryptojs_encrypted_data, password).toString(CryptoJS.enc.Utf8);
+                [document.getElementById('crypto-password-prompt'), document.querySelector('header'), document.querySelector('footer-dummy')].forEach(el => el?.classList.add('d-none'));
+                document.getElementById('cryptojs_decrypted-content')?.classList.remove('d-none');
+                addtoast();
+                header_author("NavOnly");
+            } catch (e) {
+                tries--;
+                if (tries >= 1) {
+                    document.getElementById('crypto-error-message').innerHTML = `Authentication Failed. Please try again. You may try ${tries} more time(s).`;
+                    document.getElementById('crypto-error-message').classList.remove('d-none');
+                    document.getElementById('crypto-password').classList.add('border-danger');
+                } else {
+                    if (!window.cryptojs_enc_data) {
+                        document.body.innerHTML = null;
+                        document.body.innerHTML = `
+                    <div class="no-color d-flex flex-column justify-content-center align-items-center vh-100 bg-light text-center">
+                        <h1 class="py-2 p-5 px-md-2 text-sm-center fw-bold text-danger">Authentication Failed</h1>
+                        <h4 class="py-2 p-3 px-md-4 text-sm-center fw-bold text-primary">The decryption process was unsuccessful due to insufficient information.</h4>
+                        <p class="py-2 text-secondary text-center p-3 px-md-4 fw-bold">Kindly bring this incidence to <a href="mailto:contact@dmj.one">our attention</a> as we could not find anything to decrypt. The page might be undergoing enhancements, and we appreciate your patience.</p>
+                    </div>`;
+                        console.clear();
+                    } else {
+                        // hidebody();
+                        document.body.innerHTML = null;
+                        document.body.innerHTML = `
+                    <div class="no-color d-flex flex-column justify-content-center align-items-center vh-100 bg-light text-center">
+                        <h1 class="py-2 p-5 px-md-2 text-sm-center fw-bold text-danger">Authentication Failed</h1>
+                        <h4 class="py-2 p-3 px-md-4 text-sm-center fw-bold text-primary">The decryption process was unsuccessful due to an incorrect password.</h4>
+                        <p class="py-2 text-secondary text-center p-3 px-md-4 fw-bold">Please refresh the page and provide the correct password to access the content.</p>
+                    </div>`;
+                        console.clear();
+                    }
+                }
+            }
+        }
+    };
+
+    // Return the functions that need to be accessible globally
+    return {
+        serverRefresh,
+        cryptoJSDecryption
+    };
 }
+
+// Usage
+const encryptionManager = ContentEncryptionManager(window.cryptojs_enc_data);
+// encryptionManager.serverRefresh('encryption');
+// encryptionManager.cryptoJSDecryption(cryptojs_enc_data);
+
+
+
 
 
 function body_genmenu(course) {
@@ -894,7 +1352,7 @@ function copyright(rights) {
         var rights = footer_some_rights;
     } else { rights = ""; }
 
-    var footer = document.createElement("footer");
+    let footer = document.createElement("footer");
     var sharingButtons = createSharingButtons();
     footer.appendChild(sharingButtons);
     var span = document.createElement("span");
@@ -914,7 +1372,26 @@ function copyright(rights) {
     footer.appendChild(span);
 
     //document.body.appendChild(footer);
-    document.body.insertBefore(footer, document.body.lastChild);
+    // document.body.insertBefore(footer, document.body.lastChild);
+    document.body.appendChild(footer);
+
+    // 3. Initialize a MutationObserver
+    let observer = new MutationObserver((mutationsList, observer) => {
+        for (let mutation of mutationsList) {
+            if (mutation.type === 'childList') {
+                // When a child is added to the body
+                if (document.body.lastChild !== footer) {
+                    // If the last child is not the footer, move the footer to the end
+                    document.body.appendChild(footer);
+                }
+            }
+        }
+    });
+
+    // 4. Start observing the body for configured mutations
+    observer.observe(document.body, { childList: true });
+    setTimeout(() => { observer.disconnect(); }, 20); // Disconnect the observer
+
 
     //define service worker
     if (typeof navigator.serviceWorker !== 'undefined') {
@@ -1709,7 +2186,7 @@ function gen_blockquote() {
 })();
 
 /********** Add-On: Message Us Button **********/
-(function () {
+var messageUsButtonCaller = function () {
     document.addEventListener('DOMContentLoaded', function () {
         const htmlContent = `
         <div id="btn_focus-class-message" class="btn_focus-class-message position-fixed">
@@ -1756,7 +2233,7 @@ function gen_blockquote() {
                             <hr>
                             <div class="row">
                                 <div class="col d-grid">
-                                    <button type="submit" class="btn btn-primary" id="submit-button">Submit</button>
+                                    <button type="submit" class="btn btn-primary" id="com-msg-un-submit-button">Submit</button>
                                 </div>
                                 <div class="col d-grid">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -1821,6 +2298,7 @@ function gen_blockquote() {
 
 
         const container = document.createElement('div');
+        container.id = 'common-msg-us-container';
         container.innerHTML = htmlContent;
         document.body.appendChild(container);
 
@@ -1828,7 +2306,7 @@ function gen_blockquote() {
         styleSheet.innerText = styles;
         document.head.appendChild(styleSheet);
 
-        const ids = ['anonymousSwitch', 'name', 'name-field', 'email', 'email-field', 'message-type', 'message', 'contact-form', 'submit-button', 'success-message', 'error-message', 'common_msg_us_model', 'btn_focus-class-message'];
+        const ids = ['anonymousSwitch', 'name', 'name-field', 'email', 'email-field', 'message-type', 'message', 'contact-form', 'com-msg-un-submit-button', 'success-message', 'error-message', 'common_msg_us_model', 'btn_focus-class-message'];
         const [anonymousSwitch, nameField, nameContainer, emailField, emailContainer, messageTypeElement, messageElement, form, submitButton, successMessage, errorMessage, CommonMessageUsModel, message_button] = ids.map(id => document.getElementById(id));
 
         message_button.classList.add('d-none');
@@ -1898,7 +2376,8 @@ function gen_blockquote() {
             submitButton.disabled = false;
         };
     });
-})();
+};
+messageUsButtonCaller();
 
 /********** Add-On: Bing Search Button **********/
 (function () {
@@ -1988,6 +2467,7 @@ function gen_blockquote() {
 
         const container = document.createElement('div');
         container.innerHTML = htmlContent;
+        container.id = 'searchbox-container'
         document.body.appendChild(container);
 
         const styleSheet = document.createElement('style');
@@ -2036,6 +2516,15 @@ function gen_blockquote() {
 
 /******** Fetch updated content from the server automatically ********/
 (function () {
+    let serverhardrefresh = localStorage.getItem('dailyhardrefresh');
+    let shr_today = new Date().toDateString();
+
+    // if the user is visiting for the first time today and is not on homepage, run the server refresh
+    if ((!serverhardrefresh || serverhardrefresh !== shr_today) && location.href != "https://dmj.one/") {
+        localStorage.setItem('dailyhardrefresh', shr_today);
+        encryptionManager.serverRefresh("update"); // force a server refresh. 
+    }
+
     let refreshCounter = 0; // Counter for refresh attempts
     const maxRefreshAttempts = 5; // Maximum number of refresh attempts
     let rtime = 12 * 60 * 60 * 1000; // 24 hours
@@ -2420,16 +2909,114 @@ window.onload = function () {
 
 
 /************* AUTOMATION CONTROL PANEL ******************/
-window.addEventListener("load", function () {
+// window.addEventListener("load", function () {
+//     var currentUrl = document.location.pathname;
+//     // Header Automation
+//     if (!window["loaded_header_author"] == 1 || window["page"] === 404) {
+//         var vp_headerurls = ["/edu/su/course/csu1128/program/p31", "/edu/su/course/csu1128/program/p32"];
+//         var harshal_headerurls = ["/edu/su/course/csu1128p/labfile/p7_m2"];
+
+//         if (vp_headerurls.includes(currentUrl)) {
+//             header_author("vp");
+//         } else if (harshal_headerurls.includes(currentUrl)) {
+//             header_author("harshal");
+//         } else if (window["page"] == 404) {
+//             document.body.insertAdjacentHTML('afterbegin', header_navbar());  // special case of 404 page
+//         } else {
+//             // header_author();
+//             document.body.insertAdjacentHTML('afterbegin', header_navbar());  // special case of 404 page
+//         }
+//     }
+
+//     // Body Automation - TO DO
+//     var agenmenu = document.querySelector("#agenmenu");
+//     if (agenmenu) {
+//         if (!window["loaded_body_genmenu"] == 1) {
+//             body_genmenu();
+//         }
+//     }
+
+
+
+//     // Footer Automation
+//     if (!window["loaded_copyright"] == 1) {
+//         var footerurls = ["/se.html", "/fr.html", "/de.html"];
+//         if (footerurls.includes(currentUrl)) {
+//             copyright("some");
+//         } else {
+//             copyright("all");
+//         }
+//     }
+// });
+
+// window.addEventListener("load", function () {
+//     var currentUrl = document.location.pathname;
+//     var currentUrlWithoutHtml = currentUrl.endsWith('.html') ? currentUrl.slice(0, -5) : currentUrl;
+
+//     // CryptoJS Decryption Automation
+//     if (!window.has_password_protection) {
+//         var cryptojsUrls = ["/edu/su/course/seaws002/theory/format.html", "/~dmj/invoices/hp-del"];  // add the URLs of the pages where you want to use the function
+//         if (cryptojsUrls.some(url => url === currentUrl || url === currentUrlWithoutHtml)) {
+//             cryptoJS_decryption(); // call the cryptoJS_decryption function on these pages
+//         }
+//     }
+//     // Header Automation
+//     if (!window["loaded_header_author"] == 1 || window["page"] === 404) {
+//         var vp_headerurls = ["/edu/su/course/csu1128/program/p31", "/edu/su/course/csu1128/program/p32"];
+//         var harshal_headerurls = ["/edu/su/course/csu1128p/labfile/p7_m2"];
+//         if (vp_headerurls.some(url => url === currentUrl || url === currentUrlWithoutHtml)) {
+//             header_author("vp");
+//         } else if (harshal_headerurls.some(url => url === currentUrl || url === currentUrlWithoutHtml)) {
+//             header_author("harshal");
+//         } else if (window["page"] == 404) {
+//             document.body.insertAdjacentHTML('afterbegin', header_navbar());  // special case of 404 page
+//         } else {
+//             // header_author();
+//             document.body.insertAdjacentHTML('afterbegin', header_navbar());  // special case of 404 page
+//         }
+//     }
+
+//     // Body Automation
+//     var agenmenu = document.querySelector("#agenmenu");
+//     if (agenmenu) {
+//         if (!window["loaded_body_genmenu"] == 1) {
+//             body_genmenu();
+//         }
+//     }
+
+
+
+//     // Footer Automation
+//     if (!window.loaded_copyright) {
+//         var footerurls = ["/se", "/fr", "/de"];
+//         if (footerurls.some(url => url === currentUrl || url === currentUrlWithoutHtml)) {
+//             copyright("some");
+//         } else {
+//             copyright("all");
+//         }
+//     }
+// });
+
+window.addEventListener("load", async function () {
+    // Fetch the data from the JSON file
+    const response = await fetch('/js/automation-control-panel-exceptions.json');
+    const data = await response.json();
+
     var currentUrl = document.location.pathname;
+    var currentUrlWithoutHtml = currentUrl.endsWith('.html') ? currentUrl.slice(0, -5) : currentUrl;
+
+    // CryptoJS Decryption Automation
+    if (!window.has_password_protection) {
+        if (data.cryptojsUrls.some(url => url === currentUrl || url === currentUrlWithoutHtml)) {
+            encryptionManager.cryptoJSDecryption();
+        }
+    } else this.document.body.innerHTML += "<h2 class='text-center m-5 p-10 fw-bold text-danger text-uppercase'>You are Early!</h2><h3 class='p-5 m-5 text-center'>Page is under construction, Try again later.</h3>";
+
     // Header Automation
     if (!window["loaded_header_author"] == 1 || window["page"] === 404) {
-        var vp_headerurls = ["/edu/su/course/csu1128/program/p31", "/edu/su/course/csu1128/program/p32"];
-        var harshal_headerurls = ["/edu/su/course/csu1128p/labfile/p7_m2"];
-
-        if (vp_headerurls.includes(currentUrl)) {
+        if (data.vp_headerurls.some(url => url === currentUrl || url === currentUrlWithoutHtml)) {
             header_author("vp");
-        } else if (harshal_headerurls.includes(currentUrl)) {
+        } else if (data.harshal_headerurls.some(url => url === currentUrl || url === currentUrlWithoutHtml)) {
             header_author("harshal");
         } else if (window["page"] == 404) {
             document.body.insertAdjacentHTML('afterbegin', header_navbar());  // special case of 404 page
@@ -2439,7 +3026,7 @@ window.addEventListener("load", function () {
         }
     }
 
-    // Body Automation - TO DO
+    // Body Automation
     var agenmenu = document.querySelector("#agenmenu");
     if (agenmenu) {
         if (!window["loaded_body_genmenu"] == 1) {
@@ -2447,12 +3034,9 @@ window.addEventListener("load", function () {
         }
     }
 
-
-
     // Footer Automation    
-    if (!window["loaded_copyright"] == 1) {
-        var footerurls = ["/se.html", "/fr.html", "/de.html"];
-        if (footerurls.includes(currentUrl)) {
+    if (!window.loaded_copyright) {
+        if (data.footerurls.some(url => url === currentUrl || url === currentUrlWithoutHtml)) {
             copyright("some");
         } else {
             copyright("all");
