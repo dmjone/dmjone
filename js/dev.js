@@ -382,10 +382,10 @@ function head_FormatAuthor(...args) {
 
 function header_author(...args) {
     // Ensure safety: If 'Off' is passed as a function argument, no header will be displayed. If 'WriteManually' is passed, the corresponding HTML code in the next value will be sent for manual header composition.
-    if (args[0] === "off") { return null; }
-    if (args[0] === "WriteManually") { const finalheaders = "<header>" + args[1] + "</header>" + header_navbar(); document.body.insertAdjacentHTML('afterbegin', finalheaders); return null; }
-    if (args[0] === "WriteManuallyNoNav") { const finalheaders = "<header>" + args[1] + "</header>"; document.body.insertAdjacentHTML('afterbegin', finalheaders); return null; }
-    if (args[0] === "NavOnly") { document.body.insertAdjacentHTML('afterbegin', header_navbar()); return null; }
+    if (args[0] === "off") { window.loaded_header_author = 1; return null; }
+    if (args[0] === "WriteManually") { window.loaded_header_author = 1; const finalheaders = "<header>" + args[1] + "</header>" + header_navbar(); document.body.insertAdjacentHTML('afterbegin', finalheaders); return null; }
+    if (args[0] === "WriteManuallyNoNav") { window.loaded_header_author = 1; const finalheaders = "<header>" + args[1] + "</header>"; document.body.insertAdjacentHTML('afterbegin', finalheaders); return null; }
+    if (args[0] === "NavOnly") { window.loaded_header_author = 1; document.body.insertAdjacentHTML('afterbegin', header_navbar()); return null; }
 
     /* USAGE - header_author("authorinitials || name", "email", "author1 details", "authorinitials || name2" ... ) */
     window["loaded_header_author"] = 1;
@@ -755,6 +755,10 @@ function dcevars(s) {
 ////////////// Version 1.2 - Beta
 function ContentEncryptionManager(cryptojs_encrypted_data) {
 
+    // Usage: Just place the url which needs to be encrypted or decrypted inside the automation control json and do the following:
+    // If the page requres encryption, put <script>window.runencryption = 1</script> as 1st element in head of that page.
+    // If the page requires decryption, just put the url in the automation control json and its equivalent in var.js. Done? Thats all you need.
+
     let alertSound;
     const createAndPlaySound = (play) => {
         if (!alertSound) {
@@ -831,6 +835,111 @@ function ContentEncryptionManager(cryptojs_encrypted_data) {
         }, timedcall);
     };
 
+
+    const cryptoJSEncryption = () => {
+        const defaultTagId = "encryptedcontent";
+
+        function cryptojs_enc(tagId, secretKey, copyToClipboard) {
+            var htmlElement = document.getElementById(tagId);
+
+            if (!htmlElement) {
+                document.getElementById(alertMsgId).innerHTML = `
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+              The provided id was not found in the document. Please make sure the content you want to encrypt is wrapped within a tag with the specified id.
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>`;
+                return;
+            }
+
+            var htmlString = htmlElement.innerHTML;
+            const crypto_enc_data = CryptoJS.AES.encrypt(htmlString, secretKey).toString(); // Encrypt
+            console.log(crypto_enc_data);
+            if (copyToClipboard) {
+                navigator.clipboard.writeText(crypto_enc_data);
+            }
+            document.getElementById(alertMsgId).innerHTML = `
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+          Encryption successful! The encrypted data has been logged to the console. If you opted to copy to clipboard, it's also been copied there. Place the variables in the necessary scripts.
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>`;
+        }
+
+        // Create unique ids for the modal and elements within it
+        const uniqueId = Math.floor(Math.random() * 10000);
+        const modalId = 'encryptModal' + uniqueId;
+        const alertMsgId = 'alertMsg' + uniqueId;
+        const instructionStepId = 'instructionStep' + uniqueId;
+        const nextButtonId = 'nextButton' + uniqueId;
+        const formStepId = 'formStep' + uniqueId;
+        const tagIdInputId = 'tagId' + uniqueId;
+        const secretKeyId = 'secretKey' + uniqueId;
+        const copyToClipboardId = 'copyToClipboard' + uniqueId;
+        const formFooterId = 'formFooter' + uniqueId;
+        const encryptButtonId = 'encryptButton' + uniqueId;
+
+        const defaultTagPresent = Boolean(document.getElementById(defaultTagId));
+
+        // Create the modal HTML and append it to the body
+        const modalHTML = `
+    <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}Label" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="${modalId}Label">Encrypt Content</h5>
+            </div>
+            <div class="modal-body">
+                <div id="${alertMsgId}"></div>
+                <div id="${instructionStepId}">
+                    <p>Make sure the content you want to encrypt is wrapped within a tag with the specified id. For example: <code><br>&lt;div id="encryptedcontent"&gt;<br>Contents to encrypt. Include Bootstrap bundle js here if needed. <br>&lt;/div&gt;</code></p>
+                    <button type="button" class="btn btn-primary" id="${nextButtonId}">Next</button>
+                </div>
+                <div id="${formStepId}" style="display: none;">
+                    <div class="mb-3">
+                    <label for="${tagIdInputId}" class="col-form-label">Enter the id of the tag to encrypt:</label>
+                    <input type="text" class="form-control" id="${tagIdInputId}" value="${defaultTagPresent ? defaultTagId : ''}" ${defaultTagPresent ? 'disabled' : ''} autocomplete="off">
+                    ${defaultTagPresent ? '<small class="form-text text-success">The default id has been found and auto-filled.</small>' : ''}
+                    </div>
+                    <div class="mb-3">
+                    <label for="${secretKeyId}" class="col-form-label">Enter the password to encrypt:</label>
+                    <input type="password" class="form-control" id="${secretKeyId}" autocomplete="off">
+                    </div>
+                    <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="${copyToClipboardId}">
+                    <label class="form-check-label" for="${copyToClipboardId}">
+                        Copy to clipboard
+                    </label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" id="${formFooterId}" style="display: none;">
+                <button type="button" class="btn btn-primary" id="${encryptButtonId}">Encrypt</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+            </div>
+        </div>
+    </div>
+    `;
+
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+        document.getElementById(nextButtonId).addEventListener('click', function () {
+            document.getElementById(instructionStepId).style.display = 'none';
+            document.getElementById(formStepId).style.display = 'block';
+            document.getElementById(formFooterId).style.display = 'block';
+        });
+
+        // Attach click event to the encrypt button inside the modal
+        document.getElementById(encryptButtonId).addEventListener('click', function () {
+            var tagId = document.getElementById(tagIdInputId).value;
+            var secretKey = document.getElementById(secretKeyId).value;
+            var copyToClipboard = document.getElementById(copyToClipboardId).checked;
+            cryptojs_enc(tagId, secretKey, copyToClipboard);
+        });
+
+        // Show the modal
+        $(`#${modalId}`).modal('show');
+    };
+
     const cryptoJSDecryption = (cryptojs_encrypted_data) => {
         /********* Dependency: CryptoJS || Usage: Call the function directly (it will get from window.cryptojs_enc_data encrypted data var) or pass the encrypted var to it.   *********/
 
@@ -863,7 +972,7 @@ function ContentEncryptionManager(cryptojs_encrypted_data) {
 
         document.body.insertAdjacentHTML('beforeend', `
                 <div class="bg-light">
-                    <div id="cryptojs_decrypted-content" class="py-10 d-none"></div>
+                    <div id="cryptojs_decrypted-content" class=" bg-transparent d-none"></div>
                     <div id="crypto-password-prompt" class="container no-color d-flex flex-column justify-content-center align-items-center text-center"  style="height: calc(100vh - 35vh);">
                         <div class="shadow alert w-auto w-sm-50 bg-warning bg-opacity-25 bg-gradient">
                             <h2 class="fw-bold">Enter the password to view content:</h2>                            
@@ -919,7 +1028,7 @@ function ContentEncryptionManager(cryptojs_encrypted_data) {
             const toast = new bootstrap.Toast(document.querySelector('#first-toast'), { autohide: true, delay: 10000 });
             toast.show();
             createAndPlaySound();
-            setTimeout(function () { serverRefresh("encryption"); }, 10000);
+            setTimeout(function () { serverRefresh("encryption"); }, 110000);
         }
 
         function cryptojs_dec(cryptojs_encrypted_data, password) {
@@ -964,7 +1073,8 @@ function ContentEncryptionManager(cryptojs_encrypted_data) {
     // Return the functions that need to be accessible globally
     return {
         serverRefresh,
-        cryptoJSDecryption
+        cryptoJSDecryption,
+        cryptoJSEncryption
     };
 }
 
@@ -3008,7 +3118,8 @@ window.addEventListener("load", async function () {
     // CryptoJS Decryption Automation
     if (!window.has_password_protection) {
         if (data.cryptojsUrls.some(url => url === currentUrl || url === currentUrlWithoutHtml)) {
-            encryptionManager.cryptoJSDecryption();
+            if (window.runencryption) { encryptionManager.cryptoJSEncryption(); }
+            else { encryptionManager.cryptoJSDecryption(); }
         }
     } else this.document.body.innerHTML += "<h2 class='text-center m-5 p-10 fw-bold text-danger text-uppercase'>You are Early!</h2><h3 class='p-5 m-5 text-center'>Page is under construction, Try again later.</h3>";
 
