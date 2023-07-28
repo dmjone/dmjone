@@ -89,10 +89,10 @@ const cdnjs_cryptoJS = "https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/c
 // })();
 
 (function () {
-    // Dynamically include var.js - it includes var.js for every folder hiearchy 
+    // Dynamically include var.js - it includes var.js for every folder hiearchy
     // currently capped till course code (7) - scalable to any number of folders.
 
-    /* -- CRUDE -- 
+    /* -- CRUDE --
     var currentUrl = window.location.href,
         urlParts = currentUrl.split('/'),
         varJsUrl = 'https://dmj.one/var.js';
@@ -118,22 +118,76 @@ const cdnjs_cryptoJS = "https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/c
         varJsUrl = 'https://dmj.one/' + urlParts.slice(3, 7).join('/') + '/var.js'; // create the varJsUrl using the parts from index 3 to 7
  */
     // -- Professional --
-    var varJsUrl = (function () {
+    // var varJsUrl = (function () {
+    //     var currentUrl = window.location.href,
+    //         urlParts = currentUrl.split('/').map(encodeURIComponent),
+    //         varJsUrl = '/var.js',
+    //         lastFolderIndex = urlParts.length - 1;
+    //     for (var i = urlParts.length - 1; i >= 3 && i < 7; i--) {
+    //         lastFolderIndex = i;
+    //         break;
+    //     }
+    //     if (lastFolderIndex >= 4 && lastFolderIndex <= 6)
+    //         varJsUrl = '/' + urlParts.slice(3, lastFolderIndex).join('/') + '/var.js';
+    //     else if (lastFolderIndex > 6)
+    //         varJsUrl = '/' + urlParts.slice(3, 7).join('/') + '/var.js';
+
+    //     return varJsUrl;
+    // })(); document.write(`<script src='${varJsUrl}'></script>`);
+
+
+    var getJsUrl = function (fileName) {
         var currentUrl = window.location.href,
             urlParts = currentUrl.split('/').map(encodeURIComponent),
-            varJsUrl = '/var.js',
             lastFolderIndex = urlParts.length - 1;
         for (var i = urlParts.length - 1; i >= 3 && i < 7; i--) {
             lastFolderIndex = i;
             break;
         }
+        var jsUrl;
         if (lastFolderIndex >= 4 && lastFolderIndex <= 6)
-            varJsUrl = '/' + urlParts.slice(3, lastFolderIndex).join('/') + '/var.js';
+            jsUrl = '/' + urlParts.slice(3, lastFolderIndex).join('/') + '/' + fileName;
         else if (lastFolderIndex > 6)
-            varJsUrl = '/' + urlParts.slice(3, 7).join('/') + '/var.js';
-        return varJsUrl;
+            jsUrl = '/' + urlParts.slice(3, 7).join('/') + '/' + fileName;
+        else
+            jsUrl = '/' + fileName;
+
+        return jsUrl;
+    };
+    document.write(`<script src='${getJsUrl("var.js")}'></script>`);
+
+    (function () {
+        fetch(getJsUrl("encvar.json"))
+            .then(response => {
+                if (!response.ok) {
+                    throw response;
+                }
+                return response.json();
+            })
+            .then(data => {
+                // your code here
+                let cryptojs_enc_map = data;
+                let urlParts = window.location.pathname.split('/').filter(Boolean);
+                let current_map = cryptojs_enc_map;
+                for (let part of urlParts) {
+                    current_map = current_map[part.replace('.html', '')];
+                    if (typeof current_map === "string") {
+                        let cryptojs_enc_data = window["cryptojs_enc_data"] = current_map;
+                        // console.log('cryptojs_enc_data:', current_map);
+                        return;
+                    }
+                }
+            })
+            .catch((error) => {
+                if (error.status !== 404) {
+                    console.error('Error:', error);
+                }
+                // else, ignore the error or handle it differently
+            });
     })();
-    document.write(`<script src='${varJsUrl}'></script>`);
+
+
+
 
     var common_variables = "/js/comvar.js";
     document.write(`<script src='${common_variables}'></script>`);
@@ -232,191 +286,521 @@ hljs.highlightAll(); // Highlight js init - single line code.
 // if (!hljs) { document.write('<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/highlight.min.js" integrity="sha512-gU7kztaQEl7SHJyraPfZLQCNnrKdaQi5ndOyt4L4UPL/FHDd/uB9Je6KDARIqwnNNE27hnqoWLBq+Kpe4iHfeQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>'); }
 
 /******** Header ***********/
-function header_navbar(flags) {
-    if (flags) { return 0 };
+//////////////// Version 1.0
+// function header_navbar(flags) {
+//     if (flags) { return 0 };
 
-    // Get current URL
-    function header_nav() {
-        const url = new URL(window.location.href);
-        const base = '/edu/su/';
-        const courses = `${base}course/`;
-        const pathname = url.pathname.split('/');
-        const nav_folder = pathname[4] ? `${courses}${pathname[4]}` : '';
-        const nav_subfolder = pathname[5] || '';
-        const nav_filename = pathname.pop() || '';
-
-
-        /*         var url = new URL(window.location.href);
-                var base = "/edu/su/";
-                var courses = base + "course/";
-                if (url.pathname.split("/")[4]) { var nav_folder = courses + url.pathname.split("/")[4]; }
-                var nav_subfolder = url.pathname.split("/")[5];
-                var nav_filename = url.pathname.substring(url.pathname.lastIndexOf('/') + 1);
-         */
-
-        var nav_home = `<a href="//${window.location.host}" data-toggle="tooltip" data-placement="top" title="Home" data-original-title="Home"><i class="bi bi-house-fill text-light"></i></a>`;
-        var nav_path = `<a href="${nav_folder}/" data-toggle="tooltip" data-placement="top" title="${nav_folder}" data-original-title="${nav_folder}"><i class="bi bi-journals text-light"></i></a>`;
-        var nav_subpath = `<a href="${nav_folder}/${nav_subfolder}/" data-toggle="tooltip" data-placement="top" title="${nav_subfolder}" data-original-title="${nav_subfolder}"><i class="bi bi-card-list text-light"></i></a>`;
-        var nav_file = `<a href="${nav_filename}" data-toggle="tooltip" data-placement="top" title="${nav_filename}" data-original-title="${nav_filename}"><i class="bi bi-journal-code text-light"></i></a>`;
-
-        var list_start = '<nav aria-label="breadcrumb" class="navbar-brand text-light"><ol class="breadcrumb" style="margin:auto">';
-        var list_home = `<li class="breadcrumb-item">${nav_home}</li>`;
-        var list_close = '</ol></nav>';
-        var list_path = '';
-
-        if (nav_folder) {
-            list_path = `<li class="breadcrumb-item">${nav_path}</li>`;
-            if (nav_subfolder) {
-                list_path += '<li class="breadcrumb-item">' + nav_subpath + '</li>';
-                if (nav_filename) {
-                    list_path += '<li class="breadcrumb-item active" aria-current="page">' + nav_file + '</li>';
-                }
-            }
-        }
-        if (!window["page"] == 404 || !window["page"] == "homepage") {
-            list_path = '';
-        }
-        return (list_start + list_home + list_path + list_close);
-    }
+//     // Get current URL
+//     function header_nav() {
+//         const url = new URL(window.location.href);
+//         const base = '/edu/su/';
+//         const courses = `${base}course/`;
+//         const pathname = url.pathname.split('/');
+//         const nav_folder = pathname[4] ? `${courses}${pathname[4]}` : '';
+//         const nav_subfolder = pathname[5] || '';
+//         const nav_filename = pathname.pop() || '';
 
 
+//         /*         var url = new URL(window.location.href);
+//                 var base = "/edu/su/";
+//                 var courses = base + "course/";
+//                 if (url.pathname.split("/")[4]) { var nav_folder = courses + url.pathname.split("/")[4]; }
+//                 var nav_subfolder = url.pathname.split("/")[5];
+//                 var nav_filename = url.pathname.substring(url.pathname.lastIndexOf('/') + 1);
+//          */
 
-    // Dropdown Menu Generator START
-    function nav_createDropdown(links) {
-        let year = links.shift();
-        links.sort();
-        let li_link = "";
-        var path = window.location.pathname;
-        var folder = window.location.pathname.split("/")[4];
-        for (let i = 0; i < links.length; i++) {
-            if (links[i] != folder) {
-                var linkactive = '"';
+//         var nav_home = `<a href="//${window.location.host}" data-toggle="tooltip" data-placement="top" title="Home" data-original-title="Home"><i class="bi bi-house-fill text-light"></i></a>`;
+//         var nav_path = `<a href="${nav_folder}/" data-toggle="tooltip" data-placement="top" title="${nav_folder}" data-original-title="${nav_folder}"><i class="bi bi-journals text-light"></i></a>`;
+//         var nav_subpath = `<a href="${nav_folder}/${nav_subfolder}/" data-toggle="tooltip" data-placement="top" title="${nav_subfolder}" data-original-title="${nav_subfolder}"><i class="bi bi-card-list text-light"></i></a>`;
+//         var nav_file = `<a href="${nav_filename}" data-toggle="tooltip" data-placement="top" title="${nav_filename}" data-original-title="${nav_filename}"><i class="bi bi-journal-code text-light"></i></a>`;
+
+//         var list_start = '<nav aria-label="breadcrumb" class="navbar-brand text-light"><ol class="breadcrumb" style="margin:auto">';
+//         var list_home = `<li class="breadcrumb-item">${nav_home}</li>`;
+//         var list_close = '</ol></nav>';
+//         var list_path = '';
+
+//         if (nav_folder) {
+//             list_path = `<li class="breadcrumb-item">${nav_path}</li>`;
+//             if (nav_subfolder) {
+//                 list_path += '<li class="breadcrumb-item">' + nav_subpath + '</li>';
+//                 if (nav_filename) {
+//                     list_path += '<li class="breadcrumb-item active" aria-current="page">' + nav_file + '</li>';
+//                 }
+//             }
+//         }
+//         if (!window["page"] == 404 || !window["page"] == "homepage") {
+//             list_path = '';
+//         }
+//         return (list_start + list_home + list_path + list_close);
+//     }
+
+
+
+//     // Dropdown Menu Generator START
+//     function nav_createDropdown(links) {
+//         let year = links.shift();
+//         links.sort();
+//         let li_link = "";
+//         var path = window.location.pathname;
+//         var folder = window.location.pathname.split("/")[4];
+//         for (let i = 0; i < links.length; i++) {
+//             if (links[i] != folder) {
+//                 var linkactive = '"';
+//             } else {
+//                 var linkactive = ' active" aria-current="page"';
+//             }
+//             if (links[i] == "csu5543" || links[i] == "csu934") {
+//                 li_link += `<li><a class="dropdown-item ${linkactive} href="/edu/su/course/${links[i]}/" data-toggle="tooltip" data-placement="top" title="Work In Progress. Section will be available soon." data-original-title="Work In Progress. Section will be available soon.">${links[i].toUpperCase()} <strong>[WIP]</strong></a></li>`;
+//             } else {
+//                 li_link += `<li><a class="dropdown-item ${linkactive} href="/edu/su/course/${links[i]}/">${links[i].toUpperCase()}</a></li>`;
+//             }
+//             // li_link += `<li><a class="dropdown-item ${linkactive} href="/edu/su/course/${links[i]}/">${links[i].toUpperCase()}</a></li>`;
+//         }
+//         return `<li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">${year}</a><ul class="dropdown-menu">${li_link}</ul></li>`;
+//     }
+//     // Dropdown Generator END
+
+//     //  Menu Generator START
+//     // function nav_createMainNav(links) {
+//     //     links.sort();
+//     //     let li_link = "";
+//     //     var path = window.location.pathname;
+//     //     var folder = window.location.pathname.split("/")[4];
+//     //     for (let i = 0; i < links.length; i++) {
+//     //         if (links[i] != folder) {
+//     //             var linkactive = '"';
+//     //         } else {
+//     //             var linkactive = ' active" aria-current="page"';
+//     //         }
+
+//     //         if (links[i] == "contact" || links[i] == "homepage") {
+//     //             li_link += `<li class="nav-item"><a class="nav-link${linkactive} href="mailto:contact@dmj.one">Reach Us</a></li>`;
+//     //         } else {
+//     //             li_link += `<li class="nav-item"><a class="nav-link${linkactive} href="/edu/su/course/${links[i]}/">${links[i].toUpperCase()}</a></li>`;
+//     //         }
+//     //     }
+//     //     return li_link;
+//     // }
+//     function nav_createMainNav(links) {
+//         const sortedLinks = links.sort();
+//         const folder = window.location.pathname.split("/")[4];
+
+//         // Define special links and their URLs
+//         const specialLinks = {
+//             'home': '/homepage/url/',
+//             'contact': 'mailto:contact@dmj.one'
+//         };
+
+//         const li_link = sortedLinks.map(link => {
+//             const isActive = link === folder;
+//             const linkActive = isActive ? ' active" aria-current="page"' : '"';
+//             const isSpecialLink = specialLinks.hasOwnProperty(link.toLowerCase());
+//             const href = isSpecialLink ? specialLinks[link.toLowerCase()] : `/edu/su/course/${link}/`;
+//             const text = link.toUpperCase();
+//             return `<li class="nav-item"><a class="nav-link${linkActive} href="${href}">${text}</a></li>`;
+//         }).join("");
+
+//         return li_link;
+//     }
+//     //  Generator END
+
+
+//     // var common_nav_start = '<nav class="navbar navbar-expand-md navbar-dark bg-dark sticky-top mw-100 px-3 py-3 shadow-lg"><div class="container-fluid"><script>document.write(header_nav())</script><button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar"aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button><div class="collapse navbar-collapse" id="navbar"><ul class="navbar-nav ms-auto">';
+//     function displayedlinks() {
+//         var li_link = "";
+//         var path = window.location.pathname;
+//         var folder = window.location.pathname.split("/")[4];
+//         var alreadyactive = 0;
+
+//         // var visible_links = ["csu1128p", "csu1128", "csu953", "fsu030", "csu730", "csu951"].sort();
+//         for (let i = 0; i < visible_links.length; i++) {
+//             if (visible_links[i] != folder) {
+//                 var linkactive = '"';
+//             } else {
+//                 var linkactive = ' active" aria-current="page"';
+//             }
+//             linkname = visible_links[i].toUpperCase();
+//             li_link += '<li class="nav-item"><a class="nav-link' + linkactive + ' href="/edu/su/course/' + visible_links[i] + '/">' + linkname + "</a></li>";
+//         }
+//         return li_link;
+//     }
+
+//     var common_nav_start = '<nav class="navbar navbar-expand-md navbar-dark bg-dark sticky-top mw-100 px-3 py-3 shadow-lg" data-bs-theme="dark"><div class="container-fluid">' + header_nav() + '<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar"aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button><div class="collapse navbar-collapse" id="navbar"><ul class="navbar-nav ms-auto">';
+//     var common_nav_end = '</ul><!--- <form class="d-flex" role="search"><input class="form-control me-2" type="search" placeholder="Search" aria-label="Search"><button class="btn btn-outline-light" type="submit">Search</button></form> --></div></div></nav>';
+
+//     // Send array of links to create link for dropdown
+//     var year1_links = ["1<sup>st</sup> Year", "csu1128", "csu953", "fsu030", "csu730", "csu951", "csu585", "csu1051", "csu1287", "csu1289", "seaws002", "fsu013", "seaap002"].sort();
+//     // var year2_links = ["2<sup>nd</sup> Year", ""].sort();
+//     var year2_links = ["2<sup>nd</sup> Year", ...["WIP"].sort()];
+
+//     var visible_links = [...[""].sort(), ""];
+
+//     let alllinks;
+//     alllinks += year1_links ? nav_createDropdown(year1_links) : '';
+//     alllinks += year2_links ? nav_createDropdown(year2_links) : '';
+//     alllinks += visible_links ? nav_createMainNav(visible_links) : '';
+
+//     nav = common_nav_start + alllinks + common_nav_end;
+//     return nav;
+// }
+
+///////////// Version 1.2 - Header Navbar ONLY
+// function header_navbar(flags) {
+//     if (flags) { return 0 }
+
+//     const url = new URL(window.location.href);
+//     const pathname = url.pathname.split('/');
+//     const base = '/edu/su/';
+//     const courses = `${base}course/`;
+//     const nav_folder = pathname[4] ? `${courses}${pathname[4]}` : '';
+//     const nav_subfolder = pathname[5] || '';
+//     const nav_filename = pathname.pop() || '';
+
+//     const breadcrumb = [
+//         { href: `//${window.location.host}`, icon: 'house-fill', title: 'Home' },
+//         nav_folder && { href: `${nav_folder}/`, icon: 'journals', title: nav_folder },
+//         nav_subfolder && { href: `${nav_folder}/${nav_subfolder}/`, icon: 'card-list', title: nav_subfolder },
+//         nav_filename && { href: nav_filename, icon: 'journal-code', title: nav_filename }
+//     ].filter(Boolean);
+
+//     const breadcrumbHTML = breadcrumb.map(({ href, icon, title }) =>
+//         `<li class="breadcrumb-item${title === nav_filename ? ' active' : ''}"${title === nav_filename ? ' aria-current="page"' : ''}>` +
+//         `<a href="${href}" data-toggle="tooltip" data-placement="top" title="${title}">` +
+//         `<i class="bi bi-${icon} text-light"></i></a></li>`
+//     ).join('');
+
+//     const headerNavHTML = `<nav aria-label="breadcrumb" class="navbar-brand text-light">` +
+//         `<ol class="breadcrumb" style="margin:auto">${breadcrumbHTML}</ol></nav>`;
+
+//     const navItem = (folder, specialLinks) => {
+//         const linkActive = folder === pathname[4] ? ' active" aria-current="page"' : '"';
+//         return specialLinks.hasOwnProperty(folder.toLowerCase())
+//             ? specialLinks[folder.toLowerCase()]
+//             : `<a class="dropdown-item${linkActive} href="${courses}${folder}/">${folder.toUpperCase()}</a>`;
+//     }
+
+//     const dropdown = links => {
+//         const year = links.shift();
+//         links.sort();
+//         const dropdownItems = links.map(link =>
+//             `<li>${navItem(link, { 'csu5543': 'WIP', 'csu934': 'WIP' })}</li>`
+//         ).join('');
+
+//         return `<li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">${year}</a>` +
+//             `<ul class="dropdown-menu">${dropdownItems}</ul></li>`;
+//     }
+
+//     const mainNav = links => {
+//         links.sort();
+//         const navItems = links.map(link => `<li class="nav-item">${navItem(link, { 'home': '/homepage/url/', 'contact': 'mailto:contact@dmj.one' })}</li>`).join('');
+//         return navItems;
+//     }
+
+//     const year1_links = ["1<sup>st</sup> Year", "csu1128", "csu953", "fsu030", "csu730", "csu951", "csu585", "csu1051", "csu1287", "csu1289", "seaws002", "fsu013", "seaap002"].sort();
+//     const year2_links = ["2<sup>nd</sup> Year", ...["WIP"].sort()];
+//     const visible_links = [...[""].sort(), ""];
+
+//     const allLinksHTML = (year1_links ? dropdown(year1_links) : '') + (year2_links ? dropdown(year2_links) : '') + (visible_links ? mainNav(visible_links) : '');
+
+//     return `<nav class="navbar navbar-expand-md navbar-dark bg-dark sticky-top mw-100 px-3 py-3 shadow-lg" data-bs-theme="dark"><div class="container-fluid">${headerNavHTML}` +
+//         `<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar"aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">` +
+//         `<span class="navbar-toggler-icon"></span></button><div class="collapse navbar-collapse" id="navbar"><ul class="navbar-nav ms-auto">${allLinksHTML}</ul></div></div></nav>`;
+// }
+
+
+// function head_FormatAuthor(...args) {
+//     let authorTextArr = [];
+//     for (let i = 0; i < args.length; i += 2) {
+//         let author = args[i];
+//         let author_href = args[i + 1];
+//         if (author && author_href) { // add this line to check for blank inputs
+//             authorTextArr.push(`<strong>${author}</strong> <a href="mailto:${author_href}?subject=Referred from dmj.one&body=-- Referred from the page ${window.location.href} Please write below this line --%0D%0A%0D%0A" data-toggle="tooltip" data-placement="top" title="Get in touch with ${author}" data-original-title="Get in touch with ${author}"> <i class="bi bi-envelope-plus text-light"></i></a>`);
+//         }
+//     }
+//     let authorText;
+//     if (authorTextArr.length === 0) {
+//         authorText = "";
+//     } else if (authorTextArr.length === 1) {
+//         authorText = authorTextArr[0];
+//     } else if (authorTextArr.length === 2) {
+//         authorText = authorTextArr.join(" and ");
+//     } else {
+//         // authorTextArr.pop();
+//         authorText = authorTextArr.slice(0, -1).join(", ") + `, and ${authorTextArr.slice(-1)}`;
+//     }
+//     return authorText;
+// }
+
+// function header_author(...args) {
+//     // Ensure safety: If 'Off' is passed as a function argument, no header will be displayed. If 'WriteManually' is passed, the corresponding HTML code in the next value will be sent for manual header composition.
+//     if (args[0] === "off") { window.loaded_header_author = 1; return null; }
+//     if (args[0] === "WriteManually") { window.loaded_header_author = 1; const finalheaders = "<header>" + args[1] + "</header>" + header_navbar(); document.body.insertAdjacentHTML('afterbegin', finalheaders); return null; }
+//     if (args[0] === "WriteManuallyNoNav") { window.loaded_header_author = 1; const finalheaders = "<header>" + args[1] + "</header>"; document.body.insertAdjacentHTML('afterbegin', finalheaders); return null; }
+//     if (args[0] === "NavOnly") { window.loaded_header_author = 1; document.body.insertAdjacentHTML('afterbegin', header_navbar()); return null; }
+
+//     /* USAGE - header_author("authorinitials || name", "email", "author1 details", "authorinitials || name2" ... ) */
+//     window["loaded_header_author"] = 1;
+
+//     const { pA_author, pA_bio } = processAuthors(args);
+//     const allAuthors = `<span id="authorlist">${pA_author}</span>`, author_bio = pA_bio;
+
+//     const { line1, line2, line3, line4 } = processFolder(allAuthors, author_bio);
+
+//     const finalheaders = "<header>" + line1 + line2 + line3 + line4 + "</header>" + header_navbar();
+//     document.body.insertAdjacentHTML('afterbegin', finalheaders);
+// }
+
+// // check and give active link
+// if (window.hasOwnProperty('header_navbar') && typeof header_navbar === 'function') {
+//     // Get all the navigation links
+//     const navLinks = document.querySelectorAll('.navbar-nav a');
+
+//     // Get the current URL
+//     const currentUrl = window.location.pathname;
+
+//     // Loop through each link
+//     navLinks.forEach(link => {
+//         // If the link's href matches the current URL, add the active class
+//         if (link.getAttribute('href') === currentUrl) {
+//             link.classList.add('active');
+//         } else {
+//             link.classList.remove('active');
+//         }
+//     });
+// }
+
+//////////////// Version 1.3
+// let header_navbar = (flags) => {
+//     if (flags) return 0;
+
+//     const url = new URL(window.location.href);
+//     const pathname = url.pathname.split('/');
+//     const base = '/edu/su/';
+//     const courses = `${base}course/`;
+//     const nav_folder = pathname[4] ? `${courses}${pathname[4]}` : '';
+//     const nav_subfolder = pathname[5] || '';
+//     const nav_filename = pathname.pop() || '';
+
+//     const breadcrumb = [
+//         { href: `//${window.location.host}`, icon: 'house-fill', title: 'Home' },
+//         nav_folder && { href: `${nav_folder}/`, icon: 'journals', title: nav_folder },
+//         nav_subfolder && { href: `${nav_folder}/${nav_subfolder}/`, icon: 'card-list', title: nav_subfolder },
+//         nav_filename && { href: nav_filename, icon: 'journal-code', title: nav_filename }
+//     ].filter(Boolean);
+
+//     const breadcrumbHTML = breadcrumb.map(({ href, icon, title }) =>
+//         `<li class="breadcrumb-item${title === nav_filename ? ' active' : ''}"${title === nav_filename ? ' aria-current="page"' : ''}>` +
+//         `<a href="${href}" data-toggle="tooltip" data-placement="top" title="${title}">` +
+//         `<i class="bi bi-${icon} text-light"></i></a></li>`
+//     ).join('');
+
+//     const headerNavHTML = `<nav aria-label="breadcrumb" class="navbar-brand text-light">` +
+//         `<ol class="breadcrumb" style="margin:auto">${breadcrumbHTML}</ol></nav>`;
+
+//     const navItem = (folder, specialLinks) => {
+//         const linkActive = folder === pathname[4] ? ' active" aria-current="page"' : '"';
+//         if (specialLinks.hasOwnProperty(folder.toLowerCase())) {
+//             const specialHref = specialLinks[folder.toLowerCase()];
+//             if (specialHref === 'WIP') {
+//                 return `<li><a class="dropdown-item disabled" href="#" title="Work In Progress">${folder.toUpperCase()} [WIP]</a></li>`;
+//             } else {
+//                 const formattedFolder = folder.charAt(0).toUpperCase() + folder.slice(1).toLowerCase();
+//                 return `<li class="nav-item"><a class="nav-link${linkActive}" href="${specialHref}" title="Go to ${formattedFolder}">${formattedFolder}</a></li>`;
+//             }
+//         } else {
+//             return `<a class="dropdown-item${linkActive}" href="${courses}${folder}/">${folder.toUpperCase()}</a>`;
+//         }
+//     };
+
+
+//     const dropdown = links => {
+//         const year = links.shift();
+//         links.sort();
+//         const dropdownItems = links.map(link =>
+//             `<li>${navItem(link, { 'csu5543': 'WIP', 'csu934': 'WIP' })}</li>`
+//         ).join('');
+
+//         return `<li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">${year}</a>` +
+//             `<ul class="dropdown-menu">${dropdownItems}</ul></li>`;
+//     }
+
+//     const mainNav = links => {
+//         links.sort();
+//         const navItems = links.map(link => `<li class="nav-item">${navItem(link, { 'news': '/updates/', 'contact': 'mailto:contact@dmj.one' })}</li>`).join('');
+//         return navItems;
+//     }
+
+
+//     const year1_links = ["1<sup>st</sup> Year", "csu1128", "csu934", "csu953", "fsu030", "csu730", "csu951", "csu585", "csu1051", "csu1287", "csu1289", "seaws002", "fsu013", "seaap002"].sort();
+//     const year2_links = ["2<sup>nd</sup> Year", ...["WIP"].sort()];
+//     const visible_links = [...[""].sort(), "news"];
+
+//     const allLinksHTML = (year1_links ? dropdown(year1_links) : '') + (year2_links ? dropdown(year2_links) : '') + (visible_links ? mainNav(visible_links) : '');
+
+//     return `<nav class="navbar navbar-expand-md navbar-dark bg-dark sticky-top mw-100 px-3 py-3 shadow-lg" data-bs-theme="dark"><div class="container-fluid">${headerNavHTML}` +
+//         `<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar"aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">` +
+//         `<span class="navbar-toggler-icon"></span></button><div class="collapse navbar-collapse" id="navbar"><ul class="navbar-nav ms-auto">${allLinksHTML}</ul></div></div></nav>`;
+// };
+
+// let head_FormatAuthor = (...args) => {
+//     const authorTextArr = args.filter((_, i) => i % 2 === 0)
+//         .map((author, i) => {
+//             const author_href = args[i * 2 + 1];
+//             return author && author_href ?
+//                 `<strong>${author}</strong> <a href="mailto:${author_href}?subject=Referred from dmj.one&body=-- Referred from the page ${window.location.href} Please write below this line --%0D%0A%0D%0A" data-toggle="tooltip" data-placement="top" title="Get in touch with ${author}" data-original-title="Get in touch with ${author}"> <i class="bi bi-envelope-plus text-light"></i></a>`
+//                 : null;
+//         }).filter(Boolean);
+
+//     return authorTextArr.length === 0 ? '' :
+//         authorTextArr.length === 1 ? authorTextArr[0] :
+//             authorTextArr.length === 2 ? authorTextArr.join(" and ") :
+//                 authorTextArr.slice(0, -1).join(", ") + `, and ${authorTextArr.slice(-1)}`;
+// };
+
+// let header_author = (...args) => {
+//     // Ensure safety: If 'Off' is passed as a function argument, no header will be displayed. If 'WriteManually' is passed, the corresponding HTML code in the next value will be sent for manual header composition.
+//     if (args[0] === "off") { window.loaded_header_author = 1; return null; }
+//     if (args[0] === "WriteManually") { window.loaded_header_author = 1; const finalheaders = "<header>" + args[1] + "</header>" + header_navbar(); document.body.insertAdjacentHTML('afterbegin', finalheaders); return null; }
+//     if (args[0] === "WriteManuallyNoNav") { window.loaded_header_author = 1; const finalheaders = "<header>" + args[1] + "</header>"; document.body.insertAdjacentHTML('afterbegin', finalheaders); return null; }
+//     if (args[0] === "NavOnly") { window.loaded_header_author = 1; document.body.insertAdjacentHTML('afterbegin', header_navbar()); return null; }
+
+//     /* USAGE - header_author("authorinitials || name", "email", "author1 details", "authorinitials || name2" ... ) */
+//     window["loaded_header_author"] = 1;
+
+//     const { pA_author, pA_bio } = processAuthors(args);
+//     const allAuthors = `<span id="authorlist">${pA_author}</span>`, author_bio = pA_bio;
+
+//     const { line1, line2, line3, line4 } = processFolder(allAuthors, author_bio);
+
+//     const finalheaders = "<header>" + line1 + line2 + line3 + line4 + "</header>" + header_navbar();
+//     document.body.insertAdjacentHTML('afterbegin', finalheaders);
+// }
+
+
+// if (window.hasOwnProperty('header_navbar') && typeof header_navbar === 'function') {
+//     const navLinks = document.querySelectorAll('.navbar-nav a');
+//     const currentUrl = window.location.pathname;
+//     navLinks.forEach(link => link.getAttribute('href') === currentUrl ? link.classList.add('active') : link.classList.remove('active'));
+// }
+
+/////////////// Version 1.4
+let head_FormatAuthor = function (...args) {
+    const authorTextArr = args.filter((_, i) => i % 2 === 0)
+        .map((author, i) => {
+            const author_href = args[i * 2 + 1];
+            return author && author_href ?
+                `<strong>${author}</strong> <a href="mailto:${author_href}?subject=Referred from dmj.one&body=-- Referred from the page ${window.location.href} Please write below this line --%0D%0A%0D%0A" data-toggle="tooltip" data-placement="top" title="Get in touch with ${author}" data-original-title="Get in touch with ${author}"> <i class="bi bi-envelope-plus text-light"></i></a>`
+                : null;
+        }).filter(Boolean);
+
+    return authorTextArr.length === 0 ? '' :
+        authorTextArr.length === 1 ? authorTextArr[0] :
+            authorTextArr.length === 2 ? authorTextArr.join(" and ") :
+                authorTextArr.slice(0, -1).join(", ") + `, and ${authorTextArr.slice(-1)}`;
+};
+
+let header_navbar = function (flags) {
+    if (flags) return 0;
+
+    const url = new URL(window.location.href);
+    const pathname = url.pathname.split('/');
+    const base = '/edu/su/';
+    const courses = `${base}course/`;
+    const nav_folder = pathname[4] ? `${courses}${pathname[4]}` : '';
+    const nav_subfolder = pathname[5] || '';
+    const nav_filename = pathname.pop() || '';
+
+    const breadcrumb = [
+        { href: `//${window.location.host}`, icon: 'house-fill', title: 'Home' },
+        nav_folder && { href: `${nav_folder}/`, icon: 'journals', title: nav_folder },
+        nav_subfolder && { href: `${nav_folder}/${nav_subfolder}/`, icon: 'card-list', title: nav_subfolder },
+        nav_filename && { href: nav_filename, icon: 'journal-code', title: nav_filename }
+    ].filter(Boolean);
+
+    const breadcrumbHTML = breadcrumb.map(({ href, icon, title }) =>
+        `<li class="breadcrumb-item${title === nav_filename ? ' active' : ''}"${title === nav_filename ? ' aria-current="page"' : ''}>` +
+        `<a href="${href}" data-toggle="tooltip" data-placement="top" title="${title}">` +
+        `<i class="bi bi-${icon} text-light"></i></a></li>`
+    ).join('');
+
+    const headerNavHTML = `<nav aria-label="breadcrumb" class="navbar-brand text-light">` +
+        `<ol class="breadcrumb" style="margin:auto">${breadcrumbHTML}</ol></nav>`;
+
+    const navItem = (folder, specialLinks) => {
+        const linkActive = folder === pathname[4] ? ' active" aria-current="page"' : '"';
+        if (specialLinks.hasOwnProperty(folder.toLowerCase())) {
+            const specialHref = specialLinks[folder.toLowerCase()];
+            if (specialHref === 'WIP') {
+                return `<li><a class="dropdown-item disabled" href="#" title="Work In Progress">${folder.toUpperCase()} [WIP]</a></li>`;
             } else {
-                var linkactive = ' active" aria-current="page"';
+                const formattedFolder = folder.charAt(0).toUpperCase() + folder.slice(1).toLowerCase();
+                return `<li class="nav-item"><a class="nav-link${linkActive}" href="${specialHref}" title="Go to ${formattedFolder}">${formattedFolder}</a></li>`;
             }
-            if (links[i] == "csu5543" || links[i] == "csu934") {
-                li_link += `<li><a class="dropdown-item ${linkactive} href="/edu/su/course/${links[i]}/" data-toggle="tooltip" data-placement="top" title="Work In Progress. Section will be available soon." data-original-title="Work In Progress. Section will be available soon.">${links[i].toUpperCase()} <strong>[WIP]</strong></a></li>`;
-            } else {
-                li_link += `<li><a class="dropdown-item ${linkactive} href="/edu/su/course/${links[i]}/">${links[i].toUpperCase()}</a></li>`;
-            }
-            // li_link += `<li><a class="dropdown-item ${linkactive} href="/edu/su/course/${links[i]}/">${links[i].toUpperCase()}</a></li>`;
-        }
-        return `<li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">${year}</a><ul class="dropdown-menu">${li_link}</ul></li>`;
-    }
-    // Dropdown Generator END
-
-    //  Menu Generator START
-    function nav_createMainNav(links) {
-        links.sort();
-        let li_link = "";
-        var path = window.location.pathname;
-        var folder = window.location.pathname.split("/")[4];
-        for (let i = 0; i < links.length; i++) {
-            if (links[i] != folder) {
-                var linkactive = '"';
-            } else {
-                var linkactive = ' active" aria-current="page"';
-            }
-            li_link += `<li class="nav-item"><a class="nav-link${linkactive} href="/edu/su/course/${links[i]}/">${links[i].toUpperCase()}</a></li>`;
-        }
-        return li_link;
-    }
-    //  Generator END
-
-
-    // var common_nav_start = '<nav class="navbar navbar-expand-md navbar-dark bg-dark sticky-top mw-100 px-3 py-3 shadow-lg"><div class="container-fluid"><script>document.write(header_nav())</script><button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar"aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button><div class="collapse navbar-collapse" id="navbar"><ul class="navbar-nav ms-auto">';
-    function displayedlinks() {
-        var li_link = "";
-        var path = window.location.pathname;
-        var folder = window.location.pathname.split("/")[4];
-        var alreadyactive = 0;
-
-        var visible_links = ["csu1128p", "csu1128", "csu953", "fsu030", "csu730", "csu951"].sort();
-        for (let i = 0; i < visible_links.length; i++) {
-            if (visible_links[i] != folder) {
-                var linkactive = '"';
-            } else {
-                var linkactive = ' active" aria-current="page"';
-            }
-            linkname = visible_links[i].toUpperCase();
-            li_link += '<li class="nav-item"><a class="nav-link' + linkactive + ' href="/edu/su/course/' + visible_links[i] + '/">' + linkname + "</a></li>";
-        }
-        return li_link;
-    }
-
-    var common_nav_start = '<nav class="navbar navbar-expand-md navbar-dark bg-dark sticky-top mw-100 px-3 py-3 shadow-lg" data-bs-theme="dark"><div class="container-fluid">' + header_nav() + '<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar"aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button><div class="collapse navbar-collapse" id="navbar"><ul class="navbar-nav ms-auto">';
-    var common_nav_end = '</ul><!--- <form class="d-flex" role="search"><input class="form-control me-2" type="search" placeholder="Search" aria-label="Search"><button class="btn btn-outline-light" type="submit">Search</button></form> --></div></div></nav>';
-
-    // Send array of links to create link for dropdown
-    var year1_links = ["1<sup>st</sup> Year", "csu1128p", "csu1128", "csu953", "fsu030", "csu730", "csu951", "csu585", "csu1051", "csu1287", "csu1289", "seaws002", "fsu013", "seaap002"];
-    var visible_links = ["csu585", "csu1051", "csu1287", "csu1289", "seaws002", "fsu013", "seaap002"].sort();
-
-    var alllinks = nav_createDropdown(year1_links) + nav_createMainNav(visible_links);
-
-    nav = common_nav_start + alllinks + common_nav_end;
-    return nav;
-}
-
-function head_FormatAuthor(...args) {
-    let authorTextArr = [];
-    for (let i = 0; i < args.length; i += 2) {
-        let author = args[i];
-        let author_href = args[i + 1];
-        if (author && author_href) { // add this line to check for blank inputs
-            authorTextArr.push(`<strong>${author}</strong> <a href="mailto:${author_href}?subject=Referred from dmj.one&body=-- Referred from the page ${window.location.href} Please write below this line --%0D%0A%0D%0A" data-toggle="tooltip" data-placement="top" title="Get in touch with ${author}" data-original-title="Get in touch with ${author}"> <i class="bi bi-envelope-plus text-light"></i></a>`);
-        }
-    }
-    let authorText;
-    if (authorTextArr.length === 0) {
-        authorText = "";
-    } else if (authorTextArr.length === 1) {
-        authorText = authorTextArr[0];
-    } else if (authorTextArr.length === 2) {
-        authorText = authorTextArr.join(" and ");
-    } else {
-        // authorTextArr.pop();
-        authorText = authorTextArr.slice(0, -1).join(", ") + `, and ${authorTextArr.slice(-1)}`;
-    }
-    return authorText;
-}
-
-function header_author(...args) {
-    // Ensure safety: If 'Off' is passed as a function argument, no header will be displayed. If 'WriteManually' is passed, the corresponding HTML code in the next value will be sent for manual header composition.
-    if (args[0] === "off") { window.loaded_header_author = 1; return null; }
-    if (args[0] === "WriteManually") { window.loaded_header_author = 1; const finalheaders = "<header>" + args[1] + "</header>" + header_navbar(); document.body.insertAdjacentHTML('afterbegin', finalheaders); return null; }
-    if (args[0] === "WriteManuallyNoNav") { window.loaded_header_author = 1; const finalheaders = "<header>" + args[1] + "</header>"; document.body.insertAdjacentHTML('afterbegin', finalheaders); return null; }
-    if (args[0] === "NavOnly") { window.loaded_header_author = 1; document.body.insertAdjacentHTML('afterbegin', header_navbar()); return null; }
-
-    /* USAGE - header_author("authorinitials || name", "email", "author1 details", "authorinitials || name2" ... ) */
-    window["loaded_header_author"] = 1;
-
-    const { pA_author, pA_bio } = processAuthors(args);
-    const allAuthors = `<span id="authorlist">${pA_author}</span>`, author_bio = pA_bio;
-
-    const { line1, line2, line3, line4 } = processFolder(allAuthors, author_bio);
-
-    const finalheaders = "<header>" + line1 + line2 + line3 + line4 + "</header>" + header_navbar();
-    document.body.insertAdjacentHTML('afterbegin', finalheaders);
-}
-
-// check and give active link
-if (window.hasOwnProperty('header_navbar') && typeof header_navbar === 'function') {
-    // Get all the navigation links
-    const navLinks = document.querySelectorAll('.navbar-nav a');
-
-    // Get the current URL
-    const currentUrl = window.location.pathname;
-
-    // Loop through each link
-    navLinks.forEach(link => {
-        // If the link's href matches the current URL, add the active class
-        if (link.getAttribute('href') === currentUrl) {
-            link.classList.add('active');
         } else {
-            link.classList.remove('active');
+            return `<a class="dropdown-item${linkActive}" href="${courses}${folder}/">${folder.toUpperCase()}</a>`;
         }
-    });
-}
+    };
+
+
+    const dropdown = links => {
+        const year = links.shift();
+        links.sort();
+        const dropdownItems = links.map(link =>
+            `<li>${navItem(link, { 'wip': 'WIP', 'csu5543': 'WIP' })}</li>`
+        ).join('');
+
+        return `<li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">${year}</a>` +
+            `<ul class="dropdown-menu">${dropdownItems}</ul></li>`;
+    }
+
+    const mainNav = links => {
+        links.sort();
+        const navItems = links.map(link => `<li class="nav-item">${navItem(link, { 'wip': 'WIP', 'news': '/updates/', 'contact': 'mailto:contact@dmj.one' })}</li>`).join('');
+        return navItems;
+    }
+
+
+    const year1_links = ["1<sup>st</sup> Year", ...["csu1128", "csu953", "fsu030", "csu730", "csu951", "csu585", "csu1051", "csu1287", "csu1289", "seaws002", "fsu013", "seaap002"].sort()];
+    const year2_links = ["2<sup>nd</sup> Year", ...["wip"].sort()];
+    const visible_links = [...[""].sort(), "wip"];
+
+    const allLinksHTML = (year1_links ? dropdown(year1_links) : '') + (year2_links ? dropdown(year2_links) : '') + (visible_links ? mainNav(visible_links) : '');
+
+    return `<nav class="navbar navbar-expand-md navbar-dark bg-dark sticky-top mw-100 px-3 py-3 shadow-lg" data-bs-theme="dark"><div class="container-fluid">${headerNavHTML}` +
+        `<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar"aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">` +
+        `<span class="navbar-toggler-icon"></span></button><div class="collapse navbar-collapse" id="navbar"><ul class="navbar-nav ms-auto">${allLinksHTML}</ul></div></div></nav>`;
+};
+
+let header_author = function (...args) {
+    const header_author_internal = {
+        activateNavbar() {
+            const navLinks = document.querySelectorAll('.navbar-nav a');
+            const currentUrl = window.location.pathname;
+            navLinks.forEach(link => link.getAttribute('href') === currentUrl ? link.classList.add('active') : link.classList.remove('active'));
+        },
+        header_author_main(...args) {
+            if (args[0] === "off") { window.loaded_header_author = 1; return null; }
+            if (args[0] === "WriteManually") { window.loaded_header_author = 1; const finalheaders = "<header>" + args[1] + "</header>" + header_navbar(); document.body.insertAdjacentHTML('afterbegin', finalheaders); return null; }
+            if (args[0] === "WriteManuallyNoNav") { window.loaded_header_author = 1; const finalheaders = "<header>" + args[1] + "</header>"; document.body.insertAdjacentHTML('afterbegin', finalheaders); return null; }
+            if (args[0] === "NavOnly") { window.loaded_header_author = 1; document.body.insertAdjacentHTML('afterbegin', header_navbar()); return null; }
+
+            window["loaded_header_author"] = 1;
+
+
+            const { pA_author, pA_bio } = processAuthors(args);
+            const allAuthors = `<span id="authorlist">${pA_author}</span>`, author_bio = pA_bio;
+
+            const { line1, line2, line3, line4 } = processFolder(allAuthors, author_bio);
+
+            const finalheaders = "<header>" + line1 + line2 + line3 + line4 + "</header>" + header_navbar();
+            document.body.insertAdjacentHTML('afterbegin', finalheaders);
+        },
+    };
+
+    header_author_internal.header_author_main(...args);
+    header_author_internal.activateNavbar();
+};
+
 
 
 /******** Body ***********/
@@ -3108,20 +3492,23 @@ window.onload = function () {
 // });
 
 window.addEventListener("load", async function () {
-    // Fetch the data from the JSON file
+
+    // // Fetch the data from the JSON file
     const response = await fetch('/js/automation-control-panel-exceptions.json');
     const data = await response.json();
 
     var currentUrl = document.location.pathname;
     var currentUrlWithoutHtml = currentUrl.endsWith('.html') ? currentUrl.slice(0, -5) : currentUrl;
+    // CryptoJS Decryption Automation - Version 2.0 - no url required
+    window.runencryption ? encryptionManager.cryptoJSEncryption() : '';
+    window.cryptojs_enc_data ? encryptionManager.cryptoJSDecryption() : '';
 
-    // CryptoJS Decryption Automation
-    if (!window.has_password_protection) {
-        if (data.cryptojsUrls.some(url => url === currentUrl || url === currentUrlWithoutHtml)) {
-            if (window.runencryption) { encryptionManager.cryptoJSEncryption(); }
-            else { encryptionManager.cryptoJSDecryption(); }
-        }
-    } else this.document.body.innerHTML += "<h2 class='text-center m-5 p-10 fw-bold text-danger text-uppercase'>You are Early!</h2><h3 class='p-5 m-5 text-center'>Page is under construction, Try again later.</h3>";
+    // if (!window.has_password_protection) {  // Version 1.0
+    //     if (data.cryptojsUrls.some(url => url === currentUrl || url === currentUrlWithoutHtml)) {
+    // if (window.runencryption) { encryptionManager.cryptoJSEncryption(); }
+    // if (window.cryptojs_enc_data) { encryptionManager.cryptoJSDecryption(); }
+    //     }
+    // } else this.document.body.innerHTML += "<h2 class='text-center m-5 p-10 fw-bold text-danger text-uppercase'>You are Early!</h2><h3 class='p-5 m-5 text-center'>Page is under construction, Try again later.</h3>";
 
     // Header Automation
     if (!window["loaded_header_author"] == 1 || window["page"] === 404) {
