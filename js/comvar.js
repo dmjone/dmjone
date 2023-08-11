@@ -303,6 +303,31 @@ function processFolder(allAuthors, author_bio) {
                                             break;
                                     }
                                     break;
+                                case "csu083":
+                                    prof = "Puneet Kapoor";
+                                    prof_bio = "<p>Puneet Kapoor is Computer Science expert, researcher and a senior assistant professor at Shoolini University.</p>";
+                                    prof_href = "contact@dmj.one";
+                                    course = "CSU083";
+                                    course_detail = "Design and Analysis of Algorithm";
+                                    break;
+                                case "csu1291":
+                                    switch (urlpart5) {
+                                        case 'practical':
+                                            prof = "Dr. Anurag Rana";
+                                            prof_bio = "<p>Dr. Anurag Rana is a research scientist and an assistant professor at Shoolini University.</p>";
+                                            prof_href = "contact@dmj.one";
+                                            course = "CSU1291";
+                                            course_detail = "Java Programming";
+                                            break;
+                                        default:
+                                            prof = "Dr. Anurag Rana";
+                                            prof_bio = "<p>Dr. Anurag Rana is a research scientist and an assistant professor at Shoolini University.</p>";
+                                            prof_href = "contact@dmj.one";
+                                            course = "CSU1291";
+                                            course_detail = "Java Programming";
+                                            break;
+                                    }
+                                    break;
                                 default:
                                     prof = "";
                                     prof_bio = "";

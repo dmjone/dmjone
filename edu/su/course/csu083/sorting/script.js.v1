@@ -1,0 +1,160 @@
+const delay = 300;  // delay in ms for the visualization
+
+document.getElementById('arraySize').addEventListener('input', async function () {
+    const size = this.value;
+    const arrayInputsDiv = document.getElementById('arrayInputs');
+    arrayInputsDiv.innerHTML = '';
+
+    for (let i = 0; i < size; i++) {
+        const inputElem = document.createElement('input');
+        inputElem.setAttribute('type', 'number');
+        inputElem.setAttribute('placeholder', `Element ${i + 1}`);
+        inputElem.classList.add('form-control', 'mb-2');
+
+        if (document.getElementById('autoGenerate').checked) {
+            inputElem.value = Math.floor(Math.random() * 100) + 1;  // random values between 1 and 100
+        }
+
+        arrayInputsDiv.appendChild(inputElem);
+    }
+});
+
+async function runSort() {
+    const sortType = document.getElementById('sortType').value;
+    const arrayInputs = document.getElementById('arrayInputs').getElementsByTagName('input');
+    let array = [];
+    for (let input of arrayInputs) {
+        array.push(Number(input.value));
+    }
+
+    const outputDiv = document.getElementById('output');
+    outputDiv.innerHTML = array.map(val => `<div class="bar" style="height:${val}px"></div>`).join('');
+
+    if (sortType === 'mergeSort') {
+        await mergeSortVisualized(array, 0, array.length - 1, outputDiv);
+    } else if (sortType === 'selectionSort') {
+        await selectionSortVisualized(array, outputDiv);
+    }
+}
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function visualize(action, outputDiv, index1, index2) {
+    switch (action) {
+        case 'select':
+            outputDiv.children[index1].style.backgroundColor = '#ff0000';  // red for selected element
+            break;
+        case 'compare':
+            outputDiv.children[index2].style.backgroundColor = '#ffff00';  // yellow for comparison
+            break;
+        case 'swap':
+            const tempHeight = outputDiv.children[index1].style.height;
+            outputDiv.children[index1].style.height = outputDiv.children[index2].style.height;
+            outputDiv.children[index2].style.height = tempHeight;
+            await sleep(delay);
+            break;
+        case 'unsorted':
+            outputDiv.children[index1].style.backgroundColor = '#00ff00';  // green for unsorted
+            break;
+        case 'merge-section':
+            outputDiv.children[index1].style.backgroundColor = '#ff00ff';  // magenta for merge section
+            break;
+        case 'deselect':
+            outputDiv.children[index1].style.backgroundColor = '#007bff';  // revert to original color
+            break;
+    }
+    await sleep(delay);
+}
+
+async function selectionSortVisualized(arr, outputDiv) {
+    const n = arr.length;
+    for (let i = 0; i < n - 1; i++) {
+        await visualize('select', outputDiv, i);
+        let minIdx = i;
+
+        for (let j = i + 1; j < n; j++) {
+            await visualize('compare', outputDiv, i, j);
+
+            if (arr[j] < arr[minIdx]) {
+                minIdx = j;
+            }
+
+            await visualize('deselect', outputDiv, j);
+        }
+
+        if (minIdx !== i) {
+            [arr[i], arr[minIdx]] = [arr[minIdx], arr[i]];
+            await visualize('swap', outputDiv, i, minIdx);
+        }
+
+        await visualize('deselect', outputDiv, i);
+    }
+
+    for (let i = 0; i < n; i++) {
+        await visualize('unsorted', outputDiv, i);
+    }
+}
+
+async function mergeSortVisualized(arr, l, r, outputDiv) {
+    if (l >= r) {
+        return;
+    }
+
+    await visualize('merge-section', outputDiv, l, r);
+
+    const m = Math.floor((l + r) / 2);
+    await mergeSortVisualized(arr, l, m, outputDiv);
+    await mergeSortVisualized(arr, m + 1, r, outputDiv);
+    await merge(arr, l, m, r, outputDiv);
+
+    await visualize('deselect', outputDiv, l, r);
+}
+
+async function merge(arr, l, m, r, outputDiv) {
+    const n1 = m - l + 1;
+    const n2 = r - m;
+
+    let left = new Array(n1);
+    let right = new Array(n2);
+
+    for (let i = 0; i < n1; i++) {
+        left[i] = arr[l + i];
+    }
+    for (let j = 0; j < n2; j++) {
+        right[j] = arr[m + 1 + j];
+    }
+
+    let i = 0;
+    let j = 0;
+    let k = l;
+
+    while (i < n1 && j < n2) {
+        await visualize('compare', outputDiv, l + i, m + 1 + j);
+
+        if (left[i] <= right[j]) {
+            arr[k] = left[i];
+            i++;
+        } else {
+            arr[k] = right[j];
+            j++;
+        }
+        outputDiv.children[k].style.height = `${arr[k]}px`;
+        k++;
+    }
+
+    while (i < n1) {
+        arr[k] = left[i];
+        outputDiv.children[k].style.height = `${arr[k]}px`;
+        i++;
+        k++;
+    }
+
+    while (j < n2) {
+        arr[k] = right[j];
+        outputDiv.children[k].style.height = `${arr[k]}px`;
+        j++;
+        k++;
+    }
+}

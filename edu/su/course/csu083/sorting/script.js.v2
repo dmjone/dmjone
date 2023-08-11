@@ -1,0 +1,556 @@
+// script.js for the top 5 sorting algorithms
+// This is a compact version. Due to the complexity, the code might not cover every detail of the sorting visualization.
+
+// Note: Please go through the code to understand the structure. This modular approach will help you add more algorithms in the future.
+
+window.onload = function () {
+    const arraySizeInput = document.getElementById('arraySize');
+    arraySizeInput.value = Math.floor(Math.random() * 80) + 1;
+    arraySizeInput.dispatchEvent(new Event('input'));
+};
+
+document.getElementById('arraySize').addEventListener('input', function () {
+    if (this.value > 80) {
+        alert("Please enter a value between 1 and 80.");
+        this.value = 80;
+    } else if (this.value < 1) {
+        alert("Please enter a value between 1 and 80.");
+        this.value = 1;
+    }
+
+    const size = this.value;
+    const arrayInputsDiv = document.getElementById('arrayInputs');
+    const autoGenerate = document.getElementById('autoGenerate');
+
+    arrayInputsDiv.innerHTML = '';
+
+    if (!autoGenerate.checked) {
+        for (let i = 0; i < size; i++) {
+            const inputElem = document.createElement('input');
+            inputElem.setAttribute('type', 'number');
+            inputElem.setAttribute('placeholder', `Element ${i + 1}`);
+            inputElem.classList.add('form-control', 'mb-2');
+
+            arrayInputsDiv.appendChild(inputElem);
+        }
+    } else {
+        arrayInputsDiv.textContent = 'Elements will be automatically generated when sorting.';
+    }
+});
+
+document.getElementById('autoGenerate').addEventListener('change', function () {
+    const arraySizeInput = document.getElementById('arraySize');
+    arraySizeInput.dispatchEvent(new Event('input'));
+});
+
+// Visualization Function
+const delay = 100;
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function visualize(action, outputDiv, index1, index2 = null) {
+    // Check if indices are valid
+    if (index1 >= outputDiv.children.length || (index2 !== null && index2 >= outputDiv.children.length)) {
+        console.error("Index out of bounds in visualize function:", index1, index2);
+        return;
+    }
+
+    switch (action) {
+        case 'select':
+            outputDiv.children[index1].style.backgroundColor = '#ff0000';  // Red for selected element
+            break;
+        case 'compare':
+            outputDiv.children[index2].style.backgroundColor = '#ffff00';  // Yellow for comparison
+            break;
+        case 'swap':
+            const tempHeight = outputDiv.children[index1].style.height;
+            outputDiv.children[index1].style.height = outputDiv.children[index2].style.height;
+            outputDiv.children[index2].style.height = tempHeight;
+            break;
+        case 'sorted':
+            outputDiv.children[index1].style.backgroundColor = '#ffa500';  // Orange for sorted position
+            break;
+        case 'deselect':
+            outputDiv.children[index1].style.backgroundColor = '#007bff';  // Revert to original color
+            break;
+    }
+    await sleep(delay);
+}
+
+// Run Sort
+async function runSort() {
+    const sortType = document.getElementById('sortType').value;
+    const arrayInputs = document.getElementById('arrayInputs').getElementsByTagName('input');
+    const autoGenerate = document.getElementById('autoGenerate').checked;
+    let array = [];
+
+    if (autoGenerate) {
+        const size = document.getElementById('arraySize').value;
+        for (let i = 0; i < size; i++) {
+            array.push(Math.floor(Math.random() * 100) + 1); // random values between 1 and 100
+        }
+    } else {
+        for (let input of arrayInputs) {
+            array.push(Number(input.value));
+        }
+    }
+
+    const maxValue = Math.max(...array);
+    const outputDiv = document.getElementById('output');
+    const containerWidth = outputDiv.clientWidth; // Calculate bar width. Consider a minimum width to ensure visibility.
+    const barWidth = Math.max(10, (containerWidth - (4 * containerWidth / 100)) / array.length - 2); // -2 for margins
+
+    outputDiv.innerHTML = array.map(val => {
+        const height = (val / maxValue) * 300;
+        return `<div class="bar" style="height:${height}px; width:${barWidth}px"></div>`;
+    }).join('');  // No whitespace between bars.
+
+    if (sortType === 'selectionSort') {
+        await selectionSortVisualized(array, outputDiv);
+    } else if (sortType === 'bubbleSort') {
+        await bubbleSortVisualized(array, outputDiv);
+    } else if (sortType === 'insertionSort') {
+        await insertionSortVisualized(array, outputDiv);
+    } else if (sortType === 'mergeSort') {
+        await mergeSortVisualized(array, outputDiv);
+    } else if (sortType === 'quickSort') {
+        await quickSortVisualized(array, outputDiv);
+    } else if (sortType === 'heapSort') {
+        await heapSortVisualized(array, outputDiv);
+    } else if (sortType === 'countingSort') {
+        await countingSortVisualized(array, outputDiv);
+    } else if (sortType === 'radixSort') {
+        await radixSortVisualized(array, outputDiv);
+    } else if (sortType === 'bucketSort') {
+        await bucketSortVisualized(array, outputDiv);
+    } else if (sortType === 'shellSort') {
+        await shellSortVisualized(array, outputDiv);
+    } else if (sortType === 'bingoSort') {
+        await bingoSortVisualized(array, outputDiv);
+    }
+
+
+
+
+    if (array.length !== outputDiv.children.length) {
+        console.error("Mismatch between array length and number of bars:", array.length, outputDiv.children.length);
+        return;
+    }
+
+
+    for (let i = 0; i < array.length; i++) {
+        await visualize('sorted', outputDiv, i);
+    }
+}
+
+
+/////////////////////////////////////////////////// SORTING START ///////////////////////////////////////////
+// Selection Sort
+async function selectionSortVisualized(arr, outputDiv) {
+    const n = arr.length;
+    for (let i = 0; i < n - 1; i++) {
+        let minIdx = i;
+        await visualize('select', outputDiv, minIdx);
+
+        for (let j = i + 1; j < n; j++) {
+            await visualize('compare', outputDiv, minIdx, j);
+
+            if (arr[j] < arr[minIdx]) {
+                minIdx = j;
+            }
+
+            await visualize('deselect', outputDiv, j);
+        }
+
+        if (minIdx !== i) {
+            [arr[i], arr[minIdx]] = [arr[minIdx], arr[i]];
+            await visualize('swap', outputDiv, i, minIdx);
+        }
+
+        await visualize('sorted', outputDiv, i);
+    }
+
+    await visualize('sorted', outputDiv, n - 1);
+}
+
+// Bubble Sort
+async function bubbleSortVisualized(arr, outputDiv) {
+    const n = arr.length;
+    let swapped;
+    do {
+        swapped = false;
+        for (let i = 0; i < n - 1; i++) {
+            await visualize('compare', outputDiv, i, i + 1);
+            if (arr[i] > arr[i + 1]) {
+                [arr[i], arr[i + 1]] = [arr[i + 1], arr[i]];
+                await visualize('swap', outputDiv, i, i + 1);
+                swapped = true;
+            }
+            await visualize('deselect', outputDiv, i);
+        }
+        if (!swapped) {
+            break;
+        }
+    } while (swapped);
+    for (let i = 0; i < n; i++) {
+        await visualize('sorted', outputDiv, i);
+    }
+}
+
+
+//Insertion sort
+async function insertionSortVisualized(arr, outputDiv) {
+    const n = arr.length;
+    for (let i = 1; i < n; i++) {
+        let key = arr[i];
+        let j = i - 1;
+
+        await visualize('select', outputDiv, i);
+
+        while (j >= 0 && arr[j] > key) {
+            await visualize('compare', outputDiv, j, j + 1);
+            arr[j + 1] = arr[j];
+            await visualize('swap', outputDiv, j, j + 1);
+            j = j - 1;
+        }
+
+        arr[j + 1] = key;
+        await visualize('deselect', outputDiv, i);
+    }
+
+    for (let i = 0; i < n; i++) {
+        await visualize('sorted', outputDiv, i);
+    }
+}
+
+
+// Merge Sort
+async function mergeSortVisualized(arr, outputDiv, l = 0, r = arr.length - 1) {
+    if (l >= r) {
+        return;
+    }
+    const m = Math.floor((l + r) / 2);
+    await mergeSortVisualized(arr, outputDiv, l, m);
+    await mergeSortVisualized(arr, outputDiv, m + 1, r);
+
+    await merge(arr, outputDiv, l, m, r);
+}
+async function merge(arr, outputDiv, l, m, r) {
+    let n1 = m - l + 1;
+    let n2 = r - m;
+
+    let left = new Array(n1);
+    let right = new Array(n2);
+
+    for (let i = 0; i < n1; i++) {
+        left[i] = arr[l + i];
+    }
+    for (let j = 0; j < n2; j++) {
+        right[j] = arr[m + 1 + j];
+    }
+
+    let i = 0;
+    let j = 0;
+    let k = l;
+
+    while (i < n1 && j < n2) {
+        if (left[i] <= right[j]) {
+            arr[k] = left[i];
+            i++;
+        } else {
+            arr[k] = right[j];
+            j++;
+        }
+
+        // Visualize the change
+        await visualize('compare', outputDiv, l + i, m + 1 + j);
+        outputDiv.children[k].style.height = `${(arr[k] / Math.max(...arr)) * 300}px`;
+        await visualize('select', outputDiv, k);
+
+        k++;
+    }
+
+    while (i < n1) {
+        arr[k] = left[i];
+
+        // Visualize the change
+        outputDiv.children[k].style.height = `${(arr[k] / Math.max(...arr)) * 300}px`;
+        await visualize('select', outputDiv, k);
+
+        i++;
+        k++;
+    }
+
+    while (j < n2) {
+        arr[k] = right[j];
+
+        // Visualize the change
+        outputDiv.children[k].style.height = `${(arr[k] / Math.max(...arr)) * 300}px`;
+        await visualize('select', outputDiv, k);
+
+        j++;
+        k++;
+    }
+}
+
+
+
+// Quick Sort
+async function quickSortVisualized(arr, outputDiv, low = 0, high = arr.length - 1) {
+    if (low < high) {
+        let pi = await partition(arr, outputDiv, low, high);
+        await quickSortVisualized(arr, outputDiv, low, pi - 1);
+        await quickSortVisualized(arr, outputDiv, pi + 1, high);
+    }
+}
+
+async function partition(arr, outputDiv, low, high) {
+    let pivot = arr[high];
+    await visualize('select', outputDiv, high);
+    let i = (low - 1);
+
+    for (let j = low; j <= high - 1; j++) {
+        if (arr[j] < pivot) {
+            i++;
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+            await visualize('swap', outputDiv, i, j);
+        }
+    }
+    [arr[i + 1], arr[high]] = [arr[high], arr[i + 1]];
+    await visualize('swap', outputDiv, i + 1, high);
+    return (i + 1);
+}
+
+
+// Heap Sort
+function swap(arr, i, j) {
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+}
+
+async function heapify(arr, outputDiv, n, i) {
+    let largest = i;
+    const left = 2 * i + 1;
+    const right = 2 * i + 2;
+
+    await visualize('select', outputDiv, i);
+
+    if (left < n) {
+        await visualize('compare', outputDiv, largest, left);
+        if (arr[left] > arr[largest]) {
+            largest = left;
+        }
+    }
+
+    if (right < n) {
+        await visualize('compare', outputDiv, largest, right);
+        if (arr[right] > arr[largest]) {
+            largest = right;
+        }
+    }
+
+    if (largest !== i) {
+        swap(arr, i, largest);
+        await visualize('swap', outputDiv, i, largest);
+        await visualize('deselect', outputDiv, i);  // Deselect the current element
+        await heapify(arr, outputDiv, n, largest);
+    } else {
+        await visualize('deselect', outputDiv, i);  // Deselect the current element
+    }
+}
+
+async function heapSortVisualized(arr, outputDiv) {
+    const n = arr.length;
+
+    // Build a max heap
+    for (let i = Math.floor(n / 2) - 1; i >= 0; i--) {
+        await heapify(arr, outputDiv, n, i);
+    }
+
+    // Extract elements one by one from heap
+    for (let i = n - 1; i > 0; i--) {
+        swap(arr, 0, i);
+        await visualize('swap', outputDiv, 0, i);
+        await visualize('sorted', outputDiv, i);  // Mark the sorted position
+        await heapify(arr, outputDiv, i, 0);
+    }
+
+    // Mark the last position as sorted
+    await visualize('sorted', outputDiv, 0);
+}
+
+// Counting Sort
+async function countingSortVisualized(arr, outputDiv) {
+    let maxVal = Math.max(...arr);
+    let min = Math.min(...arr);
+    let range = maxVal - min + 1;
+    let count = new Array(range).fill(0);
+    let output = new Array(arr.length).fill(0);
+
+    // Count occurrences
+    for (let i = 0; i < arr.length; i++) {
+        count[arr[i] - min]++;
+        await visualize('select', outputDiv, i);
+        await visualize('deselect', outputDiv, i);
+    }
+
+    // Update count[i] to store the position of the next occurrence of the same element
+    for (let i = 1; i < count.length; i++) {
+        count[i] += count[i - 1];
+    }
+
+    // Build the output array
+    for (let i = arr.length - 1; i >= 0; i--) {
+        output[count[arr[i] - min] - 1] = arr[i];
+        count[arr[i] - min]--;
+    }
+
+    // Copy the sorted elements to the original array and update visualization
+    for (let i = 0; i < arr.length; i++) {
+        arr[i] = output[i];
+        outputDiv.children[i].style.height = `${(arr[i] / maxVal) * 300}px`;
+        await visualize('sorted', outputDiv, i);
+    }
+}
+
+
+// Radix Sort. 
+// A utility function to get the maximum value in arr[]
+function getMax(arr) {
+    return Math.max(...arr);
+}
+async function countSortForRadix(arr, outputDiv, exp) {
+    let output = new Array(arr.length);
+    let count = new Array(10).fill(0);
+    let maxVal = Math.max(...arr);
+
+    // Count occurrences of occurrences in exp
+    for (let i = 0; i < arr.length; i++) {
+        count[Math.floor(arr[i] / exp) % 10]++;
+        await visualize('select', outputDiv, i);
+    }
+
+    // Change count[i] so that count[i] now contains actual position of this digit in output[]
+    for (let i = 1; i < 10; i++) {
+        count[i] += count[i - 1];
+    }
+
+    // Build the output array
+    for (let i = arr.length - 1; i >= 0; i--) {
+        output[count[Math.floor(arr[i] / exp) % 10] - 1] = arr[i];
+        count[Math.floor(arr[i] / exp) % 10]--;
+        await visualize('deselect', outputDiv, i);
+    }
+
+    // Copy the output array to arr[], so that arr[] now contains sorted numbers according to current digit
+    for (let i = 0; i < arr.length; i++) {
+        arr[i] = output[i];
+        outputDiv.children[i].style.height = `${(arr[i] / maxVal) * 300}px`;
+        await visualize('sorted', outputDiv, i);
+    }
+}
+
+async function radixSortVisualized(arr, outputDiv) {
+    // Find the maximum number to know the number of digits
+    let m = getMax(arr);
+
+    // Do counting sort for every digit. Note that instead of passing digit number, exp is passed. exp is 10^i where i is current digit number
+    for (let exp = 1; Math.floor(m / exp) > 0; exp *= 10) {
+        await countSortForRadix(arr, outputDiv, exp);
+    }
+}
+
+
+// Bucket Sort
+async function bucketSortVisualized(arr, outputDiv) {
+    let n = arr.length;
+    let maxVal = Math.max(...arr);
+    let minVal = Math.min(...arr);
+    let range = maxVal - minVal;
+    let bucketSize = Math.floor(range / n) + 1;
+    let buckets = Array.from({ length: n }, () => []);
+
+    // Place the values in the buckets
+    for (let i = 0; i < n; i++) {
+        let bucketIndex = Math.floor((arr[i] - minVal) / bucketSize);
+        buckets[bucketIndex].push(arr[i]);
+        await visualize('select', outputDiv, i);
+        await visualize('deselect', outputDiv, i);
+    }
+
+    // Sort each bucket and update the original array and visualization
+    let index = 0;
+    for (let i = 0; i < buckets.length; i++) {
+        let bucket = buckets[i].sort((a, b) => a - b);
+        for (let j = 0; j < bucket.length; j++) {
+            arr[index++] = bucket[j];
+            outputDiv.children[index - 1].style.height = `${(bucket[j] / maxVal) * 300}px`;
+            await visualize('sorted', outputDiv, index - 1);
+        }
+    }
+}
+
+// Shell Sort
+async function shellSortVisualized(arr, outputDiv) {
+    let n = arr.length;
+
+    // Start with a big gap, then reduce the gap
+    for (let gap = Math.floor(n / 2); gap > 0; gap = Math.floor(gap / 2)) {
+        // Do a gapped insertion sort for this gap size
+        for (let i = gap; i < n; i++) {
+            let temp = arr[i];
+            let j;
+
+            await visualize('select', outputDiv, i);
+
+            // Shift earlier gap-sorted elements up until the correct location for a[i] is found
+            for (j = i; j >= gap && arr[j - gap] > temp; j -= gap) {
+                await visualize('compare', outputDiv, j, j - gap);
+                arr[j] = arr[j - gap];
+                await visualize('swap', outputDiv, j, j - gap);
+                await visualize('deselect', outputDiv, j);
+            }
+
+            // Put temp (the original a[i]) in its correct location
+            arr[j] = temp;
+            await visualize('deselect', outputDiv, j);
+        }
+    }
+
+    for (let i = 0; i < n; i++) {
+        await visualize('sorted', outputDiv, i);
+    }
+}
+
+
+// Bingo Sort
+async function bingoSortVisualized(arr, outputDiv) {
+    let n = arr.length;
+    while (n > 1) {
+        let maxIdx = 0;
+
+        // Find the index of the maximum element
+        for (let i = 1; i < n; i++) {
+            await visualize('compare', outputDiv, maxIdx, i);
+            if (arr[i] > arr[maxIdx]) {
+                await visualize('deselect', outputDiv, maxIdx);
+                maxIdx = i;
+            } else {
+                await visualize('deselect', outputDiv, i);
+            }
+        }
+
+        // If the maximum element is not at its correct position, swap it
+        if (maxIdx !== n - 1) {
+            [arr[maxIdx], arr[n - 1]] = [arr[n - 1], arr[maxIdx]];
+            await visualize('swap', outputDiv, maxIdx, n - 1);
+        }
+
+        // Reduce the size of the array while the maximum element is at the end
+        while (arr[n - 1] === arr[maxIdx]) {
+            await visualize('sorted', outputDiv, n - 1);
+            n--;
+        }
+    }
+}
