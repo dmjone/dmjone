@@ -57,12 +57,27 @@ function get_menu_list(datetogen) {
     function get_lab(def_date, def_author) {
         const arr = [
             {
-                title: "Practical 1: Interactive Sorting Algorithms Visualizer",
-                desc: "Explore and visualize the workings of various sorting algorithms including Bubble Sort, Merge Sort, Quick Sort, and more. This interactive tool offers a step-by-step breakdown, allowing you to understand the mechanics and efficiency of each algorithm.",              
+                title: "Practical 0: Interactive Sorting Algorithms Visualizer",
+                desc: "Explore and visualize the workings of various sorting algorithms including Bubble Sort, Merge Sort, Quick Sort, and more. This interactive tool offers a step-by-step breakdown, allowing you to understand the mechanics and efficiency of each algorithm.",
                 author: "Divya Mohan",
                 link: "interactive-sorting-visualizer",
                 // cardimage: "_url_"
             },
+            {
+                "title": "Practical 1: Selection Sort in C [WIP]",
+                "desc": "Delve into the implementation of the Selection Sort algorithm using C. After understanding the code, enhance your grasp by exploring our <a href='interactive-sorting-visualizer'>interactive visualizer</a>.",
+                "author": "Divya Mohan",
+                "link": "selection-sort",
+                // "cardimage": "_url_"
+            },
+            {
+                "title": "Practical 2: Straight min max C [WIP]",
+                "desc": "Delve into the implementation of the Straight min max algorithm using C. After understanding the code, enhance your grasp by exploring our <a href='interactive-sorting-visualizer'>interactive visualizer</a>.",
+                "author": "Divya Mohan",
+                "link": "selection-sort",
+                // "cardimage": "_url_"
+            },
+
         ];
         for (let i = 0; i < arr.length; i++) {
             const _data = arr[i];
