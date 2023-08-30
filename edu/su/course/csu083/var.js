@@ -2,12 +2,12 @@
 function get_menu_list(datetogen) {
     function get_main(def_date, def_author) {
         const arr = [
-            // {
-            //     link: "theory/",
-            //     title: "Theory: Dive into the World of Design and Analysis of Algorithms: A Comprehensive Guide",
-            //     desc: "Unlock the full potential of algorithms with our in-depth guide to all the concepts. Take your problem-solving skills to the next level and discover a world of efficient solutions. Click now to embark on your DAA journey.",
-            //     codetype: "CSU085 | Concepts"
-            // },
+            {
+                link: "theory/",
+                title: "Theory: Dive into the World of Design and Analysis of Algorithms: A Comprehensive Guide",
+                desc: "Unlock the full potential of algorithms with our in-depth guide to all the concepts. Take your problem-solving skills to the next level and discover a world of efficient solutions. Click now to embark on your DAA journey.",
+                codetype: "CSU085 | Concepts"
+            },
             {
                 link: "practical/",
                 title: "Practical: Elevate Your Algorithm Design Skills: A Comprehensive Guide for Lab Enthusiasts",
@@ -34,11 +34,13 @@ function get_menu_list(datetogen) {
     function get_class(def_date, def_author) {
         const arr = [
             {
-                title: "The Digital Revolution: A Thrilling Introduction to Digital Electronics",
-                desc: "Join the revolution and discover the magic of digital electronics with our exciting introduction to the world of digital circuits and systems. From binary code to microprocessors, our guide covers all the essentials. Click now to embark on an electrifying journey into the digital realm!",
-                codetype: "Introduction",
-                readtime: r(15)
+                title: "Priori vs. Posteriori Analysis: Navigating Algorithmic Efficiency",
+                desc: "Dive deep into the world of algorithm analysis with our comprehensive guide. Unravel the theoretical predictions of a priori and contrast them with the empirical insights of a posteriori. From foundational concepts to advanced nuances, this guide offers a holistic perspective. Begin your journey into the heart of algorithmic efficiency now!",
+                codetype: "Algorithm Analysis",
+                readtime: r(5),
+                link: "priori-posteriori-analysis"
             },
+
         ];
         for (let i = 0; i < arr.length; i++) {
             const _data = arr[i];
