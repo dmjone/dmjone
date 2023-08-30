@@ -310,6 +310,20 @@ function processFolder(allAuthors, author_bio) {
                                     course = "CSU083";
                                     course_detail = "Design and Analysis of Algorithm";
                                     break;
+                                case "csu1075":
+                                    prof = "Dr. Brij Bhushan Sharma";
+                                    prof_bio = "<p>Dr. Brij Bhushan Sharma has an M Tech in Electronics and Communication (2015) and is pursuing a PhD in Smart Agriculture. He has 8 years of teaching experience and has contributed to numerous academic publications. His research focuses on developing an IoT-based Indirect Solar Dryer and a digital system to check soil fertility using AI.</p>";
+                                    prof_href = "brijbhushan@shooliniouniversity.com";                                            
+                                    course = "CSU1075";
+                                    course_detail = "Computer Organization";
+                                    break;
+                                case "csu1526":
+                                    prof = "Dr. Brij Bhushan Sharma";
+                                    prof_bio = "<p>Dr. Brij Bhushan Sharma has an M Tech in Electronics and Communication (2015) and is pursuing a PhD in Smart Agriculture. He has 8 years of teaching experience and has contributed to numerous academic publications. His research focuses on developing an IoT-based Indirect Solar Dryer and a digital system to check soil fertility using AI.</p>";
+                                    prof_href = "brijbhushan@shooliniouniversity.com";
+                                    course = "CSU1526";
+                                    course_detail = "Microprocessor and Microcontroller";
+                                    break;
                                 case "csu1291":
                                     switch (urlpart5) {
                                         case 'practical':

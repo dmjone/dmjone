@@ -2,21 +2,20 @@
 function get_menu_list(datetogen) {
     function get_main(def_date, def_author) {
         const arr = [
-            // {
-            //     link: "theory/",
-            //     title: "Theory: Dive into the World of Design and Analysis of Algorithms: A Comprehensive Guide",
-            //     desc: "Unlock the full potential of algorithms with our in-depth guide to all the concepts. Take your problem-solving skills to the next level and discover a world of efficient solutions. Click now to embark on your DAA journey.",
-            //     codetype: "CSU085 | Concepts"
-            // },
+            {
+                link: "theory/",
+                title: "Theory: Dive into the World of Java Programming: A Comprehensive Guide",
+                desc: "Unlock the full potential of Java with our in-depth guide to all the concepts. Take your programming skills to the next level and discover a world of endless coding possibilities. Click now to embark on your Java journey.",
+                codetype: "CSU1291 | Concepts"
+            },
             {
                 link: "practical/",
-                title: "Practical: Elevate Your Algorithm Design Skills: A Comprehensive Guide for Lab Enthusiasts",
-                desc: "Unleash your potential in the DAA lab with our comprehensive guide covering all the essential concepts. Discover the essence of efficient algorithms and take your problem-solving skills to the next level. Click now to embark on your DAA journey.",
-                codetype: "CSU085P | Practical"
+                title: "Practical: Elevate Your Java Programming Skills: A Comprehensive Guide for Lab Enthusiasts",
+                desc: "Unleash your potential in the Java programming lab with our comprehensive guide covering all the essential concepts. Discover the magic of code and take your programming skills to the next level. Click now to embark on your Java journey.",
+                codetype: "CSU1291P | Practical"
             },
 
         ];
-
         for (let i = 0; i < arr.length; i++) {
             const _data = arr[i];
             title = _data.title || null; if (!title) continue; // Set the title and if thats not possible, skip the loop
@@ -57,27 +56,13 @@ function get_menu_list(datetogen) {
     function get_lab(def_date, def_author) {
         const arr = [
             {
-                title: "Interactive Sorting Algorithms Visualizer",
-                desc: "Explore and visualize the workings of various sorting algorithms including Bubble Sort, Merge Sort, Quick Sort, and more. This interactive tool offers a step-by-step breakdown, allowing you to understand the mechanics and efficiency of each algorithm.",
+                title: "Practical 1: Verify truth table of all logic gates in Proteus",
+                desc: "This lab will provide a verification of truth table of logic gates using Proteus software.",
+                date: "Fri March 3, 2023",
                 author: "Divya Mohan",
-                link: "interactive-sorting-visualizer",
+                link: "verification-of-logic-gates-in-proteus",
                 // cardimage: "_url_"
             },
-            {
-                "title": "Practical 1: Selection Sort in C [WIP]",
-                "desc": "Delve into the implementation of the Selection Sort algorithm using C. After understanding the code, enhance your grasp by exploring our <a href='interactive-sorting-visualizer'>interactive visualizer</a>.",
-                "author": "Divya Mohan",
-                "link": "selection-sort",
-                // "cardimage": "_url_"
-            },
-            {
-                "title": "Practical 2: Straight min max C [WIP]",
-                "desc": "Delve into the implementation of the Straight min max algorithm using C. After understanding the code, enhance your grasp by exploring our <a href='interactive-sorting-visualizer'>interactive visualizer</a>.",
-                "author": "Divya Mohan",
-                "link": "selection-sort",
-                // "cardimage": "_url_"
-            },
-
         ];
         for (let i = 0; i < arr.length; i++) {
             const _data = arr[i];
