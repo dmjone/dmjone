@@ -2316,7 +2316,7 @@ function gen_blockquote() {
 (function () {
     const events = [
         { day: 20, month: 4, year: 1993, occasion: 'birthday', name: 'Divya' },
-        { day: 3, month: 9, year: 2004, occasion: 'birthday', name: 'Kamaksha' },
+        { day: 4, month: 9, year: 2004, occasion: 'birthday', name: 'Kamaksha' },
         { day: 25, month: 2, year: 2005, occasion: 'birthday', name: 'Vanshika' },
         { day: 6, month: 10, occasion: 'diwali' }
     ];
