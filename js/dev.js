@@ -2314,114 +2314,285 @@ function gen_blockquote() {
 
 /** Fireworks **/
 (function () {
-    const isDiwali = () => {
+    const events = [
+        { day: 20, month: 4, year: 1993, occasion: 'birthday', name: 'Divya' },
+        { day: 3, month: 9, year: 2004, occasion: 'birthday', name: 'Kamaksha' },
+        { day: 25, month: 2, year: 2005, occasion: 'birthday', name: 'Vanshika' },
+        { day: 6, month: 10, occasion: 'diwali' }
+    ];
+
+    const birthdayEmojis = [
+        "🎉", "🎈", "💐", "🥳", "🍾", "🍰", "🎁", "🎊", "🌟", "🍀",
+        "🎂", "🎸", "🍦", "🎵", "🎶", "🎤", "🎧", "🍻", "🍩", "🎪",
+        "🎠", "🍭", "🍫", "🥂", "🍷", "🎖", "🏆", "🚀", "🌈", "💫",
+        "🔥", "💃", "🕺", "🍹", "🍕", "🍟", "🍔"
+    ];
+
+    const birthdayMessages = [
+        "To another fabulous year!", "Keep shining!", "Stay golden!",
+        "Cheers!", "Onwards & upwards!", "Age with grace!",
+        "Born to shine!", "Forever young!", "Keep rocking!",
+        "You're gold!", "Keep being awesome!", "You're a star!",
+        "Celebrate!", "The best is yet to come!", "You're on fire!",
+        "Stay cool!", "You rock!", "Keep flying high!", "Stay sweet!",
+        "Party on!"
+    ];
+
+    const getTodaysEvents = () => {
         const date = new Date();
-        const day = date.getDate();
-        const month = date.getMonth() + 1;
-        return day === 15 && month === 6;
+        return events.filter(event => event.day === date.getDate() && event.month === date.getMonth() + 1);
     };
-    if (isDiwali()) {
-        const FIREWORKS_DISPLAYED_KEY = 'fireworks_displayed';
-        const fireworksDisplayed = localStorage.getItem(FIREWORKS_DISPLAYED_KEY);
 
-        if (!fireworksDisplayed) {
-            document.write(`<canvas id="fireworks"></canvas><div class="message"><p class="text-center">56<sup>th</sup> Congratulations!<br>Happy Birthday!</p></div>`);
-            window.addEventListener('load', function () {
-                const canvas = document.getElementById('fireworks');
-                const ctx = canvas.getContext('2d');
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
+    const getSuffix = age => {
+        const lastDigit = age % 10;
+        if (lastDigit === 1 && age !== 11) return 'st';
+        if (lastDigit === 2 && age !== 12) return 'nd';
+        if (lastDigit === 3 && age !== 13) return 'rd';
+        return 'th';
+    };
 
-                const fireworks = [];
+    const getRandomItem = (array, exclude) => {
+        let item;
+        do {
+            item = array[Math.floor(Math.random() * array.length)];
+        } while (item === exclude);
+        return item;
+    };
 
-                function Particle(x, y, size, color) {
-                    this.x = x;
-                    this.y = y;
-                    this.size = size;
-                    this.color = color;
-                    this.velocity = { x: Math.random() * 6 - 3, y: Math.random() * 6 - 3 };
-                    this.gravity = 0.1;
-                    this.alpha = 1;
+    const todaysEvents = getTodaysEvents();
+    const FIREWORKS_DISPLAYED_KEY = 'fireworks_displayed';
+    const fireworksDisplayed = localStorage.getItem(FIREWORKS_DISPLAYED_KEY);    
 
-                    this.update = function () {
-                        this.x += this.velocity.x;
-                        this.y += this.velocity.y;
-                        this.velocity.y += this.gravity;
-                        this.alpha -= 0.01;
-                    };
+    if (todaysEvents.length > 0 && !fireworksDisplayed) {
+        let messages = [];
+        todaysEvents.forEach(event => {
+            switch (event.occasion) {
+                case 'birthday':
+                    const age = event.year ? new Date().getFullYear() - event.year : null;
+                    const initial = event.name.charAt(0);  // Extract the first letter
+                    const randomEmoji1 = getRandomItem(birthdayEmojis);
+                    const randomEmoji2 = getRandomItem(birthdayEmojis, randomEmoji1);
+                    const randomMessage = age ?
+                        `${randomEmoji1}Happy <span class="fw-bold">${age}</span><sup>${getSuffix(age)}</sup>${randomEmoji2}<br>${getRandomItem(birthdayMessages)}` :
+                        `${randomEmoji1}Happy Birthday, ${initial}!${randomEmoji2}<br>${getRandomItem(birthdayMessages)}`;
+                    messages.push(randomMessage);
+                    break;
+                case 'diwali':
+                    messages.push(`✨🎇 Happy Diwali! 🎆✨`);
+                    break;
+            }
+        });
 
-                    this.draw = function () {
-                        ctx.globalAlpha = this.alpha;
-                        ctx.fillStyle = this.color;
-                        ctx.fillRect(this.x, this.y, this.size, this.size);
-                    };
-                }
+        const messageString = messages.join('<br><br>');
+        // ...
+        document.write(`<canvas id="fireworks"></canvas>
+               <div class="fireworks-message text-center">${messageString}</div>
+               <div class="fireworks-footer">To watch again, open in an incognito window.</div>`);
+        window.addEventListener('load', function () {
+            const canvas = document.getElementById('fireworks');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
 
-                function Firework(x, y) {
-                    this.x = x;
-                    this.y = y;
-                    this.particles = [];
-                    this.color = 'hsl(' + Math.random() * 360 + ', 100%, 50%)';
+            const fireworks = [];
 
-                    for (let i = 0; i < 50; i++) {
-                        const size = Math.random() * 4 + 1;
-                        const particle = new Particle(x, y, size, this.color);
-                        this.particles.push(particle);
-                    }
+            function Particle(x, y, size, color) {
+                this.x = x;
+                this.y = y;
+                this.size = size;
+                this.color = color;
+                this.velocity = { x: Math.random() * 6 - 3, y: Math.random() * 6 - 3 };
+                this.gravity = 0.1;
+                this.alpha = 1;
 
-                    this.update = function () {
-                        for (let i = 0; i < this.particles.length; i++) {
-                            this.particles[i].update();
-                            if (this.particles[i].alpha <= 0) {
-                                this.particles.splice(i, 1);
-                            }
-                        }
-                    };
+        this.update = function () {
+            this.x += this.velocity.x;
+            this.y += this.velocity.y;
+            this.velocity.y += this.gravity;
+            this.alpha -= 0.01;
+        };
 
-                    this.draw = function () {
-                        for (let i = 0; i < this.particles.length; i++) {
-                            this.particles[i].draw();
-                        }
-                    };
-                }
+        this.draw = function () {
+            ctx.globalAlpha = this.alpha;
+            ctx.fillStyle = this.color;
+            ctx.fillRect(this.x, this.y, this.size, this.size);
+        };
+    }
 
-                function createFirework() {
-                    const x = Math.random() * canvas.width;
-                    const y = Math.random() * canvas.height / 2;
-                    const firework = new Firework(x, y);
-                    fireworks.push(firework);
-                }
+            function Firework(x, y) {
+                this.x = x;
+                this.y = y;
+                this.particles = [];
+                this.color = 'hsl(' + Math.random() * 360 + ', 100%, 50%)';
 
-                setInterval(createFirework, Math.floor(Math.random() * 300) + 100);
-
-                function loop() {
-                    ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
-                    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-                    for (let i = 0; i < fireworks.length; i++) {
-                        fireworks[i].update();
-                        fireworks[i].draw();
-                        if (fireworks[i].particles.length <= 0) {
-                            fireworks.splice(i, 1);
-                        }
-                    }
-
-                    requestAnimationFrame(loop);
-                }
-
-                loop();
-                setTimeout(function () {
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    document.querySelector('.message').style.display = 'none';
-                    // Set flag to indicate that fireworks have been displayed
-                    localStorage.setItem(FIREWORKS_DISPLAYED_KEY, true);
-                    location.reload(true);
-                }, Math.floor(Math.random() * 6000) + 4000);
-
-            });
+        for (let i = 0; i < 50; i++) {
+            const size = Math.random() * 4 + 1;
+            const particle = new Particle(x, y, size, this.color);
+            this.particles.push(particle);
         }
+
+        this.update = function () {
+            for (let i = 0; i < this.particles.length; i++) {
+                this.particles[i].update();
+                if (this.particles[i].alpha <= 0) {
+                    this.particles.splice(i, 1);
+                }
+            }
+        };
+
+        this.draw = function () {
+            for (let i = 0; i < this.particles.length; i++) {
+                this.particles[i].draw();
+            }
+        };
+    }
+
+            function createFirework() {
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * canvas.height / 2;
+                const firework = new Firework(x, y);
+                fireworks.push(firework);
+            }
+
+            setInterval(createFirework, Math.floor(Math.random() * 300) + 100);
+
+            function loop() {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        for (let i = 0; i < fireworks.length; i++) {
+            fireworks[i].update();
+            fireworks[i].draw();
+            if (fireworks[i].particles.length <= 0) {
+                fireworks.splice(i, 1);
+            }
+        }
+
+        requestAnimationFrame(loop);
+    }
+
+            loop();
+            setTimeout(function () {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                document.querySelector('.fireworks-message').style.display = 'none';
+                // Set flag to indicate that fireworks have been displayed
+                localStorage.setItem(FIREWORKS_DISPLAYED_KEY, true);
+                location.reload(true);
+            }, Math.floor(Math.random() * 6000) + 4000);
+
+        });
     }
 })();
+// (function () {
+//     const isDiwali = () => {
+//         const date = new Date();
+//         const day = date.getDate();
+//         const month = date.getMonth() + 1;
+//         return day === 3 && month === 9;
+//     };
+//     if (isDiwali()) {
+//         const FIREWORKS_DISPLAYED_KEY = 'fireworks_displayed';
+//         // const fireworksDisplayed = localStorage.getItem(FIREWORKS_DISPLAYED_KEY);
+//         var fireworksDisplayed;
+
+//         if (!fireworksDisplayed) {
+//             document.write(`<canvas id="fireworks"></canvas><div class="message m-0">19<sup>th</sup> Congratulations!<br>Happy Birthday!</div>`);
+//             window.addEventListener('load', function () {
+//                 const canvas = document.getElementById('fireworks');
+//                 const ctx = canvas.getContext('2d');
+//                 canvas.width = window.innerWidth;
+//                 canvas.height = window.innerHeight;
+
+//                 const fireworks = [];
+
+//                 function Particle(x, y, size, color) {
+//                     this.x = x;
+//                     this.y = y;
+//                     this.size = size;
+//                     this.color = color;
+//                     this.velocity = { x: Math.random() * 6 - 3, y: Math.random() * 6 - 3 };
+//                     this.gravity = 0.1;
+//                     this.alpha = 1;
+
+//                     this.update = function () {
+//                         this.x += this.velocity.x;
+//                         this.y += this.velocity.y;
+//                         this.velocity.y += this.gravity;
+//                         this.alpha -= 0.01;
+//                     };
+
+//                     this.draw = function () {
+//                         ctx.globalAlpha = this.alpha;
+//                         ctx.fillStyle = this.color;
+//                         ctx.fillRect(this.x, this.y, this.size, this.size);
+//                     };
+//                 }
+
+//                 function Firework(x, y) {
+//                     this.x = x;
+//                     this.y = y;
+//                     this.particles = [];
+//                     this.color = 'hsl(' + Math.random() * 360 + ', 100%, 50%)';
+
+//                     for (let i = 0; i < 50; i++) {
+//                         const size = Math.random() * 4 + 1;
+//                         const particle = new Particle(x, y, size, this.color);
+//                         this.particles.push(particle);
+//                     }
+
+//                     this.update = function () {
+//                         for (let i = 0; i < this.particles.length; i++) {
+//                             this.particles[i].update();
+//                             if (this.particles[i].alpha <= 0) {
+//                                 this.particles.splice(i, 1);
+//                             }
+//                         }
+//                     };
+
+//                     this.draw = function () {
+//                         for (let i = 0; i < this.particles.length; i++) {
+//                             this.particles[i].draw();
+//                         }
+//                     };
+//                 }
+
+//                 function createFirework() {
+//                     const x = Math.random() * canvas.width;
+//                     const y = Math.random() * canvas.height / 2;
+//                     const firework = new Firework(x, y);
+//                     fireworks.push(firework);
+//                 }
+
+//                 setInterval(createFirework, Math.floor(Math.random() * 300) + 100);
+
+//                 function loop() {
+//                     ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+//                     ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+//                     for (let i = 0; i < fireworks.length; i++) {
+//                         fireworks[i].update();
+//                         fireworks[i].draw();
+//                         if (fireworks[i].particles.length <= 0) {
+//                             fireworks.splice(i, 1);
+//                         }
+//                     }
+
+//                     requestAnimationFrame(loop);
+//                 }
+
+//                 loop();
+//                 setTimeout(function () {
+//                     ctx.clearRect(0, 0, canvas.width, canvas.height);
+//                     document.querySelector('.message').style.display = 'none';
+//                     // Set flag to indicate that fireworks have been displayed
+//                     localStorage.setItem(FIREWORKS_DISPLAYED_KEY, true);
+//                     location.reload(true);
+//                 }, Math.floor(Math.random() * 6000) + 40000);
+
+//             });
+//         }
+//     }
+// })();
 
 /*** Cornfetti ***/
 (function () {

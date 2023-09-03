@@ -409,6 +409,7 @@ function processFolder(allAuthors, author_bio) {
     // Line 3 - Biblography
     let profbio = pA_bio;
     profbio = window.location.pathname.split("/")[5] && window.location.pathname.split("/")[5].length ? "" : profbio;
+    // author_bio = window.location.pathname.split("/")[5] && window.location.pathname.split("/")[5].length ? "" : author_bio;
     const line3 = profbio + author_bio;
 
     // Line 4 - Optional with buttons.
