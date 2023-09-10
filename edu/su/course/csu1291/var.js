@@ -32,12 +32,20 @@ function get_menu_list(datetogen) {
     }
     function get_class(def_date, def_author) {
         const arr = [
+            // {
+            //     title: "The Digital Revolution: A Thrilling Introduction to Digital Electronics",
+            //     desc: "Join the revolution and discover the magic of digital electronics with our exciting introduction to the world of digital circuits and systems. From binary code to microprocessors, our guide covers all the essentials. Click now to embark on an electrifying journey into the digital realm!",
+            //     codetype: "Introduction",
+            //     readtime: r(15)
+            // },
             {
-                title: "The Digital Revolution: A Thrilling Introduction to Digital Electronics",
-                desc: "Join the revolution and discover the magic of digital electronics with our exciting introduction to the world of digital circuits and systems. From binary code to microprocessors, our guide covers all the essentials. Click now to embark on an electrifying journey into the digital realm!",
-                codetype: "Introduction",
-                readtime: r(15)
-            },
+                title: "Origins of Java",
+                desc: "Dive deep into the historical tapestry of Java. From its inception at Sun Microsystems to its evolution as a versatile language, this session explores the driving forces, challenges, and milestones that have shaped Java's journey.",
+                date: "Sun September 10, 2023",
+                author: "Divya Mohan",
+                link: "origins-of-java"
+            }
+
         ];
         for (let i = 0; i < arr.length; i++) {
             const _data = arr[i];
@@ -56,13 +64,21 @@ function get_menu_list(datetogen) {
     function get_lab(def_date, def_author) {
         const arr = [
             {
-                title: "Practical 1: Verify truth table of all logic gates in Proteus",
+                title: "Practical 1: Print Hello World",
                 desc: "This lab will provide a verification of truth table of logic gates using Proteus software.",
                 date: "Fri March 3, 2023",
                 author: "Divya Mohan",
                 link: "verification-of-logic-gates-in-proteus",
                 // cardimage: "_url_"
             },
+            {
+                "title": "Practical 2: Basic Usage of Java",
+                "desc": "This lab delves into foundational Java concepts, showcasing arithmetic operations, temperature conversions, and geometric calculations. Through hands-on examples, participants get a grasp of Java's simplicity and versatility.",
+                "date": "Wednesday September 7, 2023",
+                "author": "Divya Mohan",
+                "link": "basic-usage-of-java"
+            },
+
         ];
         for (let i = 0; i < arr.length; i++) {
             const _data = arr[i];
