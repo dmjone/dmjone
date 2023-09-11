@@ -44,7 +44,36 @@ function get_menu_list(datetogen) {
                 date: "Sun September 10, 2023",
                 author: "Divya Mohan",
                 link: "origins-of-java"
-            }
+            },
+            {
+                "title": "Concepts of Java",
+                "desc": "Dive into Java's fundamental concepts. From understanding its characteristics, exploring OOP in Java, handling exceptions, to diving into the JVM, this course module is designed for a comprehensive understanding.",
+                "date": "Sun September 10, 2023",
+                "author": "Divya Mohan",
+                "link": "concepts-of-java"
+            },
+            {
+                "title": "Scanner Class in Java",
+                "desc": "Delve into the Scanner class in Java. Understand instantiation, explore basic input methods, gain insights on delimiter and pattern matching, input validation, and learn about exception handling and its importance.",
+                "date": "Sun September 10, 2023",
+                "author": "Divya Mohan",
+                "link": "scanner-class-in-java"
+            },
+            {
+                "title": "Data Types of Java",
+                "desc": "Embark on a comprehensive exploration of Java's data types. From their classification, understanding primitive and reference data types, to methods for taking input in Java, this course provides a thorough understanding.",
+                "date": "Sun September 10, 2023",
+                "author": "Divya Mohan",
+                "link": "data-types-of-java"
+            },
+            {
+                "title": "Providing Input in Java",
+                "desc": "Explore the essentials of gathering input in Java. From Scanner instantiation to exception handling, this course module offers an in-depth understanding of the topic, catering to both beginners and advanced users.",
+                "date": "Sun September 10, 2023",
+                "author": "Divya Mohan",
+                "link": "providing-input-in-java"
+            },
+
 
         ];
         for (let i = 0; i < arr.length; i++) {
