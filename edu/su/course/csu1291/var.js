@@ -64,14 +64,14 @@ function get_menu_list(datetogen) {
                 "desc": "Embark on a comprehensive exploration of Java's data types. From their classification, understanding primitive and reference data types, to methods for taking input in Java, this course provides a thorough understanding.",
                 "date": "Sun September 10, 2023",
                 "author": "Divya Mohan",
-                "link": "data-types-of-java"
+                "link": "data-types-in-java"
             },
             {
                 "title": "Providing Input in Java",
                 "desc": "Explore the essentials of gathering input in Java. From Scanner instantiation to exception handling, this course module offers an in-depth understanding of the topic, catering to both beginners and advanced users.",
                 "date": "Sun September 10, 2023",
                 "author": "Divya Mohan",
-                "link": "providing-input-in-java"
+                "link": "input-in-java"
             },
 
 
