@@ -94,8 +94,7 @@ function get_menu_list(datetogen) {
         const arr = [
             {
                 title: "Practical 1: Print Hello World",
-                desc: "This lab will provide a verification of truth table of logic gates using Proteus software.",
-                date: "Fri March 3, 2023",
+                desc: "This lab will provide a verification of truth table of logic gates using Proteus software.",                
                 author: "Divya Mohan",
                 link: "hello-world",
                 // cardimage: "_url_"
