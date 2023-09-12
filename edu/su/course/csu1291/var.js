@@ -97,7 +97,7 @@ function get_menu_list(datetogen) {
                 desc: "This lab will provide a verification of truth table of logic gates using Proteus software.",
                 date: "Fri March 3, 2023",
                 author: "Divya Mohan",
-                link: "verification-of-logic-gates-in-proteus",
+                link: "hello-world",
                 // cardimage: "_url_"
             },
             {
