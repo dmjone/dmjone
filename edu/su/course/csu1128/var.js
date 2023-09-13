@@ -478,6 +478,12 @@ function get_menu_list(datetogen) {
     function get_main(def_date, def_author) {
         const arr = [
             {
+                link: "theory/",
+                title: "Theory: Dive into the World of Logic Building with Computer Programming using C: A Comprehensive Guide",
+                desc: "Unlock the full potential of your computer programming skills with our in-depth guide to all the concepts. Take your programming skills from zero to hero or to the next level and discover a world of endless coding possibilities. Click now to embark on your Programming journey.",
+                codetype: "CSU1128 | Concepts"
+            },
+            {
                 link: "program/",
                 date: "Last Updated: Sun January 1, 2023",
                 title: "Programs done in Class",
@@ -505,12 +511,7 @@ function get_menu_list(datetogen) {
                 desc: "Challenge Your Coding Skills with Our Collection of Miscellaneous Programs and Questions! Test Your Knowledge and Master the Art of Coding with Our Comprehensive Selection. Get Ready to Showcase Your Skills - Let's Get Quizzing!",
                 codetype: "CSU1128 | Miscellaneous",
             },
-            // {
-            //     link: "theory/",
-            //     title: "Theory: Dive into the World of Java Programming: A Comprehensive Guide",
-            //     desc: "Unlock the full potential of Java with our in-depth guide to all the concepts. Take your programming skills to the next level and discover a world of endless coding possibilities. Click now to embark on your Java journey.",
-            //     codetype: "CSU1291 | Concepts"
-            // },
+
             // {
             //     link: "practical/",
             //     title: "Practical: Elevate Your Java Programming Skills: A Comprehensive Guide for Lab Enthusiasts",
@@ -541,6 +542,18 @@ function get_menu_list(datetogen) {
             //     codetype: "Introduction",
             //     readtime: r(15)
             // },
+            {
+                title: "What is a Computer",
+                desc: "WIP - What is a computer - Below Basics",
+                codetype: "Introduction",
+                link: "what-is-a-computer"
+            },
+            {
+                title: "What is a Logic Building",
+                desc: "WIP - What is Logic Building",
+                codetype: "Introduction",
+                link: "logic-building"
+            },
         ];
         for (let i = 0; i < arr.length; i++) {
             const _data = arr[i];
@@ -557,15 +570,7 @@ function get_menu_list(datetogen) {
         }
     }
     function get_programs(def_date, def_author) {
-        const arr = [
-            // {
-            //     title: "Practical 1: Verify truth table of all logic gates in Proteus",
-            //     desc: "This lab will provide a verification of truth table of logic gates using Proteus software.",
-            //     date: "Fri March 3, 2023",
-            //     author: "Divya Mohan",
-            //     link: "verification-of-logic-gates-in-proteus",
-            //     // cardimage: "_url_"
-            // },
+        const arr = [            
             {
                 date: "Mon October 3, 2022",
                 desc: "Hello World",
