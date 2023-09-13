@@ -88,54 +88,169 @@ const cdnjs_cryptoJS = "https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/c
 //     }
 // })();
 
+
+//////////////////////// LOADER - Version 1.0 - BASE
+// (function () {
+//     // Dynamically include var.js - it includes var.js for every folder hiearchy
+//     // currently capped till course code (7) - scalable to any number of folders.
+
+//     /* -- CRUDE --
+//     var currentUrl = window.location.href,
+//         urlParts = currentUrl.split('/'),
+//         varJsUrl = 'https://dmj.one/var.js';
+//     if (urlParts[3])
+//         varJsUrl = 'https://dmj.one/' + urlParts[3] + '/var.js';
+//     if (urlParts[4])
+//         varJsUrl = 'https://dmj.one/' + urlParts[3] + '/' + urlParts[4] + '/var.js';
+//     if (urlParts[5])
+//         varJsUrl = 'https://dmj.one/' + urlParts[3] + '/' + urlParts[4] + '/' + urlParts[5] + '/var.js';
+//     if (urlParts[6])
+//         varJsUrl = 'https://dmj.one/' + urlParts[3] + '/' + urlParts[4] + '/' + urlParts[5] + '/' + urlParts[6] + '/var.js';
+//     */
+
+//     /* -- Advanced --
+//     var currentUrl = window.location.href, urlParts = currentUrl.split('/'), varJsUrl = 'https://dmj.one/var.js', lastFolderIndex = urlParts.length - 1; // initialize the last complete folder index
+//     for (var i = urlParts.length - 1; i >= 3 && i < 7; i--) { // iterate through the parts in reverse order, starting from the last index
+//         lastFolderIndex = i;
+//         break;
+//     }
+//     if (lastFolderIndex >= 4 && lastFolderIndex <= 6) // check if the last folder index is between 4 and 6 (inclusive)
+//         varJsUrl = 'https://dmj.one/' + urlParts.slice(3, lastFolderIndex).join('/') + '/var.js'; // create the varJsUrl using the parts from index 3 to lastFolderIndex
+//     else if (lastFolderIndex > 6) // check if the last folder index is greater than 6
+//         varJsUrl = 'https://dmj.one/' + urlParts.slice(3, 7).join('/') + '/var.js'; // create the varJsUrl using the parts from index 3 to 7
+//  */
+//     // -- Professional --
+//     // var varJsUrl = (function () {
+//     //     var currentUrl = window.location.href,
+//     //         urlParts = currentUrl.split('/').map(encodeURIComponent),
+//     //         varJsUrl = '/var.js',
+//     //         lastFolderIndex = urlParts.length - 1;
+//     //     for (var i = urlParts.length - 1; i >= 3 && i < 7; i--) {
+//     //         lastFolderIndex = i;
+//     //         break;
+//     //     }
+//     //     if (lastFolderIndex >= 4 && lastFolderIndex <= 6)
+//     //         varJsUrl = '/' + urlParts.slice(3, lastFolderIndex).join('/') + '/var.js';
+//     //     else if (lastFolderIndex > 6)
+//     //         varJsUrl = '/' + urlParts.slice(3, 7).join('/') + '/var.js';
+
+//     //     return varJsUrl;
+//     // })(); document.write(`<script src='${varJsUrl}'></script>`);
+
+
+//     var getJsUrl = function (fileName) {
+//         var currentUrl = window.location.href,
+//             urlParts = currentUrl.split('/').map(encodeURIComponent),
+//             lastFolderIndex = urlParts.length - 1;
+//         for (var i = urlParts.length - 1; i >= 3 && i < 7; i--) {
+//             lastFolderIndex = i;
+//             break;
+//         }
+//         var jsUrl;
+//         if (lastFolderIndex >= 4 && lastFolderIndex <= 6)
+//             jsUrl = '/' + urlParts.slice(3, lastFolderIndex).join('/') + '/' + fileName;
+//         else if (lastFolderIndex > 6)
+//             jsUrl = '/' + urlParts.slice(3, 7).join('/') + '/' + fileName;
+//         else
+//             jsUrl = '/' + fileName;
+
+//         return jsUrl;
+//     };
+//     document.write(`<script src='${getJsUrl("var.js")}'></script>`);
+
+//     (function () {
+//         fetch(getJsUrl("encvar.json"))
+//             .then(response => {
+//                 if (!response.ok) {
+//                     throw response;
+//                 }
+//                 return response.json();
+//             })
+//             .then(data => {
+//                 // your code here
+//                 let cryptojs_enc_map = data;
+//                 let urlParts = window.location.pathname.split('/').filter(Boolean);
+//                 let current_map = cryptojs_enc_map;
+//                 for (let part of urlParts) {
+//                     current_map = current_map[part.replace('.html', '')];
+//                     if (typeof current_map === "string") {
+//                         let cryptojs_enc_data = window["cryptojs_enc_data"] = current_map;
+//                         // console.log('cryptojs_enc_data:', current_map);
+//                         return;
+//                     }
+//                 }
+//             })
+//             .catch((error) => {
+//                 if (error.status !== 404) {
+//                     console.error('Error:', error);
+//                 }
+//                 // else, ignore the error or handle it differently
+//             });
+//     })();
+
+//     var common_variables = "/js/comvar.js";
+//     document.write(`<script src='${common_variables}'></script>`);
+
+//     var qrcode_js = "/js/qrcode.js"; // from "https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js";
+//     document.write(`<script src='${qrcode_js}'></script>`);
+
+//     //var edu_var = "https://dmj.one/js/edu_su_var.js";
+//     //var edu_js = "https://dmj.one/js/edu_su_common.js";
+//     // const cdnjs_jquery = "https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js";
+//     // const cdnjs_bootstrap = "https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0-alpha1/js/bootstrap.bundle.min.js";
+//     // const cdnjs_highlightjs = "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/highlight.min.js";
+//     // const cdnjs_katex = "https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js";
+//     // const cdnjs_katex_autorender = "https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js";
+//     // const cdnjs_font_awesome = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js";
+
+//     // Create an array of script URLs
+//     var scripts = [cdnjs_jquery, cdnjs_bootstrap, cdnjs_highlightjs, cdnjs_katex, cdnjs_katex_autorender, cdnjs_font_awesome, cdnjs_cryptoJS];
+//     var loaded = 0; // Create a counter to keep track of the number of scripts that have finished loading
+
+//     for (var i = 0; i < scripts.length; i++) { // Iterate through the array of scripts
+//         var script = document.createElement('script'); // Create script element
+//         script.src = scripts[i]; // Set the script's URL
+//         script.defer = true;
+//         script.onload = function () {
+//             loaded++; // Increment the counter
+//             if (loaded === scripts.length) { // Check if all scripts have finished loading. If it is then Execute the onload code here
+
+//                 var autorender = document.createElement('script');
+//                 autorender.innerHTML = `
+// hljs.highlightAll(); // Highlight js init - single line code.
+// // renderMathInElement(document.body); // KaTex Math js
+// // renderMathInElement(document.body, {
+// //     delimiters: [
+// //         { left: '$$', right: '$$', display: true },
+// //         { left: '$', right: '$', display: false },
+// //         { left: '\\(', right: '\\)', display: false },
+// //         { left: '\\[', right: '\\]', display: true }
+// //     ],
+// //     throwOnError: false
+// // });
+//                 `;
+//                 document.head.appendChild(autorender);
+
+//                 // hljs.highlightAll(); // Highlight js init - single line code.
+//                 // renderMathInElement(document.body); // KaTex Math js
+
+//                 /*                 // KaTex Math js START
+//                                 renderMathInElement(document.body, {
+//                                     delimiters: [{ left: '$$', right: '$$', display: true },
+//                                     { left: '$', right: '$', display: false },
+//                                     { left: '\\(', right: '\\)', display: false },
+//                                     { left: '\\[', right: '\\]', display: true }],
+//                                     throwOnError: false
+//                                 });
+//                                 // KaTex Math js END */
+//             }
+//         };
+//         document.head.appendChild(script); // Append the script element to the head of the document
+//     }
+// })();
+
+////////////////////// LOADER - Version 1.4 - Advanced
 (function () {
-    // Dynamically include var.js - it includes var.js for every folder hiearchy
-    // currently capped till course code (7) - scalable to any number of folders.
-
-    /* -- CRUDE --
-    var currentUrl = window.location.href,
-        urlParts = currentUrl.split('/'),
-        varJsUrl = 'https://dmj.one/var.js';
-    if (urlParts[3])
-        varJsUrl = 'https://dmj.one/' + urlParts[3] + '/var.js';
-    if (urlParts[4]) 
-        varJsUrl = 'https://dmj.one/' + urlParts[3] + '/' + urlParts[4] + '/var.js';
-    if (urlParts[5]) 
-        varJsUrl = 'https://dmj.one/' + urlParts[3] + '/' + urlParts[4] + '/' + urlParts[5] + '/var.js';
-    if (urlParts[6]) 
-        varJsUrl = 'https://dmj.one/' + urlParts[3] + '/' + urlParts[4] + '/' + urlParts[5] + '/' + urlParts[6] + '/var.js';
-    */
-
-    /* -- Advanced --
-    var currentUrl = window.location.href, urlParts = currentUrl.split('/'), varJsUrl = 'https://dmj.one/var.js', lastFolderIndex = urlParts.length - 1; // initialize the last complete folder index
-    for (var i = urlParts.length - 1; i >= 3 && i < 7; i--) { // iterate through the parts in reverse order, starting from the last index
-        lastFolderIndex = i;
-        break;
-    }
-    if (lastFolderIndex >= 4 && lastFolderIndex <= 6) // check if the last folder index is between 4 and 6 (inclusive)
-        varJsUrl = 'https://dmj.one/' + urlParts.slice(3, lastFolderIndex).join('/') + '/var.js'; // create the varJsUrl using the parts from index 3 to lastFolderIndex
-    else if (lastFolderIndex > 6) // check if the last folder index is greater than 6
-        varJsUrl = 'https://dmj.one/' + urlParts.slice(3, 7).join('/') + '/var.js'; // create the varJsUrl using the parts from index 3 to 7
- */
-    // -- Professional --
-    // var varJsUrl = (function () {
-    //     var currentUrl = window.location.href,
-    //         urlParts = currentUrl.split('/').map(encodeURIComponent),
-    //         varJsUrl = '/var.js',
-    //         lastFolderIndex = urlParts.length - 1;
-    //     for (var i = urlParts.length - 1; i >= 3 && i < 7; i--) {
-    //         lastFolderIndex = i;
-    //         break;
-    //     }
-    //     if (lastFolderIndex >= 4 && lastFolderIndex <= 6)
-    //         varJsUrl = '/' + urlParts.slice(3, lastFolderIndex).join('/') + '/var.js';
-    //     else if (lastFolderIndex > 6)
-    //         varJsUrl = '/' + urlParts.slice(3, 7).join('/') + '/var.js';
-
-    //     return varJsUrl;
-    // })(); document.write(`<script src='${varJsUrl}'></script>`);
-
-
     var getJsUrl = function (fileName) {
         var currentUrl = window.location.href,
             urlParts = currentUrl.split('/').map(encodeURIComponent),
@@ -186,69 +301,46 @@ const cdnjs_cryptoJS = "https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/c
             });
     })();
 
-
-
-
     var common_variables = "/js/comvar.js";
     document.write(`<script src='${common_variables}'></script>`);
 
-    var qrcode_js = "/js/qrcode.js"; // from "https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js";
+    // from "https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js";
+    var qrcode_js = "/js/qrcode.js";
     document.write(`<script src='${qrcode_js}'></script>`);
 
-    //var edu_var = "https://dmj.one/js/edu_su_var.js";
-    //var edu_js = "https://dmj.one/js/edu_su_common.js";
-    // const cdnjs_jquery = "https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js";
-    // const cdnjs_bootstrap = "https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0-alpha1/js/bootstrap.bundle.min.js";
-    // const cdnjs_highlightjs = "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/highlight.min.js";
-    // const cdnjs_katex = "https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js";
-    // const cdnjs_katex_autorender = "https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js";
-    // const cdnjs_font_awesome = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js";
+    const allScripts = [cdnjs_jquery, cdnjs_bootstrap, cdnjs_highlightjs, cdnjs_font_awesome, cdnjs_cryptoJS];    
+    var loadScript = function (src) {
+        return new Promise(function (resolve, reject) {
+            var script = document.createElement('script');
+            script.src = src;
+            script.async = true;
+            script.onload = resolve;
+            script.onerror = reject;
+            document.head.appendChild(script);
+        });
+    };
 
-    // Create an array of script URLs
-    var scripts = [cdnjs_jquery, cdnjs_bootstrap, cdnjs_highlightjs, cdnjs_katex, cdnjs_katex_autorender, cdnjs_font_awesome, cdnjs_cryptoJS];
-    var loaded = 0; // Create a counter to keep track of the number of scripts that have finished loading
 
-    for (var i = 0; i < scripts.length; i++) { // Iterate through the array of scripts
-        var script = document.createElement('script'); // Create script element
-        script.src = scripts[i]; // Set the script's URL
-        script.defer = true;
-        script.onload = function () {
-            loaded++; // Increment the counter
-            if (loaded === scripts.length) { // Check if all scripts have finished loading. If it is then Execute the onload code here
-
-                var autorender = document.createElement('script');
-                autorender.innerHTML = `
-hljs.highlightAll(); // Highlight js init - single line code. 
-// renderMathInElement(document.body); // KaTex Math js
-// renderMathInElement(document.body, {
-//     delimiters: [
-//         { left: '$$', right: '$$', display: true },
-//         { left: '$', right: '$', display: false },
-//         { left: '\\(', right: '\\)', display: false },
-//         { left: '\\[', right: '\\]', display: true }
-//     ],
-//     throwOnError: false
-// });
-                `;
-                document.head.appendChild(autorender);
-
-                // hljs.highlightAll(); // Highlight js init - single line code. 
-                // renderMathInElement(document.body); // KaTex Math js
-
-                /*                 // KaTex Math js START
-                                renderMathInElement(document.body, {
-                                    delimiters: [{ left: '$$', right: '$$', display: true },
-                                    { left: '$', right: '$', display: false },
-                                    { left: '\\(', right: '\\)', display: false },
-                                    { left: '\\[', right: '\\]', display: true }],
-                                    throwOnError: false
-                                });
-                                // KaTex Math js END */
-            }
-        };
-        document.head.appendChild(script); // Append the script element to the head of the document
-    }
+    // Load katex.min.js first. Once katex.min.js is loaded, load auto-render.min.js
+    loadScript(cdnjs_katex).then(function () {
+        return loadScript(cdnjs_katex_autorender);                
+    }).then(function () {        
+        return Promise.all(allScripts.map(loadScript));
+    }).then(function () {
+        hljs.highlightAll(); // Highlight Js Automatic rendering init 
+        renderMathInElement(document.body, {
+            delimiters: [
+                { left: '$$', right: '$$', display: true },
+                { left: '$', right: '$', display: false },
+                { left: '\\(', right: '\\)', display: false },
+                { left: '\\[', right: '\\]', display: true }
+            ],
+            throwOnError: false
+        }); // Once all scripts are loaded, run the KaTeX rendering function
+    });
 })();
+
+
 
 (function () {
     const logo = "/logo.png";
