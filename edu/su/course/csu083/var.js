@@ -65,22 +65,22 @@ function get_menu_list(datetogen) {
                 link: "interactive-sorting-visualizer",
                 // cardimage: "_url_"
             },
-            // {
-            //     "title": "Practical 1: Selection Sort in C [WIP]",
-            //     "desc": "Delve into the implementation of the Selection Sort algorithm using C. After understanding the code, enhance your grasp by exploring our <a href='interactive-sorting-visualizer'>interactive visualizer</a>.",
-            //     "author": "Divya Mohan",
-            //     "link": "selection-sort",
-            //     // "cardimage": "_url_"
-            // },
             {
-                "title": "Practical 1: Straight Min Max Algorithm [WIP]",
+                "title": "Practical 1: Selection Sort in C [WIP]",
+                "desc": "Delve into the implementation of the Selection Sort algorithm using C. After understanding the code, enhance your grasp by exploring our <a href='interactive-sorting-visualizer'>interactive visualizer</a>.",
+                "author": "Divya Mohan",
+                "link": "selection-sort",
+                // "cardimage": "_url_"
+            },
+            {
+                "title": "Practical 2: Straight Min Max Algorithm [WIP]",
                 "desc": "Delve into the implementation of the Straight Min Max Algorithm using C, CPP, Python. After understanding the code, enhance your grasp by exploring our <a href='interactive-sorting-visualizer'>interactive visualizer</a>.",
                 "author": "Divya Mohan",
                 "link": "#",
                 // "cardimage": "_url_"
             },
             {
-                "title": "Practical 2: Binary Search Algorithm [WIP]",
+                "title": "Practical 3: Binary Search Algorithm [WIP]",
                 "desc": "Delve into the implementation of the Binary Search Algorithm using C. After understanding the code, enhance your grasp by exploring our <a href='interactive-sorting-visualizer'>interactive visualizer</a>.",
                 "author": "Divya Mohan",
                 "link": "#",
