@@ -8,12 +8,12 @@ function get_menu_list(datetogen) {
                 "desc": "Unlock the full potential of Microprocessors and Microcontrollers with our in-depth guide to all the concepts. Take your hardware skills to the next level and discover a world of endless possibilities in embedded systems. Click now to embark on your journey.",
                 "codetype": "CSU1526 | Concepts"
             },
-            {
-                "link": "practical/",
-                "title": "Practical: Elevate Your Microprocessor and Microcontroller Skills: A Comprehensive Guide for Lab Enthusiasts",
-                "desc": "Unleash your potential in the Microprocessor and Microcontroller lab with our comprehensive guide covering all the essential concepts. Discover the intricacies of hardware and take your skills to the next level. Click now to embark on your journey.",
-                "codetype": "CSU1526P | Practical"
-            },
+            // {
+            //     "link": "practical/",
+            //     "title": "Practical: Elevate Your Microprocessor and Microcontroller Skills: A Comprehensive Guide for Lab Enthusiasts",
+            //     "desc": "Unleash your potential in the Microprocessor and Microcontroller lab with our comprehensive guide covering all the essential concepts. Discover the intricacies of hardware and take your skills to the next level. Click now to embark on your journey.",
+            //     "codetype": "CSU1526P | Practical"
+            // },
         ];
         for (let i = 0; i < arr.length; i++) {
             const _data = arr[i];
@@ -37,6 +37,12 @@ function get_menu_list(datetogen) {
             //     codetype: "Introduction",
             //     readtime: r(15)
             // },
+            {
+                title: "Practice Questions",
+                desc: "Practice questions based on the topics and lectures by the faculty.",
+                codetype: "Practice Questions",
+                readtime: r(10)
+            },
         ];
         for (let i = 0; i < arr.length; i++) {
             const _data = arr[i];

@@ -318,9 +318,9 @@ function processFolder(allAuthors, author_bio) {
                                     course_detail = "Computer Organization";
                                     break;
                                 case "csu1526":
-                                    prof = "Dr. Brij Bhushan Sharma";
-                                    prof_bio = "<p>Dr. Brij Bhushan Sharma has an M Tech in Electronics and Communication (2015) and is pursuing a PhD in Smart Agriculture. He has 8 years of teaching experience and has contributed to numerous academic publications. His research focuses on developing an IoT-based Indirect Solar Dryer and a digital system to check soil fertility using AI.</p>";
-                                    prof_href = "brijbhushan@shooliniouniversity.com";
+                                    prof = "Dr. Piyush Sewal";
+                                    prof_bio = "<p>Dr. Piyush Sewal is an assistant professor at Shoolini University.</p>";
+                                    prof_href = "piyushsewal@shooliniouniversity.com";
                                     course = "CSU1526";
                                     course_detail = "Microprocessor and Microcontroller";
                                     break;
