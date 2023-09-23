@@ -6,7 +6,7 @@ function get_menu_list(datetogen) {
                 "link": "theory/",
                 "title": "Theory: Dive into the World of Microprocessors and Microcontrollers: A Comprehensive Guide",
                 "desc": "Unlock the full potential of Microprocessors and Microcontrollers with our in-depth guide to all the concepts. Take your hardware skills to the next level and discover a world of endless possibilities in embedded systems. Click now to embark on your journey.",
-                "codetype": "CSU1526 | Concepts"
+                "codetype": "CSU1526 | Concepts"                
             },
             // {
             //     "link": "practical/",
@@ -41,7 +41,8 @@ function get_menu_list(datetogen) {
                 title: "Practice Questions",
                 desc: "Practice questions based on the topics and lectures by the faculty.",
                 codetype: "Practice Questions",
-                readtime: r(10)
+                readtime: r(10),
+                link: "practice-questions"
             },
         ];
         for (let i = 0; i < arr.length; i++) {
