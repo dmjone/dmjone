@@ -70,6 +70,7 @@ function get_menu_list(datetogen) {
                 "desc": "Delve into the implementation of the Selection Sort algorithm using C. After understanding the code, enhance your grasp by exploring our <a href='interactive-sorting-visualizer'>interactive visualizer</a>.",
                 "author": "Divya Mohan",
                 "link": "selection-sort",
+                date: "Thursday, August 17, 2023"
                 // "cardimage": "_url_"
             },
             {
@@ -77,14 +78,16 @@ function get_menu_list(datetogen) {
                 "desc": "Delve into the implementation of the Straight Min Max Algorithm using C, CPP, Python. After understanding the code, enhance your grasp by exploring our <a href='interactive-sorting-visualizer'>interactive visualizer</a>.",
                 "author": "Divya Mohan",
                 "link": "#",
-                // "cardimage": "_url_"
+                // "cardimage": "_url_",
+                date: "Thursday, August 31, 2023"
             },
             {
                 "title": "Practical 3: Binary Search Algorithm [WIP]",
                 "desc": "Delve into the implementation of the Binary Search Algorithm using C. After understanding the code, enhance your grasp by exploring our <a href='interactive-sorting-visualizer'>interactive visualizer</a>.",
                 "author": "Divya Mohan",
                 "link": "#",
-                // "cardimage": "_url_"
+                // "cardimage": "_url_",
+                date: "Thursday, September 7, 2023"
             },
 
             {
@@ -92,30 +95,33 @@ function get_menu_list(datetogen) {
                 "desc": "Delve into the implementation of the Merge Sort using C. After understanding the code, enhance your grasp by exploring our <a href='interactive-sorting-visualizer'>interactive visualizer</a>.",
                 "author": "Divya Mohan",
                 "link": "#",
-                // "cardimage": "_url_"
+                // "cardimage": "_url_",
+                date: "Thursday, September 14, 2023"
             },
             {
                 "title": "Practical 5: Quick Sort [WIP]",
                 "desc": "Delve into the implementation of the Quick Sort using C. After understanding the code, enhance your grasp by exploring our <a href='interactive-sorting-visualizer'>interactive visualizer</a>.",
                 "author": "Divya Mohan",
                 "link": "#",
-                // "cardimage": "_url_"
+                // "cardimage": "_url_",
+                date: "Thursday, September 21, 2023"
             },
             {
                 "title": "Practical 6: Selection Procedure [WIP]",
                 "desc": "Delve into the implementation of the Selection Procedure using C. After understanding the code, enhance your grasp by exploring our <a href='interactive-sorting-visualizer'>interactive visualizer</a>.",
                 "author": "Divya Mohan",
                 "link": "#",
-                // "cardimage": "_url_"
+                // "cardimage": "_url_",
+                date: "Thursday, September 28, 2023"
             },
             {
                 "title": "Practical 7: Divide And Conquer - Matrix Multiplication [WIP]",
                 "desc": "Delve into the implementation of the Matrix Multiplication using Divide and Conquer using C. After understanding the code, enhance your grasp by exploring our <a href='interactive-sorting-visualizer'>interactive visualizer</a>.",
                 "author": "Divya Mohan",
                 "link": "#",
-                // "cardimage": "_url_"
+                // "cardimage": "_url_",
+                date: "Thursday, October 12, 2023"
             },
-
         ];
         for (let i = 0; i < arr.length; i++) {
             const _data = arr[i];
