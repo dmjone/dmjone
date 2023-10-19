@@ -87,6 +87,35 @@ function get_menu_list(datetogen) {
                 // "cardimage": "_url_"
             },
 
+            {
+                "title": "Practical 4: Merge Sort[WIP]",
+                "desc": "Delve into the implementation of the Merge Sort using C. After understanding the code, enhance your grasp by exploring our <a href='interactive-sorting-visualizer'>interactive visualizer</a>.",
+                "author": "Divya Mohan",
+                "link": "#",
+                // "cardimage": "_url_"
+            },
+            {
+                "title": "Practical 5: Quick Sort [WIP]",
+                "desc": "Delve into the implementation of the Quick Sort using C. After understanding the code, enhance your grasp by exploring our <a href='interactive-sorting-visualizer'>interactive visualizer</a>.",
+                "author": "Divya Mohan",
+                "link": "#",
+                // "cardimage": "_url_"
+            },
+            {
+                "title": "Practical 6: Selection Procedure [WIP]",
+                "desc": "Delve into the implementation of the Selection Procedure using C. After understanding the code, enhance your grasp by exploring our <a href='interactive-sorting-visualizer'>interactive visualizer</a>.",
+                "author": "Divya Mohan",
+                "link": "#",
+                // "cardimage": "_url_"
+            },
+            {
+                "title": "Practical 7: Divide And Conquer - Matrix Multiplication [WIP]",
+                "desc": "Delve into the implementation of the Matrix Matliplication using Divide and Conquer using C. After understanding the code, enhance your grasp by exploring our <a href='interactive-sorting-visualizer'>interactive visualizer</a>.",
+                "author": "Divya Mohan",
+                "link": "#",
+                // "cardimage": "_url_"
+            },
+
         ];
         for (let i = 0; i < arr.length; i++) {
             const _data = arr[i];
