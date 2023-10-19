@@ -110,7 +110,7 @@ function get_menu_list(datetogen) {
             },
             {
                 "title": "Practical 7: Divide And Conquer - Matrix Multiplication [WIP]",
-                "desc": "Delve into the implementation of the Matrix Matliplication using Divide and Conquer using C. After understanding the code, enhance your grasp by exploring our <a href='interactive-sorting-visualizer'>interactive visualizer</a>.",
+                "desc": "Delve into the implementation of the Matrix Multiplication using Divide and Conquer using C. After understanding the code, enhance your grasp by exploring our <a href='interactive-sorting-visualizer'>interactive visualizer</a>.",
                 "author": "Divya Mohan",
                 "link": "#",
                 // "cardimage": "_url_"
