@@ -83,7 +83,7 @@ function get_menu_list(datetogen) {
                 date: "Thursday, August 31, 2023"
             },
             {
-                "title": "Practical 2: Method 2: Straight Min Max Algorithm",
+                "title": "Practical 2: Method 2 - Straight Min Max Algorithm",
                 "desc": "Delve into the implementation of the Straight Min Max Algorithm using C, CPP, Python. After understanding the code, enhance your grasp by exploring our <a href='interactive-sorting-visualizer'>interactive visualizer</a>.",
                 "author": "Shreshth Srivastav",
                 "link": "straight-min-max-method-2",
