@@ -15,9 +15,9 @@ const arr_author = {
         bio: "<p>Harshal Khajuria is currently a student of Shoolini University pursuing B.Tech Cyber Security</p>",
         href: "harshalkotakhajuria@gmail.com"
     },
-    shrestha: {
-        name: "Shrestha Shrivastav",
-        bio: "<p>Shrestha Shrivastav is a focused student from India, currently advancing in his Bachelor's degree in Computer Science and Engineering. He is a dedicated CSE student who takes pleasure in coding and generating inventive solutions to address real-world problems.</p>",
+    shreshth: {
+        name: "Shreshth Srivastav",
+        bio: "<p>Shreshth Srivastav is a focused student from India, currently advancing in his Bachelor's degree in Computer Science and Engineering. He is a dedicated CSE student who takes pleasure in coding and generating inventive solutions to address real-world problems.</p>",
         href: "contact@dmj.one"
     },
     asmi: {

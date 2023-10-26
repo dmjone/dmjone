@@ -66,26 +66,35 @@ function get_menu_list(datetogen) {
                 // cardimage: "_url_"
             },
             {
-                "title": "Practical 1: Selection Sort in C [WIP]",
+                "title": "Practical 1: Selection Sort in C",
                 "desc": "Delve into the implementation of the Selection Sort algorithm using C. After understanding the code, enhance your grasp by exploring our <a href='interactive-sorting-visualizer'>interactive visualizer</a>.",
-                "author": "Divya Mohan",
+                "author": "Shreshth Srivastav",
                 "link": "selection-sort",
-                date: "Thursday, August 17, 2023"
+                date: "Thursday, August 17, 2023",
+                author: "Shreshth Srivastav"
                 // "cardimage": "_url_"
             },
             {
-                "title": "Practical 2: Straight Min Max Algorithm [WIP]",
+                "title": "Practical 2: Straight Min Max Algorithm",
                 "desc": "Delve into the implementation of the Straight Min Max Algorithm using C, CPP, Python. After understanding the code, enhance your grasp by exploring our <a href='interactive-sorting-visualizer'>interactive visualizer</a>.",
-                "author": "Divya Mohan",
-                "link": "#",
+                "author": "Shreshth Srivastav",
+                "link": "straight-min-max",
                 // "cardimage": "_url_",
                 date: "Thursday, August 31, 2023"
             },
             {
-                "title": "Practical 3: Binary Search Algorithm [WIP]",
+                "title": "Practical 2: Method 2: Straight Min Max Algorithm",
+                "desc": "Delve into the implementation of the Straight Min Max Algorithm using C, CPP, Python. After understanding the code, enhance your grasp by exploring our <a href='interactive-sorting-visualizer'>interactive visualizer</a>.",
+                "author": "Shreshth Srivastav",
+                "link": "straight-min-max-method-2",
+                // "cardimage": "_url_",
+                date: "Thursday, August 31, 2023"
+            },
+            {
+                "title": "Practical 3: Binary Search Algorithm",
                 "desc": "Delve into the implementation of the Binary Search Algorithm using C. After understanding the code, enhance your grasp by exploring our <a href='interactive-sorting-visualizer'>interactive visualizer</a>.",
-                "author": "Divya Mohan",
-                "link": "#",
+                "author": "Shreshth Srivastav",
+                "link": "binary-search-algorithm",
                 // "cardimage": "_url_",
                 date: "Thursday, September 7, 2023"
             },
