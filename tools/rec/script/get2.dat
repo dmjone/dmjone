@@ -1,0 +1,38 @@
+<#
+.SYNOPSIS
+    Captures screenshots every 7 seconds for 2 hours or till it is stopped midway and saves to a specific location.
+.DESCRIPTION
+    Loads necessary .NET assemblies, sets execution policy, checks for a directory and creates it if not present, captures and saves screenshots, and resets the execution policy.
+.NOTES
+    File Name  : 1.ps1
+    Author     : Divya Mohan
+    Version    : 1.0
+    Changelog  : Original version - 2023
+    Copyright  : (c) 2023 Divya Mohan. Licensed under the MIT License. See TERMS and CONDITIONS from the https://dmj.one/terms for license and usage information.
+.LINKS
+    Downloaded From : https://dmj.one/tools/rec/
+    Homepage        : https://dmj.one
+#>
+Add-Type -AssemblyName System.Windows.Forms, System.Drawing | Out-Null
+# Set-ExecutionPolicy RemoteSigned -Scope Process -Confirm:$false
+$Path = "C:\autoscr"
+New-Item -ItemType Directory -Force -Path $Path -ErrorAction Ignore | Out-Null
+$startTime = Get-Date
+
+# Get the bounds of the first display
+$firstScreen = [System.Windows.Forms.Screen]::AllScreens[0]
+$bounds = $firstScreen.Bounds
+
+while ((Get-Date) - $startTime -lt (New-TimeSpan -Hours 2)) {
+    if (Test-Path -Path "$Path\kill.switch") { Remove-Item -Path "$Path\kill.switch" -Confirm:$false; break }
+    Start-Sleep -Seconds 5
+    
+    $bitmap = New-Object System.Drawing.Bitmap $bounds.Width, $bounds.Height
+    $graphics = [System.Drawing.Graphics]::FromImage($bitmap)
+    $graphics.CopyFromScreen($bounds.X, $bounds.Y, 0, 0, $bounds.Size)
+    $graphics.Dispose()
+    
+    $bitmap.Save("$Path\$(Get-Date -Format yyyyMMddHHmmss).jpg")
+    $bitmap.Dispose()
+}
+# Set-ExecutionPolicy Default -Scope Process -Confirm:$false
