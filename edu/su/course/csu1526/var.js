@@ -38,11 +38,18 @@ function get_menu_list(datetogen) {
             //     readtime: r(15)
             // },
             {
-                title: "Practice Questions",
-                desc: "Practice questions based on the topics and lectures by the faculty.",
-                codetype: "Practice Questions",
+                title: "Practice Questions - Unit 1",
+                desc: "Practice questions based on the topics and lectures by the faculty for the Unit 1.",
+                codetype: "Practice Questions - U1",
                 readtime: r(10),
                 link: "practice-questions"
+            },
+            {
+                title: "Practice Questions - Unit 2",
+                desc: "Practice questions based on the topics and lectures by the faculty for the Unit 2.",
+                codetype: "Practice Questions - U2",
+                readtime: r(10),
+                link: "practice-questions-unit-2"
             },
         ];
         for (let i = 0; i < arr.length; i++) {
