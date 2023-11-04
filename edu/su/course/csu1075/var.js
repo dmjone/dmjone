@@ -4,16 +4,16 @@ function get_menu_list(datetogen) {
         const arr = [
             {
                 link: "theory/",
-                title: "Theory: Dive into the World of Java Programming: A Comprehensive Guide",
-                desc: "Unlock the full potential of Java with our in-depth guide to all the concepts. Take your programming skills to the next level and discover a world of endless coding possibilities. Click now to embark on your Java journey.",
+                title: "Theory: Dive into the World of Computer Organization: A Comprehensive Guide",
+                desc: "Unlock the full potential of Computer Organization with our in-depth guide to all the concepts. Take your programming skills to the next level and discover a world of endless possibilities in architecture of computers. Click now to embark on your Computer Organization journey.",
                 codetype: "CSU1291 | Concepts"
             },
-            {
-                link: "practical/",
-                title: "Practical: Elevate Your Java Programming Skills: A Comprehensive Guide for Lab Enthusiasts",
-                desc: "Unleash your potential in the Java programming lab with our comprehensive guide covering all the essential concepts. Discover the magic of code and take your programming skills to the next level. Click now to embark on your Java journey.",
-                codetype: "CSU1291P | Practical"
-            },
+            // {
+            //     link: "practical/",
+            //     title: "Practical: Elevate Your Java Programming Skills: A Comprehensive Guide for Lab Enthusiasts",
+            //     desc: "Unleash your potential in the Java programming lab with our comprehensive guide covering all the essential concepts. Discover the magic of code and take your programming skills to the next level. Click now to embark on your Java journey.",
+            //     codetype: "CSU1291P | Practical"
+            // },
 
         ];
         for (let i = 0; i < arr.length; i++) {
@@ -32,11 +32,18 @@ function get_menu_list(datetogen) {
     }
     function get_class(def_date, def_author) {
         const arr = [
+            // {
+            //     title: "The Digital Revolution: A Thrilling Introduction to Digital Electronics",
+            //     desc: "Join the revolution and discover the magic of digital electronics with our exciting introduction to the world of digital circuits and systems. From binary code to microprocessors, our guide covers all the essentials. Click now to embark on an electrifying journey into the digital realm!",
+            //     codetype: "Introduction",
+            //     readtime: r(15)
+            // },        
             {
-                title: "The Digital Revolution: A Thrilling Introduction to Digital Electronics",
-                desc: "Join the revolution and discover the magic of digital electronics with our exciting introduction to the world of digital circuits and systems. From binary code to microprocessors, our guide covers all the essentials. Click now to embark on an electrifying journey into the digital realm!",
-                codetype: "Introduction",
-                readtime: r(15)
+                title: "Pipelining",
+                desc: "Join the revolution and discover the magic of pipelining with us. From binary code to microprocessors, our guide covers all the essentials. Click now to embark on an electrifying journey into the digital realm!",
+                codetype: "Pipelinig",
+                readtime: r(15),
+                link: "pipelining"
             },
         ];
         for (let i = 0; i < arr.length; i++) {
