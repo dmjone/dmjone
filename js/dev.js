@@ -7,7 +7,8 @@ const body_blockcards_continuereading_options = ['Expand Your Knowledge', 'Keep 
 
 const cdnjs_jquery = "https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js";
 const cdnjs_bootstrap = "https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0-alpha1/js/bootstrap.bundle.min.js";
-const cdnjs_highlightjs = "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/highlight.min.js";
+const cdnjs_highlightjs = "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js";
+const cdnjs_highlightjs_asm = "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/armasm.min.js";
 const cdnjs_katex = "https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js";
 const cdnjs_katex_autorender = "https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js";
 const cdnjs_font_awesome = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js";
@@ -308,7 +309,7 @@ const cdnjs_cryptoJS = "https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/c
     var qrcode_js = "/js/qrcode.js";
     document.write(`<script src='${qrcode_js}'></script>`);
 
-    const allScripts = [cdnjs_jquery, cdnjs_bootstrap, cdnjs_highlightjs, cdnjs_font_awesome, cdnjs_cryptoJS];    
+    const allScripts = [cdnjs_jquery, cdnjs_bootstrap, cdnjs_highlightjs, cdnjs_font_awesome, cdnjs_cryptoJS, cdnjs_highlightjs_asm];
     var loadScript = function (src) {
         return new Promise(function (resolve, reject) {
             var script = document.createElement('script');
