@@ -6,7 +6,7 @@ function get_menu_list(datetogen) {
                 link: "theory/",
                 title: "Theory: Dive into the World of Computer Organization: A Comprehensive Guide",
                 desc: "Unlock the full potential of Computer Organization with our in-depth guide to all the concepts. Take your programming skills to the next level and discover a world of endless possibilities in architecture of computers. Click now to embark on your Computer Organization journey.",
-                codetype: "CSU1291 | Concepts"
+                codetype: "CSU1075 | Concepts"
             },
             // {
             //     link: "practical/",
