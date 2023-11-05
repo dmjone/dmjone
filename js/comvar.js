@@ -168,10 +168,11 @@ const arr_prof = {
     }
 };
 function processFolders() {
-
-
 }
 
+
+////////////// VERSION 1.0
+/*
 function processFolder(allAuthors, author_bio) {
     let prof, prof_href, prof_bio, course, course_detail;
     switch (urlpart1) {
@@ -312,14 +313,14 @@ function processFolder(allAuthors, author_bio) {
                                     break;
                                 case "csu1075":
                                     prof = "Dr. Brij Bhushan Sharma";
-                                    prof_bio = "<p>Dr. Brij Bhushan Sharma has an M Tech in Electronics and Communication (2015) and is pursuing a PhD in Smart Agriculture. He has 8 years of teaching experience and has contributed to numerous academic publications. His research focuses on developing an IoT-based Indirect Solar Dryer and a digital system to check soil fertility using AI.</p>";
+                                    prof_bio = "<p>Dr. Brij Bhushan Sharma has an M Tech in Electronics and Communication (2015) is an Associate Professor at the Yogananda School of AI, Computer, and Data Science at Shoolini University, and holds a PhD in Smart Agriculture. He has 8 years of teaching experience and has contributed to numerous academic publications. His research focuses on developing an IoT-based Indirect Solar Dryer and a digital system to check soil fertility using AI.</p>";
                                     prof_href = "brijbhushan@shooliniouniversity.com";                                            
                                     course = "CSU1075";
                                     course_detail = "Computer Organization";
                                     break;
                                 case "csu1526":
                                     prof = "Dr. Piyush Sewal";
-                                    prof_bio = "<p>Dr. Piyush Sewal is an assistant professor at Shoolini University.</p>";
+                                    prof_bio = "<p>Dr. Piyush Sewal is an Assistant Professor at the Yogananda School of AI, Computer, and Data Science at Shoolini University, holding a Master's in Computer Applications from HP University, Shimla, and currently pursuing a PhD in Data Science at JP University of Information Technology. His expertise lies in machine learning, distributed data processing, and in-memory computation frameworks. Sewal has passed the UGC National Eligibility Test for Computer Science and Applications in 2018 and 2019, as well as the HP State Eligibility Test in 2018. He brings over a decade of teaching experience and has imparted knowledge through more than 400 lectures at various institutions and organizations, including Rashtrapati Bhawan and the Army Skill Training Center. Committed to social causes, he has also spearheaded several social awareness initiatives and health-related drives.</p>";
                                     prof_href = "piyushsewal@shooliniouniversity.com";
                                     course = "CSU1526";
                                     course_detail = "Microprocessor and Microcontroller";
@@ -418,6 +419,231 @@ function processFolder(allAuthors, author_bio) {
 
     return { line1, line2, line3, line4 };
 }
+*/
+
+const profDetailsBio = {
+    'Dr. Pankaj Vaidya': {
+        bio: "<p>Dr. Pankaj Vaidya serves as the Head of the Yogananda School of AI, Computers, and Data Sciences, bringing with him 22 years of teaching experience. His research focuses on the application of Machine Learning in areas such as Drug Discovery and environmental remediation technologies aimed at pollution prevention and control. Dr. Vaidya obtained both his M.Tech (2005) and Ph.D. (2020) in Computer Science Engineering from Shoolini University. His scholarly output includes a variety of international scientific papers and book chapters, alongside books he has both edited and authored, which are published by SCOUPS. Committed to environmental causes, Dr. Vaidya is a nature enthusiast who actively contributes to environmental protection efforts.</p>",
+        href: "pankaj.vaidya@shooliniuniversity.com"
+    },
+    'Dr. Bharti Thakur': {
+        bio: "<p>Bharti Thakur is an Assistant Professor at the Yogananda School of Artificial Intelligence, Computing and Data Science, Shoolini University of Biotechnology and Management Sciences, Solan (HP) India. She is doing her research on ‘Data Mining and Machine Learning’. She holds 10 years of teaching experience.</p>",
+        href: "bhartithakur@shooliniuniversity.com"
+    },
+    'Dr. Pawan Kumar': {
+        bio: "<p>Dr. Pawan Kumar is a assistant Professor at Shoolini University. He has more than 20 years of experience in teaching, research, and administration. He completed his Ph.D.in 2019 from Amity University, Noida with the collaboration of Punjab University, Chandigarh. He is currently working on Optical, Thermal and Electrical Properties of Chalcogenide Glasses/Thin Films.</p>",
+        href: "pawankumarsu783@shooliniuniversity.com"
+    },
+    'Dr. Ravinder Thakur': {
+        bio: "<p>Dr. Ravinder Thakur is an assistant professor at Shoolini University.</p>",
+        href: "ravinderthakur@shooliniuniversity.com"
+    },
+    'Rajesh Williams': {
+        bio: "<p>Rajesh Williams is an English Language professional from Faculty of Liberal Arts.</p>",
+        href: "contact@dmj.one"
+    },
+    'Dr. Ruchika Sharma': {
+        bio: "<p>Dr. Ruchika Sharma is an assistant professor at Shoolini University.</p>",
+        href: "ruchika@shooliniuniversity.com"
+    },
+    'Dr. Brij Bhushan Sharma': {
+        bio: "<p>Dr. Brij Bhushan Sharma has an M Tech in Electronics and Communication (2015) is an Associate Professor at the Yogananda School of AI, Computer, and Data Science at Shoolini University, and holds a PhD in Smart Agriculture. He has 8 years of teaching experience and has contributed to numerous academic publications. His research focuses on developing an IoT-based Indirect Solar Dryer and a digital system to check soil fertility using AI.</p>",
+        href: "brijbhushan@shooliniouniversity.com"
+    },
+    'Abhishek Tomar': {
+        bio: "<p>Abhishek Tomar is an assistant professor at Shoolini University.</p>",
+        href: "abhishektomar@shooliniuniversity.com"
+    },
+    'Ms. Sakshi Gautam': {
+        bio: "<p>Ms. Sakshi Gautam is an assistant professor at Shoolini University.</p>",
+        href: "contact@dmj.one"
+    },
+    'Mr. Raghav Sharma': {
+        bio: "<p>Mr. Raghav Sharma is an assistant professor at Shoolini University.</p>",
+        href: "contact@dmj.one"
+    },
+    'Dr. Laxman Kathait': {
+        bio: "<p>Dr. Laxman Kathait is an assistant professor at Shoolini University.</p>",
+        href: "contact@dmj.one"
+    },
+    'Aarchit Joshi': {
+        bio: "<p>Aarchit Joshi is an assistant professor at Shoolini University.</p>",
+        href: "contact@dmj.one"
+    },
+    'Dr. Anurag Rana': {
+        bio: "<p>Dr. Anurag Rana is a research scientist and an assistant professor at Shoolini University.</p>",
+        href: "contact@dmj.one"
+    },
+    'Puneet Kapoor': {
+        bio: "<p>Puneet Kapoor is Computer Science expert, researcher and a senior assistant professor at Shoolini University.</p>",
+        href: "contact@dmj.one"
+    },
+    'Dr. Piyush Sewal': {
+        bio: "<p>Dr. Piyush Sewal is an Assistant Professor at the Yogananda School of AI, Computer, and Data Science at Shoolini University, holding a Master's in Computer Applications from HP University, Shimla, and currently pursuing a PhD in Data Science at JP University of Information Technology. His expertise lies in machine learning, distributed data processing, and in-memory computation frameworks. Sewal has passed the UGC National Eligibility Test for Computer Science and Applications in 2018 and 2019, as well as the HP State Eligibility Test in 2018. He brings over a decade of teaching experience and has imparted knowledge through more than 400 lectures at various institutions and organizations, including Rashtrapati Bhawan and the Army Skill Training Center. Committed to social causes, he has also spearheaded several social awareness initiatives and health-related drives.</p>",
+        href: "piyushsewal@shooliniouniversity.com"
+    }
+};
+const courseDetailsMap = {
+    'csu1128': { 'default': ["Dr. Pankaj Vaidya", "CSU1128", "Logic Building with Computer Programming"] },
+    'csu1128p': { 'default': ["Dr. Pankaj Vaidya", "CSU1128(P)", "Logic Building with Computer Programming Lab"] },
+    'csu953': { 'default': ["Dr. Bharti Thakur", "CSU953", "Front End Development Lab"] },
+    'fsu030': { 'default': ["Dr. Pawan Kumar", "FSU030", "Engineering Physics"] },
+    'csu951': { 'default': ["Dr. Ravinder Thakur", "CSU951", "Basic Mathematics"] },
+    'csu730': { 'default': ["Rajesh Williams", "CSU730", "Functional English - 1"] },
+    'csu585': { 'default': ["Dr. Ruchika Sharma", "CSU585", "Design Thinking"] },
+    'csu1287': { 'default': ["Dr. Pankaj Vaidya", "CSU1287", "OOPS Using C++ Language"] },
+    'csu1287p': { 'default': ["Dr. Pankaj Vaidya", "CSU1287p", "OOPS Using C++ Language Lab"] },
+    'fsu013': { 'default': ["Dr. Ravinder Thakur", "FSU013", "Advanced Mathematics"] },
+    'seaws002': { 'default': ["Ms. Sakshi Gautam", "SEA-WS002", "English Writing Seminar"] },
+    'seaap002': { 'default': ["Mr. Raghav Sharma", "SEA-AP002", "Aptitude Development Seminar"] },
+    'csu1289': {
+        'default': ["Dr. Brij Bhushan Sharma", "CSU1289", "Digital Electronics"],
+        'lab': ["Abhishek Tomar", "CSU1289P", "Digital Electronics Lab"]
+    },
+    'csu1051': {
+        'default': ["Dr. Laxman Kathait", "CSU1051", "Algorithms and Data Structure"],
+        'lab': ["Aarchit Joshi", "CSU1051", "Algorithms and Data Structure Lab"]
+    },
+    'csu1291': {
+        'default': ["Dr. Anurag Rana", "CSU1291", "Java Programming"],
+        'lab': ["Dr. Anurag Rana", "CSU1291", "Java Programming Lab"]
+    },
+    'csu083': { 'default': ["Puneet Kapoor", "CSU083", "Design and Analysis of Algorithm"] },
+    'csu1075': { 'default': ["Dr. Brij Bhushan Sharma", "CSU1075", "Computer Organization"] },
+    'csu1526': { 'default': ["Dr. Piyush Sewal", "CSU1526", "Microprocessor and Microcontroller"] }
+};
+
+///////////////// VERSION 2.0
+/* function processFolder(allAuthors, author_bio) {
+    let prof, prof_href, prof_bio, course, course_detail; // Variables to hold the course details and professor information    
+    switch (urlpart1) {
+        case "edu":
+            switch (urlpart2) {
+                case "su":
+                    switch (urlpart3) {
+                        case "course":
+                            switch (urlpart4) {
+                                case "csu1128": case "csu1128p": case "csu1128p": case 'csu953': case 'fsu030': case 'csu951': case 'csu730': case 'csu585': case 'csu1287': case 'csu1287p': case 'fsu013': case 'seaws002': case 'seaap002': case 'csu1289': case "csu1051": case "csu1291": case 'csu083': case 'csu1075': case 'csu1526':
+                                    switch (urlpart5) {
+                                        case 'practical':
+                                        case 'lab':
+                                            prof = courseDetailsMap[urlpart4].lab[0];
+                                            course = courseDetailsMap[urlpart4].lab[1];
+                                            course_detail = courseDetailsMap[urlpart4].lab[2];
+                                            console.log(prof);
+                                            prof_bio = profDetailsBio[prof].bio;
+                                            prof_href = profDetailsBio[prof].href;
+                                            break;
+                                        default:
+                                            prof = courseDetailsMap[urlpart4].default[0];
+                                            course = courseDetailsMap[urlpart4].default[1];
+                                            course_detail = courseDetailsMap[urlpart4].default[2];
+                                            console.log(prof);
+                                            prof_bio = profDetailsBio[prof].bio;
+                                            prof_href = profDetailsBio[prof].href;
+                                            break;
+                                    }
+                                    break;
+                                default:
+                                    prof = "";
+                                    prof_bio = "";
+                                    prof_href = "";
+                                    course = "Course Selection";
+                                    course_detail = "Select a subject below to explore its concepts";
+                                    break;
+                            }
+                            break;
+                        case "life":
+                            switch (folder) {
+                                case "events":
+                                    var details = "test";
+                                    break;
+                                case "photos":
+                                    var defaultsd = "testffrd";
+                                    break;
+                                default:
+                                    var slse = "ds";
+                                    break;
+                            }
+                            break;
+                        default:
+                            prof = "";
+                            prof_bio = "";
+                            prof_href = "";
+                            course = "Educational Initiative In Collaboration with Shoolini University";
+                            course_detail = "Education should be free. Our initiative is to educate the section of people who can not access the educational services.";
+                            break;
+                    }
+                    break;
+            }
+            break;
+    }
+
+    // Now the variables prof, prof_bio, prof_href, course, course_detail are set
+
+    // Line 1 - Main Heading
+    course_detail = window.location.pathname.split("/")[3] ? " (" + course_detail + ")" : "";
+    const line1 = `<h1>${course} ${course_detail}</h1>`;
+
+    // Line 2 - Summary line
+    var { pA_author, pA_bio } = processAuthors([prof, prof_href, prof_bio]);
+    let allprof = pA_author ? pA_author : "";
+    const line2 = getrandomline2(allAuthors, allprof);
+
+    // Line 3 - Biblography
+    let profbio = pA_bio;
+    profbio = window.location.pathname.split("/")[5] && window.location.pathname.split("/")[5].length ? "" : profbio;
+    // author_bio = window.location.pathname.split("/")[5] && window.location.pathname.split("/")[5].length ? "" : author_bio;
+    const line3 = profbio + author_bio;
+
+    // Line 4 - Optional with buttons.
+    const line4 = generatebutton(course);
+
+    return { line1, line2, line3, line4 };
+}  */
+
+//////////// Version 3.0
+function processFolder(allAuthors, author_bio) {
+    let prof = "", prof_href = "", prof_bio = "", course = "", course_detail = "";
+
+    const courseTypes = ['practical', 'lab'];
+
+    if (urlpart1 === "edu" && urlpart2 === "su") {
+        if (urlpart3 === "course") {
+            let courseType = courseTypes.includes(window.location.pathname.split("/")[5]) ? 'lab' : 'default';
+            let courseInfo = courseDetailsMap[urlpart4]?.[courseType];
+            if (courseInfo) {
+                [prof, course, course_detail] = courseInfo;
+                let profInfo = profDetailsBio[prof];
+                if (profInfo) {
+                    prof_bio = profInfo.bio;
+                    prof_href = profInfo.href;
+                }
+            } else {
+                course = "Course Selection";
+                course_detail = "Select a subject below to explore its concepts";
+            }
+        } else if (urlpart3 === "life") {
+            // Logic for 'life' section, if any
+        } else {
+            course = "Educational Initiative In Collaboration with Shoolini University";
+            course_detail = "Education should be free. Our initiative is to educate the section of people who cannot access the educational services.";
+        }
+    }
+
+    // Setting up the lines
+    course_detail = window.location.pathname.split("/")[3] ? ` (${course_detail})` : "";
+    const line1 = `<h1>${course} ${course_detail}</h1>`;
+    var { pA_author, pA_bio } = processAuthors([prof, prof_href, prof_bio]);
+    console.log(prof, prof_href, prof_bio);
+    const line2 = getrandomline2(allAuthors, pA_author ? pA_author : "");
+    const line3 = window.location.pathname.split("/")[5]?.length ? author_bio : (pA_bio + author_bio);
+    const line4 = generatebutton(course);
+
+    return { line1, line2, line3, line4 };
+}
+
+
 
 //Main support function for line2
 function getrandomline2(allAuthors, allprof) {

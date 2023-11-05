@@ -9,10 +9,10 @@ function get_menu_list(datetogen) {
                 codetype: "CSU085 | Concepts"
             },
             {
-                link: "practical/",
+                link: "lab/",
                 title: "Practical: Elevate Your Algorithm Design Skills: A Comprehensive Guide for Lab Enthusiasts",
                 desc: "Unleash your potential in the DAA lab with our comprehensive guide covering all the essential concepts. Discover the essence of efficient algorithms and take your problem-solving skills to the next level. Click now to embark on your DAA journey.",
-                codetype: "CSU085P | Practical"
+                codetype: "CSU085P | Lab"
             },
 
         ];

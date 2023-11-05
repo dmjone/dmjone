@@ -10,10 +10,10 @@ function get_menu_list(datetogen) {
                 // cardimage: "_url_"
             },
             {
-                link: "practical/",
+                link: "lab/",
                 title: "CTF Practicals: Boost Your Programming Skills with Hands-on Capture The Flag Challenges",
                 desc: "Elevate your programming knowledge with our comprehensive guide that covers all essential practical aspects of CTF. Accept the challenges and level up your tech skills. Click now to start your practical adventure.",
-                codetype: "CTF | Practicals"
+                codetype: "CTF | Lab"
             }
         ];
         for (let i = 0; i < arr.length; i++) {

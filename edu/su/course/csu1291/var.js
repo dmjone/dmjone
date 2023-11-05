@@ -9,10 +9,10 @@ function get_menu_list(datetogen) {
                 codetype: "CSU1291 | Concepts"
             },
             {
-                link: "practical/",
+                link: "lab/",
                 title: "Practical: Elevate Your Java Programming Skills: A Comprehensive Guide for Lab Enthusiasts",
                 desc: "Unleash your potential in the Java programming lab with our comprehensive guide covering all the essential concepts. Discover the magic of code and take your programming skills to the next level. Click now to embark on your Java journey.",
-                codetype: "CSU1291P | Practical"
+                codetype: "CSU1291P | Lab"
             },
 
         ];

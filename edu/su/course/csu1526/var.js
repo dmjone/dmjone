@@ -9,10 +9,10 @@ function get_menu_list(datetogen) {
                 "codetype": "CSU1526 | Concepts"                
             },
             // {
-            //     "link": "practical/",
+            //     "link": "lab/",
             //     "title": "Practical: Elevate Your Microprocessor and Microcontroller Skills: A Comprehensive Guide for Lab Enthusiasts",
             //     "desc": "Unleash your potential in the Microprocessor and Microcontroller lab with our comprehensive guide covering all the essential concepts. Discover the intricacies of hardware and take your skills to the next level. Click now to embark on your journey.",
-            //     "codetype": "CSU1526P | Practical"
+            //     "codetype": "CSU1526P | Lab"
             // },
         ];
         for (let i = 0; i < arr.length; i++) {

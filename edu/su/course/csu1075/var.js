@@ -15,10 +15,10 @@ function get_menu_list(datetogen) {
                 codetype: "CSU1075 | Computer Organization Fundamentals"
             },
             // {
-            //     link: "practical/",
+            //     link: "lab/",
             //     title: "Practical: Elevate Your Java Programming Skills: A Comprehensive Guide for Lab Enthusiasts",
             //     desc: "Unleash your potential in the Java programming lab with our comprehensive guide covering all the essential concepts. Discover the magic of code and take your programming skills to the next level. Click now to embark on your Java journey.",
-            //     codetype: "CSU1291P | Practical"
+            //     codetype: "CSU1291P | Lab"
             // },
 
         ];
@@ -48,14 +48,14 @@ function get_menu_list(datetogen) {
                 title: "Pipelining: The Heartbeat of Computer Performance",
                 desc: "Dive into the pulse of Computer Organization with a thrilling exploration of Pipelining. Discover how this crucial system boosts computing power and efficiency, allowing for swift execution of instructions in a symphony of synchronized stages. Click now to unveil the secrets of this performance-enhancing marvel in the world of computer architecture!",
                 codetype: "Pipelinig",
-                readtime: r(15),
+                readtime: r(7),
                 link: "pipelining"
             },
             {
                 title: "Instruction Codes: The Language of Processors",
                 desc: "Embark on a detailed journey through the world of Instruction Codes in Computer Organization. Uncover the intricacies of opcodes, operands, and their orchestration in the CPU to perform a ballet of computations. Click to master the art of machine language that drives the core of computing efficiency!",
                 codetype: "Instruction Codes",
-                readtime: r(10),
+                readtime: r(7),
                 link: "instruction-codes"
             },
         ];
