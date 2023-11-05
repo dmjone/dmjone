@@ -51,6 +51,13 @@ function get_menu_list(datetogen) {
                 readtime: r(15),
                 link: "pipelining"
             },
+            {
+                title: "Instruction Codes: The Language of Processors",
+                desc: "Embark on a detailed journey through the world of Instruction Codes in Computer Organization. Uncover the intricacies of opcodes, operands, and their orchestration in the CPU to perform a ballet of computations. Click to master the art of machine language that drives the core of computing efficiency!",
+                codetype: "Instruction Codes",
+                readtime: r(10),
+                link: "instruction-codes"
+            },
         ];
         for (let i = 0; i < arr.length; i++) {
             const _data = arr[i];
