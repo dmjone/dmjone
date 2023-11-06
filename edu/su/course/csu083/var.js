@@ -40,6 +40,14 @@ function get_menu_list(datetogen) {
                 readtime: r(5),
                 link: "priori-posteriori-analysis"
             },
+            {
+                title: "Almost Complete Binary Trees: Unveiling Structural Efficiency",
+                desc: "Embark on an exploratory odyssey into the world of Almost Complete Binary Trees with our in-depth guide. Discover the delicate balance and optimized structure of ACBTs, bridging theoretical principles with practical execution. From elemental concepts to complex applications, this guide encapsulates a comprehensive view of ACBTs. Initiate your intellectual venture into the essence of data structural efficiency today!",
+                codetype: "Data Structures",
+                readtime: "r(5)",
+                link: "almost-complete-binary-tree"
+            }
+
 
         ];
         for (let i = 0; i < arr.length; i++) {
