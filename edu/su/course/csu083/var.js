@@ -46,6 +46,13 @@ function get_menu_list(datetogen) {
                 codetype: "Data Structures",
                 readtime: "r(5)",
                 link: "almost-complete-binary-tree"
+            },
+            {
+                title: "Revision of Concepts",
+                desc: "Delve deep into the intricate world with our extensive revision of concepts. Unravel the complexities and strategic approaches of fundamental theories with advanced problem-solving techniques. This guide provides a overview of all the concepts, from basic recursion to advanced tabulation strategies. Embark on your journey to mastering efficient algorithms and optimal solutions in the realm of Design and Analysis of Algorithm!",
+                codetype: "Revision",
+                readtime: "r(6)",
+                link: "revision"
             }
 
 
