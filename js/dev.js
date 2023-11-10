@@ -2409,9 +2409,16 @@ function gen_blockquote() {
 (function () {
     const events = [
         { day: 20, month: 4, year: 1993, occasion: 'birthday', name: 'Divya' },
-        { day: 4, month: 9, year: 2004, occasion: 'birthday', name: 'Kamaksha' },
+        { day: 11, month: 1, year: 2004, occasion: 'birthday', name: 'Jasmine' },
+        { day: 11, month: 1, year: 2004, occasion: 'birthday', name: 'Vinayak' },
+        { day: 12, month: 1, year: 2004, occasion: 'birthday', name: 'Prithak' },
+        { day: 17, month: 1, year: 2004, occasion: 'birthday', name: 'Akshit' },
+        { day: 29, month: 1, year: 2004, occasion: 'birthday', name: 'Abhay' },
         { day: 25, month: 2, year: 2005, occasion: 'birthday', name: 'Vanshika' },
-        { day: 6, month: 10, occasion: 'diwali' }
+        { day: 4, month: 9, year: 2004, occasion: 'birthday', name: 'Kamaksha' },
+        { day: 31, month: 10, year: 2004, occasion: 'birthday', name: 'Vedansh' },
+        { day: 14, month: 12, year: 2002, occasion: 'birthday', name: 'Subhojeet' },
+        { day: 9, month: 11, occasion: 'diwali' }
     ];
 
     const birthdayEmojis = [
@@ -2452,11 +2459,21 @@ function gen_blockquote() {
         return item;
     };
 
+    // const todaysEvents = getTodaysEvents(); // failsafe method
+    // const FIREWORKS_DISPLAYED_KEY = 'fireworks_displayed';
+    // const fireworksDisplayed = localStorage.getItem(FIREWORKS_DISPLAYED_KEY);    
+
+    // if (todaysEvents.length > 0 && !fireworksDisplayed) {
+
+    //////// v2.0    
+    const todaysDate = new Date().toDateString();
     const todaysEvents = getTodaysEvents();
     const FIREWORKS_DISPLAYED_KEY = 'fireworks_displayed';
-    const fireworksDisplayed = localStorage.getItem(FIREWORKS_DISPLAYED_KEY);    
+    const forcedisplay = 0;
+    const fireworksDisplayedInfo = forcedisplay ? false : JSON.parse(localStorage.getItem(FIREWORKS_DISPLAYED_KEY))
 
-    if (todaysEvents.length > 0 && !fireworksDisplayed) {
+
+    if (todaysEvents.length > 0 && (!fireworksDisplayedInfo || fireworksDisplayedInfo.date !== todaysDate)) {
         let messages = [];
         todaysEvents.forEach(event => {
             switch (event.occasion) {
@@ -2466,7 +2483,7 @@ function gen_blockquote() {
                     const randomEmoji1 = getRandomItem(birthdayEmojis);
                     const randomEmoji2 = getRandomItem(birthdayEmojis, randomEmoji1);
                     const randomMessage = age ?
-                        `${randomEmoji1}Happy <span class="fw-bold">${age}</span><sup>${getSuffix(age)}</sup>${randomEmoji2}<br>${getRandomItem(birthdayMessages)}` :
+                        `${randomEmoji1}Happy <span class="fw-bold">${age}</span><sup>${getSuffix(age)}</sup> ${event.name}!${randomEmoji2}<br>${getRandomItem(birthdayMessages)}` :
                         `${randomEmoji1}Happy Birthday, ${initial}!${randomEmoji2}<br>${getRandomItem(birthdayMessages)}`;
                     messages.push(randomMessage);
                     break;
@@ -2478,7 +2495,7 @@ function gen_blockquote() {
 
         const messageString = messages.join('<br><br>');
         // ...
-        document.write(`<canvas id="fireworks"></canvas>
+        document.write(`<canvas id="fireworks" class=""></canvas>
                <div class="fireworks-message text-center">${messageString}</div>
                <div class="fireworks-footer">To watch again, open in an incognito window.</div>`);
         window.addEventListener('load', function () {
@@ -2560,17 +2577,20 @@ function gen_blockquote() {
                 fireworks.splice(i, 1);
             }
         }
-
         requestAnimationFrame(loop);
     }
 
             loop();
             setTimeout(function () {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-                document.querySelector('.fireworks-message').style.display = 'none';
+                // document.querySelector('fireworks').style.display = 'none';
+                document.getElementById('fireworks').classList.add('d-none');
+                document.querySelector('.fireworks-message').classList.add('d-none');
+                document.querySelector('.fireworks-footer').classList.add('d-none');
                 // Set flag to indicate that fireworks have been displayed
-                localStorage.setItem(FIREWORKS_DISPLAYED_KEY, true);
-                location.reload(true);
+                // localStorage.setItem(FIREWORKS_DISPLAYED_KEY, true);
+                localStorage.setItem(FIREWORKS_DISPLAYED_KEY, JSON.stringify({ displayed: true, date: todaysDate }));
+                forcedisplay ? null : location.reload(true);
             }, Math.floor(Math.random() * 6000) + 4000);
 
         });
