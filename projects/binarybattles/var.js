@@ -1,4 +1,58 @@
 window.addEventListener("load", async function () {
+    
+    (function () {
+        const organizers = [
+            { title: 'Director', name: 'Prof. Ashish Khosla', img: 'img/1623244771-AshishKhosla.jpeg', quote: 'Pending: Director\'s Quote or Message' },
+            { title: 'Dean', name: 'Dr. Virender Rihani', img: 'img/1654685857-VirenderRihani.jpeg', quote: 'Pending: Dean\'s Quote or Message' },
+            { title: 'Head of School', name: 'Dr. Pankaj Vaidya', img: 'img/1610703196-PankajVaidya.jpeg', quote: 'Pending: HOS\'s Quote or Message' }
+            // ... add more organizers here ...
+        ];
+
+        const container = document.getElementById('organizer-container');
+
+        organizers.forEach(organizer => {
+            const colDiv = document.createElement('div');
+            colDiv.className = 'col-md-3 mb-3';
+
+            const cardDiv = document.createElement('div');
+            cardDiv.className = 'card border-0 shadow text-center h-100';
+
+            const img = document.createElement('img');
+            img.src = organizer.img;
+            img.className = 'card-img-top';
+            img.alt = organizer.title;
+
+            const cardBodyDiv = document.createElement('div');
+            cardBodyDiv.className = 'card-body';
+
+            const titleH4 = document.createElement('h4');
+            titleH4.className = 'card-title';
+            titleH4.textContent = organizer.title;
+
+            const nameP = document.createElement('p');
+            nameP.className = 'card-text text-center';
+            nameP.textContent = organizer.name;
+
+            const quoteP = document.createElement('p');
+            quoteP.className = 'card-text';
+            const smallText = document.createElement('small');
+            smallText.className = 'text-muted';
+            smallText.textContent = organizer.quote;
+            quoteP.appendChild(smallText);
+
+            cardBodyDiv.appendChild(titleH4);
+            cardBodyDiv.appendChild(nameP);
+            cardBodyDiv.appendChild(quoteP);
+
+            cardDiv.appendChild(img);
+            cardDiv.appendChild(cardBodyDiv);
+            colDiv.appendChild(cardDiv);
+
+            container.appendChild(colDiv);
+        });
+    })();
+
+
     (function () {
         const professors = [
             { name: 'M S Thakur', title: 'Professor' },
@@ -125,7 +179,7 @@ window.addEventListener("load", async function () {
             cardBodyDiv.className = 'card-body p-3 text-center h-100';
 
             const nameH5 = document.createElement('h5');
-            nameH5.className = 'card-title fw-bold text-primary';
+            nameH5.className = 'card-title fw-bold text-primary text-opacity-50';
             nameH5.textContent = professor.name;
 
             const titleP = document.createElement('p');
@@ -140,58 +194,6 @@ window.addEventListener("load", async function () {
 
             container.appendChild(colDiv);
         });
-    })();
-
-    (function () {
-        const organizers = [
-            { title: 'Director', name: 'Prof. Ashish Khosla', img: 'img/1623244771-AshishKhosla.jpeg', quote: 'Pending: Director\'s Quote or Message' },
-            { title: 'Dean', name: 'Dr. Virender Rihani', img: 'img/1654685857-VirenderRihani.jpeg', quote: 'Pending: Dean\'s Quote or Message' },
-            { title: 'Head of School', name: 'Dr. Pankaj Vaidya', img: 'img/1610703196-PankajVaidya.jpeg', quote: 'Pending: HOS\'s Quote or Message' }
-            // ... add more organizers here ...
-        ];
-
-        const container = document.getElementById('organizer-container');
-
-        organizers.forEach(organizer => {
-            const colDiv = document.createElement('div');
-            colDiv.className = 'col-md-3 mb-3';
-
-            const cardDiv = document.createElement('div');
-            cardDiv.className = 'card border-0 shadow text-center h-100';
-
-            const img = document.createElement('img');
-            img.src = organizer.img;
-            img.className = 'card-img-top';
-            img.alt = organizer.title;
-
-            const cardBodyDiv = document.createElement('div');
-            cardBodyDiv.className = 'card-body';
-
-            const titleH4 = document.createElement('h4');
-            titleH4.className = 'card-title';
-            titleH4.textContent = organizer.title;
-
-            const nameP = document.createElement('p');
-            nameP.className = 'card-text text-center';
-            nameP.textContent = organizer.name;
-
-            const quoteP = document.createElement('p');
-            quoteP.className = 'card-text';
-            const smallText = document.createElement('small');
-            smallText.className = 'text-muted';
-            smallText.textContent = organizer.quote;
-            quoteP.appendChild(smallText);
-
-            cardBodyDiv.appendChild(titleH4);
-            cardBodyDiv.appendChild(nameP);
-            cardBodyDiv.appendChild(quoteP);
-
-            cardDiv.appendChild(img);
-            cardDiv.appendChild(cardBodyDiv);
-            colDiv.appendChild(cardDiv);
-
-            container.appendChild(colDiv);
-        });
-    })();
+    })();    
 
 });
