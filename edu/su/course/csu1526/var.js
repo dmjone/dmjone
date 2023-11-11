@@ -51,6 +51,13 @@ function get_menu_list(datetogen) {
                 readtime: r(10),
                 link: "practice-questions-unit-2"
             },
+            {
+                title: "Assignment 1",
+                desc: "Assignment 1 on the questions given by the faculty for the Assignment 1.",
+                codetype: "Practice Questions - U2",
+                readtime: r(7),
+                link: "assignment"
+            },
         ];
         for (let i = 0; i < arr.length; i++) {
             const _data = arr[i];
