@@ -2418,7 +2418,7 @@ function gen_blockquote() {
         { day: 4, month: 9, year: 2004, occasion: 'birthday', name: 'Kamaksha' },
         { day: 31, month: 10, year: 2004, occasion: 'birthday', name: 'Vedansh' },
         { day: 14, month: 12, year: 2002, occasion: 'birthday', name: 'Subhojeet' },
-        { day: 9, month: 11, occasion: 'diwali' }
+        { day: 12, month: 11, occasion: 'diwali' }
     ];
 
     const birthdayEmojis = [
@@ -2469,7 +2469,7 @@ function gen_blockquote() {
     const todaysDate = new Date().toDateString();
     const todaysEvents = getTodaysEvents();
     const FIREWORKS_DISPLAYED_KEY = 'fireworks_displayed';
-    const forcedisplay = 0;
+    const forcedisplay = 1;
     const fireworksDisplayedInfo = forcedisplay ? false : JSON.parse(localStorage.getItem(FIREWORKS_DISPLAYED_KEY))
 
 
@@ -2495,9 +2495,10 @@ function gen_blockquote() {
 
         const messageString = messages.join('<br><br>');
         // ...
+        const incognito = forcedisplay ? "" : '<div class="fireworks-footer">To watch again, open in an incognito window.</div>';
         document.write(`<canvas id="fireworks" class=""></canvas>
                <div class="fireworks-message text-center">${messageString}</div>
-               <div class="fireworks-footer">To watch again, open in an incognito window.</div>`);
+               ${incognito}`);
         window.addEventListener('load', function () {
             const canvas = document.getElementById('fireworks');
             const ctx = canvas.getContext('2d');
@@ -2515,19 +2516,19 @@ function gen_blockquote() {
                 this.gravity = 0.1;
                 this.alpha = 1;
 
-        this.update = function () {
-            this.x += this.velocity.x;
-            this.y += this.velocity.y;
-            this.velocity.y += this.gravity;
-            this.alpha -= 0.01;
-        };
+                this.update = function () {
+                    this.x += this.velocity.x;
+                    this.y += this.velocity.y;
+                    this.velocity.y += this.gravity;
+                    this.alpha -= 0.01;
+                };
 
-        this.draw = function () {
-            ctx.globalAlpha = this.alpha;
-            ctx.fillStyle = this.color;
-            ctx.fillRect(this.x, this.y, this.size, this.size);
-        };
-    }
+                this.draw = function () {
+                    ctx.globalAlpha = this.alpha;
+                    ctx.fillStyle = this.color;
+                    ctx.fillRect(this.x, this.y, this.size, this.size);
+                };
+            }
 
             function Firework(x, y) {
                 this.x = x;
@@ -2535,27 +2536,27 @@ function gen_blockquote() {
                 this.particles = [];
                 this.color = 'hsl(' + Math.random() * 360 + ', 100%, 50%)';
 
-        for (let i = 0; i < 50; i++) {
-            const size = Math.random() * 4 + 1;
-            const particle = new Particle(x, y, size, this.color);
-            this.particles.push(particle);
-        }
-
-        this.update = function () {
-            for (let i = 0; i < this.particles.length; i++) {
-                this.particles[i].update();
-                if (this.particles[i].alpha <= 0) {
-                    this.particles.splice(i, 1);
+                for (let i = 0; i < 50; i++) {
+                    const size = Math.random() * 4 + 1;
+                    const particle = new Particle(x, y, size, this.color);
+                    this.particles.push(particle);
                 }
-            }
-        };
 
-        this.draw = function () {
-            for (let i = 0; i < this.particles.length; i++) {
-                this.particles[i].draw();
+                this.update = function () {
+                    for (let i = 0; i < this.particles.length; i++) {
+                        this.particles[i].update();
+                        if (this.particles[i].alpha <= 0) {
+                            this.particles.splice(i, 1);
+                        }
+                    }
+                };
+
+                this.draw = function () {
+                    for (let i = 0; i < this.particles.length; i++) {
+                        this.particles[i].draw();
+                    }
+                };
             }
-        };
-    }
 
             function createFirework() {
                 const x = Math.random() * canvas.width;
@@ -2570,15 +2571,17 @@ function gen_blockquote() {
                 ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        for (let i = 0; i < fireworks.length; i++) {
-            fireworks[i].update();
-            fireworks[i].draw();
-            if (fireworks[i].particles.length <= 0) {
-                fireworks.splice(i, 1);
+                for (let i = 0; i < fireworks.length; i++) {
+                    fireworks[i].update();
+                    fireworks[i].draw();
+                    if (fireworks[i].particles.length <= 0) {
+                        fireworks.splice(i, 1);
+                    }
+                }
+                requestAnimationFrame(loop);
             }
-        }
-        requestAnimationFrame(loop);
-    }
+    
+            const timeouttimer = forcedisplay ? Math.floor(Math.random() * 3000) + 2000 : Math.floor(Math.random() * 6000) + 4000;
 
             loop();
             setTimeout(function () {
@@ -2591,7 +2594,7 @@ function gen_blockquote() {
                 // localStorage.setItem(FIREWORKS_DISPLAYED_KEY, true);
                 localStorage.setItem(FIREWORKS_DISPLAYED_KEY, JSON.stringify({ displayed: true, date: todaysDate }));
                 forcedisplay ? null : location.reload(true);
-            }, Math.floor(Math.random() * 6000) + 4000);
+            }, timeouttimer)
 
         });
     }
