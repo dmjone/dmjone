@@ -2417,8 +2417,9 @@ function gen_blockquote() {
         { day: 25, month: 2, year: 2005, occasion: 'birthday', name: 'Vanshika' },
         { day: 4, month: 9, year: 2004, occasion: 'birthday', name: 'Kamaksha' },
         { day: 31, month: 10, year: 2004, occasion: 'birthday', name: 'Vedansh' },
-        { day: 14, month: 12, year: 2002, occasion: 'birthday', name: 'Subhojeet' },
-        { day: 12, month: 11, occasion: 'diwali' }
+        { day: 14, month: 12, year: 2002, occasion: 'birthday', name: 'Subhojeet' },        
+        { day: 12, month: 11, occasion: 'diwali' },
+        { day: 13, month: 11, occasion: 'childrensday' },
     ];
 
     const birthdayEmojis = [
@@ -2474,14 +2475,14 @@ function gen_blockquote() {
 
 
     if (todaysEvents.length > 0 && (!fireworksDisplayedInfo || fireworksDisplayedInfo.date !== todaysDate)) {
-        let messages = [];
+        let messages = [];        
+        const randomEmoji1 = getRandomItem(birthdayEmojis);
+        const randomEmoji2 = getRandomItem(birthdayEmojis, randomEmoji1);        
         todaysEvents.forEach(event => {
             switch (event.occasion) {
                 case 'birthday':
                     const age = event.year ? new Date().getFullYear() - event.year : null;
                     const initial = event.name.charAt(0);  // Extract the first letter
-                    const randomEmoji1 = getRandomItem(birthdayEmojis);
-                    const randomEmoji2 = getRandomItem(birthdayEmojis, randomEmoji1);
                     const randomMessage = age ?
                         `${randomEmoji1}Happy <span class="fw-bold">${age}</span><sup>${getSuffix(age)}</sup> ${event.name}!${randomEmoji2}<br>${getRandomItem(birthdayMessages)}` :
                         `${randomEmoji1}Happy Birthday, ${initial}!${randomEmoji2}<br>${getRandomItem(birthdayMessages)}`;
@@ -2489,6 +2490,9 @@ function gen_blockquote() {
                     break;
                 case 'diwali':
                     messages.push(`✨🎇 Happy Diwali! 🎆✨`);
+                    break;
+                case 'childrensday':
+                    messages.push(`${randomEmoji1} Happy Children's Day! ${randomEmoji2}`);
                     break;
             }
         });
@@ -2499,7 +2503,15 @@ function gen_blockquote() {
         document.write(`<canvas id="fireworks" class=""></canvas>
                <div class="fireworks-message text-center">${messageString}</div>
                ${incognito}`);
+
+        // focus to view by scrolling and disabling scrollbar
+        document.addEventListener('DOMContentLoaded', () => {
+            document.body.style.overflow = 'hidden';
+            window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); 
+        });
+
         window.addEventListener('load', function () {
+
             const canvas = document.getElementById('fireworks');
             const ctx = canvas.getContext('2d');
             canvas.width = window.innerWidth;
@@ -2586,6 +2598,7 @@ function gen_blockquote() {
             loop();
             setTimeout(function () {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
+                document.body.style.overflow = 'auto';
                 // document.querySelector('fireworks').style.display = 'none';
                 document.getElementById('fireworks').classList.add('d-none');
                 document.querySelector('.fireworks-message').classList.add('d-none');
