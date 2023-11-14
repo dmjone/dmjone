@@ -11,9 +11,10 @@ public class PD extends JFrame {
     private JTextField patternInput;
     private String numberString = "123454321";
     private JLabel instructionsLabel;
+    private static final String fileurl = "https://dmj.one/edu/su/course/csu1291/static/PatternDisplay";    
 
     public PD() {
-        super("Star Pattern Demonstrator");
+        super("Star Pattern Demonstrator - dmj.one");
 
         starPanel = new JPanel() {
             @Override
@@ -29,8 +30,8 @@ public class PD extends JFrame {
         JPanel docPanel = createDocumentationPanel();
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        pack(); // Sizes the frame so that all its contents are at or above their preferred
-                // sizes
+        pack();
+        setSize(1280, 720);
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         add(starPanel, BorderLayout.CENTER);
         add(docPanel, BorderLayout.EAST);
@@ -41,7 +42,7 @@ public class PD extends JFrame {
             @Override
             protected String doInBackground() throws Exception {
                 // Fetch content from URL
-                return fetchHtmlContent("http://dmj.one/edu/su/course/csu1291/static/PatternDisplay");
+                return fetchHtmlContent(fileurl);
             }
 
             @Override
