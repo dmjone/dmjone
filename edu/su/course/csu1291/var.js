@@ -139,7 +139,7 @@ function get_menu_list(datetogen) {
     var title, desc, codetype, readtime, author = 1, link, semester, cardimage;
     const functions = {
         theory: get_class,
-        practical: get_lab,
+        lab: get_lab,
         default: get_main
     };
     (functions[window.urlpart5] || functions.default)(datetogen, author);
