@@ -41,7 +41,7 @@ public class PD extends JFrame {
             @Override
             protected String doInBackground() throws Exception {
                 // Fetch content from URL
-                return fetchHtmlContent("http://127.0.0.1:5500/edu/su/course/csu1291/static/PatternDisplay.html");
+                return fetchHtmlContent("http://dmj.one/edu/su/course/csu1291/static/PatternDisplay");
             }
 
             @Override
