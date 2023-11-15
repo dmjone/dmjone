@@ -2420,6 +2420,7 @@ function gen_blockquote() {
         { day: 14, month: 12, year: 2002, occasion: 'birthday', name: 'Subhojeet' },        
         { day: 12, month: 11, occasion: 'diwali' },
         { day: 13, month: 11, occasion: 'childrensday' },
+        { day: 15, month: 11, year: 2004, occasion: 'birthday', name: 'Asmi' },
     ];
 
     const birthdayEmojis = [
