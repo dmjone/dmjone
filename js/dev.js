@@ -2471,7 +2471,7 @@ function gen_blockquote() {
     const todaysDate = new Date().toDateString();
     const todaysEvents = getTodaysEvents();
     const FIREWORKS_DISPLAYED_KEY = 'fireworks_displayed';
-    const forcedisplay = 1;
+    const forcedisplay = 0;
     const fireworksDisplayedInfo = forcedisplay ? false : JSON.parse(localStorage.getItem(FIREWORKS_DISPLAYED_KEY))
 
 
@@ -2594,7 +2594,7 @@ function gen_blockquote() {
                 requestAnimationFrame(loop);
             }
     
-            const timeouttimer = forcedisplay ? Math.floor(Math.random() * 3000) + 2000 : Math.floor(Math.random() * 6000) + 4000;
+            const timeouttimer = forcedisplay ? Math.floor(Math.random() * 2000) + 3000 : Math.floor(Math.random() * 6000) + 6000;
 
             loop();
             setTimeout(function () {
