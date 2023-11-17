@@ -54,34 +54,45 @@ window.addEventListener("load", async function () {
 
 
     (function () {
+        // const professors = [
+        //     { name: 'Pankaj Vaidya', title: 'Professor' },
+        //     { name: 'Brij Bhushan Sharma', title: 'Assistant Professor' },
+        //     { name: 'Sonia', title: 'Assistant Professor' },
+        //     { name: 'Bharti Thakur', title: 'Assistant Professor' },
+        //     { name: 'Ishani Sharma', title: 'Assistant Professor' },
+        //     { name: 'Maya Thapa', title: 'Assistant Professor' },
+        //     { name: 'Piyush Sewal', title: 'Assistant Professor' },
+        //     { name: 'Kanika', title: 'Assistant Professor' }
+        // ];
+
         const professors = [
-            { name: 'M S Thakur', title: 'Professor' },
-            { name: 'Bhaskar Goel', title: 'Professor' },
-            { name: 'Ram Prakash Dwivedi', title: 'Professor' },
-            { name: 'Abhilash Pathania', title: 'Assistant Professor' },
-            { name: 'Pankaj Vaidya', title: 'Professor' },
-            { name: 'Raj Kumar Saini', title: 'Associate Professor' },
-            { name: 'Raj Kumar', title: 'Associate Professor' },
-            { name: 'Sorabh Aggarwal', title: 'Assistant Professor' },
-            { name: 'Sushil Kumar', title: 'Assistant Professor' },
-            { name: 'Veena Kashyap', title: 'Assistant Professor' },
-            { name: 'Brij Bhushan Sharma', title: 'Assistant Professor' },
-            { name: 'Namita Gandotra', title: 'Assistant Professor' },
-            { name: 'Diksha Sharma', title: 'Assistant Professor' },
-            { name: 'Nitisha Sharma', title: 'Assistant Professor' },
-            { name: 'Sonia', title: 'Assistant Professor' },
-            { name: 'Arunava Poddar', title: 'Assistant Professor' },
-            { name: 'Arvind Singh Bisht', title: 'Assistant Professor' },
-            { name: 'Kushal Kanwar', title: 'Assistant Professor' },
-            { name: 'Bharti Thakur', title: 'Assistant Professor' },
-            { name: 'Prachi Agrawal', title: 'Assistant Professor' },
-            { name: 'Navsal Kumar', title: 'Assistant Professor' },
-            { name: 'Nitin Kumar Sharma', title: 'Assistant Professor' },
-            { name: 'Rahul Chandel', title: 'Assistant Professor' },
-            { name: 'Ishani Sharma', title: 'Assistant Professor' },
-            { name: 'Maya Thapa', title: 'Assistant Professor' },
+            { name: 'Dr. Pankaj Vaidya', title: 'Professor' },
+            { name: 'Dr. Gaurav Gupta', title: 'Associate Professor' },
+            { name: 'Dr. Ravi Kant', title: 'Associate Professor' },
+            { name: 'Dr. Sonia', title: 'Associate Professor' },
+            { name: 'Dr. Bharti Thakur', title: 'Associate Professor' },
+            { name: 'Dr. Brij Bhushan Sharma', title: 'Associate Professor' },
+            { name: 'Dr. Anurag Rana', title: 'Assistant Professor' },
+            { name: 'Dr. Arvind Sharma', title: 'Assistant Professor' },
+            { name: 'Puneet Kapoor', title: 'Assistant Professor' },
+            { name: 'Aarchit Joshi', title: 'Assistant Professor' },
+            { name: 'Waleed Salehi', title: 'Assistant Professor' },
+            { name: 'Abhishek Tomar', title: 'Assistant Professor' },
+            { name: 'Kritika Rana', title: 'Assistant Professor' },
+            { name: 'Dhalak Danial Solemon', title: 'Assistant Professor' },
+            { name: 'Abdulahi Adem', title: 'Assistant Professor' },
+            { name: 'Shrawan Kumar', title: 'Assistant Professor' },
+            { name: 'Ruchika Sharma', title: 'Assistant Professor' },
+            { name: 'Anitya Gupta', title: 'Assistant Professor' },
+            { name: 'Anandita Garg', title: 'Assistant Professor' },
             { name: 'Piyush Sewal', title: 'Assistant Professor' },
-            { name: 'Kanika', title: 'Assistant Professor' }
+            { name: 'Nitesh Sharma', title: 'Assistant Professor' },
+            { name: 'Kanika', title: 'Assistant Professor' },
+            { name: 'Anjali Thakur', title: 'Assistant Professor' },
+            { name: 'Maya Thapa', title: 'Assistant Professor' },
+            { name: 'Ishani Sharma', title: 'Assistant Professor' },
+            { name: 'Dr. Rather Gousia', title: 'Assistant Professor' },
+            { name: 'Shiva', title: 'Assistant Professor' }
         ];
 
         const container = document.getElementById('learning-facilitator');
@@ -194,6 +205,6 @@ window.addEventListener("load", async function () {
 
             container.appendChild(colDiv);
         });
-    })();    
+    })();
 
 });
