@@ -1,5 +1,18 @@
 window.addEventListener("load", async function () {
-    
+
+    document.querySelectorAll('.blur-text').forEach(item => {
+        new bootstrap.Popover(item, {
+            trigger: 'hover focus',
+            title: '<i class="fas fa-lock"></i> Restricted Access',
+            content: 'Please <strong>register</strong>. Details will be given soon.',
+            placement: 'top',
+            html: true // Allow HTML in the popover
+        });
+    });
+
+
+
+
     (function () {
         const organizers = [
             { title: 'Director', name: 'Prof. Ashish Khosla', img: 'img/1623244771-AshishKhosla.jpeg', quote: 'Pending: Director\'s Quote or Message' },
