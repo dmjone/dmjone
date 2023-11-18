@@ -262,7 +262,7 @@ window.addEventListener("load", async function () {
     })();
 
     (function () {
-        const footerdata = `<footer class="footer text-center bg-transparent m-0"><div class="container"><p class="mb-0 text-center">&copy; 2023 Yogananda School of AI Computers and Data Science | Designed by <a href="https://dmj.one">dmj.one</a> under the guidance of Er. Piyush Sewal.</p><div class="py-2"><a href="https://shooliniuniversity.com/privacy-policy" class="mx-1">Privacy</a> | <a href="https://shooliniuniversity.com/terms-and-conditions" class="mx-1">Terms</a> | <a href="mailto:contact@dmj.one" class="mx-1">Contact Us</a></div><div class="pb-4"><span class="text-muted">Follow us on:</span><a href="https://www.facebook.com/ShooliniUniversityOfficial" class="mx-2"><i class="fab fa-facebook-f"></i></a><a href="https://twitter.com/ShooliniUniv" class="mx-2"><i class="fab fa-twitter"></i></a><a href="https://www.instagram.com/shooliniuniversity/" class="mx-2"><i class="fab fa-instagram"></i></a><a href="https://www.linkedin.com/school/shooliniuniversity/" class="mx-2"><i class="fab fa-linkedin-in"></i></a></div></div></footer>`;
+        const footerdata = `<footer class="footer text-center bg-transparent m-0"><div class="container"><p class="mb-0 text-center">&copy; 2023 Yogananda School of AI Computers and Data Science | Designed by <a href="https://dmj.one">dmj.one</a> under the guidance of Er. Piyush Sewal.</p><div class="py-2"><a href="https://shooliniuniversity.com/privacy-policy" class="mx-1">Privacy</a> | <a href="https://shooliniuniversity.com/terms-and-conditions" class="mx-1">Terms</a> | <a href="mailto:contact@dmj.one" class="mx-1">Contact Us</a><span id="visitor-counter"></span></div><div class="pb-4"><span class="text-muted">Follow us on:</span><a href="https://www.facebook.com/ShooliniUniversityOfficial" class="mx-2"><i class="fab fa-facebook-f"></i></a><a href="https://twitter.com/ShooliniUniv" class="mx-2"><i class="fab fa-twitter"></i></a><a href="https://www.instagram.com/shooliniuniversity/" class="mx-2"><i class="fab fa-instagram"></i></a><a href="https://www.linkedin.com/school/shooliniuniversity/" class="mx-2"><i class="fab fa-linkedin-in"></i></a></div></div></footer>`;
         document.querySelector('#registrationfooter').innerHTML = footerdata;
 
         (function () {
@@ -286,6 +286,21 @@ window.addEventListener("load", async function () {
                 });
             })();
         })();
+
+        (function () {
+            fetch('https://counter.dmj.one/')
+                .then(response => response.text())
+                .then(data => {
+                    const visitorCount = ` | <span class="small text-secondary">${data}</span>`;
+                    document.getElementById('visitor-counter').innerHTML = visitorCount;
+                })
+                .catch(error => {
+                    // console.error('Error fetching visitor count:', error);
+                    // document.getElementById('visitor-counter').textContent = 'Unavailable';
+                });
+        })();
+
+        
     })();
 
 });
