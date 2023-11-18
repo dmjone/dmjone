@@ -292,33 +292,35 @@ const cdnjs_cryptoJS = "https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/c
     })();
 
     (function () {
-        fetch(getJsUrl("encvar.json"))
-            .then(response => {
-                if (!response.ok) {
-                    throw response;
-                }
-                return response.json();
-            })
-            .then(data => {
-                // your code here
-                let cryptojs_enc_map = data;
-                let urlParts = window.location.pathname.split('/').filter(Boolean);
-                let current_map = cryptojs_enc_map;
-                for (let part of urlParts) {
-                    current_map = current_map[part.replace('.html', '')];
-                    if (typeof current_map === "string") {
-                        let cryptojs_enc_data = window["cryptojs_enc_data"] = current_map;
-                        // console.log('cryptojs_enc_data:', current_map);
-                        return;
+        if (!window.dnfetchenc) {            
+            fetch(getJsUrl("encvar.json"))
+                .then(response => {
+                    if (!response.ok) {
+                        throw response;
                     }
-                }
-            })
-            .catch((error) => {
-                if (error.status !== 404) {
-                    console.error('Error:', error);
-                }
-                // else, ignore the error or handle it differently
-            });
+                    return response.json();
+                })
+                .then(data => {
+                    // your code here
+                    let cryptojs_enc_map = data;
+                    let urlParts = window.location.pathname.split('/').filter(Boolean);
+                    let current_map = cryptojs_enc_map;
+                    for (let part of urlParts) {
+                        current_map = current_map[part.replace('.html', '')];
+                        if (typeof current_map === "string") {
+                            let cryptojs_enc_data = window["cryptojs_enc_data"] = current_map;
+                            // console.log('cryptojs_enc_data:', current_map);
+                            return;
+                        }
+                    }
+                })
+                .catch((error) => {
+                    if (error.status !== 404) {
+                        console.error('Error:', error);
+                    }
+                    // else, ignore the error or handle it differently
+                });        
+        }
     })();
 
     var common_variables = "/js/comvar.js";

@@ -70,9 +70,9 @@ window.addEventListener("load", async function () {
 
     (function () {
         const organizers = [
-            { title: 'Director', name: 'Prof. Ashish Khosla', img: 'img/1623244771-AshishKhosla.jpeg', quote: 'Pending: Director\'s Quote or Message' },
-            { title: 'Dean', name: 'Dr. Virender Rihani', img: 'img/1654685857-VirenderRihani.jpeg', quote: 'Pending: Dean\'s Quote or Message' },
-            { title: 'Head of School', name: 'Dr. Pankaj Vaidya', img: 'img/1610703196-PankajVaidya.jpeg', quote: 'Pending: HOS\'s Quote or Message' }
+            { title: 'Director', name: 'Prof. Ashish Khosla', img: 'img/1623244771-AshishKhosla.jpeg', quote: `Director's Quote or Message<br><strong>Pending</strong>` },
+            { title: 'Dean', name: 'Dr. Virender Rihani', img: 'img/1654685857-VirenderRihani.jpeg', quote: `Dean's Quote or Message<br><strong>Pending</strong>` },
+            { title: 'Head of School', name: 'Dr. Pankaj Vaidya', img: 'img/1610703196-PankajVaidya.jpeg', quote: `HOS's Quote or Message<br><strong>Pending</strong>` }
         ];
 
         const container = document.getElementById('organizer-container');
@@ -101,10 +101,10 @@ window.addEventListener("load", async function () {
             nameP.textContent = organizer.name;
 
             const quoteP = document.createElement('p');
-            quoteP.className = 'card-text';
+            quoteP.className = 'card-text text-center';
             const smallText = document.createElement('small');
             smallText.className = 'text-muted';
-            smallText.textContent = organizer.quote;
+            smallText.innerHTML = organizer.quote;
             quoteP.appendChild(smallText);
 
             cardBodyDiv.appendChild(titleH4);
