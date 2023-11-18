@@ -1,31 +1,31 @@
 window.varjsrequirefooter = 1;
 window.varjsalreadyloaded = 1;
 
-var appendAccordians = function () {
-    const parentElement = document.querySelector('.card-body.py-5');
+// var appendAccordians = function () {
+//     const parentElement = document.querySelector('.card-body.py-5');
 
-    const numberOfAccordions = 5;
+//     const numberOfAccordions = 5;
 
-    function generateAccordion(roundNumber) {
-        return `<div class="card border-0 my-2">
-                    <div class="accordion" id="toc">
-                        <div class="accordion-item">
-                            <h2 class="accordion-header" id="h${roundNumber}">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#c${roundNumber}" aria-controls="c${roundNumber}" aria-expanded="false">
-                                    <i class="fas fa-terminal"></i> <strong>&nbsp;Round ${roundNumber}</strong>
-                                </button>
-                            </h2>
-                            <div id="c${roundNumber}" class="accordion-collapse collapse" aria-labelledby="h${roundNumber}" data-bs-parent="#toc">
-                                <div class="accordion-body"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>`;
-    }
-    for (let i = 1; i <= numberOfAccordions; i++) {
-        parentElement.innerHTML += generateAccordion(i);
-    }
-};
+//     function generateAccordion(roundNumber) {
+//         return `<div class="card border-0 my-2">
+//                     <div class="accordion" id="toc">
+//                         <div class="accordion-item">
+//                             <h2 class="accordion-header" id="h${roundNumber}">
+//                                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#c${roundNumber}" aria-controls="c${roundNumber}" aria-expanded="false">
+//                                     <i class="fas fa-terminal"></i> <strong>&nbsp;Round ${roundNumber}</strong>
+//                                 </button>
+//                             </h2>
+//                             <div id="c${roundNumber}" class="accordion-collapse collapse" aria-labelledby="h${roundNumber}" data-bs-parent="#toc">
+//                                 <div class="accordion-body"></div>
+//                             </div>
+//                         </div>
+//                     </div>
+//                 </div>`;
+//     }
+//     for (let i = 1; i <= numberOfAccordions; i++) {
+//         parentElement.innerHTML += generateAccordion(i);
+//     }
+// };
 
 // var appendAccordians = function () {
 //     // The parent element where the accordions will be appended

@@ -272,7 +272,7 @@ const cdnjs_cryptoJS = "https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/c
     };
     document.write(`<script src='${getJsUrl("var.js")}'></script>`);
 
-    (function name(params) {
+    (function () {
         var appendScript = function () {
             var script = document.createElement('script');
             script.src = getJsUrl("var.js");
