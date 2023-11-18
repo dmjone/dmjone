@@ -1,7 +1,7 @@
 window.varjsrequirefooter = 1;
 window.varjsalreadyloaded = 1;
 
-window.addEventListener("load", async function () {
+window.addEventListener("load", async function () {    
 
     document.querySelectorAll('.blur-text').forEach(item => {
         new bootstrap.Popover(item, {
@@ -45,6 +45,14 @@ window.addEventListener("load", async function () {
     })();
 
     (function () {
+        const sections = `<section class="container py-5 pt-10"><h2 class="text-center mb-5 display-4 fw-bold text-primary">Organizers and Mentors</h2><div class="row justify-content-center" id="organizer-container"></div></section>
+        <section class="container py-5 pt-10" id="professor-section"><h2 class="text-center mb-5 display-4 fw-bold text-warning">Learning Facilitators</h2><div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-2 justify-content-evenly" id="learning-facilitator"></div></section>
+        <section class="container py-5 pt-10"><h2 class="text-center mb-5 display-4 fw-bold text-info">Meet the Faculty Organizers</h2><div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-3 g-2 justify-content-evenly" id="faculty-organizer"></div></section>
+        <section class="container py-5 pt-10" id="student-organizers"><h2 class="text-center mb-5 display-4 fw-bold text-info text-opacity-50">Meet the Student Organizers</h2><div class="row justify-content-center"><div class="col-lg-12"><div class="card border-0 shadow-lg"><div class="card-body p-5"><div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-2 junteny" id="student-organizer"></div></div></div></div></div></section>`;
+        document.querySelector('#jslds').innerHTML = sections;
+    })();
+
+    (function () {
         const organizers = [
             { title: 'Director', name: 'Prof. Ashish Khosla', img: 'img/1623244771-AshishKhosla.jpeg', quote: `Director's Quote or Message<br><strong>Pending</strong>` },
             { title: 'Dean', name: 'Dr. Virender Rihani', img: 'img/1654685857-VirenderRihani.jpeg', quote: `Dean's Quote or Message<br><strong>Pending</strong>` },
@@ -58,7 +66,7 @@ window.addEventListener("load", async function () {
             colDiv.className = 'col-md-3 mb-3';
 
             const cardDiv = document.createElement('div');
-            cardDiv.className = 'card border-0 shadow text-center h-100';
+            cardDiv.className = 'card border-0 shadow-lg text-center h-100';
 
             const img = document.createElement('img');
             img.src = organizer.img;
@@ -83,9 +91,13 @@ window.addEventListener("load", async function () {
             smallText.innerHTML = organizer.quote;
             quoteP.appendChild(smallText);
 
+            if (!organizer.quote.includes("Pending") || new Date() < new Date('2023-11-20')) {                
+                showquote = 1;
+            }            
+
             cardBodyDiv.appendChild(titleH4);
             cardBodyDiv.appendChild(nameP);
-            cardBodyDiv.appendChild(quoteP);
+            showquote ? cardBodyDiv.appendChild(quoteP) : null;
 
             cardDiv.appendChild(img);
             cardDiv.appendChild(cardBodyDiv);
@@ -96,7 +108,7 @@ window.addEventListener("load", async function () {
     })();
 
 
-    (function () {        
+    (function () {
         const professors = [
             { name: 'Dr. Pankaj Vaidya', title: 'Professor' },
             { name: 'Dr. Gaurav Gupta', title: 'Associate Professor' },
@@ -134,7 +146,7 @@ window.addEventListener("load", async function () {
             colDiv.className = 'col';
 
             const cardDiv = document.createElement('div');
-            cardDiv.className = 'card h-100 border-0';
+            cardDiv.className = 'card h-100 border-0 shadow';
 
             const cardBodyDiv = document.createElement('div');
             cardBodyDiv.className = 'card-body p-3 text-center h-100';
@@ -222,7 +234,7 @@ window.addEventListener("load", async function () {
             cardBodyDiv.className = 'card-body p-3 text-center h-100';
 
             const nameH5 = document.createElement('h5');
-            nameH5.className = 'card-title fw-bold text-primary text-opacity-50';
+            nameH5.className = 'card-title fw-bold text-primary text-opacity-75';
             nameH5.textContent = professor.name;
 
             const titleP = document.createElement('p');
@@ -239,47 +251,19 @@ window.addEventListener("load", async function () {
         });
     })();
 
-    (function name(params) {
+    (function () {
         var link = document.getElementById('registerlinkmain');
         if (link) {
             link.setAttribute('data-bs-toggle', 'modal');
             link.setAttribute('data-bs-target', '#registerModal');
         }
-        
-        const content = `<footer class="footer text-center bg-transparent m-0">
-                <div class="container">
-                    <p class="mb-0 text-center">&copy; 2023 Yogananda School of AI Computers and Data Science |
-                        Designed by <a href="https://dmj.one">dmj.one</a> under the guidance of Er. Piyush Sewal.</p>
-                    <div class="py-2">
-                        <a href="https://shooliniuniversity.com/privacy-policy" class="mx-1">Privacy</a> |
-                        <a href="https://shooliniuniversity.com/terms-and-conditions" class="mx-1">Terms</a> |
-                        <a href="mailto:contact@dmj.one" class="mx-1">Contact Us</a>
-                    </div>
-                    <div class="pb-4">
-                        <span class="text-muted">Follow us on:</span>
-                        <a href="https://www.facebook.com/ShooliniUniversityOfficial" class="mx-2"><i class="fab fa-facebook-f"></i></a>
-                        <a href="https://twitter.com/ShooliniUniv" class="mx-2"><i class="fab fa-twitter"></i></a>
-                        <a href="https://www.instagram.com/shooliniuniversity/" class="mx-2"><i class="fab fa-instagram"></i></a>
-                        <a href="https://www.linkedin.com/school/shooliniuniversity/" class="mx-2"><i class="fab fa-linkedin-in"></i></a>
-                    </div>
-                </div>
-            </footer>`;
-        const contentmodal = `
-        <div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
-                    <div class="modal-dialog modal-fullscreen-md-down modal-lg">
-                        <div class="modal-content" style="background:#f9f3cc">
-                            <div class="modal-header">
-                                <h5 class="modal-title text-center fw-bold" id="modalLabel">Binary Battles Registration</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <iframe id="modalIframe" src="" style="width:100%; height:500px;" frameborder="0"></iframe>
-                            </div>
-                        </div>
-                    </div>
-                </div>`;
-        document.querySelector('#registration').innerHTML += contentmodal;        
-        document.querySelector('#registrationfooter').innerHTML = content; 
+        const contentmodal = `<div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true"><div class="modal-dialog modal-fullscreen-md-down modal-lg"><div class="modal-content" style="background:#f9f3cc"><div class="modal-header"><h5 class="modal-title text-center fw-bold" id="modalLabel">Binary Battles Registration</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div><div class="modal-body"><iframe id="modalIframe" src="" style="width:100%; height:500px;" frameborder="0"></iframe></div></div></div></div>`;
+        document.querySelector('#registration').innerHTML += contentmodal;
+    })();
+
+    (function () {
+        const footerdata = `<footer class="footer text-center bg-transparent m-0"><div class="container"><p class="mb-0 text-center">&copy; 2023 Yogananda School of AI Computers and Data Science | Designed by <a href="https://dmj.one">dmj.one</a> under the guidance of Er. Piyush Sewal.</p><div class="py-2"><a href="https://shooliniuniversity.com/privacy-policy" class="mx-1">Privacy</a> | <a href="https://shooliniuniversity.com/terms-and-conditions" class="mx-1">Terms</a> | <a href="mailto:contact@dmj.one" class="mx-1">Contact Us</a></div><div class="pb-4"><span class="text-muted">Follow us on:</span><a href="https://www.facebook.com/ShooliniUniversityOfficial" class="mx-2"><i class="fab fa-facebook-f"></i></a><a href="https://twitter.com/ShooliniUniv" class="mx-2"><i class="fab fa-twitter"></i></a><a href="https://www.instagram.com/shooliniuniversity/" class="mx-2"><i class="fab fa-instagram"></i></a><a href="https://www.linkedin.com/school/shooliniuniversity/" class="mx-2"><i class="fab fa-linkedin-in"></i></a></div></div></footer>`;
+        document.querySelector('#registrationfooter').innerHTML = footerdata;
 
         (function () {
             var registerModal = document.getElementById('registerModal');
