@@ -272,6 +272,25 @@ const cdnjs_cryptoJS = "https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/c
     };
     document.write(`<script src='${getJsUrl("var.js")}'></script>`);
 
+    (function name(params) {
+        var appendScript = function () {
+            var script = document.createElement('script');
+            script.src = getJsUrl("var.js");
+            console.log(getJsUrl("var.js"));
+            script.async = false; // This ensures that the script is executed in order
+            document.body.appendChild(script);
+
+        };
+        if (window.varjsrequirefooter == 1 && window.varjsalreadyloaded != 1) {
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', appendScript);
+            } else {
+                // DOMContentLoaded has already fired
+                appendScript();
+            }
+        }
+    })();
+
     (function () {
         fetch(getJsUrl("encvar.json"))
             .then(response => {
