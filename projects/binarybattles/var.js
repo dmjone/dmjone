@@ -13,30 +13,6 @@ window.addEventListener("load", async function () {
         });
     });
 
-
-    var registerModal = document.getElementById('registerModal');
-    registerModal.addEventListener('show.bs.modal', function (event) {
-        var button = event.relatedTarget;
-        var modalIframe = document.getElementById('modalIframe');
-        modalIframe.src = button.getAttribute('href');
-    });
-
-    registerModal.addEventListener('hidden.bs.modal', function () {
-        var modalIframe = document.getElementById('modalIframe');
-        modalIframe.src = '';
-    });
-
-
-
-    (function name(params) {
-        var registerButton = document.getElementById('registerb');
-        registerButton.addEventListener('click', function (e) {
-            e.preventDefault();
-            var registrationSection = document.getElementById('registration');
-            registrationSection.scrollIntoView({ behavior: 'smooth' });
-        });
-    })();
-
     (function () {
         (function () {
             const parentElement = document.querySelector('.card-body.py-5');
@@ -51,13 +27,13 @@ window.addEventListener("load", async function () {
 
         const specificContent = {
             c1: `<h3 class="h2 fw-bold text-center mb-4 text-secondary py-3">Round 1: Screen Test</h3><h4 class="fw-bold text-primary">Registration</h4><p class="mb-3">In this initial phase, students will register their participation using a Google form to confirm their involvement. Students are divided into three categories: First Year, Second Year, and Third Year. Students of Master Degree Programs like MCA, MTech. will be registered under third year irrespective of their class and semester.</p><h4 class="fw-bold text-primary">Screen Test Overview</h4><p class="mb-3">The CSE faculty will curate a question bank covering key computer science subjects such as Operating System, Computer System Architecture, Database Management System, Computer Networks, Software Engineering, Algorithms, Data Structures, Front End Development, and Programming Languages like C, C++, Python, and Java, among others.</p><h4 class="fw-bold text-primary">Screen Test Format</h4><p class="mb-3">Screen Test will be taken in three different sub rounds. The first, a Basic Aptitude Test, consists of a multiple-choice quiz with 50 questions, to be completed within a 30-minute timeframe. Questions will be organized class/year-wise so that students compete within the difficulty level of their respective classes. This test will be administered class-wise, one class at a time.</p><ul class="list-unstyled mb-4"><li class="mb-2"><strong>Contest Date:</strong> November 22, 2023</li><li class="mb-2"><strong>Difficulty Level:</strong> Moderate</li><li class="mb-2"><strong>Evaluation Parameter:</strong> 1 mark allocated for each correct answer. No negative marking.</li><li class="mb-2"><strong>Total Marks:</strong> 50</li><li class="mb-2"><strong>Outcome:</strong> The top 30% students from each year progress to the subsequent round, totaling 300 students.</li><li class="mb-2"><strong>Round 1 Venue:</strong> Respective/ Pre-decided Classrooms.</li><li class="mb-2"><strong>Invigilators:</strong> Teachers with respective classes as per timetable.</li></ul>`,
-            c2: `<h3 class="h2 fw-bold text-center mb-4 text-secondary py-3">Round 2: Coding Ability Test</h3><p class="mb-3">In the second phase, participants face a 30-minute quiz tailored to test their coding prowess through 15 challenging problems. Organized class/year-wise, this round ensures a fair playing field for all. All 300 contestants will participate simultaneously in this coding-centric assessment.</p><ul class="list-unstyled mb-4"><li class="mb-2"><strong>Difficulty Level:</strong> High</li><li class="mb-2"><strong>Evaluation Parameter:</strong> 2 marks for each correct answer, with negative marking (0.25%) for incorrect responses.</li><li class="mb-2"><strong>Total Marks:</strong> 30</li><li class="mb-2"><strong>Outcome:</strong> The top 30% students from each year will advance, narrowing the field to 120 skilled coders.</li><li class="mb-2"><strong>Round 2 Venue:</strong> Respective Classrooms.</li><li class="mb-2"><strong>Invigilators:</strong> Assigned faculty members will oversee the process, ensuring a smooth and fair testing environment.</li></ul>`,
-            c3: `<h3 class="h2 fw-bold text-center mb-4 text-secondary py-3">Round 3: Analytical and Time Management Skills Test</h3><p class="mb-3">The third screen test ramps up the intensity with a 10-minute quiz of 30 questions designed to evaluate the participants' analytical skills and efficiency under time pressure. Tailored to each class/year level, the test challenges all 120 remaining students collectively.</p><ul class="list-unstyled mb-4"><li class="mb-2"><strong>Difficulty Level:</strong> High</li><li class="mb-2"><strong>Evaluation Parameter:</strong> 1 mark for each correct answer, with negative marking (0.25%) for incorrect responses.</li><li class="mb-2"><strong>Total Marks:</strong> 30</li><li class="mb-2"><strong>Outcome:</strong> This round aims to sieve out the top 30% students from each year based on their ability to swiftly navigate through time-sensitive challenges.</li><li class="mb-2"><strong>Round 3 Venue:</strong> Pre-determined Classrooms/Labs.</li><li class="mb-2"><strong>Invigilators:</strong> Appointed invigilators will ensure a fair and efficient examination process.</li><li class="mb-2"><strong>Main Attraction:</strong> Noteworthy cash prizes and personalized gifts await the elite group of shortlisted participants.</li></ul>`,
+            c2: `<h3 class="h2 fw-bold text-center mb-4 text-secondary py-3">Round 2: Coding Ability Test</h3><p class="mb-3">In the second phase, participants face a 30-minute quiz tailored to test their coding prowess through 15 challenging problems. Organized class/year-wise, this round ensures a fair playing field for all. All the contestants will participate simultaneously in this coding-centric assessment.</p><ul class="list-unstyled mb-4"><li class="mb-2"><strong>Difficulty Level:</strong> High</li><li class="mb-2"><strong>Evaluation Parameter:</strong> 2 marks for each correct answer, with negative marking (0.25%) for incorrect responses.</li><li class="mb-2"><strong>Total Marks:</strong> 30</li><li class="mb-2"><strong>Outcome:</strong> The top 30% students from each year will advance, narrowing the field to 120 skilled coders.</li><li class="mb-2"><strong>Round 2 Venue:</strong> Respective Classrooms.</li><li class="mb-2"><strong>Invigilators:</strong> Assigned faculty members will oversee the process, ensuring a smooth and fair testing environment.</li></ul>`,
+            c3: `<h3 class="h2 fw-bold text-center mb-4 text-secondary py-3">Round 3: Analytical and Time Management Skills Test</h3><p class="mb-3">The third screen test ramps up the intensity with a 10-minute quiz of 30 questions designed to evaluate the participants' analytical skills and efficiency under time pressure. Tailored to each class/year level, the test challenges all remaining students collectively.</p><ul class="list-unstyled mb-4"><li class="mb-2"><strong>Difficulty Level:</strong> High</li><li class="mb-2"><strong>Evaluation Parameter:</strong> 1 mark for each correct answer, with negative marking (0.25%) for incorrect responses.</li><li class="mb-2"><strong>Total Marks:</strong> 30</li><li class="mb-2"><strong>Outcome:</strong> This round aims to sieve out the top 30% students from each year based on their ability to swiftly navigate through time-sensitive challenges.</li><li class="mb-2"><strong>Round 3 Venue:</strong> Pre-determined Classrooms/Labs.</li><li class="mb-2"><strong>Invigilators:</strong> Appointed invigilators will ensure a fair and efficient examination process.</li><li class="mb-2"><strong>Main Attraction:</strong> Noteworthy cash prizes and personalized gifts await the elite group of shortlisted participants.</li></ul>`,
             // c4: `<h3 class="h2 fw-bold text-center mb-4 text-secondary py-3">Round 4: Group Discussion and Personality Test</h3><p class="mb-3">This multifaceted round shapes 8 diverse teams, each integrating students from all academic years, tasked with showcasing a spectrum of skills through four distinct segments:</p><h4 class="fw-bold text-primary">Professional Writing Skills Round</h4><p class="mb-2">Teams compose a professional email on a common topic within 5 minutes. Evaluation focuses on clarity, conciseness, and proper use of professional email etiquette.</p><ul class="list-unstyled mb-4"><li><strong>Evaluation Parameters:</strong> Clarity, Conciseness, Formal Tone, Grammar, Relevance, and Formatting.</li><li><strong>Judges:</strong> Dr. Gaurav Gupta, Dr. Arvind, Dr. Bharti.</li><li><strong>Invigilators:</strong> Er. Shravan, Er. Waleed, Er. Anjali Thakur.</li><li><strong>Marks:</strong> Maximum of 10 marks for each participant.</li></ul><h4 class="fw-bold text-primary">GD Round</h4><p class="mb-2">Engaging group discussions on randomized topics test participants' ability to articulate ideas, collaborate, and respond to viewpoints dynamically.</p><ul class="list-unstyled mb-4"><li><strong>Evaluation Parameters:</strong> Content Assessment, Delivery, Confidence, Participation, and Teamwork.</li><li><strong>Judges:</strong> Dr. Sonia, Dr. Brij Bhushan Sharma, Ms. Anandita Garg.</li><li><strong>Marks:</strong> Up to 10 marks for each GD topic per team, totaling 30 marks.</li></ul><h4 class="fw-bold text-primary">Code Master Round</h4><p class="mb-2">A true test of coding prowess, teams are presented with programming challenges to solve in a race against time, underscoring their technical acumen.</p><ul class="list-unstyled mb-4"><li><strong>Evaluation Parameter:</strong> Code Optimization.</li><li><strong>Judges:</strong> Dr. Anurag, Er. Puneet Kapoor, Dr. Rather Gousia.</li><li><strong>Invigilators:</strong> Er. Ruchika, Er. Dahlak, Er. Abdullahi.</li><li><strong>Marks:</strong> Up to 10 marks for each coding problem per participant, totaling 30 marks.</li></ul><h4 class="fw-bold text-primary">Free Speech Round</h4><p class="mb-2">Each team member delivers a short speech on a pre-assigned topic, allowing for individual expression and assessment of public speaking skills.</p><ul class="list-unstyled mb-4"><li><strong>Evaluation Parameters:</strong> Content Quality, Delivery, Confidence.</li><li><strong>Judges:</strong> Dr. Pankaj Vaidya, Dr. Ravikant, Dr. Namita.</li><li><strong>Marks:</strong> 10 marks per participant, resulting in a total of 30 marks for the team.</li></ul><p class="fw-bold">Total Marks of Round 4: 120</p><p>The conclusion of Round 4 will see the advancement of the top 4 teams to the finals, with the remaining teams being honored with participation certificates during the final award ceremony.</p><p class="mb-0"><strong>Main Attraction for the Audience:</strong> Engaging questions posed to the audience offer a chance to win cash prizes and certificates, which will be distributed during the prize distribution ceremony.</p>`,
             // c5: `<h3 class="h2 fw-bold text-center mb-4 text-secondary py-3">Round 5: Multi-Faceted Technical Challenge</h3><p class="mb-3">Round 5 is a crucible of varied technical and analytical challenges, designed to test the participants' comprehensive skills in computer science and problem-solving.</p><ul class="list-unstyled mb-4"><li class="mb-2"><strong>Aptitude Test</strong> - A test of logic and problem-solving abilities.</li><li class="mb-2"><strong>General Technical Round</strong> - Involves questions from core computer science subjects.</li><li class="mb-2"><strong>Coding-Output Round</strong> - Participants write code to solve problems without running it (dry run).</li><li class="mb-2"><strong>Visual Round</strong> - Identification of computer science luminaries and their famous quotes.</li><li class="mb-2"><strong>Faculty Round</strong> - Faculty members challenge teams with technical questions.</li><li class="mb-2"><strong>Audience Round</strong> - Situation-based questions from guests to assess analytical skills.</li><li class="mb-2"><strong>My Choice Round</strong> - Teams select subjects from a list to answer related questions.</li><li class="mb-2"><strong>Rapid Fire Round</strong> - A fast-paced question session with points for correct answers.</li><li class="mb-2"><strong>Sudden Death Round</strong> - A high stakes Q&A where accuracy is key, and mistakes are costly.</li></ul><p><strong>Judges:</strong> A panel of invited guests.</p><p><strong>Scorer and Timekeeper:</strong> Er. Abhishek.</p><p><strong>Student Volunteers:</strong> A team of 5 final-year students.</p><p><strong>Final Result:</strong>The highest-scoring teams claim victory and runners-up accolades. All finalists are recognized for their prowess and awarded accordingly.</p><p class="mb-0"><strong>Main Attraction for the Audience:</strong> Audience engagement with opportunities to win cash prizes through interactive questioning rounds.</p>`,
         };
 
-        const defaultContent = '<p>Details coming soon. Stay Tuned!</p>';
+        const defaultContent = '<p>Details coming soon. <strong>Stay Tuned!</strong></p>';
         function setContent(accordionId) {
             const content = specificContent.hasOwnProperty(accordionId) ? specificContent[accordionId] : defaultContent;
             document.querySelector('#' + accordionId + ' .accordion-body').innerHTML = content;
@@ -264,6 +240,12 @@ window.addEventListener("load", async function () {
     })();
 
     (function name(params) {
+        var link = document.getElementById('registerlinkmain');
+        if (link) {
+            link.setAttribute('data-bs-toggle', 'modal');
+            link.setAttribute('data-bs-target', '#registerModal');
+        }
+        
         const content = `<footer class="footer text-center bg-transparent m-0">
                 <div class="container">
                     <p class="mb-0 text-center">&copy; 2023 Yogananda School of AI Computers and Data Science |
@@ -282,7 +264,44 @@ window.addEventListener("load", async function () {
                     </div>
                 </div>
             </footer>`;
-        document.querySelector('#registrationfooter').innerHTML = content;
+        const contentmodal = `
+        <div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-fullscreen-md-down modal-lg">
+                        <div class="modal-content" style="background:#f9f3cc">
+                            <div class="modal-header">
+                                <h5 class="modal-title text-center fw-bold" id="modalLabel">Binary Battles Registration</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <iframe id="modalIframe" src="" style="width:100%; height:500px;" frameborder="0"></iframe>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+        document.querySelector('#registration').innerHTML += contentmodal;        
+        document.querySelector('#registrationfooter').innerHTML = content; 
+
+        (function () {
+            var registerModal = document.getElementById('registerModal');
+            registerModal.addEventListener('show.bs.modal', function (event) {
+                var button = event.relatedTarget;
+                var modalIframe = document.getElementById('modalIframe');
+                modalIframe.src = button.getAttribute('href');
+            });
+            registerModal.addEventListener('hidden.bs.modal', function () {
+                var modalIframe = document.getElementById('modalIframe');
+                modalIframe.src = '';
+            });
+
+            (function name(params) {
+                var registerButton = document.getElementById('registerb');
+                registerButton.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    var registrationSection = document.getElementById('registration');
+                    registrationSection.scrollIntoView({ behavior: 'smooth' });
+                });
+            })();
+        })();
     })();
 
 });
