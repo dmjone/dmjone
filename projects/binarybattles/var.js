@@ -54,7 +54,7 @@ window.addEventListener("load", async function () {
 
     (function () {
         var showquote;
-
+        
         const organizers = [
             { title: 'Director', name: 'Prof. Ashish Khosla', img: 'img/1623244771-AshishKhosla.jpeg', quote: `Director's Quote or Message<br><strong>Pending</strong>` },
             { title: 'Dean', name: 'Dr. Virender Rihani', img: 'img/1654685857-VirenderRihani.jpeg', quote: `Dean's Quote or Message<br><strong>Pending</strong>` },
