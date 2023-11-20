@@ -118,6 +118,7 @@ window.addEventListener("load", async function () {
             { name: 'Dr. Brij Bhushan Sharma', title: 'Associate Professor' },
             { name: 'Dr. Anurag Rana', title: 'Assistant Professor' },
             { name: 'Dr. Arvind Sharma', title: 'Assistant Professor' },
+            { name: 'Dr. Rather Gousia', title: 'Assistant Professor' },
             { name: 'Puneet Kapoor', title: 'Assistant Professor' },
             { name: 'Aarchit Joshi', title: 'Assistant Professor' },
             { name: 'Waleed Salehi', title: 'Assistant Professor' },
@@ -134,8 +135,7 @@ window.addEventListener("load", async function () {
             { name: 'Kanika', title: 'Assistant Professor' },
             { name: 'Anjali Thakur', title: 'Assistant Professor' },
             { name: 'Maya Thapa', title: 'Assistant Professor' },
-            { name: 'Ishani Sharma', title: 'Assistant Professor' },
-            { name: 'Dr. Rather Gousia', title: 'Assistant Professor' },
+            { name: 'Ishani Sharma', title: 'Assistant Professor' },            
             { name: 'Shiva', title: 'Assistant Professor' }
         ];
 
