@@ -82,7 +82,7 @@ function get_menu_list(datetogen) {
             },
             {
                 "title": "Practical 1: Selection Sort in C",
-                "desc": "Delve into the implementation of the Selection Sort algorithm using C. After understanding the code, enhance your grasp by exploring our <a href='interactive-sorting-visualizer'>interactive visualizer</a>.",
+                "desc": "Delve into the implementation of the Selection Sort algorithm using C++. After understanding the code, enhance your grasp by exploring our <a href='interactive-sorting-visualizer'>interactive visualizer</a>.",
                 "author": "Shreshth Srivastav",
                 "link": "selection-sort",
                 date: "Thursday, August 17, 2023",
@@ -91,7 +91,7 @@ function get_menu_list(datetogen) {
             },
             {
                 "title": "Practical 2: Straight Min Max Algorithm",
-                "desc": "Delve into the implementation of the Straight Min Max Algorithm using C, CPP, Python. After understanding the code, enhance your grasp by exploring our <a href='interactive-sorting-visualizer'>interactive visualizer</a>.",
+                "desc": "Delve into the implementation of the Straight Min Max Algorithm using C, C++, Python. After understanding the code, enhance your grasp by exploring our <a href='interactive-sorting-visualizer'>interactive visualizer</a>.",
                 "author": "Shreshth Srivastav",
                 "link": "straight-min-max",
                 // "cardimage": "_url_",
@@ -99,7 +99,7 @@ function get_menu_list(datetogen) {
             },
             {
                 "title": "Practical 2: Method 2 - Straight Min Max Algorithm",
-                "desc": "Delve into the implementation of the Straight Min Max Algorithm using C, CPP, Python. After understanding the code, enhance your grasp by exploring our <a href='interactive-sorting-visualizer'>interactive visualizer</a>.",
+                "desc": "Delve into the implementation of the Straight Min Max Algorithm using C, C++, Python. After understanding the code, enhance your grasp by exploring our <a href='interactive-sorting-visualizer'>interactive visualizer</a>.",
                 "author": "Shreshth Srivastav",
                 "link": "straight-min-max-method-2",
                 // "cardimage": "_url_",
@@ -107,7 +107,7 @@ function get_menu_list(datetogen) {
             },
             {
                 "title": "Practical 3: Binary Search Algorithm",
-                "desc": "Delve into the implementation of the Binary Search Algorithm using C. After understanding the code, enhance your grasp by exploring our <a href='interactive-sorting-visualizer'>interactive visualizer</a>.",
+                "desc": "Delve into the implementation of the Binary Search Algorithm using C++. After understanding the code, enhance your grasp by exploring our <a href='interactive-sorting-visualizer'>interactive visualizer</a>.",
                 "author": "Shreshth Srivastav",
                 "link": "binary-search-algorithm",
                 // "cardimage": "_url_",
@@ -116,7 +116,7 @@ function get_menu_list(datetogen) {
 
             {
                 "title": "Practical 4: Merge Sort",
-                "desc": "Delve into the implementation of the Merge Sort using C. After understanding the code, enhance your grasp by exploring our <a href='interactive-sorting-visualizer'>interactive visualizer</a>.",
+                "desc": "Delve into the implementation of the Merge Sort using C++. After understanding the code, enhance your grasp by exploring our <a href='interactive-sorting-visualizer'>interactive visualizer</a>.",
                 "author": "Divya Mohan",
                 "link": "merge-sort",
                 // "cardimage": "_url_",
@@ -124,27 +124,35 @@ function get_menu_list(datetogen) {
             },
             {
                 title: "Practical 5: Quick Sort",
-                desc: "Delve into the implementation of the Quick Sort using C. After understanding the code, enhance your grasp by exploring our <a href='interactive-sorting-visualizer'>interactive visualizer</a>.",
+                desc: "Delve into the implementation of the Quick Sort using C++. After understanding the code, enhance your grasp by exploring our <a href='interactive-sorting-visualizer'>interactive visualizer</a>.",
                 author: "Divya Mohan",
                 link: "quick-sort",
                 // "cardimage": "_url_",
                 date: "Thursday, September 21, 2023"
             },
             {
-                "title": "Practical 6: Selection Procedure [WIP]",
-                "desc": "Delve into the implementation of the Selection Procedure using C. After understanding the code, enhance your grasp by exploring our <a href='interactive-sorting-visualizer'>interactive visualizer</a>.",
+                "title": "Practical 6: Selection Procedure",
+                "desc": "Delve into the implementation of the Selection Procedure (also known as Quick Select) using C++. After understanding the code, enhance your grasp by exploring our <a href='interactive-sorting-visualizer'>interactive visualizer</a>.",
                 "author": "Divya Mohan",
-                "link": "#",
+                "link": "selection-procedure",
                 // "cardimage": "_url_",
                 date: "Thursday, September 28, 2023"
             },
             {
-                "title": "Practical 7: Divide And Conquer - Matrix Multiplication [WIP]",
-                "desc": "Delve into the implementation of the Matrix Multiplication using Divide and Conquer using C. After understanding the code, enhance your grasp by exploring our <a href='interactive-sorting-visualizer'>interactive visualizer</a>.",
+                "title": "Practical 7: Divide And Conquer - Strassens Matrix Multiplication",
+                "desc": "Delve into the implementation of the Strassens Matrix Multiplication using Divide and Conquer using C++. After understanding the code, enhance your grasp by exploring our <a href='interactive-sorting-visualizer'>interactive visualizer</a>.",
                 "author": "Divya Mohan",
-                "link": "#",
+                "link": "strassens-matrix-multiplication",
                 // "cardimage": "_url_",
                 date: "Thursday, October 12, 2023"
+            },
+            {
+                "title": "Practical 8: Heap Sort",
+                "desc": "Delve into the implementation of the Heap Sort using heapify using C++. After understanding the code, enhance your grasp by exploring our <a href='interactive-sorting-visualizer'>interactive visualizer</a>.",
+                "author": "Divya Mohan",
+                "link": "heap-sort",
+                // "cardimage": "_url_",
+                date: "Thursday, November 15, 2023"
             },
         ];
         for (let i = 0; i < arr.length; i++) {

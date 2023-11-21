@@ -508,7 +508,10 @@ const courseDetailsMap = {
         'default': ["Dr. Anurag Rana", "CSU1291", "Java Programming"],
         'lab': ["Dr. Anurag Rana", "CSU1291", "Java Programming Lab"]
     },
-    'csu083': { 'default': ["Puneet Kapoor", "CSU083", "Design and Analysis of Algorithm"] },
+    'csu083': {
+        'default': ["Puneet Kapoor", "CSU083", "Design and Analysis of Algorithm"],
+        'lab': ["Puneet Kapoor", "CSU083", "Design and Analysis of Algorithm"]
+    },
     'csu1075': { 'default': ["Dr. Brij Bhushan Sharma", "CSU1075", "Computer Organization"] },
     'csu1526': { 'default': ["Piyush Sewal", "CSU1526", "Microprocessor and Microcontroller"] }
 };
