@@ -115,10 +115,10 @@ function get_menu_list(datetogen) {
             },
 
             {
-                "title": "Practical 4: Merge Sort[WIP]",
+                "title": "Practical 4: Merge Sort",
                 "desc": "Delve into the implementation of the Merge Sort using C. After understanding the code, enhance your grasp by exploring our <a href='interactive-sorting-visualizer'>interactive visualizer</a>.",
                 "author": "Divya Mohan",
-                "link": "#",
+                "link": "merge-sort",
                 // "cardimage": "_url_",
                 date: "Thursday, September 14, 2023"
             },
