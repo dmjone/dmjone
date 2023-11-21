@@ -123,10 +123,10 @@ function get_menu_list(datetogen) {
                 date: "Thursday, September 14, 2023"
             },
             {
-                "title": "Practical 5: Quick Sort [WIP]",
-                "desc": "Delve into the implementation of the Quick Sort using C. After understanding the code, enhance your grasp by exploring our <a href='interactive-sorting-visualizer'>interactive visualizer</a>.",
-                "author": "Divya Mohan",
-                "link": "#",
+                title: "Practical 5: Quick Sort",
+                desc: "Delve into the implementation of the Quick Sort using C. After understanding the code, enhance your grasp by exploring our <a href='interactive-sorting-visualizer'>interactive visualizer</a>.",
+                author: "Divya Mohan",
+                link: "quick-sort",
                 // "cardimage": "_url_",
                 date: "Thursday, September 21, 2023"
             },
