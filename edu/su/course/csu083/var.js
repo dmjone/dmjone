@@ -82,7 +82,7 @@ function get_menu_list(datetogen) {
             },
             {
                 "title": "Practical 1: Selection Sort in C",
-                "desc": "Delve into the implementation of the Selection Sort algorithm using C++. After understanding the code, enhance your grasp by exploring our <a href='interactive-sorting-visualizer'>interactive visualizer</a>.",
+                "desc": "Delve into the implementation of the Selection Sort algorithm using C and C++. After understanding the code, enhance your grasp by exploring our <a href='interactive-sorting-visualizer'>interactive visualizer</a>.",
                 "author": "Shreshth Srivastav",
                 "link": "selection-sort",
                 date: "Thursday, August 17, 2023",
@@ -91,7 +91,7 @@ function get_menu_list(datetogen) {
             },
             {
                 "title": "Practical 2: Straight Min Max Algorithm",
-                "desc": "Delve into the implementation of the Straight Min Max Algorithm using C, C++, Python. After understanding the code, enhance your grasp by exploring our <a href='interactive-sorting-visualizer'>interactive visualizer</a>.",
+                "desc": "Delve into the implementation of the Straight Min Max Algorithm using C, C++. After understanding the code, enhance your grasp by exploring our <a href='interactive-sorting-visualizer'>interactive visualizer</a>.",
                 "author": "Shreshth Srivastav",
                 "link": "straight-min-max",
                 // "cardimage": "_url_",
@@ -99,7 +99,7 @@ function get_menu_list(datetogen) {
             },
             {
                 "title": "Practical 2: Method 2 - Straight Min Max Algorithm",
-                "desc": "Delve into the implementation of the Straight Min Max Algorithm using C, C++, Python. After understanding the code, enhance your grasp by exploring our <a href='interactive-sorting-visualizer'>interactive visualizer</a>.",
+                "desc": "Delve into the implementation of the Straight Min Max Algorithm using C. After understanding the code, enhance your grasp by exploring our <a href='interactive-sorting-visualizer'>interactive visualizer</a>.",
                 "author": "Shreshth Srivastav",
                 "link": "straight-min-max-method-2",
                 // "cardimage": "_url_",
