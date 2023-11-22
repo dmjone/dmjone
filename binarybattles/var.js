@@ -43,15 +43,16 @@ window.addEventListener("load", async function () {
     <li class="mb-2"><strong>Round 1 Venue:</strong> Respective/ Pre-decided Classrooms.</li>
     <li class="mb-2"><strong>Invigilators:</strong> Teachers with respective classes as per timetable.</li>
 </ul>`,
-       
+
             c2: `<h3 class="h2 fw-bold text-center mb-4 text-secondary py-3">Round 2: Coding Ability Test</h3>
 <h4 class="fw-bold text-primary">Screen Test Format</h4>
 <p class="mb-3">In the second phase, participants face a 30-minute quiz tailored to test their coding prowess through 15 challenging problems. Organized class/year-wise, this round ensures a fair playing field for all. All the contestants will participate simultaneously in this coding-centric assessment.</p>
+<!-- <h3 class="mb-3 text-danger text-center fw-bold"><a id="r2resultlink" href="DomainKnowledge.pdf" class="btn btn-warning btn-lg mt-3 px-5 py-3 shadow">Round 1 Winners</a></h3> -->
 <ul class="list-unstyled mb-4">
     <li class="mb-2"><strong>Difficulty Level:</strong> High</li>
     <li class="mb-2"><strong>Evaluation Parameter:</strong> 2 marks for each correct answer, with negative marking (0.25%) for incorrect responses.</li>
     <li class="mb-2"><strong>Total Marks:</strong> 30</li>
-    <li class="mb-2"><strong>Outcome:</strong> The top 30% students from each year will advance, narrowing the field to 120 skilled coders.</li>
+    <li class="mb-2"><strong>Outcome:</strong> The top 30% students from each year will advance, narrowing the field to ___ skilled coders.</li>
     <li class="mb-2"><strong>Round 2 Venue:</strong> Will be shared on November 23, 2023 at 10 AM</li>
     <li class="mb-2"><strong>Invigilators:</strong> Assigned faculty members will oversee the process, ensuring a smooth and fair testing environment.</li>
 </ul>`,
@@ -81,7 +82,7 @@ window.addEventListener("load", async function () {
 
     (function () {
         var showquote;
-        
+
         const organizers = [
             { title: 'Director', name: 'Prof. Ashish Khosla', img: 'img/1623244771-AshishKhosla.jpeg', quote: `Director's Quote or Message<br><strong>Pending</strong>` },
             { title: 'Dean', name: 'Dr. Virender Rihani', img: 'img/1654685857-VirenderRihani.jpeg', quote: `Dean's Quote or Message<br><strong>Pending</strong>` },
@@ -281,57 +282,153 @@ window.addEventListener("load", async function () {
     })();
 
     (function () {
-        var link = document.getElementById('registerlinkmain');
-        if (link) {
-            link.setAttribute('data-bs-toggle', 'modal');
-            link.setAttribute('data-bs-target', '#registerModal');
+        // Function to create modal content
+        function createModalContent(modalId, labelId, title, modalIframeid, contentstyle) {
+            return `<div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="${labelId}" aria-hidden="true">
+            <div class="modal-dialog modal-fullscreen-md-down modal-lg">
+                <div class="modal-content" ${contentstyle}>
+                    <div class="modal-header">
+                        <h5 class="modal-title text-center fw-bold" id="${labelId}">${title}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <iframe id="${modalIframeid}" src="" style="width:100%; height:500px;" frameborder="0"></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>`;
         }
-        var link2 = document.getElementById('r1resultlink');
-        if (link2) {
-            link2.setAttribute('data-bs-toggle', 'modal');
-            link2.setAttribute('data-bs-target', '#resultModal');
-        }
-        const contentmodal = `<div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true"><div class="modal-dialog modal-fullscreen-md-down modal-lg"><div class="modal-content" style="background:#f9f3cc"><div class="modal-header"><h5 class="modal-title text-center fw-bold" id="modalLabel">Binary Battles Registration</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div><div class="modal-body"><iframe id="modalIframe" src="" style="width:100%; height:500px;" frameborder="0"></iframe></div></div></div></div>`;
-        const resultModalContent = `<div class="modal fade" id="resultModal" tabindex="-1" aria-labelledby="modalLabel2" aria-hidden="true"><div class="modal-dialog modal-fullscreen-md-down modal-lg"><div class="modal-content"><div class="modal-header"><h5 class="modal-title text-center fw-bold" id="modalLabel2">Round 1: Domain Knowledge Result</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div><div class="modal-body"><iframe id="modalIframe2" src="" style="width:100%; height:500px;" frameborder="0"></iframe></div></div></div></div>`;
-        document.querySelector('#registration').innerHTML += contentmodal;
-        document.querySelector('#registration').innerHTML += resultModalContent;
+
+        // Define link and modal mappings
+        var links = [
+            { linkId: 'registerlinkmain', modalId: 'registerModal' },
+            { linkId: 'r1resultlink', modalId: 'resultModal' },
+            { linkId: 'r2resultlink', modalId: 'resultModal2' },
+            { linkId: 'r3resultlink', modalId: 'resultModal3' }
+        ];
+
+        // Iterate over each link and set attributes
+        links.forEach(function (item) {
+            var link = document.getElementById(item.linkId);
+            if (link) {
+                link.setAttribute('data-bs-toggle', 'modal');
+                link.setAttribute('data-bs-target', `#${item.modalId}`);
+            }
+        });
+
+        // Append modal contents to the DOM
+        var registrationDiv = document.querySelector('#registration');
+        registrationDiv.innerHTML += createModalContent('registerModal', 'modalLabel', 'Binary Battles Registration', 'modalIframe', 'style="background:#f9f3cc"');
+        registrationDiv.innerHTML += createModalContent('resultModal', 'modalLabel1', 'Round 1: Domain Knowledge Result', 'modalIframe1', 'style="background:#f7f7f7"');
+        registrationDiv.innerHTML += createModalContent('resultModal2', 'modalLabel2', 'Round 2: Result');
+        registrationDiv.innerHTML += createModalContent('resultModal3', 'modalLabel3', 'Round 3: Result');
     })();
+
+
+    // (function () {
+    //     var link = document.getElementById('registerlinkmain');
+    //     if (link) {
+    //         link.setAttribute('data-bs-toggle', 'modal');
+    //         link.setAttribute('data-bs-target', '#registerModal');
+    //     }
+    //     var link2 = document.getElementById('r1resultlink');
+    //     if (link2) {
+    //         link2.setAttribute('data-bs-toggle', 'modal');
+    //         link2.setAttribute('data-bs-target', '#resultModal');
+    //     }
+    //     var link3 = document.getElementById('r2resultlink');
+    //     if (link3) {
+    //         link3.setAttribute('data-bs-toggle', 'modal');
+    //         link3.setAttribute('data-bs-target', '#resultModal2');
+    //     }
+    //     var link4 = document.getElementById('r3resultlink');
+    //     if (link4) {
+    //         link4.setAttribute('data-bs-toggle', 'modal');
+    //         link4.setAttribute('data-bs-target', '#resultModal3');
+    //     }
+    //     const contentmodal = `<div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true"><div class="modal-dialog modal-fullscreen-md-down modal-lg"><div class="modal-content" style="background:#f9f3cc"><div class="modal-header"><h5 class="modal-title text-center fw-bold" id="modalLabel">Binary Battles Registration</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div><div class="modal-body"><iframe id="modalIframe" src="" style="width:100%; height:500px;" frameborder="0"></iframe></div></div></div></div>`;
+    //     const resultModalContent = `<div class="modal fade" id="resultModal" tabindex="-1" aria-labelledby="modelLabel1" aria-hidden="true"><div class="modal-dialog modal-fullscreen-md-down modal-lg"><div class="modal-content"><div class="modal-header"><h5 class="modal-title text-center fw-bold" id="modelLabel1">Round 1: Domain Knowledge Result</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div><div class="modal-body"><iframe id="modalIframe2" src="" style="width:100%; height:500px;" frameborder="0"></iframe></div></div></div></div>`;
+    //     const resultModalContent2 = `<div class="modal fade" id="resultModal2" tabindex="-1" aria-labelledby="modalLabel2" aria-hidden="true"><div class="modal-dialog modal-fullscreen-md-down modal-lg"><div class="modal-content"><div class="modal-header"><h5 class="modal-title text-center fw-bold" id="modalLabel2">Round 2:  Result</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div><div class="modal-body"><iframe id="modalIframe2" src="" style="width:100%; height:500px;" frameborder="0"></iframe></div></div></div></div>`;
+    //     const resultModalContent3 = `<div class="modal fade" id="resultModal3" tabindex="-1" aria-labelledby="modalLabel3" aria-hidden="true"><div class="modal-dialog modal-fullscreen-md-down modal-lg"><div class="modal-content"><div class="modal-header"><h5 class="modal-title text-center fw-bold" id="modalLabel3">Round 3:  Result</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div><div class="modal-body"><iframe id="modalIframe3" src="" style="width:100%; height:500px;" frameborder="0"></iframe></div></div></div></div>`;
+    //     document.querySelector('#registration').innerHTML += contentmodal;
+    //     document.querySelector('#registration').innerHTML += resultModalContent;
+    //     document.querySelector('#registration').innerHTML += resultModalContent2;
+    // })();
 
     (function () {
         const footerdata = `<footer class="footer text-center bg-transparent m-0"><div class="container"><p class="mb-0 text-center">&copy; 2023 Yogananda School of AI Computers and Data Science, Shoolini University | Designed by <a href="https://dmj.one">dmj.one</a> under the guidance of Er. Piyush Sewal.</p><div class="py-2"><a href="https://shooliniuniversity.com/privacy-policy" class="mx-1">Privacy</a> | <a href="/tos" class="mx-1">Terms</a> | <a href="mailto:contact@dmj.one" class="mx-1">Contact Us</a><span id="vsc"></span></div><div class="pb-4"><span class="text-muted">Follow us on:</span><a href="https://www.facebook.com/ShooliniUniversityOfficial" class="mx-2"><i class="fab fa-facebook-f"></i></a><a href="https://twitter.com/ShooliniUniv" class="mx-2"><i class="fab fa-twitter"></i></a><a href="https://www.instagram.com/shooliniuniversity/" class="mx-2"><i class="fab fa-instagram"></i></a><a href="https://www.linkedin.com/school/shooliniuniversity/" class="mx-2"><i class="fab fa-linkedin-in"></i></a></div></div></footer>`;
         document.querySelector('#registrationfooter').innerHTML = footerdata;
 
-        (function () {
-            var registerModal = document.getElementById('registerModal');
-            registerModal.addEventListener('show.bs.modal', function (event) {
-                var button = event.relatedTarget;
-                var modalIframe = document.getElementById('modalIframe');
-                modalIframe.src = button.getAttribute('href');
-            });
-            registerModal.addEventListener('hidden.bs.modal', function () {
-                var modalIframe = document.getElementById('modalIframe');
-                modalIframe.src = '';
-            });
+        // (function () {
+        //     var registerModal = document.getElementById('registerModal');
+        //     registerModal.addEventListener('show.bs.modal', function (event) {
+        //         var button = event.relatedTarget;
+        //         var modalIframe = document.getElementById('modalIframe');
+        //         modalIframe.src = button.getAttribute('href');
+        //     });
+        //     registerModal.addEventListener('hidden.bs.modal', function () {
+        //         var modalIframe = document.getElementById('modalIframe');
+        //         modalIframe.src = '';
+        //     });
 
-            var resultModal = document.getElementById('resultModal');
-            resultModal.addEventListener('show.bs.modal', function (event) {
-                var button2 = event.relatedTarget;
-                var modalIframe2 = document.getElementById('modalIframe2');
-                modalIframe2.src = button2.getAttribute('href');
-            });
-            resultModal.addEventListener('hidden.bs.modal', function () {
-                var modalIframe2 = document.getElementById('modalIframe2');
-                modalIframe2.src = '';
-            });
+        //     var resultModal = document.getElementById('resultModal');
+        //     resultModal.addEventListener('show.bs.modal', function (event) {
+        //         var button = event.relatedTarget;
+        //         var modalIframe = document.getElementById('modalIframe1');
+        //         modalIframe.src = button.getAttribute('href');
+        //     });
+        //     resultModal.addEventListener('hidden.bs.modal', function () {
+        //         var modalIframe = document.getElementById('modalIframe1');
+        //         modalIframe.src = '';
+        //     });
 
-            (function name(params) {
-                var registerButton = document.getElementById('registerb');
-                registerButton.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    var registrationSection = document.getElementById('registration');
-                    registrationSection.scrollIntoView({ behavior: 'smooth' });
-                });
-            })();
+        //     var resultModal = document.getElementById('resultModal2');
+        //     resultModal.addEventListener('show.bs.modal', function (event) {
+        //         var button2 = event.relatedTarget;
+        //         var modalIframe2 = document.getElementById('modalIframe2');
+        //         modalIframe2.src = button2.getAttribute('href');
+        //     });
+        //     resultModal.addEventListener('hidden.bs.modal', function () {
+        //         var modalIframe2 = document.getElementById('modalIframe2');
+        //         modalIframe2.src = '';
+        //     });
+        // })();
+
+        (function () {            
+            function addModalEventListeners(modalId, iframeId) {
+                var modal = document.getElementById(modalId);
+                if (modal) {
+                    modal.addEventListener('show.bs.modal', function (event) {
+                        var button = event.relatedTarget;
+                        var modalIframe = document.getElementById(iframeId);
+                        modalIframe.src = button.getAttribute('href');
+                    });
+                    modal.addEventListener('hidden.bs.modal', function () {
+                        var modalIframe = document.getElementById(iframeId);
+                        modalIframe.src = '';
+                    });
+                }
+            }
+
+            var modals = [
+                { modalId: 'registerModal', iframeId: 'modalIframe' },
+                { modalId: 'resultModal', iframeId: 'modalIframe1' },
+                { modalId: 'resultModal2', iframeId: 'modalIframe2' }                
+            ];
+
+            modals.forEach(function (modal) {
+                addModalEventListeners(modal.modalId, modal.iframeId);
+            });
+        })();
+
+
+        (function name(params) {
+            var registerButton = document.getElementById('registerb');
+            registerButton.addEventListener('click', function (e) {
+                e.preventDefault();
+                var registrationSection = document.getElementById('registration');
+                registrationSection.scrollIntoView({ behavior: 'smooth' });
+            });
         })();
 
         (function () {
