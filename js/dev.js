@@ -3036,6 +3036,7 @@ var messageUsButtonCaller = function () {
                                 <label for="message-type" class="form-label">Message Type*</label>
                                 <select class="form-select" id="message-type" required>
                                     <option selected disabled value="">Choose...</option>
+                                    <option>Binary Battles Event</option>
                                     <option>Course-related Inquiry</option>
                                     <option>Collaboration Request</option>
                                     <option>Volunteering</option>
