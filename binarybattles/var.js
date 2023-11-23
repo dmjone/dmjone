@@ -324,7 +324,7 @@ window.addEventListener("load", async function () {
         var registrationDiv = document.querySelector('#registration');
         registrationDiv.innerHTML += createModalContent('registerModal', 'modalLabel', 'Binary Battles Registration', 'modalIframe', 'style="background:#f9f3cc"');
         registrationDiv.innerHTML += createModalContent('resultModal', 'modalLabel1', 'Round 1: Domain Knowledge Result', 'modalIframe1', 'style="background:#f7f7f7"');
-        registrationDiv.innerHTML += createModalContent('resultModal2', 'modalLabel2', 'Round 2: Result');
+        registrationDiv.innerHTML += createModalContent('resultModal2', 'modalLabel2', 'Round 2: Coding Knowledge Result', 'modalIframe2', 'style="background:#f7f7f7"');
         registrationDiv.innerHTML += createModalContent('resultModal3', 'modalLabel3', 'Round 3: Result');
     })();
 
