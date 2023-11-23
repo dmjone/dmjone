@@ -53,7 +53,11 @@ window.addEventListener("load", async function () {
     <li class="mb-2"><strong>Evaluation Parameter:</strong> 2 marks for each correct answer, with negative marking (0.25%) for incorrect responses.</li>
     <li class="mb-2"><strong>Total Marks:</strong> 30</li>
     <li class="mb-2"><strong>Outcome:</strong> The top 30% students from each year will advance, narrowing the field to ___ skilled coders.</li>
-    <li class="mb-2"><strong>Round 2 Venue:</strong> Will be shared on November 23, 2023 at 10 AM</li>
+    <li class="mb-2"><strong>Round 2 Venue:</strong> Venue: CL2 and CL3 - E block: <ul>
+        <li>1st year reporting time 11AM</li>
+        <li>2nd year reporting time 11:45AM</li>
+        <li>3rd year/masters reporting time 12:25AM</li></ul>
+    </li>
     <li class="mb-2"><strong>Invigilators:</strong> Assigned faculty members will oversee the process, ensuring a smooth and fair testing environment.</li>
 </ul>`,
             c3: `<h3 class="h2 fw-bold text-center mb-4 text-secondary py-3">Round 3: Analytical and Time Management Skills Test</h3><h4 class="fw-bold text-primary">Screen Test Format</h4><p class="mb-3">The third screen test ramps up the intensity with a 10-minute quiz of 30 questions designed to evaluate the participants' analytical skills and efficiency under time pressure. Tailored to each class/year level, the test challenges all remaining students collectively.</p><ul class="list-unstyled mb-4"><li class="mb-2"><strong>Difficulty Level:</strong> High</li><li class="mb-2"><strong>Evaluation Parameter:</strong> 1 mark for each correct answer, with negative marking (0.25%) for incorrect responses.</li><li class="mb-2"><strong>Total Marks:</strong> 30</li><li class="mb-2"><strong>Outcome:</strong> This round aims to sieve out the top 30% students from each year based on their ability to swiftly navigate through time-sensitive challenges.</li><li class="mb-2"><strong>Round 3 Venue:</strong> Pre-determined Classrooms/Labs.</li><li class="mb-2"><strong>Invigilators:</strong> Appointed invigilators will ensure a fair and efficient examination process.</li><li class="mb-2"><strong>Main Attraction:</strong> Noteworthy cash prizes and personalized gifts await the elite group of shortlisted participants.</li></ul>`,
