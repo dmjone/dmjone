@@ -26,7 +26,7 @@ window.addEventListener("load", async function () {
         })();
 
         const specificContent = {
-            c1: `<h3 class="h2 fw-bold text-center mb-4 text-secondary py-3">Round 1: Screen Test</h3>
+            c1: `<h3 class="h2 fw-bold text-center mb-4 text-secondary py-3" id="r1result">Round 1: Screen Test</h3>
 <h4 class="fw-bold text-primary">Registration</h4>
 <p class="mb-3">In this initial phase, students will register their participation using a form to confirm their involvement. Students are divided into three categories: First Year, Second Year, and Third Year. Students of Master Degree Programs like MCA, MTech. will be registered under third year irrespective of their class and semester.</p>
 <h4 class="fw-bold text-primary">Screen Test Overview</h4>
@@ -56,7 +56,7 @@ window.addEventListener("load", async function () {
     <li class="mb-2"><strong>Round 2 Venue:</strong> Venue: CL2 and CL3 - E block: <ul>
         <li>1st year reporting time 11AM</li>
         <li>2nd year reporting time 11:45AM</li>
-        <li>3rd year/masters reporting time 12:25AM</li></ul>
+        <li>3rd year/masters reporting time 12:25PM</li></ul>
     </li>
     <li class="mb-2"><strong>Invigilators:</strong> Assigned faculty members will oversee the process, ensuring a smooth and fair testing environment.</li>
 </ul>`,
