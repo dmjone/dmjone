@@ -33,7 +33,7 @@ window.addEventListener("load", async function () {
 <p class="mb-3">The CSE faculty will curate a question bank covering key computer science subjects such as Operating System, Computer System Architecture, Database Management System, Computer Networks, Software Engineering, Algorithms, Data Structures, Front End Development, and Programming Languages like C, C++, Python, and Java, among others.</p>
 <h4 class="fw-bold text-primary">Screen Test Format</h4>
 <p class="mb-3">Screen Test will be taken in three different sub rounds. The first, a Basic Aptitude Test, consists of a multiple-choice quiz with 50 questions, to be completed within a 30-minute timeframe. Questions will be organized class/year-wise so that students compete within the difficulty level of their respective classes. This test will be administered class-wise, one class at a time.</p>
-<h3 class="mb-3 text-danger text-center fw-bold"><a id="r1resultlink" href="DomainKnowledge.pdf" class="btn btn-warning btn-lg mt-3 px-5 py-3 shadow">Round 1 Winners</a></h3>
+<!-- <h3 class="mb-3 text-danger text-center fw-bold"><a id="r1resultlink" href="DomainKnowledge.pdf" class="btn btn-warning btn-lg mt-3 px-5 py-3 shadow">Round 1 Winners</a></h3> -->
 <ul class="list-unstyled mb-4">
     <li class="mb-2"><strong>Contest Date:</strong> November 22, 2023</li>
     <li class="mb-2"><strong>Difficulty Level:</strong> Moderate</li>
