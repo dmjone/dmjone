@@ -53,7 +53,7 @@ window.addEventListener("load", async function () {
     <li class="mb-2"><strong>Evaluation Parameter:</strong> 2 marks for each correct answer, with negative marking (0.25%) for incorrect responses.</li>
     <li class="mb-2"><strong>Total Marks:</strong> 30</li>
     <li class="mb-2"><strong>Outcome:</strong> The top 30% students from each year will advance, narrowing the field to ___ skilled coders.</li>
-    <li class="mb-2"><strong>Round 2 Venue:</strong> Venue: CL2 and CL3 - E block: <ul>
+    <li class="mb-2"><strong>Round 2 Venue:</strong> Venue: CC - E block: <ul>
         <li>1st year reporting time 11AM</li>
         <li>2nd year reporting time 11:45AM</li>
         <li>3rd year/masters reporting time 12:25PM</li></ul>
