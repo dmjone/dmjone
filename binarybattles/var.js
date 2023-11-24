@@ -76,7 +76,41 @@ window.addEventListener("load", async function () {
     <li class="mb-2"><strong>Invigilators:</strong> Appointed invigilators will ensure a fair and efficient examination process.</li>
     <li class="mb-2"><strong>Main Attraction:</strong> Noteworthy cash prizes and personalized gifts await the elite group of shortlisted participants.</li>
 </ul>`,
-            // c4: `<h3 class="h2 fw-bold text-center mb-4 text-secondary py-3">Round 4: Group Discussion and Personality Test</h3><p class="mb-3">This multifaceted round shapes 8 diverse teams, each integrating students from all academic years, tasked with showcasing a spectrum of skills through four distinct segments:</p><h4 class="fw-bold text-primary">Professional Writing Skills Round</h4><p class="mb-2">Teams compose a professional email on a common topic within 5 minutes. Evaluation focuses on clarity, conciseness, and proper use of professional email etiquette.</p><ul class="list-unstyled mb-4"><li><strong>Evaluation Parameters:</strong> Clarity, Conciseness, Formal Tone, Grammar, Relevance, and Formatting.</li><li><strong>Judges:</strong> Dr. Gaurav Gupta, Dr. Arvind, Dr. Bharti.</li><li><strong>Invigilators:</strong> Er. Shravan, Er. Waleed, Er. Anjali Thakur.</li><li><strong>Marks:</strong> Maximum of 10 marks for each participant.</li></ul><h4 class="fw-bold text-primary">GD Round</h4><p class="mb-2">Engaging group discussions on randomized topics test participants' ability to articulate ideas, collaborate, and respond to viewpoints dynamically.</p><ul class="list-unstyled mb-4"><li><strong>Evaluation Parameters:</strong> Content Assessment, Delivery, Confidence, Participation, and Teamwork.</li><li><strong>Judges:</strong> Dr. Sonia, Dr. Brij Bhushan Sharma, Ms. Anandita Garg.</li><li><strong>Marks:</strong> Up to 10 marks for each GD topic per team, totaling 30 marks.</li></ul><h4 class="fw-bold text-primary">Code Master Round</h4><p class="mb-2">A true test of coding prowess, teams are presented with programming challenges to solve in a race against time, underscoring their technical acumen.</p><ul class="list-unstyled mb-4"><li><strong>Evaluation Parameter:</strong> Code Optimization.</li><li><strong>Judges:</strong> Dr. Anurag, Er. Puneet Kapoor, Dr. Rather Gousia.</li><li><strong>Invigilators:</strong> Er. Ruchika, Er. Dahlak, Er. Abdullahi.</li><li><strong>Marks:</strong> Up to 10 marks for each coding problem per participant, totaling 30 marks.</li></ul><h4 class="fw-bold text-primary">Free Speech Round</h4><p class="mb-2">Each team member delivers a short speech on a pre-assigned topic, allowing for individual expression and assessment of public speaking skills.</p><ul class="list-unstyled mb-4"><li><strong>Evaluation Parameters:</strong> Content Quality, Delivery, Confidence.</li><li><strong>Judges:</strong> Dr. Pankaj Vaidya, Dr. Ravikant, Dr. Namita.</li><li><strong>Marks:</strong> 10 marks per participant, resulting in a total of 30 marks for the team.</li></ul><p class="fw-bold">Total Marks of Round 4: 120</p><p>The conclusion of Round 4 will see the advancement of the top 4 teams to the finals, with the remaining teams being honored with participation certificates during the final award ceremony.</p><p class="mb-0"><strong>Main Attraction for the Audience:</strong> Engaging questions posed to the audience offer a chance to win cash prizes and certificates, which will be distributed during the prize distribution ceremony.</p>`,
+            c4: `<h3 class="h2 fw-bold text-center mb-4 text-secondary py-3">Round 4: Binary Battles' Semi-Final</h3>
+<p class="mb-3">This multifaceted round shapes 8 diverse teams, each integrating students from all academic years, tasked with showcasing a spectrum of skills through four distinct segments:</p>
+<h4 class="fw-bold text-primary">Professional Writing Skills Round</h4>
+<p class="mb-2">Teams compose a professional email on a common topic within 5 minutes. Evaluation focuses on clarity, conciseness, and proper use of professional email etiquette.</p>
+<ul class="list-unstyled mb-4">
+    <li><strong>Evaluation Parameters:</strong> Clarity, Conciseness, Formal Tone, Grammar, Relevance, and Formatting.</li>
+    <li><strong>Judges:</strong> Dr. Gaurav Gupta, Dr. Arvind, Dr. Bharti.</li>
+    <li><strong>Invigilators:</strong> Er. Shravan, Er. Waleed, Er. Anjali Thakur.</li>
+    <li><strong>Marks:</strong> Maximum of 10 marks for each participant.</li>
+</ul>
+<h4 class="fw-bold text-primary">GD Round</h4>
+<p class="mb-2">Engaging group discussions on randomized topics test participants' ability to articulate ideas, collaborate, and respond to viewpoints dynamically.</p>
+<ul class="list-unstyled mb-4">
+    <li><strong>Evaluation Parameters:</strong> Content Assessment, Delivery, Confidence, Participation, and Teamwork.</li>
+    <li><strong>Judges:</strong> Dr. Sonia, Dr. Brij Bhushan Sharma, Ms. Anandita Garg.</li>
+    <li><strong>Marks:</strong> Up to 10 marks for each GD topic per team, totaling 30 marks.</li>
+</ul>
+<h4 class="fw-bold text-primary">Code Master Round</h4>
+<p class="mb-2">A true test of coding prowess, teams are presented with programming challenges to solve in a race against time, underscoring their technical acumen.</p>
+<ul class="list-unstyled mb-4">
+    <li><strong>Evaluation Parameter:</strong> Code Optimization.</li>
+    <li><strong>Judges:</strong> Dr. Anurag, Er. Puneet Kapoor, Dr. Rather Gousia.</li>
+    <li><strong>Invigilators:</strong> Er. Ruchika, Er. Dahlak, Er. Abdullahi.</li>
+    <li><strong>Marks:</strong> Up to 10 marks for each coding problem per participant, totaling 30 marks.</li>
+</ul>
+<h4 class="fw-bold text-primary">Free Speech Round</h4>
+<p class="mb-2">Each team member delivers a short speech on a pre-assigned topic, allowing for individual expression and assessment of public speaking skills.</p>
+<ul class="list-unstyled mb-4">
+    <li><strong>Evaluation Parameters:</strong> Content Quality, Delivery, Confidence.</li>
+    <li><strong>Judges:</strong> Dr. Pankaj Vaidya, Dr. Ravikant, Dr. Namita.</li>
+    <li><strong>Marks:</strong> 10 marks per participant, resulting in a total of 30 marks for the team.</li>
+</ul>
+<p class="fw-bold">Total Marks of Round 4: 120</p>
+<p>The conclusion of Round 4 will see the advancement of the top 4 teams to the finals, with the remaining teams being honored with participation certificates during the final award ceremony.</p>
+<p class="mb-0"><strong>Main Attraction for the Audience:</strong> Engaging questions posed to the audience offer a chance to win cash prizes and certificates, which will be distributed during the prize distribution ceremony.</p>`,
             // c5: `<h3 class="h2 fw-bold text-center mb-4 text-secondary py-3">Round 5: Multi-Faceted Technical Challenge</h3><p class="mb-3">Round 5 is a crucible of varied technical and analytical challenges, designed to test the participants' comprehensive skills in computer science and problem-solving.</p><ul class="list-unstyled mb-4"><li class="mb-2"><strong>Aptitude Test</strong> - A test of logic and problem-solving abilities.</li><li class="mb-2"><strong>General Technical Round</strong> - Involves questions from core computer science subjects.</li><li class="mb-2"><strong>Coding-Output Round</strong> - Participants write code to solve problems without running it (dry run).</li><li class="mb-2"><strong>Visual Round</strong> - Identification of computer science luminaries and their famous quotes.</li><li class="mb-2"><strong>Faculty Round</strong> - Faculty members challenge teams with technical questions.</li><li class="mb-2"><strong>Audience Round</strong> - Situation-based questions from guests to assess analytical skills.</li><li class="mb-2"><strong>My Choice Round</strong> - Teams select subjects from a list to answer related questions.</li><li class="mb-2"><strong>Rapid Fire Round</strong> - A fast-paced question session with points for correct answers.</li><li class="mb-2"><strong>Sudden Death Round</strong> - A high stakes Q&A where accuracy is key, and mistakes are costly.</li></ul><p><strong>Judges:</strong> A panel of invited guests.</p><p><strong>Scorer and Timekeeper:</strong> Er. Abhishek.</p><p><strong>Student Volunteers:</strong> A team of 5 final-year students.</p><p><strong>Final Result:</strong>The highest-scoring teams claim victory and runners-up accolades. All finalists are recognized for their prowess and awarded accordingly.</p><p class="mb-0"><strong>Main Attraction for the Audience:</strong> Audience engagement with opportunities to win cash prizes through interactive questioning rounds.</p>`,
         };
 
@@ -340,6 +374,7 @@ window.addEventListener("load", async function () {
         registrationDiv.innerHTML += createModalContent('registerModal', 'modalLabel', 'Binary Battles Registration', 'modalIframe', 'style="background:#f9f3cc"');
         registrationDiv.innerHTML += createModalContent('resultModal', 'modalLabel1', 'Round 1: Domain Knowledge Result', 'modalIframe1', 'style="background:#f7f7f7"');
         registrationDiv.innerHTML += createModalContent('resultModal2', 'modalLabel2', 'Round 2: Coding Knowledge Result', 'modalIframe2', 'style="background:#f7f7f7"');
+        registrationDiv.innerHTML += createModalContent('resultModal3', 'modalLabel3', 'Round 3: Cognitive Knowledge Result', 'modalIframe3', 'style="background:#f7f7f7"');
         registrationDiv.innerHTML += createModalContent('resultModal3', 'modalLabel3', 'Round 3: Result');
     })();
 
@@ -432,7 +467,8 @@ window.addEventListener("load", async function () {
             var modals = [
                 { modalId: 'registerModal', iframeId: 'modalIframe' },
                 { modalId: 'resultModal', iframeId: 'modalIframe1' },
-                { modalId: 'resultModal2', iframeId: 'modalIframe2' }                
+                { modalId: 'resultModal2', iframeId: 'modalIframe2' },
+                { modalId: 'resultModal3', iframeId: 'modalIframe3' },                
             ];
 
             modals.forEach(function (modal) {
