@@ -111,7 +111,24 @@ window.addEventListener("load", async function () {
 <p class="fw-bold">Total Marks of Round 4: 120</p>
 <p>The conclusion of Round 4 will see the advancement of the top 4 teams to the finals, with the remaining teams being honored with participation certificates during the final award ceremony.</p>
 <p class="mb-0"><strong>Main Attraction for the Audience:</strong> Engaging questions posed to the audience offer a chance to win cash prizes and certificates, which will be distributed during the prize distribution ceremony.</p>`,
-            // c5: `<h3 class="h2 fw-bold text-center mb-4 text-secondary py-3">Round 5: Multi-Faceted Technical Challenge</h3><p class="mb-3">Round 5 is a crucible of varied technical and analytical challenges, designed to test the participants' comprehensive skills in computer science and problem-solving.</p><ul class="list-unstyled mb-4"><li class="mb-2"><strong>Aptitude Test</strong> - A test of logic and problem-solving abilities.</li><li class="mb-2"><strong>General Technical Round</strong> - Involves questions from core computer science subjects.</li><li class="mb-2"><strong>Coding-Output Round</strong> - Participants write code to solve problems without running it (dry run).</li><li class="mb-2"><strong>Visual Round</strong> - Identification of computer science luminaries and their famous quotes.</li><li class="mb-2"><strong>Faculty Round</strong> - Faculty members challenge teams with technical questions.</li><li class="mb-2"><strong>Audience Round</strong> - Situation-based questions from guests to assess analytical skills.</li><li class="mb-2"><strong>My Choice Round</strong> - Teams select subjects from a list to answer related questions.</li><li class="mb-2"><strong>Rapid Fire Round</strong> - A fast-paced question session with points for correct answers.</li><li class="mb-2"><strong>Sudden Death Round</strong> - A high stakes Q&A where accuracy is key, and mistakes are costly.</li></ul><p><strong>Judges:</strong> A panel of invited guests.</p><p><strong>Scorer and Timekeeper:</strong> Er. Abhishek.</p><p><strong>Student Volunteers:</strong> A team of 5 final-year students.</p><p><strong>Final Result:</strong>The highest-scoring teams claim victory and runners-up accolades. All finalists are recognized for their prowess and awarded accordingly.</p><p class="mb-0"><strong>Main Attraction for the Audience:</strong> Audience engagement with opportunities to win cash prizes through interactive questioning rounds.</p>`,
+            c5: `<h3 class="h2 fw-bold text-center mb-4 text-secondary py-3">Round 5: Binary Battles' Final</h3>
+<p class="mb-3">Round 5 is a crucible of varied technical and analytical challenges, designed to test the participants' comprehensive skills in computer science and problem-solving.</p>
+<ul class="list-unstyled mb-4">
+    <li class="mb-2"><strong>Aptitude Test</strong> - A test of logic and problem-solving abilities.</li>
+    <li class="mb-2"><strong>General Technical Round</strong> - Involves questions from core computer science subjects.</li>
+    <li class="mb-2"><strong>Coding-Output Round</strong> - Participants write code to solve problems without running it (dry run).</li>
+    <li class="mb-2"><strong>Visual Round</strong> - Identification of computer science luminaries and their famous quotes.</li>
+    <li class="mb-2"><strong>Faculty Round</strong> - Faculty members challenge teams with technical questions.</li>
+    <li class="mb-2"><strong>Audience Round</strong> - Situation-based questions from guests to assess analytical skills.</li>
+    <li class="mb-2"><strong>My Choice Round</strong> - Teams select subjects from a list to answer related questions.</li>
+    <li class="mb-2"><strong>Rapid Fire Round</strong> - A fast-paced question session with points for correct answers.</li>
+    <li class="mb-2"><strong>Sudden Death Round</strong> - A high stakes Q&A where accuracy is key, and mistakes are costly.</li>
+</ul>
+<p><strong>Judges:</strong> A panel of invited guests.</p>
+<p><strong>Scorer and Timekeeper:</strong> Er. Abhishek.</p>
+<p><strong>Student Volunteers:</strong> A team of 5 final-year students.</p>
+<p><strong>Final Result:</strong>The highest-scoring teams claim victory and runners-up accolades. All finalists are recognized for their prowess and awarded accordingly.</p>
+<p class="mb-0"><strong>Main Attraction for the Audience:</strong> Audience engagement with opportunities to win cash prizes through interactive questioning rounds.</p>`,
         };
 
         const defaultContent = '<p>Details coming soon. <strong>Stay Tuned!</strong></p>';
@@ -336,9 +353,9 @@ window.addEventListener("load", async function () {
 
     (function () {
         // Function to create modal content
-        function createModalContent(modalId, labelId, title, modalIframeid, contentstyle) {
+        function createModalContent(modalId, labelId, title, modalIframeid, contentstyle, modalfullscreen = "modal-fullscreen-md-down modal-lg") {
             return `<div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="${labelId}" aria-hidden="true">
-            <div class="modal-dialog modal-fullscreen-md-down modal-lg">
+            <div class="modal-dialog ${modalfullscreen} ">
                 <div class="modal-content" ${contentstyle}>
                     <div class="modal-header">
                         <h5 class="modal-title text-center fw-bold" id="${labelId}">${title}</h5>
@@ -357,7 +374,8 @@ window.addEventListener("load", async function () {
             { linkId: 'registerlinkmain', modalId: 'registerModal' },
             { linkId: 'r1resultlink', modalId: 'resultModal' },
             { linkId: 'r2resultlink', modalId: 'resultModal2' },
-            { linkId: 'r3resultlink', modalId: 'resultModal3' }
+            { linkId: 'r3resultlink', modalId: 'resultModal3' },
+            { linkId: 'r4resultlink', modalId: 'resultModal4' },
         ];
 
         // Iterate over each link and set attributes
@@ -375,7 +393,7 @@ window.addEventListener("load", async function () {
         registrationDiv.innerHTML += createModalContent('resultModal', 'modalLabel1', 'Round 1: Domain Knowledge Result', 'modalIframe1', 'style="background:#f7f7f7"');
         registrationDiv.innerHTML += createModalContent('resultModal2', 'modalLabel2', 'Round 2: Coding Knowledge Result', 'modalIframe2', 'style="background:#f7f7f7"');
         registrationDiv.innerHTML += createModalContent('resultModal3', 'modalLabel3', 'Round 3: Cognitive Knowledge Result', 'modalIframe3', 'style="background:#f7f7f7"');
-        registrationDiv.innerHTML += createModalContent('resultModal3', 'modalLabel3', 'Round 3: Result');
+        registrationDiv.innerHTML += createModalContent('resultModal4', 'modalLabel4', 'Round 4: Hall of Fame', 'modalIframe4', 'style="background:#f7f7f7"', 'modal-fullscreen-md-down modal-xl');        
     })();
 
 
@@ -469,6 +487,7 @@ window.addEventListener("load", async function () {
                 { modalId: 'resultModal', iframeId: 'modalIframe1' },
                 { modalId: 'resultModal2', iframeId: 'modalIframe2' },
                 { modalId: 'resultModal3', iframeId: 'modalIframe3' },                
+                { modalId: 'resultModal4', iframeId: 'modalIframe4' },                
             ];
 
             modals.forEach(function (modal) {
