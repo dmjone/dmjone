@@ -14,6 +14,45 @@ window.addEventListener("load", async function () {
     });
 
     (function () {
+        const testimonials = [
+            { message: "Well managed.. Kudos to the organizers", author: "Anonymous" },
+            { message: "In case of excitement, I was really excited that what would be asked from judges and how I'll answer to particular questions. I thanks to the Yogananda department of computer science to give us this opportunity where we tried our best. It will really help us in our career placements too. At last, it was really enjoyable, educational, and full of knowledge. I am grateful to get participated in such events. Now, I am very much excited for the finals too. Thanks a lot" },
+            { message: "It was amazing event, well organized. Congratulations all the team members of Binary Battles." },
+            { message: "According to me, I think that this initiative of organizing binary battles was quite and it helped me really lot to express my self(thinkings, feelings, emotions)to all other's. It helped me to recover my stage fear and all the pressure.These type of rounds are much good and appreciated as they will let us and everyone understand themselves, their thought's in good way as they are competing with each other's mind's." },
+            // { message: "Loved the coding challenges!", author: "Asmi Goyal" },
+            // { message: "The event was inspiring as a whole.", author: "Anant" },
+        ];
+
+        // Shuffle the array
+        testimonials.sort(() => Math.random() - 0.5);
+
+        const cards = document.getElementById('testimonials');
+        cards.innerHTML += `<h2 class="text-center mb-5 display-4 fw-bold text-danger opacity-75">Participant Testimonials</h2><div id="testimonialCardsRow" class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4"></div>`
+
+        const cardsRow = document.getElementById('testimonialCardsRow');
+        cardsRow.innerHTML = ''; // Clear existing cards
+
+        testimonials.slice(0, 4).forEach(testimonial => {
+            let authorHtml = testimonial.author ? `<div class="card-footer bg-transparent border-0"><small class="text-muted">${testimonial.author}</small></div>` : '';
+
+            const cardHtml = `
+            <div class="col mb-4">
+                <div class="card h-100 border-0 shadow">
+                    <div class="card-body d-flex flex-column justify-content-center align-items-center text-center">
+                        <p class="card-text">${testimonial.message}</p>
+                        ${authorHtml}
+                    </div>
+                </div>
+            </div>
+        `;
+            cardsRow.innerHTML += cardHtml;
+        });
+    })();
+
+
+
+
+    (function () {
         (function () {
             const parentElement = document.querySelector('.card-body.py-5');
             const numberOfAccordions = 5;
