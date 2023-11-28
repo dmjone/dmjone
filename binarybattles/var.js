@@ -15,7 +15,7 @@ window.addEventListener("load", async function () {
 
     (function () {
         const testimonials = [
-            { message: "Well managed.. Kudos to the organizers", author: "Anonymous" },
+            { message: "Well managed.. Kudos to the organizers" },
             { message: "In case of excitement, I was really excited that what would be asked from judges and how I'll answer to particular questions. I thanks to the Yogananda department of computer science to give us this opportunity where we tried our best. It will really help us in our career placements too. At last, it was really enjoyable, educational, and full of knowledge. I am grateful to get participated in such events. Now, I am very much excited for the finals too. Thanks a lot" },
             { message: "It was amazing event, well organized. Congratulations all the team members of Binary Battles." },
             { message: "According to me, I think that this initiative of organizing binary battles was quite and it helped me really lot to express my self(thinkings, feelings, emotions)to all other's. It helped me to recover my stage fear and all the pressure.These type of rounds are much good and appreciated as they will let us and everyone understand themselves, their thought's in good way as they are competing with each other's mind's." },
