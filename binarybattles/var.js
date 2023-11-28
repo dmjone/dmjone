@@ -393,7 +393,7 @@ window.addEventListener("load", async function () {
         registrationDiv.innerHTML += createModalContent('resultModal', 'modalLabel1', 'Round 1: Domain Knowledge Result', 'modalIframe1', 'style="background:#f7f7f7"');
         registrationDiv.innerHTML += createModalContent('resultModal2', 'modalLabel2', 'Round 2: Coding Knowledge Result', 'modalIframe2', 'style="background:#f7f7f7"');
         registrationDiv.innerHTML += createModalContent('resultModal3', 'modalLabel3', 'Round 3: Cognitive Knowledge Result', 'modalIframe3', 'style="background:#f7f7f7"');
-        registrationDiv.innerHTML += createModalContent('resultModal4', 'modalLabel4', 'Round 4: Hall of Fame', 'modalIframe4', 'style="background:#f7f7f7"', 'modal-fullscreen-md-down modal-xl');        
+        registrationDiv.innerHTML += createModalContent('resultModal4', 'modalLabel4', 'Hall of Fame', 'modalIframe4', 'style="background:#f7f7f7"', 'modal-fullscreen-md-down modal-xl');        
     })();
 
 
