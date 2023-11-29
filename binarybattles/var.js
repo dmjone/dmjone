@@ -415,6 +415,7 @@ window.addEventListener("load", async function () {
             { linkId: 'r2resultlink', modalId: 'resultModal2' },
             { linkId: 'r3resultlink', modalId: 'resultModal3' },
             { linkId: 'r4resultlink', modalId: 'resultModal4' },
+            { linkId: 'r5resultlink', modalId: 'resultModal5' },
         ];
 
         // Iterate over each link and set attributes
@@ -433,6 +434,7 @@ window.addEventListener("load", async function () {
         registrationDiv.innerHTML += createModalContent('resultModal2', 'modalLabel2', 'Round 2: Coding Knowledge Result', 'modalIframe2', 'style="background:#f7f7f7"');
         registrationDiv.innerHTML += createModalContent('resultModal3', 'modalLabel3', 'Round 3: Cognitive Knowledge Result', 'modalIframe3', 'style="background:#f7f7f7"');
         registrationDiv.innerHTML += createModalContent('resultModal4', 'modalLabel4', 'Hall of Fame', 'modalIframe4', 'style="background:#f7f7f7"', 'modal-fullscreen-md-down modal-xl');        
+        registrationDiv.innerHTML += createModalContent('resultModal5', 'modalLabel5', 'Vote Your Favorite Team', 'modalIframe5', 'style="background:#f7f7f7"', 'modal-fullscreen-md-down modal-xl');        
     })();
 
 
@@ -527,6 +529,7 @@ window.addEventListener("load", async function () {
                 { modalId: 'resultModal2', iframeId: 'modalIframe2' },
                 { modalId: 'resultModal3', iframeId: 'modalIframe3' },                
                 { modalId: 'resultModal4', iframeId: 'modalIframe4' },                
+                { modalId: 'resultModal5', iframeId: 'modalIframe5' },                
             ];
 
             modals.forEach(function (modal) {
