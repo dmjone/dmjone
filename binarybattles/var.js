@@ -538,14 +538,14 @@ window.addEventListener("load", async function () {
         })();
 
 
-        (function name(params) {
-            var registerButton = document.getElementById('registerb');
-            registerButton.addEventListener('click', function (e) {
-                e.preventDefault();
-                var registrationSection = document.getElementById('registration');
-                registrationSection.scrollIntoView({ behavior: 'smooth' });
-            });
-        })();
+        // (function name(params) {
+        //     var registerButton = document.getElementById('registerb');
+        //     registerButton.addEventListener('click', function (e) {
+        //         e.preventDefault();
+        //         var registrationSection = document.getElementById('registration');
+        //         registrationSection.scrollIntoView({ behavior: 'smooth' });
+        //     });
+        // })();
 
         (function () {
             fetch('https://counter.dmj.one/')
