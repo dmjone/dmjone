@@ -115,7 +115,7 @@ window.addEventListener("load", async function () {
     <li class="mb-2"><strong>Invigilators:</strong> Appointed invigilators will ensure a fair and efficient examination process.</li>
     <li class="mb-2"><strong>Main Attraction:</strong> Noteworthy cash prizes and personalized gifts await the elite group of shortlisted participants.</li>
 </ul>`,
-            c4: `<h3 class="h2 fw-bold text-center mb-4 text-secondary py-3">Round 4: Binary Battles' Semi-Final</h3>
+            c4: `<h3 class="h2 fw-bold text-center mb-4 text-secondary py-3">Binary Battles' Semi-Final</h3>
 <p class="mb-3">This multifaceted round shapes 8 diverse teams, each integrating students from all academic years, tasked with showcasing a spectrum of skills through four distinct segments:</p>
 <h4 class="fw-bold text-primary">Professional Writing Skills Round</h4>
 <p class="mb-2">Teams compose a professional email on a common topic within 5 minutes. Evaluation focuses on clarity, conciseness, and proper use of professional email etiquette.</p>
@@ -150,8 +150,8 @@ window.addEventListener("load", async function () {
 <p class="fw-bold">Total Marks of Round 4: 120</p>
 <p>The conclusion of Round 4 will see the advancement of the top 4 teams to the finals, with the remaining teams being honored with participation certificates during the final award ceremony.</p>
 <p class="mb-0"><strong>Main Attraction for the Audience:</strong> Engaging questions posed to the audience offer a chance to win cash prizes and certificates, which will be distributed during the prize distribution ceremony.</p>`,
-            c5: `<h3 class="h2 fw-bold text-center mb-4 text-secondary py-3">Round 5: Binary Battles' Final</h3>
-<p class="mb-3">Round 5 is a crucible of varied technical and analytical challenges, designed to test the participants' comprehensive skills in computer science and problem-solving.</p>
+            c5: `<h3 class="h2 fw-bold text-center mb-4 text-secondary py-3">Binary Battles' Final</h3>
+<p class="mb-3">This finale is a crucible of varied technical and analytical challenges, designed to test the participants' comprehensive skills in computer science and problem-solving.</p>
 <ul class="list-unstyled mb-4">
     <li class="mb-2"><strong>Aptitude Test</strong> - A test of logic and problem-solving abilities.</li>
     <li class="mb-2"><strong>General Technical Round</strong> - Involves questions from core computer science subjects.</li>
