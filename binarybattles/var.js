@@ -78,7 +78,7 @@ window.addEventListener("load", async function () {
     <li class="mb-2"><strong>Difficulty Level:</strong> Moderate</li>
     <li class="mb-2"><strong>Evaluation Parameter:</strong> 1 mark allocated for each correct answer. No negative marking.</li>
     <li class="mb-2"><strong>Total Marks:</strong> 50</li>
-    <li class="mb-2"><strong>Outcome:</strong> The top 30% students from each year progressed to the subsequent rounds, totaling 151 students.</li>
+    <li class="mb-2"><strong>Outcome:</strong> The top 50 students from each year, from the total of 589 students who appeared for the exam, progressed to the subsequent rounds, totaling 150 students.</li>
     <li class="mb-2"><strong>Round 1 Venue:</strong> Respective/ Pre-decided Classrooms.</li>
     <li class="mb-2"><strong>Invigilators:</strong> Teachers with respective classes as per timetable.</li>
 </ul>`,
@@ -91,7 +91,7 @@ window.addEventListener("load", async function () {
     <li class="mb-2"><strong>Difficulty Level:</strong> High</li>
     <li class="mb-2"><strong>Evaluation Parameter:</strong> 2 marks for each correct answer, with negative marking (0.25%) for incorrect responses.</li>
     <li class="mb-2"><strong>Total Marks:</strong> 30</li>
-    <li class="mb-2"><strong>Outcome:</strong> The top 30% students from each year will advance, narrowing the field to ___ skilled coders.</li>
+    <li class="mb-2"><strong>Outcome:</strong> The top 24 students from each year advancedto the next round, narrowing the field to 72 skilled coders.</li>
     <li class="mb-2"><strong>Round 2 Venue:</strong> Venue: CC - E block: <ul>
         <li>1st year reporting time 11AM</li>
         <li>2nd year reporting time 11:45AM</li>
@@ -106,7 +106,7 @@ window.addEventListener("load", async function () {
     <li class="mb-2"><strong>Difficulty Level:</strong> High</li>
     <li class="mb-2"><strong>Evaluation Parameter:</strong> 1 mark for each correct answer, with negative marking (0.25%) for incorrect responses.</li>
     <li class="mb-2"><strong>Total Marks:</strong> 30</li>
-    <li class="mb-2"><strong>Outcome:</strong> This round aims to sieve out the top 30% students from each year based on their ability to swiftly navigate through time-sensitive challenges.</li>
+    <li class="mb-2"><strong>Outcome:</strong> The round sieved out the top 8 students from each year based on their ability to swiftly navigate through time-sensitive challenges totalling 24 students being selected. Each student was distributed in the team through lucky draw chit system in such a way that each team had 1 student from each year.</li>
     <li class="mb-2"><strong>Round 3 Venue:</strong> Venue: CL-2 / CL-3 - E block: <ul>
         <li>1st year reporting time 12PM</li>
         <li>2nd year reporting time 12:20PM</li>
