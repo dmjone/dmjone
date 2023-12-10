@@ -4,9 +4,9 @@ function get_menu_list(datetogen) {
         const arr = [
             {
                 link: "theory/facf",
-                title: "Formulas of Aptitude Development-3",
-                desc: "All the formulas of the Aptitude Development Seminar-3!",
-                codetype: "SEA-AP003 | Concepts and Formulas"
+                title: "Frequently Asked Concepts and Formulas of Aptitude Development-3",
+                desc: "Explore the complete collection of essential formulas and concepts from the third seminar in the Aptitude Development Seminar series of Shoolini University.",
+                codetype: "SEA-AP003 | Key Principles and Equations"
             },
             // {
             //     link: "lab/",
