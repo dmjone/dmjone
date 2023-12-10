@@ -498,7 +498,20 @@ const profDetailsBio = {
     {
         bio: "<p>Sangeeta Kakkar is an Assistant Professor at the School of Biological & Environmental Sciences at Shoolini University</p><p>Isha Jaswal is an Assistant Professor at the School of Biological & Environmental Sciences at Shoolini University</p>",
         href: "sangeetakakkar@shooliniuniversity.com"
-    }
+    },
+    'Dr. Anita Chauhan': {
+        bio: "<p>Dr. Anita Chauhan is an Associate Professor at the School of Biological & Environmental Sciences at Shoolini University</p>",
+        href: "sangeetakakkar@shooliniuniversity.com"
+    },
+    'Dr. Garima Rana': {
+        bio: "<p>Dr. Garima Rana is an Assistant Professor at the School of Biological & Environmental Sciences at Shoolini University</p>",
+        href: "ishajaswal@shooliniuniversity.com"
+    },
+    'Dr. Anita Chauhan and Dr. Garima Rana':
+    {
+        bio: "<p>Anita Chauhan is an Associate Professor at the School of Biological & Environmental Sciences at Shoolini University</p><p>Isha Jaswal is an Assistant Professor at the School of Biological & Environmental Sciences at Shoolini University</p><p>Dr. Garima Rana is an Assistant Professor at the School of Biological & Environmental Sciences at Shoolini University</p>",
+        href: "sangeetakakkar@shooliniuniversity.com"
+    },
 };
 const courseDetailsMap = {
     'csu1128': { 'default': ["Dr. Pankaj Vaidya", "CSU1128", "Logic Building with Computer Programming"] },
@@ -533,6 +546,7 @@ const courseDetailsMap = {
     'csu1526': { 'default': ["Piyush Sewal", "CSU1526", "Microprocessor and Microcontroller"] },
     'seaap003': { 'default': ["Sahil Kashyap", "SEAAP003", "Aptitude Development 003"] },
     'csu716': { 'default': ["Sangeeta Kakkar and Isha Jaswal", "CSU716", "Life Skills Training"] },
+    'csu1627': { 'default': ["Dr. Anita Chauhan and Dr. Garima Rana", "CSU716", "Mind Wellness"] },
 };
 
 ///////////////// VERSION 2.0
