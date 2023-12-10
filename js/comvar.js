@@ -481,6 +481,10 @@ const profDetailsBio = {
     'Piyush Sewal': {
         bio: "<p>Piyush Sewal is an Assistant Professor at the Yogananda School of AI, Computer, and Data Science at Shoolini University, holding a Master's in Computer Applications from HP University, Shimla, and currently pursuing a PhD in Data Science at JP University of Information Technology. His expertise lies in machine learning, distributed data processing, and in-memory computation frameworks. Sewal has passed the UGC National Eligibility Test for Computer Science and Applications in 2018 and 2019, as well as the HP State Eligibility Test in 2018. He brings over a decade of teaching experience and has imparted knowledge through more than 400 lectures at various institutions and organizations, including Rashtrapati Bhawan and the Army Skill Training Center. Committed to social causes, he has also spearheaded several social awareness initiatives and health-related drives.</p>",
         href: "piyushsewal@shooliniouniversity.com"
+    },
+    'Sahil Kashyap': {
+        bio: "<p>Sahil Kashyap is an Assistant Professor at the Yogananda School of AI, Computer, and Data Science at Shoolini University</p>",
+        href: "sahilkashyap@shooliniouniversity.com"
     }
 };
 const courseDetailsMap = {
@@ -513,7 +517,8 @@ const courseDetailsMap = {
         'lab': ["Puneet Kapoor", "CSU083", "Design and Analysis of Algorithm"]
     },
     'csu1075': { 'default': ["Dr. Brij Bhushan Sharma", "CSU1075", "Computer Organization"] },
-    'csu1526': { 'default': ["Piyush Sewal", "CSU1526", "Microprocessor and Microcontroller"] }
+    'csu1526': { 'default': ["Piyush Sewal", "CSU1526", "Microprocessor and Microcontroller"] },
+    'seaap003': { 'default': ["Sahil Kashyap", "SEAAP003", "Aptitude Development 003"] },
 };
 
 ///////////////// VERSION 2.0
