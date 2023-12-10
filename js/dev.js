@@ -875,7 +875,7 @@ let header_navbar = function (flags) {
 
 
     const year1_links = ["1<sup>st</sup> Year", ...["csu1128", "csu953", "fsu030", "csu730", "csu951", "csu585", "csu1051", "csu1287", "csu1289", "seaws002", "fsu013", "seaap002"].sort()];
-    const year2_links = ["2<sup>nd</sup> Year", ...["csu083", "csu1291", "csu1526", "csu1075"].sort()];
+    const year2_links = ["2<sup>nd</sup> Year", ...["csu083", "csu1291", "csu1526", "csu1075", "seaap003", "csu716"].sort()];
     const visible_links = [...[""].sort(), "wip"];
 
     const allLinksHTML = (year1_links ? dropdown(year1_links) : '') + (year2_links ? dropdown(year2_links) : '') + (visible_links ? mainNav(visible_links) : '');

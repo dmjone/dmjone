@@ -98,6 +98,57 @@ function get_menu_list(datetogen) {
                 codetype: "CSU1289 | CSU1289P",
                 semester: 2
             },
+            {
+                link: "seaap003/",
+                title: "Aptitude Development Seminar 3",
+                desc: "Join our Aptitude Development Seminar to sharpen your cognitive and problem-solving skills. This dynamic and interactive seminar is designed to enhance your logical reasoning, quantitative ability, and verbal proficiency, key components in various aptitude tests. Led by experts in the field, the seminar includes engaging workshops, practice sessions, and strategies to excel in competitive scenarios. Whether you're preparing for academic examinations, job interviews, or seeking to improve your general aptitude, this seminar offers the tools and guidance to achieve your goals.",
+                codetype: "SEAAP003",
+                semester: 3
+            },
+            {
+                link: "csu1627/",
+                title: "Mind Wellness",
+                desc: "Embark on a transformative journey with our Mind Wellness course, designed to promote mental and emotional well-being. This course explores various aspects of mental health, including stress management, mindfulness, emotional intelligence, and positive psychology. Engage in interactive sessions that teach practical techniques for self-care, resilience building, and cultivating a positive mindset. The curriculum also delves into the science of happiness and the role of lifestyle factors in mental wellness. Through a blend of theoretical knowledge and experiential learning, students will gain valuable insights and skills to nurture their mental health and enhance their overall quality of life.",
+                codetype: "CSU1627",
+                semester: 3
+            },
+            {
+                link: "csu716/",
+                title: "Life Skills Training",
+                desc: "Embark on a journey of personal development with our Life Skills Training course. This essential program, led by experienced instructors Sangeeta Kakkar and Isha Jaswal, focuses on developing crucial life skills such as effective communication, decision-making, problem-solving, and emotional intelligence. Throughout the course, you will engage in interactive activities and discussions, gaining practical knowledge and insights that can be applied in both personal and professional contexts. Prepare to enhance your self-awareness, build resilience, and navigate life's challenges more confidently.",
+                codetype: "CSU716",
+                semester: 3
+            },
+            {
+                link: "csu083/",
+                title: "Design and Analysis of Algorithms",
+                desc: "Dive into the intricate world of algorithms with our 'Design and Analysis of Algorithms' course. This program, ideal for those pursuing computer science and software engineering, delves deep into algorithmic design principles, efficiency analysis, and complexity classes. Learn about various algorithmic strategies like divide-and-conquer, dynamic programming, greedy techniques, and graph algorithms. The course also covers advanced topics such as NP-completeness and approximation algorithms. Through lectures, hands-on problem-solving sessions, and assignments, students will acquire the skills to design efficient algorithms and analyze their performance critically.",
+                codetype: "CSU083 | CSU083P",
+                semester: 3
+            },
+            {
+                link: "csu1291/",
+                title: "Java Programming",
+                desc: "Immerse yourself in the world of Java Programming with this comprehensive course, tailored for both beginners and those looking to deepen their understanding of this versatile language. You will learn the fundamentals of Java, including object-oriented programming, data structures, software design principles, and exception handling. Advanced topics such as multi-threading, network programming, and utilizing Java libraries and frameworks will also be covered. With a mix of theoretical concepts and practical coding exercises, this course prepares you to develop robust Java applications for diverse platforms.",
+                codetype: "CSU1291 | CSU1291P",
+                semester: 3
+            },
+            {
+                link: "csu1075/",
+                title: "Computer Organization",
+                desc: "Our Computer Organization course offers a deep dive into the fundamental concepts and structures that form the backbone of computer systems. This course covers the essentials of computer architecture, including data representation, processor design, memory systems, and input/output organization. Students will explore how hardware and software components interact within a computer system, learning about topics such as instruction set architecture, microarchitecture, and various types of memory. Practical labs complement theoretical knowledge, providing hands-on experience with computer organization concepts and fostering a comprehensive understanding of how computers function at a fundamental level.",
+                codetype: "CSU1075",
+                semester: 3
+            },
+            {
+                link: "csu1526/",
+                title: "Microprocessor and Microcontroller",
+                desc: "Delve into the fascinating world of microprocessors and microcontrollers with Shoolini University's comprehensive course, CSU1526. Designed for students and professionals alike, this course offers an in-depth understanding of the architecture, programming, and applications of microprocessors and microcontrollers. You will learn about various processor models, assembly language programming, interfacing techniques, and the integration of microcontrollers in embedded systems. The course also covers practical aspects through lab sessions, where students will get hands-on experience in programming and working with actual microprocessor and microcontroller kits, preparing them for real-world applications in electronics, robotics, and IoT (Internet of Things).",
+                codetype: "CSU1526",
+                semester: 3
+            },
+
+            
             // {
             //     link: "csu1287/",
             //     title: "OOPS Using C++ Language",

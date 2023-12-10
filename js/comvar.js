@@ -484,7 +484,20 @@ const profDetailsBio = {
     },
     'Sahil Kashyap': {
         bio: "<p>Sahil Kashyap is an Assistant Professor at the Yogananda School of AI, Computer, and Data Science at Shoolini University</p>",
-        href: "sahilkashyap@shooliniouniversity.com"
+        href: "sahilkashyap@shooliniouniversity.com"    
+    },
+    'Sangeeta Kakkar': {
+        bio: "<p>Sangeeta Kakkar is an Assistant Professor at the School of Biological & Environmental Sciences at Shoolini University</p>",
+        href: "sangeetakakkar@shooliniuniversity.com"
+    },
+    'Isha Jaswal': {
+        bio: "<p>Isha Jaswal is an Assistant Professor at the School of Biological & Environmental Sciences at Shoolini University</p>",
+        href: "ishajaswal@shooliniuniversity.com"
+    },
+    'Sangeeta Kakkar and Isha Jaswal':
+    {
+        bio: "<p>Sangeeta Kakkar is an Assistant Professor at the School of Biological & Environmental Sciences at Shoolini University</p><p>Isha Jaswal is an Assistant Professor at the School of Biological & Environmental Sciences at Shoolini University</p>",
+        href: "sangeetakakkar@shooliniuniversity.com"
     }
 };
 const courseDetailsMap = {
@@ -519,6 +532,7 @@ const courseDetailsMap = {
     'csu1075': { 'default': ["Dr. Brij Bhushan Sharma", "CSU1075", "Computer Organization"] },
     'csu1526': { 'default': ["Piyush Sewal", "CSU1526", "Microprocessor and Microcontroller"] },
     'seaap003': { 'default': ["Sahil Kashyap", "SEAAP003", "Aptitude Development 003"] },
+    'csu716': { 'default': ["Sangeeta Kakkar and Isha Jaswal", "CSU716", "Life Skills Training"] },
 };
 
 ///////////////// VERSION 2.0
