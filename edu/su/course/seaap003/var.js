@@ -8,6 +8,12 @@ function get_menu_list(datetogen) {
                 desc: "Explore the complete collection of essential formulas and concepts from the third seminar in the Aptitude Development Seminar series of Shoolini University.",
                 codetype: "SEA-AP003 | Key Principles and Equations"
             },
+            {
+                link: "theory/practice-questions",
+                title: "Practice Questions for Aptitude Development-3",
+                desc: "Dive into a comprehensive set of practice questions based on the third seminar's formulas and concepts from the Aptitude Development Seminar series at Shoolini University.",
+                codetype: "SEA-AP003 | Practice Questions"
+            },
             // {
             //     link: "lab/",
             //     title: "🔬 Practicals: Hands-On Learning with DSA Lab!",
