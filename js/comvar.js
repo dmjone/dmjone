@@ -547,6 +547,10 @@ const courseDetailsMap = {
     'seaap003': { 'default': ["Sahil Kashyap", "SEAAP003", "Aptitude Development 003"] },
     'csu716': { 'default': ["Sangeeta Kakkar and Isha Jaswal", "CSU716", "Life Skills Training"] },
     'csu1627': { 'default': ["Dr. Anita Chauhan and Dr. Garima Rana", "CSU716", "Mind Wellness"] },
+    'csu1162': {
+        'default': ["Dr. Ruchika Sharma", "CSU1162", "Python Programming"],
+        'lab': ["Dr. Ruchika Sharma", "CSU1162P", "Python Programming Lab"]
+    },
 };
 
 ///////////////// VERSION 2.0
