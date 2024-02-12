@@ -5,14 +5,14 @@
 /*************** Fixed Functions and Variables START **************/
 const body_blockcards_continuereading_options = ['Expand Your Knowledge', 'Keep Learning', 'Feed Your Curiosity', 'Keep Your Mind Active', 'Learn More With Us', 'Stay Curious', 'Keep Discovering', 'Feed Your Brain', "Don't Stop Learning", 'Keep Exploring', 'Keep Absorbing', 'Continue Your Learning Journey', 'Unlock More Learning', 'Keep Developing Your Understanding', 'Expand Your Perspective', 'Keep Your Mind Engaged', 'The Learning Continues', 'Stay Inquisitive', 'Keep Your Brain Engaged', 'Keep Your Intellectual Fire Burning', 'Keep Challenging Yourself', 'Stay On The Learning Path', 'The Adventure Continues', 'Keep Your Mind Open', 'Stay Focused On Learning', 'Keep Your Learning Moving', 'Keep Expanding Your Mind', 'Keep Progressing In Your Learning', 'The Learning Never Stops', 'Keep Your Intellect Fueled', 'Keep Your Brain Buzzing', 'Keep Your Learning Journey Thriving', 'Keep Your Curiosity Alive', 'Keep Your Mind Alert', 'Keep Building Your Knowledge', 'Stay Invested In Your Learning', 'Keep Building Your Expertise', 'The Learning Journey Continues', 'Keep Your Understanding Evolving', 'Keep Your Learning Momentum Going', 'Keep Pushing Your Limits', 'Stay On The Path To Learning', 'Keep Unleashing Your Potential', 'Unlock More Insights', 'Dive Deeper Into Knowledge', 'Embrace the Learning Adventure', 'Ignite Your Intellectual Spark', 'Pursue Your Quest for Knowledge', 'Embark on Your Learning Voyage', 'Unearth More Wisdom', 'Uncover More Learning Treasures', 'Boost Your Brainpower', 'Elevate Your Understanding', 'Experience the Joy of Learning', 'Extend Your Intellectual Horizons', 'Accelerate Your Learning Journey', 'Illuminate Your Mind', 'Foster Your Learning Growth', 'Cultivate Your Knowledge Garden', 'Propel Your Learning Forward', 'Stoke Your Curiosity', 'Nurture Your Thirst for Knowledge', 'Enrich Your Learning Experience', 'Amplify Your Knowledge', 'Advance Your Learning Expedition', 'Expand Your Learning Universe', 'Sharpen Your Intellect', 'Reveal More Knowledge Mysteries', 'Bolster Your Learning Power', 'Invigorate Your Mind', 'Fuel Your Learning Journey', 'Boost Your Educational Enthusiasm', 'Extend Your Learning Odyssey', 'Broaden Your Knowledge Base', 'Deepen Your Understanding', 'Unfold More Learning Secrets', 'Unravel More Learning Mysteries', 'Explore Further into Knowledge', 'Progress Along Your Learning Path', 'Supercharge Your Learning', 'Venture Deeper into Knowledge', 'Advance Your Knowledge Quest', 'Quench Your Knowledge Thirst', 'Continue Your Intellectual Journey', 'Further Your Learning Adventure', 'Magnify Your Learning Experience', 'Dive Into the Knowledge Ocean', 'Illuminate Your Learning Path', 'Pioneer Your Learning Journey', 'Elevate Your Learning Endeavor', 'Enhance Your Learning Expedition', 'Galvanize Your Learning Pursuit', 'Deepen Your Knowledge Dive'];
 
-const cdnjs_jquery = "https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js";
-const cdnjs_bootstrap = "https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0-alpha1/js/bootstrap.bundle.min.js";
+const cdnjs_jquery = "https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js";
+const cdnjs_bootstrap = "https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js";
 const cdnjs_highlightjs = "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js";
 const cdnjs_highlightjs_asm = "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/armasm.min.js";
-const cdnjs_katex = "https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js";
-const cdnjs_katex_autorender = "https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js";
-const cdnjs_font_awesome = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js";
-const cdnjs_cryptoJS = "https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js";
+const cdnjs_katex = "https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js";
+const cdnjs_katex_autorender = "https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js";
+const cdnjs_font_awesome = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js";
+const cdnjs_cryptoJS = "https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js";
 
 
 
@@ -875,7 +875,7 @@ let header_navbar = function (flags) {
 
 
     const year1_links = ["1<sup>st</sup> Year", ...["csu1128", "csu953", "fsu030", "csu730", "csu951", "csu585", "csu1051", "csu1287", "csu1289", "seaws002", "fsu013", "seaap002"].sort()];
-    const year2_links = ["2<sup>nd</sup> Year", ...["csu083", "csu1291", "csu1526", "csu1075", "seaap003", "csu716"].sort()];
+    const year2_links = ["2<sup>nd</sup> Year", ...["csu083", "csu1291", "csu1526", "csu1075", "seaap003", "csu716", "csu1162"].sort()];
     const visible_links = [...[""].sort(), "wip"];
 
     const allLinksHTML = (year1_links ? dropdown(year1_links) : '') + (year2_links ? dropdown(year2_links) : '') + (visible_links ? mainNav(visible_links) : '');
@@ -1758,7 +1758,8 @@ function body_blockcards(link, date, title, desc, codetype, readtime, author, se
     //     </div>
     // </div>
     // `;
-    body_generated += `<div class="m-0 my-5 postcard light shadow-lg ${getcolor}">
+    // body_generated += `<div class="m-0 my-5 postcard light shadow-lg ${getcolor}">
+    body_generated += `<div class="m-0 my-5 postcard ${window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'} shadow-lg ${getcolor}">
     <a class="postcard__img_link" href="${link}">${imgTag}</a>
     <div class="postcard__text t-dark">
         <h2 class="postcard__title ${getcolor}"><a href="${link}">${title}</a></h2>
@@ -1780,6 +1781,30 @@ function body_blockcards(link, date, title, desc, codetype, readtime, author, se
         </ul>
     </div>
 </div>`;
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+        const applyTheme = () => {
+            document.querySelectorAll('.postcard').forEach(card => {
+                if (mediaQuery.matches) {
+                    card.classList.add('dark');
+                    card.classList.remove('light');
+                } else {
+                    card.classList.add('light');
+                    card.classList.remove('dark');
+                }
+            });
+        };
+
+        // Apply theme on initial load
+        applyTheme();
+
+        // Listen for changes in the color scheme preference
+        mediaQuery.addEventListener('change', applyTheme);
+    });
+
+
 
     let finaltowrite = body_generated
     // document.write(body_generated + m + m1 + m2 + m3 + m4 + m5 + m6 + m7 + m8 + m9 + gen_end);
@@ -1870,7 +1895,7 @@ function createSharingButtons(text, url, iconName, btnClass) {
     const socialSites = [
         { name: "WhatsApp", icon: "bi bi-whatsapp", url: `https://api.whatsapp.com/send?text=${shareMessage}` },
         { name: "Facebook", icon: "bi bi-facebook", url: `https://www.facebook.com/sharer/sharer.php?u=${currentUrl}&quote=${pageTitle}` },
-        { name: "Twitter", icon: "bi bi-twitter", url: `https://twitter.com/intent/tweet?url=${currentUrl}&text=${pageTitle}` },
+        { name: "Twitter", icon: "bi bi-twitter-x", url: `https://x.com/intent/tweet?url=${currentUrl}&text=${pageTitle}` },
         { name: "LinkedIn", icon: "bi bi-linkedin", url: `https://www.linkedin.com/sharing/share-offsite/?url=${currentUrl}` },
         { name: "Pinterest", icon: "bi bi-pinterest", url: `https://pinterest.com/pin/create/button/?url=${currentUrl}&description=${pageTitle}` },
         { name: "Reddit", icon: "bi bi-reddit", url: `https://www.reddit.com/submit?url=${currentUrl}&title=${pageTitle}` },
@@ -1883,10 +1908,11 @@ function createSharingButtons(text, url, iconName, btnClass) {
     const label = document.createElement("span");
     label.textContent = text || "Share this page: ";
     label.style.fontSize = "1.25rem";
-    label.style.color = "#0d6efd";
+    label.style.color = "var(--htag)";
     label.style.display = "inline-block";
     label.style.verticalAlign = "middle";
     label.style.marginRight = "1px";
+    label.style.fontWeight = "bold";
     sharingContainer.appendChild(label);
 
     const buttonGroup = document.createElement("div");
@@ -2083,6 +2109,15 @@ function copyright(rights) {
         // });
     };
 } */
+
+(function () {
+    document.addEventListener('DOMContentLoaded', function () {
+        if (window.location.pathname !== "/") {
+            document.body.classList.add("not-root");
+        }
+    });
+})();
+
 
 
 /********************* Custom made dmj.one Plugins *********************/
@@ -3011,7 +3046,7 @@ var messageUsButtonCaller = function () {
         
         <div class="modal fade" id="common_msg_us_model" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog">
-                <div class="modal-content">
+                <div class="modal-content" style="background: var(--background-color)">
                     <div class="modal-header">
                         <h5 class="modal-title">Message Us</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -3208,7 +3243,7 @@ messageUsButtonCaller();
         
         <div class="modal fade shadow-lg" id="searchbox" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
-                <div class="modal-content ">
+                <div class="modal-content " style="background: var(--background-color)">
                     <div class="modal-header bg-light">
                         <h5 class="modal-title" id="searchModalLabel">Search with Bing</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -3550,7 +3585,7 @@ window.onload = function () {
 
 /******* SECURITY SUITE START *******/
 (function () {
-    if (location.hostname === "dmj.one") {
+    if (location.hostname === "127.0.0.1") {
         const clearinteral_sakjds = window.setInterval(function () {
             if (localStorage.getItem("noshow") === "1" && window.scriptsremoved != 1) {
                 (function () {
@@ -3630,7 +3665,7 @@ window.onload = function () {
                         var modal =
                             `<div class="modal fade" id="nosourcecode" tabindex="-1" role="dialog" aria-labelledby="contactModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
-                <div class="modal-content">
+                <div class="modal-content" style="background: var(--background-color)">
                     <div class="modal-header">
                         <h5 class="modal-title text-center" id="contactModalLabel">Thank you for your interest and contributions!</h5>
                     </div>
