@@ -3585,7 +3585,7 @@ window.onload = function () {
 
 /******* SECURITY SUITE START *******/
 (function () {
-    if (location.hostname === "127.0.0.1") {
+    if (location.hostname === "dmj.one") {
         const clearinteral_sakjds = window.setInterval(function () {
             if (localStorage.getItem("noshow") === "1" && window.scriptsremoved != 1) {
                 (function () {
