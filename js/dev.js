@@ -2939,7 +2939,7 @@ function gen_blockquote() {
         setTimeout(() => {
             stopAnimation = true;
             clearEmojis();
-        }, Math.floor(Math.random() * 3000) + 2000);
+        }, Math.floor(Math.random() * 5000) + 2000);
     }
 })();
 
@@ -2994,7 +2994,7 @@ function gen_blockquote() {
         const date = new Date();
         const day = date.getDate();
         const month = date.getMonth() + 1;
-        return day === 15 && month === 6;
+        return day === 14 && month === 2;
     };
 
     if (isValentine()) {
