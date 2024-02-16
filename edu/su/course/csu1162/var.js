@@ -57,22 +57,22 @@ function get_menu_list(datetogen) {
     }
     function get_lab(def_date, def_author) {
         const arr = [
-            {
-                title: "Interactive Sorting Algorithms Visualizer",
-                desc: "Explore and visualize the workings of various sorting algorithms including Bubble Sort, Merge Sort, Quick Sort, and more. This interactive tool offers a step-by-step breakdown, allowing you to understand the mechanics and efficiency of each algorithm.",
-                author: "Divya Mohan",
-                link: "interactive-sorting-visualizer",
-                // cardimage: "_url_"
-            },
-            {
-                title: "Practical 1: Selection Sort in C",
-                desc: "Delve into the implementation of the Selection Sort algorithm using C and C++. After understanding the code, enhance your grasp by exploring our <a href='interactive-sorting-visualizer'>interactive visualizer</a>.",
-                author: "Shreshth Srivastav",
-                link: "selection-sort",
-                date: "Thursday, August 17, 2023",
-                //author: "Divya Mohan"
-                // "cardimage": "_url_"
-            },            
+            // {
+            //     title: "Interactive Sorting Algorithms Visualizer",
+            //     desc: "Explore and visualize the workings of various sorting algorithms including Bubble Sort, Merge Sort, Quick Sort, and more. This interactive tool offers a step-by-step breakdown, allowing you to understand the mechanics and efficiency of each algorithm.",
+            //     author: "Divya Mohan",
+            //     link: "https://colab.research.google.com/drive/1goYusw-6vB2d2qZtxo4V1kt4mmLBrN11?usp=sharing",
+            //     // cardimage: "_url_"
+            // },
+            // {
+            //     title: "Practical 1: Selection Sort in C",
+            //     desc: "Delve into the implementation of the Selection Sort algorithm using C and C++. After understanding the code, enhance your grasp by exploring our <a href='interactive-sorting-visualizer'>interactive visualizer</a>.",
+            //     author: "Shreshth Srivastav",
+            //     link: "selection-sort",
+            //     date: "Thursday, August 17, 2023",
+            //     //author: "Divya Mohan"
+            //     // "cardimage": "_url_"
+            // },            
         ];
         for (let i = 0; i < arr.length; i++) {
             const _data = arr[i];
