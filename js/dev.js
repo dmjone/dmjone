@@ -2471,6 +2471,7 @@ function gen_blockquote() {
         { day: 17, month: 1, year: 2004, occasion: 'birthday', name: 'Akshit' },
         { day: 29, month: 1, year: 2004, occasion: 'birthday', name: 'Abhay' },
         { day: 25, month: 2, year: 2005, occasion: 'birthday', name: 'Vanshika' },
+        { day: 17, month: 2, year: 2004, occasion: 'birthday', name: 'Ashutosh' },
         { day: 4, month: 9, year: 2004, occasion: 'birthday', name: 'Kamaksha' },
         { day: 31, month: 10, year: 2004, occasion: 'birthday', name: 'Vedansh' },
         { day: 14, month: 12, year: 2002, occasion: 'birthday', name: 'Subhojeet' },        
