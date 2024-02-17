@@ -39,7 +39,16 @@ function get_menu_list(datetogen) {
                 codetype: "Why Python",
                 readtime: 5,
                 link: "why-python"
-            }
+            },
+            {
+                title: "Introduction to Python: Unlocking the World of Programming",
+                desc: "Dive into the realm of Python programming, where we address a common problem: the overwhelming nature of starting to code. This article is designed to transform confusion into clarity, guiding beginners through Python's syntax, variables, data types, and operators. By demystifying these foundational concepts, we aim to equip you with the tools needed to solve real-world problems through coding. From writing your first script to understanding complex data structures, you'll discover how Python's simplicity and versatility make it an ideal language for newcomers and seasoned developers alike. Prepare to explore how each concept plays a critical role in building robust applications, setting the stage for a journey into Python's expansive ecosystem.",
+                codetype: "Getting Started with Python",
+                readtime: 15,
+                link: "getting-started-with-python"
+            },
+            
+
         ];
         for (let i = 0; i < arr.length; i++) {
             const _data = arr[i];
