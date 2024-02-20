@@ -292,7 +292,7 @@ const cdnjs_cryptoJS = "https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/c
     })();
 
     (function () {
-        if (!window.dnfetchenc) {            
+        if (!window.dnfetchenc) {
             fetch(getJsUrl("encvar.json"))
                 .then(response => {
                     if (!response.ok) {
@@ -319,7 +319,7 @@ const cdnjs_cryptoJS = "https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/c
                         console.error('Error:', error);
                     }
                     // else, ignore the error or handle it differently
-                });        
+                });
         }
     })();
 
@@ -345,8 +345,8 @@ const cdnjs_cryptoJS = "https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/c
 
     // Load katex.min.js first. Once katex.min.js is loaded, load auto-render.min.js
     loadScript(cdnjs_katex).then(function () {
-        return loadScript(cdnjs_katex_autorender);                
-    }).then(function () {        
+        return loadScript(cdnjs_katex_autorender);
+    }).then(function () {
         return Promise.all(allScripts.map(loadScript));
     }).then(function () {
         hljs.highlightAll(); // Highlight Js Automatic rendering init 
@@ -2474,7 +2474,7 @@ function gen_blockquote() {
         { day: 17, month: 2, year: 2004, occasion: 'birthday', name: 'Ashutosh' },
         { day: 4, month: 9, year: 2004, occasion: 'birthday', name: 'Kamaksha' },
         { day: 31, month: 10, year: 2004, occasion: 'birthday', name: 'Vedansh' },
-        { day: 14, month: 12, year: 2002, occasion: 'birthday', name: 'Subhojeet' },        
+        { day: 14, month: 12, year: 2002, occasion: 'birthday', name: 'Subhojeet' },
         { day: 12, month: 11, occasion: 'diwali' },
         { day: 13, month: 11, occasion: 'childrensday' },
         { day: 15, month: 11, year: 2004, occasion: 'birthday', name: 'Asmi' },
@@ -2533,9 +2533,9 @@ function gen_blockquote() {
 
 
     if (todaysEvents.length > 0 && (!fireworksDisplayedInfo || fireworksDisplayedInfo.date !== todaysDate)) {
-        let messages = [];        
+        let messages = [];
         const randomEmoji1 = getRandomItem(birthdayEmojis);
-        const randomEmoji2 = getRandomItem(birthdayEmojis, randomEmoji1);        
+        const randomEmoji2 = getRandomItem(birthdayEmojis, randomEmoji1);
         todaysEvents.forEach(event => {
             switch (event.occasion) {
                 case 'birthday':
@@ -2565,7 +2565,7 @@ function gen_blockquote() {
         // focus to view by scrolling and disabling scrollbar
         document.addEventListener('DOMContentLoaded', () => {
             document.body.style.overflow = 'hidden';
-            window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); 
+            window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
         });
 
         window.addEventListener('load', function () {
@@ -2650,7 +2650,7 @@ function gen_blockquote() {
                 }
                 requestAnimationFrame(loop);
             }
-    
+
             const timeouttimer = forcedisplay ? Math.floor(Math.random() * 2000) + 3000 : Math.floor(Math.random() * 6000) + 6000;
 
             loop();
@@ -3365,6 +3365,486 @@ messageUsButtonCaller();
 //         });
 //     });
 // })();
+
+/********** Add-On: All Alerts in oops mode **********/
+// const allAlerts = {
+//     // Usage: allAlerts.courseraDisclaimer();
+//     courseraDisclaimer: function () {
+//         const uniqueID = 'alert-' + Math.random().toString(36).substr(2, 9);
+//         let countdown = 25; // Countdown starting from 8 seconds
+
+//         const alertHTML = `
+//               <div id="${uniqueID}" class="mt-5 alert alert-danger fade show shadow" role="alert" style="position: relative; z-index: 1; border: none; background: #b32828; color: white;">
+//                 <h4 class="alert-heading text-center" style="font-weight: 700;">DISCLAIMER</h4>
+//                 <p id="countdown-${uniqueID}" class="text-center text-white mt-3">This alert will close in <strong>${countdown}</strong> seconds</p>
+//                 <p class="text-justify mb-2 text-uppercase">The case studies and answers herein are provided exclusively for <mark class="fw-bold">EDUCATIONAL USE</mark> and are supplied <mark class="fw-bold">"AS IS".</mark> Any reproduction, distribution, or use beyond ethical educational purposes is <mark class="fw-bold">STRICTLY PROHIBITED</mark> and may result in severe civil and criminal penalties. Direct copying or use of the material may lead to <mark class="fw-bold">IMMEDIATE SUSPENSION</mark> from the Coursera platform.</p>
+//                 <div class="p-2 text-uppercase text-black bg-warning bg-opacity-75 bg-gradient shadow-lg text-center fw-bold">DMJ.ONE accepts <span class="bg-black text-white px-2 py-1">NO LIABILITY</span> for any consequences, legal or otherwise, resulting from the misuse of the provided content.</div>
+//               </div>
+//             `;
+
+//         // Insert the alert into the DOM at the current script location
+//         // document.write(alertHTML);
+//         document.getElementById('course-href-provider').innerHTML += alertHTML;
+
+
+//         const interval = setInterval(() => {
+//             countdown -= 1;
+//             const countdownElement = document.getElementById(`countdown-${uniqueID}`);
+//             if (countdownElement) countdownElement.innerHTML = `This alert will close in <strong>${countdown}</strong> seconds`;
+//             if (countdown <= 0) clearInterval(interval);
+//         }, 1000);
+
+//         setTimeout(() => {
+//             const alert = document.getElementById(uniqueID);
+//             if (alert) {
+//                 alert.style.display = 'none';
+//             }
+//             clearInterval(interval);
+//         }, countdown * 1000);
+//     }
+// };
+const allAlerts = {
+    courseraDisclaimer: function () {
+        const uniqueID = 'alert-' + Math.random().toString(36).substr(2, 9);
+        let countdown = 10; // Countdown starting from 20 seconds
+
+        const alertHTML = `        
+            <div id="${uniqueID}" class="my-4 alert alert-danger fade show shadow" role="alert" style="position: relative; z-index: 1; border: none; background: #b32828; color: white;">                
+                <h4 class="alert-heading text-center" style="font-weight: 700;">DISCLAIMER</h4>
+                <p id="countdown-${uniqueID}" class="text-center text-white mt-3">This message box will close automatically in <strong>${countdown}</strong> seconds. Refresh to read again.</p>
+                <p class="text-justify mb-2 text-uppercase">The case studies and answers herein are provided exclusively for <mark class="fw-bold">EDUCATIONAL USE</mark> and are supplied <mark class="fw-bold">"AS IS".</mark> Any reproduction, distribution, or use beyond ethical educational purposes is <mark class="fw-bold">STRICTLY PROHIBITED</mark> and may result in severe civil and criminal penalties. Direct copying or use of the material may lead to <mark class="fw-bold">IMMEDIATE SUSPENSION</mark> from the Coursera platform.</p>
+                <div class="p-2 text-uppercase text-black bg-warning bg-opacity-75 bg-gradient shadow-lg text-center fw-bold">DMJ.ONE accepts <span class="bg-black text-white px-2 py-1">NO LIABILITY</span> for any consequences, legal or otherwise, resulting from the misuse of the provided content.</div>                
+            </div>`;
+
+        document.getElementById('course-href-provider').insertAdjacentHTML('beforeend', alertHTML);
+
+        const interval = setInterval(() => {
+            countdown--;
+            const countdownElement = document.getElementById(`countdown-${uniqueID}`);
+            if (countdownElement) {
+                countdownElement.innerHTML = `This message box will close automatically in <strong>${countdown}</strong> seconds. Refresh to read again.`;
+            }
+            if (countdown <= 0) {
+                clearInterval(interval);
+                const alertElement = document.getElementById(uniqueID);
+                if (alertElement) alertElement.remove();
+            }
+        }, 1000);
+    }
+};
+// const certifications = {
+//     isc2: {
+//         image: "/img/isc2_logo.png",
+//         href: "https://www.isc2.org/",
+//         text: "ISC²"
+//     },
+//     ibm: {
+//         image: "/img/ibm_logo.png",
+//         href: "https://www.ibm.com/certify/",
+//         text: "IBM"
+//     },
+//     google: {
+//         image: "/img/google_cloud.png",
+//         href: "https://cloud.google.com/certification",
+//         text: "Google Cloud"
+//     },
+//     coursera: {
+//         image: "/img/coursera.webp",
+//         href: "", // This will be set dynamically based on function call
+//         text: "Coursera"
+//     },
+//     mitx: {
+//         image: "/img/mitx.webp",
+//         href: "", // This will be set dynamically based on function call
+//         text: "MitX"
+//     },
+//     courseraDisclaimer: function () {
+//         const uniqueID = 'alert-' + Math.random().toString(36).substr(2, 9);
+//         let countdown = 15; // Countdown starting from 25 seconds
+
+//         const alertHTML = `
+//             <div id="${uniqueID}" class="mt-5 alert alert-danger fade show shadow" role="alert" style="position: relative; z-index: 1; border: none; background: #b32828; color: white;">
+//                 <h4 class="alert-heading text-center" style="font-weight: 700;">DISCLAIMER</h4>
+//                 <p id="countdown-${uniqueID}" class="text-center text-white mt-3">This alert will close in <strong>${countdown}</strong> seconds</p>
+//                 <p class="text-justify mb-2 text-uppercase">The case studies and answers herein are provided exclusively for <mark class="fw-bold">EDUCATIONAL USE</mark> and are supplied <mark class="fw-bold">"AS IS".</mark> Any reproduction, distribution, or use beyond ethical educational purposes is <mark class="fw-bold">STRICTLY PROHIBITED</mark> and may result in severe civil and criminal penalties. Direct copying or use of the material may lead to <mark class="fw-bold">IMMEDIATE SUSPENSION</mark> from the Coursera platform.</p>
+//                 <div class="p-2 text-uppercase text-black bg-warning bg-opacity-75 bg-gradient shadow-lg text-center fw-bold">DMJ.ONE accepts <span class="bg-black text-white px-2 py-1">NO LIABILITY</span> for any consequences, legal or otherwise, resulting from the misuse of the provided content.</div>
+//             </div>`;
+
+//         const interval = setInterval(() => {
+//             countdown--;
+//             const countdownElement = document.getElementById(`countdown-${uniqueID}`);
+//             if (countdownElement) {
+//                 countdownElement.innerHTML = `This alert will close in <strong>${countdown}</strong> seconds`;
+//             }
+//             if (countdown <= 0) {
+//                 clearInterval(interval);
+//                 const alertElement = document.getElementById(uniqueID);
+//                 if (alertElement) alertElement.remove();
+//             }
+//         }, 1000);
+
+//         return alertHTML;
+//     },
+//     certifiedby: function (certName, courseraLink, ...additionalParams) {
+//         let htmlContent = '';
+//         let courseraDisclaimerHTML = certName.toLowerCase() === "coursera" ? this.courseraDisclaimer() : "";
+
+//         if (certName === 'coursera') {
+//             this.coursera.href = courseraLink; // Set the Coursera link dynamically
+
+//             // Handle predefined certification or custom certification
+//             if (additionalParams.length) {
+//                 const certificationType = additionalParams[0];
+
+//                 if (certificationType === 'custom' && additionalParams.length >= 3) {
+//                     // Custom certification details are provided
+//                     const [image, href, text] = additionalParams.slice(1); // Skip 'custom' identifier
+//                     htmlContent += this.generateCertificationHTML(image, href, text);
+//                 } else if (this[certificationType]) {
+//                     // Predefined certification is specified
+//                     const { image, href, text } = this[certificationType];
+//                     htmlContent = this.generateCertificationHTML(image, href, text);
+//                 }
+//             }
+//         } else {
+//             console.error('Invalid certification type or missing parameters.');
+//             return;
+//         }
+
+//         document.getElementById('course-href-provider').innerHTML = `
+//             <div class="row justify-content-center align-items-center">
+//                 <div class="col d-flex justify-content-center align-items-center mb-3">
+//                     <a href="${this.coursera.href}" target="_blank" class="text-decoration-none">
+//                         <div class="p-3 d-inline-flex flex-column align-items-center">
+//                             <p class="fw-bold text-secondary mt-2 mb-0">Take this course on</p>
+//                             <img src="${this.coursera.image}" alt="Coursera Logo" class="img-fluid" style="max-height: 30px; max-width: 200px">
+//                         </div>
+//                     </a>
+//                 </div>
+//                 ${htmlContent}
+//             </div>
+//             ${courseraDisclaimerHTML}`;
+//     },
+//     generateCertificationHTML: function (image, href, text) {
+//         return `
+//             <div class="col d-flex justify-content-center align-items-center">
+//                 <a href="${href}" target="_blank" class="text-decoration-none">
+//                     <div class="d-inline-flex flex-column align-items-center">
+//                         <p class="fw-bold mb-1 text-secondary">Certified by <span class="text-success">${text}</span></p>
+//                         <div class="d-inline-flex flex-row align-items-center">
+//                             <img src="${image}" alt="${text}" class="img-fluid px-2" style="max-height: 40px; max-width: 200px">
+//                         </div>
+//                     </div>
+//                 </a>
+//             </div>`;
+//     }
+// };
+// const certifications = {
+//     isc2: {
+//         image: "/img/isc2_logo.png",
+//         href: "https://www.isc2.org/",
+//         text: "ISC²"
+//     },
+//     ibm: {
+//         image: "/img/ibm_logo.png",
+//         href: "https://www.ibm.com/certify/",
+//         text: "IBM"
+//     },
+//     google: {
+//         image: "/img/google_cloud.png",
+//         href: "https://cloud.google.com/certification",
+//         text: "Google Cloud"
+//     },
+//     coursera: {
+//         image: "/img/coursera.webp",
+//         href: "", // This will be set dynamically based on function call
+//         text: "Coursera"
+//     },
+//     mitx: {
+//         image: "/img/mitx.webp",
+//         href: "", // This will be set dynamically based on function call
+//         text: "MitX"
+//     },
+//     generateCourseRedirectHTML: function (image, href, text, htmlContent, courseraDisclaimerHTML) {
+//         return `
+//             <div class="row justify-content-center align-items-center">
+//                 <div class="col d-flex justify-content-center align-items-center mb-3">
+//                     <a href="${href}" target="_blank" class="text-decoration-none">
+//                         <div class="p-3 d-inline-flex flex-column align-items-center">
+//                             <p class="fw-bold text-secondary mt-2 mb-0">Take this course on</p>
+//                             <img src="${image}" alt="${text} Logo" class="img-fluid" style="max-height: 30px; max-width: 200px">
+//                         </div>
+//                     </a>
+//                 </div>
+//                 ${htmlContent}
+//             </div>
+//             ${courseraDisclaimerHTML}`;
+//     },
+//     generateCertificationHTML: function (image, href, text) {
+//         return `
+//             <div class="col d-flex justify-content-center align-items-center">
+//                 <a href="${href}" target="_blank" class="text-decoration-none">
+//                     <div class="d-inline-flex flex-column align-items-center">
+//                         <p class="fw-bold mb-1 text-secondary">Certified by <span class="text-success">${text}</span></p>
+//                         <div class="d-inline-flex flex-row align-items-center">
+//                             <img src="${image}" alt="${text}" class="img-fluid px-2" style="max-height: 40px; max-width: 200px">
+//                         </div>
+//                     </div>
+//                 </a>
+//             </div>`;
+//     },
+//     certifiedby: function (certName, courseraLink, ...additionalParams) {
+//         let htmlContent = '';
+//         let courseraDisclaimerHTML = certName.toLowerCase() === "coursera" ? allAlerts.courseraDisclaimer() : "";
+
+//         if (certName === 'coursera') {
+//             this.coursera.href = courseraLink; // Set the Coursera link dynamically
+
+//             // Handle predefined certification or custom certification
+//             if (additionalParams.length) {
+//                 const certificationType = additionalParams[0];
+
+//                 if (certificationType === 'custom' && additionalParams.length >= 3) {
+//                     // Custom certification details are provided
+//                     const [image, href, text] = additionalParams.slice(1); // Skip 'custom' identifier
+//                     htmlContent += this.generateCertificationHTML(image, href, text);
+//                 } else if (this[certificationType]) {
+//                     // Predefined certification is specified
+//                     const { image, href, text } = this[certificationType];
+//                     htmlContent = this.generateCertificationHTML(image, href, text);
+//                 }
+//             }
+//         } else {
+//             console.error('Invalid certification type or missing parameters.');
+//             return;
+//         }
+
+//         const { image, href, text } = this[certName];
+//         document.getElementById('course-href-provider').innerHTML = this.generateCourseRedirectHTML(image, href, text, htmlContent, courseraDisclaimerHTML);
+//     },
+
+// };
+
+// function testDF(ttext, tlink, timg, ctext, clink, cimg) {
+//     // usage: testDF("coursera", "https://www.coursera.org/learn/incident-response-bc-and-dr-concepts/", "/img/coursera.webp", "ISC²", "https://www.isc2.org/", "/img/isc2_logo.png")
+//     if (ttext == "coursera") {
+//         tlink = tlink ? tlink : "https://coursera.com";
+//         timg = timg ? timg : "/img/coursera.webp";
+//     }
+//     if (ctext == "isc2") {
+//         ctext = ctext ? ctext : "ISC²";
+//         clink = clink ? clink : "https://www.isc2.org/";
+//         cimg = clink? clink : "/img/isc2_logo.png";
+//     }
+//     if (ctext == "ibm") {
+//         ctext = ctext ? ctext : "IBM";
+//         clink = clink ? clink : "https://www.ibm.com/";
+//         cimg = clink ? clink : "/img/ibm_logo.png";
+//     }
+//     if (ctext == "gcloud") {
+//         ctext = ctext ? ctext : "GCloud";
+//         clink = clink ? clink : "https://www.google.com/cloud";
+//         cimg = clink ? clink : "/img/google_cloud.png";
+//     }
+//     document.getElementById('course-href-provider').innerHTML = `
+//     <div class="container-md my-2">
+//         <div class="row justify-content-center align-items-center">
+//             <div class="col d-flex justify-content-center align-items-center mb-3">
+//                 <a href="${tlink}" target="_blank" class="text-decoration-none">
+//                     <div class="p-3  d-inline-flex flex-column align-items-center">
+//                         <p class="fw-bold text-secondary mt-2 mb-0">Take this course on</p>
+//                         <img src="${timg}" alt="${ttext} Logo" class="img-fluid" style="max-height: 30px; max-width: 250px">
+//                     </div>
+//                 </a>
+//             </div>
+//             <div class="col d-flex justify-content-center align-items-center">
+//                 <a href="${clink}" target="_blank" class="text-decoration-none">
+//                     <div class="d-inline-flex flex-column align-items-center">
+//                         <p class="fw-bold mb-1 text-secondary">Certification by <span class="text-success">${ctext}</span></p>
+//                         <div class="d-inline-flex flex-row align-items-center">
+//                             <img src="${cimg}" alt="${ctext} Logo" class="img-fluid px-2" style="max-height: 40px; max-width: 200px">
+//                         </div>
+//                     </div>
+//                 </a>
+//             </div>
+//         </div>
+//     </div>`;
+//     allAlerts.courseraDisclaimer()
+// }
+
+// function testDF(ttext, tlink, timg, ctext, clink, cimg) {
+//     // Define default values for each provider in an object
+//     const defaults = {
+//         coursera: {
+//             ttext: "Coursera",
+//             tlink: "https://coursera.com",
+//             timg: "/img/coursera.webp"
+//         },
+//         mitx: {
+//             ttext: "MITx",
+//             tlink: "https://www.edx.org/school/mitx",
+//             timg: "/img/mitx_logo.png"
+//         },
+//         stanford: {
+//             ttext: "Stanford",
+//             tlink: "https://online.stanford.edu/courses",
+//             timg: "/img/stanford_logo.png"
+//         },
+//         yale: {
+//             ttext: "Yale",
+//             tlink: "https://online.yale.edu/courses",
+//             timg: "/img/yale_logo.png"
+//         },
+//         isc2: {
+//             ctext: "ISC²",
+//             clink: "https://www.isc2.org/",
+//             cimg: "/img/isc2_logo.png"
+//         },
+//         ibm: {
+//             ctext: "IBM",
+//             clink: "https://www.ibm.com/",
+//             cimg: "/img/ibm_logo.png"
+//         },
+//         gcloud: {
+//             ctext: "Google Cloud",
+//             clink: "https://www.google.com/cloud",
+//             cimg: "/img/google_cloud.png"
+//         }
+//     };
+
+//     // Set defaults for training provider
+//     dfT = defaults[ttext];
+//     if (dfT) {
+//         ttext = dfT.ttext;
+//         tlink = tlink || dfT.tlink;
+//         timg = timg || dfT.timg;
+//     }
+
+//     // Set defaults for certification provider
+//     dfC = defaults[ctext];
+//     if (dfC) {
+//         ctext = dfC.ctext;
+//         clink = clink || dfC.clink;
+//         cimg = cimg || dfC.cimg;
+//     }
+
+//     // Update HTML content
+//     document.getElementById('course-href-provider').innerHTML = `
+//         <div class="row justify-content-center align-items-center">
+//             <div class="col d-flex justify-content-center align-items-center mb-2">
+//                 <a href="${tlink}" target="_blank" class="text-decoration-none">
+//                     <div class="p-3 d-inline-flex flex-column align-items-center">
+//                         <p class="fw-bold text-secondary mt-2 mb-0">Take this course on</p>
+//                         <img src="${timg}" alt="${ttext} Logo" class="img-fluid" style="max-height: 30px; max-width: 250px">
+//                     </div>
+//                 </a>
+//             </div>
+//             <div class="col d-flex justify-content-center align-items-center">
+//                 <a href="${clink}" target="_blank" class="text-decoration-none">
+//                     <div class="d-inline-flex flex-column align-items-center">
+//                         <p class="fw-bold mb-1 text-secondary">Certification by <span class="text-success">${ctext}</span></p>
+//                         <div class="d-inline-flex flex-row align-items-center">
+//                             <img src="${cimg}" alt="${ctext} Logo" class="img-fluid px-2" style="max-height: 40px; max-width: 200px">
+//                         </div>
+//                     </div>
+//                 </a>
+//             </div>
+//         </div>`;
+
+//     // Call disclaimer or other relevant function if needed
+//     allAlerts.courseraDisclaimer(); // Assuming this function is defined elsewhere
+// }
+
+const certifications = {
+    // Define default values for each provider in an object
+    defaults: {
+        coursera: {
+            text: "Coursera",
+            link: "https://coursera.com",
+            img: "/img/coursera_logo.webp"
+        },
+        mitx: {
+            text: "MITx",
+            link: "https://www.edx.org/school/mitx",
+            img: "/img/mitx_logo.png"
+        },
+        stanford: {
+            text: "Stanford",
+            link: "https://online.stanford.edu/courses",
+            img: "/img/stanford_logo.png"
+        },
+        yale: {
+            text: "Yale",
+            link: "https://online.yale.edu/courses",
+            img: "/img/yale_logo.png"
+        },
+        isc2: {
+            text: "ISC²",
+            link: "https://www.isc2.org/",
+            img: "/img/isc2_logo.png"
+        },
+        ibm: {
+            text: "IBM",
+            link: "https://www.ibm.com/",
+            img: "/img/ibm_logo.png"
+        },
+        gcloud: {
+            text: "Google Cloud",
+            link: "https://www.google.com/cloud",
+            img: "/img/google_cloud.png"
+        }
+    },
+
+    // Helper function to apply defaults
+    applyDefaults: function (providerType, text, link, img) {
+        if (text && this.defaults[text]) {
+            const df = this.defaults[text];
+            return {
+                text: df.text,
+                link: link || df.link,
+                img: img || df.img
+            };
+        }
+        return { text, link, img };
+    },
+
+    generateCertificationHTML: function (ttext = '', tlink = '', timg = '', ctext = '', clink = '', cimg = '') {
+        document.write(`<div id="course-href-provider"></div>`);
+
+        // Apply defaults using the helper function
+        const trainingDefaults = this.applyDefaults('training', ttext.toLowerCase(), tlink, timg);
+        const certificationDefaults = this.applyDefaults('certification', ctext.toLowerCase(), clink, cimg);
+
+        // Update HTML content
+        document.getElementById('course-href-provider').innerHTML = `
+        <div class="row justify-content-center align-items-center">
+            <div class="col d-flex justify-content-center align-items-center mb-2">
+                <a href="${trainingDefaults.link}" target="_blank" class="text-decoration-none">
+                    <div class="p-3 d-inline-flex flex-column align-items-center">
+                        <p class="fw-bold text-secondary mt-2 mb-1">Take this course on</p>
+                        <img src="${trainingDefaults.img}" alt="${trainingDefaults.text} Logo" class="img-fluid" style="max-height: 40px; max-width: 200px">
+                    </div>
+                </a>
+            </div>
+            <div class="col d-flex justify-content-center align-items-center">
+                <a href="${certificationDefaults.link}" target="_blank" class="text-decoration-none">
+                    <div class="d-inline-flex flex-column align-items-center">
+                        <p class="fw-bold mb-1 text-secondary">Certification by <span class="text-success">${certificationDefaults.text}</span></p>
+                        <div class="d-inline-flex flex-row align-items-center">
+                            <img src="${certificationDefaults.img}" alt="${certificationDefaults.text} Logo" class="img-fluid px-2" style="max-height: 40px; max-width: 200px">
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>`;
+        // Call disclaimer or other relevant function if needed
+        // Assuming this function is defined elsewhere
+        allAlerts.courseraDisclaimer();
+    },
+};
+
+// Note: You would need to adjust the call to generateCertificationHTML to pass the correct parameters based on your requirements.
+
 
 
 /******** Fetch updated content from the server automatically ********/
