@@ -3,6 +3,12 @@ function get_menu_list(datetogen) {
     function get_main(def_date, def_author) {
         const arr = [
             {
+                link: "../csu1051/",
+                title: "Prerequisites: DSA <i class=\"bi bi-box-arrow-up-right\"></i>",
+                desc: "It is recommended that you master Data Structures & Algorithms with our comprehensive collection of Data Structures & Algorithms Class Topics before continuing to the Theory below! The topics below build upon the concepts present in DSA. Click on the topic to visit.",
+                codetype: "CSU1051 | Class"
+            },
+            {
                 link: "theory/",
                 title: "Theory: Dive into the World of Design and Analysis of Algorithms: A Comprehensive Guide",
                 desc: "Unlock the full potential of algorithms with our in-depth guide to all the concepts. Take your problem-solving skills to the next level and discover a world of efficient solutions. Click now to embark on your DAA journey.",
