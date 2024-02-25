@@ -13,6 +13,26 @@ const cdnjs_katex = "https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.m
 const cdnjs_katex_autorender = "https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js";
 const cdnjs_font_awesome = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js";
 const cdnjs_cryptoJS = "https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js";
+// const body_pomodoro_helptext = "The Pomodoro Technique is a time management method developed by Francesco Cirillo in the late 1980s. The technique uses a timer to break down work into intervals, traditionally 25 minutes in length, separated by short breaks. These intervals are named pomodoros, the plural in English of the Italian word pomodoro (tomato), after the tomato-shaped kitchen timer that Cirillo used as a university student. The technique has been widely popularized by dozens of apps and websites providing timers and instructions. Closely related to concepts such as timeboxing and iterative and incremental development used in software design, the method has been adopted in pair programming contexts.";
+const body_pomodoro_helptext = `
+<h2 style="color: #FFD700; margin-bottom: 1rem;">Time for a Break!</h2>
+<p>During this 5-minute break, consider engaging in activities that help you relax and recharge. Here's a guide to make the most of your break:</p>
+<p><strong>Do:</strong></p>
+<ul>
+  <li>Stand up and stretch your arms, legs, and back.</li>
+  <li>Take a short walk around your room or office.</li>
+  <li>Practice deep-breathing exercises or meditate to clear your mind.</li>
+  <li>Drink water to stay hydrated.</li>
+  <li>Look at distant objects to reduce eye strain.</li>
+</ul>
+<p><strong>Don't:</strong></p>
+<ul>
+    <li>Engage in stressful or work-related activities.</li>
+    <li>Use electronic devices that can strain your eyes further.</li>
+    <li>Consume caffeine or sugar-heavy snacks that can affect your focus.</li>
+</ul>
+<p>Remember, the goal is to relax and prepare your mind for another productive session!</p>
+`;
 
 
 
@@ -2470,8 +2490,23 @@ function gen_blockquote() {
         { day: 12, month: 1, year: 2004, occasion: 'birthday', name: 'Prithak' },
         { day: 17, month: 1, year: 2004, occasion: 'birthday', name: 'Akshit' },
         { day: 29, month: 1, year: 2004, occasion: 'birthday', name: 'Abhay' },
-        { day: 25, month: 2, year: 2005, occasion: 'birthday', name: 'Vanshika' },
         { day: 17, month: 2, year: 2004, occasion: 'birthday', name: 'Ashutosh' },
+        { day: 25, month: 2, year: 2005, occasion: 'birthday', name: 'Vanshika' },
+        { day: 2, month: 3, year: 2004, occasion: 'birthday', name: 'Samarth' },
+        { day: 6, month: 3, year: 2005, occasion: 'birthday', name: 'Aerish' },
+        { day: 11, month: 3, year: 2006, occasion: 'birthday', name: 'Krish' },
+        { day: 17, month: 3, year: 2004, occasion: 'birthday', name: 'Vipul' },
+        { day: 18, month: 3, year: 2001, occasion: 'birthday', name: 'Astha' },
+        { day: 25, month: 3, year: 2004, occasion: 'birthday', name: 'Prikshit' },
+        { day: 27, month: 3, year: 2004, occasion: 'birthday', name: 'Jatin' },
+        { day: 27, month: 3, year: 2003, occasion: 'birthday', name: 'Vineet' },
+        { day: 2, month: 4, year: 2003, occasion: 'birthday', name: 'Nitin' },
+        { day: 24, month: 4, year: 2004, occasion: 'birthday', name: 'Adarsh' },
+        { day: 26, month: 4, year: 2003, occasion: 'birthday', name: 'Parshav' },
+        { day: 19, month: 5, year: 2001, occasion: 'birthday', name: 'Tarun' },
+        { day: 20, month: 5, year: 2001, occasion: 'birthday', name: 'Rohit' },
+        { day: 23, month: 5, year: 2004, occasion: 'birthday', name: 'Anshika' },
+        { day: 1, month: 6, year: 2004, occasion: 'birthday', name: 'Aryan' },
         { day: 4, month: 9, year: 2004, occasion: 'birthday', name: 'Kamaksha' },
         { day: 31, month: 10, year: 2004, occasion: 'birthday', name: 'Vedansh' },
         { day: 14, month: 12, year: 2002, occasion: 'birthday', name: 'Subhojeet' },
@@ -2487,15 +2522,17 @@ function gen_blockquote() {
         "🔥", "💃", "🕺", "🍹", "🍕", "🍟", "🍔"
     ];
 
-    const birthdayMessages = [
-        "To another fabulous year!", "Keep shining!", "Stay golden!",
-        "Cheers!", "Onwards & upwards!", "Age with grace!",
-        "Born to shine!", "Forever young!", "Keep rocking!",
-        "You're gold!", "Keep being awesome!", "You're a star!",
-        "Celebrate!", "The best is yet to come!", "You're on fire!",
-        "Stay cool!", "You rock!", "Keep flying high!", "Stay sweet!",
-        "Party on!"
-    ];
+    // const birthdayMessages = [
+    //     "To another fabulous year!", "Keep shining!", "Stay golden!",
+    //     "Cheers!", "Onwards & upwards!", "Age with grace!",
+    //     "Born to shine!", "Forever young!", "Keep rocking!",
+    //     "You're gold!", "Keep being awesome!", "You're a star!",
+    //     "Celebrate!", "The best is yet to come!", "You're on fire!",
+    //     "Stay cool!", "You rock!", "Keep flying high!", "Stay sweet!",
+    //     "Party on!"
+    // ];
+
+    const birthdayMessages = ["To another fabulous year!", "Keep shining!", "Stay golden!", "Cheers!", "Onwards & upwards!", "Age with grace!", "Born to shine!", "Forever young!", "Keep rocking!", "You're gold!", "Keep being awesome!", "You're a star!", "Celebrate!", "The best is yet to come!", "You're on fire!", "Stay cool!", "You rock!", "Keep flying high!", "Stay sweet!", "Party on!", "Here's to you!", "Shine your light!", "Live your story!", "Stay uniquely you!", "Your joy shines!", "Aging gracefully, like you!", "Keep dazzling us!", "Forever stylish!", "Thrive on!", "Glow as you do!", "Dream your dreams!", "Cheers to your magic!", "Smile your smile!", "Fabulous as always!", "Rise above!", "Unstoppable, like you!", "Sparkle your way!", "Golden, like you!", "Embrace your journey!", "Live your best!", "Adventure calls you!", "Your spirit sparkles!", "Legend in the making!", "Keep glowing!", "Champion of the day!", "Irreplaceably you!", "Dance in the joy!", "Your day, your way!", "Radiate positivity!", "Incomparable you!", "Vibrant as ever!", "Laughter fills your day!", "Here’s to your brilliance!", "You defy the odds!", "Trailblazer!", "Your vibe attracts your tribe!", "Own the moment!", "Fierce and fabulous!", "Joyfully you!", "Leap into the new year!", "Shining example of you!", "Flourish!", "Rewriting the stars!", "Bold and beautiful!", "Uniquely celebrated!", "To more laughs and adventures!", "Keep conquering!", "Glow with grace!", "Cheers to your essence!", "Soar higher!", "Elegance in aging!", "Born for greatness!", "Stay timeless!", "Rock the world!", "You're a treasure!", "Continue to marvel!", "Shining brighter!", "Joyous celebrations!", "Ahead lies wonder!", "Ignite the year!", "Coolness personified!", "Master of your day!", "Elevate beyond!", "Sweetness personified!", "The party's just begun!", "To your endless happiness!", "Light up the world!", "Craft your tale!", "Uniquely splendid!", "Your laughter, a melody!", "Grace in every step!", "Dazzling every day!", "Stylishly you!", "Prospering always!", "Your glow, undimmed!", "Dreams taking flight!", "Magic in every moment!", "Wearing your smile!", "Consistently amazing!", "Soaring spirit!", "Like no other!", "Carve your path!", "A golden heart!", "Journeying your way!", "Best of life, embraced!"];
 
     const getTodaysEvents = () => {
         const date = new Date();
@@ -2542,7 +2579,7 @@ function gen_blockquote() {
                     const age = event.year ? new Date().getFullYear() - event.year : null;
                     const initial = event.name.charAt(0);  // Extract the first letter
                     const randomMessage = age ?
-                        `${randomEmoji1}Happy <span class="fw-bold">${age}</span><sup>${getSuffix(age)}</sup> ${event.name}!${randomEmoji2}<br>${getRandomItem(birthdayMessages)}` :
+                        `${randomEmoji1}Happy <span class="fw-bold">${age}</span><sup>${getSuffix(age)}</sup> ${event.name}!${randomEmoji2}<br><span class ="display-6">${getRandomItem(birthdayMessages)}</span>` :
                         `${randomEmoji1}Happy Birthday, ${initial}!${randomEmoji2}<br>${getRandomItem(birthdayMessages)}`;
                     messages.push(randomMessage);
                     break;
@@ -2557,7 +2594,7 @@ function gen_blockquote() {
 
         const messageString = messages.join('<br><br>');
         // ...
-        const incognito = forcedisplay ? "" : '<div class="fireworks-footer">To watch again, open in an incognito window.</div>';
+        const incognito = forcedisplay ? "" : '<div class="fireworks-footer display-6">To watch again, open in an incognito window.</div>';
         document.write(`<canvas id="fireworks" class=""></canvas>
                <div class="fireworks-message text-center">${messageString}</div>
                ${incognito}`);
@@ -3844,6 +3881,314 @@ const certifications = {
 };
 
 // Note: You would need to adjust the call to generateCertificationHTML to pass the correct parameters based on your requirements.
+
+
+
+/******** Pomodoro mode ********/
+// (function () {
+//     document.addEventListener('DOMContentLoaded', function () {
+//         const readingTime = 6 * 1000; // Adjusted back to 25 minutes
+//         const breakTime = 6 * 1000; // 5 minutes
+//         const uniqueContainerID = `container-${Math.random().toString(36).substr(2, 9)}`; // Unique ID for the container
+//         const uniqueModalID = `breakModal-${Math.random().toString(36).substr(2, 9)}`; // Unique ID for the modal
+
+//         // Define the modal HTML content with a more personalized message
+//         const modalHTML = `
+// <div class="modal fade" id="${uniqueModalID}" tabindex="-1" aria-labelledby="${uniqueModalID}Label" aria-hidden="true">
+//   <div class="modal-dialog modal-dialog-centered">
+//     <div class="modal-content">
+//       <div class="modal-header">
+//         <h5 class="modal-title" id="${uniqueModalID}Label">Time for a Well-Deserved Break!</h5>
+//         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+//       </div>
+//       <div class="modal-body">
+//         Hey there! You've been focused and productive for the last 25 minutes, which is awesome. 🌟 Now, let's take a short 5-minute break. Stand up, stretch, grab a drink, or just close your eyes and relax. Your mind and body will thank you for it!
+//       </div>
+//       <div class="modal-footer">
+//         <button type="button" class="btn btn-secondary" id="${uniqueModalID}-extendBreak">Need a longer break?</button>
+//         <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Start My Break</button>
+//       </div>
+//     </div>
+//   </div>
+// </div>
+// `;
+
+//         // Create a container div, set its HTML, and append it to the body
+//         const container = document.createElement('div');
+//         container.innerHTML = modalHTML;
+//         container.id = uniqueContainerID; // Assign the unique ID to the container
+//         document.body.appendChild(container);
+
+//         setTimeout(function notify() {
+//             const breakModal = new bootstrap.Modal(document.getElementById(uniqueModalID), {
+//                 keyboard: false // Optional: Prevent closing the modal with keyboard to ensure the user consciously decides to take a break
+//             });
+//             breakModal.show();
+
+//             // Extend break functionality with a more engaging interaction
+//             document.getElementById(`${uniqueModalID}-extendBreak`).addEventListener('click', function () {
+//                 setTimeout(() => {
+//                     alert("Extended break is over. Hope you're feeling refreshed and ready to dive back in!");
+//                     breakModal.hide();
+//                 }, breakTime); // Extends the break by an additional 5 minutes
+//                 breakModal.hide(); // Close the modal immediately when extending the break to prevent multiple clicks
+//             });
+//         }, readingTime);
+//     });
+// })();
+
+// (function () {
+//     document.addEventListener('DOMContentLoaded', function () {
+//         // Constants for reading and break periods
+//         const readingTime = 1* 1000; // 25 minutes
+//         const breakTime = 6 * 1000; // 5 minutes
+
+//         // Helper functions
+//         function generateUniqueId(prefix) {
+//             return `${prefix}-${Math.random().toString(36).substr(2, 9)}`;
+//         }
+
+//         function disableScroll() {
+//             document.body.style.overflow = 'hidden';
+//         }
+
+//         function enableScroll() {
+//             document.body.style.overflow = '';
+//         }
+
+//         function formatTime(seconds) {
+//             const minutes = Math.floor(seconds / 60);
+//             const remainingSeconds = seconds % 60;
+//             return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+//         }
+
+//         // Overlay for the break period
+//         function createOverlay() {
+//             const overlayId = generateUniqueId('overlay');
+//             const timerId = generateUniqueId('timer');
+//             const overlay = document.createElement('div');
+
+//             const breakInfo = `
+// <div class="p-4 mb-4 text-light bg-dark rounded-3" style="background-color: var(--background-color) !important;">
+//   <h4 class="mb-3">Time for a Break!</h4>
+//   <p class="mb-3">You've been working hard, and now it's time to recharge. Remember, taking short breaks can significantly increase productivity and creativity.</p>
+//   <ul class="mb-3 list-unstyled">
+//     <li><strong>Do:</strong></li>
+//     <ul>
+//       <li>Stand up and stretch your legs.</li>
+//       <li>Take deep breaths to replenish oxygen levels.</li>
+//       <li>Hydrate yourself with a glass of water.</li>
+//       <li>Rest your eyes by looking at something in the distance.</li>
+//     </ul>
+//     <li><strong>Don't:</strong></li>
+//     <ul>
+//       <li>Engage in stressful or demanding activities.</li>
+//       <li>Spend the entire break on screens (avoid social media, emails).</li>
+//     </ul>
+//   </ul>
+//   <p class="mb-3">Use this time to gently walk away from your work area if possible, allowing your mind to reset and your body to relax.</p>
+// </div>
+// <div class="text-center mt-4 pt-2">
+//   <h5 class="text-warning">You can continue reading now by refreshing the page or after</h5>
+//   <div id="${timerId}" class="text-danger fs-1"></div>
+// </div>
+// `;
+
+//             overlay.id = overlayId;
+//             overlay.style = `position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); display: none; justify-content: center; align-items: center; flex-direction: column; color: white; z-index: 1050; backdrop-filter: blur(8px);`;
+//             overlay.innerHTML = breakInfo;
+//             document.body.appendChild(overlay);
+//             return { overlay, timerId };
+//         }
+
+//         // Toast notification for the reading period
+//         function createToastContainer() {
+//             let toastContainer = document.querySelector('.toast-container');
+//             if (!toastContainer) {
+//                 toastContainer = document.createElement('div');
+//                 toastContainer.classList.add('toast-container', 'position-fixed', 'bottom-0', 'end-0', 'p-3');
+//                 document.body.appendChild(toastContainer);
+//             }
+//             return toastContainer;
+//         }
+
+//         function createToast(toastContainer) {
+//             const toastId = generateUniqueId('toast');
+//             const toastHTML = `
+// <div id="${toastId}" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="5000">
+//   <div class="toast-header">
+//     <strong class="me-auto">Break Reminder</strong>
+//     <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+//   </div>
+//   <div class="toast-body">
+//     You've been reading for 25 minutes. Time for a short 5-minute break.
+//   </div>
+// </div>
+// `;
+//             toastContainer.innerHTML += toastHTML;
+//             return toastId;
+//         }
+
+//         // Managing the break and reading periods
+//         function startBreak({ overlay, timerId }) {
+//             disableScroll();
+//             overlay.style.display = 'flex';
+//             let timeLeft = breakTime / 1000;
+//             const timerElement = document.getElementById(timerId);
+//             const interval = setInterval(() => {
+//                 timerElement.innerText = formatTime(timeLeft);
+//                 timeLeft--;
+//                 if (timeLeft < 0) {
+//                     clearInterval(interval);
+//                     overlay.style.display = 'none';
+//                     enableScroll();
+//                     startReadingPeriod();
+//                 }
+//             }, 1000);
+//         }
+
+//         function startReadingPeriod() {
+//             const toastContainer = createToastContainer();
+//             const toastId = createToast(toastContainer);
+//             setTimeout(() => {
+//                 const toastEl = new bootstrap.Toast(document.getElementById(toastId));
+//                 toastEl.show();
+//                 setTimeout(() => startBreak(createOverlay()), 5000); // Wait for the toast to finish before starting the break
+//             }, readingTime);
+//         }
+
+//         // Initialization
+//         startReadingPeriod();
+//     });
+// })();
+
+(function () {
+    document.addEventListener('DOMContentLoaded', function () {
+        // Storage for settings and reusable elements
+        const settings = {
+            readingTime: 25 * 60 * 1000, // 1 second for demonstration
+            breakTime: 5 * 60 * 1000, // 6 seconds for demonstration
+            overlayStyle: 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: none; justify-content: center; align-items: center; flex-direction: column; z-index: 1050; backdrop-filter: blur(10px);'
+        };
+
+        // Helper functions
+        const generateUniqueId = prefix => `${prefix}-${Math.random().toString(36).substr(2, 9)}`;
+        const toggleScroll = enable => document.body.style.overflow = enable ? '' : 'hidden';
+        const formatTime = seconds => `${Math.floor(seconds / 60).toString().padStart(2, '0')}:${(seconds % 60).toString().padStart(2, '0')}`;
+
+        const getBreakInfoContent = (timerId) => {
+            const isSmallScreen = window.matchMedia('(max-width: 768px)').matches;
+
+            if (isSmallScreen) {
+                return `<div class="container p-4 m-4 rounded-3 shadow-lg" style="background-color: var(--background-color) !important;">
+  <h4 class="text-center">Quick Break Time!</h4>
+  <p class="p-2">Let's take a moment to stand up, stretch, and take a few deep breaths. A quick pause can significantly boost your focus and productivity!</p>
+  <div id="${timerId}" class="fs-1 text-center text-danger">⏳</div>
+  <p class="text-muted text-center">Cannot wait? Refresh the page to remove the timer.</p>
+</div>`;
+            } else {
+                return `<div class="container p-4 m-4 rounded-3 shadow-lg" style="background-color: var(--background-color) !important;">
+  <h3 class="mb-3 text-center">Time to Refresh & Recharge!</h3>
+  <p class="">You've been pushing the limits, and it's nothing short of incredible! Now, let's take a strategic pause to supercharge. Ever wonder why the Pomodoro Technique is so effective? It's because these short breaks enhance cognitive function, allowing for better retention, creativity, and problem-solving skills. You're not just resting; you're setting the stage for even greater achievements.</p>
+  <h5 class="">Let us make this technique work for you. Here are the things you should do now:</h5>
+  <ul class=" list-unstyled">
+    <li>🚶‍♂️ Get up, stretch, and move around. Even a brief walk can reignite your creativity and focus.</li>
+    <li>🧘‍♀️ Practice deep breathing. Fill your lungs (and brain!) with oxygen to boost mental clarity.</li>
+    <li>💧 Hydrate! A refreshed body supports a sharp mind.</li>
+    <li>👀 Give your eyes a break from the screen. Look out the window or at a distant object to reduce eye strain.</li>
+  </ul>
+  <p class="mt-2">Try to steer clear of additional screen time or any task that could lead to stress. This moment is for you to unwind and recharge both mentally and physically. <strong>Do not use your phone. Do not open any social media application.</strong></p>
+  <p class=""><strong>Here's the best part:</strong> After just five minutes, you'll return with a refreshed perspective and renewed vigor, ready to tackle your tasks with newfound energy and insight. Imagine what you'll accomplish next! Let's embrace this break as a powerful tool in our productivity arsenal.</p>
+  <p class="">We believe in you! This brief interlude is your secret weapon for sustained success. See you in 5 minutes, ready and raring to go!</p>
+    <div class="text-center pt-2">
+        <h5 class="text-success">Eager to jump back in? Just a few moments to go!</h5>
+            <div id="${timerId}" class="text-danger fs-1">⏳</div>
+        <p class="text-muted text-center">Cannot wait? Refresh the page to remove the timer, but remember, the magic happens when we balance discipline with rest.</p>
+    </div>
+  </div>`;
+            }
+        };
+
+        // Overlay for the break period
+        const createOverlay = () => {
+            const overlayId = generateUniqueId('overlay');
+            const timerId = generateUniqueId('timer');
+            const overlay = document.createElement('div');
+            overlay.id = overlayId;
+            overlay.style = settings.overlayStyle;
+            const breakInfo = getBreakInfoContent(timerId); // Dynamically set content based on screen size
+            overlay.innerHTML = breakInfo;
+            document.body.appendChild(overlay);
+            return { overlay, timerId };
+        };
+
+        // Toast notification for the reading period
+        const createToast = () => {
+            let toastContainer = document.querySelector('.toast-container');
+            if (!toastContainer) {
+                toastContainer = document.createElement('div');
+                toastContainer.classList.add('toast-container', 'position-fixed', 'bottom-0', 'end-0', 'p-3');
+                document.body.appendChild(toastContainer);
+            }
+
+            const toastId = generateUniqueId('toast');
+            // Note: settings.toastContent removed, as it's not dynamically setting `toastId`
+            const toastContent = `
+<div id="${toastId}" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="10000" style="background-color: var(--background-color) !important;">
+  <div class="toast-header bg-danger bg-opacity-50" style="color: var(--text-color)">
+    <strong class="me-auto">Break Reminder</strong>
+    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+  </div>
+  <div class="toast-body bg-danger bg-opacity-10">
+    You've been reading for a while. Time for a short break.
+  </div>
+</div>`;
+
+            toastContainer.innerHTML += toastContent;
+            return toastId;
+        };
+
+        // Managing the break and reading periods
+        const startBreak = ({ overlay, timerId }) => {
+            toggleScroll(false);
+            overlay.style.display = 'flex';
+            let timeLeft = settings.breakTime / 1000;
+            const timerElement = document.getElementById(timerId);
+            const interval = setInterval(() => {
+                if (timeLeft <= 0) {
+                    clearInterval(interval);
+                    overlay.style.display = 'none';
+                    toggleScroll(true);
+                    startReadingPeriod();
+                } else {
+                    timerElement.innerText = formatTime(timeLeft);
+                    timeLeft--;
+                }
+            }, 1000);
+        };
+
+        const startReadingPeriod = () => {
+            const toastId = createToast();
+            setTimeout(() => {
+                const toastEl = new bootstrap.Toast(document.getElementById(toastId));
+                toastEl.show();
+                setTimeout(() => {
+                    const { overlay, timerId } = createOverlay();
+                    startBreak({ overlay, timerId });
+                }, 10000); // Wait for the toast to finish before starting the break
+            }, settings.readingTime);
+        };
+
+        // Initialization
+        startReadingPeriod();
+    });
+})();
+
+
+
+
+
+
 
 
 
