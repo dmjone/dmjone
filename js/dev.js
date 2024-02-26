@@ -1638,7 +1638,7 @@ function body_genmenu(course) {
 
 // Original Code
 var sitemap_links = [];
-function body_blockcards(link, date, title, desc, codetype, readtime, author, semester, cardimage) {
+function body_blockcards(link, date, title, desc, codetype, readtime, author, semester, cardimage, continuereading) {
 
     // USAGE - body_blockcards("/csu953/c1", "Thursday, September 29th 2022", "Lab 1 fn", "An introduction to HTML.", "HTML", "2");
 
@@ -1713,7 +1713,7 @@ function body_blockcards(link, date, title, desc, codetype, readtime, author, se
     var getcolor = color[randomNum(0, color.length)];
     // https://picsum.photos/
 
-    const continueReading = body_blockcards_continuereading_options[Math.floor(Math.random() * body_blockcards_continuereading_options.length)]; // Gets the options list from the global variable.
+    const continueReading = continuereading || body_blockcards_continuereading_options[Math.floor(Math.random() * body_blockcards_continuereading_options.length)]; // Gets the options list from the global variable.
 
     /**** Backup ***/
     // body_generated += `<div class="m-0 my-5 postcard light shadow ${getcolor}">`;
@@ -3829,6 +3829,11 @@ const certifications = {
             text: "Google Cloud",
             link: "https://www.google.com/cloud",
             img: "/img/google_cloud.png"
+        },
+        iima: {
+            text: "IIM Ahmedabad",
+            link: "https://www.iima.ac.in/",
+            img: "/img/IIMAhmedabad_logo.png"
         }
     },
 
@@ -4188,6 +4193,66 @@ const certifications = {
 
 
 
+
+
+
+
+/******** Dynamically inject the Table of Contents if it does not have it ********/
+(function () {
+    document.addEventListener('DOMContentLoaded', function () {
+        const main = document.querySelector('main');
+        const firstArticle = main.querySelector('article');
+        const existingToc = main.querySelector('.accordion#toc');
+        const autogen_tableofcontents = main.querySelector('.agen-tableofcontents');
+
+        if (autogen_tableofcontents && !existingToc) {
+            // Check if a ToC does not already exist            
+                const tocHTML = `
+            <div class="container mt-4 w-100 w-xl-75">
+                <div class="accordion" id="toc">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="h1">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#c1" aria-controls="c1" aria-expanded="false">
+                                <i class="fas fa-book"></i> <strong>&nbsp;Table of Contents</strong>
+                            </button>
+                        </h2>
+                        <div id="c1" class="accordion-collapse collapse" aria-labelledby="h1" data-bs-parent="#toc">
+                            <div class="accordion-body">
+                                <ol class="list-unstyled p-0 m-0"></ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+
+            // Append the ToC HTML to the first article
+            // firstArticle.innerHTML += tocHTML;
+                autogen_tableofcontents.innerHTML += tocHTML;
+            
+            window.autogen_tableofcontents = 1;
+        }
+
+        if (window.autogen_tableofcontents) {
+            // Proceed to populate the ToC with entries as necessary
+            const articles = document.querySelectorAll('article[id]');
+            const tocList = document.querySelector('.accordion-body ol');
+
+            articles.forEach(article => {
+                const id = article.id;
+                const heading = article.querySelector('h3, h4');
+                if (heading) {
+                    const li = document.createElement('li');
+                    li.className = 'p-1';
+                    const anchor = document.createElement('a');
+                    anchor.href = `#${id}`;
+                    anchor.innerHTML = `<i class="fas fa-chevron-circle-right"></i> ${heading.textContent.trim()}`;
+                    li.appendChild(anchor);
+                    tocList.appendChild(li);
+                }
+            });
+        }
+    });
+})();
 
 
 

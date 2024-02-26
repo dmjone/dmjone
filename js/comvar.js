@@ -512,6 +512,11 @@ const profDetailsBio = {
         bio: "<p>Anita Chauhan is an Associate Professor at the School of Biological & Environmental Sciences at Shoolini University</p><p>Isha Jaswal is an Assistant Professor at the School of Biological & Environmental Sciences at Shoolini University</p><p>Dr. Garima Rana is an Assistant Professor at the School of Biological & Environmental Sciences at Shoolini University</p>",
         href: "sangeetakakkar@shooliniuniversity.com"
     },
+    'Dr. Gaurav Gupta':
+    {
+        bio: "<p>Dr. Gaurav Gupta, with a BE from Dr B R Ambedkar University (2006), PG and PhD in Computer Science Engineering from KSOU-VIT and Shoolini University (2011, 2019), boasts 13 years of teaching experience. His academic achievements include numerous publications across prestigious platforms like IEEE and Springer, with 138 citations and notable indices (h-index: 5, i10-index: 4), alongside authoring over 12 books. His research focuses on machine learning applications in healthcare and agriculture, leading to the development of innovative mobile applications for Alzheimer's care and AI tools for various sectors. Dr. Gupta's contributions have earned him multiple IEEE awards and reviewer/editorial roles in several scientific journals, underscoring his prominence in smart healthcare/agriculture innovation.</p>",
+        href: "gauravgupta@shooliniouniversity.com"
+    },
 };
 const courseDetailsMap = {
     'csu1128': { 'default': ["Dr. Pankaj Vaidya", "CSU1128", "Logic Building with Computer Programming"] },
@@ -550,6 +555,10 @@ const courseDetailsMap = {
     'csu1162': {
         'default': ["Dr. Ruchika Sharma", "CSU1162", "Python Programming"],
         'lab': ["Dr. Ruchika Sharma", "CSU1162P", "Python Programming Lab"]
+    },
+    'csu357': {
+        'default': ["Dr. Gaurav Gupta", "CSU357", "Database Management System"],
+        'lab': ["Dr. Gaurav Gupta", "CSU357P", "Database management System Lab"]
     },
 };
 
@@ -670,12 +679,18 @@ function processFolder(allAuthors, author_bio) {
             course_detail = "Education should be free. Our initiative is to educate the section of people who cannot access the educational services.";
         }
     }
-
+    
+    // Publish globally for ease of access
+    window.GLOBAL_get_prof_href_ = prof_href;
+    window.GLOBAL_get_course_ = course;
+    window.GLOBAL_get_course_detail_ = course_detail; // Before () is added to the course.
+    
     // Setting up the lines
-    course_detail = window.location.pathname.split("/")[3] ? ` (${course_detail})` : "";
+    course_detail = window.location.pathname.split("/")[3] ? ` (${course_detail})` : "";    
     const line1 = `<h1>${course} ${course_detail}</h1>`;
     var { pA_author, pA_bio } = processAuthors([prof, prof_href, prof_bio]);
-    console.log(prof, prof_href, prof_bio);
+        
+    // console.log(prof, prof_href, prof_bio);
     const line2 = getrandomline2(allAuthors, pA_author ? pA_author : "");
     const line3 = window.location.pathname.split("/")[5]?.length ? author_bio : (pA_bio + author_bio);
     const line4 = generatebutton(course);
