@@ -560,6 +560,10 @@ const courseDetailsMap = {
         'default': ["Dr. Gaurav Gupta", "CSU357", "Database Management System"],
         'lab': ["Dr. Gaurav Gupta", "CSU357P", "Database management System Lab"]
     },
+    'csu360': {
+        'default': ["Aarchit Joshi", "CSU360", "Operating System"],
+        'lab': ["Aarchit Joshi", "CSU360P", "Operating System Lab"]
+    },
 };
 
 ///////////////// VERSION 2.0
