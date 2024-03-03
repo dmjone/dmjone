@@ -2131,10 +2131,10 @@ function copyright(rights) {
 } */
 
 (function () {
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function () {        
         if (window.location.pathname !== "/") {
             document.body.classList.add("not-root");
-        }
+        }        
     });
 })();
 
@@ -4189,12 +4189,22 @@ const certifications = {
     });
 })();
 
+/******** Dynamically make the Table dark if dark mode is selected ********/
+(function () {
+    document.addEventListener('DOMContentLoaded', function () {
+        // This function toggles the 'table-dark' class on all tables based on the dark mode status
+        function updateTableDarkMode(e) {
+            document.querySelectorAll('table').forEach(tbl => tbl.classList.toggle('table-dark', e.matches));
+        }
+        
+        // Set up the event listener for when the color scheme changes
+        const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        darkModeMediaQuery.addEventListener('change', updateTableDarkMode);
 
-
-
-
-
-
+        // Call the function initially to set the correct theme when the page loads
+        updateTableDarkMode(darkModeMediaQuery);
+    })
+})();
 
 
 /******** Dynamically inject the Table of Contents if it does not have it ********/
