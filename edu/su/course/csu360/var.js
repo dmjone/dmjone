@@ -3,21 +3,19 @@ function get_menu_list(datetogen) {
     function get_main(def_date, def_author) {		
         const arr = [
             {
-                link: "theory/",                
-                title: "Mastering Python Programming",
-                desc: "Dive into the world of Python programming with Shoolini University's CSU1162 Python Programming course, detailed on dmj.one. Unravel the power of Python for software development, data analysis, and automation. Click to explore foundational concepts, advanced techniques, and practical applications that empower you to solve real-world problems efficiently. Discover how to enhance your coding skills, develop sophisticated programs, and significantly boost your career prospects.",
-                codetype: "CSU1162 | Python Programming",
-                cardimage: "//cdn.dmj.one/img/csu1162.webp",
-                cardimage_dark: "//cdn.dmj.one/img/csu1162_dark.webp"
+                link: "theory/",
+                title: "Understanding Operating Systems",
+                desc: "Explore the intricacies of Operating Systems with Shoolini University's CSU360 Operating Systems course, detailed on dmj.one. Delve into the core functions of modern operating systems, including process management, memory management, file systems, and security. Click to uncover the principles and practices that underpin efficient and secure computer operations. Learn how operating systems serve as the backbone of software development and computing, preparing you for advanced topics in computer science and enhancing your problem-solving skills.",
+                codetype: "CSU360 | Operating Systems",
             },
             {
-                link: "lab/",
-                title: `Practical Python Programming Lab: Sharpen Your Coding Skills`,
-                desc: "<strong>The link will open inside Google Colaboratory.</strong><br>Elevate your programming expertise in the Python Lab with code CSU1162P. This hands-on lab course is designed to immerse you in the practical aspects of Python programming. From basic syntax to complex problem-solving, you'll learn to write efficient and effective Python code. Click to dive into interactive sessions that will bolster your coding proficiency, enhance your algorithm design capabilities, and prepare you for real-world programming challenges.",
-                codetype: "CSU1162P | Lab with Google Colab",
-                cardimage: "//cdn.dmj.one/img/colab.webp",
-                cardimage_dark: "//cdn.dmj.one/img/colab.webp"
-            },
+                // link: "lab/",
+                link: "#",
+                title: "Hands-on Operating Systems Lab: Enhance Your System Management Skills [WIP]",
+                desc: "Advance your understanding of Operating Systems in the practical lab with code CSU360P. This lab course offers a hands-on approach to learning about operating system concepts, including process synchronization, scheduling algorithms, and memory allocation techniques. Click to engage in interactive sessions that will improve your technical skills in managing and optimizing operating systems, preparing you for the complexities of real-world IT environments.",
+                codetype: "CSU360P | Operating Systems Lab",
+            }
+
 
         ];
 
@@ -39,12 +37,45 @@ function get_menu_list(datetogen) {
     function get_class(def_date, def_author) {
         const arr = [
             {
-                title: "Exploring Python: A Deep Dive into Its Universe",
-                desc: "Embark on a comprehensive exploration of Python, from its inception to its pivotal role in today's tech landscape. Understand the 'why' behind its creation, its evolutionary journey, key advantages, and the challenges it faces. Discover its applications, influence on technology, and what the future holds. This article offers a holistic view of Python, providing readers with a strong foundation and motivation for further exploration.",
-                codetype: "Why Python",
-                readtime: 5,
-                link: "why-python"
-            },            
+                title: "Exploring Operating Systems: Fundamentals to Advanced Concepts",
+                desc: "A comprehensive guide on operating systems, covering essential functions, types, and process management to advanced networking and memory concepts.",
+                codetype: "Concepts",
+                readtime: 45,
+                link: "operating-systems-concepts"
+            },       
+            {
+                "title": "Understanding Scheduling Algorithms in Operating Systems",
+                "desc": "An in-depth examination of scheduling algorithms, including types, criteria, examples, and performance metrics, essential for optimizing system efficiency.",
+                "codetype": "Concepts",
+                "readtime": 25,
+                "link": "scheduling-algorithms"
+            },
+            {
+                title: "First Come, First Served (FCFS) Scheduling Algorithm in OS",
+                desc: "An exploration of the FCFS scheduling algorithm, detailing its characteristics, advantages, disadvantages, and implementation with examples.",
+                codetype: "Concepts",
+                readtime: 15,
+                link: "scheduling-algorithms-fcfs"
+            },
+            {
+                "title": "Exploring Preemptive Shortest Job First Scheduling",
+                "desc": "A comprehensive guide on Preemptive SJF scheduling, detailing its operation, benefits, implementation challenges, and optimization strategies to improve system performance.",
+                "codetype": "SRTF || SJF-P",
+                "readtime": 15,
+                // "link": "exploring-preemptive-shortest-job-first-scheduling"
+                "link": "scheduling-algorithms-preemptive-sjf"
+            },
+            {
+                "title": "Understanding Synchronization in Operating Systems",
+                "desc": "Explore the critical role of synchronization in operating systems, including its necessity for process coordination, preventing race conditions, and ensuring efficient resource utilization.",
+                "codetype": "Synchronization",
+                "readtime": 10,
+                "link": "synchronization-concepts"
+            },
+
+
+
+
 
         ];
         for (let i = 0; i < arr.length; i++) {
@@ -53,7 +84,7 @@ function get_menu_list(datetogen) {
             link = _data.link || `c${i + 1}`;
             date = _data.date ? _data.date : `${gendate(def_date)}`;
             desc = _data.desc || `${title} ${i}`;
-            codetype = _data.codetype ? `CSU1162 | ${_data.codetype}` : `CSU1162 | Concepts`;
+            codetype = _data.codetype ? `CSU360 | ${_data.codetype}` : `CSU360 | Concepts`;
             readtime = _data.readtime || r(4);
             author = _data.author || def_author;
             semester = _data.semester || null;
