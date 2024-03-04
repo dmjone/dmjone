@@ -41,7 +41,7 @@ function get_menu_list(datetogen) {
                 desc: "A comprehensive guide on operating systems, covering essential functions, types, and process management to advanced networking and memory concepts.",
                 codetype: "Concepts",
                 readtime: 45,
-                link: "operating-systems-concepts"
+                link: "operating-system-concepts"
             },       
             {
                 "title": "Understanding Scheduling Algorithms in Operating Systems",
