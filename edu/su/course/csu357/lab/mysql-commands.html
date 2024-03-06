@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+    <!--<![endif]-->
+
+    <head>
+        <script src="/js/edu_su_common.js"></script>
+        <noscript>
+            <style>
+                html,
+                body {
+                    margin: 0;
+                    overflow: hidden;
+                }
+            </style>
+            <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+        </noscript>
+
+        <title>Data Independence - CSU357 - Shoolini University</title>
+        <meta name="description" content="Explore the concept of data independence in DBMS, including logical and physical data independence, its importance, and how it's implemented in database architectures and SQL.">
+
+        <meta property="og:image" content="/logo.png">
+        <meta property="og:type" content="article">
+
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:site" content="@divyamohan1993">
+        <meta name="twitter:creator" content="@divyamohan1993">
+        <meta name="twitter:image" content="/logo.png">
+
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+        <meta name="author" content="Divya Mohan">
+        <meta name="robots" content="index, follow">
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js" integrity="sha512-sHSNLECRJSK+BFs7E8DiFc6pf6n90bLI85Emiw1jhreduZhK3VXgq9l4kAt9eTIHYAcuQBKHL01QKs4/3Xgl8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js" integrity="sha512-iWiuBS5nt6r60fCz26Nd0Zqe0nbk1ZTIQbl3Kv7kYsX+yKMUFHzjaH2+AnM6vp2Xs+gNmaBAVWJjSmuPw76Efg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                renderMathInElement(document.body, {
+                    // customised options
+                    // • auto-render specific keys, e.g.:
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false },
+                        { left: '\\(', right: '\\)', display: false },
+                        { left: '\\[', right: '\\]', display: true }
+                    ],
+                    // • rendering keys, e.g.:
+                    throwOnError: false
+                });
+            });
+        </script>        
+    </head>
+
+    <body>
+
+        <script> header_author("dm"); </script>
+
+        <main>
+
+            <article class="agen-tableofcontents">
+                <h2 class="text-center">
+                    MySQL Commands
+                </h2>
+            </article>
+            <article>
+                <pre><code class="language-sql">-- Create a new database
+CREATE DATABASE mydatabase;
+
+-- Use the newly created database
+USE mydatabase;
+
+-- Create a new table
+CREATE TABLE employees (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    position VARCHAR(100),
+    department VARCHAR(100),
+    salary DECIMAL(10, 2),
+    hire_date DATE
+);
+
+-- Using temporal tables for system-versioned data (MySQL 8.0 and above)
+CREATE TABLE employees_history (
+id INT,
+name VARCHAR(255),
+position VARCHAR(100),
+department VARCHAR(100),
+salary DECIMAL(10, 2),
+hire_date DATE,
+SYS_START TIMESTAMP(6) GENERATED ALWAYS AS ROW START,
+SYS_END TIMESTAMP(6) GENERATED ALWAYS AS ROW END,
+PERIOD FOR SYSTEM_TIME (SYS_START, SYS_END)
+) WITH SYSTEM VERSIONING;
+
+-- Insert data into the table
+INSERT INTO employees (name, position, department, salary, hire_date) 
+VALUES ('John Doe', 'Software Engineer', 'Engineering', 75000.00, '2022-01-10');
+
+-- Insert multiple rows in one command
+INSERT INTO employees (name, position, department, salary, hire_date) 
+VALUES 
+    ('Jane Doe', 'Project Manager', 'Project Management', 85000.00, '2022-02-15'),
+    ('Jim Beam', 'Database Administrator', 'IT', 95000.00, '2022-03-01');
+
+-- Select data from the table
+SELECT * FROM employees;
+SELECT name, position FROM employees WHERE department = 'Engineering';
+
+-- Select with pattern matching using LIKE
+SELECT * FROM employees WHERE name LIKE 'J%';
+
+-- Select with case sensitivity (binary)
+SELECT * FROM employees WHERE BINARY name = 'john doe';
+
+-- Using IN to filter on multiple values
+SELECT * FROM employees WHERE department_id IN (1, 2, 3);
+
+-- Using BETWEEN for range queries
+SELECT * FROM employees WHERE salary BETWEEN 50000 AND 100000;
+
+-- Using aggregate functions (COUNT, MAX, MIN, SUM, AVG)
+SELECT COUNT(*) AS total_employees, MAX(salary) AS highest_salary FROM employees;
+
+-- Grouping data with GROUP BY
+SELECT department, COUNT(*) AS department_size FROM employees GROUP BY department;
+
+-- Filtering groups with HAVING
+SELECT department, AVG(salary) AS average_salary FROM employees GROUP BY department HAVING AVG(salary) > 60000;
+
+-- Ordering results
+SELECT * FROM employees ORDER BY salary DESC;
+
+-- Limiting results
+SELECT * FROM employees ORDER BY salary DESC LIMIT 5;
+
+-- Combining results from multiple queries with UNION
+SELECT name FROM engineering_employees
+UNION
+SELECT name FROM hr_employees;
+
+-- Nested queries (subqueries)
+SELECT name, salary FROM employees WHERE department_id = (SELECT id FROM departments WHERE name = 'IT');
+
+-- Indexing strategies for performance
+CREATE INDEX idx_salary ON employees(salary);
+CREATE INDEX idx_name_department ON employees(name, department);
+
+-- Removing indexes to change indexing strategies
+DROP INDEX idx_salary ON employees;
+
+-- Temporary Tables: Create a temporary table
+CREATE TEMPORARY TABLE temp_employees AS SELECT * FROM employees WHERE department = 'Engineering';
+
+-- Accessing the temporary table (just like a regular table, but it's session-specific and disappears after the session ends)
+SELECT * FROM temp_employees;
+
+-- Conditional selection using CASE statements in a SELECT query
+SELECT name,
+CASE WHEN salary > 80000 THEN 'High salary'
+WHEN salary BETWEEN 50000 AND 80000 THEN 'Medium salary'
+ELSE 'Low salary'
+END AS salary_level
+FROM employees;
+
+-- Using the GROUP BY clause to aggregate data
+SELECT department, COUNT(*) AS number_of_employees, AVG(salary) AS average_salary
+FROM employees
+GROUP BY department;
+
+-- Filtering groups with HAVING (used in conjunction with GROUP BY)
+SELECT department, AVG(salary) AS average_salary
+FROM employees
+GROUP BY department
+HAVING AVG(salary) > 60000;
+
+-- Using subqueries in a SELECT statement
+SELECT name, salary
+FROM employees
+WHERE salary > (SELECT AVG(salary) FROM employees);
+
+-- EXISTS condition to check for the existence of rows in a subquery
+SELECT name, department
+FROM employees
+WHERE EXISTS (SELECT 1 FROM departments WHERE departments.id = employees.department_id AND departments.name = 'Engineering');
+
+-- Using SET operations: UNION, UNION ALL, INTERSECT, EXCEPT (Note: INTERSECT and EXCEPT are not supported in MySQL, but alternatives can be achieved through JOINs and NOT EXISTS)
+-- UNION to combine results from two queries without duplicates
+SELECT name FROM employees WHERE department = 'Engineering'
+UNION
+SELECT name FROM employees WHERE department = 'IT';
+
+-- UNION ALL to combine results from two queries with duplicates
+SELECT name FROM employees WHERE department = 'Engineering'
+UNION ALL
+SELECT name FROM employees WHERE department = 'Engineering';
+
+-- Managing user access and privileges
+CREATE USER 'new_user'@'localhost' IDENTIFIED BY 'password';
+GRANT SELECT, INSERT ON mydatabase.employees TO 'new_user'@'localhost';
+REVOKE INSERT ON mydatabase.employees FROM 'new_user'@'localhost';
+DROP USER 'new_user'@'localhost';
+
+-- Setting password policies (MySQL 8.0 and above)
+SET GLOBAL validate_password.policy = LOW;
+CREATE USER 'secure_user'@'localhost' IDENTIFIED BY 'StrongPassword!123';
+
+-- Encrypting data with AES functions
+SELECT HEX(AES_ENCRYPT('Sensitive Data', 'encryption_key')) AS encrypted_data;
+SELECT AES_DECRYPT(UNHEX('encrypted_data'), 'encryption_key') AS decrypted_data;
+
+-- Handling dates and times
+SELECT CURRENT_DATE, CURRENT_TIME, NOW();
+SELECT name, YEAR(hire_date) AS year_hired FROM employees WHERE MONTH(hire_date) = 1;
+
+-- Modify the size of a column
+ALTER TABLE employees MODIFY COLUMN name VARCHAR(255);
+
+-- Change the data type of a column
+ALTER TABLE employees MODIFY COLUMN salary FLOAT;
+
+-- Rename a column
+ALTER TABLE employees CHANGE COLUMN position title VARCHAR(100);
+
+-- Add a column with a specific position in the table
+ALTER TABLE employees ADD COLUMN birth_date DATE AFTER name;
+
+-- Add a UNIQUE constraint to a column
+ALTER TABLE employees ADD UNIQUE (email);
+
+-- Add a FOREIGN KEY constraint
+ALTER TABLE employees ADD CONSTRAINT fk_department_id FOREIGN KEY (department_id) REFERENCES departments(id);
+
+-- Remove a constraint
+ALTER TABLE employees DROP FOREIGN KEY fk_department_id;
+
+-- Create a composite primary key
+ALTER TABLE employees DROP PRIMARY KEY, ADD PRIMARY KEY (id, department_id);
+
+-- Drop a UNIQUE constraint
+ALTER TABLE employees DROP INDEX email;
+
+-- Set a column as NOT NULL
+ALTER TABLE employees MODIFY COLUMN name VARCHAR(255) NOT NULL;
+
+-- Remove the NOT NULL constraint from a column
+ALTER TABLE employees MODIFY COLUMN name VARCHAR(255);
+
+-- Add a DEFAULT value to a column
+ALTER TABLE employees ALTER COLUMN hire_date SET DEFAULT '2023-01-01';
+
+-- Remove a DEFAULT value from a column
+ALTER TABLE employees ALTER COLUMN hire_date DROP DEFAULT;
+
+-- Update data in the table
+UPDATE employees SET salary = 80000.00 WHERE name = 'John Doe';
+
+-- Delete data from the table
+DELETE FROM employees WHERE name = 'Jim Beam';
+
+-- Join tables (assuming another table 'departments' exists)
+SELECT employees.name, departments.name AS department_name
+FROM employees
+JOIN departments ON employees.department = departments.id;
+
+-- Create an index to improve search performance
+CREATE INDEX idx_department ON employees(department);
+
+-- Alter table structure
+ALTER TABLE employees ADD email VARCHAR(100);
+ALTER TABLE employees DROP COLUMN email;
+
+-- Locking a table for write operations (useful for ensuring data integrity during complex updates or inserts)
+LOCK TABLES employees WRITE;
+-- Remember to unlock the table after operations are done
+UNLOCK TABLES;
+
+-- Setting session variables (useful for storing temporary data or configuration settings)
+SET @myVariable := 'temporary value';
+-- Accessing session variables
+SELECT @myVariable;
+
+-- Managing indexes to improve query performance
+-- Create an index on a column
+CREATE INDEX idx_salary ON employees(salary);
+
+-- Drop an index
+DROP INDEX idx_salary ON employees;
+
+-- Show indexes from a table
+SHOW INDEX FROM employees;
+
+-- User and privilege management
+-- Create a new user
+CREATE USER 'newuser'@'localhost' IDENTIFIED BY 'password';
+
+-- Grant privileges to a user
+GRANT SELECT, INSERT ON mydatabase.* TO 'newuser'@'localhost';
+
+-- Show grants for a specific user
+SHOW GRANTS FOR 'newuser'@'localhost';
+
+-- Revoke privileges from a user
+REVOKE INSERT ON mydatabase.* FROM 'newuser'@'localhost';
+
+-- Drop a user
+DROP USER 'newuser'@'localhost';
+
+-- Reset the password for a user (MySQL 5.7 and prior use SET PASSWORD, MySQL 8.0+ uses ALTER USER)
+ALTER USER 'newuser'@'localhost' IDENTIFIED BY 'newpassword';
+
+-- Transactions (ensure atomic operations)
+START TRANSACTION;
+INSERT INTO employees (name, position, department, salary, hire_date) 
+VALUES ('Alice Smith', 'HR Manager', 'Human Resources', 90000.00, '2022-04-01');
+-- Rollback changes if something goes wrong
+ROLLBACK;
+-- Commit changes to the database
+COMMIT;
+
+-- Conditional updates based on other values in the table
+UPDATE employees SET salary = salary * 1.10 WHERE department = 'Engineering';
+
+-- Update joining with another table
+UPDATE employees e
+JOIN departments d ON e.department_id = d.id
+SET e.salary = e.salary * 1.05
+WHERE d.name = 'IT';
+
+-- Using CASE in updates
+UPDATE employees
+SET salary = CASE
+WHEN position = 'Software Engineer' THEN salary * 1.10
+WHEN position = 'Database Administrator' THEN salary * 1.15
+ELSE salary * 1.05
+END;
+
+-- Delete rows based on a condition from another table
+DELETE e FROM employees e
+JOIN departments d ON e.department_id = d.id
+WHERE d.name = 'Obsolete Department';
+
+-- Using transactions for multiple operations
+START TRANSACTION;
+INSERT INTO departments (name) VALUES ('New Department');
+UPDATE employees SET department_id = LAST_INSERT_ID() WHERE department = 'Temporary Department';
+COMMIT;
+
+-- Handling errors in transactions with ROLLBACK
+START TRANSACTION;
+INSERT INTO departments (name) VALUES ('Critical Department');
+-- Assume some error occurs here
+ROLLBACK;
+
+-- Creating a view for simplified querying
+CREATE VIEW engineering_employees AS
+SELECT * FROM employees WHERE department = 'Engineering';
+
+-- Querying a view
+SELECT * FROM engineering_employees;
+
+-- Updating a view (Note: Only certain views are updatable)
+CREATE OR REPLACE VIEW engineering_employees AS
+SELECT * FROM employees WHERE department = 'Engineering' AND position = 'Software Engineer';
+
+-- Dropping a view
+DROP VIEW engineering_employees;
+
+-- Creating stored procedures
+DELIMITER $$
+CREATE PROCEDURE GetAllEmployees()
+BEGIN
+SELECT * FROM employees;
+END$$
+DELIMITER ;
+
+-- Calling a stored procedure
+CALL GetAllEmployees();
+
+-- Creating a function to calculate tax
+DELIMITER $$
+CREATE FUNCTION CalculateTax(salary DECIMAL(10, 2))
+RETURNS DECIMAL(10, 2)
+BEGIN
+RETURN salary * 0.20;
+END$$
+DELIMITER ;
+
+-- Using the function in a SELECT statement
+SELECT name, CalculateTax(salary) AS tax FROM employees;
+
+-- Creating triggers for automatic operations
+DELIMITER $$
+CREATE TRIGGER before_employee_insert
+BEFORE INSERT ON employees
+FOR EACH ROW
+BEGIN
+IF NEW.salary < 30000 THEN SET NEW.salary=30000;
+END IF;
+END
+$$ DELIMITER ;
+
+-- Optimizing table performance
+ANALYZE TABLE employees;
+OPTIMIZE TABLE employees;
+
+-- Checking table storage and index usage
+SHOW TABLE STATUS LIKE 'employees' ;
+
+
+-- Grant privileges to a user
+GRANT SELECT, INSERT, UPDATE ON mydatabase.employees TO 'user'@'localhost';
+
+-- Revoke privileges from a user
+REVOKE INSERT ON mydatabase.employees FROM 'user'@'localhost';
+
+-- Drop a table
+DROP TABLE employees;
+
+-- Drop a database
+DROP DATABASE mydatabase;
+
+-- Backup a database (Note: This is executed from the command line, not within the MySQL shell)
+mysqldump -u username -p mydatabase > mydatabase_backup.sql
+
+-- Restore a database from a backup file (Note: Also executed from the command line)
+mysql -u username -p mydatabase < mydatabase_backup.sql
+</code></pre>
+
+        </main>
+        <script> copyright("all"); </script>
+    </body>
+
+</html>
