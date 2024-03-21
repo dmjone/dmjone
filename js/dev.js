@@ -1488,21 +1488,20 @@ function ContentEncryptionManager(cryptojs_encrypted_data) {
         window.has_password_protection = 1;
         header_author("WriteManuallyNoNav", "<h1 class='text-light text-center'>Password Protected Content</h1>");
 
-        document.body.insertAdjacentHTML('beforeend', `
-                <div class="bg-light">
-                    <div id="cryptojs_decrypted-content" class=" bg-transparent d-none"></div>
-                    <div id="crypto-password-prompt" class="container no-color d-flex flex-column justify-content-center align-items-center text-center"  style="height: calc(100vh - 35vh);">
-                        <div class="shadow alert w-auto w-sm-50 bg-warning bg-opacity-25 bg-gradient">
-                            <h2 class="fw-bold">Enter the password to view content:</h2>                            
-                        </div>
-                        <input type="password" id="crypto-password" name="password" class="shadow-lg mt-3 mb-2 form-control w-auto w-sm-50 border-info" placeholder="Password Required*" autocomplete="off" maxlength="40" size="30" data-lpignore="true" required autofocus>
-                        <div class="input-group w-auto w-sm-50 mt-4 justify-content-center align-items-center text-center">                                                        
-                            <button id="crypto-submit-button" class="shadow m-2 btn btn-outline-success rounded btn-lg fw-bold"><i class="bi bi-key-fill"></i> Submit</button>
-                            <button id="get-password" class="shadow m-2 btn btn-outline-danger rounded btn-lg fw-bold" data-bs-toggle="modal" data-bs-target="#common_msg_us_model"><i class="bi bi-question-circle-fill"></i> Get Password</button>
-                        </div>                                                                        
-                        <div id="crypto-error-message" class="text-danger d-none mt-4 fw-bold"></div>
+        document.body.insertAdjacentHTML('beforeend', `                
+                <div id="cryptojs_decrypted-content" class=" bg-transparent d-none"></div>
+                <div id="crypto-password-prompt" class="container no-color d-flex flex-column justify-content-center align-items-center text-center"  style="height: calc(100vh - 35vh);">
+                    <div class="shadow alert w-auto w-sm-50 bg-warning bg-opacity-25 bg-gradient">
+                        <h2 class="fw-bold">Enter the password to view content:</h2>                            
                     </div>
-                </div>`);
+                    <input type="password" id="crypto-password" name="password" class="shadow-lg mt-3 mb-2 form-control w-auto w-sm-50 border-info" placeholder="Password Required*" autocomplete="off" maxlength="40" size="30" data-lpignore="true" required autofocus>
+                    <div class="input-group w-auto w-sm-50 mt-4 justify-content-center align-items-center text-center">                                                        
+                        <button id="crypto-submit-button" class="shadow m-2 btn btn-outline-success rounded btn-lg fw-bold"><i class="bi bi-key-fill"></i> Submit</button>
+                        <button id="get-password" class="shadow m-2 btn btn-outline-danger rounded btn-lg fw-bold" data-bs-toggle="modal" data-bs-target="#common_msg_us_model"><i class="bi bi-question-circle-fill"></i> Get Password</button>
+                    </div>                                                                        
+                    <div id="crypto-error-message" class="text-danger d-none mt-4 fw-bold"></div>
+                </div>
+                `);
 
         window.addEventListener("resize", handleResize);
         handleResize();
