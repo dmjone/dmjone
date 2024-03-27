@@ -132,7 +132,7 @@ function get_menu_list(datetogen) {
     function get_projects(def_date, def_author) {
         const arr = [
             {
-                title: "Timekeeper: A Java Remainder App (Major Project)",
+                title: "Timekeeper: A Java Remainder App (Major Project)<span class='d-none' id='timekeeper'></span>",
                 desc: `<p><strong>Project Version:</strong> 1.0</p>
     <p><strong>Developed by:</strong> Divya Mohan, in collaboration with dmj.one and Shoolini University</p>
     <p><strong>Mentored by:</strong> Dr. Anurag Rana</p>
