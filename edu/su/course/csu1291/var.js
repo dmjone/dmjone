@@ -14,6 +14,12 @@ function get_menu_list(datetogen) {
                 desc: "Unleash your potential in the Java programming lab with our comprehensive guide covering all the essential concepts. Discover the magic of code and take your programming skills to the next level. Click now to embark on your Java journey.",
                 codetype: "CSU1291P | Lab"
             },
+            {
+                link: "projects/",
+                title: "List of Projects",
+                desc: "Explore a diverse range of projects designed to challenge and enhance your coding skills. From fundamental exercises to advanced programming challenges, our projects span various languages and concepts, offering something for every level of experience. Click now to dive into our curated collection and start your next coding adventure.",
+                codetype: "CSU1291P | Projects"
+            },
 
         ];
         for (let i = 0; i < arr.length; i++) {
@@ -94,7 +100,7 @@ function get_menu_list(datetogen) {
         const arr = [
             {
                 title: "Practical 1: Print Hello World",
-                desc: "This lab will provide a verification of truth table of logic gates using Proteus software.",                
+                desc: "This lab will provide insight into how to install, begin, create and compile files with Java.",                
                 author: "Divya Mohan",
                 link: "hello-world",
                 // cardimage: "_url_"
@@ -122,6 +128,49 @@ function get_menu_list(datetogen) {
             body_blockcards(link, date, title, desc, codetype, readtime, author, semester, cardimage);
         }
     }
+    
+    function get_projects(def_date, def_author) {
+        const arr = [
+            {
+                title: "Timekeeper: A Java Remainder App (Major Project)",
+                desc: `<p><strong>Project Version:</strong> 1.0</p>
+    <p><strong>Developed by:</strong> Divya Mohan, in collaboration with dmj.one and Shoolini University</p>
+    <p><strong>Mentored by:</strong> Dr. Anurag Rana</p>
+    <p><strong>Distributed for:</strong> Shoolini University euniv Portal</p>
+    <p><strong>Description:</strong> A simple and effective tool for managing daily reminders securely without
+    sending data anywhere. Created to enhance productivity and organization, this app allows users to set and manage
+    reminders with ease, ensuring that important tasks are never forgotten.</p>
+    <p><strong>Special thanks to Shoolini University for their support and encouragement in this project.</strong></p>
+`,                
+                author: "Divya Mohan",
+                link: "https://go.dmj.one/CAgc8",
+                continuereading: "Download the TimeKeeper.jar file",
+                // cardimage: "_url_"
+            },
+            // {
+            //     "title": "Practical 2: Basic Usage of Java",
+            //     "desc": "This lab delves into foundational Java concepts, showcasing arithmetic operations, temperature conversions, and geometric calculations. Through hands-on examples, participants get a grasp of Java's simplicity and versatility.",
+            //     "date": "Wednesday September 7, 2023",
+            //     "author": "Divya Mohan",
+            //     "link": "basic-usage-of-java"
+            // },
+
+        ];
+        for (let i = 0; i < arr.length; i++) {
+            const _data = arr[i];
+            title = _data.title || null; if (!title) continue; // Set the title and if thats not possible, skip the loop
+            link = _data.link || null;
+            date = _data.date ? _data.date : `${gendate(def_date)}`;
+            desc = _data.desc || `${title}`;
+            codetype = _data.codetype ? `${_data.codetype}` : `CSU1291`;
+            readtime = _data.readtime || r(4); readtime = null; // Null readtime - Special Case
+            author = _data.author || def_author;
+            semester = _data.semester || null;
+            cardimage = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? _data.cardimage_dark : _data.cardimage || null;
+            continuereading = _data.continuereading || null;
+            body_blockcards(link, date, title, desc, codetype, readtime, author, semester, cardimage, continuereading);
+        }
+    }
 
 
     /**********  AUTOMATION CONTROL **********/
@@ -140,6 +189,7 @@ function get_menu_list(datetogen) {
     const functions = {
         theory: get_class,
         lab: get_lab,
+        projects: get_projects,
         default: get_main
     };
     (functions[window.urlpart5] || functions.default)(datetogen, author);
