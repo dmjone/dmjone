@@ -110,6 +110,13 @@ function get_menu_list(datetogen) {
                 "readtime": 7,
                 "link": "data-modelling-using-er-approach"
             },
+            {
+                "title": "ER Diagrams: Design & Application",
+                "desc": "Dive into ER Diagrams for DBMS: Learn design principles, entity relationships, and model limitations. Ideal for CSU357 at Shoolini University, this guide blends theory with practice for beginners and advanced learners.",
+                "codetype": "ER Model",
+                "readtime": 7,
+                "link": "er-model"
+            },
 
         ];
         for (let i = 0; i < arr.length; i++) {
