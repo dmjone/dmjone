@@ -90,12 +90,20 @@ function get_menu_list(datetogen) {
                 link: "exploring-data-models"
             },
             {
-                title: "Understanding Data Independence in DBMS: A Comprehensive Guide",
+                title: "Understanding Data Independence in DBMS",
                 desc: "Dive into the crucial concept of Data Independence within Database Management Systems (DBMS), unraveling its significance for database design and operation. Learn about logical and physical data independence, their impact on database scalability and flexibility, and how they enable changes without affecting applications. This guide covers types of data independence, their implementation in DBMS architectures, and practical examples in SQL, offering invaluable insights for developers and database administrators.",
                 codetype: "Data Independence",
                 readtime: 7,
                 link: "exploring-data-independence-dbms"
             },
+            {
+                "title": "Exploring Database Languages",
+                "desc": "Embark on a journey through the essential database languages that power Database Management Systems (DBMS). This comprehensive guide covers everything from Data Definition Language (DDL) to Data Manipulation Language (DML), Data Control Language (DCL), Transaction Control Language (TCL), and the pivotal SQL Query Language. Understand their distinct roles, how they interconnect, and their practical applications in real-world database management. Perfect for beginners and seasoned professionals alike, this guide provides the foundation for mastering SQL and effectively managing databases.",
+                "codetype": "Database Languages",
+                "readtime": 8,
+                "link": "exploring-database-languages"
+            }
+
 
 
         ];
