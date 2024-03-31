@@ -3,10 +3,10 @@ function get_menu_list(datetogen) {
     function get_main(def_date, def_author) {
         const arr = [
             {
-                "link": `mailto:${window.GLOBAL_get_prof_href_}?subject=Referred%20from%20dmj.one&body=--%20Referred%20from%20the%20page%20${window.location.href}%20Please%20write%20below%20this%20line%20--%0D%0A%0D%0A`,
-                "title": `Need Help with ${window.GLOBAL_get_course_detail_}?`,
-                "desc": `<strong>Get help from Dr. Gaurav Gupta, the course creator himself.</strong><br>Why worry when we are here to guide you? If you're encountering challenges or have questions regarding ${window.GLOBAL_get_course_detail_} course by Shoolini University, we encourage you to reach out directly to Shoolini University's faculty Dr. Gaurav Gupta. He is a very experienced instructor and is here to assist you through every step of your learning journey, ensuring you grasp the complexities effectively. Click to compose an email and seek guidance on ${window.GLOBAL_get_course_detail_}.`,
-                "codetype": `${window.GLOBAL_get_course_} | ${window.GLOBAL_get_course_detail_}`,
+                link: `mailto:${window.GLOBAL_get_prof_href_}?subject=Referred%20from%20dmj.one&body=--%20Referred%20from%20the%20page%20${window.location.href}%20Please%20write%20below%20this%20line%20--%0D%0A%0D%0A`,
+                title: `Need Help with ${window.GLOBAL_get_course_detail_}?`,
+                desc: `<strong>Get help from Dr. Gaurav Gupta, the course creator himself.</strong><br>Why worry when we are here to guide you? If you're encountering challenges or have questions regarding ${window.GLOBAL_get_course_detail_} course by Shoolini University, we encourage you to reach out directly to Shoolini University's faculty Dr. Gaurav Gupta. He is a very experienced instructor and is here to assist you through every step of your learning journey, ensuring you grasp the complexities effectively. Click to compose an email and seek guidance on ${window.GLOBAL_get_course_detail_}.`,
+                codetype: `${window.GLOBAL_get_course_} | ${window.GLOBAL_get_course_detail_}`,
                 date: "Updated: Mon February 26, 2024", // Null date - Special Case
                 cardimage: "//cdn.dmj.one/img/needhelp.webp",
                 cardimage_dark: "//cdn.dmj.one/img/needhelp.webp",
@@ -48,11 +48,11 @@ function get_menu_list(datetogen) {
     function get_class(def_date, def_author) {
         const arr = [
             {
-                "title": "Decoding Database Management Systems",
-                "desc": "This guide explores the intricacies of Database Management Systems (DBMS), from basic definitions and key features to various types of DBMS and their real-world applications. Dive into the evolution from file-based systems to advanced DBMS, understanding the challenges of the former and the solutions offered by the latter. Learn about the characteristics and problems of file-based approaches and how the database approach overcomes these issues, enhancing data redundancy, accessibility, integrity, and security. Perfect for aspiring database professionals and students, this guide also covers the technical aspects and the impact of DBMS across multiple industries.",
-                "codetype": "DBMS Overview",
-                "readtime": 5,
-                "link": "introduction-to-database"
+                title: "Decoding Database Management Systems",
+                desc: "This guide explores the intricacies of Database Management Systems (DBMS), from basic definitions and key features to various types of DBMS and their real-world applications. Dive into the evolution from file-based systems to advanced DBMS, understanding the challenges of the former and the solutions offered by the latter. Learn about the characteristics and problems of file-based approaches and how the database approach overcomes these issues, enhancing data redundancy, accessibility, integrity, and security. Perfect for aspiring database professionals and students, this guide also covers the technical aspects and the impact of DBMS across multiple industries.",
+                codetype: "DBMS Overview",
+                readtime: 5,
+                link: "introduction-to-database"
             },
             {
                 title: "Exploring the Core of Database Management Systems",
@@ -62,11 +62,11 @@ function get_menu_list(datetogen) {
                 link: "core-database-management-systems"
             },
             {
-                "title": "Exploring DBMS: Advantages and Challenges",
-                "desc": "An in-depth exploration of Database Management Systems, highlighting their advantages, challenges, and the evolving landscape of data management technologies.",
-                "codetype": "Database Systems",
-                "readtime": 7,
-                "link": "understanding-dbms-advantages-and-challenges"
+                title: "Exploring DBMS: Advantages and Challenges",
+                desc: "An in-depth exploration of Database Management Systems, highlighting their advantages, challenges, and the evolving landscape of data management technologies.",
+                codetype: "Database Systems",
+                readtime: 7,
+                link: "understanding-dbms-advantages-and-challenges"
             },
             {
                 title: "Understanding the Three-Level Database Architecture",
@@ -97,26 +97,41 @@ function get_menu_list(datetogen) {
                 link: "exploring-data-independence-dbms"
             },
             {
-                "title": "Exploring Database Languages",
-                "desc": "Embark on a journey through the essential database languages that power Database Management Systems (DBMS). This comprehensive guide covers everything from Data Definition Language (DDL) to Data Manipulation Language (DML), Data Control Language (DCL), Transaction Control Language (TCL), and the pivotal SQL Query Language. Understand their distinct roles, how they interconnect, and their practical applications in real-world database management. Perfect for beginners and seasoned professionals alike, this guide provides the foundation for mastering SQL and effectively managing databases.",
-                "codetype": "Database Languages",
-                "readtime": 8,
-                "link": "exploring-database-languages"
+                title: "Exploring Database Languages",
+                desc: "Embark on a journey through the essential database languages that power Database Management Systems (DBMS). This comprehensive guide covers everything from Data Definition Language (DDL) to Data Manipulation Language (DML), Data Control Language (DCL), Transaction Control Language (TCL), and the pivotal SQL Query Language. Understand their distinct roles, how they interconnect, and their practical applications in real-world database management. Perfect for beginners and seasoned professionals alike, this guide provides the foundation for mastering SQL and effectively managing databases.",
+                codetype: "Database Languages",
+                readtime: 8,
+                link: "exploring-database-languages"
             },
             {
-                "title": "Data Modelling using ER Approach",
-                "desc": "Explore the essentials of data modelling using the Entity-Relationship (ER) Approach in database management systems (DBMS). This comprehensive guide covers database design, ER model basics, key constraints, cardinality, ternary relationships, participation constraints, weak entities, 'IS A' hierarchies, aggregation, and conceptual design using the ER model. Perfect for students and educators involved in computer science courses at Shoolini University, this resource simplifies complex concepts into understandable terms, linking theory with practical applications in DBMS.",
-                "codetype": "ER Modelling",
-                "readtime": 7,
-                "link": "data-modelling-using-er-approach"
+                title: "Data Modelling using ER Approach",
+                desc: "Explore the essentials of data modelling using the Entity-Relationship (ER) Approach in database management systems (DBMS). This comprehensive guide covers database design, ER model basics, key constraints, cardinality, ternary relationships, participation constraints, weak entities, 'IS A' hierarchies, aggregation, and conceptual design using the ER model. Perfect for students and educators involved in computer science courses at Shoolini University, this resource simplifies complex concepts into understandable terms, linking theory with practical applications in DBMS.",
+                codetype: "ER Modelling",
+                readtime: 7,
+                link: "data-modelling-using-er-approach"
             },
             {
-                "title": "ER Diagrams: Design & Application",
-                "desc": "Dive into ER Diagrams for DBMS: Learn design principles, entity relationships, and model limitations. Ideal for CSU357 at Shoolini University, this guide blends theory with practice for beginners and advanced learners.",
-                "codetype": "ER Model",
-                "readtime": 7,
-                "link": "er-model"
+                title: "ER Diagrams: Design & Application",
+                desc: "Dive into ER Diagrams for DBMS: Learn design principles, entity relationships, and model limitations. Ideal for CSU357 at Shoolini University, this guide blends theory with practice for beginners and advanced learners.",
+                codetype: "ER Model",
+                readtime: 7,
+                link: "er-model"
             },
+            {
+                title: "Relational Data Models",
+                desc: "Unlock the essentials of Relational Data Models: From basic concepts to advanced RDBMS features, including SQL, data normalization, and integrity constraints. Perfect for CSU357 at Shoolini University, this article offers a thorough exploration for both novices and seasoned learners.",
+                codetype: "Relational Data Model",
+                readtime: 10,
+                link: "relational-data-model"
+            },
+            {
+                "title": "Mastering Codd's 12 Rules for RDBMS",
+                "desc": "Embark on a journey through the fundamental principles of relational databases with our in-depth exploration of Codd's 12 Rules. Perfect for CSU357 at Shoolini University, this guide is meticulously designed to equip both novices and experienced learners with the knowledge to understand and apply these foundational rules. From ensuring data integrity to achieving database independence, learn how these rules lay the groundwork for advanced RDBMS features, including SQL, data normalization, and integrity constraints.",
+                "codetype": "Codd's 12 Rules",
+                "readtime": 10,
+                "link": "codds-12-rules"
+            }
+
 
         ];
         for (let i = 0; i < arr.length; i++) {
