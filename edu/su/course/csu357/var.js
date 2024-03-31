@@ -102,9 +102,14 @@ function get_menu_list(datetogen) {
                 "codetype": "Database Languages",
                 "readtime": 8,
                 "link": "exploring-database-languages"
-            }
-
-
+            },
+            {
+                "title": "Data Modelling using ER Approach",
+                "desc": "Explore the essentials of data modelling using the Entity-Relationship (ER) Approach in database management systems (DBMS). This comprehensive guide covers database design, ER model basics, key constraints, cardinality, ternary relationships, participation constraints, weak entities, 'IS A' hierarchies, aggregation, and conceptual design using the ER model. Perfect for students and educators involved in computer science courses at Shoolini University, this resource simplifies complex concepts into understandable terms, linking theory with practical applications in DBMS.",
+                "codetype": "ER Modelling",
+                "readtime": 7,
+                "link": "data-modelling-using-er-approach"
+            },
 
         ];
         for (let i = 0; i < arr.length; i++) {
