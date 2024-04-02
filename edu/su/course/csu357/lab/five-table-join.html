@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+    <!--<![endif]-->
+
+    <head>
+        <script src="/js/edu_su_common.js"></script>
+        <noscript>
+            <style>
+                html,
+                body {
+                    margin: 0;
+                    overflow: hidden;
+                }
+            </style>
+            <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+        </noscript>
+
+        <title>Five Table Join - CSU357 - Shoolini University</title>
+        <meta name="description" content="Explore the frequently used commands in MySQL.">
+
+        <meta property="og:image" content="/logo.png">
+        <meta property="og:type" content="article">
+
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:site" content="@divyamohan1993">
+        <meta name="twitter:creator" content="@divyamohan1993">
+        <meta name="twitter:image" content="/logo.png">
+
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+        <meta name="author" content="Divya Mohan">
+        <meta name="robots" content="index, follow">
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js" integrity="sha512-sHSNLECRJSK+BFs7E8DiFc6pf6n90bLI85Emiw1jhreduZhK3VXgq9l4kAt9eTIHYAcuQBKHL01QKs4/3Xgl8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js" integrity="sha512-iWiuBS5nt6r60fCz26Nd0Zqe0nbk1ZTIQbl3Kv7kYsX+yKMUFHzjaH2+AnM6vp2Xs+gNmaBAVWJjSmuPw76Efg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                renderMathInElement(document.body, {
+                    // customised options
+                    // • auto-render specific keys, e.g.:
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false },
+                        { left: '\\(', right: '\\)', display: false },
+                        { left: '\\[', right: '\\]', display: true }
+                    ],
+                    // • rendering keys, e.g.:
+                    throwOnError: false
+                });
+            });
+        </script>
+    </head>
+
+    <body>
+
+        <script> header_author("dm"); </script>
+
+        <main>
+
+            <article class="agen-tableofcontents">
+                <h2 class="text-center">
+                    Five Table Join
+                </h2>
+            </article>
+            <article>
+                <pre><code class="language-python">pip install mysql-connector-python faker
+import mysql.connector
+from faker import Faker
+import random
+
+# Initialize Faker
+faker = Faker()
+
+# Database connection
+db = mysql.connector.connect(
+  host="localhost",
+  user=input("Enter username: "),
+  password=input("Enter password: "),
+  database=input("Enter DB name: ")
+)
+cursor = db.cursor()
+
+# Create tables
+cursor.execute("CREATE TABLE IF NOT EXISTS Users (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255), email VARCHAR(255))")
+cursor.execute("CREATE TABLE IF NOT EXISTS Products (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255), price DECIMAL(10,2))")
+cursor.execute("CREATE TABLE IF NOT EXISTS Orders (id INT AUTO_INCREMENT PRIMARY KEY, user_id INT, product_id INT)")
+cursor.execute("CREATE TABLE IF NOT EXISTS Payments (order_id INT, amount DECIMAL(10,2), method VARCHAR(255))")
+cursor.execute("CREATE TABLE IF NOT EXISTS Shipment (order_id INT, address VARCHAR(255), shipped_date DATE)")
+
+# Insert fake data into Users and Products
+for _ in range(10):
+    cursor.execute("INSERT INTO Users (name, email) VALUES (%s, %s)", (faker.name(), faker.email()))
+    cursor.execute("INSERT INTO Products (name, price) VALUES (%s, %s)", (faker.word(), random.uniform(10.0, 100.0)))
+
+db.commit()  # Commit inserts
+
+# Let's assume each user has an order for a random product
+cursor.execute("SELECT id FROM Users")
+user_ids = cursor.fetchall()
+cursor.execute("SELECT id FROM Products")
+product_ids = cursor.fetchall()
+
+for user_id in user_ids:
+    selected_product_id = random.choice(product_ids)[0]
+    cursor.execute("INSERT INTO Orders (user_id, product_id) VALUES (%s, %s)", (user_id[0], selected_product_id))
+    last_order_id = cursor.lastrowid
+    cursor.execute("INSERT INTO Payments (order_id, amount, method) VALUES (%s, %s, %s)", (last_order_id, random.uniform(10.0, 100.0), faker.credit_card_provider()))
+    cursor.execute("INSERT INTO Shipment (order_id, address, shipped_date) VALUES (%s, %s, %s)", (last_order_id, faker.address(), faker.date()))
+
+db.commit()  # Commit the rest of inserts
+
+# Perform a join operation (example)
+cursor.execute("""
+SELECT Users.name, Products.name, Orders.id, Payments.amount, Shipment.address
+FROM Orders
+JOIN Users ON Orders.user_id = Users.id
+JOIN Products ON Orders.product_id = Products.id
+JOIN Payments ON Orders.id = Payments.order_id
+JOIN Shipment ON Orders.id = Shipment.order_id
+""")
+
+# Fetch and print all records
+records = cursor.fetchall()
+for record in records:
+    print(record)
+
+# Close connection
+cursor.close()
+db.close()
+</code></pre>
+
+        </main>
+        <script> copyright("all"); </script>
+    </body>
+
+</html>
