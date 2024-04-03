@@ -96,12 +96,6 @@ function get_menu_list(datetogen) {
                 "readtime": 4,
                 "link": "moore-machines"
             }
-
-
-
-
-        
-
         ];
         for (let i = 0; i < arr.length; i++) {
             const _data = arr[i];
@@ -109,7 +103,7 @@ function get_menu_list(datetogen) {
             link = _data.link || `c${i + 1}`;
             date = _data.date ? _data.date : `${gendate(def_date)}`;
             desc = _data.desc || `${title} ${i}`;
-            codetype = _data.codetype ? `CSU1162 | ${_data.codetype}` : `CSU1162 | Concepts`;
+            codetype = _data.codetype ? `CSU1105 | ${_data.codetype}` : `CSU1105 | Concepts`;
             readtime = _data.readtime || r(4);
             author = _data.author || def_author;
             semester = _data.semester || null;
