@@ -1,3 +1,5 @@
+
+
 import mysql.connector
 from faker import Faker
 import random
@@ -57,6 +59,59 @@ JOIN Shipment ON Orders.id = Shipment.order_id
 records = cursor.fetchall()
 for record in records:
     print(record)
+
+
+cursor.execute("""
+SELECT Users.name, Products.name, Orders.id, Payments.amount, Shipment.address
+FROM Orders
+INNER JOIN Users ON Orders.user_id = Users.id
+INNER JOIN Products ON Orders.product_id = Products.id
+INNER JOIN Payments ON Orders.id = Payments.order_id
+INNER JOIN Shipment ON Orders.id = Shipment.order_id
+""")
+records = cursor.fetchall()
+for record in records:
+    print("INNER JOIN:", record)
+
+cursor.execute("""
+SELECT Users.name, Orders.id
+FROM Users
+LEFT JOIN Orders ON Users.id = Orders.user_id
+""")
+records = cursor.fetchall()
+for record in records:
+    print("LEFT JOIN:", record)
+
+cursor.execute("""
+SELECT Products.name, Orders.id
+FROM Products
+RIGHT JOIN Orders ON Products.id = Orders.product_id
+""")
+records = cursor.fetchall()
+for record in records:
+    print("RIGHT JOIN:", record)
+
+cursor.execute("""
+SELECT Users.name, Orders.id
+FROM Users
+LEFT JOIN Orders ON Users.id = Orders.user_id
+UNION
+SELECT Users.name, Orders.id
+FROM Orders
+RIGHT JOIN Users ON Orders.user_id = Users.id
+""")
+records = cursor.fetchall()
+for record in records:
+    print("FULL JOIN (Simulated):", record)
+
+cursor.execute("""
+SELECT Users.name, Products.name
+FROM Users
+CROSS JOIN Products
+""")
+records = cursor.fetchall()
+for record in records:
+    print("CROSS JOIN:", record)
 
 # Close connection
 cursor.close()

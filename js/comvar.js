@@ -5,6 +5,11 @@ const arr_author = {
         bio: "<p>Divya Mohan is a driven computer science student from India, pursuing his B.Tech in Computer Science and Engineering. With a unique approach to teaching, he breaks down complex concepts into simple, digestible chunks to make tech accessible to all learners. Dedicated to delivering top-quality results, Divya is fueled by his passion for technology and education, constantly striving to improve his skills and make an impact in the field.</p>",
         href: "contact@dmj.one"
     },
+    aj: {
+        name: "Aarchit Joshi",
+        bio: "<p>Aarchit Joshi is a computer science scholar from India, pursuing his Ph.D. in Computer Science and Engineering with a specialization in Artificial Intelligence. Aarchit employs innovative teaching methodologies to distill complex AI concepts into understandable, manageable lessons, aiming to democratize technology education. Driven by a profound passion for AI research and a commitment to excellence in education, he continuously seeks to enhance his expertise and contribute significantly to the field.</p>",
+        href: "contact@dmj.one"
+    },
     vp: {
         name: "Vanshika Painuly",
         bio: "<p>Vanshika Painuly is a computer science student from Uttrakhand, India, pursuing her B.Tech degree. She has a knack for making technical information easily accessible to learners, breaking down complex concepts into clear, understandable chunks. Vanshika's passion for technology and education drives her to deliver outstanding results, and she is dedicated to continuously improving her skills in the field.</p>",
@@ -563,6 +568,9 @@ const courseDetailsMap = {
     'csu360': {
         'default': ["Aarchit Joshi", "CSU360", "Operating System"],
         'lab': ["Aarchit Joshi", "CSU360P", "Operating System Lab"]
+    },
+    'csu1105': {
+        'default': ["Aarchit Joshi", "CSU1105", "Formal Languages and Automata Theory"],        
     },
 };
 

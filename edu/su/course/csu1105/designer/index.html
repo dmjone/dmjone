@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+    <!--<![endif]-->
+
+    <head>
+        <script src="/js/edu_su_common.js"></script>
+        <noscript>
+            <style>
+                html,
+                body {
+                    margin: 0;
+                    overflow: hidden;
+                }
+            </style>
+            <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+        </noscript>
+
+        <title>Finite State Machine Designer - Shoolini U</title>
+        <meta name="description" content="Dive into the world of Deterministic Finite Automata and beyond in Theory of Computing.">
+
+        <meta property="og:image" content="/logo.png">
+        <meta property="og:type" content="article">
+
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:site" content="@divyamohan1993">
+        <meta name="twitter:creator" content="@divyamohan1993">
+        <meta name="twitter:image" content="/logo.png">
+
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+        <meta name="author" content="Divya Mohan">
+        <meta name="robots" content="index, follow">
+        <style>
+            canvas {
+                cursor: crosshair;
+                position: inherit !important;
+                height: auto !important;
+                width: auto !important;
+                position: absolute;
+                top: auto;
+                left: auto;
+                pointer-events: all;
+            }
+        </style>
+        
+        <script>
+            function showNotification(message = "Copied to clipboard.") {
+                const notificationToast = document.getElementById('copyToast');
+                notificationToast.querySelector('.toast-body').textContent = message;
+
+                
+                const notification = new bootstrap.Toast(notificationToast, {
+                    autohide: true,
+                    delay: 7000
+                });
+                notification.show();
+            }
+        </script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/shepherd.js/11.2.0/css/shepherd.min.css" integrity="sha512-B/jBsZ5GJKmb99JjqVUsP6NLf0dHi9hbbviMlYzrIxUAsQqmnV4rzQc4Kq9wBLdc478s665nmbVWXFpDNpUM3w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/shepherd.js/11.2.0/js/shepherd.min.js" integrity="sha512-U3ol6Fd79i+gmjM7piIkZVLcdiCCc+FUuKhyjsJblTNdhm0fjUeXByy8pR60oWUhMOx4yBmuyBj0EQyQE/d5JQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    </head>
+
+    <body>
+        <script>header_author("aj","dm")</script>
+
+        <main class="container-fluid">
+            
+
+            <div class="py-5">
+                <h2 class="display-5 text-center mb-4">Finite State Machine Designer</h2>
+
+                <div class="mt-5">
+                    <div class="d-flex flex-column align-items-center">
+                        <canvas id="canvas" width="800" height="600" class="bg-white bg-opacity-75 mb-0 shadow-lg">
+                            <span class="error">Your browser does not support<br>the HTML5 &lt;canvas&gt; element</span>
+                        </canvas>
+                       
+                        <div class="card w-75 shadow-lg">
+                            <div class="card-body bg-gradient" style="background:var(--background-color);color:var(--text-color)">
+                                <h5 class="card-title text-center mb-3">Designer Controls</h5>
+                                <div class="text-center">
+                                    <div class="mb-3">
+                                        <span class="me-2">Export as:</span>
+                                        <a href="javascript:saveAsPNG()" class="btn btn-outline-success btn-sm me-1" onclick="showNotification('Downloading transparent PNG. Use it anywhere freely.\nDont forget to share!')">Save as PNG</a>
+                                        <a href="javascript:saveAsSVG()" class="btn btn-outline-success btn-sm me-1" onclick="showNotification('Downloading transparent SVG. Use it anywhere freely.\nDont forget to share!')">Save as SVG</a>
+                                        <a href="javascript:copySVGToClipboard()" class="btn btn-outline-success btn-sm me-1" onclick="showNotification('Copied minified SVG to Clipboard. Use it anywhere freely.\nDont forget to share!')">Copy SVG code</a>
+                                        <a href="javascript:copyLaTeXToClipboard()" class="btn btn-outline-success btn-sm me-1" onclick="showNotification('Copied LaTeX codes to Clipboard. Use it anywhere freely.\nDont forget to share!')">Copy LaTeX code</a>
+                                        <a href="javascript:saveAsJSON()" class="btn btn-secondary btn-sm me-1" onclick="showNotification('Great! Your work is saved now. If you want to work on this project again, then upload this file using restore button.')">Take Backup</a>
+                                        <button class="btn btn-outline-primary btn-sm" onclick="javascript:uploadJSON()" onclick="showNotification('Select the \'Backup\' file for which you want to restore your work.')">Restore</button>
+                                    </div>
+                                    <div class="row gx-2 justify-content-center">
+                                        <div class="col-12 col-md-4 mb-3">
+                                            <label for="rangeSlider" class="form-label"><strong>Circle Radius</strong></label>
+                                            <input type="range" class="form-range" id="rangeSlider" min="20" max="80" value="30" oninput="javascript:radiusChanged();" onchange="javascript:radiusChanged();">
+                                        </div>
+                                        <div class="col-12 col-md-4 mb-3">
+                                            <button class="btn btn-warning w-100" onclick="javascript:makeNodeTextOnly()">Toggle Drawing</button>
+                                        </div>
+                                        <div class="col-12 col-md-4">
+                                            <button class="btn btn-danger w-100" onclick="javascript:clearCanvas()">Clear</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="d-flex flex-column align-items-center"><button class="btn btn-dark btn-sm" data-bs-toggle="modal" data-bs-target="#helpModal">What is this? Explain me first.</button></div>                                
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                                
+                <button class="btn btn-primary btn-lg rounded-circle position-fixed bottom-0 end-0 m-4" id="helpFAB" data-bs-toggle="modal" data-bs-target="#helpModal">
+                    <i class="bi bi-question-lg"></i>
+                </button>
+                
+                <!-- Help Modal -->
+                <div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-scrollable modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="helpModalLabel">Finite State Machine Designer - Self Help</h5>
+                                <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
+                            </div>
+                            <div class="modal-body">
+                                <!-- Instructions Content Here -->
+                                <h3 class="fs-5 mb-3 text-center">How to use the Finite State Machine Designer</h3>
+                                <h6 class="text-muted mb-4 fw-bold text-center">Click outside to close and start designing!</h6>
+                                <ul class="list-unstyled">
+                                    <li><i class="bi bi-plus-circle-fill text-primary me-2"></i><strong>Add a state:</strong> Double-click on the canvas.</li>
+                                    <li><i class="bi bi-arrow-right-circle-fill text-success me-2"></i><strong>Add an arrow:</strong> Shift + drag on the canvas.</li>
+                                    <li><i class="bi bi-hand-index-thumb-fill text-warning me-2"></i><strong>Move something:</strong> Drag it around.</li>
+                                    <li><i class="bi bi-trash-fill text-danger me-2"></i><strong>Delete something:</strong> Click it and press the delete key.</li>
+                                    <li><i class="bi bi-check-circle-fill text-primary me-2"></i><strong>Make accept state:</strong> Double-click on an existing state.</li>
+                                    <li><i class="bi bi-type-underline text-success me-2"></i><strong>Type numeric subscript:</strong> Put an underscore before the number (e.g., "S_0").</li>
+                                    <li><i class="bi bi-fonts text-warning me-2"></i><strong>Type Greek letter:</strong> Put a backslash before it (e.g., "\beta").</li>
+                                </ul>
+                                <h4 class="fs-6 mt-4">Available Symbols:</h4>
+                                <p>You can use the following symbols by typing a backslash (\) followed by the symbol name:</p>
+                                <ul class="list-unstyled">
+                                    <li>\Alpha, \Beta, \Gamma, \Delta, \Epsilon, \Zeta, \Eta, \Theta, \Iota, \Kappa, \Lambda, \Mu, \Nu, \Xi, \Omicron, \Pi, \Rho, \Sigma, \Tau, \Upsilon, \Phi, \Chi, \Psi, \Omega, \rightarrow, \leftarrow, \emptyset, \eps</li>
+                                </ul>
+                                <p class="mt-3 text-center">This interactive tool leverages HTML5 and JavaScript, utilizing the canvas element for dynamic and creative content creation.</p>
+                            </div>
+
+                            <!-- <div class="modal-footer">
+                                <p class="text-center fw-bold">Click outside to close</p>
+                               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            </div> -->
+                        </div>
+                    </div>
+                </div>
+
+
+
+                
+                <!-- <div class="container my-4">
+                    <h3 class="fs-5 mb-3 text-center ">Guide to Using the Finite State Machine Designer:</h3>
+                    <div class="accordion" id="advancedHelpAccordion">
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="basicOperationsHeader">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#basicOperations" aria-expanded="true" aria-controls="basicOperations">
+                                    <i class="bi bi-pencil-square me-2"></i> Basic Operations
+                                </button>
+                            </h2>
+                            <div id="basicOperations" class="accordion-collapse collapse show" aria-labelledby="basicOperationsHeader" data-bs-parent="#advancedHelpAccordion">
+                                <div class="accordion-body">
+                                    <ul class="list-unstyled">
+                                        <li><i class="bi bi-plus-circle-fill text-primary me-2"></i><strong>Add a state:</strong> Double-click on the canvas.</li>
+                                        <li><i class="bi bi-arrow-right-circle-fill text-success me-2"></i><strong>Add an arrow:</strong> Shift + drag on the canvas.</li>
+                                        <li><i class="bi bi-hand-index-thumb-fill text-warning me-2"></i><strong>Move something:</strong> Drag it around.</li>
+                                        <li><i class="bi bi-trash-fill text-danger me-2"></i><strong>Delete something:</strong> Click it and press the delete key.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="advancedEditingHeader">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#advancedEditing" aria-expanded="false" aria-controls="advancedEditing">
+                                    <i class="bi bi-gear-fill me-2"></i> Advanced Editing
+                                </button>
+                            </h2>
+                            <div id="advancedEditing" class="accordion-collapse collapse" aria-labelledby="advancedEditingHeader" data-bs-parent="#advancedHelpAccordion">
+                                <div class="accordion-body">
+                                    <ul class="list-unstyled">
+                                        <li><i class="bi bi-check-circle-fill text-primary me-2"></i><strong>Make accept state:</strong> Double-click on an existing state.</li>
+                                        <li><i class="bi bi-type-underline text-success me-2"></i><strong>Type numeric subscript:</strong> Put an underscore before the number (e.g., "S_0").</li>
+                                        <li><i class="bi bi-fonts text-warning me-2"></i><strong>Type Greek letter:</strong> Put a backslash before it (e.g., "\beta").</li>
+                                        <li><i class="bi bi-symmetry-horizontal text-danger me-2"></i><strong>Additional symbols:</strong> Type "\emptyset" for ∅, "\rightarrow" for →, and "\leftarrow" for ←.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="mt-3 text-center">This interactive tool leverages HTML5 and JavaScript, utilizing the canvas element for dynamic and creative content creation.</p>
+                </div> -->
+                
+
+
+                <input type="file" id="jsonUpload" class="d-none" accept="text/json" onchange="jsonUploaded()">
+            
+
+
+        </main>
+
+        
+        <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+            <div id="copyToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header bg-danger bg-opacity-75 bg-gradient">
+                    <strong class="me-auto">Notification</strong>
+                </div>
+                <div class="toast-body bg-danger bg-opacity-25 bg-gradient">
+                    Copied to clipboard.
+                </div>
+            </div>
+        </div>       
+    </body>
+
+</html>
