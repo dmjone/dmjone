@@ -28,7 +28,7 @@
     document.getElementById('copyBtn').addEventListener('click', copyAbsenteesToClipboard);
 
     function promptForSecretKey() {
-        let secretKey = prompt("Please enter the password (hint: amity gmail):", "");
+        let secretKey = prompt("Please enter the password:", "");
         if (!secretKey || secretKey.length < 5) {
             alert('A valid password is required to access this information. Please refresh the page to try again.');
             return null;
@@ -52,7 +52,7 @@
         shuffledNames.forEach((name) => {
             const div = document.createElement('div');
             div.innerHTML = `${name} - ${nameRollMap[name]}`;
-            div.className = 'name-item list-group-item p-3 text-center';
+            div.className = 'name-item list-group-item p-4 text-center';
             div.onclick = function () {
                 isAbsent[NAMES.indexOf(name)] = !isAbsent[NAMES.indexOf(name)];
                 this.classList.toggle('selected');
