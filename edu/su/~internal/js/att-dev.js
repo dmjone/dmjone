@@ -31,7 +31,7 @@
         let secretKey = prompt("Please enter the password (hint: amity gmail):", "");
         if (!secretKey || secretKey.length < 5) {
             alert('A valid password is required to access this information. Please refresh the page to try again.');
-            return 'shoolini2026';
+            return null;
         }
         return secretKey;
     }
