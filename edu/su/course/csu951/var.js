@@ -115,7 +115,7 @@ function get_menu_list(datetogen) {
         var outputDate = weekdays[newDate.getUTCDay()] + " " + months[newDate.getUTCMonth()] + " " + newDate.getUTCDate() + ", " + newDate.getUTCFullYear();
         return outputDate;
     }
-    function r(t) { return Math.floor(Math.random() * 10) + t };
+    function r(t) { return Math.floor(Math.random() * 10) + t }
     var dated = "December 25, 2022";
     var title, desc, codetype, readtime, author = 1, link;
     const functions = {
