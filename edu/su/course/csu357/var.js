@@ -149,7 +149,7 @@ function get_menu_list(datetogen) {
                 desc: "Embark on a journey through the advanced stages of database normalization with our comprehensive guide on Fourth Normal Form (4NF) and Fifth Normal Form (5NF). Tailored for students of CSU357 Database Systems at Shoolini University, this resource delves into the intricacies of data modeling, integrity constraints, and the normalization process. Ideal for beginners and advanced learners, this guide offers a step-by-step approach to achieving database perfection, ensuring optimal data management and operational efficiency.",
                 codetype: "Database Normalization Techniques",
                 readtime: 5,
-                link: "normal-forms-4nf-5nf"
+                link: "4nf-5nf"
             },
             {
                 title: "Understanding SQL Joins: A Comprehensive Guide",
