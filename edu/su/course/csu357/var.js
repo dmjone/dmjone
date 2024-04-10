@@ -26,8 +26,7 @@ function get_menu_list(datetogen) {
                 title: "Hands-On Database Management System Lab: Enhancing Data Skills [WIP]",
                 desc: "Deepen your understanding of Database Management Systems in the CSU357P DBMS Lab. This practical lab course focuses on applying the theoretical concepts learned in CSU357 through hands-on exercises. Engage with SQL queries, database design, and data normalization practices. Click to participate in interactive labs that will improve your ability to design, implement, and manage databases effectively, preparing you for complex data challenges in the real world.",
                 codetype: "CSU357P | DBMS Lab"
-            }
-
+            }, 
         ];
 
         for (let i = 0; i < arr.length; i++) {
@@ -125,25 +124,39 @@ function get_menu_list(datetogen) {
                 link: "relational-data-model"
             },
             {
-                "title": "Mastering Codd's 12 Rules for RDBMS",
-                "desc": "Embark on a journey through the fundamental principles of relational databases with our in-depth exploration of Codd's 12 Rules. Perfect for CSU357 at Shoolini University, this guide is meticulously designed to equip both novices and experienced learners with the knowledge to understand and apply these foundational rules. From ensuring data integrity to achieving database independence, learn how these rules lay the groundwork for advanced RDBMS features, including SQL, data normalization, and integrity constraints.",
-                "codetype": "Codd's 12 Rules",
-                "readtime": 7,
-                "link": "codds-12-rules"
+                title: "Mastering Codd's 12 Rules for RDBMS",
+                desc: "Embark on a journey through the fundamental principles of relational databases with our in-depth exploration of Codd's 12 Rules. Perfect for CSU357 at Shoolini University, this guide is meticulously designed to equip both novices and experienced learners with the knowledge to understand and apply these foundational rules. From ensuring data integrity to achieving database independence, learn how these rules lay the groundwork for advanced RDBMS features, including SQL, data normalization, and integrity constraints.",
+                codetype: "Codd's 12 Rules",
+                readtime: 7,
+                link: "codds-12-rules"
             },
             {
-                "title": "Functional Dependencies and Normalization",
-                "desc": "Know the complexities of database design with our comprehensive guide on Advanced Database Normalization Techniques. Ideal for CSU357 at Shoolini University, this resource is crafted to bridge the gap for learners at all levels - from beginners to advanced enthusiasts. Explore beyond the basics into 4NF, 5NF, and the elusive DKNF, understanding their impact on reducing redundancy, and ensuring data integrity. Discover how these advanced techniques form the backbone of efficient RDBMS, supporting the principles of data normalization and integrity constraints, and setting the stage for optimized database performance and maintenance.",
-                "codetype": "Database Normalization",
-                "readtime": 5,
-                "link": "functional-dependency-and-normalization"
+                title: "Functional Dependencies and Normalization",
+                desc: "Know the complexities of database design with our comprehensive guide on Advanced Database Normalization Techniques. Ideal for CSU357 at Shoolini University, this resource is crafted to bridge the gap for learners at all levels - from beginners to advanced enthusiasts. Explore beyond the basics into 4NF, 5NF, and the elusive DKNF, understanding their impact on reducing redundancy, and ensuring data integrity. Discover how these advanced techniques form the backbone of efficient RDBMS, supporting the principles of data normalization and integrity constraints, and setting the stage for optimized database performance and maintenance.",
+                codetype: "Database Normalization",
+                readtime: 5,
+                link: "functional-dependency-and-normalization"
             },
             {
-                "title": "From Unnormalized to Excellence: The Journey to BCNF",
-                "desc": "Navigate the complexities of database normalization from Unnormalized Form (UNF) to Boyce-Codd Normal Form (BCNF) with our comprehensive guide. Tailored for students of CSU357 Database Systems at Shoolini University, this resource demystifies the step-by-step process of enhancing data integrity and reducing redundancy through meticulous normalization techniques. Ideal for both beginners and advanced learners, this guide illuminates the path to achieving optimal database design, ensuring a solid foundation for understanding relational databases and their operational efficiency.",
-                "codetype": "Normalization Process",
-                "readtime": 5,
-                "link": "normal-forms-1nf-2nf-3nf-bcnf"
+                title: "From Unnormalized to Excellence: The Journey to BCNF",
+                desc: "Navigate the complexities of database normalization from Unnormalized Form (UNF) to Boyce-Codd Normal Form (BCNF) with our comprehensive guide. Tailored for students of CSU357 Database Systems at Shoolini University, this resource demystifies the step-by-step process of enhancing data integrity and reducing redundancy through meticulous normalization techniques. Ideal for both beginners and advanced learners, this guide illuminates the path to achieving optimal database design, ensuring a solid foundation for understanding relational databases and their operational efficiency.",
+                codetype: "Normalization Process",
+                readtime: 5,
+                link: "normal-forms-1nf-2nf-3nf-bcnf"
+            },
+            {
+                title: "From 4NF to 5NF: The Quest for Database Perfection",
+                desc: "Embark on a journey through the advanced stages of database normalization with our comprehensive guide on Fourth Normal Form (4NF) and Fifth Normal Form (5NF). Tailored for students of CSU357 Database Systems at Shoolini University, this resource delves into the intricacies of data modeling, integrity constraints, and the normalization process. Ideal for beginners and advanced learners, this guide offers a step-by-step approach to achieving database perfection, ensuring optimal data management and operational efficiency.",
+                codetype: "Database Normalization Techniques",
+                readtime: 5,
+                link: "normal-forms-4nf-5nf"
+            },
+            {
+                title: "Understanding SQL Joins: A Comprehensive Guide",
+                desc: "Master the art of SQL Joins with our comprehensive guide, tailored for students of CSU357 Database Systems at Shoolini University. From INNER JOIN to OUTER JOIN, LEFT JOIN to RIGHT JOIN, this resource covers the essentials of SQL Joins, their syntax, and practical applications in database management. Ideal for beginners and advanced learners, this guide offers a step-by-step approach to understanding the nuances of SQL Joins, ensuring optimal data retrieval and manipulation in relational databases.",
+                codetype: "SQL Joins",
+                readtime: 5,
+                link: "sql-joins"
             },
 
 
