@@ -9,8 +9,7 @@ function get_menu_list(datetogen) {
                 codetype: "CSU360 | Operating Systems",
             },
             {
-                // link: "lab/",
-                link: "#",
+                link: "lab/",                
                 title: "Hands-on Operating Systems Lab: Enhance Your System Management Skills [WIP]",
                 desc: "Advance your understanding of Operating Systems in the practical lab with code CSU360P. This lab course offers a hands-on approach to learning about operating system concepts, including process synchronization, scheduling algorithms, and memory allocation techniques. Click to engage in interactive sessions that will improve your technical skills in managing and optimizing operating systems, preparing you for the complexities of real-world IT environments.",
                 codetype: "CSU360P | Operating Systems Lab",
@@ -59,7 +58,7 @@ function get_menu_list(datetogen) {
                 "title": "Exploring Preemptive Shortest Job First Scheduling",
                 "desc": "A comprehensive guide on Preemptive SJF scheduling, detailing its operation, benefits, implementation challenges, and optimization strategies to improve system performance.",
                 "codetype": "SRTF || SJF-P",
-                "readtime": 15,
+                "readtime": 5,
                 // "link": "exploring-preemptive-shortest-job-first-scheduling"
                 "link": "scheduling-algorithms-preemptive-sjf"
             },
@@ -70,7 +69,83 @@ function get_menu_list(datetogen) {
                 "readtime": 10,
                 "link": "synchronization-concepts"
             },
-
+            {
+                "title": "Mutex vs. Semaphore: Understanding the Differences",
+                "desc": "A detailed comparison of Mutex and Semaphore synchronization mechanisms, highlighting their characteristics, use cases, and implementation in operating systems for process synchronization and coordination.",
+                "codetype": "semaphores",
+                "readtime": 10,
+                "link": "semaphores"
+            },
+            {
+                "title": "Thread Synchronization in Operating Systems",
+                "desc": "An exploration of thread synchronization in operating systems, including the need for synchronization, common synchronization techniques, and challenges in multi-threaded programming.",
+                "codetype": "Threads",
+                "readtime": 10,
+                "link": "threads"
+            },
+            {
+                "title": "Concurrency and Concurrent Programming",
+                "desc": "An in-depth look at concurrency and concurrent programming in operating systems, including the concepts of parallelism, synchronization, and multi-threading for efficient system performance.",
+                "codetype": "Concurrent Programming",
+                "readtime": 10,
+                "link": "concurrent-programming"
+            },
+            {
+                "title": "fork() System Call in C: Understanding Process Creation",
+                "desc": "An in-depth look at the fork() system call in C programming, including its purpose, operation, return values, and examples for creating child processes in Unix-based systems.",
+                "codetype": "fork()",
+                "readtime": 10,
+                "link": "fork"
+            },
+            {
+                "title": "Deadlock in Operating Systems: Causes, Prevention, and Resolution",
+                "desc": "An examination of deadlock in operating systems, including its causes, detection methods, prevention strategies, and resolution techniques to ensure system stability and resource availability.",
+                "codetype": "Deadlock",
+                "readtime": 5,
+                "link": "deadlock"
+            },
+            {
+                "title": "Loading in Operating Systems",
+                "desc": "An exploration of loading processes in operating systems, detailing the loading sequence and relocation strategies for executing programs efficiently.",
+                "codetype": "Loading",
+                "readtime": 10,
+                "link": "loading"
+            },
+            {
+                "title": "Linking in Operating Systems",
+                "desc": "An overview of linking processes in operating systems, including static and dynamic linking, linking loaders, and shared libraries for efficient program execution.",
+                "codetype": "Linking",
+                "readtime": 10,
+                "link": "linking"
+            },
+            {
+                "title": "Address Binding in Operating Systems",
+                "desc": "An examination of address binding in operating systems, including compile-time, load-time, and execution-time address binding strategies for efficient program execution and memory management.",
+                "codetype": "Address Binding",
+                "readtime": 10,
+                "link": "address-binding"
+            },
+            {
+                "title": "Exploring Memory Management in Operating Systems",
+                "desc": "A detailed overview of memory management in operating systems, including memory hierarchy, allocation strategies, virtual memory, and memory protection mechanisms for efficient system operation.",
+                "codetype": "Memory Management",
+                "readtime": 10,
+                "link": "memory-management"
+            },
+            {
+                "title": "RAM Chip Implementation",
+                "desc": "An exploration of the implementation of RAM chips in computer systems, detailing the structure, operation, and functionality of RAM chips for data storage and retrieval.",
+                "codetype": "RAM",
+                "readtime": 10,
+                "link": "ram-chip-implimentation"
+            },
+            {
+                "title": "Paging in Operating Systems: Concepts and Implementation",
+                "desc": "An exploration of paging in operating systems, detailing the concept of virtual memory, page tables, page replacement algorithms, and implementation strategies for efficient memory management.",
+                "codetype": "Paging",
+                "readtime": 5,
+                "link": "paging"
+            },
         ];
         for (let i = 0; i < arr.length; i++) {
             const _data = arr[i];

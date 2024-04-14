@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+    <!--<![endif]-->
+
+    <head>
+        <script src="/js/edu_su_common.js"></script>
+        <noscript>
+            <style>
+                html,
+                body {
+                    margin: 0;
+                    overflow: hidden;
+                }
+            </style>
+            <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+        </noscript>
+
+        <title>Fork() - CSU360 - Shoolini University</title>
+        <meta name="description" content="Learn about the fork() system call in Unix-like operating systems and how it is used to create new processes.">
+
+
+        <meta property="og:image" content="/logo.png">
+        <meta property="og:type" content="article">
+
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:site" content="@divyamohan1993">
+        <meta name="twitter:creator" content="@divyamohan1993">
+        <meta name="twitter:image" content="/logo.png">
+
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+        <meta name="author" content="Divya Mohan">
+        <meta name="robots" content="index, follow">
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js" integrity="sha512-sHSNLECRJSK+BFs7E8DiFc6pf6n90bLI85Emiw1jhreduZhK3VXgq9l4kAt9eTIHYAcuQBKHL01QKs4/3Xgl8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js" integrity="sha512-iWiuBS5nt6r60fCz26Nd0Zqe0nbk1ZTIQbl3Kv7kYsX+yKMUFHzjaH2+AnM6vp2Xs+gNmaBAVWJjSmuPw76Efg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                renderMathInElement(document.body, {
+                    // customised options
+                    // • auto-render specific keys, e.g.:
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false },
+                        { left: '\\(', right: '\\)', display: false },
+                        { left: '\\[', right: '\\]', display: true }
+                    ],
+                    // • rendering keys, e.g.:
+                    throwOnError: false
+                });
+            });
+        </script>
+    </head>
+
+    <body>
+
+        <script> header_author("dm"); </script>
+
+        <main>
+
+            <article class="agen-tableofcontents">
+                <h2 class="text-center">
+                    Fork()
+                </h2>
+            </article>
+
+            <article id="fork-introduction">
+                <h3>1. Introduction to fork()</h3>
+                <p>
+                    The <code>fork()</code> function is a system call in UNIX-like operating systems used to create a new process, known as a child process, which runs concurrently with the process that made the fork() call (parent process). A new process is created by duplicating the existing process from which it was called. The end result is two virtually identical processes running independently.
+                </p>
+            </article>
+
+            <article id="fork-usage">
+                <h3>2. Usage of fork()</h3>
+                <p>
+                    The primary use of <code>fork()</code> is to enable process creation during program execution. After the <code>fork()</code> system call, both the parent and the child processes will execute the code following the fork(). The main distinction is in the return value, which is used to determine the process type:
+                </p>
+                <ul>
+                    <li><strong>Parent Process</strong>: receives the process ID (PID) of the newly created child process.</li>
+                    <li><strong>Child Process</strong>: receives a return value of 0.</li>
+                    <li><strong>Error</strong>: returns -1, no child process is created, and an error code is set to indicate the issue.</li>
+                </ul>
+            </article>
+
+            <article id="fork-programming-example">
+                <h4>2.1 Simple Programming Example</h4>
+                <pre><code class="language-c">
+#include &lt;stdio.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;sys/types.h&gt;
+
+int main() {
+    pid_t pid;
+    pid = fork();
+
+    if (pid == -1) {
+        // Error handling
+        perror("fork failed");
+        return -1;
+    } else if (pid == 0) {
+        // Code executed by child
+        printf("Child process\n");
+    } else {
+        // Code executed by parent
+        printf("Parent process, child PID: %d\n", pid);
+    }
+    return 0;
+}
+</code></pre>
+                <p>This example demonstrates the basic structure of using <code>fork()</code> in a C program. The process splits into two branches: one for the parent and one for the child, each printing their status.</p>
+            </article>
+
+            <article id="fork-implications">
+                <h3>3. Implications of using fork()</h3>
+                <p>
+                    Using <code>fork()</code> can have significant implications on program behavior and performance:
+                </p>
+                <ul>
+                    <li><strong>Resource Utilization</strong>: After <code>fork()</code>, both the parent and the child may use system resources, potentially leading to higher resource consumption.</li>
+                    <li><strong>Concurrency</strong>: <code>fork()</code> allows multiple processes to run in parallel, which can improve performance but also introduces complexity in synchronization.</li>
+                    <li><strong>Copies of File Descriptors</strong>: File descriptors and other resources are duplicated in the child, which means they share the same files and sockets, possibly leading to data corruption if not handled properly.</li>
+                </ul>
+            </article>
+
+            <article id="fork-memory-model">
+                <h4>3.1 Memory Model After fork()</h4>
+                <p>
+                    In modern operating systems, <code>fork()</code> often uses a copy-on-write (COW) approach, where the parent and child processes initially share the same physical memory pages. Memory pages are only duplicated when one of the processes modifies a page, thus optimizing the use of memory.
+                </p>
+            </article>
+
+            <article id="fork-synchronization">
+                <h5>3.1.1 Synchronization Challenges</h5>
+                <p>
+                    Synchronization is critical when using <code>fork()</code> due to the potential for race conditions where the parent and child processes operate on shared resources. Techniques such as semaphores, mutexes, and condition variables are often used to manage access to shared resources effectively.
+                </p>
+            </article>
+
+            <article id="fork-alternatives">
+                <h3>4. Alternatives to fork()</h3>
+                <p>
+                    While <code>fork()</code> is widely used, alternatives such as <code>pthread_create()</code> for creating threads (lightweight processes) or <code>clone()</code> for finer control over what is shared between parent and child processes, offer different benefits and trade-offs. Understanding these alternatives helps in choosing the right approach based on the requirements of your application.
+                </p>
+            </article>
+
+            <article id="fork-security-considerations">
+                <h3>5. Security Considerations with fork()</h3>
+                <p>
+                    Security implications of using <code>fork()</code> are critical, especially in environments where the parent and child processes may handle sensitive data:
+                </p>
+                <ul>
+                    <li><strong>Memory Management</strong>: Ensuring that sensitive information is not inadvertently shared between parent and child processes through memory.</li>
+                    <li><strong>Resource Leakage</strong>: Preventing file descriptor leaks and ensuring that all resources are properly closed or transferred to prevent security vulnerabilities.</li>
+                    <li><strong>Denial of Service</strong>: Avoiding excessive use of <code>fork()</code> which can lead to resource starvation and potentially be used as a vector for denial of service attacks.</li>
+                </ul>
+            </article>
+
+            <article id="fork-process-communication">
+                <h4>5.1 Inter-Process Communication (IPC)</h4>
+                <p>
+                    After a <code>fork()</code>, establishing communication between parent and child processes is essential, especially for applications requiring coordinated operations:
+                </p>
+                <pre><code class="language-c">
+#include &lt;stdio.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;sys/ipc.h&gt;
+#include &lt;sys/shm.h&gt;
+
+int main() {
+    int pid = fork();
+    if (pid == 0) {
+        // Child process
+        // IPC mechanism to communicate with parent
+    } else {
+        // Parent process
+        // IPC mechanism to monitor or coordinate with child
+    }
+    return 0;
+}
+</code></pre>
+                <p>Common IPC methods include pipes, message queues, shared memory, and sockets.</p>
+            </article>
+
+            <article id="fork-performance-optimization">
+                <h3>6. Performance Optimization with fork()</h3>
+                <p>
+                    Optimizing the use of <code>fork()</code> can significantly affect the performance of applications, especially those heavily reliant on process creation:
+                </p>
+                <ul>
+                    <li><strong>Minimizing Copy-On-Write Overheads</strong>: Techniques to reduce the overheads associated with the copy-on-write mechanism.</li>
+                    <li><strong>Resource Management</strong>: Strategies for efficient resource management post-fork to avoid duplicative resource consumption.</li>
+                    <li><strong>Process Pooling</strong>: Using a pool of pre-forked processes that can be quickly adapted to new tasks instead of repeatedly invoking <code>fork()</code>.</li>
+                </ul>
+            </article>
+
+            <article id="fork-use-cases">
+                <h4>6.1 Advanced Use Cases of fork()</h4>
+                <p>
+                    Exploring advanced scenarios where <code>fork()</code> plays a crucial role, such as in web servers for handling multiple client requests or in scientific computing for parallel task execution.
+                </p>
+                <pre><code class="language-c">#include &lt;stdio.h>
+#include &lt;stdlib.h>
+#include &lt;unistd.h>
+#include &lt;sys/socket.h>
+#include &lt;netinet/in.h>
+#include &lt;errno.h>
+#include &lt;string.h>
+
+#define PORT 8080
+#define MAX_CHILDREN 5
+
+void handle_client(int server_fd) {
+    int new_socket;
+    struct sockaddr_in address;
+    int addrlen = sizeof(address);
+
+    while (1) {
+        printf("Child %d waiting for new connection...\n", getpid());
+
+        if ((new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen))&lt;0) {
+            perror("accept");
+            exit(EXIT_FAILURE);
+        }
+
+        // Handle the client connected to new_socket
+        printf("Child %d handling connection\n", getpid());
+        // Simulating client handling
+        sleep(10); // Simulate some work by sleeping
+
+        close(new_socket);
+    }
+}
+
+int main() {
+    int server_fd, opt = 1;
+    struct sockaddr_in address;
+
+    // Creating socket file descriptor
+    if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
+        perror("socket failed");
+        exit(EXIT_FAILURE);
+    }
+
+    // Forcefully attaching socket to the port 8080
+    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt))) {
+        perror("setsockopt");
+        exit(EXIT_FAILURE);
+    }
+    
+    address.sin_family = AF_INET;
+    address.sin_addr.s_addr = INADDR_ANY;
+    address.sin_port = htons(PORT);
+    
+    // Forcefully attaching socket to the port 8080
+    if (bind(server_fd, (struct sockaddr *)&address, sizeof(address))&lt;0) {
+        perror("bind failed");
+        exit(EXIT_FAILURE);
+    }
+
+    if (listen(server_fd, 10) < 0) {
+        perror("listen");
+        exit(EXIT_FAILURE);
+    }
+
+    for (int i = 0; i < MAX_CHILDREN; i++) {
+        pid_t pid = fork();
+        if (pid < 0) {
+            perror("fork failed");
+            exit(EXIT_FAILURE);
+        }
+
+        if (pid == 0) { // Child process
+            handle_client(server_fd);
+            exit(0);
+        }
+    }
+
+    // Parent waits for all children to exit (though they likely never will in this setup)
+    int status = 0;
+    while (wait(&status) > 0);
+
+    return 0;
+}</code></pre>
+            </article>
+
+
+        </main>
+        <script> copyright("all"); </script>
+    </body>
+
+</html>
