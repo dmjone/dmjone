@@ -95,6 +95,20 @@ function get_menu_list(datetogen) {
                 "codetype": "Exploring Moore Machines",
                 "readtime": 4,
                 "link": "moore-machines"
+            },
+            {
+                "title": "Revision",
+                "desc": "This revision article provides a comprehensive overview of the key concepts covered in the Theory of Computing course. From automata theory to computational complexity, this resource offers a structured review of the foundational principles and theories that underpin the field of computer science. Ideal for exam preparation or reinforcing understanding, this revision guide summarizes essential topics, definitions, and applications, providing a solid foundation for further exploration and study.",
+                "codetype": "TOC Revision",
+                "readtime": 10,
+                "link": "revision"
+            },
+            {
+                "title": "Push Down Automata",
+                "desc": "Discover the world of Pushdown Automata (PDA), a fundamental concept in automata theory that extends the capabilities of finite automata to handle context-free languages. This article explores the structure, functionality, and applications of PDAs in language recognition, parsing algorithms, and the design of compilers. Gain insights into the operational mechanics of PDAs, their equivalence to context-free grammars, and their pivotal role in theoretical computer science.",
+                "codetype": "PDA",
+                "readtime": 10,
+                "link": "push-down-automata"
             }
         ];
         for (let i = 0; i < arr.length; i++) {
