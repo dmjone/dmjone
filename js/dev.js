@@ -2483,7 +2483,7 @@ function gen_blockquote() {
 /** Fireworks **/
 (function () {
     const events = [
-        { day: 20, month: 4, year: 1993, occasion: 'birthday', name: 'Divya' },
+        // { day: 20, month: 4, year: 1993, occasion: 'birthday', name: 'Divya' },
         { day: 11, month: 1, year: 2004, occasion: 'birthday', name: 'Jasmine' },
         { day: 11, month: 1, year: 2004, occasion: 'birthday', name: 'Vinayak' },
         { day: 12, month: 1, year: 2004, occasion: 'birthday', name: 'Prithak' },

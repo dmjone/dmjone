@@ -258,6 +258,14 @@ function get_menu_list(datetogen) {
                 readtime: 4,
                 link: "#"
             },
+            {
+                title: "Practical 15: Write a C program to simulate the following page replacement algorithm: <br>A. FIFO <br>B. LRU <br>C. Optimal",
+                desc: "Learn to simulate page replacement algorithms in operating systems. This practical exercise will guide you through the implementation of page replacement algorithms such as FIFO, LRU, and Optimal, enabling you to understand their impact on memory management and system performance.",
+                codetype: "Concepts",
+                readtime: 4,
+                link: "#"
+
+            }
             
         ];
         for (let i = 0; i < arr.length; i++) {
