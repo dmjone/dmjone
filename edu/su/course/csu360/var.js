@@ -264,9 +264,7 @@ function get_menu_list(datetogen) {
                 codetype: "Concepts",
                 readtime: 4,
                 link: "#"
-
-            }
-            
+            }            
         ];
         for (let i = 0; i < arr.length; i++) {
             const _data = arr[i];

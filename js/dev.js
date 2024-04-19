@@ -2483,7 +2483,7 @@ function gen_blockquote() {
 /** Fireworks **/
 (function () {
     const events = [
-        // { day: 20, month: 4, year: 1993, occasion: 'birthday', name: 'Divya' },
+        { day: 20, month: 4, year: 1993, occasion: 'birthday', name: 'dmj' },
         { day: 11, month: 1, year: 2004, occasion: 'birthday', name: 'Jasmine' },
         { day: 11, month: 1, year: 2004, occasion: 'birthday', name: 'Vinayak' },
         { day: 12, month: 1, year: 2004, occasion: 'birthday', name: 'Prithak' },
@@ -2564,7 +2564,7 @@ function gen_blockquote() {
     const todaysDate = new Date().toDateString();
     const todaysEvents = getTodaysEvents();
     const FIREWORKS_DISPLAYED_KEY = 'fireworks_displayed';
-    const forcedisplay = 0;
+    const forcedisplay = 1;
     const fireworksDisplayedInfo = forcedisplay ? false : JSON.parse(localStorage.getItem(FIREWORKS_DISPLAYED_KEY))
 
 
@@ -2577,9 +2577,16 @@ function gen_blockquote() {
                 case 'birthday':
                     const age = event.year ? new Date().getFullYear() - event.year : null;
                     const initial = event.name.charAt(0);  // Extract the first letter
-                    const randomMessage = age ?
-                        `${randomEmoji1}Happy <span class="fw-bold">${age}</span><sup>${getSuffix(age)}</sup> ${event.name}!${randomEmoji2}<br><span class ="display-6">${getRandomItem(birthdayMessages)}</span>` :
-                        `${randomEmoji1}Happy Birthday, ${initial}!${randomEmoji2}<br>${getRandomItem(birthdayMessages)}`;
+                    let randomMessage;
+                    if (!event.name == 'dmj') {
+                        randomMessage = age ?
+                            `${randomEmoji1}Happy <span class="fw-bold">${age}</span><sup>${getSuffix(age)}</sup> ${event.name}!${randomEmoji2}<br><span class ="display-6">${getRandomItem(birthdayMessages)}</span>` :
+                            `${randomEmoji1}Happy Birthday, ${initial}!${randomEmoji2}<br>${getRandomItem(birthdayMessages)}`;
+                            // `${randomEmoji1}Enjoy the day ${event.name}!${randomEmoji2}<br><span class ="display-6">${getRandomItem(birthdayMessages)}</span>`;
+                            // `<p class="text-center" style="font-size:1rem">${'❤️'.repeat(10)}<p><p class="text-center" style="font-size:1rem">${'❤️'.repeat(10)}<p><p class="text-center" style="font-size:1rem">${'❤️'.repeat(10)}<p><p class="text-center" style="font-size:1.5rem">${'❤️'.repeat(1)}<p><p class="mt-10 text-muted text-sm-center small" style="font-size:1.1rem">Click for a musical melody!</p>`;
+                    } else {
+                        randomMessage = `${randomEmoji1}Happy <span class="fw-bold">${age}</span><sup>${getSuffix(age)}</sup>${randomEmoji2}<br><span class ="display-6">${getRandomItem(birthdayMessages)}</span><p class="text-muted text-sm-center small" style="font-size:1.1rem">Click for a musical melody!</p>`
+                    }
                     messages.push(randomMessage);
                     break;
                 case 'diwali':
@@ -2706,6 +2713,61 @@ function gen_blockquote() {
         });
     }
 })();
+
+// (function () {
+//     document.addEventListener("DOMContentLoaded", () => {
+//         var audio = new Audio('/media/music/happy_bday.mp3');
+//         var audioPlayed = false;
+//         var playAudio = () => {
+//             if (!audioPlayed) {
+//                 audio.play().then(() => {
+//                     audioPlayed = true;
+//                     document.removeEventListener("click", playAudio);
+//                     document.removeEventListener("keypress", playAudio);
+//                 }).catch(() => { });
+//             }
+//         };
+//         document.addEventListener("click", playAudio);
+//         document.addEventListener("keypress", playAudio);
+//     });
+// })();
+(function () {
+    document.addEventListener("DOMContentLoaded", () => {
+        const audio = document.createElement('audio');
+        audio.src = '/media/music/happy_bday.mp3';
+        audio.preload = 'auto';
+
+        let audioPlayed = false;
+
+        const playAudio = () => {
+            console.log("Attempt to play audio"); // Debugging
+            if (!audioPlayed) {
+                audio.play().then(() => {
+                    console.log("Audio played successfully"); // Debugging
+                    audioPlayed = true;
+                    removeEventListeners();
+                }).catch((error) => {
+                    console.log("Playback failed", error); // Debugging
+                });
+            }
+        };
+
+        const removeEventListeners = () => {
+            ['click', 'keypress', 'touchstart', 'scroll'].forEach(event => {
+                document.removeEventListener(event, playAudio);
+            });
+        };
+
+        ['click', 'keypress', 'touchstart', 'scroll'].forEach(event => {
+            document.addEventListener(event, playAudio);
+        });
+
+        playAudio(); // Attempt to play on load
+    });
+})();
+
+
+
 // (function () {
 //     const isDiwali = () => {
 //         const date = new Date();
