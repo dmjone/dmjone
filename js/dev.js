@@ -2711,7 +2711,42 @@ function gen_blockquote() {
             }, timeouttimer)
 
         });
-    }
+
+        (function () {
+            document.addEventListener("DOMContentLoaded", () => {
+                const audio = document.createElement('audio');
+                audio.src = '/media/music/happy_bday.mp3';
+                audio.preload = 'auto';
+
+                let audioPlayed = false;
+
+                const playAudio = () => {
+                    console.log("Attempt to play audio"); // Debugging
+                    if (!audioPlayed) {
+                        audio.play().then(() => {
+                            console.log("Audio played successfully"); // Debugging
+                            audioPlayed = true;
+                            removeEventListeners();
+                        }).catch((error) => {
+                            console.log("Playback failed", error); // Debugging
+                        });
+                    }
+                };
+
+                const removeEventListeners = () => {
+                    ['click', 'keypress', 'touchstart', 'scroll'].forEach(event => {
+                        document.removeEventListener(event, playAudio);
+                    });
+                };
+
+                ['click', 'keypress', 'touchstart', 'scroll'].forEach(event => {
+                    document.addEventListener(event, playAudio);
+                });
+
+                playAudio(); // Attempt to play on load
+            });
+        })();
+    }    
 })();
 
 // (function () {
@@ -2731,40 +2766,7 @@ function gen_blockquote() {
 //         document.addEventListener("keypress", playAudio);
 //     });
 // })();
-(function () {
-    document.addEventListener("DOMContentLoaded", () => {
-        const audio = document.createElement('audio');
-        audio.src = '/media/music/happy_bday.mp3';
-        audio.preload = 'auto';
 
-        let audioPlayed = false;
-
-        const playAudio = () => {
-            console.log("Attempt to play audio"); // Debugging
-            if (!audioPlayed) {
-                audio.play().then(() => {
-                    console.log("Audio played successfully"); // Debugging
-                    audioPlayed = true;
-                    removeEventListeners();
-                }).catch((error) => {
-                    console.log("Playback failed", error); // Debugging
-                });
-            }
-        };
-
-        const removeEventListeners = () => {
-            ['click', 'keypress', 'touchstart', 'scroll'].forEach(event => {
-                document.removeEventListener(event, playAudio);
-            });
-        };
-
-        ['click', 'keypress', 'touchstart', 'scroll'].forEach(event => {
-            document.addEventListener(event, playAudio);
-        });
-
-        playAudio(); // Attempt to play on load
-    });
-})();
 
 
 
