@@ -74,7 +74,7 @@
             <article>
                 <h4>1. FIFO (First-In-First-Out)</h4>
                 <p>The FIFO page replacement algorithm is one of the simplest types of algorithm that manages the pages in memory. It operates on the principle that the pages that have been in memory the longest should be replaced first. This algorithm does not account for the frequency of page use after its entry into memory.</p>
-                <pre><code class="language-c">// The FIFO algorithm is implemented using the following function:
+                <pre><code class="language-c d-none">// The FIFO algorithm is implemented using the following function:
 void fifo(int pages[], int n, int frameSize) {
     int frame[frameSize], fcount = 0;
     for (int i = 0; i < frameSize; i++)
@@ -148,13 +148,16 @@ int main()
     printf("\nTotal Page Faults:\t%d\n", pageFaults);
     return 0;
 }</code></pre>
-
+                <div class="text-center">
+                    <img src="../img/p15/p15-img1.webp" class="img-fluid dynamicimg" alt="FIFO Page Replacement">
+                    <figcaption class="figure-caption">Figure: FIFO Page Replacement</figcaption>
+                </div>
             </article>
 
             <article>
                 <h4>2. LRU (Least Recently Used)</h4>
                 <p>The LRU algorithm keeps track of page usage over a short period of time. It replaces the page that has been in memory the longest with no recent use. This means that it favors pages that have been most recently used.</p>
-                <pre><code class="language-c">// The LRU algorithm is implemented using the following function:
+                <pre><code class="language-c d-none">// The LRU algorithm is implemented using the following function:
 void lru(int pages[], int n, int frameSize) {
     int frame[frameSize], used[frameSize];
     for (int i = 0; i < frameSize; i++) {
@@ -248,13 +251,16 @@ int main()
     printf ("The Total Page Faults are: %d\n", pageFault);
     return 0;
 }</code></pre>
-
+                <div class="text-center">
+                    <img src="../img/p15/p15-img2.webp" class="img-fluid dynamicimg" alt="LRU Page Replacement">
+                    <figcaption class="figure-caption">Figure: LRU Page Replacement</figcaption>
+                </div>
             </article>
 
             <article>
                 <h4>3. Optimal Page Replacement</h4>
                 <p>The Optimal Page Replacement algorithm replaces the page that will not be used for the longest period of time in the future. It provides the best possible way to manage page replacements but requires future knowledge of the reference string, which is not possible in actual systems.</p>
-                <pre><code class="language-c">// The Optimal algorithm is implemented using the following function:
+                <pre><code class="language-c d-none">// The Optimal algorithm is implemented using the following function:
 void optimal(int pages[], int n, int frameSize) {
     int frame[frameSize];
     for (int i = 0; i < frameSize; i++)
@@ -298,121 +304,124 @@ void optimal(int pages[], int n, int frameSize) {
             <article>
                 <h5>3.1 Implementation of Optimal Page Replacement in C</h5>
                 <pre><code class="language-c">#include &lt;stdio.h>
-
-void optimal(int string[20], int n, int size)
+  
+// This function checks if current strea item(key) exists in any of the frames or not
+int search(int key, int frame_items[], int frame_occupied)
 {
-    // Creating array for block storage
-    int frames[n];
-    // Initializing each block with -1
-    for (int i = 0; i < n; i++)
-        frames[i] = -1;
+    for (int i = 0; i < frame_occupied; i++)
+        if (frame_items[i] == key)
+            return 1;
+    return 0;
+}
 
-    // Index to insert element
-    int index = -1;
-
-    // Counters
-    int page_miss = 0;
-    int page_hits = 0;
-
-    // Pointer to indicate initially frames filled or not
-    int full = 0;
-
-    // Traversing each symbol in fifo
-    for (int i = 0; i < size; i++)
-    {
-        int symbol = string[i];
-        int flag = 0;
-
-        for (int j = 0; j < n; j++)
-        {
-            if (symbol == frames[j])
-            {
-                flag = 1;
+void printOuterStructure(int max_frames){
+    printf("Stream ");
+    
+    for(int i = 0; i < max_frames; i++)
+        printf("Frame%d ", i+1);
+}
+void printCurrFrames(int item, int frame_items[], int frame_occupied, int max_frames){
+    
+    // print current reference stream item
+    printf("\n%d \t\t", item);
+    
+    // print frame occupants one by one
+    for(int i = 0; i < max_frames; i++){
+        if(i < frame_occupied)
+            printf("%d \t\t", frame_items[i]);
+        else
+            printf("- \t\t");
+    }
+}
+// This Function helps in finding frame that will not be used
+// for the longest period of time in future in ref_str[0 ... refStrLen - 1]
+int predict(int ref_str[], int frame_items[], int refStrLen, int index, int frame_occupied)
+{
+    // For each current occupant in frame item
+    // we try to find the frame item that will not be referenced in 
+    // for the longest in future in the upcoming reference string
+    int result = -1, farthest = index;
+    for (int i = 0; i < frame_occupied; i++) {
+        int j;
+        for (j = index; j < refStrLen; j++) 
+        { 
+            if (frame_items[i] == ref_str[j]) 
+            { 
+                if (j > farthest) {
+                    farthest = j;
+                    result = i;
+                }
                 break;
             }
         }
-
-        if (flag == 1)
-        {
-            printf("\nSymbol: %d  Frame: ", symbol);
-            for (int j = 0; j < n; j++)
-                printf("%d ", frames[j]);
-            page_hits += 1;
-        }
-        else
-        {
-            // Frames are still empty
-            if (full == 0)
-            {
-                index = (index + 1) % n;
-                frames[index] = symbol;
-                page_miss += 1;
-                printf("\nSymbol: %d  Frame: ", symbol);
-                for (int j = 0; j < n; j++)
-                    printf("%d ", frames[j]);
-
-                // Frames filled or not
-                if (i == n - 1)
-                    full = 1;
-            }
-
-            // Frames are full, now we can apply optimal page replacement
-            else
-            {
-                // First find the index to replace with
-                int pos = -1;
-                int index = -1;
-
-                // Traversing each symbol and checking their optimal possibility
-                for (int j = 0; j < n; j++)
-                {
-                    // Whether symbol in frame found or not in future cached frame
-                    int found = 0;
-                    for (int k = i + 1; k < size; k++)
-                    {
-                        // If symbol exists in cached string
-                        if (frames[j] == string[k])
-                        {
-                            found = 1;
-                            if (pos < k)
-                            {
-                                pos = k;
-                                index = j;
-                            }
-                            break;
-                        }
-                    }
-                    // Symbol does not exist in cached frame
-                    if (found == 0)
-                    {
-                        pos = size;
-                        index = j;
-                    }
-                }
-                page_miss++;
-                // Now assign symbol in lru position
-                frames[index] = symbol;
-
-                printf("\nSymbol: %d  Frame: ", symbol);
-                for (int j = 0; j < n; j++)
-                    printf("%d ", frames[j]);
-            }
-        }
+  
+        // If we find a page that is never referenced in future,
+        // return it immediately as its the best
+        if (j == refStrLen)
+            return i;
     }
-    printf("\nPage hits: %d", page_hits);
-    printf("\nPage misses: %d", page_miss);
+  
+    // If none of the frame items appear in reference string
+    // in the future then we return 0th index. Otherwise we return result
+    return (result == -1) ? 0 : result;
 }
-
-// Main function
-int main(void)
+  
+void optimalPage(int ref_str[], int refStrLen, int frame_items[], int max_frames)
 {
-    int string[] = {2, 4, 7, 6, 7, 2, 2, 3, 3, 3};
-    int no_frames = 3;
-    int size = sizeof(string) / sizeof(int);
-    printf("%d", size);
-    optimal(string, no_frames, size);
+    // initially none of the frames are occupied
+    int frame_occupied = 0;
+    printOuterStructure(max_frames);
+    
+    // Here we traverse through reference string
+    // and check for miss and hit.
+    int hits = 0;
+    for (int i = 0; i < refStrLen; i++) {
+  
+        // If found already in the frame items : HIT
+        if (search(ref_str[i], frame_items, frame_occupied)) {
+            hits++;
+            printCurrFrames(ref_str[i], frame_items, frame_occupied, max_frames);
+            continue;
+        }
+  
+        // If not found in frame items : MISS
+  
+        // If frames are empty then current reference string item in frame
+        if (frame_occupied < max_frames){
+            frame_items[frame_occupied] = ref_str[i];
+            frame_occupied++;
+            printCurrFrames(ref_str[i], frame_items, frame_occupied, max_frames);
+        }
+        // else we need to use optmial algorithm to find
+        // frame index where we need to do replacement for this
+        // incoming reference string item
+        else {
+            int pos = predict(ref_str, frame_items, refStrLen, i + 1, frame_occupied);
+            frame_items[pos] = ref_str[i];
+            printCurrFrames(ref_str[i], frame_items, frame_occupied, max_frames);
+        }
+        
+    }
+    printf("\n\nHits: %d\n", hits);
+    printf("Misses: %d", refStrLen - hits);
+}
+  
+// Driver Function
+int main()
+{
+    // int ref_str[] = {9, 0, 5, 1, 0, 3, 0, 4, 1, 3, 0, 3, 1, 3};
+    int ref_str[] = {7, 0, 1, 2, 0, 3, 0, 4, 2, 3, 0, 3, 2, 1, 2, 0, 1, 7, 0, 1};
+    int refStrLen = sizeof(ref_str) / sizeof(ref_str[0]);
+    int max_frames = 3;
+    int frame_items[max_frames];
+    
+    optimalPage(ref_str, refStrLen, frame_items, max_frames);
     return 0;
 }</code></pre>
+                <div class="text-center">
+                    <img src="../img/p15/p15-img3.webp" class="img-fluid dynamicimg" alt="Optimal Page Replacement">
+                    <figcaption class="figure-caption">Figure: Optimal Page Replacement</figcaption>
+                </div>
             </article>
 
 
@@ -424,9 +433,124 @@ int main(void)
                 <p>Ensure that the <code>page_replacement.c</code> file contains all the function implementations and the main function that initializes the page array and calls these algorithms. Alternatively you can use the codes seperately.</p>
             </article>
 
+            <article id="image-section">
+                <h3>Image Reference</h3>
+                <div class="mt-3">
+                    <div class="row text-center" id="gallery"></div>
+                </div>
+
+                <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-xl">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="modalTitle"></h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body text-center">
+                                <img id="modalImage" class="img-fluid" src="" alt="">
+                            </div>
+                            <div class="modal-footer justify-content-between">
+                                <button type="button" class="btn btn-secondary" id="previousButton">Back</button>
+                                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary" id="nextButton">Next</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
         </main>
 
         <script> copyright("all"); </script>
     </body>
+
+    <script>
+        var currentImageIndex = -1; // Initialize current image index
+
+        // Array of objects for each step
+        var steps = [
+            { src: "../img/p15/p15-img1.webp", alt: "FIFO", caption: "Figure: First In First Out" },
+            { src: "../img/p15/p15-img2.webp", alt: "LRU", caption: "Figure: LRU" },
+            { src: "../img/p15/p15-img3.webp", alt: "Optimal Page Replacement", caption: "Figure: Optimal Page Replacement" },
+        ];
+
+        // Function to initialize gallery
+        function initGallery() {
+            var gallery = document.getElementById('gallery');
+            steps.forEach(function (step, index) {
+                var col = document.createElement('div');
+                col.className = 'col-12 col-sm-6 col-md-4 col-lg-3 mb-4';
+                col.innerHTML = `
+                                                            <img src="${step.src}" class="img-fluid dynamicimg" alt="${step.alt}" data-bs-toggle="modal" data-bs-target="#imageModal" onclick="openModal('${step.src}', '${step.alt}')">
+                                                            <figcaption class="figure-caption text-center">${step.caption}</figcaption>
+                                                        `;
+                gallery.appendChild(col);
+
+                // Update onclick to pass the current index
+                col.querySelector('img').onclick = function () {
+                    openModal(step.src, step.alt, index);
+                };
+            });
+
+            updateImageSources(); // Call the function to update all images with the 'dynamicimg' class
+        }
+
+        // Function to open modal
+
+        var currentImageIndex = -1; // Initialize current image index
+
+        // ... Your steps array and initGallery function ...
+
+        // Function to open modal and set the image and title
+        function openModal(src, alt, index) {
+            currentImageIndex = index; // Set the current image index
+
+            var modalTitle = document.getElementById('modalTitle');
+            var modalImage = document.getElementById('modalImage');
+
+            modalTitle.textContent = alt; // Set modal title to alt text
+            modalImage.src = src;
+            modalImage.alt = alt;
+
+            // Set up previous button functionality
+            var previousButton = document.getElementById('previousButton');
+            previousButton.style.display = currentImageIndex > 0 ? 'block' : 'none'; // Show if not the first image
+            previousButton.onclick = function () {
+                if (currentImageIndex > 0) {
+                    currentImageIndex--;
+                    var prevStep = steps[currentImageIndex];
+                    openModal(prevStep.src, prevStep.caption, currentImageIndex);
+                }
+            };
+
+            // Set up next button functionality
+            var nextButton = document.getElementById('nextButton');
+            nextButton.style.display = currentImageIndex < steps.length - 1 ? 'block' : 'none'; // Show if not the last image
+            nextButton.onclick = function () {
+                if (currentImageIndex < steps.length - 1) {
+                    currentImageIndex++;
+                    var nextStep = steps[currentImageIndex];
+                    openModal(nextStep.src, nextStep.caption, currentImageIndex);
+                }
+            };
+        }
+
+        // Function to update image sources
+        function updateImageSources() {
+            let images = document.querySelectorAll(".dynamicimg");
+
+            for (let image of images) {
+                let imageName = image.src.split("/").pop();
+                if (window.location.hostname === "dmj.one") {
+                    image.src = "https://cdn.dmj.one/edu/su/course/csu360/img/p15/" + imageName;
+                } else {
+                    image.src = "../img/p15/" + imageName;
+                }
+            }
+        }
+
+        // Initialize gallery on document ready
+        document.addEventListener('DOMContentLoaded', initGallery);
+    </script>
 
 </html>

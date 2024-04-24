@@ -2578,13 +2578,16 @@ function gen_blockquote() {
                     const age = event.year ? new Date().getFullYear() - event.year : null;
                     const initial = event.name.charAt(0);  // Extract the first letter
                     let randomMessage;
-                    if (!event.name == 'dmj') {
+                    console.log(event.name);
+                    if (!(event.name === "dmj")) {
+                        console.log(1);
                         randomMessage = age ?
                             `${randomEmoji1}Happy <span class="fw-bold">${age}</span><sup>${getSuffix(age)}</sup> ${event.name}!${randomEmoji2}<br><span class ="display-6">${getRandomItem(birthdayMessages)}</span>` :
                             `${randomEmoji1}Happy Birthday, ${initial}!${randomEmoji2}<br>${getRandomItem(birthdayMessages)}`;
                             // `${randomEmoji1}Enjoy the day ${event.name}!${randomEmoji2}<br><span class ="display-6">${getRandomItem(birthdayMessages)}</span>`;
                             // `<p class="text-center" style="font-size:1rem">${'❤️'.repeat(10)}<p><p class="text-center" style="font-size:1rem">${'❤️'.repeat(10)}<p><p class="text-center" style="font-size:1rem">${'❤️'.repeat(10)}<p><p class="text-center" style="font-size:1.5rem">${'❤️'.repeat(1)}<p><p class="mt-10 text-muted text-sm-center small" style="font-size:1.1rem">Click for a musical melody!</p>`;
                     } else {
+                        console.log(0);
                         randomMessage = `${randomEmoji1}Happy <span class="fw-bold">${age}</span><sup>${getSuffix(age)}</sup>${randomEmoji2}<br><span class ="display-6">${getRandomItem(birthdayMessages)}</span><p class="text-muted text-sm-center small" style="font-size:1.1rem">Click for a musical melody!</p>`
                     }
                     messages.push(randomMessage);

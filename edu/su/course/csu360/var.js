@@ -216,7 +216,7 @@ function get_menu_list(datetogen) {
                 readtime: 4,
                 link: "configure-internet-protocol"
             }, {
-                title: "Practical 8: Perform an operation of operating system to install and configure<br>A. SSH services <br>B. Apache HTTP Server (httpd).",
+                title: "Practical 8: Perform an operation of operating system to install and configure<br>A. SSH service <br>B. HTTP Service",
                 desc: "Learn to install and configure SSH services and Apache HTTP Server in Linux systems. This practical exercise will guide you through the process of setting up SSH services for secure remote access and installing Apache HTTP Server for web hosting, enabling you to manage network services and applications effectively.",
                 codetype: "Concepts",
                 readtime: 4,
