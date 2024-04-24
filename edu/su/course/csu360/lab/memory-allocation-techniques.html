@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+    <!--<![endif]-->
+
+    <head>
+        <script src="/js/edu_su_common.js"></script>
+        <noscript>
+            <style>
+                html,
+                body {
+                    margin: 0;
+                    overflow: hidden;
+                }
+            </style>
+            <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+        </noscript>
+
+        <title>Memory Allocation Technique - CSU360 - Shoolini U</title>
+        <meta name="description" content="Learn about the memory allocation techniques in operating systems with Shoolini's CSU360 course.">
+
+        <meta property="og:image" content="/logo.png">
+        <meta property="og:type" content="article">
+
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:site" content="@divyamohan1993">
+        <meta name="twitter:creator" content="@divyamohan1993">
+        <meta name="twitter:image" content="/logo.png">
+
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+        <meta name="author" content="Divya Mohan">
+        <meta name="robots" content="index, follow">
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js" integrity="sha512-sHSNLECRJSK+BFs7E8DiFc6pf6n90bLI85Emiw1jhreduZhK3VXgq9l4kAt9eTIHYAcuQBKHL01QKs4/3Xgl8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js" integrity="sha512-iWiuBS5nt6r60fCz26Nd0Zqe0nbk1ZTIQbl3Kv7kYsX+yKMUFHzjaH2+AnM6vp2Xs+gNmaBAVWJjSmuPw76Efg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                renderMathInElement(document.body, {
+                    // customised options
+                    // • auto-render specific keys, e.g.:
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false },
+                        { left: '\\(', right: '\\)', display: false },
+                        { left: '\\[', right: '\\]', display: true }
+                    ],
+                    // • rendering keys, e.g.:
+                    throwOnError: false
+                });
+            });
+        </script>
+    </head>
+
+    <body>
+
+        <script> header_author("dm"); </script>
+
+        <main>
+
+            <article class="agen-tableofcontents">
+                <h2 class="text-center">
+                    Memory Allocation Techniques - First Fit, Best Fit, Worst Fit
+                </h2>
+            </article>
+
+            <article id="header-memory-allocation">
+                <h3>1. Memory Allocation Techniques</h3>
+                <p>This section covers the theoretical concepts behind three primary memory allocation techniques used in operating systems: Worst Fit, Best Fit, and First Fit. Each technique utilizes a different strategy to manage free memory in a system and has its own advantages and disadvantages.</p>
+            </article>
+
+            <article>
+                <h4>1.1 First Fit</h4>
+                <p>First Fit allocates the first block that is big enough. This method scans memory from the beginning and allocates the first free block that fits the process. It is generally faster than Best and Worst Fit because it stops searching as soon as it finds a free block large enough.</p>
+                <p><strong>Advantages:</strong></p>
+                <ul>
+                    <li>Simple and fast, especially if the free blocks are sorted by size.</li>
+                    <li>Less processing time since it allocates the first suitable block.</li>
+                </ul>
+                <p><strong>Disadvantages:</strong></p>
+                <ul>
+                    <li>May cause more fragmentation compared to Best Fit, as it can leave larger free blocks towards the end of the memory.</li>
+                    <li>Performance depends on the order of requests and releases, which can vary significantly.</li>
+                </ul>
+                <article>
+                    <h5>1.1.1 Implementation of First Fit in C</h5>
+                    <pre><code class="language-c">#include &lt;stdio.h>
+#include &lt;conio.h>
+#define max 25
+void main()
+{
+    int frag[max], b[max], f[max], i, j, nb, nf, temp, highest = 0;
+    static int bf[max], ff[max];
+    clrscr();
+    printf("\n\tMemory Management Scheme - Worst Fit");
+    printf("\nEnter the number of blocks:");
+    scanf("%d", &nb);
+    printf("Enter the number of files:");
+    scanf("%d", &nf);
+    printf("\nEnter the size of the blocks:-\n");
+    for (i = 1; i <= nb; i++)
+    {
+        printf("Block %d:", i);
+        scanf("%d", &b[i]);
+    }
+    printf("Enter the size of the files :-\n");
+    for (i = 1; i <= nf; i++)
+    {
+        printf("File %d:", i);
+        scanf("%d", &f[i]);
+    }
+    for (i = 1; i <= nf; i++)
+    {
+
+        for (j = 1; j <= nb; j++)
+        {
+            if (bf[j] != 1) // if bf[j] is not allocated
+            {
+                temp = b[j] - f[i];
+                if (temp >= 0)
+                    if (highest < temp)
+                    {
+                        ff[i] = j;
+                        highest = temp;
+                    }
+            }
+        }
+        frag[i] = highest;
+        bf[ff[i]] = 1;
+        highest = 0;
+    }
+    printf("\nFile_no:\tFile_size :\tBlock_no:\tBlock_size:\tFragement");
+    for (i = 1; i <= nf; i++)
+        printf("\n%d\t\t%d\t\t%d\t\t%d\t\t%d", i, f[i], ff[i], b[ff[i]], frag[i]);
+    getch();
+}</code></pre>
+                </article>
+            </article>
+
+            <article>
+                <h4>1.2 Best Fit</h4>
+                <p>Best Fit allocates the smallest free block that is adequate to accommodate the process's demands. By doing this, it attempts to minimize the size of the unallocated space which reduces the likelihood of unusable small free spaces after allocation.</p>
+                <p><strong>Advantages:</strong></p>
+                <ul>
+                    <li>Optimizes space utilization by minimizing leftover space in memory blocks.</li>
+                    <li>Typically leaves smallest leftover blocks, which reduces the chances of fragmentation over time.</li>
+                </ul>
+                <p><strong>Disadvantages:</strong></p>
+                <ul>
+                    <li>Can increase fragmentation due to the accumulation of too small to use memory blocks over time.</li>
+                    <li>Searching for the smallest adequate block can increase allocation time, especially with larger memory size.</li>
+                </ul>
+                <article>
+                    <h5>1.1.1 Implementation of Best Fit in C</h5>
+                    <pre><code class="language-c">#include &lt;stdio.h>
+#include &lt;conio.h>
+#define max 25
+void main()
+{
+    int frag[max], b[max], f[max], i, j, nb, nf, temp, lowest = 10000;
+    static int bf[max], ff[max];
+    clrscr();
+    printf("\nEnter the number of blocks:");
+    scanf("%d", &nb);
+    printf("Enter the number of files:");
+    scanf("%d", &nf);
+    printf("\nEnter the size of the blocks:-\n");
+    for (i = 1; i <= nb; i++)
+    {
+        printf("Block %d:", i);
+        scanf("%d", &b[i]);
+    }
+    printf("Enter the size of the files :-\n");
+    for (i = 1; i <= nf; i++)
+    {
+        printf("File %d:", i);
+        scanf("%d", &f[i]);
+    }
+    for (i = 1; i <= nf; i++)
+    {
+        for (j = 1; j <= nb; j++)
+        {
+            if (bf[j] != 1)
+            {
+                temp = b[j] - f[i];
+                if (temp >= 0)
+                    if (lowest > temp)
+                    {
+                        ff[i] = j;
+
+                        lowest = temp;
+                    }
+            }
+        }
+        frag[i] = lowest;
+        bf[ff[i]] = 1;
+        lowest = 10000;
+    }
+    printf("\nFile No\tFile Size \tBlock No\tBlock Size\tFragment");
+    for (i = 1; i <= nf && ff[i] != 0; i++)
+        printf("\n%d\t\t%d\t\t%d\t\t%d\t\t%d", i, f[i], ff[i], b[ff[i]], frag[i]);
+    getch();
+}</code></pre>
+                </article>
+            </article>
+
+            <article>
+                <h4>1.3 Worst Fit</h4>
+                <p>The Worst Fit allocation method scans the list of free blocks and allocates the largest available block to the process. Its primary objective is to reduce the size of the largest free block. This approach is based on the assumption that a larger block will be more likely to accommodate future process requests, thereby minimizing the number of times a process cannot be allocated due to insufficient memory.</p>
+                <p><strong>Advantages:</strong></p>
+                <ul>
+                    <li>Reduces the size of the largest free memory block less frequently than other techniques.</li>
+                    <li>Can be more efficient in systems with large variance in process sizes.</li>
+                </ul>
+                <p><strong>Disadvantages:</strong></p>
+                <ul>
+                    <li>Can lead to inefficient use of space due to potentially leaving too large gaps unusable for smaller processes.</li>
+                    <li>May increase the time to search for a suitable block as it needs to examine all free blocks.</li>
+                </ul>
+                <article>
+                    <h5>1.1.1 Implementation of Worst Fit in C</h5>
+                    <pre><code class="language-c">#include &lt;stdio.h>
+#include &lt;conio.h>
+#define max 25
+void main()
+{
+    int frag[max], b[max], f[max], i, j, nb, nf, temp;
+    static int bf[max], ff[max];
+    clrscr();
+    printf("\n\tMemory Management Scheme - First Fit");
+    printf("\nEnter the number of blocks:");
+    scanf("%d", &nb);
+    printf("Enter the number of files:");
+    scanf("%d", &nf);
+    printf("\nEnter the size of the blocks:-\n");
+    for (i = 1; i <= nb; i++)
+    {
+        printf("Block %d:", i);
+        scanf("%d", &b[i]);
+    }
+    printf("Enter the size of the files :-\n");
+    for (i = 1; i <= nf; i++)
+    {
+        printf("File %d:", i);
+        scanf("%d", &f[i]);
+    }
+    for (i = 1; i <= nf; i++)
+    {
+        for (j = 1; j <= nb; j++)
+        {
+            if (bf[j] != 1)
+            {
+                temp = b[j] - f[i];
+                if (temp >= 0)
+                {
+                    ff[i] = j;
+                    break;
+                }
+            }
+        }
+        frag[i] = temp;
+        bf[ff[i]] = 1;
+    }
+    printf("\nFile_no:\tFile_size :\tBlock_no:\tBlock_size:\tFragement");
+    for (i = 1; i <= nf; i++)
+        printf("\n%d\t\t%d\t\t%d\t\t%d\t\t%d", i, f[i], ff[i], b[ff[i]], frag[i]);
+    getch();
+}</code></pre>
+                </article>
+            </article>
+
+        </main>
+
+        <script> copyright("all"); </script>
+    </body>
+
+</html>

@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+    <!--<![endif]-->
+
+    <head>
+        <script src="/js/edu_su_common.js"></script>
+        <noscript>
+            <style>
+                html,
+                body {
+                    margin: 0;
+                    overflow: hidden;
+                }
+            </style>
+            <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+        </noscript>
+
+        <title>Page Replacement Algorithm - CSU360 - Shoolini U</title>
+        <meta name="description" content="Learn about Page Replacement Algorithm in Operating System with Shoolini's CSU360 course.">
+
+        <meta property="og:image" content="/logo.png">
+        <meta property="og:type" content="article">
+
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:site" content="@divyamohan1993">
+        <meta name="twitter:creator" content="@divyamohan1993">
+        <meta name="twitter:image" content="/logo.png">
+
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+        <meta name="author" content="Divya Mohan">
+        <meta name="robots" content="index, follow">
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js" integrity="sha512-sHSNLECRJSK+BFs7E8DiFc6pf6n90bLI85Emiw1jhreduZhK3VXgq9l4kAt9eTIHYAcuQBKHL01QKs4/3Xgl8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js" integrity="sha512-iWiuBS5nt6r60fCz26Nd0Zqe0nbk1ZTIQbl3Kv7kYsX+yKMUFHzjaH2+AnM6vp2Xs+gNmaBAVWJjSmuPw76Efg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                renderMathInElement(document.body, {
+                    // customised options
+                    // • auto-render specific keys, e.g.:
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false },
+                        { left: '\\(', right: '\\)', display: false },
+                        { left: '\\[', right: '\\]', display: true }
+                    ],
+                    // • rendering keys, e.g.:
+                    throwOnError: false
+                });
+            });
+        </script>
+    </head>
+
+    <body>
+
+        <script> header_author("dm"); </script>
+
+        <main>
+
+            <article class="agen-tableofcontents">
+                <h2 class="text-center">
+                    Page Replacement Algorithm
+                </h2>
+            </article>
+
+            <article id="header-practical-15">
+                <h3>Practical 15: Page Replacement Algorithms in C</h3>
+                <p>This practical aims to simulate three common page replacement algorithms: First-In-First-Out (FIFO), Least Recently Used (LRU), and Optimal Page Replacement. Each of these algorithms helps in managing how pages are loaded into memory from disk and replaced to accommodate new pages when memory is full. This simulation will be implemented using the C programming language on a Kali Linux environment.</p>
+            </article>
+
+            <article>
+                <h4>1. FIFO (First-In-First-Out)</h4>
+                <p>The FIFO page replacement algorithm is one of the simplest types of algorithm that manages the pages in memory. It operates on the principle that the pages that have been in memory the longest should be replaced first. This algorithm does not account for the frequency of page use after its entry into memory.</p>
+                <pre><code class="language-c">// The FIFO algorithm is implemented using the following function:
+void fifo(int pages[], int n, int frameSize) {
+    int frame[frameSize], fcount = 0;
+    for (int i = 0; i < frameSize; i++)
+        frame[i] = -1;
+
+    for (int i = 0; i < n; i++) {
+        int j = 0, flag = 0;
+        while (j < frameSize) {
+            if (frame[j] == pages[i]) {
+                flag = 1;
+                break;
+            }
+            j++;
+        }
+        if (flag == 0) {
+            frame[fcount] = pages[i];
+            fcount = (fcount + 1) % frameSize;
+        }
+        for (j = 0; j < frameSize; j++)
+            printf("%d ", frame[j]);
+        printf("\\n");
+    }
+}</code></pre>
+            </article>
+            <article>
+                <h5>1.1 Implementation of FIFO Page Replacement in C</h5>
+                <pre><code class="language-c">#include &lt;stdio.h>
+int main()
+{
+    int incomingStream[] = {4, 1, 2, 4, 5};
+    int pageFaults = 0;
+    int frames = 3;
+    int m, n, s, pages;
+    pages = sizeof(incomingStream) / sizeof(incomingStream[0]);
+    printf(" Incoming \t Frame 1 \t Frame 2 \t Frame 3 ");
+    int temp[frames];
+    for (m = 0; m < frames; m++)
+    {
+        temp[m] = -1;
+    }
+    for (m = 0; m < pages; m++)
+    {
+        s = 0;
+        for (n = 0; n < frames; n++)
+        {
+            if (incomingStream[m] == temp[n])
+            {
+                s++;
+                pageFaults--;
+            }
+        }
+        pageFaults++;
+        if ((pageFaults <= frames) && (s == 0))
+        {
+            temp[m] = incomingStream[m];
+        }
+        else if (s == 0)
+        {
+            temp[(pageFaults - 1) % frames] = incomingStream[m];
+        }
+        printf("\n");
+        printf("%d\t\t\t", incomingStream[m]);
+        for (n = 0; n < frames; n++)
+        {
+            if (temp[n] != -1)
+                printf(" %d\t\t\t", temp[n]);
+            else
+                printf(" - \t\t\t");
+        }
+    }
+    printf("\nTotal Page Faults:\t%d\n", pageFaults);
+    return 0;
+}</code></pre>
+
+            </article>
+
+            <article>
+                <h4>2. LRU (Least Recently Used)</h4>
+                <p>The LRU algorithm keeps track of page usage over a short period of time. It replaces the page that has been in memory the longest with no recent use. This means that it favors pages that have been most recently used.</p>
+                <pre><code class="language-c">// The LRU algorithm is implemented using the following function:
+void lru(int pages[], int n, int frameSize) {
+    int frame[frameSize], used[frameSize];
+    for (int i = 0; i < frameSize; i++) {
+        frame[i] = -1;
+        used[i] = 0;
+    }
+
+    for (int i = 0; i < n; i++) {
+        int j = 0, flag = 0, least = 9999, rIndex;
+        while (j < frameSize) {
+            if (frame[j] == pages[i]) {
+                flag = 1;
+                used[j] = i;
+                break;
+            }
+            if (used[j] < least) {
+                least = used[j];
+                rIndex = j;
+            }
+            j++;
+        }
+        if (flag == 0) {
+            frame[rIndex] = pages[i];
+            used[rIndex] = i;
+        }
+        for (j = 0; j < frameSize; j++)
+            printf("%d ", frame[j]);
+        printf("\\n");
+    }
+}</code></pre>
+            </article>
+            <article>
+                <h5>2.1 Implementation of LRU Page Replacement in C</h5>
+                <pre><code class="language-c">#include &lt;stdio.h>
+
+int main()
+{
+    int frame, page, i, j, flag = 0, count = 0, temp, pageFault = 0, index;
+
+    printf ("LRU Page Replacement Algorithm\n");
+    printf ("Enter the number of frames available: ");
+    scanf ("%d", &frame);
+    printf ("Enter the number of pages available: ");
+    scanf ("%d", &page);
+    int free_frame[frame], pages[page], used_frame[frame];
+
+    for (count = 0; count < frame; count++)
+        free_frame[count] = -1;
+
+    printf ("Enter the page sizes: ");
+    for (i = 0; i < page; i++)
+        scanf ("%d", &pages[i]);
+
+    for (count = 0; count < page; count++)
+    {
+        flag = 0;
+        for (j = 0; j < frame; j++)
+        {
+            if (free_frame[j] == pages[count])
+            {
+                flag = 1;
+                break;
+            }
+        }
+
+        if (flag == 0)
+        {
+            for (j = 0; j < frame; j++)
+                used_frame[j] = 0;
+            for (j = 0, temp = count - 1; j < frame; j++, temp--)
+            {
+                for (i = 0; i < frame; i++)
+                {
+                    if (free_frame[i] == pages[temp])
+                        used_frame[i] = 1;
+                }
+            }
+            for (j = 0; j < frame; j++)
+                if (used_frame[j] == 0)
+                    index = j;
+
+            free_frame[index] = pages[count];
+            printf ("Page Fault: ");
+            pageFault++;
+        }
+        for (i = 0; i < frame; i++)
+            printf ("%d\t", free_frame[i]);
+
+        printf ("\n");
+    }
+    printf ("The Total Page Faults are: %d\n", pageFault);
+    return 0;
+}</code></pre>
+
+            </article>
+
+            <article>
+                <h4>3. Optimal Page Replacement</h4>
+                <p>The Optimal Page Replacement algorithm replaces the page that will not be used for the longest period of time in the future. It provides the best possible way to manage page replacements but requires future knowledge of the reference string, which is not possible in actual systems.</p>
+                <pre><code class="language-c">// The Optimal algorithm is implemented using the following function:
+void optimal(int pages[], int n, int frameSize) {
+    int frame[frameSize];
+    for (int i = 0; i < frameSize; i++)
+        frame[i] = -1;
+
+    for (int i = 0; i < n; i++) {
+        int j = 0, flag = 0, max, fIndex, found[frameSize];
+        for (int k = 0; k < frameSize; k++)
+            found[k] = 0;
+
+        for (j = 0; j < frameSize; j++) {
+            if (frame[j] == pages[i]) {
+                flag = 1;
+                break;
+            }
+        }
+        if (flag == 0) {
+            for (j = 0; j < frameSize; j++) {
+                int k;
+                for (k = i + 1; k < n && frame[j] != pages[k]; k++);
+                if (k == n) found[j] = 9999;
+                else found[j] = k;
+            }
+            max = found[0], fIndex = 0;
+            for (j = 1; j < frameSize; j++) {
+                if (found[j] > max) {
+                    max = found
+
+[j];
+                    fIndex = j;
+                }
+            }
+            frame[fIndex] = pages[i];
+        }
+        for (j = 0; j < frameSize; j++)
+            printf("%d ", frame[j]);
+        printf("\\n");
+    }
+}</code></pre>
+            </article>
+            <article>
+                <h5>3.1 Implementation of Optimal Page Replacement in C</h5>
+                <pre><code class="language-c">#include &lt;stdio.h>
+
+void optimal(int string[20], int n, int size)
+{
+    // Creating array for block storage
+    int frames[n];
+    // Initializing each block with -1
+    for (int i = 0; i < n; i++)
+        frames[i] = -1;
+
+    // Index to insert element
+    int index = -1;
+
+    // Counters
+    int page_miss = 0;
+    int page_hits = 0;
+
+    // Pointer to indicate initially frames filled or not
+    int full = 0;
+
+    // Traversing each symbol in fifo
+    for (int i = 0; i < size; i++)
+    {
+        int symbol = string[i];
+        int flag = 0;
+
+        for (int j = 0; j < n; j++)
+        {
+            if (symbol == frames[j])
+            {
+                flag = 1;
+                break;
+            }
+        }
+
+        if (flag == 1)
+        {
+            printf("\nSymbol: %d  Frame: ", symbol);
+            for (int j = 0; j < n; j++)
+                printf("%d ", frames[j]);
+            page_hits += 1;
+        }
+        else
+        {
+            // Frames are still empty
+            if (full == 0)
+            {
+                index = (index + 1) % n;
+                frames[index] = symbol;
+                page_miss += 1;
+                printf("\nSymbol: %d  Frame: ", symbol);
+                for (int j = 0; j < n; j++)
+                    printf("%d ", frames[j]);
+
+                // Frames filled or not
+                if (i == n - 1)
+                    full = 1;
+            }
+
+            // Frames are full, now we can apply optimal page replacement
+            else
+            {
+                // First find the index to replace with
+                int pos = -1;
+                int index = -1;
+
+                // Traversing each symbol and checking their optimal possibility
+                for (int j = 0; j < n; j++)
+                {
+                    // Whether symbol in frame found or not in future cached frame
+                    int found = 0;
+                    for (int k = i + 1; k < size; k++)
+                    {
+                        // If symbol exists in cached string
+                        if (frames[j] == string[k])
+                        {
+                            found = 1;
+                            if (pos < k)
+                            {
+                                pos = k;
+                                index = j;
+                            }
+                            break;
+                        }
+                    }
+                    // Symbol does not exist in cached frame
+                    if (found == 0)
+                    {
+                        pos = size;
+                        index = j;
+                    }
+                }
+                page_miss++;
+                // Now assign symbol in lru position
+                frames[index] = symbol;
+
+                printf("\nSymbol: %d  Frame: ", symbol);
+                for (int j = 0; j < n; j++)
+                    printf("%d ", frames[j]);
+            }
+        }
+    }
+    printf("\nPage hits: %d", page_hits);
+    printf("\nPage misses: %d", page_miss);
+}
+
+// Main function
+int main(void)
+{
+    int string[] = {2, 4, 7, 6, 7, 2, 2, 3, 3, 3};
+    int no_frames = 3;
+    int size = sizeof(string) / sizeof(int);
+    printf("%d", size);
+    optimal(string, no_frames, size);
+    return 0;
+}</code></pre>
+            </article>
+
+
+            <article>
+                <h3>4 Compilation and Execution</h3>
+                <p>To compile and run the simulation, use the following commands on your Kali terminal:</p>
+                <pre><code class="language-auto">gcc -o page_replacement page_replacement.c
+./page_replacement</code></pre>
+                <p>Ensure that the <code>page_replacement.c</code> file contains all the function implementations and the main function that initializes the page array and calls these algorithms. Alternatively you can use the codes seperately.</p>
+            </article>
+
+        </main>
+
+        <script> copyright("all"); </script>
+    </body>
+
+</html>

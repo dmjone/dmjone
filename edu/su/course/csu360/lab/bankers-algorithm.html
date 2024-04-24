@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+    <!--<![endif]-->
+
+    <head>
+        <script src="/js/edu_su_common.js"></script>
+        <noscript>
+            <style>
+                html,
+                body {
+                    margin: 0;
+                    overflow: hidden;
+                }
+            </style>
+            <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+        </noscript>
+
+        <title>Bankers Algorithm - CSU360 - Shoolini U</title>
+        <meta name="description" content="Learn about the Bankers Algorithm in Operating System with Shoolini's CSU360 course.">
+
+        <meta property="og:image" content="/logo.png">
+        <meta property="og:type" content="article">
+
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:site" content="@divyamohan1993">
+        <meta name="twitter:creator" content="@divyamohan1993">
+        <meta name="twitter:image" content="/logo.png">
+
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+        <meta name="author" content="Divya Mohan">
+        <meta name="robots" content="index, follow">
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js" integrity="sha512-sHSNLECRJSK+BFs7E8DiFc6pf6n90bLI85Emiw1jhreduZhK3VXgq9l4kAt9eTIHYAcuQBKHL01QKs4/3Xgl8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js" integrity="sha512-iWiuBS5nt6r60fCz26Nd0Zqe0nbk1ZTIQbl3Kv7kYsX+yKMUFHzjaH2+AnM6vp2Xs+gNmaBAVWJjSmuPw76Efg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                renderMathInElement(document.body, {
+                    // customised options
+                    // • auto-render specific keys, e.g.:
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false },
+                        { left: '\\(', right: '\\)', display: false },
+                        { left: '\\[', right: '\\]', display: true }
+                    ],
+                    // • rendering keys, e.g.:
+                    throwOnError: false
+                });
+            });
+        </script>
+    </head>
+
+    <body>
+
+        <script> header_author("dm"); </script>
+
+        <main>
+
+            <article class="agen-tableofcontents">
+                <h2 class="text-center">
+                    Banker's Algorithm
+                </h2>
+            </article>
+
+            <article id="header-shortlink-from-h3">
+                <h3>1. Introduction to Banker's Algorithm</h3>
+                <p>Banker's Algorithm is a resource allocation and deadlock avoidance algorithm used in operating systems to ensure that a computer system will not enter into a deadlock state. It simulates the allocation of predetermined resources to multiple processes in a way that avoids deadlock. The algorithm is named after the banking system, where the bank never allocates available cash in such a way that it can no longer satisfy the needs of all of its customers.</p>
+            </article>
+
+            <article>
+                <h4>1.1 Concepts and Definitions</h4>
+                <p>The Banker's Algorithm uses several data structures to keep track of the resources. The key concepts include:</p>
+                <ul>
+                    <li><strong>Available</strong>: A vector that indicates the number of available instances of each resource.</li>
+                    <li><strong>Max</strong>: A matrix that represents the maximum demand of each process.</li>
+                    <li><strong>Allocation</strong>: A matrix that represents the current allocation of each resource to each process.</li>
+                    <li><strong>Need</strong>: A matrix indicating the remaining resource need of each process, which is calculated as Max - Allocation.</li>
+                </ul>
+                <p>The algorithm proceeds by simulating each request and deciding whether it is safe to fulfill the request. A state is considered <em>safe</em> if there is at least one sequence of all processes in the system such that each process can request and obtain additional resources necessary to complete its designated task without causing a deadlock.</p>
+            </article>
+
+            <article>
+                <h5>1.1.1 Implementation of Banker's Algorithm in C</h5>
+                <p>The following C program demonstrates the implementation of the Banker's Algorithm. It assumes that there are a fixed number of resources and processes. Users will need to enter the maximum required resources, the allocation matrix, and the available resources at runtime.</p>
+                <pre><code class="language-c">#include &lt;stdio.h&gt;
+#define P 5 // Number of processes
+#define R 3 // Number of resources
+
+// Function prototypes
+void calculateNeed(int need[P][R], int max[P][R], int allot[P][R]);
+int isSafe(int processes[], int avail[], int max[][R], int allot[][R]);
+
+int main() {
+    int processes[] = {0, 1, 2, 3, 4};
+
+    // Available instances of resources
+    int avail[] = {3, 3, 2};
+
+    // Maximum R that can be allocated to processes
+    int max[P][R] = {
+        {7, 5, 3},
+        {3, 2, 2},
+        {9, 0, 2},
+        {2, 2, 2},
+        {4, 3, 3}
+    };
+
+    // Resources currently allocated to processes
+    int allot[P][R] = {
+        {0, 1, 0},
+        {2, 0, 0},
+        {3, 0, 2},
+        {2, 1, 1},
+        {0, 0, 2}
+    };
+
+    // Check system is in safe state or not
+    isSafe(processes, avail, max, allot);
+
+    return 0;
+}
+
+void calculateNeed(int need[P][R], int max[P][R], int allot[P][R]) {
+    for (int i = 0; i &lt; P; i++)
+        for (int j = 0; j &lt; R; j++)
+            need[i][j] = max[i][j] - allot[i][j];
+}
+
+int isSafe(int processes[], int avail[], int max[][R], int allot[][R]) {
+    int need[P][R];
+    calculateNeed(need, max, allot);
+
+    int finish[P] = {0};
+    int safeSeq[P];
+    int work[R];
+    for (int i = 0; i &lt; R; i++)
+        work[i] = avail[i];
+
+    int count = 0;
+    while (count &lt; P) {
+        int found = 0;
+        for (int p = 0; p &lt; P; p++) {
+            if (!finish[p]) {
+                int j;
+                for (j = 0; j &lt; R; j++)
+                    if (need[p][j] &gt; work[j])
+                        break;
+
+                if (j == R) {
+                    for (int k = 0; k &lt; R; k++)
+                        work[k] += allot[p][k];
+
+                    safeSeq[count++] = p;
+                    finish[p] = 1;
+                    found = 1;
+                }
+            }
+        }
+
+        if (!found) {
+            printf("System is not in a safe state\n");
+            return 0;
+        }
+
+
+    }
+
+    printf("System is in a safe state.\nSafe sequence is: ");
+    for (int i = 0; i &lt; P; i++)
+        printf("%d ",safeSeq[i]);
+    printf("\n");
+    return 1;
+}</code></pre>
+                <p>This program will check for the safe state of the system after any resource request and prints a safe sequence if one exists.</p>
+            </article>
+
+            <article>
+                <h4>1.1.2 Alternate Implementation of Banker's Algorithm in C</h4>
+                <p>Below is an alternate implementation for the Banker's Algorithm in C.</p>
+                <pre><code class="language-c">// Banker's Algorithm  
+#include &lt;stdio.h>  
+int main()  
+{  
+    // P0 , P1 , P2 , P3 , P4 are the Process names here  
+    int n , m , i , j , k;  
+    n = 5; // Number of processes  
+    m = 3; // Number of resources  
+    int alloc[ 5 ] [ 3 ] = { { 0 , 1 , 0 }, // P0 // Allocation Matrix  
+                        { 2 , 0 , 0 } , // P1  
+                        { 3 , 0 , 2 } , // P2  
+                        { 2 , 1 , 1 } , // P3  
+                        { 0 , 0 , 2 } } ; // P4  
+    int max[ 5 ] [ 3 ] = { { 7 , 5 , 3 } , // P0 // MAX Matrix  
+                    { 3 , 2 , 2 } , // P1  
+                    { 9 , 0 , 2 } , // P2  
+                    { 2 , 2 , 2 } , // P3  
+                    { 4 , 3 , 3 } } ; // P4  
+    int avail[3] = { 3 , 3 , 2 } ; // Available Resources  
+    int f[n] , ans[n] , ind = 0 ;  
+    for (k = 0; k < n; k++) {  
+        f[k] = 0;  
+    }  
+    int need[n][m];  
+    for (i = 0; i < n; i++) {  
+        for (j = 0; j < m; j++)  
+            need[i][j] = max[i][j] - alloc[i][j] ;  
+    }  
+    int y = 0;  
+    for (k = 0; k < 5; k++){  
+        for (i = 0; i < n; i++){  
+            if (f[i] == 0){  
+                int flag = 0;  
+                for (j = 0; j < m; j++) {  
+                    if(need[i][j] > avail[j]){  
+                        flag = 1;  
+                        break;  
+                    }  
+                }  
+                if ( flag == 0 ) {  
+                    ans[ind++] = i;  
+                    for (y = 0; y < m; y++)  
+                        avail[y] += alloc[i][y] ;  
+                    f[i] = 1;  
+                }  
+            }  
+        }  
+    }  
+    int flag = 1;   
+    for(int i=0;i&lt;n;i++)  
+    {  
+    if(f[i] == 0)  
+    {  
+        flag = 0;  
+        printf(" The following system is not safe ");  
+        break;  
+    }  
+    }  
+    if (flag == 1)  
+    {  
+    printf(" Following is the SAFE Sequence \ n ");  
+    for (i = 0; i < n - 1; i++)  
+        printf(" P%d -> " , ans[i]);  
+    printf(" P%d ", ans[n - 1]);  
+    }  
+    return(0);  
+}</code></pre>
+            </article>
+
+        </main>
+
+        <script> copyright("all"); </script>
+    </body>
+
+</html>
