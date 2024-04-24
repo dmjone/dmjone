@@ -80,6 +80,10 @@
                     <p>Before configuring a new IP address, it's important to check the current settings. This can be done using the <code>ip</code> command.</p>
                     <pre><code class="language-bash">ip a</code></pre>
                     <p>This command displays all current network interfaces and their IP configuration.</p>
+                    <div class="text-center">
+                        <img src="../img/p7/p7-img1.webp" class="img-fluid dynamicimg" alt="ip a">
+                        <figcaption class="figure-caption">Figure: ip a command</figcaption>
+                    </div>
                 </article>
 
                 <article>
@@ -87,6 +91,10 @@
                     <p>To configure a static IP address, you need to edit the network configuration file. In Kali Linux, this is typically handled by the NetworkManager.</p>
                     <p>First, identify the connection name using:</p>
                     <pre><code class="language-bash">nmcli con show</code></pre>
+                    <div class="text-center">
+                        <img src="../img/p7/p7-img2.webp" class="img-fluid dynamicimg" alt="Show Connections">
+                        <figcaption class="figure-caption">Figure: Show Connections</figcaption>
+                    </div>
                     <p>Then, modify the connection settings for your specific network interface (replace "eth0" with your interface name and adjust the IP details accordingly):</p>
                     <pre><code class="language-bash">nmcli con mod eth0 ipv4.addresses 192.168.1.100/24
 nmcli con mod eth0 ipv4.gateway 192.168.1.1
@@ -112,10 +120,33 @@ nmcli con mod eth0 ipv4.method manual</code></pre>
                     <pre><code class="language-bash">systemctl status NetworkManager</code></pre>
                     <p>If the service is not running, start it using:</p>
                     <pre><code class="language-bash">systemctl start NetworkManager</code></pre>
+                    <p>Then, get the current ip address to verify the IP class change:</p>
+                    <pre><code class="language-bash">ifconfig</code></pre>
+                    <div class="text-center">
+                        <img src="../img/p7/p7-img3.webp" class="img-fluid dynamicimg" alt="Get current IP Address">
+                        <figcaption class="figure-caption">Figure: Get current IP Address</figcaption>
+                    </div>
                     <p>Then, modify the IP configuration:</p>
-                    <pre><code class="language-bash">nmcli con mod eth0 ipv4.addresses 10.0.0.100/24
-nmcli con up eth0</code></pre>
+                    <pre><code class="language-bash">nmcli con mod "Wired connection 1" ipv4.addresses 10.0.0.100/24 # Apply Changes
+nmcli con down "Wired connection 1" && nmcli con up "Wired connection 1" # Restart Adapter</code></pre>
+                    <div class="text-center">
+                        <img src="../img/p7/p7-img4.webp" class="img-fluid dynamicimg" alt="Change the IP Address Class">
+                        <figcaption class="figure-caption">Figure: Change the IP Address Class</figcaption>
+                    </div>
                     <p>This command changes the IP address and reactivates the network connection to apply changes.</p>
+                    <p>Then, Verify the IP class change:</p>
+                    <pre><code class="language-bash">ifconfig</code></pre>
+                    <div class="text-center">
+                        <img src="../img/p7/p7-img5.webp" class="img-fluid dynamicimg" alt="Get new class IP Address">
+                        <figcaption class="figure-caption">Figure: Get new class IP Address</figcaption>
+                    </div>
+                    <p>Optionally, to revert back to automatic settings, run these:</p>
+                    <pre><code class="language-bash">nmcli con mod "Wired connection 1" ipv4.method auto # Revert Changes and set to auto
+nmcli con down "Wired connection 1" && nmcli con up "Wired connection 1" # Restart Adapter</code></pre>
+                    <div class="text-center">
+                        <img src="../img/p7/p7-img6.webp" class="img-fluid dynamicimg" alt="Get new class IP Address">
+                        <figcaption class="figure-caption">Figure: Get new class IP Address</figcaption>
+                    </div>
                 </article>
 
                 <article>
@@ -139,9 +170,125 @@ nmcli con up eth0</code></pre>
                 </article>
             </article>
 
+            <article id="image-section">
+                <h3>Image Reference</h3>
+                <div class="mt-3">
+                    <div class="row text-center" id="gallery"></div>
+                </div>
+            
+                <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-xl">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="modalTitle"></h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body text-center">
+                                <img id="modalImage" class="img-fluid" src="" alt="">
+                            </div>
+                            <div class="modal-footer justify-content-between">
+                                <button type="button" class="btn btn-secondary" id="previousButton">Back</button>
+                                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary" id="nextButton">Next</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </article>
         </main>
         <script> copyright("all"); </script>
 
+        <script>
+            var currentImageIndex = -1; // Initialize current image index
+
+            // Array of objects for each step
+            var steps = [
+                { src: "../img/p7/p7-img1.webp", alt: "ip a command", caption: "Figure: ip a command" },
+                { src: "../img/p7/p7-img2.webp", alt: "Show Connections", caption: "Figure: Show Connections" },
+                { src: "../img/p7/p7-img3.webp", alt: "Copying and Moving Files", caption: "Figure: Copying and Moving Files" },
+                { src: "../img/p7/p7-img4.webp", alt: "Directory Operations with Content", caption: "Figure: Directory Operations with Content" },
+                { src: "../img/p7/p7-img5.webp", alt: "Viewing File Content", caption: "Figure: Viewing File Content" },
+                { src: "../img/p7/p7-img6.webp", alt: "Viewing File Content", caption: "Figure: Viewing File Content" },
+            ];
+
+            // Function to initialize gallery
+            function initGallery() {
+                var gallery = document.getElementById('gallery');
+                steps.forEach(function (step, index) {
+                    var col = document.createElement('div');
+                    col.className = 'col-12 col-sm-6 col-md-4 col-lg-3 mb-4';
+                    col.innerHTML = `
+                                        <img src="${step.src}" class="img-fluid dynamicimg" alt="${step.alt}" data-bs-toggle="modal" data-bs-target="#imageModal" onclick="openModal('${step.src}', '${step.alt}')">
+                                        <figcaption class="figure-caption text-center">${step.caption}</figcaption>
+                                    `;
+                    gallery.appendChild(col);
+
+                    // Update onclick to pass the current index
+                    col.querySelector('img').onclick = function () {
+                        openModal(step.src, step.alt, index);
+                    };
+                });
+
+                updateImageSources(); // Call the function to update all images with the 'dynamicimg' class
+            }
+
+            // Function to open modal
+
+            var currentImageIndex = -1; // Initialize current image index
+
+            // ... Your steps array and initGallery function ...
+
+            // Function to open modal and set the image and title
+            function openModal(src, alt, index) {
+                currentImageIndex = index; // Set the current image index
+
+                var modalTitle = document.getElementById('modalTitle');
+                var modalImage = document.getElementById('modalImage');
+
+                modalTitle.textContent = alt; // Set modal title to alt text
+                modalImage.src = src;
+                modalImage.alt = alt;
+
+                // Set up previous button functionality
+                var previousButton = document.getElementById('previousButton');
+                previousButton.style.display = currentImageIndex > 0 ? 'block' : 'none'; // Show if not the first image
+                previousButton.onclick = function () {
+                    if (currentImageIndex > 0) {
+                        currentImageIndex--;
+                        var prevStep = steps[currentImageIndex];
+                        openModal(prevStep.src, prevStep.caption, currentImageIndex);
+                    }
+                };
+
+                // Set up next button functionality
+                var nextButton = document.getElementById('nextButton');
+                nextButton.style.display = currentImageIndex < steps.length - 1 ? 'block' : 'none'; // Show if not the last image
+                nextButton.onclick = function () {
+                    if (currentImageIndex < steps.length - 1) {
+                        currentImageIndex++;
+                        var nextStep = steps[currentImageIndex];
+                        openModal(nextStep.src, nextStep.caption, currentImageIndex);
+                    }
+                };
+            }
+
+            // Function to update image sources
+            function updateImageSources() {
+                let images = document.querySelectorAll(".dynamicimg");
+
+                for (let image of images) {
+                    let imageName = image.src.split("/").pop();
+                    if (window.location.hostname === "dmj.one") {
+                        image.src = "https://cdn.dmj.one/edu/su/course/csu360/img/p7/" + imageName;
+                    } else {
+                        image.src = "../img/p7/" + imageName;
+                    }
+                }
+            }
+
+            // Initialize gallery on document ready
+            document.addEventListener('DOMContentLoaded', initGallery);
+        </script>
 
     </body>
 
