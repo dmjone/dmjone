@@ -58,7 +58,7 @@ function processAuthors(args) {
             i += 2;
         }
         authorTextArr.push(author, author_href);
-    }
+    }    
     return {
         pA_author: head_FormatAuthor(...authorTextArr),
         pA_bio: author_bio
@@ -696,6 +696,7 @@ function processFolder(allAuthors, author_bio) {
     window.GLOBAL_get_prof_href_ = prof_href;
     window.GLOBAL_get_course_ = course;
     window.GLOBAL_get_course_detail_ = course_detail; // Before () is added to the course.
+    window.GLOBAL_get_Faculty_Name_ = prof;
     
     // Setting up the lines
     course_detail = window.location.pathname.split("/")[3] ? ` (${course_detail})` : "";    

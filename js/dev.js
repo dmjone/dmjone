@@ -924,6 +924,10 @@ let header_author = function (...args) {
             const { pA_author, pA_bio } = processAuthors(args);
             const allAuthors = `<span id="authorlist">${pA_author}</span>`, author_bio = pA_bio;
 
+            // Added to display when user prints the article
+            window.GLOBAL_get_Author_Name_ = pA_author;
+            
+
             const { line1, line2, line3, line4 } = processFolder(allAuthors, author_bio);
 
             const finalheaders = "<header>" + line1 + line2 + line3 + line4 + "</header>" + header_navbar();
@@ -935,7 +939,75 @@ let header_author = function (...args) {
     header_author_internal.activateNavbar();
 };
 
+/************************* Print Specific Layout Generator ****************************/
+(function () {
+    document.addEventListener('DOMContentLoaded', function () {
+        // Create QR code data URL
+        var qr = qrcode(0, 'H');
+        qr.addData(window.location.href);
+        qr.make();
+        var qrcode_data = qr.createDataURL(4, "");
 
+        // Create and configure the QR code image
+        var img = new Image();
+        img.src = qrcode_data;
+        img.alt = 'QR Code to visit the website of the article';
+        img.className = 'img-fluid d-none d-print-block mx-auto mt-10';
+
+        // Function to extract text content from strong tags
+        // function extractTextFromStrongTag(htmlString) {
+        //     var tempDiv = document.createElement('div');
+        //     tempDiv.innerHTML = htmlString;
+        //     return Array.from(tempDiv.querySelectorAll('strong'), el => el.textContent).join(', ');
+        // }
+
+        function extractTextFromStrongTag(htmlString) {
+            var tempDiv = document.createElement('div');
+            tempDiv.innerHTML = htmlString.toUpperCase();
+            var authorNames = Array.from(tempDiv.querySelectorAll('strong'), el => el.textContent);
+
+            // If there's more than one name, format the string with "and" before the last name
+            if (authorNames.length > 1) {
+                var lastAuthor = authorNames.pop();
+                return authorNames.join(', ') + ' and ' + lastAuthor;
+            } else {
+                return authorNames.join('');
+            }
+        }
+
+
+        // Prepare the author and faculty divs with text content
+        var authorsText = extractTextFromStrongTag(window.GLOBAL_get_Author_Name_);        
+        var authorsDiv = document.createElement('div');
+        authorsDiv.className = 'd-none d-print-block mx-auto mt-4';
+        authorsDiv.innerHTML = authorsText ? `<p class="text-center">${authorsText}</p>` : '';
+
+        var facultyDiv = document.createElement('div');
+        facultyDiv.className = 'd-none d-print-block mx-auto mt-5';        
+        facultyDiv.innerHTML = window.GLOBAL_get_course_detail_ ? window.GLOBAL_get_course_ ? `<p class="text-center">${window.GLOBAL_get_course_detail_} (${window.GLOBAL_get_course_})</p>` : `<p class="text-center">${window.GLOBAL_get_course_detail_}</p>` : '';        
+        facultyDiv.innerHTML += window.GLOBAL_get_Faculty_Name_ ? `<p class="text-center"><span class="fw-bold"></span> ${window.GLOBAL_get_Faculty_Name_}</p>` : '';                
+        facultyDiv.innerHTML += `<p class="text-center">${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>`;
+        
+        // Create a div for logos
+        var logodiv = document.createElement('div');
+        logodiv.innerHTML = `<div class="row mb-10 d-none d-print-flex">
+                            <div class="col-6 col">
+                                <img src="/logo.png" class="img-fluid" alt="Logo" style="max-width:20%">
+                            </div>
+                            <div class="col-6 col">
+                                <img src="/img/shoolini_logo.png" class="img-fluid" alt="Logo" style="max-width:40%">
+                            </div>
+                         </div>`;
+
+        // Append the elements to the article element
+        var article = document.querySelector('.agen-tableofcontents');
+        var h2 = article.querySelector('h2');
+        article.insertBefore(logodiv, h2);
+        article.insertBefore(authorsDiv, h2.nextSibling);
+        article.insertBefore(facultyDiv, authorsDiv.nextSibling);
+        article.insertBefore(img, facultyDiv.nextSibling);
+    });
+})()
 
 /******** Body ***********/
 // Decode Encrypted Variable's - Call this function to decode variables.
@@ -1691,6 +1763,7 @@ function body_blockcards(link, date, title, desc, codetype, readtime, author, se
         qr.make();
         return qr.createDataURL(4, "");
     })();
+    
 
     let unsplash_categories = ["programming", "robot", "space", "script", "tech", "network", "electronic", "server", "code"];
     unsplash_categories = unsplash_categories[randomNum(0, unsplash_categories.length - 1)];
@@ -4294,7 +4367,7 @@ const certifications = {
         if (autogen_tableofcontents && !existingToc) {
             // Check if a ToC does not already exist            
                 const tocHTML = `
-            <div class="container mt-4 w-100 w-xl-75">
+            <div class="container mt-4 w-100 w-xl-75 d-print-none">
                 <div class="accordion" id="toc">
                     <div class="accordion-item">
                         <h2 class="accordion-header" id="h1">
