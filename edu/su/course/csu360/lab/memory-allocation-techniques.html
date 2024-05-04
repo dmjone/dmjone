@@ -62,9 +62,9 @@
 
             <article class="agen-tableofcontents">
                 <h2 class="text-center">
-                    Practical 14: Write a C program to simulate the following contiguous memory allocation techniques: First fit, Best fit, and Worst fit
+                    Practical 14: Write a C program to simulate the following contiguous memory allocation techniques: <strong>First fit</strong>, <strong>Best fit</strong>, and <strong>Worst fit</strong>
                 </h2>
-<div class="d-none contentdate">2024, April 10</div>
+                <div class="d-none contentdate">2024, April 10</div>
             </article>
 
             <article id="header-memory-allocation">
@@ -85,15 +85,47 @@
                     <li>May cause more fragmentation compared to Best Fit, as it can leave larger free blocks towards the end of the memory.</li>
                     <li>Performance depends on the order of requests and releases, which can vary significantly.</li>
                 </ul>
-                <article>
-                    <h5>14.1.1. Implementation of First Fit in C</h5>
-                    <pre><code class="language-c">#include &lt;stdio.h>
+            </article>
+            <article>
+                <h5>14.1.1. Algorithm of First Fit</h5>
+                <ol>
+                    <li><strong>Start Scan:</strong> Begin at the start of the list of memory blocks.</li>
+                    <li><strong>Check Block Size:</strong> Examine each memory block in sequence to determine if it is free and large enough to accommodate the requested memory size.</li>
+                    <li><strong>Allocate Memory:</strong>
+                        <ul>
+                            <li>If a suitable block is found:
+                                <ul>
+                                    <li>Allocate the necessary memory from this block to the process.</li>
+                                    <li>If the block is exactly the size needed, mark it as fully occupied.</li>
+                                    <li>If the block is larger than needed, allocate the required amount at the beginning of the block and reduce the size of the block by the amount allocated.</li>
+                                </ul>
+                            </li>
+                            <li>If no suitable block is found after checking all available blocks:
+                                <ul>
+                                    <li>Return a memory allocation error or attempt another memory management strategy, such as compaction or swapping.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <li><strong>Update Memory List:</strong> Adjust the list of memory blocks to reflect the allocated memory and any remaining free space.</li>
+                    <li><strong>Process Request Complete:</strong> End the allocation process once the memory has been successfully assigned or an error has been returned.</li>
+                </ol>
+                <div class="text-center">
+                    <img src="../img/p14/p14-img1.webp" class="img-fluid dynamicimg imgblacktowhite" alt="First Fit">
+                    <figcaption class="figure-caption">Figure 14.1.1.1: Output of First Fit</figcaption>
+                </div>
+            </article>
+
+            <article class="d-print-none">
+                <h5>14.1.2. Implementation of First Fit in C</h5>
+                <pre><code class="language-c">#include &lt;stdio.h>
+
 #define max 25
 void main()
 {
-    int frag[max], b[max], f[max], i, j, nb, nf, temp, highest = 0;
+    int frag[max], b[max], f[max], i, j, nb, nf, temp;
     static int bf[max], ff[max];
-    printf("\n\tMemory Management Scheme - Worst Fit");
+    printf("\n\tMemory Management Scheme - First Fit");
     printf("\nEnter the number of blocks:");
     scanf("%d", &nb);
     printf("Enter the number of files:");
@@ -112,34 +144,25 @@ void main()
     }
     for (i = 1; i <= nf; i++)
     {
-
         for (j = 1; j <= nb; j++)
         {
-            if (bf[j] != 1) // if bf[j] is not allocated
+            if (bf[j] != 1)
             {
                 temp = b[j] - f[i];
                 if (temp >= 0)
-                    if (highest < temp)
-                    {
-                        ff[i] = j;
-                        highest = temp;
+                {
+                ff[i] = j;
+                    break;
                     }
             }
         }
-        frag[i] = highest;
+        frag[i] = temp;
         bf[ff[i]] = 1;
-        highest = 0;
     }
     printf("\nFile_no:\tFile_size :\tBlock_no:\tBlock_size:\tFragement");
     for (i = 1; i <= nf; i++)
-        printf("\n%d\t\t%d\t\t%d\t\t%d\t\t%d", i, f[i], ff[i], b[ff[i]], frag[i]);
-
+        printf("\n%d\t\t%d\t\t%d\t\t%d\t\t%d", i, f[i], ff[i], b[ff[i]], frag[i]);    
 }</code></pre>
-                    <div class="text-center">
-                        <img src="../img/p14/p14-img1.webp" class="img-fluid dynamicimg terminalimgunique-883uw3" alt="First Fit">
-                        <figcaption class="figure-caption">Figure 14.1.1.1: First Fit</figcaption>
-                    </div>
-                </article>
             </article>
 
             <article>
@@ -155,9 +178,44 @@ void main()
                     <li>Can increase fragmentation due to the accumulation of too small to use memory blocks over time.</li>
                     <li>Searching for the smallest adequate block can increase allocation time, especially with larger memory size.</li>
                 </ul>
-                <article>
-                    <h5>14.2.1 Implementation of Best Fit in C</h5>
-                    <pre><code class="language-c">#include &lt;stdio.h>
+            </article>
+            <article>
+                <h5>14.2.1. Algorithm of Best Fit</h5>
+                <ol>
+                    <li><strong>Initialize Variables:</strong> Start with no block selected and set the size of the smallest suitable block found to be infinite (or a very large number).</li>
+                    <li><strong>Scan Memory Blocks:</strong> Go through each block of memory:
+                        <ul>
+                            <li>If the block is free and its size is greater than or equal to the requested size and smaller than the smallest found so far, update the smallest block variable to this block's size and record its location.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Check for Suitable Block:</strong>
+                        <ul>
+                            <li>If a suitable block has been found:
+                                <ul>
+                                    <li>Allocate the required amount of memory from this block.</li>
+                                    <li>If the block size is exactly what is needed, mark it as fully occupied.</li>
+                                    <li>If the block is larger than needed, allocate the necessary amount and reduce the size of the block by that amount, leaving the remainder as a smaller free block.</li>
+                                </ul>
+                            </li>
+                            <li>If no suitable block is found (smallest block variable remains infinite):
+                                <ul>
+                                    <li>Return a memory allocation error or consider using other memory management techniques, such as compaction or using a different allocation strategy.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <li><strong>Update Memory List:</strong> Modify the list of memory blocks to reflect the new allocation and any changes in block sizes.</li>
+                    <li><strong>Complete Request:</strong> End the process once memory has been successfully allocated or an error message has been issued.</li>
+                </ol>
+                <div class="text-center">
+                    <img src="../img/p14/p14-img2.webp" class="img-fluid dynamicimg imgblacktowhite" alt="Best Fit">
+                    <figcaption class="figure-caption">Figure 14.2.1.1: Best Fit</figcaption>
+                </div>
+            </article>
+
+            <article class="d-print-none">
+                <h5>14.2.2. Implementation of Best Fit in C</h5>
+                <pre><code class="language-c">#include &lt;stdio.h>
 
 #define max 25
 void main()
@@ -205,11 +263,6 @@ void main()
     for (i = 1; i <= nf && ff[i] != 0; i++)
         printf("\n%d\t\t%d\t\t%d\t\t%d\t\t%d", i, f[i], ff[i], b[ff[i]], frag[i]);    
 }</code></pre>
-                    <div class="text-center">
-                        <img src="../img/p14/p14-img2.webp" class="img-fluid dynamicimg terminalimgunique-883uw3" alt="Best Fit">
-                        <figcaption class="figure-caption">Figure 14.2.1.1: Best Fit</figcaption>
-                    </div>
-                </article>
             </article>
 
             <article>
@@ -225,17 +278,50 @@ void main()
                     <li>Can lead to inefficient use of space due to potentially leaving too large gaps unusable for smaller processes.</li>
                     <li>May increase the time to search for a suitable block as it needs to examine all free blocks.</li>
                 </ul>
-                <article>
-                    <h5>14.3.1 Implementation of Worst Fit in C</h5>
-                    <pre><code class="language-c">#include &lt;stdio.h>
+            </article>
+            <article>
+                <h5>14.3.1 Algorithm of Worst Fit</h5>
+                <ol>
+                    <li><strong>Initialize Variables:</strong> Start with no block selected and set the size of the largest block found to zero.</li>
+                    <li><strong>Scan Memory Blocks:</strong> Go through each block of memory:
+                        <ul>
+                            <li>If the block is free and its size is larger than the current largest block that has been found and is capable of accommodating the requested size, update the largest block variable to this block's size and record its location.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Allocate Memory:</strong>
+                        <ul>
+                            <li>If a suitable block (largest block) has been found:
+                                <ul>
+                                    <li>Allocate the required amount of memory from this block.</li>
+                                    <li>If the block is exactly the size needed, mark it as fully occupied.</li>
+                                    <li>If the block is larger than needed, allocate the necessary amount from the beginning or end of the block and reduce the size of the block by the amount allocated, leaving the remainder as a free block.</li>
+                                </ul>
+                            </li>
+                            <li>If no suitable block is found:
+                                <ul>
+                                    <li>Return a memory allocation error or consider using other memory management techniques, such as compaction or using a different allocation strategy.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <li><strong>Update Memory List:</strong> Modify the list of memory blocks to reflect the new allocation and any changes in block sizes.</li>
+                    <li><strong>Complete Request:</strong> End the process once memory has been successfully allocated or an error message has been issued.</li>
+                </ol>
+                <div class="text-center">
+                    <img src="../img/p14/p14-img3.webp" class="img-fluid dynamicimg imgblacktowhite" alt="Worst Fit">
+                    <figcaption class="figure-caption">Figure 14.3.1.1: Worst Fit</figcaption>
+                </div>
+            </article>
 
+            <article class="d-print-none">
+                <h5>14.3.2 Implementation of Worst Fit in C</h5>
+                <pre><code class="language-c">#include &lt;stdio.h>
 #define max 25
 void main()
 {
-    int frag[max], b[max], f[max], i, j, nb, nf, temp;
+    int frag[max], b[max], f[max], i, j, nb, nf, temp, highest = 0;
     static int bf[max], ff[max];
-    
-    printf("\n\tMemory Management Scheme - First Fit");
+    printf("\n\tMemory Management Scheme - Worst Fit");
     printf("\nEnter the number of blocks:");
     scanf("%d", &nb);
     printf("Enter the number of files:");
@@ -254,30 +340,29 @@ void main()
     }
     for (i = 1; i <= nf; i++)
     {
+
         for (j = 1; j <= nb; j++)
         {
-            if (bf[j] != 1)
+            if (bf[j] != 1) // if bf[j] is not allocated
             {
                 temp = b[j] - f[i];
                 if (temp >= 0)
-                {
-                    ff[i] = j;
-                    break;
-                }
+                    if (highest < temp)
+                    {
+                        ff[i] = j;
+                        highest = temp;
+                    }
             }
         }
-        frag[i] = temp;
+        frag[i] = highest;
         bf[ff[i]] = 1;
+        highest = 0;
     }
     printf("\nFile_no:\tFile_size :\tBlock_no:\tBlock_size:\tFragement");
     for (i = 1; i <= nf; i++)
-        printf("\n%d\t\t%d\t\t%d\t\t%d\t\t%d", i, f[i], ff[i], b[ff[i]], frag[i]);    
+        printf("\n%d\t\t%d\t\t%d\t\t%d\t\t%d", i, f[i], ff[i], b[ff[i]], frag[i]);
+
 }</code></pre>
-                    <div class="text-center">
-                        <img src="../img/p14/p14-img3.webp" class="img-fluid dynamicimg terminalimgunique-883uw3" alt="Worst Fit">
-                        <figcaption class="figure-caption">Figure 14.3.1.1: Worst Fit</figcaption>
-                    </div>
-                </article>
             </article>
 
             <article id="image-section">

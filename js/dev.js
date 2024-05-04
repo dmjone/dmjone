@@ -969,6 +969,8 @@ let header_author = function (...args) {
         let titleofthepage = articleElement.querySelector('h2').innerText;
         let dateofthepage = articleElement.querySelector('.contentdate') ? articleElement.querySelector('.contentdate').innerText : "n.d.";
         let h2 = articleElement.querySelector('h2');
+        h2.classList.add('d-print-none');
+        
 
         // Create a div for logos
         var logodiv = document.createElement('div');
@@ -979,11 +981,12 @@ let header_author = function (...args) {
                             <img src="/img/shoolini_logo.png" class="img-fluid" alt="Logo" style="max-width:80%">
                         </div>`;
         logodiv.innerHTML = noactualarticle ? `<div class="row d-none d-print-flex"><img src="/logo.png" class="img-fluid" alt="Logo" style="max-width:40%"></div>` : `<div class="row d-none d-print-flex justify-content-between">${dmjshoolini}</div>`;
-        logodiv.className = 'd-none d-print-flex mx-auto';
+        logodiv.className = 'd-none d-print-flex mx-auto mb-10';
         if (noactualarticle) {
             articleElement.parentNode.insertBefore(logodiv, articleElement);
             return null;
         }
+
 
 
         // Create QR code data URL
@@ -997,10 +1000,10 @@ let header_author = function (...args) {
         qrImage.src = qrcode_data;
         qrImage.alt = 'QR Code to visit the website of the article';
         qrImage.className = 'img-fluid ';
-        qrImage.style = 'max-width: 150px; max-height: 150px;';
+        // qrImage.style = 'max-width: 150px; max-height: 150px;';
 
         var qrDiv = document.createElement('div');
-        qrDiv.className = 'd-none d-none d-print-block mx-auto my-10';
+        qrDiv.className = 'd-none d-none d-print-block mx-auto mt-10';
         qrDiv.appendChild(qrImage);
 
         // Function to extract text content from strong tags
@@ -1041,22 +1044,27 @@ let header_author = function (...args) {
             }
         }
 
+        // Prepare the titleofthepage div with the titleofthepage as text content
+        var titleDiv = document.createElement('div');
+        titleDiv.className = 'd-none d-print-block mx-auto mt-2';
+        titleDiv.innerHTML = `<h2 class="text-center text-uppercase">${titleofthepage}</h2>`;
+
         // Prepare the author and faculty divs with text content
         var authorsText = extractTextFromStrongTag(window.GLOBAL_get_Author_Name_);
         var authorsDiv = document.createElement('div');
-        authorsDiv.className = 'd-none d-print-block mx-auto mt-3 mb-5';
+        authorsDiv.className = 'd-none d-print-block mx-auto mt-3 mb-4';
         authorsDiv.innerHTML = authorsText ? `<p class="text-center text-uppercase">${authorsText}</p><p class="text-uppercase text-center" style="font-size:8px!important">Faculty of Engineering and Technology</p><p class="text-uppercase text-center" style="font-size:10px!important">Shoolini University, Solan, Himachal Pradesh, India</p>` : '';
 
 
         var facultyDiv = document.createElement('div');
-        facultyDiv.className = 'd-none d-print-block mx-auto mt-2 mb-2';
+        facultyDiv.className = 'd-none d-print-block mx-auto';
         facultyDiv.innerHTML = window.GLOBAL_get_course_detail_ ? window.GLOBAL_get_course_ ? `<p class="text-center fst-italic">Under the guidance of <span class="text-capitalize">${window.GLOBAL_get_Faculty_Name_}</span> in the subject of <span class="text-capitalize">${window.GLOBAL_get_course_detail_} (${window.GLOBAL_get_course_})</span></p>` : `<p class="text-center">${window.GLOBAL_get_course_detail_}</p>` : '';
         // facultyDiv.innerHTML += window.GLOBAL_get_Faculty_Name_ ? `<p class="text-center text-uppercase"><span class="fw-bold"></span> ${window.GLOBAL_get_Faculty_Name_}</p>` : '';
         facultyDiv.innerHTML += `<p class="text-center text-uppercase" style="font-size:8px!important">Printed: ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>`;
 
         var authorsetal = formatAuthorsEtAl(window.GLOBAL_get_Author_Name_);
         var citationblockquote = document.createElement('blockquote');
-        citationblockquote.className = 'd-none d-print-flex mt-5 text-decoration-none';
+        citationblockquote.className = 'd-none d-print-flex mt-3 text-decoration-none';
         citationblockquote.style = 'font-style:unset !important';
         citationblockquote.innerHTML = authorsetal ? `<p class="citation">${authorsetal} (${dateofthepage}). <em>${titleofthepage}</em>. Retrieved from ${window.location.href}</p>` : '';
 
@@ -1071,20 +1079,21 @@ let header_author = function (...args) {
         // article.insertBefore(img, facultyDiv.nextSibling);
 
         // Create a document fragment to hold all the elements in the correct order
-        let docFragmentBeforeh2 = document.createDocumentFragment();                        
+        let docFragmentBeforeh2 = document.createDocumentFragment();
         docFragmentBeforeh2.appendChild(logodiv);
-        docFragmentBeforeh2.appendChild(qrDiv);        
         
         let docFragmentAfterh2 = document.createDocumentFragment();
+        docFragmentAfterh2.appendChild(titleDiv);
         docFragmentAfterh2.appendChild(authorsDiv);
-        docFragmentAfterh2.appendChild(facultyDiv);        
+        docFragmentAfterh2.appendChild(facultyDiv);
+        docFragmentAfterh2.appendChild(qrDiv);
         docFragmentAfterh2.appendChild(citationblockquote);
 
         // Insert the document fragment at the beginning of articleElement
         articleElement.insertBefore(docFragmentBeforeh2, h2);
         articleElement.insertBefore(docFragmentAfterh2, h2.nextSibling);
     });
-})()
+})();
 
 /******** Body ***********/
 // Decode Encrypted Variable's - Call this function to decode variables.
