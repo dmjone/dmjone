@@ -926,7 +926,7 @@ let header_author = function (...args) {
 
             // Added to display when user prints the article
             window.GLOBAL_get_Author_Name_ = pA_author;
-            
+
 
             const { line1, line2, line3, line4 } = processFolder(allAuthors, author_bio);
 
@@ -942,6 +942,50 @@ let header_author = function (...args) {
 /************************* Print Specific Layout Generator ****************************/
 (function () {
     document.addEventListener('DOMContentLoaded', function () {
+        const path = window.location.pathname.split('/').filter(Boolean); // Split the path and remove empty segments
+
+        // Check if the path length is exactly 6
+        if (path.length === 6) {
+            // Create a link element for the CSS
+            const linkElement = document.createElement('link');
+            linkElement.rel = 'stylesheet';
+            linkElement.type = 'text/css';
+            // linkElement.media = 'print';
+            linkElement.href = '/css/print-article-APA6.css'; // Adjust the path as needed
+            document.head.appendChild(linkElement);
+        }
+    });
+})();
+
+(function () {
+    document.addEventListener('DOMContentLoaded', function () {
+        let noactualarticle;
+        // Retrive elements of the page        
+        let articleElement = document.querySelector('article.agen-tableofcontents');
+        if (typeof articleElement === 'undefined' || articleElement === null) {
+            noactualarticle = 1;
+            articleElement = document.querySelector('main');
+        }
+        let titleofthepage = articleElement.querySelector('h2').innerText;
+        let dateofthepage = articleElement.querySelector('.contentdate') ? articleElement.querySelector('.contentdate').innerText : "n.d.";
+        let h2 = articleElement.querySelector('h2');
+
+        // Create a div for logos
+        var logodiv = document.createElement('div');
+        dmjshoolini = `<div class="col-6 col">
+                            <img src="/logo.png" class="img-fluid" alt="Logo" style="max-width:40%">
+                        </div>
+                        <div class="col-6 col">
+                            <img src="/img/shoolini_logo.png" class="img-fluid" alt="Logo" style="max-width:80%">
+                        </div>`;
+        logodiv.innerHTML = noactualarticle ? `<div class="row d-none d-print-flex"><img src="/logo.png" class="img-fluid" alt="Logo" style="max-width:40%"></div>` : `<div class="row d-none d-print-flex justify-content-between">${dmjshoolini}</div>`;
+        logodiv.className = 'd-none d-print-flex mx-auto';
+        if (noactualarticle) {
+            articleElement.parentNode.insertBefore(logodiv, articleElement);
+            return null;
+        }
+
+
         // Create QR code data URL
         var qr = qrcode(0, 'H');
         qr.addData(window.location.href);
@@ -949,10 +993,15 @@ let header_author = function (...args) {
         var qrcode_data = qr.createDataURL(4, "");
 
         // Create and configure the QR code image
-        var img = new Image();
-        img.src = qrcode_data;
-        img.alt = 'QR Code to visit the website of the article';
-        img.className = 'img-fluid d-none d-print-block mx-auto mt-10';
+        var qrImage = new Image();
+        qrImage.src = qrcode_data;
+        qrImage.alt = 'QR Code to visit the website of the article';
+        qrImage.className = 'img-fluid ';
+        qrImage.style = 'max-width: 150px; max-height: 150px;';
+
+        var qrDiv = document.createElement('div');
+        qrDiv.className = 'd-none d-none d-print-block mx-auto my-10';
+        qrDiv.appendChild(qrImage);
 
         // Function to extract text content from strong tags
         // function extractTextFromStrongTag(htmlString) {
@@ -961,9 +1010,26 @@ let header_author = function (...args) {
         //     return Array.from(tempDiv.querySelectorAll('strong'), el => el.textContent).join(', ');
         // }
 
+        function formatAuthorsEtAl(htmlString) {
+            var tempDiv = document.createElement('div');
+            tempDiv.innerHTML = htmlString;
+            var strongTags = tempDiv.querySelectorAll('strong');
+
+            // If there's only one author, just return the formatted name
+            if (strongTags.length === 1) {
+                var singleAuthorName = strongTags[0].textContent.trim().split(' ');
+                return singleAuthorName[1] + ' ' + singleAuthorName[0].charAt(0) + '.';
+            } else if (strongTags.length > 1) {
+                // Assuming the first strong tag is the primary author
+                var primaryAuthorName = strongTags[0].textContent.trim().split(' ');
+                return primaryAuthorName[1] + ' ' + primaryAuthorName[0].charAt(0) + '. et al.';
+            }
+            return ''; // In case there are no strong tags
+        }
+
         function extractTextFromStrongTag(htmlString) {
             var tempDiv = document.createElement('div');
-            tempDiv.innerHTML = htmlString.toUpperCase();
+            tempDiv.innerHTML = htmlString;
             var authorNames = Array.from(tempDiv.querySelectorAll('strong'), el => el.textContent);
 
             // If there's more than one name, format the string with "and" before the last name
@@ -975,37 +1041,48 @@ let header_author = function (...args) {
             }
         }
 
-
         // Prepare the author and faculty divs with text content
-        var authorsText = extractTextFromStrongTag(window.GLOBAL_get_Author_Name_);        
+        var authorsText = extractTextFromStrongTag(window.GLOBAL_get_Author_Name_);
         var authorsDiv = document.createElement('div');
-        authorsDiv.className = 'd-none d-print-block mx-auto mt-4';
-        authorsDiv.innerHTML = authorsText ? `<p class="text-center">${authorsText}</p>` : '';
+        authorsDiv.className = 'd-none d-print-block mx-auto mt-3 mb-5';
+        authorsDiv.innerHTML = authorsText ? `<p class="text-center text-uppercase">${authorsText}</p><p class="text-uppercase text-center" style="font-size:8px!important">Faculty of Engineering and Technology</p><p class="text-uppercase text-center" style="font-size:10px!important">Shoolini University, Solan, Himachal Pradesh, India</p>` : '';
+
 
         var facultyDiv = document.createElement('div');
-        facultyDiv.className = 'd-none d-print-block mx-auto mt-5';        
-        facultyDiv.innerHTML = window.GLOBAL_get_course_detail_ ? window.GLOBAL_get_course_ ? `<p class="text-center">${window.GLOBAL_get_course_detail_} (${window.GLOBAL_get_course_})</p>` : `<p class="text-center">${window.GLOBAL_get_course_detail_}</p>` : '';        
-        facultyDiv.innerHTML += window.GLOBAL_get_Faculty_Name_ ? `<p class="text-center"><span class="fw-bold"></span> ${window.GLOBAL_get_Faculty_Name_}</p>` : '';                
-        facultyDiv.innerHTML += `<p class="text-center">${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>`;
-        
-        // Create a div for logos
-        var logodiv = document.createElement('div');
-        logodiv.innerHTML = `<div class="row mb-10 d-none d-print-flex">
-                            <div class="col-6 col">
-                                <img src="/logo.png" class="img-fluid" alt="Logo" style="max-width:20%">
-                            </div>
-                            <div class="col-6 col">
-                                <img src="/img/shoolini_logo.png" class="img-fluid" alt="Logo" style="max-width:40%">
-                            </div>
-                         </div>`;
+        facultyDiv.className = 'd-none d-print-block mx-auto mt-2 mb-2';
+        facultyDiv.innerHTML = window.GLOBAL_get_course_detail_ ? window.GLOBAL_get_course_ ? `<p class="text-center fst-italic">Under the guidance of <span class="text-capitalize">${window.GLOBAL_get_Faculty_Name_}</span> in the subject of <span class="text-capitalize">${window.GLOBAL_get_course_detail_} (${window.GLOBAL_get_course_})</span></p>` : `<p class="text-center">${window.GLOBAL_get_course_detail_}</p>` : '';
+        // facultyDiv.innerHTML += window.GLOBAL_get_Faculty_Name_ ? `<p class="text-center text-uppercase"><span class="fw-bold"></span> ${window.GLOBAL_get_Faculty_Name_}</p>` : '';
+        facultyDiv.innerHTML += `<p class="text-center text-uppercase" style="font-size:8px!important">Printed: ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>`;
+
+        var authorsetal = formatAuthorsEtAl(window.GLOBAL_get_Author_Name_);
+        var citationblockquote = document.createElement('blockquote');
+        citationblockquote.className = 'd-none d-print-flex mt-5 text-decoration-none';
+        citationblockquote.style = 'font-style:unset !important';
+        citationblockquote.innerHTML = authorsetal ? `<p class="citation">${authorsetal} (${dateofthepage}). <em>${titleofthepage}</em>. Retrieved from ${window.location.href}</p>` : '';
 
         // Append the elements to the article element
-        var article = document.querySelector('.agen-tableofcontents');
-        var h2 = article.querySelector('h2');
-        article.insertBefore(logodiv, h2);
-        article.insertBefore(authorsDiv, h2.nextSibling);
-        article.insertBefore(facultyDiv, authorsDiv.nextSibling);
-        article.insertBefore(img, facultyDiv.nextSibling);
+        // var article = document.querySelector('.agen-tableofcontents');
+
+        // articleElement.insertBefore(logodiv, h2);
+        // articleElement.insertBefore(qrImage, h2);
+        // articleElement.insertBefore(authorsDiv, h2.nextSibling);
+        // articleElement.insertBefore(facultyDiv, authorsDiv.nextSibling);
+        // articleElement.insertBefore(citationblockquote, facultyDiv.nextSibling);
+        // article.insertBefore(img, facultyDiv.nextSibling);
+
+        // Create a document fragment to hold all the elements in the correct order
+        let docFragmentBeforeh2 = document.createDocumentFragment();                        
+        docFragmentBeforeh2.appendChild(logodiv);
+        docFragmentBeforeh2.appendChild(qrDiv);        
+        
+        let docFragmentAfterh2 = document.createDocumentFragment();
+        docFragmentAfterh2.appendChild(authorsDiv);
+        docFragmentAfterh2.appendChild(facultyDiv);        
+        docFragmentAfterh2.appendChild(citationblockquote);
+
+        // Insert the document fragment at the beginning of articleElement
+        articleElement.insertBefore(docFragmentBeforeh2, h2);
+        articleElement.insertBefore(docFragmentAfterh2, h2.nextSibling);
     });
 })()
 
@@ -1763,7 +1840,7 @@ function body_blockcards(link, date, title, desc, codetype, readtime, author, se
         qr.make();
         return qr.createDataURL(4, "");
     })();
-    
+
 
     let unsplash_categories = ["programming", "robot", "space", "script", "tech", "network", "electronic", "server", "code"];
     unsplash_categories = unsplash_categories[randomNum(0, unsplash_categories.length - 1)];
@@ -2062,10 +2139,12 @@ function createSharingButtons(text, url, iconName, btnClass) {
 }
 
 
-function copyright(rights) {
+function copyright(rights, noprint = false) {
     window["loaded_copyright"] = 1;
     // sitemap_var_gen_clipboard(); // uncomment this line to get the sitemap generation link copier 
     if (rights === "off") { return null; }
+    console.log(noprint);
+    if (noprint === true) { return null; }
 
     var footer_all_rights = ' &#8226; All rights reserved';
     var footer_some_rights = ' &#8226; Some rights reserved';
@@ -2081,6 +2160,7 @@ function copyright(rights) {
     let footer = document.createElement("footer");
     var sharingButtons = createSharingButtons();
     footer.appendChild(sharingButtons);
+    var div = document.createElement("div");
     var span = document.createElement("span");
     var strong = document.createElement("strong");
 
@@ -2091,10 +2171,28 @@ function copyright(rights) {
         isServer = " (Live)";
     }
 
-    const modified = "cloudflare" == footer_getHeaderValue('server') ? `<span style="font-size:10px">Not seeing updated content? Page was loaded on ${document.lastModified} ${isServer}. Refresh with <kbd>CTRL</kbd> + <kbd>R</kbd> to check again.</span> <br>` : `<span style="font-size:10px">Not seeing updated content? Page last modified on ${document.lastModified} ${isServer}. Refresh with <kbd>CTRL</kbd> + <kbd>R</kbd> to check again.</span> <br>`;
+    const modified = "cloudflare" == footer_getHeaderValue('server') ?
+        `<span style="font-size:10px" class="d-print-none">Not seeing updated content? Page was loaded on ${document.lastModified} ${isServer}. Refresh with <kbd>CTRL</kbd> + <kbd>R</kbd> to check again.</span> <br>` :
+        `<span style="font-size:10px" class="d-print-none">Not seeing updated content? Page last modified on ${document.lastModified} ${isServer}. Refresh with <kbd>CTRL</kbd> + <kbd>R</kbd> to check again.</span> <br>`;
 
+    const footerNotice = `
+  <span class="footer-notice d-none d-print-block my-0" style="font-size:8px !important; font-family:"Times New Roman" !important>
+    <h3 class="d-none d-print-block fw-normal my-1">This article is provided as part of the <span class="text-capitalize">public welfare initiatives</span> by <span class="text-lowercase">dmj.one</span></h3>
+        <div>
+            <strong>General:</strong> All material provided herein is for educational or informational purposes only. No representation is made about the accuracy or completeness of the information contained on this page. Any use of or reliance on this material is strictly at the user's own risk. The author disclaims all liability for any damages or losses arising from such use.
+            <strong>Citations:</strong> Content on this page is the intellectual property of the author. Users may cite the content at their own discretion and must assume full responsibility for maintaining academic integrity and adhering to their institution's citation guidelines.
+            <strong>Commercial Use:</strong> Users must secure their own permissions for any commercial use of this content and agree to indemnify the author from any claims arising from such use.
+            <strong>Contact:</strong> Direct all inquiries to contact@dmj.one. By accessing this content, you agree to contact the author for any further clarification or licensing information.
+        </div>
+  </span>
+`;
+
+    // Include this variable where you set up the rest of the footer HTML content
+
+    div.innerHTML = footerNotice;
     strong.innerHTML = modified + `&copy; 2007 - ${new Date().getFullYear()} Divya Mohan ${rights} ${footer_link_privacy} ${footer_link_tos}`;
     span.appendChild(strong);
+    footer.appendChild(div);
     footer.appendChild(span);
 
     //document.body.appendChild(footer);
@@ -2203,10 +2301,10 @@ function copyright(rights) {
 } */
 
 (function () {
-    document.addEventListener('DOMContentLoaded', function () {        
+    document.addEventListener('DOMContentLoaded', function () {
         if (window.location.pathname !== "/") {
             document.body.classList.add("not-root");
-        }        
+        }
     });
 })();
 
@@ -2657,8 +2755,8 @@ function gen_blockquote() {
                         randomMessage = age ?
                             `${randomEmoji1}Happy <span class="fw-bold">${age}</span><sup>${getSuffix(age)}</sup> ${event.name}!${randomEmoji2}<br><span class ="display-6">${getRandomItem(birthdayMessages)}</span>` :
                             `${randomEmoji1}Happy Birthday, ${initial}!${randomEmoji2}<br>${getRandomItem(birthdayMessages)}`;
-                            // `${randomEmoji1}Enjoy the day ${event.name}!${randomEmoji2}<br><span class ="display-6">${getRandomItem(birthdayMessages)}</span>`;
-                            // `<p class="text-center" style="font-size:1rem">${'❤️'.repeat(10)}<p><p class="text-center" style="font-size:1rem">${'❤️'.repeat(10)}<p><p class="text-center" style="font-size:1rem">${'❤️'.repeat(10)}<p><p class="text-center" style="font-size:1.5rem">${'❤️'.repeat(1)}<p><p class="mt-10 text-muted text-sm-center small" style="font-size:1.1rem">Click for a musical melody!</p>`;
+                        // `${randomEmoji1}Enjoy the day ${event.name}!${randomEmoji2}<br><span class ="display-6">${getRandomItem(birthdayMessages)}</span>`;
+                        // `<p class="text-center" style="font-size:1rem">${'❤️'.repeat(10)}<p><p class="text-center" style="font-size:1rem">${'❤️'.repeat(10)}<p><p class="text-center" style="font-size:1rem">${'❤️'.repeat(10)}<p><p class="text-center" style="font-size:1.5rem">${'❤️'.repeat(1)}<p><p class="mt-10 text-muted text-sm-center small" style="font-size:1.1rem">Click for a musical melody!</p>`;
                     } else {
                         console.log(0);
                         randomMessage = `${randomEmoji1}Happy <span class="fw-bold">${age}</span><sup>${getSuffix(age)}</sup>${randomEmoji2}<br><span class ="display-6">${getRandomItem(birthdayMessages)}</span><p class="text-muted text-sm-center small" style="font-size:1.1rem">Click for a musical melody!</p>`
@@ -2822,7 +2920,7 @@ function gen_blockquote() {
                 playAudio(); // Attempt to play on load
             });
         })();
-    }    
+    }
 })();
 
 // (function () {
@@ -4335,7 +4433,7 @@ const certifications = {
         function updateTableDarkMode(e) {
             document.querySelectorAll('table').forEach(tbl => tbl.classList.toggle('table-dark', e.matches));
         }
-        
+
         // Set up the event listener for when the color scheme changes
         const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
         darkModeMediaQuery.addEventListener('change', updateTableDarkMode);
@@ -4352,7 +4450,7 @@ const certifications = {
 
         // Select all article elements with class 'borderart' or auto_id
         const articlesWithBorderArt = document.querySelectorAll('article.auto_id, article.borderart');
-        
+
         // Loop through each article and assign a random ID
         articlesWithBorderArt.forEach(function (article) {
             var randomId = 'article-' + Math.floor(Math.random() * 1000000);
@@ -4366,7 +4464,7 @@ const certifications = {
 
         if (autogen_tableofcontents && !existingToc) {
             // Check if a ToC does not already exist            
-                const tocHTML = `
+            const tocHTML = `
             <div class="container mt-4 w-100 w-xl-75 d-print-none">
                 <div class="accordion" id="toc">
                     <div class="accordion-item">
@@ -4386,8 +4484,8 @@ const certifications = {
 
             // Append the ToC HTML to the first article
             // firstArticle.innerHTML += tocHTML;
-                autogen_tableofcontents.innerHTML += tocHTML;
-            
+            autogen_tableofcontents.innerHTML += tocHTML;
+
             window.autogen_tableofcontents = 1;
         }
 
@@ -4635,7 +4733,7 @@ window.onload = function () {
 
 /******* SECURITY SUITE START *******/
 (function () {
-    if (location.hostname === "dmj.one"  && !window.dontdisable) {
+    if (location.hostname === "dmj.one" && !window.dontdisable) {
         const clearinteral_sakjds = window.setInterval(function () {
             if (localStorage.getItem("noshow") === "1" && window.scriptsremoved != 1) {
                 (function () {

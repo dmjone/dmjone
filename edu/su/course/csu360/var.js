@@ -176,25 +176,29 @@ function get_menu_list(datetogen) {
                 desc: "Learn to set up your operating system lab environment with VirtualBox, a powerful virtualization tool for creating and managing virtual machines. This practical exercise will guide you through the installation and configuration of VirtualBox, enabling you to create a virtualized environment for hands-on learning and experimentation.",
                 codetype: "Installation",
                 readtime: 2,
-                link: "installing-virtualbox"
+                link: "installing-virtualbox",
+                date: "Wed February 07, 2024"
             },
             {
                 title: "Practical 2: Creation of Virtual Environment and Mounting Operating System in VirtualBox",
                 desc: "Learn to create virtual machines and install operating systems in VirtualBox for hands-on practice and experimentation. This practical exercise will guide you through the process of creating a virtual machine, configuring hardware settings, and installing an operating system, enabling you to explore different OS environments and configurations.",
                 codetype: "VM Configuration",
                 readtime: 5,
+                date: "Wed February 07, 2024",
                 link: "configuring-virtualbox"
             }, {
                 title: "Practical 3: Perform an operation of operating system for File Management System.",
                 desc: "Learn to manage files and directories in Linux systems for efficient data organization and storage. This practical exercise will guide you through file management tasks, including creating, copying, moving, and deleting files, enabling you to organize and maintain your data effectively.",
                 codetype: "Concepts",
                 readtime: 5,
+                date: "Wed February 14, 2024",
                 link: "file-management-system"
             }, {
                 title: "Practical 4: Perform an operation of operating system for File Permissions.",
                 desc: "Learn to manage file permissions in Linux systems for data security and access control. This practical exercise will guide you through setting file permissions, ownership, and access rights, enabling you to protect sensitive data and manage user privileges effectively.",
                 codetype: "Concepts",
                 readtime: 5,
+                date: "Wed February 14, 2024",
                 link: "file-permissions"
             },
             {
@@ -202,60 +206,70 @@ function get_menu_list(datetogen) {
                 desc: "Learn to manage users and groups in Linux systems for system security and resource allocation. This practical exercise will guide you through user management tasks, including creating, modifying, and deleting user accounts, enabling you to control access permissions and system resources effectively.",
                 codetype: "Linux Commands",
                 readtime: 4,
+                date: "Wed February 21, 2024",
                 link: "user-management-system"
             },  {
                 title: "Practical 6: Read and Write about primary, secondary and virtual memory",
                 desc: "Learn about primary, secondary, and virtual memory in operating systems. This practical exercise will introduce you to the concepts of memory management, including primary memory (RAM), secondary memory (storage devices), and virtual memory, enabling you to understand their role in system performance and resource allocation.",
                 codetype: "Concepts",
                 readtime: 5,
+                date: "Wed February 21, 2024",
                 link: "primary-secondary-virtual-memory"
             }, {
                 title: "Practical 7: Perform an operation of operating system to configure Internet Protocol.",
                 desc: "Learn to configure Internet Protocol (IP) settings in Linux systems for network connectivity. This practical exercise will guide you through the process of setting up IP addresses, subnet masks, and gateways, enabling you to establish network connections and communicate with other devices on the network.",
                 codetype: "Concepts",
                 readtime: 4,
+                date: "Wed February 28, 2024",
                 link: "configure-internet-protocol"
             }, {
                 title: "Practical 8: Perform an operation of operating system to install and configure<br>A. SSH service <br>B. HTTP Service",
                 desc: "Learn to install and configure SSH services and Apache HTTP Server in Linux systems. This practical exercise will guide you through the process of setting up SSH services for secure remote access and installing Apache HTTP Server for web hosting, enabling you to manage network services and applications effectively.",
                 codetype: "Concepts",
                 readtime: 4,
+                date: "Wed March 13, 2024",
                 link: "install-and-configure-ssh-services"
             }, {
                 title: "Practical 9: Perform an operation of operating system to install and configure Network Firewall and Ports",
                 desc: "Learn to install and configure network firewalls and ports in Linux systems. This practical exercise will guide you through the process of setting up network firewalls, managing ports, and enhancing network security, enabling you to protect your system from unauthorized access and malicious attacks.",
                 codetype: "Concepts",
                 readtime: 4,
+                date: "Wed March 13, 2024",
                 link: "install-and-configure-network-firewall-and-ports"
             }, {
                 title: "Practical 10: Commands of Linux Operating System.",
                 desc: "Learn about essential Linux commands for system administration and management. This practical exercise will introduce you to common Linux commands for file operations, user management, network configuration, and system monitoring, enabling you to perform various tasks in the Linux environment efficiently.",
                 codetype: "Concepts",
                 readtime: 4,
+                date: "Wed March 20, 2024",
                 link: "commands-in-linux"
             }, {
                 title: "Practical 11: Write a C program for implementation of Scheduling Algorithms: <br>A. FCFS<br> B. SJF<br> C. Round Robin<br> D. Priority Scheduling", 
                 desc: "<span class='fw-bold'>Create code for FCFS, SJF, Round Robin and Priority seperately</span><br>Learn to implement scheduling algorithms in operating systems. This practical exercise will guide you through the implementation of scheduling algorithms such as FCFS, SJF, Round Robin, and Priority Scheduling, enabling you to understand their role in process management and system performance.",
                 codetype: "Concepts",
                 readtime: 5,
+                date: "Wed March 20, 2024",
                 link: "scheduling-algorithms-fcfs-sjf-roundrobin-priority"
             }, {
                 title: "Practical 12: Write a C program to implement Producer Consumer problem using semaphores.",
                 desc: "Learn to implement the Producer-Consumer problem using semaphores in operating systems. This practical exercise will guide you through the implementation of the Producer-Consumer problem, enabling you to understand the role of semaphores in process synchronization and inter-process communication in operating systems.",
                 codetype: "Concepts",
                 readtime: 5,
+                date: "Wed March 27, 2024",
                 link: "producer-consumer-problem"
             }, {
                 title: "Practical 13: Write a C program to implement Banker's Algorithm in Operating System for deadlock avoidance.",
                 desc: "Learn to implement Banker's Algorithm in operating systems. This practical exercise will guide you through the implementation of the Banker's Algorithm, enabling you to understand its role in deadlock avoidance and resource allocation strategies in operating systems. <br><i><span class='text-center fw-bold'>It should produce a safe sequence as an output.</span></i>",
                 codetype: "Concepts",
                 readtime: 5,
+                date: "Wed April 3, 2024",
                 link: "bankers-algorithm"
             }, {
                 title: "Practical 14: Write a C program to simulate the following contiguous memory allocation techniques: <br>A. First fit <br>B. Best fit <br>C. Worst fit",
                 desc: "Learn to simulate contiguous memory allocation techniques in operating systems. This practical exercise will guide you through the implementation of memory allocation algorithms such as Worst Fit, Best Fit, and First Fit, enabling you to understand their performance characteristics and resource utilization.",
                 codetype: "Concepts",
                 readtime: 4,
+                date: "Wed April 10, 2024",
                 link: "memory-allocation-techniques"
             },
             {
@@ -263,6 +277,7 @@ function get_menu_list(datetogen) {
                 desc: "Learn to simulate page replacement algorithms in operating systems. This practical exercise will guide you through the implementation of page replacement algorithms such as FIFO, LRU, and Optimal, enabling you to understand their impact on memory management and system performance.",
                 codetype: "Concepts",
                 readtime: 4,
+                date: "Wed April 17, 2024",
                 link: "page-replacement-algorithm"
             }            
         ];
