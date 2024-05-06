@@ -980,7 +980,7 @@ let header_author = function (...args) {
         // Get the location of the page
         // var currentlocation = 'https://dmj.one/' + window.location.pathname.split('/').pop().replace('.html', '');        
         let currentlocation = 'https://dmj.one' + window.location.pathname.replace(/\.html$/, '') || window.location.href;
-        currentlocation = 'https://dmj.one/edu/su/course/csu360/'; // Fix location for specific work.
+        // currentlocation = 'https://dmj.one/edu/su/course/csu360/'; // Fix location for specific work.
 
 
 
