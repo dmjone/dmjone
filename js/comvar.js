@@ -40,6 +40,12 @@ const arr_author = {
         bio: "<p>Prithak is a student from Nepal who is currently pursuing a Bachelor's degree in Computer Science and Engineering at Shoolini University in India. As a CSE student, he is passionate about programming and enjoys building projects that utilize cutting-edge technologies to solve complex problems.</p>",
         href: "contact@dmj.one"
     },
+    rijul: {
+        name: "Rijul Chaudhary",
+        bio: "<p>Rijul Chaudhary is a dedicated student from India, currently studying for his Bachelor's degree in Computer Science and Engineering at Shoolini University. Rijul has a keen interest in software development and is passionate about using his programming skills to create innovative solutions that address real-world challenges.</p>",
+        href: "contact@dmj.one"
+    },
+
 };
 
 function processAuthors(args) {
