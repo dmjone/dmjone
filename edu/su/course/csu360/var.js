@@ -10,7 +10,7 @@ function get_menu_list(datetogen) {
             },
             {
                 link: "lab/",                
-                title: "Hands-on Operating Systems Lab: Enhance Your System Management Skills [WIP]",
+                title: "Hands-on Operating Systems Lab: Enhance Your System Management Skills",
                 desc: "Advance your understanding of Operating Systems in the practical lab with code CSU360P. This lab course offers a hands-on approach to learning about operating system concepts, including process synchronization, scheduling algorithms, and memory allocation techniques. Click to engage in interactive sessions that will improve your technical skills in managing and optimizing operating systems, preparing you for the complexities of real-world IT environments.",
                 codetype: "CSU360P | Operating Systems Lab",
             }
