@@ -959,39 +959,36 @@ let header_author = function (...args) {
 
 (function () {
     document.addEventListener('DOMContentLoaded', function () {
-        let noactualarticle;
-        // Retrive elements of the page        
+        let noactualarticle, studentmode, logocontent_dmj_shoolini_qr;
+
+                    
+        studentmode = window.GLOBAL_get_isstudentmode_ || 0;
+        
+        
+        // Retrive elements of the page
         let articleElement = document.querySelector('article.agen-tableofcontents');
         if (typeof articleElement === 'undefined' || articleElement === null) {
             noactualarticle = 1;
             articleElement = document.querySelector('main');
         }
+
         let titleofthepage = articleElement.querySelector('h2').innerText;
         let dateofthepage = articleElement.querySelector('.contentdate') ? articleElement.querySelector('.contentdate').innerText : "n.d.";
         let h2 = articleElement.querySelector('h2');
         h2.classList.add('d-print-none');
-        
-
-        // Create a div for logos
-        var logodiv = document.createElement('div');
-        dmjshoolini = `<div class="col-6 col">
-                            <img src="/logo.png" class="img-fluid" alt="Logo" style="max-width:40%">
-                        </div>
-                        <div class="col-6 col">
-                            <img src="/img/shoolini_logo.png" class="img-fluid" alt="Logo" style="max-width:80%">
-                        </div>`;
-        logodiv.innerHTML = noactualarticle ? `<div class="row d-none d-print-flex"><img src="/logo.png" class="img-fluid" alt="Logo" style="max-width:40%"></div>` : `<div class="row d-none d-print-flex justify-content-between">${dmjshoolini}</div>`;
-        logodiv.className = 'd-none d-print-flex mx-auto mb-10';
-        if (noactualarticle) {
-            articleElement.parentNode.insertBefore(logodiv, articleElement);
-            return null;
-        }
+            
+        // Get the location of the page
+        // var currentlocation = 'https://dmj.one/' + window.location.pathname.split('/').pop().replace('.html', '');        
+        let currentlocation = 'https://dmj.one' + window.location.pathname.replace(/\.html$/, '') || window.location.href;
+        currentlocation = 'https://dmj.one/edu/su/course/csu360/'; // Fix location for specific work.
 
 
 
         // Create QR code data URL
         var qr = qrcode(0, 'H');
-        qr.addData(window.location.href);
+        // qr.addData(window.location.href);
+        qr.addData(currentlocation);
+
         qr.make();
         var qrcode_data = qr.createDataURL(4, "");
 
@@ -1005,6 +1002,54 @@ let header_author = function (...args) {
         var qrDiv = document.createElement('div');
         qrDiv.className = 'd-none d-none d-print-block mx-auto mt-10';
         qrDiv.appendChild(qrImage);
+
+        logocontent_dmj_shoolini_qr = () => {
+            let data; // Define data variable to hold the HTML string
+            if (studentmode) {
+                // Create a <style> element
+                const style = document.createElement('style');
+                style.textContent = `@media print { #defaultcopyrightfooter{ display: none; }}`;
+                document.head.appendChild(style);
+
+
+
+                // Only display the Shoolini logo when in student mode
+                data = `<div class="col-12">
+                  <img src="/img/shoolini_logo.png" class="img-fluid" alt="Shoolini University Logo" style="max-width:40%;">
+                </div>`;
+            } else {
+                // Base structure for other modes
+                data = `<div class="col-6 col">
+                  <img src="/logo.png" class="img-fluid" alt="DMJ Logo" style="max-width:40%;">
+                </div>`;
+
+                if (noactualarticle) {
+                    // Add QR code for no article mode
+                    data += `<div class="col-6 col">
+                       <img src="${qrcode_data}" class="img-fluid" alt="QR Code" style="max-width:40%;">
+                     </div>`;
+                } else {
+                    // Add Shoolini logo for normal mode
+                    data += `<div class="col-6 col">
+                       <img src="/img/shoolini_logo.png" class="img-fluid" alt="Shoolini University Logo" style="max-width:80%;">
+                     </div>`;
+                }
+            }
+            return data;
+        };
+
+
+
+        // Create a div for logos
+        var logodiv = document.createElement('div');        
+        // logodiv.innerHTML = noactualarticle ? `<div class="row d-none d-print-flex"><img src="/logo.png" class="img-fluid" alt="Logo" style="max-width:40%"></div>` : `<div class="row d-none d-print-flex justify-content-between">${logocontent_dmj_shoolini_qr}</div>`;
+        logodiv.innerHTML = `<div class="row d-none d-print-flex justify-content-between">${logocontent_dmj_shoolini_qr()}</div>`;
+        logodiv.className = 'd-none d-print-flex mx-auto mb-10';
+        if (noactualarticle) {
+            articleElement.parentNode.insertBefore(logodiv, articleElement);
+            return null;
+        }
+
 
         // Function to extract text content from strong tags
         // function extractTextFromStrongTag(htmlString) {
@@ -1050,23 +1095,26 @@ let header_author = function (...args) {
         titleDiv.innerHTML = `<h2 class="text-center text-uppercase">${titleofthepage}</h2>`;
 
         // Prepare the author and faculty divs with text content
-        var authorsText = extractTextFromStrongTag(window.GLOBAL_get_Author_Name_);
-        var authorsDiv = document.createElement('div');
+        // var authorsText = extractTextFromStrongTag(window.GLOBAL_get_Author_Name_);
+        // var authorsText = 'Divya Mohan <em>(GF202214698)</em>';
+        var authorsText = studentmode ? 'Divya Mohan <em>(GF202214698)</em>' : extractTextFromStrongTag(window.GLOBAL_get_Author_Name_);
+        var authorsdept = studentmode ? 'Yogananda School of AI, Computers and Data Science' : 'Faculty of Engineering and Technology';
+        var authorsDiv = document.createElement('div');        
         authorsDiv.className = 'd-none d-print-block mx-auto mt-3 mb-4';
-        authorsDiv.innerHTML = authorsText ? `<p class="text-center text-uppercase">${authorsText}</p><p class="text-uppercase text-center" style="font-size:8px!important">Faculty of Engineering and Technology</p><p class="text-uppercase text-center" style="font-size:10px!important">Shoolini University, Solan, Himachal Pradesh, India</p>` : '';
+        authorsDiv.innerHTML = authorsText ? `<p class="text-center text-uppercase">${authorsText}</p><p class="text-uppercase text-center" style="font-size:8px!important">${authorsdept}</p><p class="text-uppercase text-center fw-bold" style="font-size:10px!important">Shoolini University, Solan, Himachal Pradesh, India</p>` : '';        
 
 
         var facultyDiv = document.createElement('div');
         facultyDiv.className = 'd-none d-print-block mx-auto';
         facultyDiv.innerHTML = window.GLOBAL_get_course_detail_ ? window.GLOBAL_get_course_ ? `<p class="text-center fst-italic">Under the guidance of <span class="text-capitalize">${window.GLOBAL_get_Faculty_Name_}</span> in the subject of <span class="text-capitalize">${window.GLOBAL_get_course_detail_} (${window.GLOBAL_get_course_})</span></p>` : `<p class="text-center">${window.GLOBAL_get_course_detail_}</p>` : '';
         // facultyDiv.innerHTML += window.GLOBAL_get_Faculty_Name_ ? `<p class="text-center text-uppercase"><span class="fw-bold"></span> ${window.GLOBAL_get_Faculty_Name_}</p>` : '';
-        facultyDiv.innerHTML += `<p class="text-center text-uppercase" style="font-size:8px!important">Printed: ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>`;
+        facultyDiv.innerHTML += `<p class="text-center text-uppercase" style="font-size:8px!important">${studentmode ? 'Submitted on' : 'Printed on'} ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>`;
 
         var authorsetal = formatAuthorsEtAl(window.GLOBAL_get_Author_Name_);
         var citationblockquote = document.createElement('blockquote');
         citationblockquote.className = 'd-none d-print-flex mt-3 text-decoration-none';
         citationblockquote.style = 'font-style:unset !important';
-        citationblockquote.innerHTML = authorsetal ? `<p class="citation">${authorsetal} (${dateofthepage}). <em>${titleofthepage}</em>. Retrieved from ${window.location.href}</p>` : '';
+        citationblockquote.innerHTML = authorsetal ? `<p class="citation">${authorsetal} (${dateofthepage}). <em>${titleofthepage}</em>. Retrieved from ${currentlocation}</p>` : '';
 
         // Append the elements to the article element
         // var article = document.querySelector('.agen-tableofcontents');
@@ -2166,7 +2214,9 @@ function copyright(rights, noprint = false) {
         var rights = footer_some_rights;
     } else { rights = ""; }
 
-    let footer = document.createElement("footer");
+    let footer = document.createElement("footer");    
+    footer.id = "defaultcopyrightfooter";
+
     var sharingButtons = createSharingButtons();
     footer.appendChild(sharingButtons);
     var div = document.createElement("div");
