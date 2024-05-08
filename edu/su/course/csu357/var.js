@@ -22,8 +22,8 @@ function get_menu_list(datetogen) {
                 cardimage_dark: "//cdn.dmj.one/img/csu357_dark.webp"
             },
             {
-                link: "#",
-                title: "Hands-On Database Management System Lab: Enhancing Data Skills [WIP]",
+                link: "lab",
+                title: "Hands-On Database Management System Lab: Enhancing Data Skills",
                 desc: "Deepen your understanding of Database Management Systems in the CSU357P DBMS Lab. This practical lab course focuses on applying the theoretical concepts learned in CSU357 through hands-on exercises. Engage with SQL queries, database design, and data normalization practices. Click to participate in interactive labs that will improve your ability to design, implement, and manage databases effectively, preparing you for complex data challenges in the real world.",
                 codetype: "CSU357P | DBMS Lab"
             }, 
@@ -164,15 +164,16 @@ function get_menu_list(datetogen) {
         for (let i = 0; i < arr.length; i++) {
             const _data = arr[i];
             title = _data.title || null; if (!title) continue; // Set the title and if thats not possible, skip the loop
-            link = _data.link || `c${i + 1}`;
+            link = _data.link || null;
             date = _data.date ? _data.date : `${gendate(def_date)}`;
-            desc = _data.desc || `${title} ${i}`;
-            codetype = _data.codetype ? `CSU357 | ${_data.codetype}` : `CSU357 | Concepts`;
+            desc = _data.desc || `${title}`;
+            codetype = _data.codetype ? `${_data.codetype}` : `CSU1162`;
             readtime = _data.readtime || r(4);
             author = _data.author || def_author;
-            cardimage = _data.cardimage || null;
             semester = _data.semester || null;
-            body_blockcards(link, date, title, desc, codetype, readtime, author, semester, cardimage);
+            cardimage = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? _data.cardimage_dark : _data.cardimage || null;
+            continuereading = _data.continuereading || null;
+            body_blockcards(link, date, title, desc, codetype, readtime, author, semester, cardimage, continuereading);
         }
     }
     function get_lab(def_date, def_author) {
@@ -183,20 +184,92 @@ function get_menu_list(datetogen) {
             //     author: "Divya Mohan",
             //     link: "https://colab.research.google.com/drive/1goYusw-6vB2d2qZtxo4V1kt4mmLBrN11?usp=sharing",
             //     // cardimage: "_url_"
-            // },                      
+            // },  
+            {
+                title: "MySQL Commands Cheat Sheet",
+                desc: "Access a comprehensive cheat sheet of MySQL commands for quick reference and easy learning. This resource covers essential MySQL commands, syntax, and examples to help you navigate the world of database management with ease.",
+                codetype: "MySQL Commands",
+                readtime: 20,
+                link: "mysql-commands",
+            },
+            {
+                title: "Lab Practicals",
+                desc: "Practice and refine your database management skills with our collection of lab practicals. This resource offers a range of hands-on exercises and SQL queries to help you master the art of database management effectively.",
+                codetype: "Lab Practicals",
+                readtime: 25,
+                link: "lab-practicals",
+            }
+            // {
+            //     title: "SQL Query Practice",
+            //     desc: "Enhance your SQL skills with our interactive SQL query practice tool. This resource offers a range of SQL queries for practice, covering basic to advanced topics, to help you master the art of database management.",
+            //     codetype: "SQL Query Practice",
+            //     readtime: 20,
+            //     link: "sql-query-practice",
+            // },
+            // {
+            //     title: "Database Design Tool",
+            //     desc: "Design and visualize your database schema with our interactive database design tool. This resource allows you to create, modify, and visualize database structures, helping you understand the principles of database design effectively.",
+            //     codetype: "Database Design",
+            //     readtime: 20,
+            //     link: "database-design-tool",
+            // },
+            // {
+            //     title: "SQL Query Builder",
+            //     desc: "Build and execute SQL queries with our interactive SQL query builder tool. This resource offers a user-friendly interface to create, modify, and execute SQL queries, helping you practice and refine your SQL skills effectively.",
+            //     codetype: "SQL Query Builder",
+            //     readtime: 20,
+            //     link: "sql-query-builder",
+            // },
+            // {
+            //     title: "Database Normalization Tool",
+            //     desc: "Normalize your database schema with our interactive database normalization tool. This resource guides you through the normalization process, helping you understand and implement data normalization effectively.",
+            //     codetype: "Database Normalization",
+            //     readtime: 20,
+            //     link: "database-normalization-tool",
+            // },
+            // {
+            //     title: "SQL Joins Visualizer",
+            //     desc: "Visualize and understand SQL Joins with our interactive SQL Joins visualizer tool. This resource offers a step-by-step breakdown of different types of SQL Joins, helping you master the art of data retrieval and manipulation.",
+            //     codetype: "SQL Joins Visualizer",
+            //     readtime: 20,
+            //     link: "sql-joins-visualizer",
+            // },
+            // {
+            //     title: "Entity-Relationship Diagram Tool",
+            //     desc: "Design and visualize your ER diagrams with our interactive ER diagram tool. This resource allows you to create, modify, and visualize entity-relationship diagrams, helping you understand and implement data modeling effectively.",
+            //     codetype: "ER Diagram Tool",
+            //     readtime: 20,
+            //     link: "er-diagram-tool",
+            // },
+            // {
+            //     title: "Database Schema Generator",
+            //     desc: "Generate sample database schemas with our interactive database schema generator tool. This resource offers a range of pre-defined schemas for practice and learning, helping you understand database design principles effectively.",
+            //     codetype: "Database Schema Generator",
+            //     readtime: 20,
+            //     link: "database-schema-generator",
+            // },
+            // {
+            //     title: "SQL Practice Problems",
+            //     desc: "Sharpen your SQL skills with our collection of SQL practice problems. This resource offers a variety of SQL queries and scenarios for practice, covering basic to advanced topics, to help you master the art of database management.",
+            //     codetype: "SQL Practice Problems",
+            //     readtime: 20,
+            //     link: "sql-practice-problems",
+            // },
         ];
+
         for (let i = 0; i < arr.length; i++) {
             const _data = arr[i];
             title = _data.title || null; if (!title) continue; // Set the title and if thats not possible, skip the loop
-            link = _data.link || `p${i + 1}`;
+            link = _data.link || null;
             date = _data.date ? _data.date : `${gendate(def_date)}`;
-            desc = _data.desc || `${title} ${i}`;
-            codetype = _data.codetype ? `CSU357P | ${_data.codetype}` : `CSU357P | Lab`;
-            readtime = _data.readtime || r(5);
+            desc = _data.desc || `${title}`;
+            codetype = _data.codetype ? `${_data.codetype}` : `CSU1162`;
+            readtime = _data.readtime || r(4); 
             author = _data.author || def_author;
-            cardimage = _data.cardimage || null;
             semester = _data.semester || null;
-            body_blockcards(link, date, title, desc, codetype, readtime, author, semester, cardimage);
+            cardimage = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? _data.cardimage_dark : _data.cardimage || null;
+            continuereading = _data.continuereading || null;
+            body_blockcards(link, date, title, desc, codetype, readtime, author, semester, cardimage, continuereading);
         }
     }
 
