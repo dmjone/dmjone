@@ -186,19 +186,19 @@ function get_menu_list(datetogen) {
             //     // cardimage: "_url_"
             // },  
             {
-                title: "MySQL Commands Cheat Sheet",
-                desc: "Access a comprehensive cheat sheet of MySQL commands for quick reference and easy learning. This resource covers essential MySQL commands, syntax, and examples to help you navigate the world of database management with ease.",
-                codetype: "MySQL Commands",
-                readtime: 20,
-                link: "mysql-commands",
-            },
-            {
                 title: "Lab Practicals",
                 desc: "Practice and refine your database management skills with our collection of lab practicals. This resource offers a range of hands-on exercises and SQL queries to help you master the art of database management effectively.",
                 codetype: "Lab Practicals",
                 readtime: 25,
                 link: "lab-practicals",
-            }
+            },
+            {
+                title: "MySQL Commands Cheat Sheet",
+                desc: "Access a comprehensive cheat sheet of MySQL commands for quick reference and easy learning. This resource covers essential MySQL commands, syntax, and examples to help you navigate the world of database management with ease.",
+                codetype: "MySQL Commands",
+                readtime: 20,
+                link: "mysql-commands",
+            },            
             // {
             //     title: "SQL Query Practice",
             //     desc: "Enhance your SQL skills with our interactive SQL query practice tool. This resource offers a range of SQL queries for practice, covering basic to advanced topics, to help you master the art of database management.",
