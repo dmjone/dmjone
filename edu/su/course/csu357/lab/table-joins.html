@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+    <!--<![endif]-->
+
+    <head>
+        <script src="/js/edu_su_common.js"></script>
+        <noscript>
+            <style>
+                html,
+                body {
+                    margin: 0;
+                    overflow: hidden;
+                }
+            </style>
+            <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+        </noscript>
+
+        <title>Practical 14 - Table Joins - CSU357P - Shoolini U</title>
+        <meta name="description" content="Practical 13: Mathematical Functions in SQL. Learn how to use mathematical functions in SQL queries to perform calculations on numeric data.">
+
+        <meta property="og:image" content="/logo.png">
+        <meta property="og:type" content="article">
+
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:site" content="@divyamohan1993">
+        <meta name="twitter:creator" content="@divyamohan1993">
+        <meta name="twitter:image" content="/logo.png">
+
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+        <meta name="author" content="Divya Mohan">
+        <meta name="robots" content="index, follow">
+    </head>
+
+    <body>
+
+        <script> header_author("dm"); </script>
+
+        <main>
+
+            <article class="agen-tableofcontents">
+                <h2 class="text-center">
+                    Practical 14: Table Joins in SQL
+                </h2>
+                <div class="d-none contentdate">2024, May 8</div>
+            </article>
+
+            <article id="table-joins">
+                <h3>14. Table Joins in SQL</h3>
+                <p>
+                    Up until this point, all queries have been limited to selecting data from a single table at a time using the <code>SELECT</code> statement. One of the most powerful features of SQL and relational database systems is the <strong>Join</strong>. Joins allow linking data from two or more tables into a single query result using a single <code>SELECT</code> statement.
+                </p>
+            </article>
+
+            <article>
+                <h4>14.1. Introduction to Joins</h4>
+                <p>
+                    A <strong>Join</strong> in a SQL <code>SELECT</code> statement is recognized when more than one table appears after the <code>FROM</code> keyword.
+                </p>
+                <pre><code class="language-sql">
+SELECT "list-of-columns"
+FROM table1, table2
+WHERE "search-condition(s)";
+  </code></pre>
+            </article>
+
+            <article>
+                <h4>14.2. Flat Table vs. Relational Tables</h4>
+                <p>
+                    Working with a single table (flat table) can lead to redundant data. For instance, if all customer purchases are recorded in one table, redundant data will be inserted for each purchase:
+                </p>
+                <article>
+                    <h5>Customer Purchases Data</h5>
+                    <table class="table table-resonsive table-bordered">
+                        <thead>
+                            <tr>
+                                <th>id</th>
+                                <th>first</th>
+                                <th>last</th>
+                                <th>address</th>
+                                <th>city</th>
+                                <th>state</th>
+                                <th>zip</th>
+                                <th>date</th>
+                                <th>item</th>
+                                <th>price</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>10982</td>
+                                <td>Wolfgang</td>
+                                <td>Schultz</td>
+                                <td>300 N. 1st Ave</td>
+                                <td>Yuma</td>
+                                <td>AZ</td>
+                                <td>85002</td>
+                                <td>032299</td>
+                                <td>snowboard</td>
+                                <td>45.00</td>
+                            </tr>
+                            <tr>
+                                <td>10982</td>
+                                <td>Wolfgang</td>
+                                <td>Schultz</td>
+                                <td>300 N. 1st Ave</td>
+                                <td>Yuma</td>
+                                <td>AZ</td>
+                                <td>85002</td>
+                                <td>082899</td>
+                                <td>snow shovel</td>
+                                <td>35.00</td>
+                            </tr>
+                            <tr>
+                                <td>10982</td>
+                                <td>Wolfgang</td>
+                                <td>Schultz</td>
+                                <td>300 N. 1st Ave</td>
+                                <td>Yuma</td>
+                                <td>AZ</td>
+                                <td>85002</td>
+                                <td>091199</td>
+                                <td>gloves</td>
+                                <td>15.00</td>
+                            </tr>
+                            <tr>
+                                <td>10982</td>
+                                <td>Wolfgang</td>
+                                <td>Schultz</td>
+                                <td>300 N. 1st Ave</td>
+                                <td>Yuma</td>
+                                <td>AZ</td>
+                                <td>85002</td>
+                                <td>100999</td>
+                                <td>lantern</td>
+                                <td>35.00</td>
+                            </tr>
+                            <tr>
+                                <td>10982</td>
+                                <td>Wolfgang</td>
+                                <td>Schultz</td>
+                                <td>300 N. 1st Ave</td>
+                                <td>Yuma</td>
+                                <td>AZ</td>
+                                <td>85002</td>
+                                <td>022900</td>
+                                <td>tent</td>
+                                <td>85.00</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </article>
+                <p>
+                    An ideal database should have separate tables for customers and purchases to eliminate redundant data:
+                </p>
+                <h5>14.2.1 Customer_info Table</h5>
+                <table class="table table-resonsive table-bordered">
+                    <thead>
+                        <tr>
+                            <th>id</th>
+                            <th>first</th>
+                            <th>last</th>
+                            <th>address</th>
+                            <th>city</th>
+                            <th>state</th>
+                            <th>zip</th>
+                        </tr>
+                    </thead>
+                </table>
+               
+                <h5>14.2.2 Purchases Table</h5>
+                <table class="table table-resonsive table-bordered">
+                    <thead>
+                        <tr>
+                            <th>id</th>
+                            <th>date</th>
+                            <th>item</th>
+                            <th>price</th>
+                        </tr>
+                    </thead>
+                </table>               
+            </article>
+
+            <article>
+                <h4>14.3. Performing Joins</h4>
+                <p>
+                    To select data from both tables, use a join on the common column <code>customer_number</code>:
+                </p>
+                <pre><code class="language-sql">
+SELECT customer_info.firstname, customer_info.lastname, purchases.item
+FROM customer_info, purchases
+WHERE customer_info.customer_number = purchases.customer_number;
+  </code></pre>
+                <p>
+                    This is an <strong>Inner Join</strong> (Equijoin), the most common type of join.
+                </p>
+                <p>
+                    Each column name is preceded by the table name to avoid confusion, especially if column names are identical in both tables.
+                </p>
+            </article>
+
+            <article>
+                <h4>14.4. ANSI SQL-92 Syntax</h4>
+                <p>
+                    Another syntax specification for an Inner Join:
+                </p>
+                <pre><code class="language-sql">
+SELECT customer_info.firstname, customer_info.lastname, purchases.item
+FROM customer_info INNER JOIN purchases
+ON customer_info.customer_number = purchases.customer_number;
+  </code></pre>
+                <p>
+                    Example with employee data:
+                </p>
+                <pre><code class="language-sql">
+SELECT employee_info.employeeid, employee_info.lastname, employee_sales.comission
+FROM employee_info, employee_sales
+WHERE employee_info.employeeid = employee_sales.employeeid;
+  </code></pre>
+            </article>
+
+            <article>
+                <h4>14.5. Exercises</h4>
+                <h5>14.5.1. Exercise 1</h5>
+                <p>
+                    Write a query using a join to determine which items were ordered by each of the customers in the customers table. Select the customerid, firstname, lastname, order_date, item, and price for everything each customer purchased in the items_ordered table.
+                </p>
+                <pre><code class="language-sql">
+SELECT customers.customerid, customers.firstname, customers.lastname,
+items_ordered.order_date, items_ordered.item, items_ordered.price
+FROM customers, items_ordered
+WHERE customers.customerid = items_ordered.customerid;
+  </code></pre>
+
+                <h5>15.5.2. Exercise 2</h5>
+                <p>
+                    Repeat exercise #1, but display the results sorted by state in descending order.
+                </p>
+                <pre><code class="language-sql">
+SELECT customers.customerid, customers.firstname, customers.state, items_ordered.item
+FROM customers, items_ordered
+WHERE customers.customerid = items_ordered.customerid
+ORDER BY customers.state DESC;
+  </code></pre>
+            </article>
+
+
+        </main>
+
+        <script> copyright("all"); </script>
+    </body>
+
+</html>
