@@ -22,7 +22,7 @@ function get_menu_list(datetogen) {
                 cardimage_dark: "//cdn.dmj.one/img/csu357_dark.webp"
             },
             {
-                link: "lab",
+                link: "lab/",
                 title: "Hands-On Database Management System Lab: Enhancing Data Skills",
                 desc: "Deepen your understanding of Database Management Systems in the CSU357P DBMS Lab. This practical lab course focuses on applying the theoretical concepts learned in CSU357 through hands-on exercises. Engage with SQL queries, database design, and data normalization practices. Click to participate in interactive labs that will improve your ability to design, implement, and manage databases effectively, preparing you for complex data challenges in the real world.",
                 codetype: "CSU357P | DBMS Lab"
