@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+    <!--<![endif]-->
+
+    <head>
+        <script src="/js/edu_su_common.js"></script>
+        <noscript>
+            <style>
+                html,
+                body {
+                    margin: 0;
+                    overflow: hidden;
+                }
+            </style>
+            <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+        </noscript>
+
+        <title>Recovery - CSU357 - Shoolini University</title>
+        <meta name="description" content="Recovery is the process of restoring the database to a consistent state after a failure. It involves rolling back uncommitted transactions and redoing committed ones.">
+
+        <meta property="og:image" content="/logo.png">
+        <meta property="og:type" content="article">
+
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:site" content="@divyamohan1993">
+        <meta name="twitter:creator" content="@divyamohan1993">
+        <meta name="twitter:image" content="/logo.png">
+
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+        <meta name="author" content="Divya Mohan">
+        <meta name="robots" content="index, follow">
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js" integrity="sha512-sHSNLECRJSK+BFs7E8DiFc6pf6n90bLI85Emiw1jhreduZhK3VXgq9l4kAt9eTIHYAcuQBKHL01QKs4/3Xgl8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js" integrity="sha512-iWiuBS5nt6r60fCz26Nd0Zqe0nbk1ZTIQbl3Kv7kYsX+yKMUFHzjaH2+AnM6vp2Xs+gNmaBAVWJjSmuPw76Efg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                renderMathInElement(document.body, {
+                    // customised options
+                    // • auto-render specific keys, e.g.:
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false },
+                        { left: '\\(', right: '\\)', display: false },
+                        { left: '\\[', right: '\\]', display: true }
+                    ],
+                    // • rendering keys, e.g.:
+                    throwOnError: false
+                });
+            });
+        </script>
+    </head>
+
+    <body>
+
+        <script> header_author("dm"); </script>
+
+        <main>
+
+            <article class="agen-tableofcontents">
+                <h2 class="text-center">
+                    Recovery
+                </h2>
+            </article>
+
+            <article id="header-recovery">
+                <h3>1. Recovery in DBMS</h3>
+                <p>Recovery in Database Management Systems (DBMS) refers to the process of restoring the database to a correct state in the event of a failure. This ensures data integrity, consistency, and availability.</p>
+            </article>
+
+            <article>
+                <h4>1.1 Types of Failures</h4>
+                <p>Database systems may encounter various types of failures:</p>
+                <ul>
+                    <li><strong>Transaction Failure</strong>: Occurs when a transaction cannot complete successfully due to logical errors, system crashes, or deadlocks.</li>
+                    <li><strong>System Crash</strong>: Results from hardware failures, software bugs, or power outages, leading to a loss of volatile memory.</li>
+                    <li><strong>Disk Failure</strong>: Involves physical damage to storage media, causing data loss.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h4>1.2 Recovery Techniques</h4>
+                <p>Several techniques are employed to recover from failures:</p>
+                <ul>
+                    <li><strong>Log-Based Recovery</strong>: Utilizes a log to record all database modifications. In the event of a failure, the log can be used to redo or undo transactions.</li>
+                    <li><strong>Shadow Paging</strong>: Maintains a shadow copy of the database pages. During recovery, the shadow copy is used to restore the database to a consistent state.</li>
+                    <li><strong>Checkpointing</strong>: Periodically saves the state of the database to reduce the amount of work needed during recovery.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h5>1.2.1 Log-Based Recovery in short</h5>
+                <p>Log-based recovery is a common method used to ensure data integrity. The log contains entries for every transaction, including the following information:</p>
+                <ul>
+                    <li><strong>Transaction ID</strong>: A unique identifier for the transaction.</li>
+                    <li><strong>Operations</strong>: Details of the operations performed (e.g., insert, update, delete).</li>
+                    <li><strong>Old Values</strong>: The data values before the operation.</li>
+                    <li><strong>New Values</strong>: The data values after the operation.</li>
+                </ul>
+                <pre><code class="language-sql">
+-- Creating a log table
+CREATE TABLE log (
+    transaction_id INT,
+    operation VARCHAR(50),
+    old_value VARCHAR(255),
+    new_value VARCHAR(255)
+);
+
+-- Inserting a log entry
+INSERT INTO log (transaction_id, operation, old_value, new_value) VALUES (1, 'UPDATE', '100', '200');
+</code></pre>
+            </article>
+
+            <article>
+                <h5>1.2.2 Shadow Paging in short</h5>
+                <p>Shadow paging is another recovery method where a shadow copy of the database is maintained. The process involves:</p>
+                <ul>
+                    <li>Creating a shadow copy before any transaction begins.</li>
+                    <li>Updating the shadow copy during the transaction.</li>
+                    <li>Committing the shadow copy to the main database upon successful transaction completion.</li>
+                </ul>
+                <p>If a failure occurs, the shadow copy is used to restore the database.</p>
+                <pre><code class="language-sql">
+-- Example process of shadow paging
+BEGIN TRANSACTION;
+CREATE SHADOW COPY;
+-- Perform operations
+COMMIT TRANSACTION;
+</code></pre>
+            </article>
+
+            <article>
+                <h5>1.2.3 Checkpointing in short</h5>
+                <p>Checkpointing involves periodically saving the database state, which helps in minimizing the recovery time. The process includes:</p>
+                <ul>
+                    <li>Flushing all log records to disk.</li>
+                    <li>Writing a checkpoint record to the log.</li>
+                    <li>Saving the current state of the database to disk.</li>
+                </ul>
+                <p>In the event of a failure, recovery can start from the last checkpoint, reducing the amount of log data to be processed.</p>
+                <pre><code class="language-sql">
+-- Example of checkpointing
+CHECKPOINT;
+-- Continue with database operations
+</code></pre>
+            </article>            
+
+            <article>
+                <h4>1.3 Log-Based Recovery in Detail</h4>
+                <p>Log-based recovery is a fundamental technique in DBMS to ensure the durability and atomicity of transactions. This method relies on a log file, which records all changes made to the database. The log contains sufficient information to undo or redo transactions if a failure occurs.</p>
+            </article>
+
+            <article>
+                <h5>1.3.1 Components of Log-Based Recovery</h5>
+                <p>Log-based recovery involves several key components:</p>
+                <ul>
+                    <li><strong>Log File</strong>: A sequential file that stores log records, documenting all modifications.</li>
+                    <li><strong>Log Record</strong>: An entry in the log file containing details about a transaction's operations.</li>
+                    <li><strong>Transaction Manager</strong>: Manages the execution of transactions and interacts with the log manager to record actions.</li>
+                    <li><strong>Log Manager</strong>: Responsible for writing log records to the log file and managing log operations.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h5>1.3.2 Structure of a Log Record</h5>
+                <p>A log record typically includes the following information:</p>
+                <ul>
+                    <li><strong>Transaction ID</strong>: Unique identifier for the transaction.</li>
+                    <li><strong>Log Sequence Number (LSN)</strong>: A unique identifier for each log record, ensuring the order of records.</li>
+                    <li><strong>Type of Operation</strong>: Indicates the operation performed, such as INSERT, UPDATE, DELETE, or COMMIT.</li>
+                    <li><strong>Data Before Image (BFIM)</strong>: The data value before the operation (old value).</li>
+                    <li><strong>Data After Image (AFIM)</strong>: The data value after the operation (new value).</li>
+                    <li><strong>Timestamp</strong>: The time when the operation was performed.</li>
+                </ul>
+                <pre><code class="language-sql">
+-- Example log record
+INSERT INTO log (transaction_id, lsn, operation, bfim, afim, timestamp)
+VALUES (1, 1001, 'UPDATE', '100', '200', '2024-05-10 10:00:00');
+</code></pre>
+            </article>
+
+            <article>
+                <h5>1.3.3 Logging Process</h5>
+                <p>When a transaction modifies the database, the following steps occur:</p>
+                <ol>
+                    <li><strong>Before Image Recording</strong>: The old value of the data is recorded in the log before the modification.</li>
+                    <li><strong>After Image Recording</strong>: The new value of the data is recorded in the log after the modification.</li>
+                    <li><strong>Write-Ahead Logging (WAL)</strong>: Ensures that log records are written to the log file before the actual data is written to the database.</li>
+                </ol>
+            </article>
+
+            <article>
+                <h5>1.3.4 Recovery Process</h5>
+                <p>In the event of a failure, the recovery process involves two main phases: redo and undo.</p>
+
+                <h6>1.3.4.1 Redo Phase</h6>
+                <p>The redo phase re-applies all changes from committed transactions to ensure all modifications are present in the database. The steps include:</p>
+                <ol>
+                    <li>Scanning the log from the beginning or the last checkpoint.</li>
+                    <li>Applying all operations to the database to redo the transactions.</li>
+                </ol>
+                <pre><code class="language-sql">
+-- Redo operation example
+-- Applying changes from log to database
+UPDATE table_name SET column_name = '200' WHERE column_name = '100';
+</code></pre>
+
+                <h6>1.3.4.2 Undo Phase</h6>
+                <p>The undo phase reverses changes from uncommitted transactions to maintain consistency. The steps include:</p>
+                <ol>
+                    <li>Scanning the log backward from the point of failure.</li>
+                    <li>Undoing all operations of uncommitted transactions.</li>
+                </ol>
+                <pre><code class="language-sql">
+-- Undo operation example
+-- Reversing changes from uncommitted transactions
+UPDATE table_name SET column_name = '100' WHERE column_name = '200';
+</code></pre>
+            </article>
+
+            <article>
+                <h5>1.3.5 Write-Ahead Logging (WAL) Protocol</h5>
+                <p>The WAL protocol is crucial for log-based recovery, ensuring data integrity. It mandates that:</p>
+                <ul>
+                    <li>Log records must be written to the log file before the corresponding data pages are written to disk.</li>
+                    <li>Transaction logs must be written before a transaction is considered committed.</li>
+                </ul>
+                <p>This protocol ensures that no data modifications are lost, as log records provide a reliable means to redo or undo operations.</p>
+                <pre><code class="language-sql">
+-- Example of enforcing WAL protocol
+BEGIN TRANSACTION;
+INSERT INTO log (transaction_id, lsn, operation, bfim, afim, timestamp) VALUES (2, 1002, 'UPDATE', '300', '400', CURRENT_TIMESTAMP);
+UPDATE table_name SET column_name = '400' WHERE column_name = '300';
+COMMIT TRANSACTION;
+</code></pre>
+            </article>
+
+            <article>
+                <h4>1.4 Shadow Paging in Detail</h4>
+                <p>Shadow paging is a recovery technique used to ensure database consistency without the need for logs. It maintains two copies of the database: the current page table and the shadow page table. Modifications are made to the current page table, and the shadow page table remains unchanged until a transaction is committed.</p>
+            </article>
+
+            <article>
+                <h5>1.4.1 Components of Shadow Paging</h5>
+                <p>Shadow paging involves the following components:</p>
+                <ul>
+                    <li><strong>Current Page Table</strong>: A table that points to the current pages of the database where modifications occur.</li>
+                    <li><strong>Shadow Page Table</strong>: A table that points to the original pages of the database before any modifications.</li>
+                    <li><strong>Database Pages</strong>: The actual data pages in the database.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h5>1.4.2 Process of Shadow Paging</h5>
+                <p>The process of shadow paging includes several key steps:</p>
+                <ol>
+                    <li><strong>Initialization</strong>: At the beginning of a transaction, the shadow page table is created as a copy of the current page table.</li>
+                    <li><strong>Modification</strong>: When a transaction modifies a page, a new copy of the page is created, and the current page table is updated to point to this new page. The shadow page table remains unchanged.</li>
+                    <li><strong>Commit</strong>: Once the transaction is successfully completed, the shadow page table is updated to match the current page table, and the changes become permanent.</li>
+                    <li><strong>Abort</strong>: If the transaction fails, the current page table is discarded, and the shadow page table is used to restore the database to its original state.</li>
+                </ol>
+            </article>
+
+            <article>
+                <h5>1.4.3 Advantages and Disadvantages of Shadow Paging</h5>
+                <p>Understanding the pros and cons of shadow paging helps in evaluating its effectiveness:</p>
+
+                <h6>Advantages</h6>
+                <ul>
+                    <li><strong>Simplicity</strong>: Shadow paging is simple to implement as it does not require logs or complex recovery mechanisms.</li>
+                    <li><strong>No Redo or Undo</strong>: There is no need for redo or undo operations, as the shadow page table provides a consistent state.</li>
+                </ul>
+
+                <h6>Disadvantages</h6>
+                <ul>
+                    <li><strong>Space Overhead</strong>: Maintaining two copies of the database pages requires additional storage space.</li>
+                    <li><strong>Performance Overhead</strong>: Copying pages can be resource-intensive, leading to performance degradation for large transactions.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h5>1.4.4 Example of Shadow Paging</h5>
+                <p>Consider a scenario where a transaction updates a page in the database:</p>
+                <ol>
+                    <li>Initialize the shadow page table as a copy of the current page table.</li>
+                    <li>When a page is updated, create a new copy of the page and update the current page table to point to this new page.</li>
+                    <li>Commit the transaction by updating the shadow page table to match the current page table.</li>
+                    <li>If the transaction fails, discard the current page table and use the shadow page table to restore the database.</li>
+                </ol>
+                <pre><code class="language-sql">
+-- Example process of shadow paging
+BEGIN TRANSACTION;
+-- Assume page 1 is updated
+UPDATE current_page_table SET page_pointer = new_page_pointer WHERE page_id = 1;
+-- If transaction is successful
+COMMIT;
+-- Update shadow page table to match current page table
+UPDATE shadow_page_table SET page_pointer = new_page_pointer WHERE page_id = 1;
+</code></pre>
+            </article>
+
+            <article>
+                <h5>1.4.5 Checkpointing in Shadow Paging</h5>
+                <p>Checkpointing in shadow paging involves creating a consistent snapshot of the database at regular intervals. This reduces the recovery time by providing a known good state from which to start.</p>
+                <ol>
+                    <li>Flush all dirty pages from the buffer to disk.</li>
+                    <li>Update the shadow page table to reflect the current state of the database.</li>
+                    <li>Write a checkpoint record to indicate the completion of the checkpoint.</li>
+                </ol>
+                <pre><code class="language-sql">
+-- Checkpointing example
+CHECKPOINT;
+-- Flush dirty pages to disk
+-- Update shadow page table
+UPDATE shadow_page_table SET ...;
+-- Write checkpoint record
+INSERT INTO checkpoint_log (timestamp) VALUES (CURRENT_TIMESTAMP);
+</code></pre>
+            </article>
+
+            <article>
+                <h5>1.4.6 Implementation in SQL</h5>
+                <p>Here is an example of implementing shadow paging in SQL:</p>
+                <pre><code class="language-sql">
+-- Create shadow page table as a copy of the current page table
+CREATE TABLE shadow_page_table AS SELECT * FROM current_page_table;
+
+-- Begin transaction
+BEGIN TRANSACTION;
+
+-- Update current page table when a page is modified
+UPDATE current_page_table SET page_pointer = new_page_pointer WHERE page_id = 1;
+
+-- Commit transaction
+COMMIT;
+
+-- Update shadow page table upon successful commit
+UPDATE shadow_page_table SET page_pointer = new_page_pointer WHERE page_id = 1;
+
+-- If transaction fails, discard current page table changes
+ROLLBACK;
+</code></pre>
+            </article>
+
+            <article id="header-checkpointing">
+                <h3>1.5 Checkpointing in Detail</h3>
+                <p>Checkpointing is a technique used in DBMS to reduce the time required for recovery by periodically saving a consistent state of the database to disk. This helps in minimizing the amount of log data that needs to be processed during recovery, thereby speeding up the process.</p>
+            </article>
+
+            <article>
+                <h5>1.5.1 Components of Checkpointing</h5>
+                <p>Checkpointing involves the following components:</p>
+                <ul>
+                    <li><strong>Checkpoint Record</strong>: A log record indicating the point at which the checkpoint was taken.</li>
+                    <li><strong>Dirty Pages</strong>: Pages that have been modified in memory but not yet written to disk.</li>
+                    <li><strong>Checkpoint Log</strong>: A log that keeps track of all checkpoints taken.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h5>1.5.2 Process of Checkpointing</h5>
+                <p>The process of checkpointing involves several key steps:</p>
+                <ol>
+                    <li><strong>Flushing Dirty Pages</strong>: All modified (dirty) pages in memory are written to disk.</li>
+                    <li><strong>Writing the Checkpoint Record</strong>: A checkpoint record is written to the log, indicating the completion of the checkpoint.</li>
+                    <li><strong>Updating the Checkpoint Log</strong>: The checkpoint log is updated to include the new checkpoint.</li>
+                </ol>
+                <pre><code class="language-sql">
+-- Example of writing a checkpoint
+CHECKPOINT;
+-- Flush dirty pages to disk
+-- Write checkpoint record
+INSERT INTO checkpoint_log (timestamp) VALUES (CURRENT_TIMESTAMP);
+</code></pre>
+            </article>
+
+            <article>
+                <h5>1.5.3 Types of Checkpoints</h5>
+                <p>There are several types of checkpoints, each with its own use case:</p>
+
+                <h6>1.5.3.1 Consistent Checkpoints</h6>
+                <p>Ensures that the database is in a consistent state. All transactions are completed, and no transactions are in progress.</p>
+
+                <h6>1.5.3.2 Fuzzy Checkpoints</h6>
+                <p>Allows some transactions to be in progress while the checkpoint is taken. Only dirty pages are flushed to disk.</p>
+
+                <h6>1.5.3.3 Incremental Checkpoints</h6>
+                <p>Only the pages modified since the last checkpoint are written to disk, reducing the amount of data written during each checkpoint.</p>
+            </article>
+
+            <article>
+                <h5>1.5.4 Advantages and Disadvantages of Checkpointing</h5>
+                <p>Understanding the benefits and drawbacks of checkpointing helps in evaluating its effectiveness:</p>
+
+                <h6>Advantages</h6>
+                <ul>
+                    <li><strong>Reduced Recovery Time</strong>: By minimizing the amount of log data that needs to be processed during recovery, checkpointing significantly reduces recovery time.</li>
+                    <li><strong>Improved Performance</strong>: Regular checkpointing can lead to improved system performance by spreading the I/O load over time.</li>
+                </ul>
+
+                <h6>Disadvantages</h6>
+                <ul>
+                    <li><strong>Performance Overhead</strong>: Checkpointing can introduce performance overhead, especially if taken too frequently.</li>
+                    <li><strong>Complexity</strong>: Implementing checkpointing requires additional complexity in the DBMS.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h5>1.5.5 Implementation in SQL</h5>
+                <p>Here is an example of implementing checkpointing in SQL:</p>
+                <pre><code class="language-sql">
+-- Creating a checkpoint log table
+CREATE TABLE checkpoint_log (
+    checkpoint_id INT AUTO_INCREMENT PRIMARY KEY,
+    timestamp TIMESTAMP
+);
+
+-- Function to perform checkpointing
+DELIMITER //
+CREATE PROCEDURE perform_checkpoint()
+BEGIN
+    -- Flush dirty pages to disk
+    FLUSH TABLES;
+    
+    -- Write checkpoint record
+    INSERT INTO checkpoint_log (timestamp) VALUES (CURRENT_TIMESTAMP);
+    
+    -- Optionally, update other metadata or perform additional tasks
+END //
+DELIMITER ;
+
+-- Execute checkpoint procedure
+CALL perform_checkpoint();
+</code></pre>
+            </article>
+
+            <article>
+                <h5>1.5.6 Checkpointing in Recovery</h5>
+                <p>During recovery, checkpoints are used to reduce the amount of log data that needs to be processed:</p>
+                <ol>
+                    <li>Identify the last checkpoint from the checkpoint log.</li>
+                    <li>Start the recovery process from this checkpoint, reducing the amount of data to be read and applied.</li>
+                </ol>
+                <pre><code class="language-sql">
+-- Example of recovery process using checkpoint
+-- Identify the last checkpoint
+SELECT MAX(timestamp) INTO @last_checkpoint FROM checkpoint_log;
+
+-- Start recovery from the last checkpoint
+-- Apply all transactions from this point onwards
+SELECT * FROM transaction_log WHERE timestamp >= @last_checkpoint;
+</code></pre>
+            </article>
+
+        </main>
+        <script> copyright("all"); </script>
+    </body>
+
+</html>

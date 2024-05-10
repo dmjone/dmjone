@@ -75,19 +75,19 @@ function get_menu_list(datetogen) {
                 link: "understanding-three-level-database-architecture"
             },
             {
-                title: "Understanding Database Schemas and Instances",
-                desc: "Explore the foundational concepts of database schemas and instances in DBMS, including their design, functionality, and management.",
-                codetype: "Database Management",
-                readtime: 7,
-                link: "understanding-database-schemas-and-instances"
-            },
-            {
                 title: "Exploring Data Models in Database Management",
                 desc: "This comprehensive guide explores the fundamental concept of Data Models in Database Management Systems (DBMS), detailing the various types of data models and their significance in organizing, managing, and manipulating data within an organization. It covers Object-based, Record-based, and Physical data models, highlighting their roles in database design and implementation. Additionally, the guide delves into conceptual modeling, DBMS functions, data modeling techniques, SQL implementation methods, the evolution of data models, and the challenges faced in data modeling. This resource offers valuable insights for developers, database administrators, and students aiming to understand and apply data modeling principles effectively.",
                 codetype: "Data Models",
                 readtime: 5,
                 link: "exploring-data-models"
             },
+            {
+                title: "Understanding Database Schemas and Instances",
+                desc: "Explore the foundational concepts of database schemas and instances in DBMS, including their design, functionality, and management.",
+                codetype: "Database Management",
+                readtime: 7,
+                link: "understanding-database-schemas-and-instances"
+            },            
             {
                 title: "Understanding Data Independence in DBMS",
                 desc: "Dive into the crucial concept of Data Independence within Database Management Systems (DBMS), unraveling its significance for database design and operation. Learn about logical and physical data independence, their impact on database scalability and flexibility, and how they enable changes without affecting applications. This guide covers types of data independence, their implementation in DBMS architectures, and practical examples in SQL, offering invaluable insights for developers and database administrators.",
@@ -158,6 +158,48 @@ function get_menu_list(datetogen) {
                 readtime: 5,
                 link: "sql-joins"
             },
+            {
+                title: "Transactions in DBMS",
+                desc: "Explore the complexities of database transactions with our comprehensive guide on Transaction Management in Database Systems. Ideal for students of CSU357 Database Systems at Shoolini University, this resource delves into the fundamentals of ACID properties, transaction states, and concurrency control mechanisms. From isolation levels to deadlock prevention, this guide offers a step-by-step approach to mastering transaction management, ensuring data integrity and consistency in relational databases.",
+                codetype: "Transaction Management",
+                readtime: 5,
+                link: "transactions-in-dbms"
+            },
+            {
+                title: "Concurrency Control in DBMS",
+                desc: "Dive into the intricacies of Concurrency Control in Database Management Systems (DBMS) with our comprehensive guide. Tailored for students of CSU357 Database Systems at Shoolini University, this resource explores the challenges of data concurrency, transaction isolation levels, and the mechanisms for ensuring data consistency and integrity. From lock-based protocols to timestamp ordering, this guide offers a step-by-step approach to mastering concurrency control, ensuring optimal database performance and reliability.",
+                codetype: "Concurrency Control",
+                readtime: 5,
+                link: "concurrency-control-in-dbms"
+            },
+            {
+                title: "Locking Mechanisms in DBMS",
+                desc: "Unlock the complexities of Locking Mechanisms in Database Management Systems (DBMS) with our comprehensive guide. Tailored for students of CSU357 Database Systems at Shoolini University, this resource delves into the fundamentals of lock-based protocols, their types, and practical applications in ensuring data integrity and consistency. From shared locks to exclusive locks, this guide offers a step-by-step approach to mastering locking mechanisms, ensuring optimal database performance and reliability.",
+                codetype: "Locking Mechanisms",
+                readtime: 5,
+                link: "locking-mechanisms-in-dbms"
+            },
+            {
+                title: "Timestamp Ordering in DBMS",
+                desc: "Explore the intricacies of Timestamp Ordering in Database Management Systems (DBMS) with our comprehensive guide. Tailored for students of CSU357 Database Systems at Shoolini University, this resource delves into the fundamentals of timestamp-based protocols, their implementation, and practical applications in ensuring data consistency and integrity. From timestamp generation to conflict resolution, this guide offers a step-by-step approach to mastering timestamp ordering, ensuring optimal database performance and reliability.",
+                codetype: "Timestamp Ordering",
+                readtime: 5,
+                link: "timestamp-ordering-in-dbms"
+            },
+            {
+                title: "Deadlock Handling in DBMS",
+                desc: "Navigate the complexities of Deadlock Handling in Database Management Systems (DBMS) with our comprehensive guide. Tailored for students of CSU357 Database Systems at Shoolini University, this resource explores the challenges of data concurrency, deadlock detection, and resolution mechanisms. From wait-die to wound-wait, this guide offers a step-by-step approach to mastering deadlock handling, ensuring optimal database performance and reliability.",
+                codetype: "Deadlock Handling",
+                readtime: 5,
+                link: "deadlock-handling-in-dbms"
+            },
+            {
+                title: "Recovery Techniques in DBMS",
+                desc: "Discover the intricacies of Recovery Techniques in Database Management Systems (DBMS) with our comprehensive guide. Tailored for students of CSU357 Database Systems at Shoolini University, this resource delves into the fundamentals of recovery mechanisms, their types, and practical applications in ensuring data consistency and integrity. From deferred updates to immediate updates, this guide offers a step-by-step approach to mastering recovery techniques, ensuring optimal database performance and reliability.",
+                codetype: "Recovery Techniques",
+                readtime: 5,
+                link: "recovery-techniques-in-dbms"
+            }
 
 
         ];

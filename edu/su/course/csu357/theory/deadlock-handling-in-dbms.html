@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+    <!--<![endif]-->
+
+    <head>
+        <script src="/js/edu_su_common.js"></script>
+        <noscript>
+            <style>
+                html,
+                body {
+                    margin: 0;
+                    overflow: hidden;
+                }
+            </style>
+            <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+        </noscript>
+
+        <title>Deadlock Handling - CSU357 - Shoolini University</title>
+        <meta name="description" content="Learn about deadlock handling in Database Management Systems (DBMS) and the techniques used to prevent and resolve deadlocks.">
+
+        <meta property="og:image" content="/logo.png">
+        <meta property="og:type" content="article">
+
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:site" content="@divyamohan1993">
+        <meta name="twitter:creator" content="@divyamohan1993">
+        <meta name="twitter:image" content="/logo.png">
+
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+        <meta name="author" content="Divya Mohan">
+        <meta name="robots" content="index, follow">
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js" integrity="sha512-sHSNLECRJSK+BFs7E8DiFc6pf6n90bLI85Emiw1jhreduZhK3VXgq9l4kAt9eTIHYAcuQBKHL01QKs4/3Xgl8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js" integrity="sha512-iWiuBS5nt6r60fCz26Nd0Zqe0nbk1ZTIQbl3Kv7kYsX+yKMUFHzjaH2+AnM6vp2Xs+gNmaBAVWJjSmuPw76Efg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                renderMathInElement(document.body, {
+                    // customised options
+                    // • auto-render specific keys, e.g.:
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false },
+                        { left: '\\(', right: '\\)', display: false },
+                        { left: '\\[', right: '\\]', display: true }
+                    ],
+                    // • rendering keys, e.g.:
+                    throwOnError: false
+                });
+            });
+        </script>
+    </head>
+
+    <body>
+
+        <script> header_author("dm"); </script>
+
+        <main>
+
+            <article class="agen-tableofcontents">
+                <h2 class="text-center">
+                    Deadlock Handling
+                </h2>
+            </article>
+
+            <article id="deadlock-handling">
+                <h3>1. Deadlock Handling in DBMS</h3>
+                <p>Deadlock is a situation in DBMS where two or more transactions are unable to proceed because each is waiting for one of the others to release a lock. Effective deadlock handling ensures the smooth operation of the database system.</p>
+            </article>
+
+            <article>
+                <h4>1.1 Deadlock Prevention</h4>
+                <p>Deadlock prevention aims to ensure that the system never enters a deadlock state. There are several strategies for this:</p>
+                <ul>
+                    <li><strong>Mutual Exclusion</strong>: Avoiding mutual exclusion is generally not possible, as some resources are inherently non-shareable.</li>
+                    <li><strong>Hold and Wait</strong>: A transaction must acquire all necessary locks before execution or release all held locks before requesting new ones.</li>
+                    <li><strong>No Preemption</strong>: If a transaction holding some resources requests another resource that cannot be immediately allocated, all held resources are released.</li>
+                    <li><strong>Circular Wait</strong>: Enforcing a global ordering of resource types and ensuring that each transaction requests resources in an increasing order of enumeration.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h4>1.2 Deadlock Avoidance</h4>
+                <p>Deadlock avoidance dynamically examines the resource-allocation state to ensure that there can never be a circular wait. The most common algorithm used is the Banker’s algorithm.</p>
+                <h5>1.2.1 Wait-Die Scheme</h5>
+                <p>In this scheme, if an older transaction requests a resource held by a younger one, it waits. Otherwise, it is rolled back (dies).</p>
+                <h5>1.2.2 Wound-Wait Scheme</h5>
+                <p>If an older transaction requests a resource held by a younger one, the younger one is rolled back (wounded). Otherwise, the older transaction waits.</p>
+            </article>
+
+            <article>
+                <h4>1.3 Deadlock Detection</h4>
+                <p>In deadlock detection, the system allows transactions to request resources and detects deadlocks when they occur. This involves maintaining a wait-for graph and periodically checking it for cycles.</p>
+                <pre><code class="language-sql">-- Example of detecting deadlocks in SQL Server
+SELECT 
+    request_session_id, 
+    resource_type, 
+    resource_associated_entity_id
+FROM 
+    sys.dm_tran_locks
+WHERE 
+    resource_type = 'OBJECT'
+</code></pre>
+            </article>
+
+            <article>
+                <h4>1.4 Deadlock Recovery</h4>
+                <p>Once a deadlock is detected, the system must recover from it. This involves aborting one or more transactions to break the deadlock. The aborted transactions are rolled back and restarted.</p>
+                <ul>
+                    <li><strong>Victim Selection</strong>: Choose the transaction to abort based on factors like how long the transaction has been running, how much it has done, and how many resources it holds.</li>
+                    <li><strong>Rollback</strong>: Abort the selected transaction and roll back its operations.</li>
+                    <li><strong>Starvation Prevention</strong>: Ensure that the same transaction is not repeatedly chosen as a victim.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h4>1.5 Implementation Methods in SQL</h4>
+                <p>SQL-based systems have specific commands and settings to handle deadlocks. Here are a few examples:</p>
+                <h5>1.5.1 Setting Deadlock Priority</h5>
+                <pre><code class="language-sql">-- Set the deadlock priority in SQL Server
+SET DEADLOCK_PRIORITY HIGH;
+-- Other possible values are LOW and NORMAL
+</code></pre>
+                <h5>1.5.2 Detecting Deadlocks</h5>
+                <pre><code class="language-sql">-- Enable deadlock graph in SQL Server for analysis
+DBCC TRACEON (1222, -1);
+</code></pre>
+            </article>
+        </main>
+        <script> copyright("all"); </script>
+    </body>
+
+</html>

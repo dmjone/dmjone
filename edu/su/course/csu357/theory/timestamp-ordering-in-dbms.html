@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+    <!--<![endif]-->
+
+    <head>
+        <script src="/js/edu_su_common.js"></script>
+        <noscript>
+            <style>
+                html,
+                body {
+                    margin: 0;
+                    overflow: hidden;
+                }
+            </style>
+            <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+        </noscript>
+
+        <title>Timestamp Ordering - CSU357 - Shoolini University</title>
+        <meta name="description" content="Learn about timestamp ordering in concurrency control techniques in databases.">
+
+        <meta property="og:image" content="/logo.png">
+        <meta property="og:type" content="article">
+
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:site" content="@divyamohan1993">
+        <meta name="twitter:creator" content="@divyamohan1993">
+        <meta name="twitter:image" content="/logo.png">
+
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+        <meta name="author" content="Divya Mohan">
+        <meta name="robots" content="index, follow">
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js" integrity="sha512-sHSNLECRJSK+BFs7E8DiFc6pf6n90bLI85Emiw1jhreduZhK3VXgq9l4kAt9eTIHYAcuQBKHL01QKs4/3Xgl8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js" integrity="sha512-iWiuBS5nt6r60fCz26Nd0Zqe0nbk1ZTIQbl3Kv7kYsX+yKMUFHzjaH2+AnM6vp2Xs+gNmaBAVWJjSmuPw76Efg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                renderMathInElement(document.body, {
+                    // customised options
+                    // • auto-render specific keys, e.g.:
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false },
+                        { left: '\\(', right: '\\)', display: false },
+                        { left: '\\[', right: '\\]', display: true }
+                    ],
+                    // • rendering keys, e.g.:
+                    throwOnError: false
+                });
+            });
+        </script>
+    </head>
+
+    <body>
+
+        <script> header_author("dm"); </script>
+
+        <main>
+
+            <article class="agen-tableofcontents">
+                <h2 class="text-center">
+                    Timestamp Ordering
+                </h2>
+            </article>
+
+            <article id="header-shortlink-from-h3">
+                <h3>1. Timestamps in DBMS</h3>
+                <p>A timestamp in a Database Management System (DBMS) is a unique identifier created by the system to track and manage changes to the database. Timestamps are crucial for concurrency control, ensuring data consistency, and implementing various database operations like transactions, recovery, and versioning.</p>
+            </article>
+
+            <article>
+                <h4>1.1 Importance of Timestamps</h4>
+                <p>Timestamps play a pivotal role in DBMS for the following reasons:</p>
+                <ul>
+                    <li><strong>Concurrency Control</strong>: Ensures multiple transactions can occur simultaneously without conflicting.</li>
+                    <li><strong>Data Consistency</strong>: Maintains the integrity of data by tracking changes accurately.</li>
+                    <li><strong>Transaction Management</strong>: Helps in sequencing operations and managing the execution of transactions.</li>
+                    <li><strong>Recovery</strong>: Aids in restoring the database to a consistent state after a failure.</li>
+                    <li><strong>Versioning</strong>: Facilitates tracking of data changes over time.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h4>1.2 Timestamp-Based Protocols</h4>
+                <p>Timestamps are fundamental in implementing timestamp-based protocols, which include:</p>
+                <article>
+                    <h5>1.2.1 Timestamp Ordering Protocol</h5>
+                    <p>This protocol ensures that transactions are executed in a timestamp order to maintain serializability. Each transaction is assigned a timestamp, and the system orders transactions based on these timestamps.</p>
+                    <ul>
+                        <li><strong>Read Timestamp (RTS)</strong>: The largest timestamp of any transaction that successfully read the item.</li>
+                        <li><strong>Write Timestamp (WTS)</strong>: The largest timestamp of any transaction that successfully wrote the item.</li>
+                    </ul>
+                    <p>If a transaction's timestamp is less than the write timestamp of the item it wants to read/write, the transaction is aborted and restarted with a new timestamp.</p>
+                </article>
+
+                <article>
+                    <h5>1.2.2 Thomas’s Write Rule</h5>
+                    <p>This rule is an optimization of the timestamp ordering protocol. It allows some write operations to be ignored if they do not affect the final outcome, enhancing performance.</p>
+                    <p>The write operation can be ignored if the timestamp of the write is less than the current write timestamp of the data item, indicating that the write is outdated and irrelevant.</p>
+                </article>
+            </article>
+
+            <article>
+                <h4>1.3 Implementation of Timestamps in SQL</h4>
+                <p>SQL provides various methods to implement and utilize timestamps:</p>
+                <article>
+                    <h5>1.3.1 Creating a Timestamp Column</h5>
+                    <p>To create a timestamp column in an SQL table:</p>
+                    <pre><code class="language-sql">CREATE TABLE example_table (
+    id INT PRIMARY KEY,
+    data VARCHAR(100),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);</code></pre>
+                    <p>This command creates a table with a timestamp column that records the creation time of each row.</p>
+                </article>
+
+                <article>
+                    <h5>1.3.2 Updating a Timestamp Column</h5>
+                    <p>To update a timestamp column whenever a row is modified:</p>
+                    <pre><code class="language-sql">CREATE TABLE example_table (
+    id INT PRIMARY KEY,
+    data VARCHAR(100),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);</code></pre>
+                    <p>This command ensures that the <code>updated_at</code> column reflects the last modification time.</p>
+                </article>
+
+                <article>
+                    <h5>1.3.3 Retrieving Records Based on Timestamps</h5>
+                    <p>To query records based on their timestamps:</p>
+                    <pre><code class="language-sql">SELECT * FROM example_table
+WHERE created_at >= '2023-01-01 00:00:00' AND created_at < '2024-01-01 00:00:00';</code></pre>
+                    <p>This query retrieves all records created in the year 2023.</p>
+                </article>
+            </article>
+
+            <article>
+                <h4>1.4 Timestamps in Concurrency Control</h4>
+                <p>In concurrency control, timestamps ensure the correct execution order of transactions, preventing conflicts and maintaining data integrity. This section details the role of timestamps in key concurrency control techniques.</p>
+
+                <article>
+                    <h5>1.4.1 Basic Timestamp Ordering</h5>
+                    <p>Basic timestamp ordering is a concurrency control method where each transaction is assigned a unique timestamp. Transactions are executed in the order of their timestamps to avoid conflicts.</p>
+                    <ul>
+                        <li><strong>Read Operation</strong>: A transaction $T_i$ can read a data item only if its timestamp is greater than the write timestamp of the last transaction that wrote the item. Otherwise, $T_i$ is aborted and restarted.</li>
+                        <li><strong>Write Operation</strong>: A transaction $T_i$ can write a data item only if its timestamp is greater than the read and write timestamps of the last transactions that accessed the item. If not, $T_i$ is aborted and restarted.</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h5>1.4.2 Multiversion Concurrency Control (MVCC)</h5>
+                    <p>MVCC uses multiple versions of data items to handle concurrent transactions, leveraging timestamps for version control.</p>
+                    <ul>
+                        <li><strong>Read Operation</strong>: Each transaction reads the latest version of the data item that is committed before the transaction's timestamp.</li>
+                        <li><strong>Write Operation</strong>: Each transaction creates a new version of the data item with its timestamp, making it visible to subsequent transactions.</li>
+                    </ul>
+                    <p>This method improves performance by allowing read operations to proceed without waiting for write operations.</p>
+                </article>
+
+                <article>
+                    <h5>1.4.3 Two-Phase Locking (2PL) with Timestamps</h5>
+                    <p>Two-Phase Locking (2PL) can be combined with timestamps to enhance concurrency control. The protocol ensures that all locks are acquired before any are released, divided into two phases:</p>
+                    <ul>
+                        <li><strong>Growing Phase</strong>: A transaction can obtain locks but cannot release any.</li>
+                        <li><strong>Shrinking Phase</strong>: A transaction can release locks but cannot obtain any new ones.</li>
+                    </ul>
+                    <p>Timestamps can be used to resolve deadlocks by assigning priorities to transactions based on their timestamps. Older transactions (with smaller timestamps) are given higher priority.</p>
+                </article>
+
+                <article>
+                    <h5>1.4.4 Optimistic Concurrency Control (OCC)</h5>
+                    <p>OCC assumes that conflicts are rare and checks for conflicts only at the end of the transaction. It involves three phases:</p>
+                    <ul>
+                        <li><strong>Read Phase</strong>: The transaction reads data items and stores them in a local workspace.</li>
+                        <li><strong>Validation Phase</strong>: Before committing, the transaction is validated to ensure no conflicts occurred during its execution. Timestamps are used to check for conflicts with other transactions.</li>
+                        <li><strong>Write Phase</strong>: If validated, the transaction updates the database; otherwise, it is aborted and restarted.</li>
+                    </ul>
+                    </p>
+                </article>
+            </article>
+        </main>
+        <script> copyright("all"); </script>
+    </body>
+
+</html>
