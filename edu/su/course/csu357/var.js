@@ -100,7 +100,7 @@ function get_menu_list(datetogen) {
                 desc: "Embark on a journey through the essential database languages that power Database Management Systems (DBMS). This comprehensive guide covers everything from Data Definition Language (DDL) to Data Manipulation Language (DML), Data Control Language (DCL), Transaction Control Language (TCL), and the pivotal SQL Query Language. Understand their distinct roles, how they interconnect, and their practical applications in real-world database management. Perfect for beginners and seasoned professionals alike, this guide provides the foundation for mastering SQL and effectively managing databases.",
                 codetype: "Database Languages",
                 readtime: 8,
-                link: "exploring-database-languages"
+                link: "database-languages"
             },
             {
                 title: "Data Modelling using ER Approach",

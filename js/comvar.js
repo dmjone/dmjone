@@ -5,6 +5,11 @@ const arr_author = {
         bio: "<p>Divya Mohan is a driven computer science student from India, pursuing his B.Tech in Computer Science and Engineering. With a unique approach to teaching, he breaks down complex concepts into simple, digestible chunks to make tech accessible to all learners. Dedicated to delivering top-quality results, Divya is fueled by his passion for technology and education, constantly striving to improve his skills and make an impact in the field.</p>",
         href: "contact@dmj.one"
     },
+    gg: {
+        name: "Gaurav Gupta",
+        bio: "<p>Dr. Gaurav Gupta, with a BE from Dr B R Ambedkar University (2006), PG and PhD in Computer Science Engineering from KSOU-VIT and Shoolini University (2011, 2019), boasts 13 years of teaching experience. His academic achievements include numerous publications across prestigious platforms like IEEE and Springer, with 138 citations and notable indices (h-index: 5, i10-index: 4), alongside authoring over 12 books. His research focuses on machine learning applications in healthcare and agriculture, leading to the development of innovative mobile applications for Alzheimer's care and AI tools for various sectors. Dr. Gupta's contributions have earned him multiple IEEE awards and reviewer/editorial roles in several scientific journals, underscoring his prominence in smart healthcare/agriculture innovation.</p>",
+        href: "gauravgupta@shooliniouniversity.com"
+    },
     aj: {
         name: "Aarchit Joshi",
         bio: "<p>Aarchit Joshi is a computer science scholar from India, pursuing his Ph.D. in Computer Science and Engineering with a specialization in Artificial Intelligence. Aarchit employs innovative teaching methodologies to distill complex AI concepts into understandable, manageable lessons, aiming to democratize technology education. Driven by a profound passion for AI research and a commitment to excellence in education, he continuously seeks to enhance his expertise and contribute significantly to the field.</p>",

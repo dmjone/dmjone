@@ -56,7 +56,7 @@
 
     <body>
 
-        <script> header_author("dm"); </script>
+        <script> header_author("dm", "gg"); </script>
 
         <main>
 
@@ -64,6 +64,7 @@
                 <h2 class="text-center">
                     Recovery
                 </h2>
+                <div class="d-none contentdate">April, 2024</div>
             </article>
 
             <article id="header-recovery">
@@ -100,8 +101,7 @@
                     <li><strong>Old Values</strong>: The data values before the operation.</li>
                     <li><strong>New Values</strong>: The data values after the operation.</li>
                 </ul>
-                <pre><code class="language-sql">
--- Creating a log table
+                <pre><code class="language-sql">-- Creating a log table
 CREATE TABLE log (
     transaction_id INT,
     operation VARCHAR(50),
@@ -123,8 +123,7 @@ INSERT INTO log (transaction_id, operation, old_value, new_value) VALUES (1, 'UP
                     <li>Committing the shadow copy to the main database upon successful transaction completion.</li>
                 </ul>
                 <p>If a failure occurs, the shadow copy is used to restore the database.</p>
-                <pre><code class="language-sql">
--- Example process of shadow paging
+                <pre><code class="language-sql">-- Example process of shadow paging
 BEGIN TRANSACTION;
 CREATE SHADOW COPY;
 -- Perform operations
@@ -141,8 +140,7 @@ COMMIT TRANSACTION;
                     <li>Saving the current state of the database to disk.</li>
                 </ul>
                 <p>In the event of a failure, recovery can start from the last checkpoint, reducing the amount of log data to be processed.</p>
-                <pre><code class="language-sql">
--- Example of checkpointing
+                <pre><code class="language-sql">-- Example of checkpointing
 CHECKPOINT;
 -- Continue with database operations
 </code></pre>
@@ -175,8 +173,7 @@ CHECKPOINT;
                     <li><strong>Data After Image (AFIM)</strong>: The data value after the operation (new value).</li>
                     <li><strong>Timestamp</strong>: The time when the operation was performed.</li>
                 </ul>
-                <pre><code class="language-sql">
--- Example log record
+                <pre><code class="language-sql">-- Example log record
 INSERT INTO log (transaction_id, lsn, operation, bfim, afim, timestamp)
 VALUES (1, 1001, 'UPDATE', '100', '200', '2024-05-10 10:00:00');
 </code></pre>
@@ -202,8 +199,7 @@ VALUES (1, 1001, 'UPDATE', '100', '200', '2024-05-10 10:00:00');
                     <li>Scanning the log from the beginning or the last checkpoint.</li>
                     <li>Applying all operations to the database to redo the transactions.</li>
                 </ol>
-                <pre><code class="language-sql">
--- Redo operation example
+                <pre><code class="language-sql">-- Redo operation example
 -- Applying changes from log to database
 UPDATE table_name SET column_name = '200' WHERE column_name = '100';
 </code></pre>
@@ -214,8 +210,7 @@ UPDATE table_name SET column_name = '200' WHERE column_name = '100';
                     <li>Scanning the log backward from the point of failure.</li>
                     <li>Undoing all operations of uncommitted transactions.</li>
                 </ol>
-                <pre><code class="language-sql">
--- Undo operation example
+                <pre><code class="language-sql">-- Undo operation example
 -- Reversing changes from uncommitted transactions
 UPDATE table_name SET column_name = '100' WHERE column_name = '200';
 </code></pre>
@@ -229,8 +224,7 @@ UPDATE table_name SET column_name = '100' WHERE column_name = '200';
                     <li>Transaction logs must be written before a transaction is considered committed.</li>
                 </ul>
                 <p>This protocol ensures that no data modifications are lost, as log records provide a reliable means to redo or undo operations.</p>
-                <pre><code class="language-sql">
--- Example of enforcing WAL protocol
+                <pre><code class="language-sql">-- Example of enforcing WAL protocol
 BEGIN TRANSACTION;
 INSERT INTO log (transaction_id, lsn, operation, bfim, afim, timestamp) VALUES (2, 1002, 'UPDATE', '300', '400', CURRENT_TIMESTAMP);
 UPDATE table_name SET column_name = '400' WHERE column_name = '300';
@@ -290,8 +284,7 @@ COMMIT TRANSACTION;
                     <li>Commit the transaction by updating the shadow page table to match the current page table.</li>
                     <li>If the transaction fails, discard the current page table and use the shadow page table to restore the database.</li>
                 </ol>
-                <pre><code class="language-sql">
--- Example process of shadow paging
+                <pre><code class="language-sql">-- Example process of shadow paging
 BEGIN TRANSACTION;
 -- Assume page 1 is updated
 UPDATE current_page_table SET page_pointer = new_page_pointer WHERE page_id = 1;
@@ -310,8 +303,7 @@ UPDATE shadow_page_table SET page_pointer = new_page_pointer WHERE page_id = 1;
                     <li>Update the shadow page table to reflect the current state of the database.</li>
                     <li>Write a checkpoint record to indicate the completion of the checkpoint.</li>
                 </ol>
-                <pre><code class="language-sql">
--- Checkpointing example
+                <pre><code class="language-sql">-- Checkpointing example
 CHECKPOINT;
 -- Flush dirty pages to disk
 -- Update shadow page table
@@ -324,8 +316,7 @@ INSERT INTO checkpoint_log (timestamp) VALUES (CURRENT_TIMESTAMP);
             <article>
                 <h5>1.4.6 Implementation in SQL</h5>
                 <p>Here is an example of implementing shadow paging in SQL:</p>
-                <pre><code class="language-sql">
--- Create shadow page table as a copy of the current page table
+                <pre><code class="language-sql">-- Create shadow page table as a copy of the current page table
 CREATE TABLE shadow_page_table AS SELECT * FROM current_page_table;
 
 -- Begin transaction
@@ -368,8 +359,7 @@ ROLLBACK;
                     <li><strong>Writing the Checkpoint Record</strong>: A checkpoint record is written to the log, indicating the completion of the checkpoint.</li>
                     <li><strong>Updating the Checkpoint Log</strong>: The checkpoint log is updated to include the new checkpoint.</li>
                 </ol>
-                <pre><code class="language-sql">
--- Example of writing a checkpoint
+                <pre><code class="language-sql">-- Example of writing a checkpoint
 CHECKPOINT;
 -- Flush dirty pages to disk
 -- Write checkpoint record
@@ -411,8 +401,7 @@ INSERT INTO checkpoint_log (timestamp) VALUES (CURRENT_TIMESTAMP);
             <article>
                 <h5>1.5.5 Implementation in SQL</h5>
                 <p>Here is an example of implementing checkpointing in SQL:</p>
-                <pre><code class="language-sql">
--- Creating a checkpoint log table
+                <pre><code class="language-sql">-- Creating a checkpoint log table
 CREATE TABLE checkpoint_log (
     checkpoint_id INT AUTO_INCREMENT PRIMARY KEY,
     timestamp TIMESTAMP
@@ -444,8 +433,7 @@ CALL perform_checkpoint();
                     <li>Identify the last checkpoint from the checkpoint log.</li>
                     <li>Start the recovery process from this checkpoint, reducing the amount of data to be read and applied.</li>
                 </ol>
-                <pre><code class="language-sql">
--- Example of recovery process using checkpoint
+                <pre><code class="language-sql">-- Example of recovery process using checkpoint
 -- Identify the last checkpoint
 SELECT MAX(timestamp) INTO @last_checkpoint FROM checkpoint_log;
 
