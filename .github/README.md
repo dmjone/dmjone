@@ -1,4 +1,4 @@
-[![CodeQL](https://github.com/dmjone/dmjone.github.io/actions/workflows/codeql.yml/badge.svg)](https://github.com/dmjone/dmjone.github.io/actions/workflows/codeql.yml) | [![Deploy static content to Pages](https://github.com/dmjone/dmjone.github.io/actions/workflows/pages.yml/badge.svg)](https://github.com/dmjone/dmjone.github.io/actions/workflows/pages.yml) | [![Dependency Review](https://github.com/dmjone/dmjone.github.io/actions/workflows/dependency-review.yml/badge.svg)](https://github.com/dmjone/dmjone.github.io/actions/workflows/dependency-review.yml)
+[![CodeQL](https://github.com/dmjone/dmjone.github.io/actions/workflows/codeql.yml/badge.svg)](https://github.com/dmjone/dmjone.github.io/actions/workflows/codeql.yml) | [![Deploy static content to Pages](https://github.com/dmjone/dmjone.github.io/actions/workflows/pages.yml/badge.svg)](https://github.com/dmjone/dmjone.github.io/actions/workflows/pages.yml) | [![Dependency Review](https://github.com/dmjone/dmjone.github.io/actions/workflows/dependency-review.yml/badge.svg)](https://github.com/dmjone/dmjone.github.io/actions/workflows/dependency-review.yml) | [![CodeFactor](https://www.codefactor.io/repository/github/dmjone/dmjone/badge)](https://www.codefactor.io/repository/github/dmjone/dmjone)
 
 # Welcome to the educational initiative of [dmj.one](https://dmj.one)!
 
@@ -15,4 +15,4 @@
 🌎 We believe that education has the power to change the world. By sharing our knowledge and working together, we can create a better future for everyone. Join our community and let's make a difference, together.
 
 ***
-&copy; 2022, dmj.one
+&copy; 2024, dmj.one
