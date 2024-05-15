@@ -160,42 +160,42 @@ function get_menu_list(datetogen) {
             },
             {
                 title: "Transactions in DBMS",
-                desc: "Explore the complexities of database transactions with our comprehensive guide on Transaction Management in Database Systems. Ideal for students of CSU357 Database Systems at Shoolini University, this resource delves into the fundamentals of ACID properties, transaction states, and concurrency control mechanisms. From isolation levels to deadlock prevention, this guide offers a step-by-step approach to mastering transaction management, ensuring data integrity and consistency in relational databases.",
+                desc: "Explore the complexities of database transactions with our comprehensive guide on Transaction Management in Database Systems. This resource delves into the fundamentals of ACID properties, transaction states, and concurrency control mechanisms. From isolation levels to deadlock prevention, this guide offers a step-by-step approach to mastering transaction management, ensuring data integrity and consistency in relational databases.",
                 codetype: "Transaction Management",
                 readtime: 5,
                 link: "transactions-in-dbms"
             },
             {
-                title: "Concurrency Control in DBMS",
-                desc: "Dive into the intricacies of Concurrency Control in Database Management Systems (DBMS) with our comprehensive guide. Tailored for students of CSU357 Database Systems at Shoolini University, this resource explores the challenges of data concurrency, transaction isolation levels, and the mechanisms for ensuring data consistency and integrity. From lock-based protocols to timestamp ordering, this guide offers a step-by-step approach to mastering concurrency control, ensuring optimal database performance and reliability.",
+                title: "Concurrency Control Techniques in DBMS",
+                desc: "Dive into the intricacies of Concurrency Control in Database Management Systems (DBMS) with our comprehensive guide. This resource explores the challenges of data concurrency, transaction isolation levels, and the mechanisms for ensuring data consistency and integrity. From lock-based protocols to timestamp ordering, this guide offers a step-by-step approach to mastering concurrency control, ensuring optimal database performance and reliability.",
                 codetype: "Concurrency Control",
                 readtime: 5,
-                link: "concurrency-control-in-dbms"
+                link: "concurrency-control-techniques"
             },
             {
                 title: "Locking Mechanisms in DBMS",
-                desc: "Unlock the complexities of Locking Mechanisms in Database Management Systems (DBMS) with our comprehensive guide. Tailored for students of CSU357 Database Systems at Shoolini University, this resource delves into the fundamentals of lock-based protocols, their types, and practical applications in ensuring data integrity and consistency. From shared locks to exclusive locks, this guide offers a step-by-step approach to mastering locking mechanisms, ensuring optimal database performance and reliability.",
+                desc: "Unlock the complexities of Locking Mechanisms in Database Management Systems (DBMS) with our comprehensive guide. This resource delves into the fundamentals of lock-based protocols, their types, and practical applications in ensuring data integrity and consistency. From shared locks to exclusive locks, this guide offers a step-by-step approach to mastering locking mechanisms, ensuring optimal database performance and reliability.",
                 codetype: "Locking Mechanisms",
                 readtime: 5,
                 link: "locking-mechanisms-in-dbms"
             },
             {
                 title: "Timestamp Ordering in DBMS",
-                desc: "Explore the intricacies of Timestamp Ordering in Database Management Systems (DBMS) with our comprehensive guide. Tailored for students of CSU357 Database Systems at Shoolini University, this resource delves into the fundamentals of timestamp-based protocols, their implementation, and practical applications in ensuring data consistency and integrity. From timestamp generation to conflict resolution, this guide offers a step-by-step approach to mastering timestamp ordering, ensuring optimal database performance and reliability.",
+                desc: "Explore the intricacies of Timestamp Ordering in Database Management Systems (DBMS) with our comprehensive guide. This resource delves into the fundamentals of timestamp-based protocols, their implementation, and practical applications in ensuring data consistency and integrity. From timestamp generation to conflict resolution, this guide offers a step-by-step approach to mastering timestamp ordering, ensuring optimal database performance and reliability.",
                 codetype: "Timestamp Ordering",
                 readtime: 5,
                 link: "timestamp-ordering-in-dbms"
             },
             {
                 title: "Deadlock Handling in DBMS",
-                desc: "Navigate the complexities of Deadlock Handling in Database Management Systems (DBMS) with our comprehensive guide. Tailored for students of CSU357 Database Systems at Shoolini University, this resource explores the challenges of data concurrency, deadlock detection, and resolution mechanisms. From wait-die to wound-wait, this guide offers a step-by-step approach to mastering deadlock handling, ensuring optimal database performance and reliability.",
+                desc: "Navigate the complexities of Deadlock Handling in Database Management Systems (DBMS) with our comprehensive guide. This resource explores the challenges of data concurrency, deadlock detection, and resolution mechanisms. From wait-die to wound-wait, this guide offers a step-by-step approach to mastering deadlock handling, ensuring optimal database performance and reliability.",
                 codetype: "Deadlock Handling",
                 readtime: 5,
                 link: "deadlock-handling-in-dbms"
             },
             {
                 title: "Recovery Techniques in DBMS",
-                desc: "Discover the intricacies of Recovery Techniques in Database Management Systems (DBMS) with our comprehensive guide. Tailored for students of CSU357 Database Systems at Shoolini University, this resource delves into the fundamentals of recovery mechanisms, their types, and practical applications in ensuring data consistency and integrity. From deferred updates to immediate updates, this guide offers a step-by-step approach to mastering recovery techniques, ensuring optimal database performance and reliability.",
+                desc: "Discover the intricacies of Recovery Techniques in Database Management Systems (DBMS) with our comprehensive guide. This resource delves into the fundamentals of recovery mechanisms, their types, and practical applications in ensuring data consistency and integrity. From deferred updates to immediate updates, this guide offers a step-by-step approach to mastering recovery techniques, ensuring optimal database performance and reliability.",
                 codetype: "Recovery Techniques",
                 readtime: 5,
                 link: "recovery-techniques-in-dbms"
