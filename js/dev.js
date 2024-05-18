@@ -980,7 +980,7 @@ let header_author = function (...args) {
         // Get the location of the page
         // var currentlocation = 'https://dmj.one/' + window.location.pathname.split('/').pop().replace('.html', '');        
         let currentlocation = 'https://dmj.one' + window.location.pathname.replace(/\.html$/, '') || window.location.href;
-        // let currentlocation = 'https://dmj.one/edu/su/course/csu360/lab/'; // Fix location for specific work.
+        // currentlocation = 'https://dmj.one/'; // Fix location for specific work.
 
 
 
@@ -1016,7 +1016,10 @@ let header_author = function (...args) {
                 // Only display the Shoolini logo when in student mode
                 data = `<div class="col-12">
                   <img src="/img/shoolini_logo.png" class="img-fluid" alt="Shoolini University Logo" style="max-width:40%;">
-                </div>`;
+                </div>
+                <!--<div class="col-6">
+                  <img src="/img/icf_logo.jpg" class="img-fluid" alt="Shoolini University Logo" style="max-width:80%;">
+                </div>-->`;
             } else {
                 // Base structure for other modes
                 data = `<div class="col-6 col">
@@ -1107,6 +1110,7 @@ let header_author = function (...args) {
         var facultyDiv = document.createElement('div');
         facultyDiv.className = 'd-none d-print-block mx-auto';
         facultyDiv.innerHTML = window.GLOBAL_get_course_detail_ ? window.GLOBAL_get_course_ ? `<p class="text-center fst-italic">Under the guidance of <span class="text-capitalize">${window.GLOBAL_get_Faculty_Name_}</span> in the subject of <span class="text-capitalize">${window.GLOBAL_get_course_detail_} (${window.GLOBAL_get_course_})</span></p>` : `<p class="text-center">${window.GLOBAL_get_course_detail_}</p>` : '';
+        // facultyDiv.innerHTML = window.GLOBAL_get_course_detail_ ? window.GLOBAL_get_course_ ? `<p class="text-center fst-italic">Under the guidance of <span class="text-capitalize">Asst. Prof. Payal Khanna</span> in the subject of <span class="text-capitalize">Enhancing Leadership through Coaching Skills (CSU1806)</span></p>` : `<p class="text-center">${window.GLOBAL_get_course_detail_}</p>` : '';
         // facultyDiv.innerHTML += window.GLOBAL_get_Faculty_Name_ ? `<p class="text-center text-uppercase"><span class="fw-bold"></span> ${window.GLOBAL_get_Faculty_Name_}</p>` : '';
         facultyDiv.innerHTML += `<p class="text-center text-uppercase" style="font-size:8px!important">${studentmode ? 'Submitted on' : 'Printed on'} ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>`;
 
