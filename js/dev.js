@@ -905,6 +905,22 @@ let header_navbar = function (flags) {
         `<span class="navbar-toggler-icon"></span></button><div class="collapse navbar-collapse" id="navbar"><ul class="navbar-nav ms-auto">${allLinksHTML}</ul></div></div></nav>`;
 };
 
+/********************** Public the author to window variable **************************/
+function extractTextFromStrongTag(htmlString) {
+    // function used in next block header_author. It extracts the text from the strong tag. 
+    var tempDiv = document.createElement('div');
+    tempDiv.innerHTML = htmlString;
+    var authorNames = Array.from(tempDiv.querySelectorAll('strong'), el => el.textContent);
+
+    // If there's more than one name, format the string with "and" before the last name
+    if (authorNames.length > 1) {
+        var lastAuthor = authorNames.pop();
+        return authorNames.join(', ') + ' and ' + lastAuthor;
+    } else {
+        return authorNames.join('');
+    }
+}
+
 let header_author = function (...args) {
     const header_author_internal = {
         activateNavbar() {
@@ -926,6 +942,8 @@ let header_author = function (...args) {
 
             // Added to display when user prints the article
             window.GLOBAL_get_Author_Name_ = pA_author;
+            // console.log(extractTextFromStrongTag(pA_author));
+            window.GLOBAL_get_formatted_Author_Name_ = extractTextFromStrongTag(pA_author);
 
 
             const { line1, line2, line3, line4 } = processFolder(allAuthors, author_bio);
@@ -938,6 +956,7 @@ let header_author = function (...args) {
     header_author_internal.header_author_main(...args);
     header_author_internal.activateNavbar();
 };
+
 
 /************************* Print Specific Layout Generator ****************************/
 (function () {
@@ -966,13 +985,13 @@ let header_author = function (...args) {
         
         
         // Retrive elements of the page
-        let articleElement = document.querySelector('article.agen-tableofcontents');
+        let articleElement = document.querySelector('article.agen-tableofcontents');        
         if (typeof articleElement === 'undefined' || articleElement === null) {
             noactualarticle = 1;
             articleElement = document.querySelector('main');
         }
 
-        let titleofthepage = articleElement.querySelector('h2').innerText;
+        let titleofthepage = articleElement.querySelector('h2').innerText || '';
         let dateofthepage = articleElement.querySelector('.contentdate') ? articleElement.querySelector('.contentdate').innerText : "n.d.";
         let h2 = articleElement.querySelector('h2');
         h2.classList.add('d-print-none');
@@ -988,9 +1007,9 @@ let header_author = function (...args) {
         var qr = qrcode(0, 'H');
         // qr.addData(window.location.href);
         qr.addData(currentlocation);
-
         qr.make();
         var qrcode_data = qr.createDataURL(4, "");
+        window.GLOBAL_get_qr_code_data = qrcode_data;
 
         // Create and configure the QR code image
         var qrImage = new Image();
@@ -1001,7 +1020,13 @@ let header_author = function (...args) {
 
         var qrDiv = document.createElement('div');
         qrDiv.className = 'd-none d-none d-print-block mx-auto mt-10';
-        qrDiv.appendChild(qrImage);
+        qrDiv.appendChild(qrImage);        
+
+        if (!studentmode) {
+            const style = document.createElement('style');
+            style.textContent = `@media print { *,*::before { background: #fff !important; -webkit-print-color-adjust: exact !important; color-adjust: exact !important; print-color-adjust: exact !important; }}`;
+            document.head.appendChild(style);
+        }
 
         logocontent_dmj_shoolini_qr = () => {
             let data; // Define data variable to hold the HTML string
@@ -1078,19 +1103,19 @@ let header_author = function (...args) {
             return ''; // In case there are no strong tags
         }
 
-        function extractTextFromStrongTag(htmlString) {
-            var tempDiv = document.createElement('div');
-            tempDiv.innerHTML = htmlString;
-            var authorNames = Array.from(tempDiv.querySelectorAll('strong'), el => el.textContent);
+        // function extractTextFromStrongTag(htmlString) {
+        //     var tempDiv = document.createElement('div');
+        //     tempDiv.innerHTML = htmlString;
+        //     var authorNames = Array.from(tempDiv.querySelectorAll('strong'), el => el.textContent);
 
-            // If there's more than one name, format the string with "and" before the last name
-            if (authorNames.length > 1) {
-                var lastAuthor = authorNames.pop();
-                return authorNames.join(', ') + ' and ' + lastAuthor;
-            } else {
-                return authorNames.join('');
-            }
-        }
+        //     // If there's more than one name, format the string with "and" before the last name
+        //     if (authorNames.length > 1) {
+        //         var lastAuthor = authorNames.pop();
+        //         return authorNames.join(', ') + ' and ' + lastAuthor;
+        //     } else {
+        //         return authorNames.join('');
+        //     }
+        // }
 
         // Prepare the titleofthepage div with the titleofthepage as text content
         var titleDiv = document.createElement('div');
@@ -1100,11 +1125,15 @@ let header_author = function (...args) {
         // Prepare the author and faculty divs with text content
         // var authorsText = extractTextFromStrongTag(window.GLOBAL_get_Author_Name_);
         // var authorsText = 'Divya Mohan <em>(GF202214698)</em>';
-        var authorsText = studentmode ? 'Divya Mohan <em>(GF202214698)</em>' : extractTextFromStrongTag(window.GLOBAL_get_Author_Name_);
+        // const formattedauthorname = extractTextFromStrongTag(window.GLOBAL_get_Author_Name_);
+        const formattedauthorname = window.GLOBAL_get_formatted_Author_Name_;
+        // window.GLOBAL_get_formatted_Author_Name_ = formattedauthorname;
+        // console.log(formattedauthorname);
+        var authorsText = studentmode ? 'Divya Mohan <em>(GF202214698)</em>' : formattedauthorname;
         var authorsdept = studentmode ? 'Yogananda School of AI, Computers and Data Science' : 'Faculty of Engineering and Technology';
         var authorsDiv = document.createElement('div');        
         authorsDiv.className = 'd-none d-print-block mx-auto mt-3 mb-4';
-        authorsDiv.innerHTML = authorsText ? `<p class="text-center text-uppercase">${authorsText}</p><p class="text-uppercase text-center" style="font-size:8px!important">${authorsdept}</p><p class="text-uppercase text-center fw-bold" style="font-size:10px!important">Shoolini University, Solan, Himachal Pradesh, India</p>` : '';        
+        authorsDiv.innerHTML = authorsText ? `<p class="text-center text-uppercase">${authorsText}</p><p class="text-uppercase text-center" style="font-size:8pt!important">${authorsdept}</p><p class="text-uppercase text-center fw-bold" style="font-size:10pt!important">Shoolini University, Solan, Himachal Pradesh, India</p>` : '';        
 
 
         var facultyDiv = document.createElement('div');
@@ -1112,7 +1141,7 @@ let header_author = function (...args) {
         facultyDiv.innerHTML = window.GLOBAL_get_course_detail_ ? window.GLOBAL_get_course_ ? `<p class="text-center fst-italic">Under the guidance of <span class="text-capitalize">${window.GLOBAL_get_Faculty_Name_}</span> in the subject of <span class="text-capitalize">${window.GLOBAL_get_course_detail_} (${window.GLOBAL_get_course_})</span></p>` : `<p class="text-center">${window.GLOBAL_get_course_detail_}</p>` : '';
         // facultyDiv.innerHTML = window.GLOBAL_get_course_detail_ ? window.GLOBAL_get_course_ ? `<p class="text-center fst-italic">Under the guidance of <span class="text-capitalize">Asst. Prof. Payal Khanna</span> in the subject of <span class="text-capitalize">Enhancing Leadership through Coaching Skills (CSU1806)</span></p>` : `<p class="text-center">${window.GLOBAL_get_course_detail_}</p>` : '';
         // facultyDiv.innerHTML += window.GLOBAL_get_Faculty_Name_ ? `<p class="text-center text-uppercase"><span class="fw-bold"></span> ${window.GLOBAL_get_Faculty_Name_}</p>` : '';
-        facultyDiv.innerHTML += `<p class="text-center text-uppercase" style="font-size:8px!important">${studentmode ? 'Submitted on' : 'Printed on'} ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>`;
+        facultyDiv.innerHTML += `<p class="text-center text-uppercase" style="font-size:8pt!important">${studentmode ? 'Submitted on' : 'Printed on'} ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>`;
 
         var authorsetal = formatAuthorsEtAl(window.GLOBAL_get_Author_Name_);
         var citationblockquote = document.createElement('blockquote');
@@ -1146,6 +1175,10 @@ let header_author = function (...args) {
         articleElement.insertBefore(docFragmentAfterh2, h2.nextSibling);
     });
 })();
+
+
+
+
 
 /******** Body ***********/
 // Decode Encrypted Variable's - Call this function to decode variables.
@@ -2200,112 +2233,222 @@ function createSharingButtons(text, url, iconName, btnClass) {
 }
 
 
-function copyright(rights, noprint = false) {
+// function copyright(rights, noprint) {
+//     window["loaded_copyright"] = 1;
+//     // sitemap_var_gen_clipboard(); // uncomment this line to get the sitemap generation link copier
+//     if (rights === "off") { return null; }
+//     // console.log(noprint);
+//     if (noprint === true) { return null; }
+
+//     var footer_all_rights = ' &#8226; All rights reserved';
+//     var footer_some_rights = ' &#8226; Some rights reserved';
+//     var footer_link_privacy = ' &#8226; <a href="/privacy">Privacy</a>';
+//     var footer_link_tos = ' &#8226; <a href="/tos">Terms and Conditions</a>';
+
+//     if (rights == "all") {
+//         var rights = footer_all_rights;
+//     } else if (rights == "some") {
+//         var rights = footer_some_rights;
+//     } else { rights = ""; }
+
+//     let footer = document.createElement("footer");
+//     footer.id = "defaultcopyrightfooter";
+
+//     var sharingButtons = createSharingButtons();
+//     footer.appendChild(sharingButtons);
+//     var div = document.createElement("div");
+//     var span = document.createElement("span");
+//     var strong = document.createElement("strong");
+
+//     const date = new Date();
+//     const isServer = "";
+//     const lastModified = new Date(document.lastModified);
+//     if (date.getTime() === lastModified.getTime()) {
+//         isServer = " (Live)";
+//     }
+
+//     const modified = "cloudflare" == footer_getHeaderValue('server') ?
+//         `<span style="font-size:10px" class="d-print-none">Not seeing updated content? Page was loaded on ${document.lastModified} ${isServer}. Refresh with <kbd>CTRL</kbd> + <kbd>R</kbd> to check again.</span> <br>` :
+//         `<span style="font-size:10px" class="d-print-none">Not seeing updated content? Page last modified on ${document.lastModified} ${isServer}. Refresh with <kbd>CTRL</kbd> + <kbd>R</kbd> to check again.</span> <br>`;
+
+//     const footerNotice = `
+//   <span class="footer-notice d-none d-print-block my-0" style="font-size:8pt !important; font-family:"Times New Roman" !important>
+//     <h2 class="d-none d-print-block fw-normal my-1 mx-o px-0 text-center">This article is provided as part of the <span class="text-capitalize">public welfare initiatives</span> by <span class='text-lowercase'>dmj.one</span></h2>
+//         <div>
+//             <strong>General:</strong> All material provided herein is for educational or informational purposes only. No representation is made about the accuracy or completeness of the information contained on this page. Any use of or reliance on this material is strictly at the user's own risk. The author disclaims all liability for any damages or losses arising from such use.
+//             <strong>Citations:</strong> Content on this page is the intellectual property of the author. Users may cite the content at their own discretion and must assume full responsibility for maintaining academic integrity and adhering to their institution's citation guidelines.
+//             <strong>Commercial Use:</strong> Users must secure their own permissions for any commercial use of this content and agree to indemnify the author from any claims arising from such use.
+//             <strong>Contact:</strong> Direct all inquiries to contact@dmj.one. By accessing this content, you agree to contact the author for any further clarification or licensing information.
+//         </div>
+//   </span>
+// `;
+
+//     // Include this variable where you set up the rest of the footer HTML content
+
+//     div.innerHTML = footerNotice;
+//     strong.innerHTML = modified + `&copy; 2007 - ${new Date().getFullYear()} ${window.GLOBAL_get_formatted_Author_Name_ ? window.GLOBAL_get_formatted_Author_Name_ + ' |' : ''} dmj.one ${rights} ${footer_link_privacy} ${footer_link_tos}`;
+//     span.appendChild(strong);
+//     footer.appendChild(div);
+//     footer.appendChild(span);
+
+//     document.body.appendChild(footer);
+
+    
+//     const article = document.createElement("article");
+//     article.className = 'agen-the-end d-none d-print-block';
+//     article.innerHTML = `<h2 class="text-center">The End</h2><div class="text-center">&copy; 2007 - ${new Date().getFullYear()} ${window.GLOBAL_get_formatted_Author_Name_ ? window.GLOBAL_get_formatted_Author_Name_ + ' |' : ''} dmj.one ${rights} ${footer_link_privacy} ${footer_link_tos}</div>`;
+
+//     document.body.appendChild(article);
+
+//     // I want the clipboard to be displayed after footer.
+//     // var article = document.createElement("article");
+//     // article.className = 'agen-the-end d-none d-print-block';
+//     // article.innerHTML = `<h2 class="text-center">The End</h2><div class="text-center">&copy; 2007 - ${new Date().getFullYear()} ${window.GLOBAL_get_formatted_Author_Name_ ? window.GLOBAL_get_formatted_Author_Name_ + ' |' : ''} dmj.one ${rights} ${footer_link_privacy} ${footer_link_tos}</div>`;
+//     // footer.appendChild(article); // Append "The End" section to the footer
+    
+
+//     //document.body.appendChild(footer);
+//     // document.body.insertBefore(footer, document.body.lastChild);
+//     // document.body.appendChild(footer);
+//     // document.body.appendChild(article);
+
+//     // 3. Initialize a MutationObserver
+//     // let observer = new MutationObserver((mutationsList, observer) => {
+//     //     for (let mutation of mutationsList) {
+//     //         if (mutation.type === 'childList') {
+//     //             // When a child is added to the body
+//     //             if (document.body.lastChild !== footer) {
+//     //                 // If the last child is not the footer, move the footer to the end
+//     //                 document.body.appendChild(footer);
+//     //             }
+//     //         }
+//     //     }
+//     // });
+
+//     const observer = new MutationObserver((mutationsList) => {
+//         mutationsList.forEach((mutation) => {
+//             if (mutation.type === 'childList' && document.body.lastChild !== article) {
+//                 document.body.appendChild(footer);
+//                 document.body.appendChild(article);
+//             }
+//         });
+//     });
+
+//     // 4. Start observing the body for configured mutations
+//     observer.observe(document.body, { childList: true });
+//     setTimeout(() => { observer.disconnect(); }, 20); // Disconnect the observer
+
+
+//     //define service worker
+//     if (typeof navigator.serviceWorker !== 'undefined') {
+//         navigator.serviceWorker.register('/sw.js')
+//     }
+
+//     // Notification cookie
+//     //if (!(localStorage.getItem("noshow"))) { dcevars(notify_cookie); }
+
+//     window.onload = function () {
+//         // Syntax highlighter - Enable is using highlight js.
+//         // hljs.highlightAll();
+
+//         // renderMathInElement(document.body, {
+//         //     // customised options
+//         //     // • auto-render specific keys, e.g.:
+//         //     delimiters: [
+//         //         { left: '$$', right: '$$', display: true },
+//         //         { left: '$', right: '$', display: false },
+//         //         { left: '\\(', right: '\\)', display: false },
+//         //         { left: '\\[', right: '\\]', display: true }
+//         //     ],
+//         //     // • rendering keys, e.g.:
+//         //     throwOnError: false
+//         // });
+//     };
+// }
+
+function copyright(rights, noprint) {
+    function initializeCopyright() {
     window["loaded_copyright"] = 1;
-    // sitemap_var_gen_clipboard(); // uncomment this line to get the sitemap generation link copier 
-    if (rights === "off") { return null; }
-    console.log(noprint);
-    if (noprint === true) { return null; }
+    if (rights === "off") return null;
+    if (noprint) return null;
 
-    var footer_all_rights = ' &#8226; All rights reserved';
-    var footer_some_rights = ' &#8226; Some rights reserved';
-    var footer_link_privacy = ' &#8226; <a href="/privacy">Privacy</a>';
-    var footer_link_tos = ' &#8226; <a href="/tos">Terms and Conditions</a>';
+    const footer_all_rights = ' &#8226; All rights reserved';
+    const footer_some_rights = ' &#8226; Some rights reserved';
+    const footer_link_privacy = ' &#8226; <a href="/privacy">Privacy</a>';
+    const footer_link_tos = ' &#8226; <a href="/tos">Terms and Conditions</a>';
 
-    if (rights == "all") {
-        var rights = footer_all_rights;
-    } else if (rights == "some") {
-        var rights = footer_some_rights;
-    } else { rights = ""; }
+    rights = rights === "all" ? footer_all_rights : rights === "some" ? footer_some_rights : "";
 
-    let footer = document.createElement("footer");    
+    const footer = document.createElement("footer");
     footer.id = "defaultcopyrightfooter";
 
-    var sharingButtons = createSharingButtons();
-    footer.appendChild(sharingButtons);
-    var div = document.createElement("div");
-    var span = document.createElement("span");
-    var strong = document.createElement("strong");
+    footer.appendChild(createSharingButtons());
+
+    const div = document.createElement("div");
+    const span = document.createElement("span");
+    const strong = document.createElement("strong");
 
     const date = new Date();
-    const isServer = "";
+    let isServer = "";
     const lastModified = new Date(document.lastModified);
     if (date.getTime() === lastModified.getTime()) {
         isServer = " (Live)";
     }
 
-    const modified = "cloudflare" == footer_getHeaderValue('server') ?
-        `<span style="font-size:10px" class="d-print-none">Not seeing updated content? Page was loaded on ${document.lastModified} ${isServer}. Refresh with <kbd>CTRL</kbd> + <kbd>R</kbd> to check again.</span> <br>` :
-        `<span style="font-size:10px" class="d-print-none">Not seeing updated content? Page last modified on ${document.lastModified} ${isServer}. Refresh with <kbd>CTRL</kbd> + <kbd>R</kbd> to check again.</span> <br>`;
+    const modified = `cloudflare` === footer_getHeaderValue('server')
+        ? `<span style="font-size:10px" class="d-print-none">Not seeing updated content? Page was loaded on ${document.lastModified} ${isServer}. Refresh with <kbd>CTRL</kbd> + <kbd>R</kbd> to check again.</span> <br>`
+        : `<span style="font-size:10px" class="d-print-none">Not seeing updated content? Page last modified on ${document.lastModified} ${isServer}. Refresh with <kbd>CTRL</kbd> + <kbd>R</kbd> to check again.</span> <br>`;
 
     const footerNotice = `
-  <span class="footer-notice d-none d-print-block my-0" style="font-size:8px !important; font-family:"Times New Roman" !important>
-    <h3 class="d-none d-print-block fw-normal my-1">This article is provided as part of the <span class="text-capitalize">public welfare initiatives</span> by <span class="text-lowercase">dmj.one</span></h3>
-        <div>
-            <strong>General:</strong> All material provided herein is for educational or informational purposes only. No representation is made about the accuracy or completeness of the information contained on this page. Any use of or reliance on this material is strictly at the user's own risk. The author disclaims all liability for any damages or losses arising from such use.
-            <strong>Citations:</strong> Content on this page is the intellectual property of the author. Users may cite the content at their own discretion and must assume full responsibility for maintaining academic integrity and adhering to their institution's citation guidelines.
-            <strong>Commercial Use:</strong> Users must secure their own permissions for any commercial use of this content and agree to indemnify the author from any claims arising from such use.
-            <strong>Contact:</strong> Direct all inquiries to contact@dmj.one. By accessing this content, you agree to contact the author for any further clarification or licensing information.
-        </div>
-  </span>
-`;
-
-    // Include this variable where you set up the rest of the footer HTML content
+        <span class="footer-notice d-none d-print-block my-0" style="font-size:8pt !important; font-family:'Times New Roman' !important">
+            <h2 class="d-none d-print-block fw-normal my-1 mx-o px-0 text-center">This article is provided as part of the <span class="text-capitalize">public welfare initiatives</span> by <span class='text-lowercase'>dmj.one</span></h2>
+            <div>
+                <strong>General:</strong> All material provided herein is for educational or informational purposes only. No representation is made about the accuracy or completeness of the information contained on this page. Any use of or reliance on this material is strictly at the user's own risk. The author disclaims all liability for any damages or losses arising from such use.
+                <strong>Citations:</strong> Content on this page is the intellectual property of the author. Users may cite the content at their own discretion and must assume full responsibility for maintaining academic integrity and adhering to their institution's citation guidelines.
+                <strong>Commercial Use:</strong> Users must secure their own permissions for any commercial use of this content and agree to indemnify the author from any claims arising from such use.
+                <strong>Contact:</strong> Direct all inquiries to contact@dmj.one. By accessing this content, you agree to contact the author for any further clarification or licensing information.
+            </div>
+        </span>`;
 
     div.innerHTML = footerNotice;
-    strong.innerHTML = modified + `&copy; 2007 - ${new Date().getFullYear()} Divya Mohan ${rights} ${footer_link_privacy} ${footer_link_tos}`;
+    strong.innerHTML = `${modified}&copy; 2007 - ${new Date().getFullYear()} ${window.GLOBAL_get_formatted_Author_Name_ ? window.GLOBAL_get_formatted_Author_Name_ + ' |' : ''} dmj.one ${rights} ${footer_link_privacy} ${footer_link_tos}`;
     span.appendChild(strong);
     footer.appendChild(div);
-    footer.appendChild(span);
+    footer.appendChild(span);    
 
-    //document.body.appendChild(footer);
-    // document.body.insertBefore(footer, document.body.lastChild);
+    const article = document.createElement("article");
+    article.className = 'agen-the-end d-none d-print-flex';
+    // article.style = 'page-break-before: always !important; page-break-inside: avoid !important; page-break-after: avoid !important;';
+    article.innerHTML = `<div class="text-center theend fw-bold"><img class="img-fluid" src="${window.GLOBAL_get_qr_code_data}" alt="QR Code of the link" width="400px" height="400px"></div>`;
+    // document.body.appendChild(article);
+    footer.appendChild(article);
+
     document.body.appendChild(footer);
-
-    // 3. Initialize a MutationObserver
-    let observer = new MutationObserver((mutationsList, observer) => {
-        for (let mutation of mutationsList) {
-            if (mutation.type === 'childList') {
-                // When a child is added to the body
-                if (document.body.lastChild !== footer) {
-                    // If the last child is not the footer, move the footer to the end
-                    document.body.appendChild(footer);
-                }
+    const observer = new MutationObserver((mutationsList) => {
+        mutationsList.forEach((mutation) => {
+            if (mutation.type === 'childList' && document.body.lastChild !== footer) {
+                document.body.appendChild(footer);
             }
-        }
+        });
     });
 
-    // 4. Start observing the body for configured mutations
     observer.observe(document.body, { childList: true });
-    setTimeout(() => { observer.disconnect(); }, 20); // Disconnect the observer
-
-
-    //define service worker
-    if (typeof navigator.serviceWorker !== 'undefined') {
-        navigator.serviceWorker.register('/sw.js')
+    setTimeout(() => observer.disconnect(), 20);
+    
+    window.onload = function () { };
     }
 
-    // Notification cookie
-    //if (!(localStorage.getItem("noshow"))) { dcevars(notify_cookie); }
-
-    window.onload = function () {
-        // Syntax highlighter - Enable is using highlight js.
-        // hljs.highlightAll();
-
-        // renderMathInElement(document.body, {
-        //     // customised options
-        //     // • auto-render specific keys, e.g.:
-        //     delimiters: [
-        //         { left: '$$', right: '$$', display: true },
-        //         { left: '$', right: '$', display: false },
-        //         { left: '\\(', right: '\\)', display: false },
-        //         { left: '\\[', right: '\\]', display: true }
-        //     ],
-        //     // • rendering keys, e.g.:
-        //     throwOnError: false
-        // });
-    };
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initializeCopyright);
+    } else {
+        initializeCopyright();
+    }
+    
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js');
+    }
 }
+
 
 
 /* function copyright(rights) {
@@ -2395,6 +2538,49 @@ function gen_blockquote() {
         authors[0].innerHTML = author;
     } quote();
 }
+
+/******** Indent Paragraph if lines are more than 1 *********/
+// (function () {
+    // applies it everywhere
+//     document.addEventListener("DOMContentLoaded", function () {
+//         var paragraphs = document.querySelectorAll('p');
+
+//         paragraphs.forEach(function (p) {
+//             var lineHeight = parseFloat(getComputedStyle(p).lineHeight);
+//             var height = p.offsetHeight;
+
+//             if (height > lineHeight) {
+//                 p.style.textIndent = '0.5in';
+//             }
+//         });
+//     });
+// })();
+(function () {
+    document.addEventListener("DOMContentLoaded", function () {
+        function applyIndentation() {
+            var paragraphs = document.querySelectorAll('p');
+
+            paragraphs.forEach(function (p) {
+                var lineHeight = parseFloat(getComputedStyle(p).lineHeight);
+                var height = p.offsetHeight;
+
+                if (height > lineHeight) {
+                    p.style.textIndent = '0.5in';
+                }
+            });
+        }
+
+        window.addEventListener('beforeprint', applyIndentation);
+        window.addEventListener('afterprint', function () {
+            var paragraphs = document.querySelectorAll('p');
+            paragraphs.forEach(function (p) {
+                p.style.textIndent = '';
+            });
+        });
+    });
+})();
+
+
 
 /******** Display Cookie Notice ********/
 (function () {
@@ -2736,11 +2922,13 @@ function gen_blockquote() {
         { day: 2, month: 4, year: 2003, occasion: 'birthday', name: 'Nitin' },
         { day: 24, month: 4, year: 2004, occasion: 'birthday', name: 'Adarsh' },
         { day: 26, month: 4, year: 2003, occasion: 'birthday', name: 'Parshav' },
+        { day: 7, month: 5, year: 2003, occasion: 'birthday', name: 'Kaustuv' },
         { day: 19, month: 5, year: 2001, occasion: 'birthday', name: 'Tarun' },
         { day: 20, month: 5, year: 2001, occasion: 'birthday', name: 'Rohit' },
         { day: 23, month: 5, year: 2004, occasion: 'birthday', name: 'Anshika' },
         { day: 1, month: 6, year: 2004, occasion: 'birthday', name: 'Aryan' },
         { day: 4, month: 9, year: 2004, occasion: 'birthday', name: 'Kamaksha' },
+        { day: 28, month: 9, year: 1998, occasion: 'birthday', name: 'Stephen' },
         { day: 31, month: 10, year: 2004, occasion: 'birthday', name: 'Vedansh' },
         { day: 14, month: 12, year: 2002, occasion: 'birthday', name: 'Subhojeet' },
         { day: 12, month: 11, occasion: 'diwali' },
