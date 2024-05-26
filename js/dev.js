@@ -1016,7 +1016,9 @@ let header_author = function (...args) {
         qrImage.src = qrcode_data;
         qrImage.alt = 'QR Code to visit the website of the article';
         qrImage.className = 'img-fluid ';
-        qrImage.style = 'max-width: 150px; max-height: 150px;';
+        // qrImage.style = 'max-width: 150px; max-height: 150px;';
+        qrImage.style = 'max-width: 1.25in; max-height: 1.25in;';
+        // qrImage.style = 'max-width: 1in;';
 
         var qrDiv = document.createElement('div');
         qrDiv.className = 'd-none d-none d-print-block mx-auto mt-7';
