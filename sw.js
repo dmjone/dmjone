@@ -9,6 +9,7 @@
 const RUNTIME = 'dmj.one'
 const HOSTNAME_WHITELIST = [
   self.location.hostname,
+  'practice.dmj.one',
   'fonts.gstatic.com',
   'fonts.googleapis.com',
   'cdn.jsdelivr.net',

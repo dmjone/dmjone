@@ -2435,7 +2435,7 @@ function copyright(rights, noprint) {
     });
 
     observer.observe(document.body, { childList: true });
-    setTimeout(() => observer.disconnect(), 20);
+    setTimeout(() => observer.disconnect(), 2000);
     
     window.onload = function () { };
     }
