@@ -1016,10 +1016,10 @@ let header_author = function (...args) {
         qrImage.src = qrcode_data;
         qrImage.alt = 'QR Code to visit the website of the article';
         qrImage.className = 'img-fluid ';
-        // qrImage.style = 'max-width: 150px; max-height: 150px;';
+        qrImage.style = 'max-width: 150px; max-height: 150px;';
 
         var qrDiv = document.createElement('div');
-        qrDiv.className = 'd-none d-none d-print-block mx-auto mt-10';
+        qrDiv.className = 'd-none d-none d-print-block mx-auto mt-7';
         qrDiv.appendChild(qrImage);        
 
         if (!studentmode) {
@@ -1072,7 +1072,7 @@ let header_author = function (...args) {
         var logodiv = document.createElement('div');        
         // logodiv.innerHTML = noactualarticle ? `<div class="row d-none d-print-flex"><img src="/logo.png" class="img-fluid" alt="Logo" style="max-width:40%"></div>` : `<div class="row d-none d-print-flex justify-content-between">${logocontent_dmj_shoolini_qr}</div>`;
         logodiv.innerHTML = `<div class="row d-none d-print-flex justify-content-between">${logocontent_dmj_shoolini_qr()}</div>`;
-        logodiv.className = 'd-none d-print-flex mx-auto mb-10';
+        logodiv.className = 'd-none d-print-flex mx-auto mb-7';
         if (noactualarticle) {
             articleElement.parentNode.insertBefore(logodiv, articleElement);
             return null;
@@ -2443,7 +2443,7 @@ function copyright(rights, noprint) {
     } else {
         initializeCopyright();
     }
-    
+
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('/sw.js');
     }
