@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+    <!--<![endif]-->
+
+    <head>
+        <script src="/js/edu_su_common.js"></script>
+        <noscript>
+            <style>
+                html,
+                body {
+                    margin: 0;
+                    overflow: hidden;
+                }
+            </style>
+            <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+        </noscript>
+
+        <title>Bankers Algorithm - CSU360 - Shoolini U</title>
+        <meta name="description" content="Learn about the Bankers Algorithm in Operating System with Shoolini's CSU360 course.">
+
+        <meta property="og:image" content="/logo.png">
+        <meta property="og:type" content="article">
+
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:site" content="@divyamohan1993">
+        <meta name="twitter:creator" content="@divyamohan1993">
+        <meta name="twitter:image" content="/logo.png">
+
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+        <meta name="author" content="Divya Mohan">
+        <meta name="robots" content="index, follow">
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js" integrity="sha512-sHSNLECRJSK+BFs7E8DiFc6pf6n90bLI85Emiw1jhreduZhK3VXgq9l4kAt9eTIHYAcuQBKHL01QKs4/3Xgl8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js" integrity="sha512-iWiuBS5nt6r60fCz26Nd0Zqe0nbk1ZTIQbl3Kv7kYsX+yKMUFHzjaH2+AnM6vp2Xs+gNmaBAVWJjSmuPw76Efg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                renderMathInElement(document.body, {
+                    // customised options
+                    // • auto-render specific keys, e.g.:
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false },
+                        { left: '\\(', right: '\\)', display: false },
+                        { left: '\\[', right: '\\]', display: true }
+                    ],
+                    // • rendering keys, e.g.:
+                    throwOnError: false
+                });
+            });
+        </script>
+
+        <style>
+            /* body {
+                font-family: Arial, sans-serif;
+                margin: 20px;
+                line-height: 1.6;
+            } */
+        
+            .question {
+                margin-bottom: 20px;
+            }
+        
+            .question-text {
+                font-weight: bold;
+            }
+        
+            .options {
+                margin: 10px 0;
+            }
+        
+            .correct-answer {
+                color: green;
+                font-weight: bold;
+            }
+        </style>
+    </head>
+
+    <body>
+
+        <script> header_author("dm"); </script>
+
+        <main>
+            <article>
+                <h2 class="text-center">
+                    Placement Quiz
+                </h2>
+                <!-- <div class="d-none contentdate">2024, April 3</div> -->
+            </article>
+            <article id="questions-container"></article>
+        </main>
+
+        <!-- <script> copyright("all"); </script> -->
+    </body>
+
+
+    <script>
+        async function fetchQuestions() {
+            try {
+                const response = await fetch('qb.txt');
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const data = await response.text();
+                const questions = parseQuestions(data);
+                const selectedQuestions = getRandomQuestions(questions, 20);
+                displayQuestions(selectedQuestions);
+            } catch (error) {
+                console.error('Error fetching the questions:', error);
+            }
+        }
+
+        function parseQuestions(data) {
+            const lines = data.split('\n');
+            let questions = [];
+            let currentQuestion = null;
+
+            lines.forEach(line => {
+                line = line.trim();
+                if (line.startsWith('ANSWER:')) {
+                    if (currentQuestion) {
+                        currentQuestion.answer = line.split(' ')[1];
+                        questions.push(currentQuestion);
+                        currentQuestion = null;
+                    }
+                } else if (line.match(/^[A-Z]\)/)) {
+                    if (currentQuestion) {
+                        currentQuestion.options.push(line);
+                    }
+                } else if (line) {
+                    if (currentQuestion) {
+                        questions.push(currentQuestion);
+                    }
+                    currentQuestion = { text: line, options: [], answer: '' };
+                }
+            });
+            return questions;
+        }
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function getRandomQuestions(questions, num) {
+            return shuffle(questions).slice(0, num);
+        }
+
+        function displayQuestions(questions) {
+            const container = document.getElementById('questions-container');
+            const fragment = document.createDocumentFragment();
+            const optionLabels = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
+
+            questions.forEach((q, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'question';
+
+                const questionText = document.createElement('div');
+                questionText.className = 'question-text';
+                questionText.textContent = `Q${index + 1}: ${q.text}`;
+                questionDiv.appendChild(questionText);
+
+                const optionsDiv = document.createElement('div');
+                optionsDiv.className = 'options';
+
+                const shuffledOptions = shuffle([...q.options]);
+
+                shuffledOptions.forEach((option, i) => {
+                    const originalOptionLetter = option.charAt(0);
+                    const isCorrect = originalOptionLetter === q.answer;
+                    const optionDiv = document.createElement('div');
+                    optionDiv.className = isCorrect ? 'correct-answer' : '';
+                    optionDiv.textContent = `${optionLabels[i]}) ${option.slice(2)}`;
+                    optionsDiv.appendChild(optionDiv);
+                });
+
+                questionDiv.appendChild(optionsDiv);
+                fragment.appendChild(questionDiv);
+            });
+
+            container.appendChild(fragment);
+        }
+
+        fetchQuestions();
+    </script>
+
+
+
+
+</html>
+<!-- <!DOCTYPE html>
+<html>
+
+    <head>
+        <title>Questions</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                margin: 20px;
+                line-height: 1.6;
+            }
+
+            .question {
+                margin-bottom: 20px;
+            }
+
+            .question-text {
+                font-weight: bold;
+            }
+
+            .options {
+                margin: 10px 0;
+            }
+
+            .correct-answer {
+                color: green;
+                font-weight: bold;
+            }
+        </style>
+    </head>
+
+    <body>
+
+        
+    </body>
+
+</html> -->

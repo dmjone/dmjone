@@ -290,7 +290,10 @@ const body_pomodoro_helptext = `
 
         return jsUrl;
     };
-    document.write(`<script src='${getJsUrl("var.js")}'></script>`);
+    window.GetCourseSpecificBaseFile = getJsUrl;
+    try {
+        document.write(`<script src='${getJsUrl("var.js")}'></script>`);
+    } catch (e) { console.log("Could not load js". e)}
 
     (function () {
         var appendScript = function () {
@@ -311,37 +314,82 @@ const body_pomodoro_helptext = `
         }
     })();
 
+    // (function () {
+    //     if (!window.dnfetchenc) {
+    //         try {            
+    //         fetch(getJsUrl("encvar.json"))
+    //             .then(response => {
+    //                 if (!response.ok) {
+    //                     throw response;
+    //                 }
+    //                 return response.json();
+    //             })
+    //             .then(data => {
+    //                 // your code here
+    //                 let cryptojs_enc_map = data;
+    //                 let urlParts = window.location.pathname.split('/').filter(Boolean);
+    //                 let current_map = cryptojs_enc_map;
+    //                 for (let part of urlParts) {
+    //                     current_map = current_map[part.replace('.html', '')];
+    //                     if (typeof current_map === "string") {
+    //                         let cryptojs_enc_data = window["cryptojs_enc_data"] = current_map;
+    //                         // console.log('cryptojs_enc_data:', current_map);
+    //                         return;
+    //                     }
+    //                 }
+    //             })
+    //             .catch((error) => {
+    //                 if (error.status !== 404) {
+    //                     console.error('Error:', error);
+    //                 }
+    //                 // else, ignore the error or handle it differently
+    //             });
+    //         } catch (e) {'Could Not load encrytion.'}
+    //     }
+    // })();
+    
     (function () {
         if (!window.dnfetchenc) {
-            fetch(getJsUrl("encvar.json"))
-                .then(response => {
-                    if (!response.ok) {
-                        throw response;
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    // your code here
-                    let cryptojs_enc_map = data;
-                    let urlParts = window.location.pathname.split('/').filter(Boolean);
-                    let current_map = cryptojs_enc_map;
-                    for (let part of urlParts) {
-                        current_map = current_map[part.replace('.html', '')];
-                        if (typeof current_map === "string") {
-                            let cryptojs_enc_data = window["cryptojs_enc_data"] = current_map;
-                            // console.log('cryptojs_enc_data:', current_map);
-                            return;
+            try {
+                fetch(getJsUrl("encvar.json"))
+                    .then(response => {
+                        if (!response.ok) {
+                            if (response.status === 404) {
+                                throw new Error('404');
+                            } else {
+                                throw response;
+                            }
                         }
-                    }
-                })
-                .catch((error) => {
-                    if (error.status !== 404) {
-                        console.error('Error:', error);
-                    }
-                    // else, ignore the error or handle it differently
-                });
+                        return response.json();
+                    })
+                    .then(data => {
+                        // your code here
+                        let cryptojs_enc_map = data;
+                        let urlParts = window.location.pathname.split('/').filter(Boolean);
+                        let current_map = cryptojs_enc_map;
+                        for (let part of urlParts) {
+                            current_map = current_map[part.replace('.html', '')];
+                            if (typeof current_map === "string") {
+                                let cryptojs_enc_data = window["cryptojs_enc_data"] = current_map;
+                                // console.log('cryptojs_enc_data:', current_map);
+                                return;
+                            }
+                        }
+                    })
+                    .catch((error) => {
+                        if (error.message === '404') {
+                            console.log('Resource not found. Exiting function.');
+                            return; // Exit early
+                        } else {
+                            console.error('Error:', error);
+                        }
+                    });
+            } catch (e) {
+                console.error('Could not load encryption.');
+            }
         }
     })();
+
 
     var common_variables = "/js/comvar.js";
     document.write(`<script src='${common_variables}'></script>`);
@@ -978,211 +1026,1219 @@ let header_author = function (...args) {
 
 (function () {
     document.addEventListener('DOMContentLoaded', function () {
-        let noactualarticle, studentmode, logocontent_dmj_shoolini_qr;
-
-                    
-        studentmode = window.GLOBAL_get_isstudentmode_ || 0;
-        
-        
-        // Retrive elements of the page
-        let articleElement = document.querySelector('article.agen-tableofcontents');        
-        if (typeof articleElement === 'undefined' || articleElement === null) {
-            noactualarticle = 1;
-            articleElement = document.querySelector('main');
-        }
-
-        let titleofthepage = articleElement.querySelector('h2').innerText || '';
-        let dateofthepage = articleElement.querySelector('.contentdate') ? articleElement.querySelector('.contentdate').innerText : "n.d.";
-        let h2 = articleElement.querySelector('h2');
-        h2.classList.add('d-print-none');
-            
-        // Get the location of the page
-        // var currentlocation = 'https://dmj.one/' + window.location.pathname.split('/').pop().replace('.html', '');        
-        let currentlocation = 'https://dmj.one' + window.location.pathname.replace(/\.html$/, '') || window.location.href;
-        // currentlocation = 'https://dmj.one/'; // Fix location for specific work.
+        try {
+            let noactualarticle, studentmode, logocontent_dmj_shoolini_qr;
 
 
+            studentmode = window.GLOBAL_get_isstudentmode_ || 0;
 
-        // Create QR code data URL
-        var qr = qrcode(0, 'H');
-        // qr.addData(window.location.href);
-        qr.addData(currentlocation);
-        qr.make();
-        var qrcode_data = qr.createDataURL(4, "");
-        window.GLOBAL_get_qr_code_data = qrcode_data;
 
-        // Create and configure the QR code image
-        var qrImage = new Image();
-        qrImage.src = qrcode_data;
-        qrImage.alt = 'QR Code to visit the website of the article';
-        qrImage.className = 'img-fluid ';
-        // qrImage.style = 'max-width: 150px; max-height: 150px;';
-        qrImage.style = 'max-width: 1.25in; max-height: 1.25in;';
-        // qrImage.style = 'max-width: 1in;';
+            // Retrive elements of the page
+            let articleElement = document.querySelector('article.agen-tableofcontents');
+            if (typeof articleElement === 'undefined' || articleElement === null) {
+                noactualarticle = 1;
+                articleElement = document.querySelector('main');
+            }
 
-        var qrDiv = document.createElement('div');
-        qrDiv.className = 'd-none d-none d-print-block mx-auto mt-7';
-        qrDiv.appendChild(qrImage);        
 
-        if (!studentmode) {
-            const style = document.createElement('style');
-            style.textContent = `@media print { *,*::before { background: #fff !important; -webkit-print-color-adjust: exact !important; color-adjust: exact !important; print-color-adjust: exact !important; }}`;
-            document.head.appendChild(style);
-        }
+            let titleofthepage = articleElement.querySelector('h2').innerText || '';
+            let dateofthepage = articleElement.querySelector('.contentdate') ? articleElement.querySelector('.contentdate').innerText : "n.d.";
+            let h2 = articleElement.querySelector('h2');
+            h2.classList.add('d-print-none');
 
-        logocontent_dmj_shoolini_qr = () => {
-            let data; // Define data variable to hold the HTML string
-            if (studentmode) {
-                // Create a <style> element
+
+            // Get the location of the page
+            // var currentlocation = 'https://dmj.one/' + window.location.pathname.split('/').pop().replace('.html', '');        
+            let currentlocation = 'https://dmj.one' + window.location.pathname.replace(/\.html$/, '') || window.location.href;
+            // currentlocation = 'https://dmj.one/'; // Fix location for specific work.
+
+
+
+            // Create QR code data URL
+            var qr = qrcode(0, 'H');
+            // qr.addData(window.location.href);
+            qr.addData(currentlocation);
+            qr.make();
+            var qrcode_data = qr.createDataURL(4, "");
+            window.GLOBAL_get_qr_code_data = qrcode_data;
+
+            // Create and configure the QR code image
+            var qrImage = new Image();
+            qrImage.src = qrcode_data;
+            qrImage.alt = 'QR Code to visit the website of the article';
+            qrImage.className = 'img-fluid ';
+            // qrImage.style = 'max-width: 150px; max-height: 150px;';
+            qrImage.style = 'max-width: 1.25in; max-height: 1.25in;';
+            // qrImage.style = 'max-width: 1in;';
+
+            var qrDiv = document.createElement('div');
+            qrDiv.className = 'd-none d-none d-print-block mx-auto mt-7';
+            qrDiv.appendChild(qrImage);
+
+            if (!studentmode) {
                 const style = document.createElement('style');
-                style.textContent = `@media print { #defaultcopyrightfooter{ display: none; }}`;
+                style.textContent = `@media print { *,*::before { background: #fff !important; -webkit-print-color-adjust: exact !important; color-adjust: exact !important; print-color-adjust: exact !important; }}`;
                 document.head.appendChild(style);
+            }
+
+            logocontent_dmj_shoolini_qr = () => {
+                let data; // Define data variable to hold the HTML string
+                if (studentmode) {
+                    // Create a <style> element
+                    const style = document.createElement('style');
+                    style.textContent = `@media print { #defaultcopyrightfooter{ display: none; }}`;
+                    document.head.appendChild(style);
 
 
 
-                // Only display the Shoolini logo when in student mode
-                data = `<div class="col-12">
+                    // Only display the Shoolini logo when in student mode
+                    data = `<div class="col-12">
                   <img src="/img/shoolini_logo.png" class="img-fluid" alt="Shoolini University Logo" style="max-width:40%;">
                 </div>
                 <!--<div class="col-6">
                   <img src="/img/icf_logo.jpg" class="img-fluid" alt="Shoolini University Logo" style="max-width:80%;">
                 </div>-->`;
-            } else {
-                // Base structure for other modes
-                data = `<div class="col-6 col">
+                } else {
+                    // Base structure for other modes
+                    data = `<div class="col-6 col">
                   <img src="/logo.png" class="img-fluid" alt="DMJ Logo" style="max-width:40%;">
                 </div>`;
 
-                if (noactualarticle) {
-                    // Add QR code for no article mode
-                    data += `<div class="col-6 col">
+                    if (noactualarticle) {
+                        // Add QR code for no article mode
+                        data += `<div class="col-6 col">
                        <img src="${qrcode_data}" class="img-fluid" alt="QR Code" style="max-width:40%;">
                      </div>`;
-                } else {
-                    // Add Shoolini logo for normal mode
-                    data += `<div class="col-6 col">
+                    } else {
+                        // Add Shoolini logo for normal mode
+                        data += `<div class="col-6 col">
                        <img src="/img/shoolini_logo.png" class="img-fluid" alt="Shoolini University Logo" style="max-width:80%;">
                      </div>`;
+                    }
                 }
+                return data;
+            };
+
+
+
+            // Create a div for logos
+            var logodiv = document.createElement('div');
+            // logodiv.innerHTML = noactualarticle ? `<div class="row d-none d-print-flex"><img src="/logo.png" class="img-fluid" alt="Logo" style="max-width:40%"></div>` : `<div class="row d-none d-print-flex justify-content-between">${logocontent_dmj_shoolini_qr}</div>`;
+            logodiv.innerHTML = `<div class="row d-none d-print-flex justify-content-between">${logocontent_dmj_shoolini_qr()}</div>`;
+            logodiv.className = 'd-none d-print-flex mx-auto mb-7';
+            if (noactualarticle) {
+                articleElement.parentNode.insertBefore(logodiv, articleElement);
+                return null;
             }
-            return data;
-        };
 
 
+            // Function to extract text content from strong tags
+            // function extractTextFromStrongTag(htmlString) {
+            //     var tempDiv = document.createElement('div');
+            //     tempDiv.innerHTML = htmlString;
+            //     return Array.from(tempDiv.querySelectorAll('strong'), el => el.textContent).join(', ');
+            // }
 
-        // Create a div for logos
-        var logodiv = document.createElement('div');        
-        // logodiv.innerHTML = noactualarticle ? `<div class="row d-none d-print-flex"><img src="/logo.png" class="img-fluid" alt="Logo" style="max-width:40%"></div>` : `<div class="row d-none d-print-flex justify-content-between">${logocontent_dmj_shoolini_qr}</div>`;
-        logodiv.innerHTML = `<div class="row d-none d-print-flex justify-content-between">${logocontent_dmj_shoolini_qr()}</div>`;
-        logodiv.className = 'd-none d-print-flex mx-auto mb-7';
-        if (noactualarticle) {
-            articleElement.parentNode.insertBefore(logodiv, articleElement);
+            function formatAuthorsEtAl(htmlString) {
+                var tempDiv = document.createElement('div');
+                tempDiv.innerHTML = htmlString;
+                var strongTags = tempDiv.querySelectorAll('strong');
+
+                // If there's only one author, just return the formatted name
+                if (strongTags.length === 1) {
+                    var singleAuthorName = strongTags[0].textContent.trim().split(' ');
+                    return singleAuthorName[1] + ' ' + singleAuthorName[0].charAt(0) + '.';
+                } else if (strongTags.length > 1) {
+                    // Assuming the first strong tag is the primary author
+                    var primaryAuthorName = strongTags[0].textContent.trim().split(' ');
+                    return primaryAuthorName[1] + ' ' + primaryAuthorName[0].charAt(0) + '. et al.';
+                }
+                return ''; // In case there are no strong tags
+            }
+
+            // function extractTextFromStrongTag(htmlString) {
+            //     var tempDiv = document.createElement('div');
+            //     tempDiv.innerHTML = htmlString;
+            //     var authorNames = Array.from(tempDiv.querySelectorAll('strong'), el => el.textContent);
+
+            //     // If there's more than one name, format the string with "and" before the last name
+            //     if (authorNames.length > 1) {
+            //         var lastAuthor = authorNames.pop();
+            //         return authorNames.join(', ') + ' and ' + lastAuthor;
+            //     } else {
+            //         return authorNames.join('');
+            //     }
+            // }
+
+            // Prepare the titleofthepage div with the titleofthepage as text content
+            var titleDiv = document.createElement('div');
+            titleDiv.className = 'd-none d-print-block mx-auto mt-2';
+            titleDiv.innerHTML = `<h2 class="text-center text-uppercase">${titleofthepage}</h2>`;
+
+            // Prepare the author and faculty divs with text content
+            // var authorsText = extractTextFromStrongTag(window.GLOBAL_get_Author_Name_);
+            // var authorsText = 'Divya Mohan <em>(GF202214698)</em>';
+            // const formattedauthorname = extractTextFromStrongTag(window.GLOBAL_get_Author_Name_);
+            const formattedauthorname = window.GLOBAL_get_formatted_Author_Name_;
+            // window.GLOBAL_get_formatted_Author_Name_ = formattedauthorname;
+            // console.log(formattedauthorname);
+            var authorsText = studentmode ? 'Divya Mohan <em>(GF202214698)</em>' : formattedauthorname;
+            var authorsdept = studentmode ? 'Yogananda School of AI, Computers and Data Science' : 'Faculty of Engineering and Technology';
+            var authorsDiv = document.createElement('div');
+            authorsDiv.className = 'd-none d-print-block mx-auto mt-3 mb-4';
+            authorsDiv.innerHTML = authorsText ? `<p class="text-center text-uppercase">${authorsText}</p><p class="text-uppercase text-center" style="font-size:8pt!important">${authorsdept}</p><p class="text-uppercase text-center fw-bold" style="font-size:10pt!important">Shoolini University, Solan, Himachal Pradesh, India</p>` : '';
+
+
+            var facultyDiv = document.createElement('div');
+            facultyDiv.className = 'd-none d-print-block mx-auto';
+            facultyDiv.innerHTML = window.GLOBAL_get_course_detail_ ? window.GLOBAL_get_course_ ? `<p class="text-center fst-italic">Under the guidance of <span class="text-capitalize">${window.GLOBAL_get_Faculty_Name_}</span> in the subject of <span class="text-capitalize">${window.GLOBAL_get_course_detail_} (${window.GLOBAL_get_course_})</span></p>` : `<p class="text-center">${window.GLOBAL_get_course_detail_}</p>` : '';
+            // facultyDiv.innerHTML = window.GLOBAL_get_course_detail_ ? window.GLOBAL_get_course_ ? `<p class="text-center fst-italic">Under the guidance of <span class="text-capitalize">Asst. Prof. Payal Khanna</span> in the subject of <span class="text-capitalize">Enhancing Leadership through Coaching Skills (CSU1806)</span></p>` : `<p class="text-center">${window.GLOBAL_get_course_detail_}</p>` : '';
+            // facultyDiv.innerHTML += window.GLOBAL_get_Faculty_Name_ ? `<p class="text-center text-uppercase"><span class="fw-bold"></span> ${window.GLOBAL_get_Faculty_Name_}</p>` : '';
+            facultyDiv.innerHTML += `<p class="text-center text-uppercase" style="font-size:8pt!important">${studentmode ? 'Submitted on' : 'Printed on'} ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>`;
+
+            var authorsetal = formatAuthorsEtAl(window.GLOBAL_get_Author_Name_);
+            var citationblockquote = document.createElement('blockquote');
+            citationblockquote.className = 'd-none d-print-flex mt-3 text-decoration-none';
+            citationblockquote.style = 'font-style:unset !important';
+            citationblockquote.innerHTML = authorsetal ? `<p class="citation">${authorsetal} (${dateofthepage}). <em>${titleofthepage}</em>. Retrieved from ${currentlocation}</p>` : '';
+
+            // Append the elements to the article element
+            // var article = document.querySelector('.agen-tableofcontents');
+
+            // articleElement.insertBefore(logodiv, h2);
+            // articleElement.insertBefore(qrImage, h2);
+            // articleElement.insertBefore(authorsDiv, h2.nextSibling);
+            // articleElement.insertBefore(facultyDiv, authorsDiv.nextSibling);
+            // articleElement.insertBefore(citationblockquote, facultyDiv.nextSibling);
+            // article.insertBefore(img, facultyDiv.nextSibling);
+
+            // Create a document fragment to hold all the elements in the correct order
+            let docFragmentBeforeh2 = document.createDocumentFragment();
+            docFragmentBeforeh2.appendChild(logodiv);
+
+            let docFragmentAfterh2 = document.createDocumentFragment();
+            docFragmentAfterh2.appendChild(titleDiv);
+            docFragmentAfterh2.appendChild(authorsDiv);
+            docFragmentAfterh2.appendChild(facultyDiv);
+            docFragmentAfterh2.appendChild(qrDiv);
+            docFragmentAfterh2.appendChild(citationblockquote);
+
+            // Insert the document fragment at the beginning of articleElement
+            articleElement.insertBefore(docFragmentBeforeh2, h2);
+            articleElement.insertBefore(docFragmentAfterh2, h2.nextSibling);
+        } catch (e) { console.log("Could Not apply Print Specific Styles")}
+    });
+})();
+
+
+/***********************  Random Quiz **************************/
+
+//////////// Version 1.0
+// (function () {
+//     // if (window.location.pathname.split('/').filter(Boolean).length !== 6 || !window.QuizMode) return console.log('Not a quiz page');
+//     // if (urlpart3 !== 'placements') return console.log('Placements page');
+//     document.addEventListener('DOMContentLoaded', function () {
+
+//         if (!window.placementquiz) return console.log('Not a quiz page');
+
+//         if (window.placementquiz) {
+//             // Prepare the quiz page for loading questions.
+//             var quiznewlinkhref = document.createElement('link');
+//             quiznewlinkhref.setAttribute('rel', 'stylesheet');
+//             quiznewlinkhref.setAttribute('href', '/css/quiz.css');
+//             document.head.appendChild(quiznewlinkhref);
+
+//             document.body.innerHTML = `<div class="name-container" id="name-container"></div>
+//                 <div class="timer-container" id="timer-container">
+//                     <div class="timer text-center" id="timer">Start Answering!</div>
+//                 </div>
+//                 <div class="score-container" id="score-container">0/0</div>
+//                 <div class="container">
+//                     <h2 class="my-9 text-center display-3">Lets get you trained!</h2>
+//                     <div class="negative-marking-warning bg-danger py-3 text-center bg-opacity-50 my-4 d-none" id="negative-marking-warning"></div>
+//                     <div id="questions-container" class="row row-cols-1 row-cols-md-2 g-4"></div>
+//                 </div>
+
+//                 <div class="modal fade" id="endModal" tabindex="-1" aria-labelledby="endModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+//                     <div class="modal-dialog modal-dialog-centered">
+//                         <div class="modal-content text-center p-5">
+//                             <h2 id="final-score"></h2>
+//                             <p id="congrats-message"></p>
+//                             <p id="time-taken" class="text-center"></p>
+//                             <p class="text-center fw-bold">The page will refresh automatically in 15 seconds.</p>
+//                         </div>
+//                     </div>
+//                 </div>`;
+
+//             const MIN_QUESTIONS = 7;
+//             const MAX_QUESTIONS = 7;
+//             const MIN_TIME_PER_QUESTION = 5;
+//             const MAX_TIME_PER_QUESTION = 60;
+//             const SCORE_CONTAINER_ID = 'score-container';
+//             const TIMER_ELEMENT_ID = 'timer';
+//             const NAME_CONTAINER_ID = 'name-container';
+//             const QUESTIONS_CONTAINER_ID = 'questions-container';
+//             const FINAL_SCORE_ID = 'final-score';
+//             const CONGRATS_MESSAGE_ID = 'congrats-message';
+//             const TIME_TAKEN_ID = 'time-taken';
+//             const END_MODAL_ID = 'endModal';
+//             let NEGATIVE_MARKING_ENABLED = 'auto';
+//             let negativeMarkingValue;
+//             let selectedcorrect = 0;
+
+//             var getJsUrl = function (fileName) {
+//                 var currentUrl = window.location.href,
+//                     urlParts = currentUrl.split('/').map(encodeURIComponent),
+//                     lastFolderIndex = urlParts.length - 1;
+//                 for (var i = urlParts.length - 1; i >= 3 && i < 7; i--) {
+//                     lastFolderIndex = i;
+//                     break;
+//                 }
+//                 var jsUrl;
+//                 if (lastFolderIndex >= 4 && lastFolderIndex <= 6)
+//                     jsUrl = '/' + urlParts.slice(3, lastFolderIndex).join('/') + '/' + fileName;
+//                 else if (lastFolderIndex > 6)
+//                     jsUrl = '/' + urlParts.slice(3, 7).join('/') + '/' + fileName;
+//                 else
+//                     jsUrl = '/' + fileName;
+
+//                 return jsUrl;
+//             };
+
+//             if (NEGATIVE_MARKING_ENABLED === 'auto') {
+//                 NEGATIVE_MARKING_ENABLED = Math.random() < 0.5;
+//             }
+
+//             if (NEGATIVE_MARKING_ENABLED) {
+//                 negativeMarkingValue = getRandomNumber(0.5 * 10, 2.0 * 10) / 10;
+//                 const warningElement = document.getElementById('negative-marking-warning');
+//                 warningElement.textContent = `Negative marking is enabled. Each incorrect answer will deduct ${negativeMarkingValue} points.`;
+//                 warningElement.classList.toggle('d-none');
+//             }
+
+//             let score = 0;
+//             const answeredQuestions = new Set();
+//             const attempts = {};
+//             let timerInterval;
+//             let startTime;
+//             const totalQuestions = getRandomNumber(MIN_QUESTIONS, MAX_QUESTIONS);
+//             const name = getUserName();
+
+//             document.getElementById(NAME_CONTAINER_ID).textContent = `${name}`;
+
+//             function getUserName() {
+//                 let name = localStorage.getItem('userName');
+//                 if (!name) {
+//                     name = prompt('Please enter your name:');
+//                     if (name) {
+//                         localStorage.setItem('userName', name);
+//                     }
+//                 }
+//                 return name || 'Guest';
+//             }
+
+//             function getRandomNumber(min, max) {
+//                 return Math.floor(Math.random() * (max - min + 1)) + min;
+//             }
+
+//             function calculateTimePerQuestion() {
+//                 const randomTimePerQuestion = getRandomNumber(MIN_TIME_PER_QUESTION, MAX_TIME_PER_QUESTION);
+//                 return totalQuestions * randomTimePerQuestion;
+//             }
+
+//             // console.log(getJsUrl('qb.txt'));
+//             async function fetchQuestions() {
+//                 try {
+//                     const response = await fetch(getJsUrl('qb.txt'));
+//                     if (!response.ok) throw new Error('Network response was not ok');
+//                     const data = await response.text();
+//                     const questions = parseQuestions(data);
+//                     const selectedQuestions = getRandomQuestions(questions, totalQuestions);
+//                     displayQuestions(selectedQuestions);
+//                     const totalTime = calculateTimePerQuestion();
+//                     startTimer(totalTime);
+//                     startTime = new Date();
+//                 } catch (error) {
+//                     console.error('Error fetching the questions:', error);
+//                 }
+//             }
+
+//             function parseQuestions(data) {
+//                 const lines = data.split('\n');
+//                 let questions = [];
+//                 let currentQuestion = null;
+
+//                 lines.forEach(line => {
+//                     line = line.trim();
+//                     if (line.startsWith('ANSWER:')) {
+//                         if (currentQuestion) {
+//                             currentQuestion.answer = line.split(' ')[1];
+//                             questions.push(currentQuestion);
+//                             currentQuestion = null;
+//                         }
+//                     } else if (line.match(/^[A-Z][).]/)) {
+//                         if (currentQuestion) {
+//                             currentQuestion.options.push(line);
+//                         }
+//                     } else if (line) {
+//                         if (currentQuestion) questions.push(currentQuestion);
+//                         currentQuestion = { text: line, options: [], answer: '' };
+//                     }
+//                 });
+//                 return questions;
+//             }
+
+//             function shuffle(array) {
+//                 for (let i = array.length - 1; i > 0; i--) {
+//                     const j = Math.floor(Math.random() * (i + 1));
+//                     [array[i], array[j]] = [array[j], array[i]];
+//                 }
+//                 return array;
+//             }
+
+//             function getRandomQuestions(questions, num) {
+//                 return shuffle(questions).slice(0, num);
+//             }
+
+//             function createOption(option, i, questionIndex, cardBodyDiv, cardHeader) {
+//                 const originalOptionLetter = option.charAt(0);
+//                 const optionDiv = document.createElement('div');
+//                 optionDiv.className = 'option';
+
+//                 const input = document.createElement('input');
+//                 input.type = 'radio';
+//                 input.name = `question-${questionIndex}`;
+//                 input.value = originalOptionLetter;
+//                 input.className = 'form-check-input';
+//                 input.id = `question-${questionIndex}-option-${i}`;
+
+//                 const label = document.createElement('label');
+//                 label.htmlFor = input.id;
+//                 label.textContent = option.slice(2);
+
+//                 optionDiv.appendChild(input);
+//                 optionDiv.appendChild(label);
+//                 optionDiv.addEventListener('click', () => handleOptionClick(optionDiv, cardBodyDiv, cardHeader));
+
+//                 return optionDiv;
+//             }
+
+//             function handleOptionClick(optionDiv, cardBodyDiv, cardHeader) {
+//                 const radio = optionDiv.querySelector('input[type="radio"]');
+//                 radio.checked = true;
+//                 const allOptions = optionDiv.closest('.options').querySelectorAll('.option');
+//                 allOptions.forEach(div => div.classList.remove('selected'));
+//                 optionDiv.classList.add('selected');
+
+//                 const questionIndex = cardBodyDiv.dataset.index;
+//                 const correctAnswer = cardBodyDiv.dataset.answer;
+
+//                 attempts[questionIndex]++;
+
+//                 if (radio.value === correctAnswer) {
+//                     optionDiv.classList.add('selected');
+//                     cardBodyDiv.classList.add('correct');
+//                     cardHeader.classList.add('correct');
+//                     if (!answeredQuestions.has(questionIndex)) {
+//                         score++;
+//                         selectedcorrect++;
+//                         answeredQuestions.add(questionIndex);
+//                         updateScore();
+//                         checkCompletion();
+//                     }
+//                     disableQuestion(cardBodyDiv);
+//                 } else {
+//                     optionDiv.classList.add('bg-danger');
+//                     if (attempts[questionIndex] >= 1) {
+//                         if (NEGATIVE_MARKING_ENABLED) {
+//                             if (score > 0 && score - negativeMarkingValue >= 0) {
+//                                 score -= negativeMarkingValue;
+//                                 updateScore();
+//                             }
+//                         }
+//                         cardBodyDiv.classList.add('incorrect');
+//                         cardHeader.classList.add('incorrect');
+//                         disableQuestion(cardBodyDiv);
+//                         checkCompletion();
+//                     }
+//                 }
+//             }
+
+//             function displayQuestions(questions) {
+//                 const container = document.getElementById(QUESTIONS_CONTAINER_ID);
+//                 questions.forEach((q, index) => {
+//                     attempts[index] = 0;
+
+//                     const colDiv = document.createElement('div');
+//                     colDiv.className = 'col';
+
+//                     const cardDiv = document.createElement('div');
+//                     cardDiv.className = 'card';
+
+//                     const cardHeader = document.createElement('div');
+//                     cardHeader.className = 'card-header';
+//                     cardHeader.innerHTML = `Q${index + 1}. ${q.text}`;
+
+//                     const cardBodyDiv = document.createElement('div');
+//                     cardBodyDiv.className = 'card-body';
+//                     cardBodyDiv.dataset.index = index;
+//                     cardBodyDiv.dataset.answer = q.answer;
+
+//                     const questionText = document.createElement('p');
+//                     questionText.textContent = q.text;
+//                     questionText.classList = 'fw-bold d-none';
+
+//                     const optionsDiv = document.createElement('div');
+//                     optionsDiv.className = 'options';
+
+//                     q.options.forEach((option, i) => {
+//                         const optionDiv = createOption(option, i, index, cardBodyDiv, cardHeader);
+//                         optionsDiv.appendChild(optionDiv);
+//                     });
+
+//                     cardBodyDiv.appendChild(questionText);
+//                     cardBodyDiv.appendChild(optionsDiv);
+//                     cardDiv.appendChild(cardHeader);
+//                     cardDiv.appendChild(cardBodyDiv);
+//                     colDiv.appendChild(cardDiv);
+//                     container.appendChild(colDiv);
+//                 });
+//             }
+
+//             function disableQuestion(cardBodyDiv) {
+//                 cardBodyDiv.classList.add('disabled');
+//                 const inputs = cardBodyDiv.querySelectorAll('input[type="radio"]');
+//                 inputs.forEach(input => input.disabled = true);
+//             }
+
+//             function updateScore() {
+//                 const scoreContainer = document.getElementById(SCORE_CONTAINER_ID);
+//                 scoreContainer.textContent = `${Math.round(score)} / ${totalQuestions}`;
+//                 scoreContainer.classList.remove('d-none');
+//                 scoreContainer.classList.add('animate');
+//                 setTimeout(() => {
+//                     scoreContainer.classList.remove('animate');
+//                 }, 500);
+//             }
+
+//             function startTimer(duration) {
+//                 let timer = duration,
+//                     minutes,
+//                     seconds;
+//                 const timerElement = document.getElementById(TIMER_ELEMENT_ID);
+//                 timerInterval = setInterval(() => {
+//                     minutes = parseInt(timer / 60, 10);
+//                     seconds = parseInt(timer % 60, 10);
+
+//                     minutes = minutes < 10 ? "0" + minutes : minutes;
+//                     seconds = seconds < 10 ? "0" + seconds : seconds;
+
+//                     timerElement.textContent = `${minutes}:${seconds}`;
+
+//                     if (--timer < 0) {
+//                         clearInterval(timerInterval);
+//                         endQuiz();
+//                     }
+//                 }, 1000);
+//             }
+
+//             function endQuiz() {
+//                 disableAllQuestions();
+//                 showFinalScore();
+//             }
+
+//             function disableAllQuestions() {
+//                 const questionCards = document.querySelectorAll('.card-body');
+//                 questionCards.forEach(cardBody => {
+//                     cardBody.classList.add('disabled');
+//                     const inputs = cardBody.querySelectorAll('input[type="radio"]');
+//                     inputs.forEach(input => input.disabled = true);
+//                 });
+//             }
+
+//             function showFinalScore() {
+//                 const finalScore = document.getElementById(FINAL_SCORE_ID);
+//                 const congratsMessage = document.getElementById(CONGRATS_MESSAGE_ID);
+//                 const timeTaken = document.getElementById(TIME_TAKEN_ID);
+//                 const totalTime = Math.round((new Date() - startTime) / 1000);
+//                 const minutes = Math.floor(totalTime / 60);
+//                 const seconds = totalTime % 60;
+//                 const timeTakenText = `Time taken: ${minutes} minutes and ${seconds} seconds`;
+
+//                 // const correctPercentage = Math.round((score / totalQuestions) * 100);
+//                 const correctPercentage = Math.round((score / totalQuestions) * 100);
+//                 // const incorrectAnswers = totalQuestions - score;
+//                 const incorrectAnswers = totalQuestions - selectedcorrect;
+//                 const accuracy = (score / totalQuestions * 100).toFixed(2);
+
+//                 finalScore.textContent = `Your score is: ${Math.round(score)} / ${totalQuestions}`;
+//                 timeTaken.textContent = timeTakenText;
+
+//                 let analysisMessage = `
+//                         <strong>Analysis:</strong><br>
+//                         Total Questions: ${totalQuestions}<br>
+//                         Correct Answers: ${selectedcorrect}<br>
+//                         Incorrect Answers: ${incorrectAnswers}<br>
+//                         Accuracy: ${accuracy}%<br><br>
+//                 `;
+
+//                 const messages = [
+//                     { threshold: totalQuestions, message: `Fantastic job ${name}!</p><p>You got a perfect score! Keep up the great work!` },
+//                     { threshold: totalQuestions - 1, message: `Excellent work ${name}!</p><p>Almost perfect, keep striving for that 100%!` },
+//                     { threshold: Math.ceil(totalQuestions * 0.9), message: `Great job ${name}!</p><p>You're doing really well! Just a bit more practice to reach perfection!` },
+//                     { threshold: Math.ceil(totalQuestions * 0.8), message: `Very good effort ${name}!</p><p>You're scoring high, keep practicing and you'll get even better!` },
+//                     { threshold: Math.ceil(totalQuestions * 0.7), message: `Good job ${name}!</p><p>You're on the right track, keep up the hard work!` },
+//                     { threshold: Math.ceil(totalQuestions * 0.6), message: `Nice effort ${name}!</p><p>Keep practicing and you'll see continuous improvement!` },
+//                     { threshold: Math.ceil(totalQuestions * 0.5), message: `Well done ${name}!</p><p>You're halfway there, keep practicing to improve your score!` },
+//                     { threshold: Math.ceil(totalQuestions * 0.4), message: `Not bad ${name}!</p><p>Keep practicing and you'll get better each time!` },
+//                     { threshold: Math.ceil(totalQuestions * 0.3), message: `Nice try ${name}!</p><p>Don't get discouraged, practice makes perfect!` },
+//                     { threshold: Math.ceil(totalQuestions * 0.2), message: `Keep going ${name}!</p><p>Each attempt is a step towards improvement!` },
+//                     { threshold: Math.ceil(totalQuestions * 0.1), message: `Don't give up ${name}!</p><p>Every effort counts, keep practicing and you'll get there!` },
+//                     { threshold: 0, message: `Don't be disheartened ${name}!</p><p>Keep trying and you'll see progress! Refresh the page to try again.` },
+//                     { threshold: -Infinity, message: `Oops ${name}!</p><p>It looks like your score went below zero. Don't worry, you can always try again and improve! Keep practicing!` },
+//                 ];
+
+//                 const motivationalEnding = `Keep practicing on dmj.one, where we believe in "Quality Education for All". Your continuous effort and practice will surely lead to success!`;
+
+
+//                 const selectedMessage = messages.find(m => score >= m.threshold).message;
+
+//                 congratsMessage.innerHTML = `<p class='fw-bold text-center'>${selectedMessage}</p>${analysisMessage}<p>${motivationalEnding}</p>`;
+
+//                 document.querySelector('.name-container').classList.add('d-none');
+//                 document.querySelector('.timer-container').classList.add('d-none');
+//                 document.querySelector('.score-container').classList.add('d-none');
+
+//                 const body = document.querySelector('body');
+//                 body.classList.add('darken');
+//                 const container = document.querySelector('.container');
+//                 container.classList.add('blur');
+
+//                 const endModal = new bootstrap.Modal(document.getElementById(END_MODAL_ID));
+//                 endModal.show();
+
+//                 setTimeout(() => {
+//                     location.reload();
+//                 }, 15000);
+//             }
+
+//             function checkCompletion() {
+//                 if (Object.values(attempts).filter(attempt => attempt > 0).length === totalQuestions) {
+//                     clearInterval(timerInterval);
+//                     endQuiz();
+//                 }
+//             }
+
+//             fetchQuestions();
+//         }
+//     });
+// })();
+
+////////////////////  Version 1.1 - Working
+(function () {
+    document.addEventListener("DOMContentLoaded", function () {
+        if (!(window.PlacementQuiz || window.SubjectQuiz || window.ReviewSubjectQuestions)) {
             return null;
         }
 
+        ////////// Control Panel //////////
 
-        // Function to extract text content from strong tags
-        // function extractTextFromStrongTag(htmlString) {
-        //     var tempDiv = document.createElement('div');
-        //     tempDiv.innerHTML = htmlString;
-        //     return Array.from(tempDiv.querySelectorAll('strong'), el => el.textContent).join(', ');
-        // }
+        const MIN_QUESTIONS = 3;
+        const MAX_QUESTIONS = 11;
+        const MIN_TIME_PER_QUESTION = 5;
+        const MAX_TIME_PER_QUESTION = 45;
+        const SCORE_CONTAINER_ID = 'score-container';
+        const TIMER_ELEMENT_ID = 'timer';
+        const NAME_CONTAINER_ID = 'name-container';
+        const QUESTIONS_CONTAINER_ID = 'questions-container';
+        const FINAL_SCORE_ID = 'final-score';
+        const CONGRATS_MESSAGE_ID = 'congrats-message';
+        const TIME_TAKEN_ID = 'time-taken';
+        const END_MODAL_ID = 'endModal';
+        const FETCH_FILE_NAME = 'qb.txt';
+        const FETCH_FILE_NAME_WITH_DYNAMIC_PATH = GetCourseSpecificBaseFile(FETCH_FILE_NAME);
+        const FETCH_FILE_NAMES = ['qb.txt', '/edu/su/course/csu360/qb.txt']; // All Subject QuestionBank files
+        let NEGATIVE_MARKING_ENABLED = 'auto';
+        let negativeMarkingValue;
+        let fetchQuestions;
+        let selectedcorrect = 0;
 
-        function formatAuthorsEtAl(htmlString) {
-            var tempDiv = document.createElement('div');
-            tempDiv.innerHTML = htmlString;
-            var strongTags = tempDiv.querySelectorAll('strong');
+        if (window.PlacementQuiz || window.SubjectQuiz) {
+            ///////// Prerequisites //////////
 
-            // If there's only one author, just return the formatted name
-            if (strongTags.length === 1) {
-                var singleAuthorName = strongTags[0].textContent.trim().split(' ');
-                return singleAuthorName[1] + ' ' + singleAuthorName[0].charAt(0) + '.';
-            } else if (strongTags.length > 1) {
-                // Assuming the first strong tag is the primary author
-                var primaryAuthorName = strongTags[0].textContent.trim().split(' ');
-                return primaryAuthorName[1] + ' ' + primaryAuthorName[0].charAt(0) + '. et al.';
+            const quiznewlinkhref = document.createElement('link');
+            quiznewlinkhref.setAttribute('rel', 'stylesheet');
+            quiznewlinkhref.setAttribute('href', '/css/quiz.css');
+            document.head.appendChild(quiznewlinkhref);
+
+            document.body.innerHTML = `<div class="name-container" id="name-container"></div>
+                        <div class="timer-container" id="timer-container">
+                            <div class="timer text-center" id="timer">Start Answering!</div>
+                        </div>
+                        <div class="score-container" id="score-container">0/0</div>
+                        <div class="container">
+                            <h2 class="my-9 text-center display-3">Lets get you trained!</h2>
+                            <div class="negative-marking-warning bg-warning py-3 text-center bg-opacity-25 bg-gradient h4 my-8 d-none" id="negative-marking-warning"></div>
+                            <!-- <div id="questions-container" class="g-4"></div> -->
+                            <div id="questions-container" class="row row-cols-1 row-cols-md-2 g-4"></div>
+                        </div>
+                    
+                        <div class="modal fade" id="endModal" tabindex="-1" aria-labelledby="endModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content text-center p-5">
+                                    <h2 id="final-score"></h2>
+                                    <p id="congrats-message"></p>
+                                    <p id="time-taken" class="text-center"></p>
+                                    <p class="text-center fw-bold">The page will refresh automatically in 15 seconds.</p>
+                                </div>
+                            </div>
+                        </div>`;
+
+
+            ////////// LOGIC /////////////                
+
+            if (NEGATIVE_MARKING_ENABLED === 'auto') {
+                NEGATIVE_MARKING_ENABLED = Math.random() < 0.5;
             }
-            return ''; // In case there are no strong tags
+
+            if (NEGATIVE_MARKING_ENABLED) {
+                negativeMarkingValue = getRandomNumber(0.5 * 10, 2.0 * 10) / 10;
+                const warningElement = document.getElementById('negative-marking-warning');
+                warningElement.textContent = `Negative marking is enabled. Each incorrect answer will deduct ${negativeMarkingValue} points.`;
+                warningElement.classList.toggle('d-none');
+            }
+
+            let score = 0;
+            const answeredQuestions = new Set();
+            const attempts = {};
+            let timerInterval;
+            let startTime;
+            let totalQuestions = getRandomNumber(MIN_QUESTIONS, MAX_QUESTIONS);
+            totalQuestions = totalQuestions % 2 == 0 ? totalQuestions : totalQuestions + 1; // always even number of questions.
+            const name = getUserName();
+
+            document.getElementById(NAME_CONTAINER_ID).textContent = `${name}`;
+
+            function getUserName() {
+                let name = localStorage.getItem('userName');
+                if (!name) {
+                    name = prompt('Please enter your first name:');
+                    if (name) {
+                        localStorage.setItem('userName', name);
+                    }
+                }
+                return name || 'Guest';
+            }
+
+            function getRandomNumber(min, max) {
+                return Math.floor(Math.random() * (max - min + 1)) + min;
+            }
+
+            function calculateTimePerQuestion() {
+                const randomTimePerQuestion = getRandomNumber(MIN_TIME_PER_QUESTION, MAX_TIME_PER_QUESTION);
+                return totalQuestions * randomTimePerQuestion;
+            }
+
+            if (window.PlacementQuiz) {
+                fetchQuestions = async function () {
+                    try {
+                        const questionData = await Promise.all(FETCH_FILE_NAMES.map(async (fileName) => {
+                            const response = await fetch(fileName);
+                            if (!response.ok) throw new Error('Network response was not ok');
+                            return response.text();
+                        }));
+
+                        const questions = questionData.flatMap(data => parseQuestions(data));
+                        const selectedQuestions = getRandomQuestions(questions, totalQuestions);
+                        displayQuestions(selectedQuestions);
+                        const totalTime = calculateTimePerQuestion();
+                        startTimer(totalTime);
+                        startTime = new Date();
+                    } catch (error) {
+                        console.error('Error fetching the questions:', error);
+                    }
+                };
+            } else { // case for subject quiz
+                fetchQuestions = async function () {
+                    try {
+                        const response = await fetch(FETCH_FILE_NAME_WITH_DYNAMIC_PATH);
+                        if (!response.ok) throw new Error('Network response was not ok');
+                        const data = await response.text();
+                        const questions = parseQuestions(data);
+                        const selectedQuestions = getRandomQuestions(questions, totalQuestions);
+                        displayQuestions(selectedQuestions);
+                        const totalTime = calculateTimePerQuestion();
+                        startTimer(totalTime);
+                        startTime = new Date();
+                    } catch (error) {
+                        console.error('Error fetching the questions:', error);
+                    }
+                };
+            }
+
+            function parseQuestions(data) {
+                const lines = data.split('\n');
+                let questions = [];
+                let currentQuestion = null;
+
+                lines.forEach(line => {
+                    line = line.trim();
+                    if (line.startsWith('ANSWER:')) {
+                        if (currentQuestion) {
+                            currentQuestion.answer = line.split(' ')[1];
+                            currentQuestion.options = shuffle(currentQuestion.options); // shuffle options
+                            questions.push(currentQuestion);
+                            currentQuestion = null;
+                        }
+                    } else if (line.match(/^[A-Z][).]/)) {
+                        if (currentQuestion) {
+                            currentQuestion.options.push(line);
+                        }
+                    } else if (line) {
+                        if (currentQuestion) questions.push(currentQuestion);
+                        currentQuestion = { text: line, options: [], answer: '' };
+                    }
+                });
+                return questions;
+            }
+
+            function shuffle(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+                return array;
+            }
+
+            function getRandomQuestions(questions, num) {
+                return shuffle(questions).slice(0, num);
+            }
+
+            function createOption(option, i, questionIndex, cardBodyDiv, cardHeader) {
+                const originalOptionLetter = option.charAt(0);
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'option';
+
+                const input = document.createElement('input');
+                input.type = 'radio';
+                input.name = `question-${questionIndex}`;
+                input.value = originalOptionLetter;
+                input.className = 'form-check-input';
+                input.id = `question-${questionIndex}-option-${i}`;
+
+                const label = document.createElement('label');
+                label.htmlFor = input.id;
+                label.textContent = option.slice(2);
+
+                optionDiv.appendChild(input);
+                optionDiv.appendChild(label);
+                optionDiv.addEventListener('click', () => handleOptionClick(optionDiv, cardBodyDiv, cardHeader));
+
+                return optionDiv;
+            }
+
+            function handleOptionClick(optionDiv, cardBodyDiv, cardHeader) {
+                const radio = optionDiv.querySelector('input[type="radio"]');
+                radio.checked = true;
+                const allOptions = optionDiv.closest('.options').querySelectorAll('.option');
+                allOptions.forEach(div => div.classList.remove('selected'));
+                optionDiv.classList.add('selected');
+
+                const questionIndex = cardBodyDiv.dataset.index;
+                const correctAnswer = cardBodyDiv.dataset.answer;
+
+                attempts[questionIndex]++;
+
+                if (radio.value === correctAnswer) {
+                    optionDiv.classList.add('selected');
+                    cardBodyDiv.classList.add('correct');
+                    cardHeader.classList.add('correct');
+                    if (!answeredQuestions.has(questionIndex)) {
+                        score++;
+                        selectedcorrect++;
+                        answeredQuestions.add(questionIndex);
+                        updateScore();
+                        checkCompletion();
+                    }
+                    disableQuestion(cardBodyDiv);
+                } else {
+                    optionDiv.classList.add('bg-danger');
+                    if (attempts[questionIndex] >= 1) {
+                        if (NEGATIVE_MARKING_ENABLED) {
+                            if (score > 0 && score - negativeMarkingValue >= 0) {
+                                score -= negativeMarkingValue;
+                                updateScore();
+                            }
+                        }
+                        cardBodyDiv.classList.add('incorrect');
+                        cardHeader.classList.add('incorrect');
+                        disableQuestion(cardBodyDiv);
+                        checkCompletion();
+                    }
+                }
+            }
+
+            function displayQuestions(questions) {
+                const container = document.getElementById(QUESTIONS_CONTAINER_ID);
+                questions.forEach((q, index) => {
+                    attempts[index] = 0;
+
+                    const colDiv = document.createElement('div');
+                    colDiv.className = 'col';
+
+                    const cardDiv = document.createElement('div');
+                    cardDiv.className = 'card';
+
+                    const cardHeader = document.createElement('div');
+                    cardHeader.className = 'card-header';
+                    cardHeader.innerHTML = `Q${index + 1}. ${q.text}`;
+
+                    const cardBodyDiv = document.createElement('div');
+                    cardBodyDiv.className = 'card-body';
+                    cardBodyDiv.dataset.index = index;
+                    cardBodyDiv.dataset.answer = q.answer;
+
+                    const questionText = document.createElement('p');
+                    questionText.textContent = q.text;
+                    questionText.classList = 'fw-bold d-none';
+
+                    const optionsDiv = document.createElement('div');
+                    optionsDiv.className = 'options';
+
+                    q.options.forEach((option, i) => {
+                        const optionDiv = createOption(option, i, index, cardBodyDiv, cardHeader);
+                        optionsDiv.appendChild(optionDiv);
+                    });
+
+                    cardBodyDiv.appendChild(questionText);
+                    cardBodyDiv.appendChild(optionsDiv);
+                    cardDiv.appendChild(cardHeader);
+                    cardDiv.appendChild(cardBodyDiv);
+                    colDiv.appendChild(cardDiv);
+                    container.appendChild(colDiv);
+                });
+            }
+
+            function disableQuestion(cardBodyDiv) {
+                cardBodyDiv.classList.add('disabled');
+                const inputs = cardBodyDiv.querySelectorAll('input[type="radio"]');
+                inputs.forEach(input => input.disabled = true);
+            }
+
+            function updateScore() {
+                const scoreContainer = document.getElementById(SCORE_CONTAINER_ID);
+                scoreContainer.textContent = `${Math.round(score)} / ${totalQuestions}`;
+                scoreContainer.classList.remove('d-none');
+                scoreContainer.classList.add('animate');
+                setTimeout(() => {
+                    scoreContainer.classList.remove('animate');
+                }, 500);
+            }
+
+            function startTimer(duration) {
+                let timer = duration,
+                    minutes,
+                    seconds;
+                const timerElement = document.getElementById(TIMER_ELEMENT_ID);
+                timerInterval = setInterval(() => {
+                    minutes = parseInt(timer / 60, 10);
+                    seconds = parseInt(timer % 60, 10);
+
+                    minutes = minutes < 10 ? "0" + minutes : minutes;
+                    seconds = seconds < 10 ? "0" + seconds : seconds;
+
+                    timerElement.textContent = `${minutes}:${seconds}`;
+
+                    if (--timer < 0) {
+                        clearInterval(timerInterval);
+                        endQuiz();
+                    }
+                }, 1000);
+            }
+
+            function endQuiz() {
+                disableAllQuestions();
+                showFinalScore();
+            }
+
+            function disableAllQuestions() {
+                const questionCards = document.querySelectorAll('.card-body');
+                questionCards.forEach(cardBody => {
+                    cardBody.classList.add('disabled');
+                    const inputs = cardBody.querySelectorAll('input[type="radio"]');
+                    inputs.forEach(input => input.disabled = true);
+                });
+            }
+
+            function showFinalScore() {
+                const finalScore = document.getElementById(FINAL_SCORE_ID);
+                const congratsMessage = document.getElementById(CONGRATS_MESSAGE_ID);
+                const timeTaken = document.getElementById(TIME_TAKEN_ID);
+                const totalTime = Math.round((new Date() - startTime) / 1000);
+                const minutes = Math.floor(totalTime / 60);
+                const seconds = totalTime % 60;
+                const timeTakenText = `Time taken: ${minutes} minutes and ${seconds} seconds`;
+
+                // const correctPercentage = Math.round((score / totalQuestions) * 100);
+                const correctPercentage = Math.round((score / totalQuestions) * 100);
+                // const incorrectAnswers = totalQuestions - score;
+                const incorrectAnswers = totalQuestions - selectedcorrect;
+                const accuracy = (score / totalQuestions * 100).toFixed(2);
+
+                finalScore.textContent = `Your score is: ${Math.round(score)} / ${totalQuestions}`;
+                timeTaken.textContent = timeTakenText;
+
+                let analysisMessage = `
+                            <strong>Analysis:</strong><br>
+                            Total Questions: ${totalQuestions}<br>
+                            Correct Answers: ${selectedcorrect}<br>
+                            Incorrect Answers: ${incorrectAnswers}<br>
+                            Accuracy: ${accuracy}%<br><br>     
+                        `;
+
+                const messages = [
+                    { threshold: totalQuestions, message: `Fantastic job ${name}!</p><p>You got a perfect score! Keep up the great work!` },
+                    { threshold: totalQuestions - 1, message: `Excellent work ${name}!</p><p>Almost perfect, keep striving for that 100%!` },
+                    { threshold: Math.ceil(totalQuestions * 0.9), message: `Great job ${name}!</p><p>You're doing really well! Just a bit more practice to reach perfection!` },
+                    { threshold: Math.ceil(totalQuestions * 0.8), message: `Very good effort ${name}!</p><p>You're scoring high, keep practicing and you'll get even better!` },
+                    { threshold: Math.ceil(totalQuestions * 0.7), message: `Good job ${name}!</p><p>You're on the right track, keep up the hard work!` },
+                    { threshold: Math.ceil(totalQuestions * 0.6), message: `Nice effort ${name}!</p><p>Keep practicing and you'll see continuous improvement!` },
+                    { threshold: Math.ceil(totalQuestions * 0.5), message: `Well done ${name}!</p><p>You're halfway there, keep practicing to improve your score!` },
+                    { threshold: Math.ceil(totalQuestions * 0.4), message: `Not bad ${name}!</p><p>Keep practicing and you'll get better each time!` },
+                    { threshold: Math.ceil(totalQuestions * 0.3), message: `Nice try ${name}!</p><p>Don't get discouraged, practice makes perfect!` },
+                    { threshold: Math.ceil(totalQuestions * 0.2), message: `Keep going ${name}!</p><p>Each attempt is a step towards improvement!` },
+                    { threshold: Math.ceil(totalQuestions * 0.1), message: `Don't give up ${name}!</p><p>Every effort counts, keep practicing and you'll get there!` },
+                    { threshold: 0, message: `Don't be disheartened ${name}!</p><p>Keep trying and you'll see progress! Refresh the page to try again.` },
+                    { threshold: -Infinity, message: `Oops ${name}!</p><p>It looks like your score went below zero. Don't worry, you can always try again and improve! Keep practicing!` },
+                ];
+
+                const motivationalEnding = `Keep practicing on dmj.one, where we believe in "Quality Education for All". Your continuous effort and practice will surely lead to success!`;
+
+
+                const selectedMessage = messages.find(m => score >= m.threshold).message;
+
+                congratsMessage.innerHTML = `<p class='fw-bold text-center'>${selectedMessage}</p>${analysisMessage}<p>${motivationalEnding}</p>`;
+
+                document.querySelector('.name-container').classList.add('d-none');
+                document.querySelector('.timer-container').classList.add('d-none');
+                document.querySelector('.score-container').classList.add('d-none');
+
+                const body = document.querySelector('body');
+                body.classList.add('darken');
+                const container = document.querySelector('.container');
+                container.classList.add('blur');
+
+                const endModal = new bootstrap.Modal(document.getElementById(END_MODAL_ID));
+                endModal.show();
+
+                setTimeout(() => {
+                    location.reload();
+                }, 15000);
+            }
+
+            function checkCompletion() {
+                if (Object.values(attempts).filter(attempt => attempt > 0).length === totalQuestions) {
+                    clearInterval(timerInterval);
+                    endQuiz();
+                }
+            }
+
+            fetchQuestions();
         }
 
-        // function extractTextFromStrongTag(htmlString) {
-        //     var tempDiv = document.createElement('div');
-        //     tempDiv.innerHTML = htmlString;
-        //     var authorNames = Array.from(tempDiv.querySelectorAll('strong'), el => el.textContent);
+        if (window.ReviewSubjectQuestions) {
+            (function () {
+                const reviewcss = document.createElement('link');
+                reviewcss.setAttribute('rel', 'stylesheet');
+                reviewcss.setAttribute('href', '/css/reviewaiken.css');
+                document.head.appendChild(reviewcss);
 
-        //     // If there's more than one name, format the string with "and" before the last name
-        //     if (authorNames.length > 1) {
-        //         var lastAuthor = authorNames.pop();
-        //         return authorNames.join(', ') + ' and ' + lastAuthor;
-        //     } else {
-        //         return authorNames.join('');
-        //     }
-        // }
-
-        // Prepare the titleofthepage div with the titleofthepage as text content
-        var titleDiv = document.createElement('div');
-        titleDiv.className = 'd-none d-print-block mx-auto mt-2';
-        titleDiv.innerHTML = `<h2 class="text-center text-uppercase">${titleofthepage}</h2>`;
-
-        // Prepare the author and faculty divs with text content
-        // var authorsText = extractTextFromStrongTag(window.GLOBAL_get_Author_Name_);
-        // var authorsText = 'Divya Mohan <em>(GF202214698)</em>';
-        // const formattedauthorname = extractTextFromStrongTag(window.GLOBAL_get_Author_Name_);
-        const formattedauthorname = window.GLOBAL_get_formatted_Author_Name_;
-        // window.GLOBAL_get_formatted_Author_Name_ = formattedauthorname;
-        // console.log(formattedauthorname);
-        var authorsText = studentmode ? 'Divya Mohan <em>(GF202214698)</em>' : formattedauthorname;
-        var authorsdept = studentmode ? 'Yogananda School of AI, Computers and Data Science' : 'Faculty of Engineering and Technology';
-        var authorsDiv = document.createElement('div');        
-        authorsDiv.className = 'd-none d-print-block mx-auto mt-3 mb-4';
-        authorsDiv.innerHTML = authorsText ? `<p class="text-center text-uppercase">${authorsText}</p><p class="text-uppercase text-center" style="font-size:8pt!important">${authorsdept}</p><p class="text-uppercase text-center fw-bold" style="font-size:10pt!important">Shoolini University, Solan, Himachal Pradesh, India</p>` : '';        
+                const APA6 = document.createElement('link');
+                APA6.setAttribute('rel', 'stylesheet');
+                APA6.setAttribute('href', '/css/print-article-APA6.css');
+                document.head.appendChild(APA6);
 
 
-        var facultyDiv = document.createElement('div');
-        facultyDiv.className = 'd-none d-print-block mx-auto';
-        facultyDiv.innerHTML = window.GLOBAL_get_course_detail_ ? window.GLOBAL_get_course_ ? `<p class="text-center fst-italic">Under the guidance of <span class="text-capitalize">${window.GLOBAL_get_Faculty_Name_}</span> in the subject of <span class="text-capitalize">${window.GLOBAL_get_course_detail_} (${window.GLOBAL_get_course_})</span></p>` : `<p class="text-center">${window.GLOBAL_get_course_detail_}</p>` : '';
-        // facultyDiv.innerHTML = window.GLOBAL_get_course_detail_ ? window.GLOBAL_get_course_ ? `<p class="text-center fst-italic">Under the guidance of <span class="text-capitalize">Asst. Prof. Payal Khanna</span> in the subject of <span class="text-capitalize">Enhancing Leadership through Coaching Skills (CSU1806)</span></p>` : `<p class="text-center">${window.GLOBAL_get_course_detail_}</p>` : '';
-        // facultyDiv.innerHTML += window.GLOBAL_get_Faculty_Name_ ? `<p class="text-center text-uppercase"><span class="fw-bold"></span> ${window.GLOBAL_get_Faculty_Name_}</p>` : '';
-        facultyDiv.innerHTML += `<p class="text-center text-uppercase" style="font-size:8pt!important">${studentmode ? 'Submitted on' : 'Printed on'} ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>`;
 
-        var authorsetal = formatAuthorsEtAl(window.GLOBAL_get_Author_Name_);
-        var citationblockquote = document.createElement('blockquote');
-        citationblockquote.className = 'd-none d-print-flex mt-3 text-decoration-none';
-        citationblockquote.style = 'font-style:unset !important';
-        citationblockquote.innerHTML = authorsetal ? `<p class="citation">${authorsetal} (${dateofthepage}). <em>${titleofthepage}</em>. Retrieved from ${currentlocation}</p>` : '';
 
-        // Append the elements to the article element
-        // var article = document.querySelector('.agen-tableofcontents');
+                document.body.innerHTML = `
+                    <article class="agen-tableofcontents" style="break-after: avoid !important;">
+                    <h3 class="text-center fw-bold display-4">Review Of Questions</h3>
+                    <p class="bg-warning bg-opacity-25 p-3 fw-bold text-center d-print-none">Press Ctrl + P to Print or to Save as PDF.</p>
+                    <div class="instructionsforprofessor">
+                        <div class="row py-3 w-100">
+                            <div class="col-6">
+                                <p class="text-start">Subject:_____________________________</p>
+                            </div>
+                            <div class="col-6">
+                                <p class="text-end">Professor:_____________________________</p>
+                            </div>
+                        </div>
 
-        // articleElement.insertBefore(logodiv, h2);
-        // articleElement.insertBefore(qrImage, h2);
-        // articleElement.insertBefore(authorsDiv, h2.nextSibling);
-        // articleElement.insertBefore(facultyDiv, authorsDiv.nextSibling);
-        // articleElement.insertBefore(citationblockquote, facultyDiv.nextSibling);
-        // article.insertBefore(img, facultyDiv.nextSibling);
+                        <p class="text-left">Dear ${window.GLOBAL_get_Faculty_Name_ ? 'Dr. / Shri. / Smt. ' + window.GLOBAL_get_Faculty_Name_ : 'Subject Expert'},<br><br>
+                        Thank you for sparing your valuable time to review these questions. Education is the foundation upon which we build our future. By diligently reviewing each question, you contribute to a more informed, educated, and empowered student community. By committing to accurate and thorough reviews, you help shape the minds of tomorrow's leaders. Your effort in this review process is greatly appreciated.</p>
+                        <p>At dmj.one, we believe in "Quality Education for All." Your dedication to reviewing and ensuring the correctness of the answers is crucial to this mission. Accurate answers in these quizzes ensure effective learning for students.<br>Please follow the instructions below to review the questions and mark the correct options for the incorrect ones you find. <span class="fw-bold">I thank you for your invaluable contribution.</span></p>
+                        
+                        <br>
+                        <p class="">Divya Mohan<br>Founder, dmj.one | CTO, Biopronut Pvt. Ltd.</p>
+                        <hr>
 
-        // Create a document fragment to hold all the elements in the correct order
-        let docFragmentBeforeh2 = document.createDocumentFragment();
-        docFragmentBeforeh2.appendChild(logodiv);
-        
-        let docFragmentAfterh2 = document.createDocumentFragment();
-        docFragmentAfterh2.appendChild(titleDiv);
-        docFragmentAfterh2.appendChild(authorsDiv);
-        docFragmentAfterh2.appendChild(facultyDiv);
-        docFragmentAfterh2.appendChild(qrDiv);
-        docFragmentAfterh2.appendChild(citationblockquote);
+                        <p class="py-3">
+                            <strong>Instructions:</strong>
+                            <ul>                                
+                                <li>For each question you found to be incorrect, please write down the question number in the top row and the correct option in the bottom row.</li>
+                                <li>Please ensure to fill each box correctly as per the question and option provided.</li>
+                                <li>Kindly double-check each entry to ensure accuracy.</li>
+                            </ul>
+                        </p>
 
-        // Insert the document fragment at the beginning of articleElement
-        articleElement.insertBefore(docFragmentBeforeh2, h2);
-        articleElement.insertBefore(docFragmentAfterh2, h2.nextSibling);
+                        ${Array.from({ length: 1 }, () => `
+                            <table class="table table-bordered" style="width: 100%; margin-top: 20px; table-layout: fixed;">
+                                <thead>
+                                    <tr>
+                                        <th colspan="20" class="text-center">Please write the wrong question number below this.</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        ${Array.from({ length: 20 }, () => `
+                                            <td>
+                                                <input type="text" placeholder="" style="width: 100%; border: none; text-align: center;">
+                                            </td>
+                                        `).join('')}
+                                    </tr>
+                                    <tr>
+                                        ${Array.from({ length: 20 }, () => `
+                                            <td>
+                                                <input type="text" placeholder="" style="width: 100%; border: none; text-align: center;">
+                                            </td>
+                                        `).join('')}
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <th colspan="20" class="text-center">Please write the correct option for that question above.</th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                            `).join('')}
+                            <table class="table table-bordered" style="width: 100%; margin-top: 20px; table-layout: fixed;">
+                                <tbody>
+                                    <tr>
+                                        ${Array.from({ length: 20 }, () => `
+                                            <td>
+                                                <input type="text" placeholder="" style="width: 100%; border: none; text-align: center;">
+                                            </td>
+                                        `).join('')}
+                                    </tr>
+                                    <tr>
+                                        ${Array.from({ length: 20 }, () => `
+                                            <td>
+                                                <input type="text" placeholder="" style="width: 100%; border: none; text-align: center;">
+                                            </td>
+                                        `).join('')}
+                                    </tr>
+                                </tbody>            
+                            </table>
+                        </article>
+                    </div>
+                    <hr class="m-0">
+                    <article id="questions-container" class="m-0 p-0 pb-5"></article>
+                `;
+
+                async function fetchQuestions() {
+                    try {
+                        const response = await fetch(FETCH_FILE_NAME_WITH_DYNAMIC_PATH);
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        const data = await response.text();
+                        const questions = parseQuestions(data);
+                        displayQuestions(questions);
+                    } catch (error) {
+                        console.error('Error fetching the questions:', error);
+                    }
+                }
+
+                function parseQuestions(data) {
+                    const lines = data.split('\n');
+                    let questions = [];
+                    let currentQuestion = null;
+
+                    lines.forEach(line => {
+                        line = line.trim();
+                        if (line.startsWith('ANSWER:')) {
+                            if (currentQuestion) {
+                                currentQuestion.answer = line.split(' ')[1];
+                                questions.push(currentQuestion);
+                                currentQuestion = null;
+                            }
+                        } else if (line.match(/^[A-Z][).]/)) {
+                            if (currentQuestion) {
+                                currentQuestion.options.push(line);
+                            }
+                        } else if (line) {
+                            if (currentQuestion) {
+                                questions.push(currentQuestion);
+                            }
+                            currentQuestion = { text: line, options: [], answer: '' };
+                        }
+                    });
+                    return questions;
+                }
+
+                function shuffle(array) {
+                    for (let i = array.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [array[i], array[j]] = [array[j], array[i]];
+                    }
+                    return array;
+                }
+
+                function displayQuestions(questions) {
+                    const container = document.getElementById('questions-container');
+                    const fragment = document.createDocumentFragment();
+
+                    questions.forEach((q, index) => {
+                        const questionDiv = document.createElement('div');
+                        questionDiv.className = 'question';
+
+                        const questionText = document.createElement('div');
+                        questionText.className = 'question-text';
+                        questionText.textContent = `Q${index + 1}: ${q.text}`;
+                        questionDiv.appendChild(questionText);
+
+                        const optionsDiv = document.createElement('div');
+                        optionsDiv.className = 'options';
+
+                        const shuffledOptions = shuffle([...q.options]);
+                        const optionLabels = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
+
+                        shuffledOptions.forEach((option, i) => {
+                            const optionLetter = option.charAt(0);
+                            const isCorrect = optionLetter === q.answer;
+                            const optionDiv = document.createElement('div');
+                            optionDiv.className = isCorrect ? 'correct-answer' : '';
+                            optionDiv.textContent = `${optionLabels[i]}) ${option.slice(2)}`;
+                            optionsDiv.appendChild(optionDiv);
+                        });
+                        questionDiv.appendChild(optionsDiv);
+                        fragment.appendChild(questionDiv);
+                    });
+
+                    container.appendChild(fragment);
+                }
+
+                fetchQuestions();
+            })();
+
+        }
     });
 })();
 
 
 
-
-
-/******** Body ***********/
+/************************************* Body *********************************/
 // Decode Encrypted Variable's - Call this function to decode variables.
 // Example: execute the vars by calling <script>decenv(_varname_);</script> in html where it is required.
 // abbr: DeCodeEncryptedVAr - dcevar
@@ -2295,7 +3351,7 @@ function createSharingButtons(text, url, iconName, btnClass) {
 
 //     document.body.appendChild(footer);
 
-    
+
 //     const article = document.createElement("article");
 //     article.className = 'agen-the-end d-none d-print-block';
 //     article.innerHTML = `<h2 class="text-center">The End</h2><div class="text-center">&copy; 2007 - ${new Date().getFullYear()} ${window.GLOBAL_get_formatted_Author_Name_ ? window.GLOBAL_get_formatted_Author_Name_ + ' |' : ''} dmj.one ${rights} ${footer_link_privacy} ${footer_link_tos}</div>`;
@@ -2307,7 +3363,7 @@ function createSharingButtons(text, url, iconName, btnClass) {
 //     // article.className = 'agen-the-end d-none d-print-block';
 //     // article.innerHTML = `<h2 class="text-center">The End</h2><div class="text-center">&copy; 2007 - ${new Date().getFullYear()} ${window.GLOBAL_get_formatted_Author_Name_ ? window.GLOBAL_get_formatted_Author_Name_ + ' |' : ''} dmj.one ${rights} ${footer_link_privacy} ${footer_link_tos}</div>`;
 //     // footer.appendChild(article); // Append "The End" section to the footer
-    
+
 
 //     //document.body.appendChild(footer);
 //     // document.body.insertBefore(footer, document.body.lastChild);
@@ -2368,86 +3424,170 @@ function createSharingButtons(text, url, iconName, btnClass) {
 //     };
 // }
 
+// function copyright(rights, noprint) {
+//     function initializeCopyright() {
+//     window["loaded_copyright"] = 1;
+//     if (rights === "off") return null;
+//     if (noprint) return null;
+
+//     const footer_all_rights = ' &#8226; All rights reserved';
+//     const footer_some_rights = ' &#8226; Some rights reserved';
+//     const footer_link_privacy = ' &#8226; <a href="/privacy">Privacy</a>';
+//     const footer_link_tos = ' &#8226; <a href="/tos">Terms and Conditions</a>';
+
+//     rights = rights === "all" ? footer_all_rights : rights === "some" ? footer_some_rights : "";
+
+//     const footer = document.createElement("footer");
+//     footer.id = "defaultcopyrightfooter";
+
+//     footer.appendChild(createSharingButtons());
+
+//     const div = document.createElement("div");
+//     const span = document.createElement("span");
+//     const strong = document.createElement("strong");
+
+//     const date = new Date();
+//     let isServer = "";
+//     const lastModified = new Date(document.lastModified);
+//     if (date.getTime() === lastModified.getTime()) {
+//         isServer = " (Live)";
+//     }
+
+//     const modified = `cloudflare` === footer_getHeaderValue('server')
+//         ? `<span style="font-size:10px" class="d-print-none">Not seeing updated content? Page was loaded on ${document.lastModified} ${isServer}. Refresh with <kbd>CTRL</kbd> + <kbd>R</kbd> to check again.</span> <br>`
+//         : `<span style="font-size:10px" class="d-print-none">Not seeing updated content? Page last modified on ${document.lastModified} ${isServer}. Refresh with <kbd>CTRL</kbd> + <kbd>R</kbd> to check again.</span> <br>`;
+
+//     const footerNotice = `
+//         <span class="footer-notice d-none d-print-block my-0" style="font-size:8pt !important; font-family:'Times New Roman' !important">
+//             <h2 class="d-none d-print-block fw-normal my-1 mx-o px-0 text-center">This article is provided as part of the <span class="text-capitalize">public welfare initiatives</span> by <span class='text-lowercase'>dmj.one</span></h2>
+//             <div>
+//                 <strong>General:</strong> All material provided herein is for educational or informational purposes only. No representation is made about the accuracy or completeness of the information contained on this page. Any use of or reliance on this material is strictly at the user's own risk. The author disclaims all liability for any damages or losses arising from such use.
+//                 <strong>Citations:</strong> Content on this page is the intellectual property of the author. Users may cite the content at their own discretion and must assume full responsibility for maintaining academic integrity and adhering to their institution's citation guidelines.
+//                 <strong>Commercial Use:</strong> Users must secure their own permissions for any commercial use of this content and agree to indemnify the author from any claims arising from such use.
+//                 <strong>Contact:</strong> Direct all inquiries to contact@dmj.one. By accessing this content, you agree to contact the author for any further clarification or licensing information.
+//             </div>
+//         </span>`;
+
+//     div.innerHTML = footerNotice;
+//     strong.innerHTML = `${modified}&copy; 2007 - ${new Date().getFullYear()} ${window.GLOBAL_get_formatted_Author_Name_ ? window.GLOBAL_get_formatted_Author_Name_ + ' |' : ''} dmj.one ${rights} ${footer_link_privacy} ${footer_link_tos}`;
+//     span.appendChild(strong);
+//     footer.appendChild(div);
+//     footer.appendChild(span);
+
+//     const article = document.createElement("article");
+//     article.className = 'agen-the-end d-none d-print-flex';
+//     // article.style = 'page-break-before: always !important; page-break-inside: avoid !important; page-break-after: avoid !important;';
+//     article.innerHTML = `<div class="text-center theend fw-bold"><img class="img-fluid" src="${window.GLOBAL_get_qr_code_data}" alt="QR Code of the link" width="400px" height="400px"></div>`;
+//     // document.body.appendChild(article);
+//     footer.appendChild(article);
+
+//     document.body.appendChild(footer);
+//     // const observer = new MutationObserver((mutationsList) => {
+//     //     mutationsList.forEach((mutation) => {
+//     //         if (mutation.type === 'childList' && document.body.lastChild !== footer) {
+//     //             document.body.appendChild(footer);
+//     //         }
+//     //     });
+//         // });
+
+//     // observer.observe(document.body, { childList: true });
+//     // setTimeout(() => observer.disconnect(), 2000);
+
+//         if ('serviceWorker' in navigator) {
+//             navigator.serviceWorker.register('/sw.js');
+//         }
+
+//     window.onload = function () { };
+//     }
+
+//     if (document.readyState === 'loading') {
+//         document.addEventListener('DOMContentLoaded', initializeCopyright);
+//     } else {
+//         initializeCopyright();
+//     }
+// }
+
 function copyright(rights, noprint) {
     function initializeCopyright() {
-    window["loaded_copyright"] = 1;
-    if (rights === "off") return null;
-    if (noprint) return null;
+        window["loaded_copyright"] = 1;
+        if (rights === "off") return null;
+        if (noprint) return null;
 
-    const footer_all_rights = ' &#8226; All rights reserved';
-    const footer_some_rights = ' &#8226; Some rights reserved';
-    const footer_link_privacy = ' &#8226; <a href="/privacy">Privacy</a>';
-    const footer_link_tos = ' &#8226; <a href="/tos">Terms and Conditions</a>';
+        const footer_all_rights = ' &#8226; All rights reserved';
+        const footer_some_rights = ' &#8226; Some rights reserved';
+        const footer_link_privacy = ' &#8226; <a href="/privacy">Privacy</a>';
+        const footer_link_tos = ' &#8226; <a href="/tos">Terms and Conditions</a>';
 
-    rights = rights === "all" ? footer_all_rights : rights === "some" ? footer_some_rights : "";
+        rights = rights === "all" ? footer_all_rights : rights === "some" ? footer_some_rights : "";
 
-    const footer = document.createElement("footer");
-    footer.id = "defaultcopyrightfooter";
+        const footer = document.createElement("footer");
+        footer.id = "defaultcopyrightfooter";
 
-    footer.appendChild(createSharingButtons());
+        footer.appendChild(createSharingButtons());
 
-    const div = document.createElement("div");
-    const span = document.createElement("span");
-    const strong = document.createElement("strong");
+        const div = document.createElement("div");
+        const span = document.createElement("span");
+        const strong = document.createElement("strong");
 
-    const date = new Date();
-    let isServer = "";
-    const lastModified = new Date(document.lastModified);
-    if (date.getTime() === lastModified.getTime()) {
-        isServer = " (Live)";
-    }
+        const date = new Date();
+        let isServer = "";
+        const lastModified = new Date(document.lastModified);
+        if (date.getTime() === lastModified.getTime()) {
+            isServer = " (Live)";
+        }
 
-    const modified = `cloudflare` === footer_getHeaderValue('server')
-        ? `<span style="font-size:10px" class="d-print-none">Not seeing updated content? Page was loaded on ${document.lastModified} ${isServer}. Refresh with <kbd>CTRL</kbd> + <kbd>R</kbd> to check again.</span> <br>`
-        : `<span style="font-size:10px" class="d-print-none">Not seeing updated content? Page last modified on ${document.lastModified} ${isServer}. Refresh with <kbd>CTRL</kbd> + <kbd>R</kbd> to check again.</span> <br>`;
+        const modified = `cloudflare` === footer_getHeaderValue('server')
+            ? `<span style="font-size:10px" class="d-print-none">Not seeing updated content? Page was loaded on ${document.lastModified} ${isServer}. Refresh with <kbd>CTRL</kbd> + <kbd>R</kbd> to check again.</span> <br>`
+            : `<span style="font-size:10px" class="d-print-none">Not seeing updated content? Page last modified on ${document.lastModified} ${isServer}. Refresh with <kbd>CTRL</kbd> + <kbd>R</kbd> to check again.</span> <br>`;
 
-    const footerNotice = `
-        <span class="footer-notice d-none d-print-block my-0" style="font-size:8pt !important; font-family:'Times New Roman' !important">
-            <h2 class="d-none d-print-block fw-normal my-1 mx-o px-0 text-center">This article is provided as part of the <span class="text-capitalize">public welfare initiatives</span> by <span class='text-lowercase'>dmj.one</span></h2>
-            <div>
-                <strong>General:</strong> All material provided herein is for educational or informational purposes only. No representation is made about the accuracy or completeness of the information contained on this page. Any use of or reliance on this material is strictly at the user's own risk. The author disclaims all liability for any damages or losses arising from such use.
-                <strong>Citations:</strong> Content on this page is the intellectual property of the author. Users may cite the content at their own discretion and must assume full responsibility for maintaining academic integrity and adhering to their institution's citation guidelines.
-                <strong>Commercial Use:</strong> Users must secure their own permissions for any commercial use of this content and agree to indemnify the author from any claims arising from such use.
-                <strong>Contact:</strong> Direct all inquiries to contact@dmj.one. By accessing this content, you agree to contact the author for any further clarification or licensing information.
-            </div>
-        </span>`;
+        const footerNotice = `
+            <span class="footer-notice d-none d-print-block my-0" style="font-size:8pt !important; font-family:'Times New Roman' !important">
+                <h2 class="d-none d-print-block fw-normal my-1 mx-o px-0 text-center">This article is provided as part of the <span class="text-capitalize">public welfare initiatives</span> by <span class='text-lowercase'>dmj.one</span></h2>
+                <div>
+                    <strong>General:</strong> All material provided herein is for educational or informational purposes only. No representation is made about the accuracy or completeness of the information contained on this page. Any use of or reliance on this material is strictly at the user's own risk. The author disclaims all liability for any damages or losses arising from such use.
+                    <strong>Citations:</strong> Content on this page is the intellectual property of the author. Users may cite the content at their own discretion and must assume full responsibility for maintaining academic integrity and adhering to their institution's citation guidelines.
+                    <strong>Commercial Use:</strong> Users must secure their own permissions for any commercial use of this content and agree to indemnify the author from any claims arising from such use.
+                    <strong>Contact:</strong> Direct all inquiries to contact@dmj.one. By accessing this content, you agree to contact the author for any further clarification or licensing information.
+                </div>
+            </span>`;
 
-    div.innerHTML = footerNotice;
-    strong.innerHTML = `${modified}&copy; 2007 - ${new Date().getFullYear()} ${window.GLOBAL_get_formatted_Author_Name_ ? window.GLOBAL_get_formatted_Author_Name_ + ' |' : ''} dmj.one ${rights} ${footer_link_privacy} ${footer_link_tos}`;
-    span.appendChild(strong);
-    footer.appendChild(div);
-    footer.appendChild(span);    
+        div.innerHTML = footerNotice;
+        strong.innerHTML = `${modified}&copy; 2007 - ${new Date().getFullYear()} ${window.GLOBAL_get_formatted_Author_Name_ ? window.GLOBAL_get_formatted_Author_Name_ + ' |' : ''} dmj.one ${rights} ${footer_link_privacy} ${footer_link_tos}`;
+        span.appendChild(strong);
+        footer.appendChild(div);
+        footer.appendChild(span);
 
-    const article = document.createElement("article");
-    article.className = 'agen-the-end d-none d-print-flex';
-    // article.style = 'page-break-before: always !important; page-break-inside: avoid !important; page-break-after: avoid !important;';
-    article.innerHTML = `<div class="text-center theend fw-bold"><img class="img-fluid" src="${window.GLOBAL_get_qr_code_data}" alt="QR Code of the link" width="400px" height="400px"></div>`;
-    // document.body.appendChild(article);
-    footer.appendChild(article);
+        const article = document.createElement("article");
+        article.className = 'agen-the-end d-none d-print-flex';
+        article.innerHTML = `<div class="text-center theend fw-bold"><img class="img-fluid" src="${window.GLOBAL_get_qr_code_data}" alt="QR Code of the link" width="400px" height="400px"></div>`;
+        footer.appendChild(article);
 
-    document.body.appendChild(footer);
-    const observer = new MutationObserver((mutationsList) => {
-        mutationsList.forEach((mutation) => {
-            if (mutation.type === 'childList' && document.body.lastChild !== footer) {
-                document.body.appendChild(footer);
-            }
+        document.body.appendChild(footer);
+
+        // Disconnect the observer after a short delay to prevent infinite loop
+        const observer = new MutationObserver((mutationsList) => {
+            mutationsList.forEach((mutation) => {
+                if (mutation.type === 'childList' && !document.body.contains(footer)) {
+                    document.body.appendChild(footer);
+                }
+            });
         });
-    });
 
-    observer.observe(document.body, { childList: true });
-    setTimeout(() => observer.disconnect(), 2000);
-    
-    window.onload = function () { };
+        observer.observe(document.body, { childList: true });
+
+        setTimeout(() => observer.disconnect(), 5000);
+
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js');
+        }
+
+        window.onload = function () { };
     }
 
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', initializeCopyright);
     } else {
         initializeCopyright();
-    }
-
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/sw.js');
     }
 }
 
@@ -2543,7 +3683,7 @@ function gen_blockquote() {
 
 /******** Indent Paragraph if lines are more than 1 *********/
 // (function () {
-    // applies it everywhere
+// applies it everywhere
 //     document.addEventListener("DOMContentLoaded", function () {
 //         var paragraphs = document.querySelectorAll('p');
 
@@ -4700,24 +5840,25 @@ const certifications = {
 /******** Dynamically inject the Table of Contents if it does not have it ********/
 (function () {
     document.addEventListener('DOMContentLoaded', function () {
+        try {
 
-        // Select all article elements with class 'borderart' or auto_id
-        const articlesWithBorderArt = document.querySelectorAll('article.auto_id, article.borderart');
+            // Select all article elements with class 'borderart' or auto_id
+            const articlesWithBorderArt = document.querySelectorAll('article.auto_id, article.borderart');
 
-        // Loop through each article and assign a random ID
-        articlesWithBorderArt.forEach(function (article) {
-            var randomId = 'article-' + Math.floor(Math.random() * 1000000);
-            article.setAttribute('id', randomId);
-        });
+            // Loop through each article and assign a random ID
+            articlesWithBorderArt.forEach(function (article) {
+                var randomId = 'article-' + Math.floor(Math.random() * 1000000);
+                article.setAttribute('id', randomId);
+            });
 
-        const main = document.querySelector('main');
-        const firstArticle = main.querySelector('article');
-        const existingToc = main.querySelector('.accordion#toc');
-        const autogen_tableofcontents = main.querySelector('.agen-tableofcontents');
+            const main = document.querySelector('main');
+            const firstArticle = main.querySelector('article');
+            const existingToc = main.querySelector('.accordion#toc');
+            const autogen_tableofcontents = main.querySelector('.agen-tableofcontents');
 
-        if (autogen_tableofcontents && !existingToc) {
-            // Check if a ToC does not already exist            
-            const tocHTML = `
+            if (autogen_tableofcontents && !existingToc) {
+                // Check if a ToC does not already exist            
+                const tocHTML = `
             <div class="container mt-4 w-100 w-xl-75 d-print-none">
                 <div class="accordion" id="toc">
                     <div class="accordion-item">
@@ -4735,32 +5876,33 @@ const certifications = {
                 </div>
             </div>`;
 
-            // Append the ToC HTML to the first article
-            // firstArticle.innerHTML += tocHTML;
-            autogen_tableofcontents.innerHTML += tocHTML;
+                // Append the ToC HTML to the first article
+                // firstArticle.innerHTML += tocHTML;
+                autogen_tableofcontents.innerHTML += tocHTML;
 
-            window.autogen_tableofcontents = 1;
-        }
+                window.autogen_tableofcontents = 1;
+            }
 
-        if (window.autogen_tableofcontents) {
-            // Proceed to populate the ToC with entries as necessary
-            const articles = document.querySelectorAll('article[id]');
-            const tocList = document.querySelector('.accordion-body ol');
+            if (window.autogen_tableofcontents) {
+                // Proceed to populate the ToC with entries as necessary
+                const articles = document.querySelectorAll('article[id]');
+                const tocList = document.querySelector('.accordion-body ol');
 
-            articles.forEach(article => {
-                const id = article.id;
-                const heading = article.querySelector('h3, h4');
-                if (heading) {
-                    const li = document.createElement('li');
-                    li.className = 'p-1';
-                    const anchor = document.createElement('a');
-                    anchor.href = `#${id}`;
-                    anchor.innerHTML = `<i class="fas fa-chevron-circle-right"></i> ${heading.textContent.trim()}`;
-                    li.appendChild(anchor);
-                    tocList.appendChild(li);
-                }
-            });
-        }
+                articles.forEach(article => {
+                    const id = article.id;
+                    const heading = article.querySelector('h3, h4');
+                    if (heading) {
+                        const li = document.createElement('li');
+                        li.className = 'p-1';
+                        const anchor = document.createElement('a');
+                        anchor.href = `#${id}`;
+                        anchor.innerHTML = `<i class="fas fa-chevron-circle-right"></i> ${heading.textContent.trim()}`;
+                        li.appendChild(anchor);
+                        tocList.appendChild(li);
+                    }
+                });
+            }
+        } catch (e) { console.log('Could Not insert Automatically Generated Table of Contents')}
     });
 })();
 

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Random Questions</title>
+        <style>
+            .question {
+                margin-bottom: 20px;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div id="questions-container"></div>
+
+        <script>
+            async function fetchQuestions() {
+                const response = await fetch('qb.txt');
+                const text = await response.text();
+                return text;
+            }
+
+            function parseQuestions(text) {
+                const rawQuestions = text.split('\n').reduce((acc, line) => {
+                    if (line.startsWith('ANSWER: ')) {
+                        acc[acc.length - 1] += '\n' + line;
+                    } else if (line.trim().length > 0) {
+                        acc.push(line);
+                    }
+                    return acc;
+                }, []).join('\n').split('ANSWER: ').map((q, index, arr) => {
+                    if (index < arr.length - 1) {
+                        return q + '\nANSWER: ' + arr[index + 1].split('\n')[0];
+                    } else {
+                        return q;
+                    }
+                }).slice(0, -1);
+
+                return rawQuestions.map(q => {
+                    const lines = q.trim().split('\n');
+                    const question = lines[0].trim();
+                    const options = lines.slice(1, -1);
+                    const answerLine = lines[lines.length - 1];
+                    const answer = answerLine.split(': ')[1].trim();
+
+                    const optionMap = options.reduce((acc, option) => {
+                        const [letter, ...rest] = option.split(') ');
+                        acc[letter.trim()] = rest.join(') ').trim();
+                        return acc;
+                    }, {});
+
+                    return {
+                        question,
+                        options: optionMap,
+                        answer
+                    };
+                });
+            }
+
+            function getRandomElements(arr, count) {
+                const shuffled = arr.sort(() => 0.5 - Math.random());
+                return shuffled.slice(0, count);
+            }
+
+            function generateHTML(questions) {
+                const container = document.getElementById('questions-container');
+                questions.forEach(q => {
+                    const questionDiv = document.createElement('div');
+                    questionDiv.className = 'question';
+
+                    const questionText = document.createElement('p');
+                    questionText.textContent = q.question;
+                    questionDiv.appendChild(questionText);
+
+                    Object.entries(q.options).forEach(([letter, option]) => {
+                        const optionText = document.createElement('p');
+                        optionText.textContent = `${letter}) ${option}`;
+                        questionDiv.appendChild(optionText);
+                    });
+
+                    const answerText = document.createElement('p');
+                    answerText.textContent = `Answer: ${q.answer}) ${q.options[q.answer]}`;
+                    questionDiv.appendChild(answerText);
+
+                    container.appendChild(questionDiv);
+                });
+            }
+
+            async function main() {
+                const text = await fetchQuestions();
+                const questions = parseQuestions(text);
+                const randomQuestions = getRandomElements(questions, 5);
+                generateHTML(randomQuestions);
+            }
+
+            main();
+        </script>
+    </body>
+
+</html>
