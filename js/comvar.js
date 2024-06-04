@@ -2,52 +2,52 @@
 const arr_author = {
     dm: {
         name: "Divya Mohan",
-        bio: "<p>Divya Mohan is a driven computer science student from India, pursuing his B.Tech in Computer Science and Engineering. With a unique approach to teaching, he breaks down complex concepts into simple, digestible chunks to make tech accessible to all learners. Dedicated to delivering top-quality results, Divya is fueled by his passion for technology and education, constantly striving to improve his skills and make an impact in the field.</p>",
+        bio: "<p class='studentauthorbio header-p-author-description'>Divya Mohan is a driven computer science student from India, pursuing his B.Tech in Computer Science and Engineering. With a unique approach to teaching, he breaks down complex concepts into simple, digestible chunks to make tech accessible to all learners. Dedicated to delivering top-quality results, Divya is fueled by his passion for technology and education, constantly striving to improve his skills and make an impact in the field.</p>",
         href: "contact@dmj.one"
     },
     gg: {
         name: "Gaurav Gupta",
-        bio: "<p>Dr. Gaurav Gupta, with a BE from Dr B R Ambedkar University (2006), PG and PhD in Computer Science Engineering from KSOU-VIT and Shoolini University (2011, 2019), boasts 13 years of teaching experience. His academic achievements include numerous publications across prestigious platforms like IEEE and Springer, with 138 citations and notable indices (h-index: 5, i10-index: 4), alongside authoring over 12 books. His research focuses on machine learning applications in healthcare and agriculture, leading to the development of innovative mobile applications for Alzheimer's care and AI tools for various sectors. Dr. Gupta's contributions have earned him multiple IEEE awards and reviewer/editorial roles in several scientific journals, underscoring his prominence in smart healthcare/agriculture innovation.</p>",
+        bio: "<p class='studentauthorbio header-p-author-description'>Dr. Gaurav Gupta, with a BE from Dr B R Ambedkar University (2006), PG and PhD in Computer Science Engineering from KSOU-VIT and Shoolini University (2011, 2019), boasts 13 years of teaching experience. His academic achievements include numerous publications across prestigious platforms like IEEE and Springer, with 138 citations and notable indices (h-index: 5, i10-index: 4), alongside authoring over 12 books. His research focuses on machine learning applications in healthcare and agriculture, leading to the development of innovative mobile applications for Alzheimer's care and AI tools for various sectors. Dr. Gupta's contributions have earned him multiple IEEE awards and reviewer/editorial roles in several scientific journals, underscoring his prominence in smart healthcare/agriculture innovation.</p>",
         href: "gauravgupta@shooliniouniversity.com"
     },
     aj: {
         name: "Aarchit Joshi",
-        bio: "<p>Aarchit Joshi is a computer science scholar from India, pursuing his Ph.D. in Computer Science and Engineering with a specialization in Artificial Intelligence. Aarchit employs innovative teaching methodologies to distill complex AI concepts into understandable, manageable lessons, aiming to democratize technology education. Driven by a profound passion for AI research and a commitment to excellence in education, he continuously seeks to enhance his expertise and contribute significantly to the field.</p>",
+        bio: "<p class='studentauthorbio header-p-author-description'>Aarchit Joshi is a computer science scholar from India, pursuing his Ph.D. in Computer Science and Engineering with a specialization in Artificial Intelligence. Aarchit employs innovative teaching methodologies to distill complex AI concepts into understandable, manageable lessons, aiming to democratize technology education. Driven by a profound passion for AI research and a commitment to excellence in education, he continuously seeks to enhance his expertise and contribute significantly to the field.</p>",
         href: "contact@dmj.one"
     },
     vp: {
         name: "Vanshika Painuly",
-        bio: "<p>Vanshika Painuly is a computer science student from Uttrakhand, India, pursuing her B.Tech degree. She has a knack for making technical information easily accessible to learners, breaking down complex concepts into clear, understandable chunks. Vanshika's passion for technology and education drives her to deliver outstanding results, and she is dedicated to continuously improving her skills in the field.</p>",
+        bio: "<p class='studentauthorbio header-p-author-description'>Vanshika Painuly is a computer science student from Uttrakhand, India, pursuing her B.Tech degree. She has a knack for making technical information easily accessible to learners, breaking down complex concepts into clear, understandable chunks. Vanshika's passion for technology and education drives her to deliver outstanding results, and she is dedicated to continuously improving her skills in the field.</p>",
         href: "vp@dmj.one"
     },
     harshal: {
         name: "Harshal Khajuria",
-        bio: "<p>Harshal Khajuria is currently a student of Shoolini University pursuing B.Tech Cyber Security</p>",
+        bio: "<p class='studentauthorbio header-p-author-description'>Harshal Khajuria is currently a student of Shoolini University pursuing B.Tech Cyber Security</p>",
         href: "harshalkotakhajuria@gmail.com"
     },
     shreshth: {
         name: "Shreshth Srivastav",
-        bio: "<p>Shreshth Srivastav is a focused student from India, currently advancing in his Bachelor's degree in Computer Science and Engineering. He is a dedicated CSE student who takes pleasure in coding and generating inventive solutions to address real-world problems.</p>",
+        bio: "<p class='studentauthorbio header-p-author-description'>Shreshth Srivastav is a focused student from India, currently advancing in his Bachelor's degree in Computer Science and Engineering. He is a dedicated CSE student who takes pleasure in coding and generating inventive solutions to address real-world problems.</p>",
         href: "contact@dmj.one"
     },
     asmi: {
         name: "Asmi Goyal",
-        bio: "<p>Asmi Goyal is an up-and-coming technology enthusiast and computer science student from India. With a passion for innovation, she spends her time exploring new ways to utilize technology to transform the world. Through hard work and dedication, she has developed a strong foundation in coding and is committed to utilizing her skills to create meaningful solutions to complex problems.</p>",
+        bio: "<p class='studentauthorbio header-p-author-description'>Asmi Goyal is an up-and-coming technology enthusiast and computer science student from India. With a passion for innovation, she spends her time exploring new ways to utilize technology to transform the world. Through hard work and dedication, she has developed a strong foundation in coding and is committed to utilizing her skills to create meaningful solutions to complex problems.</p>",
         href: "contact@dmj.one"
     },
     vinayak: {
         name: "Vinayak Awasthi",
-        bio: "<p>Vinayak Awasti is a student from India who is currently pursuing his Bachelor's degree in Computer Science and Engineering. He is a dedicated CSE student who enjoys coding and developing innovative solutions to real-world problems.</p>",
+        bio: "<p class='studentauthorbio header-p-author-description'>Vinayak Awasti is a student from India who is currently pursuing his Bachelor's degree in Computer Science and Engineering. He is a dedicated CSE student who enjoys coding and developing innovative solutions to real-world problems.</p>",
         href: "contact@dmj.one"
     },
     prithak: {
         name: "Prithak Thapa",
-        bio: "<p>Prithak is a student from Nepal who is currently pursuing a Bachelor's degree in Computer Science and Engineering at Shoolini University in India. As a CSE student, he is passionate about programming and enjoys building projects that utilize cutting-edge technologies to solve complex problems.</p>",
+        bio: "<p class='studentauthorbio header-p-author-description'>Prithak is a student from Nepal who is currently pursuing a Bachelor's degree in Computer Science and Engineering at Shoolini University in India. As a CSE student, he is passionate about programming and enjoys building projects that utilize cutting-edge technologies to solve complex problems.</p>",
         href: "contact@dmj.one"
     },
     rijul: {
         name: "Rijul Chaudhary",
-        bio: "<p>Rijul Chaudhary is a dedicated student from India, currently studying for his Bachelor's degree in Computer Science and Engineering at Shoolini University. Rijul has a keen interest in software development and is passionate about using his programming skills to create innovative solutions that address real-world challenges.</p>",
+        bio: "<p class='studentauthorbio header-p-author-description'>Rijul Chaudhary is a dedicated student from India, currently studying for his Bachelor's degree in Computer Science and Engineering at Shoolini University. Rijul has a keen interest in software development and is passionate about using his programming skills to create innovative solutions that address real-world challenges.</p>",
         href: "contact@dmj.one"
     },
 
@@ -439,98 +439,98 @@ function processFolder(allAuthors, author_bio) {
 
 const profDetailsBio = {
     'Dr. Pankaj Vaidya': {
-        bio: "<p>Dr. Pankaj Vaidya serves as the Head of the Yogananda School of AI, Computers, and Data Sciences, bringing with him 22 years of teaching experience. His research focuses on the application of Machine Learning in areas such as Drug Discovery and environmental remediation technologies aimed at pollution prevention and control. Dr. Vaidya obtained both his M.Tech (2005) and Ph.D. (2020) in Computer Science Engineering from Shoolini University. His scholarly output includes a variety of international scientific papers and book chapters, alongside books he has both edited and authored, which are published by SCOUPS. Committed to environmental causes, Dr. Vaidya is a nature enthusiast who actively contributes to environmental protection efforts.</p>",
+        bio: "<p class='professorbio header-p-author-description'>Dr. Pankaj Vaidya serves as the Head of the Yogananda School of AI, Computers, and Data Sciences, bringing with him 22 years of teaching experience. His research focuses on the application of Machine Learning in areas such as Drug Discovery and environmental remediation technologies aimed at pollution prevention and control. Dr. Vaidya obtained both his M.Tech (2005) and Ph.D. (2020) in Computer Science Engineering from Shoolini University. His scholarly output includes a variety of international scientific papers and book chapters, alongside books he has both edited and authored, which are published by SCOUPS. Committed to environmental causes, Dr. Vaidya is a nature enthusiast who actively contributes to environmental protection efforts.</p>",
         href: "pankaj.vaidya@shooliniuniversity.com"
     },
     'Dr. Bharti Thakur': {
-        bio: "<p>Bharti Thakur is an Assistant Professor at the Yogananda School of Artificial Intelligence, Computing and Data Science, Shoolini University of Biotechnology and Management Sciences, Solan (HP) India. She is doing her research on ‘Data Mining and Machine Learning’. She holds 10 years of teaching experience.</p>",
+        bio: "<p class='professorbio header-p-author-description'>Bharti Thakur is an Assistant Professor at the Yogananda School of Artificial Intelligence, Computing and Data Science, Shoolini University of Biotechnology and Management Sciences, Solan (HP) India. She is doing her research on ‘Data Mining and Machine Learning’. She holds 10 years of teaching experience.</p>",
         href: "bhartithakur@shooliniuniversity.com"
     },
     'Dr. Pawan Kumar': {
-        bio: "<p>Dr. Pawan Kumar is a assistant Professor at Shoolini University. He has more than 20 years of experience in teaching, research, and administration. He completed his Ph.D.in 2019 from Amity University, Noida with the collaboration of Punjab University, Chandigarh. He is currently working on Optical, Thermal and Electrical Properties of Chalcogenide Glasses/Thin Films.</p>",
+        bio: "<p class='professorbio header-p-author-description'>Dr. Pawan Kumar is a assistant Professor at Shoolini University. He has more than 20 years of experience in teaching, research, and administration. He completed his Ph.D.in 2019 from Amity University, Noida with the collaboration of Punjab University, Chandigarh. He is currently working on Optical, Thermal and Electrical Properties of Chalcogenide Glasses/Thin Films.</p>",
         href: "pawankumarsu783@shooliniuniversity.com"
     },
     'Dr. Ravinder Thakur': {
-        bio: "<p>Dr. Ravinder Thakur is an assistant professor at Shoolini University.</p>",
+        bio: "<p class='professorbio header-p-author-description'>Dr. Ravinder Thakur is an assistant professor at Shoolini University.</p>",
         href: "ravinderthakur@shooliniuniversity.com"
     },
     'Rajesh Williams': {
-        bio: "<p>Rajesh Williams is an English Language professional from Faculty of Liberal Arts.</p>",
+        bio: "<p class='professorbio header-p-author-description'>Rajesh Williams is an English Language professional from Faculty of Liberal Arts.</p>",
         href: "contact@dmj.one"
     },
     'Dr. Ruchika Sharma': {
-        bio: "<p>Dr. Ruchika Sharma is an assistant professor at Shoolini University.</p>",
+        bio: "<p class='professorbio header-p-author-description'>Dr. Ruchika Sharma is an assistant professor at Shoolini University.</p>",
         href: "ruchika@shooliniuniversity.com"
     },
     'Dr. Brij Bhushan Sharma': {
-        bio: "<p>Dr. Brij Bhushan Sharma has an M Tech in Electronics and Communication (2015) is an Associate Professor at the Yogananda School of AI, Computer, and Data Science at Shoolini University, and holds a PhD in Smart Agriculture. He has 8 years of teaching experience and has contributed to numerous academic publications. His research focuses on developing an IoT-based Indirect Solar Dryer and a digital system to check soil fertility using AI.</p>",
+        bio: "<p class='professorbio header-p-author-description'>Dr. Brij Bhushan Sharma has an M Tech in Electronics and Communication (2015) is an Associate Professor at the Yogananda School of AI, Computer, and Data Science at Shoolini University, and holds a PhD in Smart Agriculture. He has 8 years of teaching experience and has contributed to numerous academic publications. His research focuses on developing an IoT-based Indirect Solar Dryer and a digital system to check soil fertility using AI.</p>",
         href: "brijbhushan@shooliniouniversity.com"
     },
     'Abhishek Tomar': {
-        bio: "<p>Abhishek Tomar is an assistant professor at Shoolini University.</p>",
+        bio: "<p class='professorbio header-p-author-description'>Abhishek Tomar is an assistant professor at Shoolini University.</p>",
         href: "abhishektomar@shooliniuniversity.com"
     },
     'Ms. Sakshi Gautam': {
-        bio: "<p>Ms. Sakshi Gautam is an assistant professor at Shoolini University.</p>",
+        bio: "<p class='professorbio header-p-author-description'>Ms. Sakshi Gautam is an assistant professor at Shoolini University.</p>",
         href: "contact@dmj.one"
     },
     'Mr. Raghav Sharma': {
-        bio: "<p>Mr. Raghav Sharma is an assistant professor at Shoolini University.</p>",
+        bio: "<p class='professorbio header-p-author-description'>Mr. Raghav Sharma is an assistant professor at Shoolini University.</p>",
         href: "contact@dmj.one"
     },
     'Dr. Laxman Kathait': {
-        bio: "<p>Dr. Laxman Kathait is an assistant professor at Shoolini University.</p>",
+        bio: "<p class='professorbio header-p-author-description'>Dr. Laxman Kathait is an assistant professor at Shoolini University.</p>",
         href: "contact@dmj.one"
     },
     'Aarchit Joshi': {
-        bio: "<p>Aarchit Joshi is an assistant professor at Shoolini University.</p>",
+        bio: "<p class='professorbio header-p-author-description'>Aarchit Joshi is an assistant professor at Shoolini University.</p>",
         href: "contact@dmj.one"
     },
     'Dr. Anurag Rana': {
-        bio: "<p>Dr. Anurag Rana is a research scientist and an assistant professor at Shoolini University.</p>",
+        bio: "<p class='professorbio header-p-author-description'>Dr. Anurag Rana is a research scientist and an assistant professor at Shoolini University.</p>",
         href: "contact@dmj.one"
     },
     'Puneet Kapoor': {
-        bio: "<p>Puneet Kapoor is Computer Science expert, researcher and a senior assistant professor at Shoolini University.</p>",
+        bio: "<p class='professorbio header-p-author-description'>Puneet Kapoor is Computer Science expert, researcher and a senior assistant professor at Shoolini University.</p>",
         href: "contact@dmj.one"
     },
     'Piyush Sewal': {
-        bio: "<p>Piyush Sewal is an Assistant Professor at the Yogananda School of AI, Computer, and Data Science at Shoolini University, holding a Master's in Computer Applications from HP University, Shimla, and currently pursuing a PhD in Data Science at JP University of Information Technology. His expertise lies in machine learning, distributed data processing, and in-memory computation frameworks. Sewal has passed the UGC National Eligibility Test for Computer Science and Applications in 2018 and 2019, as well as the HP State Eligibility Test in 2018. He brings over a decade of teaching experience and has imparted knowledge through more than 400 lectures at various institutions and organizations, including Rashtrapati Bhawan and the Army Skill Training Center. Committed to social causes, he has also spearheaded several social awareness initiatives and health-related drives.</p>",
+        bio: "<p class='professorbio header-p-author-description'>Piyush Sewal is an Assistant Professor at the Yogananda School of AI, Computer, and Data Science at Shoolini University, holding a Master's in Computer Applications from HP University, Shimla, and currently pursuing a PhD in Data Science at JP University of Information Technology. His expertise lies in machine learning, distributed data processing, and in-memory computation frameworks. Sewal has passed the UGC National Eligibility Test for Computer Science and Applications in 2018 and 2019, as well as the HP State Eligibility Test in 2018. He brings over a decade of teaching experience and has imparted knowledge through more than 400 lectures at various institutions and organizations, including Rashtrapati Bhawan and the Army Skill Training Center. Committed to social causes, he has also spearheaded several social awareness initiatives and health-related drives.</p>",
         href: "piyushsewal@shooliniouniversity.com"
     },
     'Sahil Kashyap': {
-        bio: "<p>Sahil Kashyap is an Assistant Professor at the Yogananda School of AI, Computer, and Data Science at Shoolini University</p>",
+        bio: "<p class='professorbio header-p-author-description'>Sahil Kashyap is an Assistant Professor at the Yogananda School of AI, Computer, and Data Science at Shoolini University</p>",
         href: "sahilkashyap@shooliniouniversity.com"    
     },
     'Sangeeta Kakkar': {
-        bio: "<p>Sangeeta Kakkar is an Assistant Professor at the School of Biological & Environmental Sciences at Shoolini University</p>",
+        bio: "<p class='professorbio header-p-author-description'>Sangeeta Kakkar is an Assistant Professor at the School of Biological & Environmental Sciences at Shoolini University</p>",
         href: "sangeetakakkar@shooliniuniversity.com"
     },
     'Isha Jaswal': {
-        bio: "<p>Isha Jaswal is an Assistant Professor at the School of Biological & Environmental Sciences at Shoolini University</p>",
+        bio: "<p class='professorbio header-p-author-description'>Isha Jaswal is an Assistant Professor at the School of Biological & Environmental Sciences at Shoolini University</p>",
         href: "ishajaswal@shooliniuniversity.com"
     },
     'Sangeeta Kakkar and Isha Jaswal':
     {
-        bio: "<p>Sangeeta Kakkar is an Assistant Professor at the School of Biological & Environmental Sciences at Shoolini University</p><p>Isha Jaswal is an Assistant Professor at the School of Biological & Environmental Sciences at Shoolini University</p>",
+        bio: "<p class='professorbio header-p-author-description'>Sangeeta Kakkar is an Assistant Professor at the School of Biological & Environmental Sciences at Shoolini University</p><p>Isha Jaswal is an Assistant Professor at the School of Biological & Environmental Sciences at Shoolini University</p>",
         href: "sangeetakakkar@shooliniuniversity.com"
     },
     'Dr. Anita Chauhan': {
-        bio: "<p>Dr. Anita Chauhan is an Associate Professor at the School of Biological & Environmental Sciences at Shoolini University</p>",
+        bio: "<p class='professorbio header-p-author-description'>Dr. Anita Chauhan is an Associate Professor at the School of Biological & Environmental Sciences at Shoolini University</p>",
         href: "sangeetakakkar@shooliniuniversity.com"
     },
     'Dr. Garima Rana': {
-        bio: "<p>Dr. Garima Rana is an Assistant Professor at the School of Biological & Environmental Sciences at Shoolini University</p>",
+        bio: "<p class='professorbio header-p-author-description'>Dr. Garima Rana is an Assistant Professor at the School of Biological & Environmental Sciences at Shoolini University</p>",
         href: "ishajaswal@shooliniuniversity.com"
     },
     'Dr. Anita Chauhan and Dr. Garima Rana':
     {
-        bio: "<p>Anita Chauhan is an Associate Professor at the School of Biological & Environmental Sciences at Shoolini University</p><p>Isha Jaswal is an Assistant Professor at the School of Biological & Environmental Sciences at Shoolini University</p><p>Dr. Garima Rana is an Assistant Professor at the School of Biological & Environmental Sciences at Shoolini University</p>",
+        bio: "<p class='professorbio header-p-author-description'>Anita Chauhan is an Associate Professor at the School of Biological & Environmental Sciences at Shoolini University</p><p>Isha Jaswal is an Assistant Professor at the School of Biological & Environmental Sciences at Shoolini University</p><p>Dr. Garima Rana is an Assistant Professor at the School of Biological & Environmental Sciences at Shoolini University</p>",
         href: "sangeetakakkar@shooliniuniversity.com"
     },
     'Dr. Gaurav Gupta':
     {
-        bio: "<p>Dr. Gaurav Gupta, with a BE from Dr B R Ambedkar University (2006), PG and PhD in Computer Science Engineering from KSOU-VIT and Shoolini University (2011, 2019), boasts 13 years of teaching experience. His academic achievements include numerous publications across prestigious platforms like IEEE and Springer, with 138 citations and notable indices (h-index: 5, i10-index: 4), alongside authoring over 12 books. His research focuses on machine learning applications in healthcare and agriculture, leading to the development of innovative mobile applications for Alzheimer's care and AI tools for various sectors. Dr. Gupta's contributions have earned him multiple IEEE awards and reviewer/editorial roles in several scientific journals, underscoring his prominence in smart healthcare/agriculture innovation.</p>",
+        bio: "<p class='professorbio header-p-author-description'>Dr. Gaurav Gupta, with a BE from Dr B R Ambedkar University (2006), PG and PhD in Computer Science Engineering from KSOU-VIT and Shoolini University (2011, 2019), boasts 13 years of teaching experience. His academic achievements include numerous publications across prestigious platforms like IEEE and Springer, with 138 citations and notable indices (h-index: 5, i10-index: 4), alongside authoring over 12 books. His research focuses on machine learning applications in healthcare and agriculture, leading to the development of innovative mobile applications for Alzheimer's care and AI tools for various sectors. Dr. Gupta's contributions have earned him multiple IEEE awards and reviewer/editorial roles in several scientific journals, underscoring his prominence in smart healthcare/agriculture innovation.</p>",
         href: "gauravgupta@shooliniouniversity.com"
     },
 };
@@ -565,7 +565,7 @@ const courseDetailsMap = {
     },
     'csu1075': { 'default': ["Dr. Brij Bhushan Sharma", "CSU1075", "Computer Organization"] },
     'csu1526': { 'default': ["Piyush Sewal", "CSU1526", "Microprocessor and Microcontroller"] },
-    'seaap003': { 'default': ["Sahil Kashyap", "SEAAP003", "Aptitude Development 003"] },
+    'seaap003': { 'default': ["Sahil Kashyap", "SEA-AP003", "Aptitude Development 003"] },
     'csu716': { 'default': ["Sangeeta Kakkar and Isha Jaswal", "CSU716", "Life Skills Training"] },
     'csu1627': { 'default': ["Dr. Anita Chauhan and Dr. Garima Rana", "CSU716", "Mind Wellness"] },
     'csu1162': {
@@ -583,6 +583,12 @@ const courseDetailsMap = {
     'csu1105': {
         'default': ["Aarchit Joshi", "CSU1105", "Formal Languages and Automata Theory"],        
     },
+    'csu1641': {
+        'default': ["Dr. Arvind Sharma", "CSU1641", "Cyber Security"],        
+    },
+    'seaap004': { 'default': ["Anandita", "SEA-AP004", "Aptitude Development 004"]},
+    'seaws004': { 'default': ["Chen Chun", "SEA-WS004", "Writing Seminar 004"]},
+    'csu1806': { 'default': ["Payal Khanna", "CSU1806", "Enhancing Leadership through Coaching Skills"]},
 };
 
 ///////////////// VERSION 2.0
@@ -872,9 +878,9 @@ function getrandomline2(allAuthors, allprof) {
 
 
     if (allprof) {
-        return `<p>${randomFirstPart} by ${allAuthors} ${randomSecondPart}</p>`;
+        return `<p class="authorslistline">${randomFirstPart} by ${allAuthors} ${randomSecondPart}</p>`;
     } else {
-        return `<p>${randomFirstPart} by ${allAuthors}</p>`;
+        return `<p class="authorslistline">${randomFirstPart} by ${allAuthors}</p>`;
     }
 }
 
