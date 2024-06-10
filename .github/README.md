@@ -228,7 +228,9 @@ Distributed under the MIT License. See `LICENSE` for more information.
 ## Contact
 
 Project Link: [https://dmj.one/](https://dmj.one)
+
 Founder / Project Lead / Legal: Divya Mohan - [LinkedIn](https://www.linkedin.com/in/divyamohan1993/) - [Email](mailto:divyamohan1993@gmail.com)
+
 Contributors: 
 
 <!--
