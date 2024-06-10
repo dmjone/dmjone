@@ -1,6 +1,6 @@
 Copyright © 2023 Divya Mohan. All rights reserved.
 
-Unless stated otherwise, this repository is protected under the terms of the GNU Affero General Public License, version 3 or later. If the notice "Copyright © YYYY Divya Mohan. All rights reserved." is present either in the file itself where the code is present or on the page from where it has been called using that piece of code, then all rights are reserved, and you must contact us for permission to use or distribute the software at [contact [at] dmj.one](mailto:contact@dmj.one).
+Unless stated otherwise, this repository is protected under the terms of the GNU Affero General Public License, version 3 or later. If the notice "Copyright © YYYY AuthorName | dmj.one. All rights reserved." is present either in the file itself where the code is present or on the page from where it has been called using that piece of code, then all rights are reserved, and you must contact us for permission to use or distribute the software at [contact [at] dmj.one](mailto:contact@dmj.one).
 
 Should you want to review the terms of the license, please visit [GNU Affero General Public License v3](https://www.gnu.org/licenses/agpl-3.0.html). For convenience, the license is also attached below.
 ***
