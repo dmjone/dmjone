@@ -223,7 +223,7 @@ Thank you for your contributions!
 
 ## License
 
-Distributed under the MIT License. See `LICENSE` for more information.
+Distributed under the GNU Affero General Public License, version 3 or later. See `LICENSE` for more information.
 
 ## Contact
 
