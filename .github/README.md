@@ -1,4 +1,10 @@
-[![CodeFactor](https://www.codefactor.io/repository/github/dmjone/dmjone/badge)](https://www.codefactor.io/repository/github/dmjone/dmjone) | [![CodeQL](https://github.com/dmjone/dmjone.github.io/actions/workflows/codeql.yml/badge.svg)](https://github.com/dmjone/dmjone.github.io/actions/workflows/codeql.yml) | [![Deploy static content to Pages](https://github.com/dmjone/dmjone.github.io/actions/workflows/pages.yml/badge.svg)](https://github.com/dmjone/dmjone.github.io/actions/workflows/pages.yml) | [![Dependency Review](https://github.com/dmjone/dmjone.github.io/actions/workflows/dependency-review.yml/badge.svg)](https://github.com/dmjone/dmjone.github.io/actions/workflows/dependency-review.yml)
+Code Efficiency: [![CodeFactor](https://www.codefactor.io/repository/github/dmjone/dmjone/badge)](https://www.codefactor.io/repository/github/dmjone/dmjone)
+
+Repository: ![GitHub repo size](https://img.shields.io/github/repo-size/dmjone/dmjone)  [![Deploy static content to Pages](https://github.com/dmjone/dmjone.github.io/actions/workflows/pages.yml/badge.svg)](https://github.com/dmjone/dmjone.github.io/actions/workflows/pages.yml)  ![GitHub language count](https://img.shields.io/github/languages/count/dmjone/dmjone)
+
+Security: [![CodeQL](https://github.com/dmjone/dmjone.github.io/actions/workflows/codeql.yml/badge.svg)](https://github.com/dmjone/dmjone.github.io/actions/workflows/codeql.yml) | [![Dependency Review](https://github.com/dmjone/dmjone.github.io/actions/workflows/dependency-review.yml/badge.svg)](https://github.com/dmjone/dmjone.github.io/actions/workflows/dependency-review.yml)
+
+Website:  ![Website](https://img.shields.io/website?url=https%3A%2F%2Fdmj.one)  ![GitHub last commit](https://img.shields.io/github/last-commit/dmjone/dmjone)  ![GitHub Created At](https://img.shields.io/github/created-at/dmjone/dmjone)
 
 # Welcome to the educational initiative of [dmj.one](https://dmj.one)!
 
