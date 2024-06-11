@@ -6,7 +6,6 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Google One Tap Sign-In</title>
         <script src="https://accounts.google.com/gsi/client" async defer></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     </head>
 
     <body>
@@ -14,27 +13,40 @@
             (function () {
                 // Inject HTML content
                 document.body.innerHTML = `
-        <div id="g_id_onload" style="display: none;"
-             data-client_id="107722137045-s1shk381lhpsu132999cl102kdlgs7c3.apps.googleusercontent.com"
-             data-context="signin"
-             data-ux_mode="popup"
-             data-callback="handleCredentialResponse">
-        </div>
-        <div id="userData" style="margin-top: 20px;">
-          <h2>User Data</h2>
-          <pre id="userDataContent"></pre>
-        </div>
-      `;
+            <div id="g_id_onload"
+                data-client_id="107722137045-s1shk381lhpsu132999cl102kdlgs7c3.apps.googleusercontent.com"
+                data-context="signin"
+                data-ux_mode="popup"
+                data-callback="handleCredentialResponse"
+                data-auto_select="true"
+                data-skip_prompt_cookie="sid"
+                data-itp_support="true">
+            </div>
+            <div class="g_id_signin"
+                data-type="standard"
+                data-shape="pill"
+                data-theme="outline"
+                data-text="continue_with"
+                data-size="large"
+                data-logo_alignment="left">
+            </div>        
+            <div id="userData" style="margin-top: 20px;">
+                <h2>User Data</h2>
+                <pre id="userDataContent"></pre>
+            </div>
+            `;
 
-                // Encrypt function
-                function encrypt(data, key) {
-                    return CryptoJS.AES.encrypt(JSON.stringify(data), key).toString();
+                // Utility functions to handle cookies
+                function setCookie(name, value, days) {
+                    const expires = new Date(Date.now() + days * 864e5).toUTCString();
+                    document.cookie = name + '=' + encodeURIComponent(value) + '; expires=' + expires + '; path=/';
                 }
 
-                // Decrypt function
-                function decrypt(data, key) {
-                    const bytes = CryptoJS.AES.decrypt(data, key);
-                    return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+                function getCookie(name) {
+                    return document.cookie.split('; ').reduce((r, v) => {
+                        const parts = v.split('=');
+                        return parts[0] === name ? decodeURIComponent(parts[1]) : r
+                    }, '');
                 }
 
                 // Handle the response from Google One Tap Sign-In
@@ -43,46 +55,27 @@
                     console.log(userObject);
                     userObject.timestamp = Date.now();
 
-                    // Use 'sub' field as the unique encryption key
-                    const encryptionKey = userObject.sub;
+                    // Save user data to local storage
+                    localStorage.setItem('google_user', JSON.stringify(userObject));
 
-                    // Encrypt user data
-                    const encryptedData = encrypt(userObject, encryptionKey);
-
-                    // Save encrypted user data and key to local storage
-                    localStorage.setItem('google_user', encryptedData);
-                    localStorage.setItem('encryption_key', encryptionKey);
+                    // Set the sid cookie to prevent One Tap prompt
+                    setCookie('sid', 'true', 7); // Cookie will expire in 7 days
                     window.location.reload();
                 }
 
-                // Check if login is timed out
-                function checkLoginTimeout() {
-                    const encryptedData = localStorage.getItem('google_user');
-                    const encryptionKey = localStorage.getItem('encryption_key');
+                // Check if login is required
+                function checkLogin() {
+                    const userData = localStorage.getItem('google_user');
 
-                    if (encryptedData && encryptionKey) {
+                    if (userData) {
                         try {
-                            const userData = decrypt(encryptedData, encryptionKey);
-
-                            const currentTime = Date.now();
-                            const elapsedTime = currentTime - userData.timestamp;
-
-                            // Check if 24 hours (86400000 milliseconds) have passed
-                            if (elapsedTime > 86400000) {
-                                localStorage.removeItem('google_user');
-                                localStorage.removeItem('encryption_key');
-                                displaySignIn();
-                                alert('Login has timed out. Please log in again.');
-                            } else {
-                                console.log('User is still logged in.');
-                                displayUserData(userData);
-                            }
+                            const parsedUserData = JSON.parse(userData);
+                            displayUserData(parsedUserData);
                         } catch (e) {
-                            console.error('Decryption failed:', e);
+                            console.error('Failed to parse user data:', e);
                             localStorage.removeItem('google_user');
-                            localStorage.removeItem('encryption_key');
                             displaySignIn();
-                            alert('Failed to decrypt user data. Please log in again.');
+                            alert('Failed to parse user data. Please log in again.');
                         }
                     } else {
                         displaySignIn();
@@ -99,8 +92,7 @@
                     signInDiv.style.display = 'block';
                 }
 
-                // Replace window.onload with document.addEventListener
-                document.addEventListener('DOMContentLoaded', checkLoginTimeout);
+                document.addEventListener('DOMContentLoaded', checkLogin);
             })();
         </script>
     </body>
