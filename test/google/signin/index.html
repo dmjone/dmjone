@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Google One Tap Sign-In</title>
+        <script src="https://accounts.google.com/gsi/client" async defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    </head>
+
+    <body>
+        <!-- Add a div to display sign-in button -->
+        <div id="g_id_onload" data-client_id="107722137045-s1shk381lhpsu132999cl102kdlgs7c3.apps.googleusercontent.com" data-context="signin" data-ux_mode="popup" data-callback="handleCredentialResponse">
+        </div>
+
+        <!-- Div to display user data -->
+        <div id="userData" style="margin-top: 20px;">
+            <h2>User Data</h2>
+            <pre id="userDataContent"></pre>
+        </div>
+
+        <script>
+            // Encrypt function
+            function encrypt(data, key) {
+                return CryptoJS.AES.encrypt(JSON.stringify(data), key).toString();
+            }
+
+            // Decrypt function
+            function decrypt(data, key) {
+                const bytes = CryptoJS.AES.decrypt(data, key);
+                return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+            }
+
+            // Handle the response from Google One Tap Sign-In
+            function handleCredentialResponse(response) {
+                const userObject = JSON.parse(atob(response.credential.split('.')[1]));
+                console.log(userObject);
+                userObject.timestamp = Date.now();
+
+                // Use 'sub' field as the unique encryption key
+                const encryptionKey = userObject.sub;
+
+                // Encrypt user data
+                const encryptedData = encrypt(userObject, encryptionKey);
+
+                // Save encrypted user data to local storage
+                localStorage.setItem('google_user', encryptedData);
+                window.location.reload();
+            }
+
+            // Check if login is timed out
+            function checkLoginTimeout() {
+                const encryptedData = localStorage.getItem('google_user');
+                if (encryptedData) {
+                    // Attempt to decrypt using stored sub (unique ID)
+                    try {
+                        const tempData = JSON.parse(atob(encryptedData.split('.')[1]));
+                        const encryptionKey = tempData.sub;
+                        const userData = decrypt(encryptedData, encryptionKey);
+
+                        const currentTime = Date.now();
+                        const elapsedTime = currentTime - userData.timestamp;
+
+                        // Check if 24 hours (86400000 milliseconds) have passed
+                        if (elapsedTime > 86400000) {
+                            localStorage.removeItem('google_user');
+                            alert('Login has timed out. Please log in again.');
+                        } else {
+                            console.log('User is still logged in.');
+                            displayUserData(userData);
+                        }
+                    } catch (e) {
+                        console.error('Decryption failed:', e);
+                        localStorage.removeItem('google_user');
+                        alert('Failed to decrypt user data. Please log in again.');
+                    }
+                }
+            }
+
+            function displayUserData(userData) {
+                const userDataContent = document.getElementById('userDataContent');
+                userDataContent.textContent = JSON.stringify(userData, null, 2);
+            }
+
+            window.onload = checkLoginTimeout;
+        </script>
+    </body>
+
+</html>
