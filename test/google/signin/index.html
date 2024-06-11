@@ -10,82 +10,98 @@
     </head>
 
     <body>
-        <!-- Add a div to display sign-in button -->
-        <div id="g_id_onload" data-client_id="107722137045-s1shk381lhpsu132999cl102kdlgs7c3.apps.googleusercontent.com" data-context="signin" data-ux_mode="popup" data-callback="handleCredentialResponse">
-        </div>
-
-        <!-- Div to display user data -->
-        <div id="userData" style="margin-top: 20px;">
-            <h2>User Data</h2>
-            <pre id="userDataContent"></pre>
-        </div>
-
         <script>
-            // Encrypt function
-            function encrypt(data, key) {
-                return CryptoJS.AES.encrypt(JSON.stringify(data), key).toString();
-            }
+            (function () {
+                // Inject HTML content
+                document.body.innerHTML = `
+        <div id="g_id_onload" style="display: none;"
+             data-client_id="107722137045-s1shk381lhpsu132999cl102kdlgs7c3.apps.googleusercontent.com"
+             data-context="signin"
+             data-ux_mode="popup"
+             data-callback="handleCredentialResponse">
+        </div>
+        <div id="userData" style="margin-top: 20px;">
+          <h2>User Data</h2>
+          <pre id="userDataContent"></pre>
+        </div>
+      `;
 
-            // Decrypt function
-            function decrypt(data, key) {
-                const bytes = CryptoJS.AES.decrypt(data, key);
-                return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-            }
+                // Encrypt function
+                function encrypt(data, key) {
+                    return CryptoJS.AES.encrypt(JSON.stringify(data), key).toString();
+                }
 
-            // Handle the response from Google One Tap Sign-In
-            function handleCredentialResponse(response) {
-                const userObject = JSON.parse(atob(response.credential.split('.')[1]));
-                console.log(userObject);
-                userObject.timestamp = Date.now();
+                // Decrypt function
+                function decrypt(data, key) {
+                    const bytes = CryptoJS.AES.decrypt(data, key);
+                    return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+                }
 
-                // Use 'sub' field as the unique encryption key
-                const encryptionKey = userObject.sub;
+                // Handle the response from Google One Tap Sign-In
+                window.handleCredentialResponse = function (response) {
+                    const userObject = JSON.parse(atob(response.credential.split('.')[1]));
+                    console.log(userObject);
+                    userObject.timestamp = Date.now();
 
-                // Encrypt user data
-                const encryptedData = encrypt(userObject, encryptionKey);
+                    // Use 'sub' field as the unique encryption key
+                    const encryptionKey = userObject.sub;
 
-                // Save encrypted user data and key to local storage
-                localStorage.setItem('google_user', encryptedData);
-                localStorage.setItem('encryption_key', encryptionKey);
-                window.location.reload();
-            }
+                    // Encrypt user data
+                    const encryptedData = encrypt(userObject, encryptionKey);
 
-            // Check if login is timed out
-            function checkLoginTimeout() {
-                const encryptedData = localStorage.getItem('google_user');
-                const encryptionKey = localStorage.getItem('encryption_key');
+                    // Save encrypted user data and key to local storage
+                    localStorage.setItem('google_user', encryptedData);
+                    localStorage.setItem('encryption_key', encryptionKey);
+                    window.location.reload();
+                }
 
-                if (encryptedData && encryptionKey) {
-                    try {
-                        const userData = decrypt(encryptedData, encryptionKey);
+                // Check if login is timed out
+                function checkLoginTimeout() {
+                    const encryptedData = localStorage.getItem('google_user');
+                    const encryptionKey = localStorage.getItem('encryption_key');
 
-                        const currentTime = Date.now();
-                        const elapsedTime = currentTime - userData.timestamp;
+                    if (encryptedData && encryptionKey) {
+                        try {
+                            const userData = decrypt(encryptedData, encryptionKey);
 
-                        // Check if 24 hours (86400000 milliseconds) have passed
-                        if (elapsedTime > 86400000) {
+                            const currentTime = Date.now();
+                            const elapsedTime = currentTime - userData.timestamp;
+
+                            // Check if 24 hours (86400000 milliseconds) have passed
+                            if (elapsedTime > 86400000) {
+                                localStorage.removeItem('google_user');
+                                localStorage.removeItem('encryption_key');
+                                displaySignIn();
+                                alert('Login has timed out. Please log in again.');
+                            } else {
+                                console.log('User is still logged in.');
+                                displayUserData(userData);
+                            }
+                        } catch (e) {
+                            console.error('Decryption failed:', e);
                             localStorage.removeItem('google_user');
                             localStorage.removeItem('encryption_key');
-                            alert('Login has timed out. Please log in again.');
-                        } else {
-                            console.log('User is still logged in.');
-                            displayUserData(userData);
+                            displaySignIn();
+                            alert('Failed to decrypt user data. Please log in again.');
                         }
-                    } catch (e) {
-                        console.error('Decryption failed:', e);
-                        localStorage.removeItem('google_user');
-                        localStorage.removeItem('encryption_key');
-                        alert('Failed to decrypt user data. Please log in again.');
+                    } else {
+                        displaySignIn();
                     }
                 }
-            }
 
-            function displayUserData(userData) {
-                const userDataContent = document.getElementById('userDataContent');
-                userDataContent.textContent = JSON.stringify(userData, null, 2);
-            }
+                function displayUserData(userData) {
+                    const userDataContent = document.getElementById('userDataContent');
+                    userDataContent.textContent = JSON.stringify(userData, null, 2);
+                }
 
-            window.onload = checkLoginTimeout;
+                function displaySignIn() {
+                    const signInDiv = document.getElementById('g_id_onload');
+                    signInDiv.style.display = 'block';
+                }
+
+                // Replace window.onload with document.addEventListener
+                document.addEventListener('DOMContentLoaded', checkLoginTimeout);
+            })();
         </script>
     </body>
 
