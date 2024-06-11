@@ -44,19 +44,19 @@
                 // Encrypt user data
                 const encryptedData = encrypt(userObject, encryptionKey);
 
-                // Save encrypted user data to local storage
+                // Save encrypted user data and key to local storage
                 localStorage.setItem('google_user', encryptedData);
+                localStorage.setItem('encryption_key', encryptionKey);
                 window.location.reload();
             }
 
             // Check if login is timed out
             function checkLoginTimeout() {
                 const encryptedData = localStorage.getItem('google_user');
-                if (encryptedData) {
-                    // Attempt to decrypt using stored sub (unique ID)
+                const encryptionKey = localStorage.getItem('encryption_key');
+
+                if (encryptedData && encryptionKey) {
                     try {
-                        const tempData = JSON.parse(atob(encryptedData.split('.')[1]));
-                        const encryptionKey = tempData.sub;
                         const userData = decrypt(encryptedData, encryptionKey);
 
                         const currentTime = Date.now();
@@ -64,7 +64,8 @@
 
                         // Check if 24 hours (86400000 milliseconds) have passed
                         if (elapsedTime > 86400000) {
-                            // localStorage.removeItem('google_user');
+                            localStorage.removeItem('google_user');
+                            localStorage.removeItem('encryption_key');
                             alert('Login has timed out. Please log in again.');
                         } else {
                             console.log('User is still logged in.');
@@ -72,7 +73,8 @@
                         }
                     } catch (e) {
                         console.error('Decryption failed:', e);
-                        // localStorage.removeItem('google_user');
+                        localStorage.removeItem('google_user');
+                        localStorage.removeItem('encryption_key');
                         alert('Failed to decrypt user data. Please log in again.');
                     }
                 }
