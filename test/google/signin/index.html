@@ -6,37 +6,59 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Google One Tap Sign-In</title>
         <script src="https://accounts.google.com/gsi/client" async defer></script>
+        <style>
+            body {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                margin: 0;
+                flex-direction: column;
+                background-color: #f4f4f9;
+            }
+
+            #logo {
+                margin-bottom: 20px;
+            }
+
+            .g_id_signin {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            #userData {
+                margin-top: 20px;
+                text-align: center;
+            }
+
+            table {
+                margin: 20px auto;
+                border-collapse: collapse;
+                width: 80%;
+            }
+
+            table,
+            th,
+            td {
+                border: 1px solid black;
+            }
+
+            th,
+            td {
+                padding: 10px;
+                text-align: left;
+            }
+
+            th {
+                background-color: #f2f2f2;
+            }
+        </style>
     </head>
 
     <body>
         <script>
             (function () {
-                // Inject HTML content
-                document.body.innerHTML = `
-            <div id="g_id_onload"
-                data-client_id="107722137045-s1shk381lhpsu132999cl102kdlgs7c3.apps.googleusercontent.com"
-                data-context="signin"
-                data-ux_mode="popup"
-                data-callback="handleCredentialResponse"
-                data-auto_select="true"
-                data-skip_prompt_cookie="sid"
-                data-itp_support="true">
-            </div>
-            <div class="g_id_signin"
-                data-type="standard"
-                data-skip_prompt_cookie="sid"
-                data-shape="pill"
-                data-theme="outline"
-                data-text="continue_with"
-                data-size="large"
-                data-logo_alignment="left">
-            </div>        
-            <div id="userData" style="margin-top: 20px;">
-                <h2>User Data</h2>
-                <pre id="userDataContent"></pre>
-            </div>
-            `;
-
                 // Utility functions to handle cookies
                 function setCookie(name, value, days) {
                     const expires = new Date(Date.now() + days * 864e5).toUTCString();
@@ -53,7 +75,6 @@
                 // Handle the response from Google One Tap Sign-In
                 window.handleCredentialResponse = function (response) {
                     const userObject = JSON.parse(atob(response.credential.split('.')[1]));
-                    console.log(userObject);
                     userObject.timestamp = Date.now();
 
                     // Save user data to local storage
@@ -61,7 +82,9 @@
 
                     // Set the sid cookie to prevent One Tap prompt
                     setCookie('sid', 'true', 7); // Cookie will expire in 7 days
-                    window.location.reload();
+
+                    // Redirect to dmj.one
+                    // window.location.href = 'https://dmj.one';
                 }
 
                 // Check if login is required
@@ -84,14 +107,54 @@
                 }
 
                 function displayUserData(userData) {
-                    const userDataContent = document.getElementById('userDataContent');
-                    userDataContent.textContent = JSON.stringify(userData, null, 2);
+                    const userDataTable = `
+                    <table>
+                        <tr><th>Field</th><th>Value</th></tr>
+                        <tr><td>ISS</td><td><hidden></td></tr>
+                        <tr><td>AZP</td><td><hidden></td></tr>
+                        <tr><td>AUD</td><td><hidden></td></tr>
+                        <tr><td>SUB</td><td><hidden></td></tr>
+                        <tr><td>Email</td><td>${userData.email}</td></tr>
+                        <tr><td>Email Verified</td><td>${userData.email_verified}</td></tr>
+                        <tr><td>Name</td><td>${userData.name}</td></tr>
+                        <tr><td>Given Name</td><td>${userData.given_name}</td></tr>
+                        <tr><td>Family Name</td><td>${userData.family_name}</td></tr>
+                        <tr><td>Picture</td><td><img src="${userData.picture}" alt="User Picture"></td></tr>
+                    </table>
+                `;
+                    document.getElementById('userData').innerHTML = userDataTable;
                 }
 
                 function displaySignIn() {
                     const signInDiv = document.getElementById('g_id_onload');
                     signInDiv.style.display = 'block';
                 }
+
+                // Inject HTML content
+                const skipPromptCookie = getCookie('sid');
+                document.body.innerHTML = `
+                <img id="logo" src="/logo.png" alt="DMJ One Logo">
+                <div id="g_id_onload"
+                    data-client_id="107722137045-s1shk381lhpsu132999cl102kdlgs7c3.apps.googleusercontent.com"
+                    data-context="signin"
+                    data-ux_mode="popup"
+                    data-callback="handleCredentialResponse"
+                    data-auto_select="true"
+                    data-skip_prompt_cookie="sid"
+                    data-itp_support="true">
+                </div>
+                ${!skipPromptCookie ? `
+                <div class="g_id_signin"
+                    data-type="standard"
+                    data-skip_prompt_cookie="sid"
+                    data-shape="pill"
+                    data-theme="outline"
+                    data-text="continue_with"
+                    data-size="large"
+                    data-logo_alignment="left">
+                </div>` : ''}
+                <div id="userData"></div>
+            `;
 
                 document.addEventListener('DOMContentLoaded', checkLogin);
             })();
