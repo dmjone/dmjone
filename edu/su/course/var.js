@@ -193,18 +193,7 @@ function get_menu_list(datetogen) {
     }
 
     /**********  AUTOMATION CONTROL **********/
-    // Get Random date near the entered date. 
-    function gendate(date) {
-        var inputDate = new Date(date);
-        var offset = Math.floor(Math.random() * 20 - 10) * 24 * 60 * 60 * 1000;
-        var newDate = new Date(inputDate.getTime() + offset);
-        var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-        var weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-        var outputDate = weekdays[newDate.getUTCDay()] + " " + months[newDate.getUTCMonth()] + " " + newDate.getUTCDate() + ", " + newDate.getUTCFullYear();
-        return outputDate;
-    }
-    function r(t) { return Math.floor(Math.random() * 10) + t }
-    var title, desc, codetype, readtime, author = 1, link, semester;
+    let title, link, date, desc, codetype, readtime, author, semester, cardimage, continuereading;
     const functions = {
         course: get_course,
         // seminar: get_seminar,

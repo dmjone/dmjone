@@ -117,7 +117,7 @@ function get_menu_list(datetogen) {
         return outputDate;
     }
     function r(t) { return Math.floor(Math.random() * 10) + t }
-    var title, desc, codetype, readtime, author = 1, link, semester, cardimage;
+    let title, link, date, desc, codetype, readtime, author, semester, cardimage, continuereading;
     const functions = {
         theory: get_theory,
         practical: get_practical,

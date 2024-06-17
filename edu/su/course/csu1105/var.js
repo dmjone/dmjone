@@ -17,30 +17,10 @@ function get_menu_list(datetogen) {
             }
         ];
 
-        for (let i = 0; i < arr.length; i++) {
-            const _data = arr[i];
-            title = _data.title || null; if (!title) continue; // Set the title and if thats not possible, skip the loop
-            link = _data.link || null;
-            date = _data.date ? _data.date : `${gendate(def_date)}`;
-            desc = _data.desc || `${title}`;
-            codetype = _data.codetype ? `${_data.codetype}` : `CSU1105`;
-            readtime = _data.readtime || r(4); readtime = null; // Null readtime - Special Case
-            author = _data.author || def_author; author = null; // Null author - Special Case
-            semester = _data.semester || null;
-            cardimage = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? _data.cardimage_dark : _data.cardimage || null;
-            continuereading = _data.continuereading || null;
-            body_blockcards(link, date, title, desc, codetype, readtime, author, semester, cardimage, continuereading);
-        }
+        body_genmenu.processData(arr, def_date, def_author, { isMainCategory: true});
     }
     function get_class(def_date, def_author) {
         const arr = [
-            // {
-            //     title: "Exploring Python: A Deep Dive into Its Universe",
-            //     desc: "Embark on a comprehensive exploration of Python, from its inception to its pivotal role in today's tech landscape. Understand the 'why' behind its creation, its evolutionary journey, key advantages, and the challenges it faces. Discover its applications, influence on technology, and what the future holds. This article offers a holistic view of Python, providing readers with a strong foundation and motivation for further exploration.",
-            //     codetype: "Why Python",
-            //     readtime: 5,
-            //     link: "why-python"
-            // },
             {
                 "title": "Cases of DFA, NFA, RE, Grammar, Mealy, and Moore",
                 "desc": "This comprehensive article presents a series of cases involving Deterministic Finite Automata (DFA), Nondeterministic Finite Automata (NFA), Regular Expressions (RE), Grammars, Mealy Machines, and Moore Machines. From theoretical foundations to practical applications, explore how these concepts are employed in language processing, compiler design, digital circuit design, and algorithm development. Each case study highlights the unique advantages, challenges, and solutions provided by these models in solving complex computational problems, offering insights into their interconnections and the elegant structure of theoretical computer science.",
@@ -111,64 +91,14 @@ function get_menu_list(datetogen) {
                 "link": "push-down-automata"
             }
         ];
-        for (let i = 0; i < arr.length; i++) {
-            const _data = arr[i];
-            title = _data.title || null; if (!title) continue; // Set the title and if thats not possible, skip the loop
-            link = _data.link || `c${i + 1}`;
-            date = _data.date ? _data.date : `${gendate(def_date)}`;
-            desc = _data.desc || `${title} ${i}`;
-            codetype = _data.codetype ? `CSU1105 | ${_data.codetype}` : `CSU1105 | Concepts`;
-            readtime = _data.readtime || r(4);
-            author = _data.author || def_author;
-            semester = _data.semester || null;
-            cardimage = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? _data.cardimage_dark : _data.cardimage || null;
-            continuereading = _data.continuereading || null;
-            body_blockcards(link, date, title, desc, codetype, readtime, author, semester, cardimage, continuereading);
-        }
-    }
-    function get_lab(def_date, def_author) {
-        const arr = [
-            // {
-            //     title: "Interactive Sorting Algorithms Visualizer",
-            //     desc: "Explore and visualize the workings of various sorting algorithms including Bubble Sort, Merge Sort, Quick Sort, and more. This interactive tool offers a step-by-step breakdown, allowing you to understand the mechanics and efficiency of each algorithm.",
-            //     author: "Divya Mohan",
-            //     link: "https://colab.research.google.com/drive/1goYusw-6vB2d2qZtxo4V1kt4mmLBrN11?usp=sharing",
-            //     // cardimage: "_url_"
-            // },                      
-        ];
-        for (let i = 0; i < arr.length; i++) {
-            const _data = arr[i];
-            title = _data.title || null; if (!title) continue; // Set the title and if thats not possible, skip the loop
-            link = _data.link || `p${i + 1}`;
-            date = _data.date ? _data.date : `${gendate(def_date)}`;
-            desc = _data.desc || `${title} ${i}`;
-            codetype = _data.codetype ? `CSU1162P | ${_data.codetype}` : `CSU1162P | Lab`;
-            readtime = _data.readtime || r(5);
-            author = _data.author || def_author;
-            semester = _data.semester || null;
-            cardimage = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? _data.cardimage_dark : _data.cardimage || null;
-            continuereading = _data.continuereading || null;
-            body_blockcards(link, date, title, desc, codetype, readtime, author, semester, cardimage, continuereading);
-        }
+        body_genmenu.processData(arr, def_date, def_author);
     }
 
 
     /**********  AUTOMATION CONTROL **********/
-    // Get Random date near the entered date. 
-    function gendate(date) {
-        var inputDate = new Date(date);
-        var offset = Math.floor(Math.random() * 20 - 10) * 24 * 60 * 60 * 1000;
-        var newDate = new Date(inputDate.getTime() + offset);
-        var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-        var weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-        var outputDate = weekdays[newDate.getUTCDay()] + " " + months[newDate.getUTCMonth()] + " " + newDate.getUTCDate() + ", " + newDate.getUTCFullYear();
-        return outputDate;
-    }
-    function r(t) { return Math.floor(Math.random() * 10) + t }
-    var title, desc, codetype, readtime, author = 1, link, semester, cardimage, continuereading;
+    let title, link, date, desc, codetype, readtime, author = 1, semester, cardimage, continuereading;
     const functions = {
         theory: get_class,
-        lab: get_lab,
         default: get_main
     };
     (functions[window.urlpart5] || functions.default)(datetogen, author);

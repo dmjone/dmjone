@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Dynamic Navbar</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/css/bootstrap.min.css">
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    </head>
+
+    <body>
+        <nav class="navbar navbar-expand-md sticky-top mw-100 px-3 py-sm-1 mb-1 nav-transparent fadein-5" data-bs-theme="dark" id="navbar-container">
+            <!-- Navbar content will be inserted here by JavaScript -->
+        </nav>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                fetch('/js/courselist.json')
+                    .then(response => response.json())
+                    .then(data => {
+                        const coursesBySemester = data.reduce((acc, course) => {
+                            const semester = course.details.semester;
+                            if (!acc[semester]) {
+                                acc[semester] = [];
+                            }
+                            acc[semester].push(course);
+                            return acc;
+                        }, {});
+
+                        const navbarContainer = document.getElementById('navbar-container');
+                        navbarContainer.innerHTML = generateNavbarHTML(coursesBySemester);
+                    })
+                    .catch(error => console.error('Error fetching courses:', error));
+            });
+
+            function generateNavbarHTML(coursesBySemester) {
+                let navbarHTML = `
+                <div class="container-fluid">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <a class="navbar-brand" href="/">
+                            <img src="/logo.png" alt="dmj.one Logo" style="height: 50px;">
+                        </a>
+                    </div>
+                    <div class="d-flex align-items-center justify-content-between align-items-center">
+                        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
+                    </div>
+                    <div class="collapse navbar-collapse dropdown-center justify-content-center" id="navbar">
+                        <ul class="navbar-nav mx-auto">
+                            <li class="nav-item"><a class="nav-link active" href="/">Home</a></li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Courses</a>
+                                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-lg-start" aria-labelledby="navbarDropdown">
+            `;
+
+                for (const [semester, courses] of Object.entries(coursesBySemester)) {
+                    navbarHTML += `
+                    <li class="dropdown-submenu">
+                        <a class="dropdown-item dropdown-toggle" href="#">${semester}</a>
+                        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-lg-start">
+                `;
+
+                    courses.forEach(course => {
+                        navbarHTML += `<li><a class="dropdown-item" href="/edu/su/course/${course.id}/">${course.title}</a></li>`;
+                    });
+
+                    navbarHTML += `
+                        </ul>
+                    </li>
+                `;
+                }
+
+                navbarHTML += `
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">Initiatives</a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="/about" data-toggle="tooltip" data-placement="top" title="Visit our Educational Initiative." data-original-title="Visit our Educational Initiative.">Educational</a></li>
+                                </ul>
+                            </li>
+                            <li class="nav-item"><a class="nav-link" href="mailto:contact@dmj.one">Contact</a></li>
+                        </ul>
+                        <button id="search-button" type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#searchbox"><i class="bi bi-search"></i></button>
+                    </div>
+                </div>
+            `;
+
+                return navbarHTML;
+            }
+        </script>
+    </body>
+
+</html>

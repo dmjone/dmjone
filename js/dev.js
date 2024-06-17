@@ -6,13 +6,19 @@
 const body_blockcards_continuereading_options = ['Expand Your Knowledge', 'Keep Learning', 'Feed Your Curiosity', 'Keep Your Mind Active', 'Learn More With Us', 'Stay Curious', 'Keep Discovering', 'Feed Your Brain', "Don't Stop Learning", 'Keep Exploring', 'Keep Absorbing', 'Continue Your Learning Journey', 'Unlock More Learning', 'Keep Developing Your Understanding', 'Expand Your Perspective', 'Keep Your Mind Engaged', 'The Learning Continues', 'Stay Inquisitive', 'Keep Your Brain Engaged', 'Keep Your Intellectual Fire Burning', 'Keep Challenging Yourself', 'Stay On The Learning Path', 'The Adventure Continues', 'Keep Your Mind Open', 'Stay Focused On Learning', 'Keep Your Learning Moving', 'Keep Expanding Your Mind', 'Keep Progressing In Your Learning', 'The Learning Never Stops', 'Keep Your Intellect Fueled', 'Keep Your Brain Buzzing', 'Keep Your Learning Journey Thriving', 'Keep Your Curiosity Alive', 'Keep Your Mind Alert', 'Keep Building Your Knowledge', 'Stay Invested In Your Learning', 'Keep Building Your Expertise', 'The Learning Journey Continues', 'Keep Your Understanding Evolving', 'Keep Your Learning Momentum Going', 'Keep Pushing Your Limits', 'Stay On The Path To Learning', 'Keep Unleashing Your Potential', 'Unlock More Insights', 'Dive Deeper Into Knowledge', 'Embrace the Learning Adventure', 'Ignite Your Intellectual Spark', 'Pursue Your Quest for Knowledge', 'Embark on Your Learning Voyage', 'Unearth More Wisdom', 'Uncover More Learning Treasures', 'Boost Your Brainpower', 'Elevate Your Understanding', 'Experience the Joy of Learning', 'Extend Your Intellectual Horizons', 'Accelerate Your Learning Journey', 'Illuminate Your Mind', 'Foster Your Learning Growth', 'Cultivate Your Knowledge Garden', 'Propel Your Learning Forward', 'Stoke Your Curiosity', 'Nurture Your Thirst for Knowledge', 'Enrich Your Learning Experience', 'Amplify Your Knowledge', 'Advance Your Learning Expedition', 'Expand Your Learning Universe', 'Sharpen Your Intellect', 'Reveal More Knowledge Mysteries', 'Bolster Your Learning Power', 'Invigorate Your Mind', 'Fuel Your Learning Journey', 'Boost Your Educational Enthusiasm', 'Extend Your Learning Odyssey', 'Broaden Your Knowledge Base', 'Deepen Your Understanding', 'Unfold More Learning Secrets', 'Unravel More Learning Mysteries', 'Explore Further into Knowledge', 'Progress Along Your Learning Path', 'Supercharge Your Learning', 'Venture Deeper into Knowledge', 'Advance Your Knowledge Quest', 'Quench Your Knowledge Thirst', 'Continue Your Intellectual Journey', 'Further Your Learning Adventure', 'Magnify Your Learning Experience', 'Dive Into the Knowledge Ocean', 'Illuminate Your Learning Path', 'Pioneer Your Learning Journey', 'Elevate Your Learning Endeavor', 'Enhance Your Learning Expedition', 'Galvanize Your Learning Pursuit', 'Deepen Your Knowledge Dive'];
 
 const cdnjs_jquery = "https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js";
-const cdnjs_bootstrap = "https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js";
+const cdnjs_bootstrap = "https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js";
 const cdnjs_highlightjs = "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js";
 const cdnjs_highlightjs_asm = "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/armasm.min.js";
 const cdnjs_katex = "https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js";
 const cdnjs_katex_autorender = "https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js";
 const cdnjs_font_awesome = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js";
 const cdnjs_cryptoJS = "https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js";
+const google_login_js = "https://accounts.google.com/gsi/client";
+const randomidgenerator = (i = 10) => [...Array(i)].map(() => 'abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRTUVWXYZ23456789'[Math.floor(Math.random() * 55)]).join('');
+
+const maintainence_mode = 1;
+const maintainence_message = "Some links, images, and features may not work as expected. Thank you for your patience.";
+
 // const body_pomodoro_helptext = "The Pomodoro Technique is a time management method developed by Francesco Cirillo in the late 1980s. The technique uses a timer to break down work into intervals, traditionally 25 minutes in length, separated by short breaks. These intervals are named pomodoros, the plural in English of the Italian word pomodoro (tomato), after the tomato-shaped kitchen timer that Cirillo used as a university student. The technique has been widely popularized by dozens of apps and websites providing timers and instructions. Closely related to concepts such as timeboxing and iterative and incremental development used in software design, the method has been adopted in pair programming contexts.";
 const body_pomodoro_helptext = `
 <h2 style="color: #FFD700; margin-bottom: 1rem;">Time for a Break!</h2>
@@ -293,7 +299,7 @@ const body_pomodoro_helptext = `
     window.GetCourseSpecificBaseFile = getJsUrl;
     try {
         document.write(`<script src='${getJsUrl("var.js")}'></script>`);
-    } catch (e) { console.log("Could not load js". e)}
+    } catch (e) { console.log("Could not load js".e) }
 
     (function () {
         var appendScript = function () {
@@ -347,7 +353,7 @@ const body_pomodoro_helptext = `
     //         } catch (e) {'Could Not load encrytion.'}
     //     }
     // })();
-    
+
     (function () {
         if (!window.dnfetchenc) {
             try {
@@ -360,10 +366,17 @@ const body_pomodoro_helptext = `
                                 throw response;
                             }
                         }
+                        // if responce is empty json throw it
+                        if (response.headers.get('content-length') === '0') {
+                            return;
+                        }
                         return response.json();
                     })
                     .then(data => {
                         // your code here
+                        if (!data) {
+                            return;
+                        }
                         let cryptojs_enc_map = data;
                         let urlParts = window.location.pathname.split('/').filter(Boolean);
                         let current_map = cryptojs_enc_map;
@@ -398,7 +411,7 @@ const body_pomodoro_helptext = `
     var qrcode_js = "/js/qrcode.js";
     document.write(`<script src='${qrcode_js}'></script>`);
 
-    const allScripts = [cdnjs_jquery, cdnjs_bootstrap, cdnjs_highlightjs, cdnjs_font_awesome, cdnjs_cryptoJS, cdnjs_highlightjs_asm];
+    const allScripts = [google_login_js, cdnjs_jquery, cdnjs_bootstrap, cdnjs_highlightjs, cdnjs_font_awesome, cdnjs_cryptoJS, cdnjs_highlightjs_asm];
     var loadScript = function (src) {
         return new Promise(function (resolve, reject) {
             var script = document.createElement('script');
@@ -948,9 +961,22 @@ let header_navbar = function (flags) {
 
     const allLinksHTML = (year1_links ? dropdown(year1_links) : '') + (year2_links ? dropdown(year2_links) : '') + (visible_links ? mainNav(visible_links) : '');
 
-    return `<nav class="navbar navbar-expand-md navbar-dark bg-dark sticky-top mw-100 px-3 py-3 shadow-lg" data-bs-theme="dark"><div class="container-fluid">${headerNavHTML}` +
-        `<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar"aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">` +
-        `<span class="navbar-toggler-icon"></span></button><div class="collapse navbar-collapse" id="navbar"><ul class="navbar-nav ms-auto">${allLinksHTML}</ul></div></div></nav>`;
+    const finallinks = `
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark sticky-top mw-100 px-3 py-3 shadow-lg" data-bs-theme="dark">
+        <div class="container-fluid">
+            ${headerNavHTML}
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse" id="navbar">
+                <ul class="navbar-nav ms-auto">
+                    ${allLinksHTML}
+                    <div id="userMenu"></div>
+                </ul>
+            </div>
+        </div>
+    </nav>`;
+
+    return finallinks;
 };
 
 /********************** Public the author to window variable **************************/
@@ -1012,7 +1038,7 @@ let header_author = function (...args) {
         const path = window.location.pathname.split('/').filter(Boolean); // Split the path and remove empty segments
 
         // Check if the path length is exactly 6
-        if (path.length === 6) {
+        if (path.length >= 5) {
             // Create a link element for the CSS
             const linkElement = document.createElement('link');
             linkElement.rel = 'stylesheet';
@@ -1026,31 +1052,80 @@ let header_author = function (...args) {
 
 (function () {
     document.addEventListener('DOMContentLoaded', function () {
+
+        // GLOBAL CONTROL CENTER - For manual entry just add like this 'Your Text Here' || null || previous values.
+        const IS_STUDENT_MODE = window.GLOBAL_get_isstudentmode_ || 0;
+        const SITE_URL = 'https://dmj.one';
+        // const CURRENT_LOCATION = `https://dmj.one/${urlpart1}/${urlpart2}/${urlpart3}/${urlpart4}/` || null || SITE_URL + window.location.pathname.replace(/\.html$/, '') || window.location.href;
+        const CURRENT_LOCATION = SITE_URL + window.location.pathname.replace(/\.html$/, '') || window.location.href;
+        const QR_CODE_MODE = 4;
+        const QR_CODE_MAX_WIDTH = '1.25in';
+        const QR_CODE_MAX_HEIGHT = '1.25in';
+        const SHOOLINI_LOGO_SRC = '/img/shoolini_logo.png';
+        const DMJ_LOGO_SRC = '/logo.png';
+        const PRINT_STYLE_CONTENT = `@media print { *,*::before { background: #fff !important; -webkit-print-color-adjust: exact !important; color-adjust: exact !important; print-color-adjust: exact !important; }}`;
+        const PRINT_STYLE_DISPLAY_NONE = `@media print { #defaultcopyrightfooter{ display: none; }}`;
+        const AUTHOR_NAME = null || window.GLOBAL_get_formatted_Author_Name_;
+        AUTHOR_NAME_WINDOW_WITH_ETAL = null || formatAuthorsEtAl(window.GLOBAL_get_Author_Name_);
+        const AUTHOR_TEXT_STUDENT_MODE = 'Divya Mohan <em>(GF202214698)</em>';
+        const AUTHOR_DEPT_STUDENT_MODE = 'Yogananda School of AI, Computers and Data Science';
+        const AUTHOR_DEPT_OTHER_MODE = 'Faculty of Engineering and Technology';
+        const UNIVERSITY_NAME = 'Shoolini University, Solan, Himachal Pradesh, India';
+        const FACULTY_NAME = null || window.GLOBAL_get_Faculty_Name_;
+        const COURSE = null || window.GLOBAL_get_course_;
+        const COURSE_DETAILS = null || window.GLOBAL_get_course_detail_;
+        const DATE_OPTIONS = { month: 'long', day: 'numeric', year: 'numeric' };
+        const RETRIEVED_DATE = new Date().toLocaleDateString('en-US', DATE_OPTIONS);
+        // 2 more global setting defined after 30 lines due to try block constraint.
+
+        function formatAuthorsEtAl(htmlString) {
+            var tempDiv = document.createElement('div');
+            tempDiv.innerHTML = htmlString;
+            var strongTags = tempDiv.querySelectorAll('strong');
+
+            // If there's only one author, just return the formatted name
+            if (strongTags.length === 1) {
+                var singleAuthorName = strongTags[0].textContent.trim().split(' ');
+                return singleAuthorName[1] + ' ' + singleAuthorName[0].charAt(0) + '.';
+            } else if (strongTags.length > 1) {
+                // Assuming the first strong tag is the primary author
+                var primaryAuthorName = strongTags[0].textContent.trim().split(' ');
+                return primaryAuthorName[1] + ' ' + primaryAuthorName[0].charAt(0) + '. et al.';
+            }
+            return ''; // In case there are no strong tags
+        }
+
+
         try {
             let noactualarticle, studentmode, logocontent_dmj_shoolini_qr;
 
 
-            studentmode = window.GLOBAL_get_isstudentmode_ || 0;
+            studentmode = IS_STUDENT_MODE;
 
 
-            // Retrive elements of the page
+            // Retrive elements of the page 
             let articleElement = document.querySelector('article.agen-tableofcontents');
             if (typeof articleElement === 'undefined' || articleElement === null) {
                 noactualarticle = 1;
                 articleElement = document.querySelector('main');
             }
 
+            // DEPENDEDS ON THE PAGE STRUCTURE
+            // const TITLE_OF_THE_PAGE = `${COURSE_DETAILS} (${COURSE})`; // For Creating course related main header page
+            // Get the title of the page and the date of the page
+            const TITLE_OF_THE_PAGE = null || articleElement.querySelector('h2').innerText;
+            const DATE_OF_THE_PAGE = null || articleElement.querySelector('.contentdate') ? articleElement.querySelector('.contentdate').innerText : "n.d."
 
-            let titleofthepage = articleElement.querySelector('h2').innerText || '';
-            let dateofthepage = articleElement.querySelector('.contentdate') ? articleElement.querySelector('.contentdate').innerText : "n.d.";
+
+            let titleofthepage = TITLE_OF_THE_PAGE;
+            let dateofthepage = DATE_OF_THE_PAGE;
             let h2 = articleElement.querySelector('h2');
             h2.classList.add('d-print-none');
 
 
             // Get the location of the page
             // var currentlocation = 'https://dmj.one/' + window.location.pathname.split('/').pop().replace('.html', '');        
-            let currentlocation = 'https://dmj.one' + window.location.pathname.replace(/\.html$/, '') || window.location.href;
-            // currentlocation = 'https://dmj.one/'; // Fix location for specific work.
+            let currentlocation = CURRENT_LOCATION;
 
 
 
@@ -1059,7 +1134,7 @@ let header_author = function (...args) {
             // qr.addData(window.location.href);
             qr.addData(currentlocation);
             qr.make();
-            var qrcode_data = qr.createDataURL(4, "");
+            var qrcode_data = qr.createDataURL(QR_CODE_MODE, "");
             window.GLOBAL_get_qr_code_data = qrcode_data;
 
             // Create and configure the QR code image
@@ -1067,8 +1142,8 @@ let header_author = function (...args) {
             qrImage.src = qrcode_data;
             qrImage.alt = 'QR Code to visit the website of the article';
             qrImage.className = 'img-fluid ';
-            // qrImage.style = 'max-width: 150px; max-height: 150px;';
-            qrImage.style = 'max-width: 1.25in; max-height: 1.25in;';
+            // qrImage.style = 'max-width: 150px; max-height: 150px;';            
+            qrImage.style = 'max-width:' + QR_CODE_MAX_WIDTH + ';' + 'max-height:' + QR_CODE_MAX_HEIGHT + ';';
             // qrImage.style = 'max-width: 1in;';
 
             var qrDiv = document.createElement('div');
@@ -1093,15 +1168,15 @@ let header_author = function (...args) {
 
                     // Only display the Shoolini logo when in student mode
                     data = `<div class="col-12">
-                  <img src="/img/shoolini_logo.png" class="img-fluid" alt="Shoolini University Logo" style="max-width:40%;">
+                  <img src="${SHOOLINI_LOGO_SRC}" class="img-fluid" alt="Shoolini University Logo" style="max-width:40%;">
                 </div>
                 <!--<div class="col-6">
-                  <img src="/img/icf_logo.jpg" class="img-fluid" alt="Shoolini University Logo" style="max-width:80%;">
+                  <img src="/img/icf_logo.jpg" class="img-fluid" alt="ICF Logo" style="max-width:80%;">
                 </div>-->`;
                 } else {
                     // Base structure for other modes
                     data = `<div class="col-6 col">
-                  <img src="/logo.png" class="img-fluid" alt="DMJ Logo" style="max-width:40%;">
+                  <img src="${DMJ_LOGO_SRC}" class="img-fluid" alt="DMJ Logo" style="max-width:40%;">
                 </div>`;
 
                     if (noactualarticle) {
@@ -1112,7 +1187,7 @@ let header_author = function (...args) {
                     } else {
                         // Add Shoolini logo for normal mode
                         data += `<div class="col-6 col">
-                       <img src="/img/shoolini_logo.png" class="img-fluid" alt="Shoolini University Logo" style="max-width:80%;">
+                       <img src="${SHOOLINI_LOGO_SRC}" class="img-fluid" alt="Shoolini University Logo" style="max-width:80%;">
                      </div>`;
                     }
                 }
@@ -1139,22 +1214,6 @@ let header_author = function (...args) {
             //     return Array.from(tempDiv.querySelectorAll('strong'), el => el.textContent).join(', ');
             // }
 
-            function formatAuthorsEtAl(htmlString) {
-                var tempDiv = document.createElement('div');
-                tempDiv.innerHTML = htmlString;
-                var strongTags = tempDiv.querySelectorAll('strong');
-
-                // If there's only one author, just return the formatted name
-                if (strongTags.length === 1) {
-                    var singleAuthorName = strongTags[0].textContent.trim().split(' ');
-                    return singleAuthorName[1] + ' ' + singleAuthorName[0].charAt(0) + '.';
-                } else if (strongTags.length > 1) {
-                    // Assuming the first strong tag is the primary author
-                    var primaryAuthorName = strongTags[0].textContent.trim().split(' ');
-                    return primaryAuthorName[1] + ' ' + primaryAuthorName[0].charAt(0) + '. et al.';
-                }
-                return ''; // In case there are no strong tags
-            }
 
             // function extractTextFromStrongTag(htmlString) {
             //     var tempDiv = document.createElement('div');
@@ -1179,24 +1238,24 @@ let header_author = function (...args) {
             // var authorsText = extractTextFromStrongTag(window.GLOBAL_get_Author_Name_);
             // var authorsText = 'Divya Mohan <em>(GF202214698)</em>';
             // const formattedauthorname = extractTextFromStrongTag(window.GLOBAL_get_Author_Name_);
-            const formattedauthorname = window.GLOBAL_get_formatted_Author_Name_;
+            const formattedauthorname = AUTHOR_NAME;
             // window.GLOBAL_get_formatted_Author_Name_ = formattedauthorname;
             // console.log(formattedauthorname);
-            var authorsText = studentmode ? 'Divya Mohan <em>(GF202214698)</em>' : formattedauthorname;
-            var authorsdept = studentmode ? 'Yogananda School of AI, Computers and Data Science' : 'Faculty of Engineering and Technology';
+            var authorsText = studentmode ? AUTHOR_TEXT_STUDENT_MODE : formattedauthorname;
+            var authorsdept = studentmode ? AUTHOR_DEPT_STUDENT_MODE : AUTHOR_DEPT_OTHER_MODE;
             var authorsDiv = document.createElement('div');
             authorsDiv.className = 'd-none d-print-block mx-auto mt-3 mb-4';
-            authorsDiv.innerHTML = authorsText ? `<p class="text-center text-uppercase">${authorsText}</p><p class="text-uppercase text-center" style="font-size:8pt!important">${authorsdept}</p><p class="text-uppercase text-center fw-bold" style="font-size:10pt!important">Shoolini University, Solan, Himachal Pradesh, India</p>` : '';
+            authorsDiv.innerHTML = authorsText ? `<p class="text-center text-uppercase">${authorsText}</p><p class="text-uppercase text-center" style="font-size:8pt!important">${authorsdept}</p><p class="text-uppercase text-center fw-bold" style="font-size:10pt!important">${UNIVERSITY_NAME}</p>` : '';
 
 
             var facultyDiv = document.createElement('div');
             facultyDiv.className = 'd-none d-print-block mx-auto';
-            facultyDiv.innerHTML = window.GLOBAL_get_course_detail_ ? window.GLOBAL_get_course_ ? `<p class="text-center fst-italic">Under the guidance of <span class="text-capitalize">${window.GLOBAL_get_Faculty_Name_}</span> in the subject of <span class="text-capitalize">${window.GLOBAL_get_course_detail_} (${window.GLOBAL_get_course_})</span></p>` : `<p class="text-center">${window.GLOBAL_get_course_detail_}</p>` : '';
+            facultyDiv.innerHTML = COURSE_DETAILS ? COURSE ? `<p class="text-center fst-italic">Under the guidance of <span class="text-capitalize">${FACULTY_NAME}</span> in the subject of <span class="text-capitalize">${COURSE_DETAILS} (${COURSE})</span></p>` : `<p class="text-center">${COURSE_DETAILS}</p>` : '';
             // facultyDiv.innerHTML = window.GLOBAL_get_course_detail_ ? window.GLOBAL_get_course_ ? `<p class="text-center fst-italic">Under the guidance of <span class="text-capitalize">Asst. Prof. Payal Khanna</span> in the subject of <span class="text-capitalize">Enhancing Leadership through Coaching Skills (CSU1806)</span></p>` : `<p class="text-center">${window.GLOBAL_get_course_detail_}</p>` : '';
             // facultyDiv.innerHTML += window.GLOBAL_get_Faculty_Name_ ? `<p class="text-center text-uppercase"><span class="fw-bold"></span> ${window.GLOBAL_get_Faculty_Name_}</p>` : '';
-            facultyDiv.innerHTML += `<p class="text-center text-uppercase" style="font-size:8pt!important">${studentmode ? 'Submitted on' : 'Printed on'} ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>`;
+            facultyDiv.innerHTML += `<p class="text-center text-uppercase" style="font-size:8pt!important">${studentmode ? 'Submitted on' : 'Printed on'} ${RETRIEVED_DATE}</p>`;
 
-            var authorsetal = formatAuthorsEtAl(window.GLOBAL_get_Author_Name_);
+            var authorsetal = AUTHOR_NAME_WINDOW_WITH_ETAL;
             var citationblockquote = document.createElement('blockquote');
             citationblockquote.className = 'd-none d-print-flex mt-3 text-decoration-none';
             citationblockquote.style = 'font-style:unset !important';
@@ -1226,9 +1285,12 @@ let header_author = function (...args) {
             // Insert the document fragment at the beginning of articleElement
             articleElement.insertBefore(docFragmentBeforeh2, h2);
             articleElement.insertBefore(docFragmentAfterh2, h2.nextSibling);
-        } catch (e) { console.log("Could Not apply Print Specific Styles")}
+        } catch (e) {
+            //console.log("Could Not apply Print Specific Styles")
+        }
     });
 })();
+// })(forprint_manualmode,forprint_authorname, forprint_subjectcode, forprint_teachername);
 
 
 /***********************  Random Quiz **************************/
@@ -1671,7 +1733,7 @@ let header_author = function (...args) {
             quiznewlinkhref.setAttribute('href', '/css/quiz.css');
             document.head.appendChild(quiznewlinkhref);
 
-            document.body.innerHTML = `<div class="name-container" id="name-container"></div>
+            document.body.innerHTML += `<div class="name-container" id="name-container"></div>
                         <div class="timer-container" id="timer-container">
                             <div class="timer text-center" id="timer">Start Answering!</div>
                         </div>
@@ -1717,17 +1779,15 @@ let header_author = function (...args) {
             totalQuestions = totalQuestions % 2 == 0 ? totalQuestions : totalQuestions + 1; // always even number of questions.
             const name = getUserName();
 
-            document.getElementById(NAME_CONTAINER_ID).textContent = `${name}`;
-
             function getUserName() {
                 let name = localStorage.getItem('userName');
                 if (!name) {
-                    name = prompt('Please enter your first name:');
-                    if (name) {
-                        localStorage.setItem('userName', name);
-                    }
+                    const redirectUrl = encodeURIComponent(window.location.pathname);
+                    window.location.href = `/login?redirect=${redirectUrl}`;
+                } else {
+                    document.getElementById(NAME_CONTAINER_ID).textContent = name;
                 }
-                return name || 'Guest';
+                return name;
             }
 
             function getRandomNumber(min, max) {
@@ -2236,6 +2296,180 @@ let header_author = function (...args) {
     });
 })();
 
+/************************** GOOGLE OAUTH LOGIN SYSTEM WITH MYACCOUNT ****************************/
+(function () {
+
+    // const local_login_page_path = '/test/google/signin/alogin';
+    // const local_account_page_path = '/test/google/signin/account';
+    const local_login_page_path = '/login';
+    const local_account_page_path = '/my/';
+
+    function setCookie(name, value, expiryTime) {
+        const expires = new Date(expiryTime).toUTCString();
+        document.cookie = name + '=' + encodeURIComponent(value) + '; expires=' + expires + '; path=/';
+    }
+
+    function getCookie(name) {
+        return document.cookie.split('; ').reduce((r, v) => {
+            const parts = v.split('=');
+            return parts[0] === name ? decodeURIComponent(parts[1]) : r;
+        }, '');
+    }
+
+    function createSession(userData) {
+        const expiryTime = userData.exp * 1000; // Convert exp to milliseconds                 
+        localStorage.setItem('google_user', JSON.stringify(userData));
+        localStorage.setItem('userName', userData.name);
+        setCookie('sid', 'true', expiryTime);
+    }
+
+    function destroySession() {
+        localStorage.removeItem('google_user');
+        localStorage.removeItem('userName');
+        document.cookie = 'sid=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+        const timeoutExpiry = Date.now() + 5 * 60 * 1000;
+        setCookie('logout_timeout', 'true', timeoutExpiry);
+    }
+
+    function signOut() {
+        destroySession();
+        window.location.reload(true);
+    }
+
+    window.handleCredentialResponse = function (response) {
+        const userObject = JSON.parse(atob(response.credential.split('.')[1]));
+        userObject.timestamp = Date.now();
+        createSession(userObject);
+        displayLogin();
+    };
+
+    function checkLogin() {
+        const userData = localStorage.getItem('google_user');
+        const skipPromptCookie = getCookie('sid');
+
+        if (!userData || !skipPromptCookie) {
+            destroySession();
+            return false;
+        }
+
+        if (userData && skipPromptCookie) {
+            try {
+                const parsedUserData = JSON.parse(userData);
+                const currentTime = Date.now();
+                const expiryTime = parsedUserData.exp * 1000;
+
+                if (currentTime >= expiryTime) {
+                    destroySession();
+                    return false;
+                } else {
+                    return true;
+                }
+            } catch (e) {
+                destroySession();
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
+    console.log(checkLogin());
+
+    function getRedirectUrl() {
+        const urlParams = new URLSearchParams(window.location.search);
+        let redirectto = urlParams.get('redirect');
+        if (redirectto) {
+            // Ensure that the redirect path begins with a '/' to prevent unintended URLs
+            if (!redirectto.startsWith('/')) {
+                redirectto = '/' + redirectto;
+            }
+            // Prepend the origin if it's a relative path
+            if (!redirectto.startsWith('http') && !redirectto.startsWith('https')) {
+                redirectto = window.location.origin + redirectto;
+            }
+        }
+        console.log('Redirect to: ', redirectto);
+        return redirectto;
+    }
+
+    function displayLogin() {
+        const redirectto = getRedirectUrl();
+        const isloggedin = checkLogin();
+
+        if (!isloggedin) {
+            console.log('User not logged in from displayLogin');
+            // Redirect to login page if not logged in and currently on the account page
+            // if (window.location.pathname !== local_login_page_path || window.location.pathname !== '/') { globalautologinprompt(); }
+            if (window.location.pathname === local_account_page_path) {
+                window.location.href = local_login_page_path + '?redirect=' + encodeURIComponent(window.location.pathname);
+            }
+        } else {
+            console.log('User logged in');
+            // If there's a valid redirect URL, navigate there
+            if (redirectto) {
+                window.location.href = redirectto;
+            } else {
+                // Redirect to the account page if no specific redirect provided and currently on the login page
+                if (window.location.pathname === local_login_page_path) {
+                    window.location.href = local_account_page_path;
+                }
+            }
+            displayUserLoggedInNav(); // Assuming this function updates the navigation for logged-in users
+        }
+    }
+
+    function globalautologinprompt() {
+        const logout_timeout = getCookie('logout_timeout');
+        document.body.innerHTML += `<div id="g_id_onload"
+                        data-client_id="107722137045-s1shk381lhpsu132999cl102kdlgs7c3.apps.googleusercontent.com"
+                        data-context="signin"
+                        data-ux_mode="popup"
+                        data-callback="handleCredentialResponse"
+                        data-auto_select=${logout_timeout ? "false" : "true"}
+                        data-skip_prompt_cookie="sid"
+                        data-itp_support="true">
+                    </div>`;
+    }
+
+    function displayUserLoggedInNav() {
+        isloggedin = checkLogin();
+        if (!isloggedin) {
+            console.log('User not logged in from displayUserLoggedInNav');
+            return;
+        }
+        if (isloggedin && localStorage.getItem('google_user')) {
+            try {
+                const userDetails = JSON.parse(localStorage.getItem('google_user'));
+                const userMenu = document.getElementById('userMenu');
+                userMenu.innerHTML = `<li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">
+                        <img src="${userDetails.picture}" alt="User Picture" class="rounded-circle" width="25" height="25" id="userPic">
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a class="dropdown-item" href="${local_login_page_path}">My Account</a>
+                        </li>
+                            <!-- <a class="dropdown-item" href="#">${userDetails.name}</a>                
+                            <a class="dropdown-item" href="#">${userDetails.email}</a> -->
+                        <li>                
+                            <div class="dropdown-divider"></div>
+                            <button class="dropdown-item signOutButton">Logout</button>
+                        </li>        
+                    </ul>
+                    </li>`;
+                const signOutButtons = document.querySelectorAll('.signOutButton');
+                signOutButtons.forEach(button => {
+                    button.addEventListener('click', signOut);
+                });
+            } catch (e) {
+                console.log('Could not parse user details from localStorage');
+            }
+        }
+    }
+    document.addEventListener('DOMContentLoaded', displayLogin);
+})();
+
+
 
 
 /************************************* Body *********************************/
@@ -2262,6 +2496,8 @@ function dcevars(s) {
     div.innerHTML = decoded;
     document.body.appendChild(div);
 }
+
+
 
 /******** CryptoJS Encryption System ********/
 
@@ -2920,6 +3156,44 @@ function body_genmenu(course) {
     // });
     // Substituted document.write(body_generated); by DOMContentLoaded for automation
 
+
+    /**********  AUTOMATION CONTROL **********/
+    body_genmenu.processData = function (arr, def_date, def_author, options = {}) {
+        // Get Random date near the entered date.
+        function gendate(date) {
+            var inputDate = new Date(date);
+            var offset = Math.floor(Math.random() * 20 - 10) * 24 * 60 * 60 * 1000;
+            var newDate = new Date(inputDate.getTime() + offset);
+            var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            var weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+            var outputDate = weekdays[newDate.getUTCDay()] + " " + months[newDate.getUTCMonth()] + " " + newDate.getUTCDate() + ", " + newDate.getUTCFullYear();
+            return outputDate;
+        }
+
+        function r(t) { if (!t) { return; } return Math.floor(Math.random() * 10) + t }
+
+
+        const { isMainCategory = false } = options;
+        for (let i = 0; i < arr.length; i++) {
+            const _data = arr[i];
+            const title = _data.title || options.title || null;
+            if (!title) continue;
+            const link = _data.link || options.link || null;
+            const date = _data.date || options.date || `${gendate(def_date)}`;
+            const desc = _data.desc || options.desc || null;
+            const codetype = _data.codetype || options.codetype;
+            let readtime = r(_data.readtime) || r(options.readtime) || r(4);
+            if (isMainCategory) readtime = null; // Null readtime - Special Case for main category
+            let author = _data.author || options.author || def_author;
+            if (isMainCategory) author = null; // Null author - Special Case for main category
+            const semester = _data.semester || options.semester || null;
+            const cardimage = _data.cardimage || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? _data.cardimage_dark : null) || options.cardimage || null;
+            const continuereading = _data.continuereading || options.continuereading || null;
+            body_blockcards(link, date, title, desc, codetype, readtime, author, semester, cardimage, continuereading);
+        }                
+    }
+
+
     // const datetogen = "April 1, 2023"; // Manual Date - Change this date to reflect it everywhere.
     const datetogen = new Date(new Date().setDate(new Date().getDate() - 7)).toDateString(); // Get Date automatically. Change the number with days to minus the date. Number 7 or 10 denotes days to substract from current date.
     // var offset = Math.floor(Math.random() * 10) * -1 * 24 * 60 * 60 * 1000; // Change this in the specific var.js if you dont want to generate future dates and only past date. supplied date - 10th date.
@@ -2948,7 +3222,7 @@ function body_blockcards(link, date, title, desc, codetype, readtime, author, se
 
     if (!title && !desc) { return }; // Exit early if no title and desc provided. Do NOT Remove. Else it will waste the time in processing and give incomplete blocks
     title = title || "Unknown Title";
-    desc = desc || "No desc provided";
+    desc = desc || null;
     link = link || "#";
     date = date || new Date().toDateString();
 
@@ -2998,8 +3272,8 @@ function body_blockcards(link, date, title, desc, codetype, readtime, author, se
     unsplash_categories = unsplash_categories[randomNum(0, unsplash_categories.length - 1)];
 
     // var imgsrc = randomNum01(5) === 0 ? qrcode_data : `https://picsum.photos/${randomNum(200, 400)}`;
-    var imgsrc = randomNum01(7) === 0 ? `https://picsum.photos/${randomNum(200, 400)}` : `https://source.unsplash.com/${randomNum(200, 300)}x${randomNum(200, 300)}/?${unsplash_categories}`;
-    imgsrc = randomNum01(3) === 0 ? imgsrc : qrcode_data;
+    var imgsrc = randomNum01(1) === 0 ? `https://picsum.photos/${randomNum(200, 400)}` : `https://source.unsplash.com/${randomNum(200, 300)}x${randomNum(200, 300)}/?${unsplash_categories}`;
+    imgsrc = randomNum01(9) === 0 ? imgsrc : qrcode_data;
     imgsrc = cardimage || imgsrc; // forces to choose supplied image
     var is_qr = Number(imgsrc === qrcode_data);
     var imgAlt = is_qr ? "QR code of the URL" : "A Random Image from picsum.photo";
@@ -3094,7 +3368,7 @@ function body_blockcards(link, date, title, desc, codetype, readtime, author, se
             </ul>
         </div>
         <div class="postcard__bar"></div>
-        <div class="postcard__preview-txt"><p>${desc}</p></div>
+        <div class="postcard__preview-txt d-none ${desc ?'d-sm-block':''}"><p>${desc}</p></div>
         <ul class="postcard__tagbox tagtox-read my-3">
             <a href="${link}">
                 <li class="tag__item read-more play ${getcolor} fw-bold text-center" id="article_userclickguide" style="cursor: inherit;" data-toggle="tooltip" data-placement="top" title="Click here to continue reading." data-original-title="Click to continue reading."><i class="bi bi-book"></i>  ${continueReading}...</li>
@@ -3188,6 +3462,304 @@ function maintenance_mode() {
         }
     }
 }());
+
+
+/************* Truncate the whitespace of all the codes inside pre code for highlight js **************/
+// (function () {
+//     function removelines (element, lines) {
+//         // Split the code into lines
+
+
+//         // Extract variable names (this is a simple example and may need adjustment for complex cases)
+//         const variableRegex = /\b[a-zA-Z_][a-zA-Z0-9_]*\b/g;
+//         let variables = new Set();
+
+//         lines.forEach(line => {
+//             let match;
+//             while ((match = variableRegex.exec(line)) !== null) {
+//                 variables.add(match[0]);
+//             }
+//         });
+
+//         // Filter out common keywords to focus on actual variables
+//         const keywords = ['int', 'float', 'double', 'char', 'void', 'const', 'std', 'size_t', 'if', 'else', 'for', 'while', 'return'];
+//         variables = Array.from(variables).filter(variable => !keywords.includes(variable));
+
+//         if (variables.length > 0) {
+//             // Pick a random variable to rename
+//             const randomVariable = variables[Math.floor(Math.random() * variables.length)];
+//             const newVariableName = 'changed_' + randomVariable;
+
+//             // Replace the variable in the code
+//             element.textContent = element.textContent.split(randomVariable).join(newVariableName);
+
+//             // Inform the user about the changed variable
+//             const info = document.createElement('div');
+//             info.className = 'bg-info bg-opacity-25 p-2 mb-2 rounded-3 small';
+//             info.textContent = `Information: To encourage critical thinking and prevent unreflective copying, the variable/text "${randomVariable}" has been renamed to "${newVariableName}". As a result, the code may not function correctly. Please review and understand the code thoroughly. You will need to revert the changed variable/text name back to "${randomVariable}" to restore the code's functionality.`;
+//             element.parentElement.insertAdjacentElement('beforebegin', info);
+//         }
+//     }
+//     document.addEventListener('DOMContentLoaded', function () {
+//         try {
+//             document.querySelectorAll('pre code').forEach(element => {
+//                 element.textContent = element.textContent.trim();
+//                 const lines = element.textContent.split('\n');
+//                 Math.random() < 0.5 ? removelines(element, lines) : '';
+//             });
+//             hljs.highlightElement(element);
+//         } catch (e) { console.warn("Nothing to render") }
+//     });
+// })();
+
+(function () {
+
+    /* function removelines(element, lines) {
+        // Extract variable names (this is a simple example and may need adjustment for complex cases)
+        const variableRegex = /\b[a-zA-Z_][a-zA-Z0-9_]*\b/g;
+        let variables = new Set();
+
+        lines.forEach(line => {
+            let match;
+            while ((match = variableRegex.exec(line)) !== null) {
+                variables.add(match[0]);
+            }
+        });
+
+        // Filter out common keywords to focus on actual variables
+        const keywords = ['int', 'float', 'double', 'char', 'void', 'const', 'std', 'size_t', 'if', 'else', 'for', 'while', 'return'];
+        variables = Array.from(variables).filter(variable => !keywords.includes(variable));
+
+        if (variables.length > 0) {
+            // Pick a random variable to rename
+            const randomVariable = variables[Math.floor(Math.random() * variables.length)];
+            const newVariableName = 'changed_' + randomVariable;
+
+            // Store original text if not already stored
+            if (!element.dataset.originalText) {
+                element.dataset.originalText = element.textContent;
+            }
+
+            // Replace the variable in the code
+            element.textContent = element.textContent.split(randomVariable).join(newVariableName);
+
+            // Inform the user about the changed variable
+            const info = document.createElement('div');
+            info.className = 'bg-info bg-opacity-25 p-2 mb-2 rounded-3 small notice';
+            info.textContent = `Notice: To encourage critical thinking and prevent unreflective copying, the variable/text "${randomVariable}" has been renamed to "${newVariableName}". As a result, the code may not function correctly. Please review and understand the code thoroughly. You will need to revert the changed variable/text name back to "${randomVariable}" to restore the code's functionality.`;
+            element.parentElement.insertAdjacentElement('beforebegin', info);
+        }
+    } */
+
+    function removelines(element, lines) {
+        // Extract variable names (this is a simple example and may need adjustment for complex cases)
+        const variableRegex = /\b[a-zA-Z_][a-zA-Z0-9_]*\b/g;
+        let variables = new Set();
+
+        lines.forEach(line => {
+            let match;
+            while ((match = variableRegex.exec(line)) !== null) {
+                variables.add(match[0]);
+            }
+        });
+
+        // Filter out common keywords to focus on actual variables
+        const keywords = ['int', 'float', 'double', 'char', 'void', 'const', 'std', 'size_t', 'if', 'else', 'for', 'while', 'return', 'include', 'iostream', 'vector', 'static', 'main', 'print', 'printf', 'scanf', 'input', 'cin', 'cout', 'private', 'public', 'protected', 'class', 'in', 'elif', 'def', 'import', 'as', 'from', 'try', 'except', 'finally', 'with', 'assert', 'del', 'lambda', 'yield', 'global', 'nonlocal', 'pass', 'break', 'continue', 'True', 'False', 'None', 'and', 'or', 'not', 'is', 'raise', 'exec', 'await', 'async', 'str', 'list', 'dict', 'set', 'tuple', 'range', 'len', 'append', 'remove', 'insert', 'keys', 'values', 'items', 'interface', 'extends', 'implements', 'abstract', 'enum', 'package', 'throws', 'null', 'true', 'false', 'instanceof', 'new', 'this', 'super', 'synchronized', 'transient', 'volatile', 'case', 'switch', 'default', 'goto', 'sizeof', 'typedef', 'union', 'struct', 'namespace', 'template', 'catch', 'throw', 'select', 'update', 'delete', 'create', 'drop', 'alter', 'table', 'view', 'index', 'trigger', 'grant', 'revoke', 'commit', 'rollback', 'savepoint', 'declare', 'begin', 'end', 'function', 'procedure', 'cursor', 'when', 'then', 'elsif', 'loop', 'fetch', 'open', 'close', 'exit', 'foreach', 'do', 'repeat', 'until', 'echo', 'require', 'use', 'final', 'die', 'clone', 'self', '__construct', '__destruct', '__call', '__callStatic', '__get', '__set', '__isset', '__unset', '__sleep', '__wakeup', '__toString', '__invoke', '__set_state', '__clone', '__debugInfo', '__autoload'];
+        // Make it unique and change it to the format 'data', 'data2', data3' and so on.
+        // data = (Array.from(new Set(keywords)))        
+        // navigator.clipboard.writeText(data.map(link => `'${link}'`).join(', '));
+
+        variables = Array.from(variables).filter(variable => keywords.includes(variable));
+
+        if (variables.length > 0) {
+            // Pick a random variable to rename
+            const randomVariable = variables[Math.floor(Math.random() * variables.length)];
+            const newVariableName = 'changed_' + randomVariable;
+
+            // Store original text if not already stored
+            if (!element.dataset.originalText) {
+                element.dataset.originalText = element.textContent.trim();
+                // console.log(element.dataset.originalText);
+            }
+
+            // Replace the variable in the code (only whole words)
+            const wordBoundaryRegex = new RegExp(`\\b${randomVariable}\\b`, 'g');
+            if (!wordBoundaryRegex.test(element.textContent)) {
+                console.log(False)
+                return; // Exit if the variable is not found
+            }
+            element.textContent = element.textContent.replace(wordBoundaryRegex, newVariableName);
+
+            const info = document.createElement('div');
+            info.className = 'bg-info bg-opacity-25 p-2 mb-2 rounded-3 small notice';
+            info.textContent = `Notice: To encourage critical thinking and prevent unreflective copying, the variable/text "${randomVariable}" has been renamed to "${newVariableName}". As a result, the code may not function correctly. Please review and understand the code thoroughly. You will need to revert the changed variable/text name back to "${randomVariable}" to restore the code's functionality.`;
+            element.parentElement.insertAdjacentElement('beforebegin', info);
+        }
+    }
+
+    function trimWhitespace(element) {
+        element.textContent = element.textContent.trim();
+        return element.textContent;
+    }
+
+    function revertChanges(element) {
+        if (element.dataset.originalText) {
+            element.textContent = element.dataset.originalText.trim();
+        }
+    }
+
+    function applyChanges(element) {
+        const lines = element.textContent.split('\n');
+        if (Math.random() < 0.5) {
+            removelines(element, lines);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        try {
+            document.querySelectorAll('pre code').forEach(element => {
+                element.textContent = trimWhitespace(element);
+                applyChanges(element);
+            });
+
+            window.addEventListener('beforeprint', function () {
+                document.querySelectorAll('pre code').forEach(element => {
+                    trimWhitespace(element);
+                    revertChanges(element);
+                    element.removeAttribute('data-highlighted');
+                });
+                document.querySelectorAll('.notice').forEach(notice => {
+                    notice.classList.add('d-none');
+                });
+                hljs.highlightAll();
+            });
+
+            window.addEventListener('afterprint', function () {
+                document.querySelectorAll('pre code').forEach(element => {
+                    trimWhitespace(element);
+                    applyChanges(element);
+                    element.removeAttribute('data-highlighted');
+                });
+                // document.querySelectorAll('.notice').forEach(notice => {
+                //     notice.classList.remove('d-none');
+                // });
+                hljs.highlightAll();
+            });
+        } catch (e) {
+            console.warn("Nothing to render");
+        }
+    });
+})();
+
+
+
+/***************** Toast Notification Generator - GLOBAL Function ******************/
+(function () {
+    // TO USE DO THIS --------- EXAMPLE
+    // showNotification('Your system will undergo maintenance tonight.');
+    // showNotification('Your system will undergo maintenance tonight.', { autohide: false, delay: 10000, playSound: false });
+    // showNotification('Update completed successfully.', {
+    //     headerText: 'Update Notification',
+    //     bodyClass: 'toast-body bg-success text-white',
+    //     delay: 3000,
+    //     autohide: true
+    // });
+    // showNotification('A new feature has been enabled.', {
+    //     headerText: 'Feature Update',
+    //     playSound: true,
+    //     soundSrc: '/media/music/notification-sound.mp3',
+    //     autohide: false
+    // });
+
+    // Configuration defaults
+    const defaults = {
+        id: randomidgenerator(),
+        headerClass: 'toast-header bg-primary text-white',
+        headerIcon: 'bi bi-exclamation-triangle-fill',
+        headerText: 'Notification',
+        bodyClass: 'toast-body',
+        autohide: true,
+        delay: 5000,
+        playSound: true,
+        soundSrc: '/media/music/click-sound.mp3'
+    };
+
+    // Sound manager to handle audio elements
+    const soundManager = {
+        alertSound: null,
+        playSound: function (src) {
+            if (!this.alertSound) {
+                this.alertSound = document.createElement("audio");
+                this.alertSound.id = 'toastAlertSound';
+                this.alertSound.src = src;
+                document.body.appendChild(this.alertSound);
+            }
+            this.alertSound.src = src; // Ensure the src is always up-to-date
+            this.alertSound.play().catch(err => console.error("Sound play failed:", err));
+        }
+    };
+
+    // Function to show the toast
+    const showToast = (settings) => {
+        const toastElement = document.querySelector(`#${settings.id}-toast`);
+        if (toastElement && typeof bootstrap !== 'undefined' && bootstrap.Toast) {
+            const toast = new bootstrap.Toast(toastElement, { autohide: settings.autohide, delay: settings.delay });
+            toast.show();
+            if (settings.playSound) {
+                soundManager.playSound(settings.soundSrc);
+            }
+        } else {
+            // Retry showing the toast after a delay if Bootstrap is not ready
+            setTimeout(() => showToast(settings), 100);
+        }
+    };
+
+    // Function to generate and append toast HTML
+    const generateToast = (settings) => {
+        const toastHTML = `
+            <div id="${settings.id}-toast" class="toast position-fixed bottom-0 end-0 m-5 mx-2 shadow-lg" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="${settings.autohide}" data-bs-delay="${settings.delay}">
+                <div class="${settings.headerClass} d-flex align-items-center">
+                    <i class="${settings.headerIcon} me-2"></i>
+                    <strong class="me-auto">${settings.headerText}</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="${settings.bodyClass}">${settings.bodyText}</div>
+            </div>
+        `;
+        let toastContainer = document.getElementById('toastContainer');
+        if (!toastContainer) {
+            toastContainer = document.createElement('div');
+            toastContainer.id = randomidgenerator();
+            toastContainer.setAttribute('aria-live', 'polite');
+            toastContainer.setAttribute('aria-atomic', 'true');
+            toastContainer.classList.add('position-fixed', 'bottom-0', 'end-0', 'p-3', 'd-none', 'd-sm-block');
+            document.body.appendChild(toastContainer);
+        }
+        toastContainer.innerHTML = toastHTML;
+        showToast(settings);
+    };
+
+    // Initialization on user interaction, executes only once
+    const onUserInteraction = (fn) => {
+        const events = ['click', 'mousemove', 'keydown', 'touchstart'];
+        const handler = () => {
+            fn();  // Execute the passed function
+            // Remove all event listeners after the function has executed
+            events.forEach(event => window.removeEventListener(event, handler));
+        };
+        events.forEach(event => window.addEventListener(event, handler));
+    };
+
+    const showNotification = (message = '', options = {}) => {
+        if (!message) return;
+        const settings = { ...defaults, ...options, bodyText: message };
+        document.readyState === 'loading' ?
+            document.addEventListener('DOMContentLoaded', () => onUserInteraction(() => generateToast(settings))) :
+            onUserInteraction(() => generateToast(settings));
+    };
+
+    window.showNotification = showNotification;
+})();
 
 
 
@@ -3520,6 +4092,54 @@ function copyright(rights, noprint) {
 
         rights = rights === "all" ? footer_all_rights : rights === "some" ? footer_some_rights : "";
 
+        ////////////// DISQUS comments and recommendations section /////////////
+        (function () {
+            try {
+                if (window.nodisqus) return;
+                // const urlPattern = /^\/edu\/su\/course\/\w+\/(theory|lab)\/\w+/;
+                const urlPattern = /^\/edu\/su\/course\/\w+\/\w+\/\w+/;
+                if (!urlPattern.test(window.location.pathname)) return;
+
+                const disqus = document.createElement("article");
+                disqus.id = "disqus_thread";
+                disqus.className = "container my-5 d-print-none";
+                document.body.appendChild(disqus);
+
+                ////////////// Disqus recomendation section ////////////////////
+                // const disqusrecomendation = document.createElement("div");//
+                // disqusrecomendation.id = "disqus_recommendations"; ////////
+                // disqusrecomendation.className = "container my-5"; ////////
+                // document.body.appendChild(disqusrecomendation); /////////
+                ////////////// Section end ////////////////////////////////
+
+                /**
+                    *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+                    *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables    */
+
+                var disqus_config = function () {
+                    var base_url = 'https://dmj.one';
+                    var pathname = window.location.pathname;
+                    this.page.url = base_url + pathname;  // Replace PAGE_URL with your page's canonical URL variable
+                    this.page.identifier = pathname; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+                };
+
+                (function () { // DON'T EDIT BELOW THIS LINE
+                    var d = document, s = d.createElement('script');
+                    s.src = 'https://dmjone.disqus.com/embed.js';
+                    s.setAttribute('data-timestamp', +new Date());
+                    (d.head || d.body).appendChild(s);
+                })();
+
+                // (function () { // REQUIRED CONFIGURATION VARIABLE: EDIT THE SHORTNAME BELOW
+                //     var d = document, s = d.createElement('script'); // IMPORTANT: Replace EXAMPLE with your forum shortname!
+                //     s.src = 'https://dmjone.disqus.com/recommendations.js';
+                //     s.setAttribute('data-timestamp', +new Date());
+                //     (d.head || d.body).appendChild(s);
+                // })();
+            } catch (e) { console.log("Something failed in Disqus Code") }
+        })();
+        ////////////////////////// DISQUS Section end    ///////////////////////////////
+
         const footer = document.createElement("footer");
         footer.id = "defaultcopyrightfooter";
 
@@ -3730,7 +4350,7 @@ function gen_blockquote() {
         document.addEventListener('DOMContentLoaded', function () {
             const cookieNotice = document.createElement("div");
             cookieNotice.id = "cookie-notice";
-            cookieNotice.classList.add("w-100", "bg-dark", "text-white", "pt-3", "px-4", "pb-1", "position-fixed");
+            cookieNotice.classList.add("w-100", "bg-dark", "text-white", "pt-3", "px-4", "pb-1", "position-fixed", "d-print-none");
             cookieNotice.style = "z-index: 1000; bottom: 0;";
 
             const container = document.createElement("div");
@@ -3828,7 +4448,7 @@ function gen_blockquote() {
     const isSummer = () => {
         const date = new Date();
         const month = date.getMonth() + 1; // JavaScript months range from 0 to 11
-        return month === 6 || month === 7;
+        return month === 4 || month === 7;
     };
 
     // If it's not summer, immediately exit
@@ -3996,7 +4616,7 @@ function gen_blockquote() {
         const date = new Date();
         const day = date.getDate();
         const month = date.getMonth() + 1;
-        return day === 20 && month === 4; // Change the date to the birthday date you want to celebrate
+        return day === 5 && month === 6; // Change the date to the birthday date you want to celebrate
     };
 
     if (isBirthday()) {
@@ -4046,6 +4666,7 @@ function gen_blockquote() {
 (function () {
     const events = [
         { day: 20, month: 4, year: 1993, occasion: 'birthday', name: 'dmj' },
+        { day: 15, month: 6, year: 1967, occasion: 'birthday', name: 'dmj' },
         { day: 11, month: 1, year: 2004, occasion: 'birthday', name: 'Jasmine' },
         { day: 11, month: 1, year: 2004, occasion: 'birthday', name: 'Vinayak' },
         { day: 12, month: 1, year: 2004, occasion: 'birthday', name: 'Prithak' },
@@ -4069,6 +4690,17 @@ function gen_blockquote() {
         { day: 20, month: 5, year: 2001, occasion: 'birthday', name: 'Rohit' },
         { day: 23, month: 5, year: 2004, occasion: 'birthday', name: 'Anshika' },
         { day: 1, month: 6, year: 2004, occasion: 'birthday', name: 'Aryan' },
+        { day: 3, month: 6, year: 2004, occasion: 'birthday', name: 'Adarsh' },
+        { day: 4, month: 6, year: 2004, occasion: 'birthday', name: 'Aarushi' },
+        { day: 13, month: 6, year: 2004, occasion: 'birthday', name: 'Anshuman' },
+        { day: 16, month: 6, year: 2000, occasion: 'birthday', name: 'Yuvraj' },
+        { day: 10, month: 7, year: 2004, occasion: 'birthday', name: 'Riyant' },
+        { day: 2, month: 8, year: 2004, occasion: 'birthday', name: 'Aryan' },
+        { day: 2, month: 8, year: 1996, occasion: 'birthday', name: 'Palvinder' },
+        { day: 11, month: 8, year: 2001, occasion: 'birthday', name: 'Paras' },
+        { day: 17, month: 8, year: 1990, occasion: 'birthday', name: 'Dr. BB Sharma' },
+        { day: 19, month: 8, year: 2004, occasion: 'birthday', name: 'Shruti' },
+        { day: 20, month: 8, year: 2004, occasion: 'birthday', name: 'Piyush' },
         { day: 4, month: 9, year: 2004, occasion: 'birthday', name: 'Kamaksha' },
         { day: 28, month: 9, year: 1998, occasion: 'birthday', name: 'Stephen' },
         { day: 31, month: 10, year: 2004, occasion: 'birthday', name: 'Vedansh' },
@@ -4662,7 +5294,7 @@ function gen_blockquote() {
         const date = new Date();
         const day = date.getDate();
         const month = date.getMonth() + 1;
-        return day === 14 && month === 2;
+        return day === 5 && month === 6;
     };
 
     if (isValentine()) {
@@ -5838,60 +6470,195 @@ const certifications = {
 
 
 /******** Dynamically inject the Table of Contents if it does not have it ********/
-(function () {
-    document.addEventListener('DOMContentLoaded', function () {
-        try {
+// (function () {
+//     document.addEventListener('DOMContentLoaded', function () {
+//         try {
 
-            // Select all article elements with class 'borderart' or auto_id
-            const articlesWithBorderArt = document.querySelectorAll('article.auto_id, article.borderart');
+//             // Select all article elements with class 'borderart' or auto_id
+//             const articlesWithBorderArt = document.querySelectorAll('article.auto_id, article.borderart, article.genautoid');
+
+//             // Loop through each article and assign a random ID
+//             articlesWithBorderArt.forEach(function (article) {
+//                 var randomId = 'article-' + Math.floor(Math.random() * 1000000);
+//                 article.setAttribute('id', randomId);
+//             });
+
+//             const main = document.querySelector('main');
+//             const firstArticle = main.querySelector('article');
+//             const existingToc = main.querySelector('.accordion#toc');
+//             const autogen_tableofcontents = main.querySelector('.agen-tableofcontents');
+
+//             if (autogen_tableofcontents && !existingToc) {
+//                 // Check if a ToC does not already exist
+//                 const tocHTML = `
+//             <div class="container mt-4 w-100 w-xl-75 d-print-none">
+//                 <div class="accordion" id="toc">
+//                     <div class="accordion-item">
+//                         <h2 class="accordion-header" id="h1">
+//                             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#c1" aria-controls="c1" aria-expanded="false">
+//                                 <i class="fas fa-book"></i> <strong>&nbsp;Table of Contents</strong>
+//                             </button>
+//                         </h2>
+//                         <div id="c1" class="accordion-collapse collapse" aria-labelledby="h1" data-bs-parent="#toc">
+//                             <div class="accordion-body">
+//                                 <ol class="list-unstyled p-0 m-0"></ol>
+//                             </div>
+//                         </div>
+//                     </div>
+//                 </div>
+//             </div>`;
+
+//                 // Append the ToC HTML to the first article
+//                 // firstArticle.innerHTML += tocHTML;
+//                 autogen_tableofcontents.innerHTML += tocHTML;
+
+//                 window.autogen_tableofcontents = 1;
+//             }
+
+//             if (window.autogen_tableofcontents) {
+//                 // Proceed to populate the ToC with entries as necessary
+//                 const articles = document.querySelectorAll('article[id]');
+//                 const tocList = document.querySelector('.accordion-body ol');
+
+//                 articles.forEach(article => {
+//                     const id = article.id;
+//                     const heading = article.querySelector('h3, h4');
+//                     if (heading) {
+//                         const li = document.createElement('li');
+//                         li.className = 'p-1';
+//                         const anchor = document.createElement('a');
+//                         anchor.href = `#${id}`;
+//                         anchor.innerHTML = `<i class="fas fa-chevron-circle-right"></i> ${heading.textContent.trim()}`;
+//                         li.appendChild(anchor);
+//                         tocList.appendChild(li);
+//                     }
+//                 });
+//             }
+//         } catch (e) { console.log('Could Not insert Automatically Generated Table of Contents') }
+//     });
+// })();
+// (function () {
+// document.addEventListener('DOMContentLoaded', function () {
+//     try {
+//         // Select all article elements with class 'borderart', 'auto_id', or 'genautoid'
+//         const articlesWithBorderArt = document.querySelectorAll('article.auto_id, article.borderart, article.genautoid');
+
+//         // Loop through each article and assign a random ID
+//         articlesWithBorderArt.forEach(function (article) {
+//             var randomId = 'article-' + Math.floor(Math.random() * 1000000);
+//             article.setAttribute('id', randomId);
+//         });
+
+//         const main = document.querySelector('main');
+//         const existingToc = main.querySelector('.accordion#toc');
+//         const autogen_tableofcontents = main.querySelector('.agen-tableofcontents');
+
+//         if (autogen_tableofcontents && !existingToc) {
+//             const accordionId = randomidgenerator();
+//             const collapseId = randomidgenerator();
+
+//             // Check if a ToC does not already exist                           
+//             const tocHTML = `
+//                         <div class="container mt-4 w-100 w-xl-75 d-print-none">
+//                             <div class="accordion" id="toc">
+//                                 <div class="accordion-item">
+//                                     <h2 class="accordion-header" id="h1">
+//                                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#c1" aria-controls="c1" aria-expanded="false">
+//                                             <i class="fas fa-book"></i> <strong>&nbsp;Table of Contents</strong>
+//                                         </button>
+//                                     </h2>
+//                                     <div id="c1" class="accordion-collapse collapse" aria-labelledby="h1" data-bs-parent="#toc">
+//                                         <div class="accordion-body">
+//                                             <ol class="list-unstyled p-0 m-0"></ol>
+//                                         </div>
+//                                     </div>
+//                                 </div>
+//                             </div>
+//                         </div>`;
+
+//             // Append the ToC HTML to the autogen_tableofcontents
+//             autogen_tableofcontents.innerHTML += tocHTML;
+
+//             window.autogen_tableofcontents = 1;
+//         }
+
+//         if (window.autogen_tableofcontents) {
+//             // Proceed to populate the ToC with entries as necessary
+//             const articles = document.querySelectorAll('article[id]');
+//             const tocList = document.querySelector('.accordion-body ol');
+
+//             articles.forEach(article => {
+//                 const id = article.id;
+//                 const heading = article.querySelector('h3, h4');
+//                 if (heading) {
+//                     const li = document.createElement('li');
+//                     li.className = 'p-1';
+//                     const anchor = document.createElement('a');
+//                     anchor.href = `#${id}`;
+//                     anchor.innerHTML = `<i class="fas fa-chevron-circle-right"></i> ${heading.textContent.trim()}`;
+//                     li.appendChild(anchor);
+//                     tocList.appendChild(li);
+//                 }
+//             });
+//         }
+//     } catch (e) {
+//         console.log('Could Not insert Automatically Generated Table of Contents', e);
+//     }
+// });
+// })();
+(function () {
+    document.addEventListener('DOMContentLoaded', () => {
+        try {
+            // Select all article elements with class 'borderart', 'auto_id', or 'genautoid'
+            const articlesWithBorderArt = document.querySelectorAll('article.auto_id, article.borderart, article.genautoid, article.autoid, article.auto-id');
 
             // Loop through each article and assign a random ID
-            articlesWithBorderArt.forEach(function (article) {
-                var randomId = 'article-' + Math.floor(Math.random() * 1000000);
-                article.setAttribute('id', randomId);
+            articlesWithBorderArt.forEach(article => {
+                const randomId = 'article-' + randomidgenerator();
+                article.id = randomId;
             });
 
             const main = document.querySelector('main');
-            const firstArticle = main.querySelector('article');
             const existingToc = main.querySelector('.accordion#toc');
-            const autogen_tableofcontents = main.querySelector('.agen-tableofcontents');
+            const autogenTableOfContents = main.querySelector('.agen-tableofcontents');
 
-            if (autogen_tableofcontents && !existingToc) {
-                // Check if a ToC does not already exist            
+            // Check if there are any articles with IDs to be listed in the ToC
+            const articles = main.querySelectorAll('article[id]');
+
+            if (autogenTableOfContents && !existingToc && articles.length > 0) {
+                // Generate a random ID for the accordion
+                const accordionId = randomidgenerator();
+                const collapseId = randomidgenerator();
+
+                // Check if a ToC does not already exist
                 const tocHTML = `
-            <div class="container mt-4 w-100 w-xl-75 d-print-none">
-                <div class="accordion" id="toc">
-                    <div class="accordion-item">
-                        <h2 class="accordion-header" id="h1">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#c1" aria-controls="c1" aria-expanded="false">
-                                <i class="fas fa-book"></i> <strong>&nbsp;Table of Contents</strong>
-                            </button>
-                        </h2>
-                        <div id="c1" class="accordion-collapse collapse" aria-labelledby="h1" data-bs-parent="#toc">
-                            <div class="accordion-body">
-                                <ol class="list-unstyled p-0 m-0"></ol>
+                        <div class="container mt-4 w-100 w-xl-75 d-print-none">
+                            <div class="accordion" id="${accordionId}">
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="h1">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#${collapseId}" aria-controls="${collapseId}" aria-expanded="false">
+                                            <i class="fas fa-book"></i> <strong>&nbsp;Table of Contents</strong>
+                                        </button>
+                                    </h2>
+                                    <div id="${collapseId}" class="accordion-collapse collapse" aria-labelledby="h1" data-bs-parent="#${accordionId}">
+                                        <div class="accordion-body">
+                                            <ol class="list-unstyled p-0 m-0"></ol>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
-            </div>`;
+                        </div>`;
 
-                // Append the ToC HTML to the first article
-                // firstArticle.innerHTML += tocHTML;
-                autogen_tableofcontents.innerHTML += tocHTML;
+                // Append the ToC HTML to the autogen_tableofcontents
+                autogenTableOfContents.innerHTML += tocHTML;
 
-                window.autogen_tableofcontents = 1;
-            }
-
-            if (window.autogen_tableofcontents) {
                 // Proceed to populate the ToC with entries as necessary
-                const articles = document.querySelectorAll('article[id]');
                 const tocList = document.querySelector('.accordion-body ol');
 
                 articles.forEach(article => {
                     const id = article.id;
                     const heading = article.querySelector('h3, h4');
-                    if (heading) {
+                    if (heading && id) {
                         const li = document.createElement('li');
                         li.className = 'p-1';
                         const anchor = document.createElement('a');
@@ -5902,11 +6669,22 @@ const certifications = {
                     }
                 });
             }
-        } catch (e) { console.log('Could Not insert Automatically Generated Table of Contents')}
+        } catch (e) {
+            console.log('Could not insert Automatically Generated Table of Contents');
+        }
     });
 })();
 
 
+/********* Add Spaced Repeatition LocalStorage ************/
+// (function () {    
+//     const currentUrl = window.location.href;
+//     if (currentUrl) {
+//         const visitDate = Date.now();
+//         localStorage.setItem(`SpacedRepeatpageLoadTime-${currentUrl}`, visitDate);
+//         console.log(`Logged visit for ${currentUrl} at ${new Date(visitDate)}`);
+//     }
+// })();
 
 
 /******** Fetch updated content from the server automatically ********/
@@ -6126,7 +6904,116 @@ window.onload = function () {
     // console.log("Total time to read the webpage: " + totalTime + " minutes");
 };
 
-/******* SECURITY SUITE START *******/
+
+/****************** Get the name from the user using bootstrap modal ***********************/
+// (function () {
+//     if (localStorage.getItem('userName')) return;
+//     document.addEventListener("DOMContentLoaded", function () {
+//         // append jquery to head
+//         var jq = document.createElement('script');
+//         jq.src = cdnjs_jquery;
+//         document.head.appendChild(jq);
+//         // ensure jquery is loaded before continuing
+//         jq.onload = function () {
+//             // append bootstrap to head
+//             var bs = document.createElement('script');
+//             bs.src = cdnjs_bootstrap;
+//             document.head.appendChild(bs);
+//             // ensure bootstrap is loaded before continuing
+//             bs.onload = function () {
+
+//                 const warningId = 'warning-' + Math.random().toString(36).substr(2, 9);
+//                 let isWarningDisplayed = false;
+
+//                 const showModal = () => {
+//                     if (!document.getElementById('nameModal')) {
+//                         document.body.innerHTML += `
+//                             <div class="modal fade" id="nameModal" tabindex="-1" aria-labelledby="nameModalLabel" aria-hidden="true">
+//                                 <div class="modal-dialog">
+//                                     <div class="modal-content">
+//                                         <div class="modal-header">
+//                                             <h5 class="modal-title" id="nameModalLabel">Welcome</h5>
+//                                             <button type="button" class="btn-close" id="closeModalButton" aria-label="Close"></button>
+//                                         </div>
+//                                         <div class="modal-body">
+//                                             <p>Please enter your name so we can personalize your experience. All data is stored locally on your system and never sent to our servers.</p>
+//                                             <form id="nameForm">
+//                                                 <div class="mb-3">
+//                                                     <label for="userName" class="form-label">Please enter your first name:</label>
+//                                                     <input type="text" class="form-control" id="userName" required>
+//                                                     <div id="${warningId}" class="mt-2" style="display: none; color: red; font-size: 0.9em;">If you want to use the name "Guest", please click Save or Close again.</div>
+//                                                 </div>
+//                                             </form>
+//                                         </div>
+//                                         <div class="modal-footer">
+//                                             <button type="button" class="btn btn-primary" id="saveNameButton">Save</button>
+//                                         </div>
+//                                     </div>
+//                                 </div>
+//                             </div>
+//                         `;
+//                     }
+
+//                     const nameModal = new bootstrap.Modal(document.getElementById('nameModal'));
+//                     nameModal.show();
+
+//                     const saveName = () => {
+//                         const userName = document.getElementById('userName').value.trim();
+//                         if (!userName && !isWarningDisplayed) {
+//                             document.getElementById(warningId).style.display = 'block';
+//                             isWarningDisplayed = true;
+//                         } else {
+//                             localStorage.setItem('userName', userName || 'Guest');
+//                             nameModal.hide();
+//                             location.reload();
+//                         }
+//                     };
+
+//                     document.getElementById('saveNameButton').addEventListener('click', saveName);
+//                     document.getElementById('userName').addEventListener('keypress', (e) => {
+//                         if (e.key === 'Enter') {
+//                             e.preventDefault();
+//                             saveName();
+//                         }
+//                     });
+
+//                     document.getElementById('closeModalButton').addEventListener('click', () => {
+//                         if (!isWarningDisplayed) {
+//                             document.getElementById(warningId).style.display = 'block';
+//                             isWarningDisplayed = true;
+//                         } else {
+//                             localStorage.setItem('userName', 'Guest');
+//                             nameModal.hide();
+//                             location.reload();
+//                         }
+//                     });
+
+//                     document.getElementById('nameModal').addEventListener('hidden.bs.modal', () => {
+//                         if (!localStorage.getItem('userName')) {
+//                             nameModal.show();
+//                         }
+//                     });
+//                 };
+
+//                 if (!localStorage.getItem('userName')) {
+//                     showModal();
+//                 }
+//             };
+//         };
+//     });
+// })();
+
+/***************** GOOGLE LOGIN SUITE START *********************/
+(function () {
+    function test() {
+        var script = document.createElement('script');
+        script.src = 'https://accounts.google.com/gsi/client';
+        script.async = true;
+        script.defer = true;
+        document.head.appendChild(script);
+    }
+})();
+/***************** SECURITY SUITE START *************************/
 (function () {
     if (location.hostname === "dmj.one" && !window.dontdisable) {
         const clearinteral_sakjds = window.setInterval(function () {
@@ -6443,6 +7330,15 @@ window.addEventListener("load", async function () {
             copyright("all");
         }
     }
+
+    // Maintenence Mode    
+    maintainence_mode ? showNotification(maintainence_message, {
+        headerClass: 'toast-header bg-warning bg-opacity-50',
+        headerIcon: 'bi bi-tools',
+        headerText: 'Undergoing Maintenance',
+        bodyClass: 'toast-body text-justify',
+        playSound: false,
+    }) : null;
 });
 
 

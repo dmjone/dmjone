@@ -15,17 +15,7 @@ function get_menu_list(datetogen) {
                 codetype: "Assignment"
             } */
         ];
-        for (let i = 0; i < arr.length; i++) {
-            const _data = arr[i];
-            title = _data.title || null; if (!title) continue; // Set the title and if thats not possible, skip the loop
-            link = _data.link || null;
-            date = _data.date ? _data.date : `${gendate(def_date)}`;
-            desc = _data.desc || `${title}`;
-            codetype = _data.codetype ? `Design Thinking | ${_data.codetype}` : `Design Thinking`;
-            readtime = _data.readtime || r(14); readtime = null; // Null readtime - Special Case
-            author = _data.author || def_author; author = null; // Null author - Special Case
-            body_blockcards(link, date, title, desc, codetype, readtime, author);
-        }
+        body_genmenu.processData(arr, def_date, def_author, { isMainCategory: true });
     }
     function get_insight(def_date, def_author) {
         const arr = [
@@ -56,17 +46,7 @@ function get_menu_list(datetogen) {
             },
 
         ];
-        for (let i = 0; i < arr.length; i++) {
-            const _data = arr[i];
-            title = _data.title || null; if (!title) continue; // Set the title and if thats not possible, skip the loop
-            link = _data.link || `s${i + 1}`;
-            date = _data.date ? _data.date : `${gendate(def_date)}`;
-            desc = _data.desc || `${title} ${i}`;
-            codetype = _data.codetype ? `Design Thinking | ${_data.codetype}` : `Design Thinking | Introduction`;
-            readtime = _data.readtime || r(14);
-            author = _data.author || def_author;
-            body_blockcards(link, date, title, desc, codetype, readtime, author);
-        }
+        body_genmenu.processData(arr, def_date, def_author);
     }
     function get_seminar(def_date, def_author) {
         const arr = [
@@ -79,17 +59,7 @@ function get_menu_list(datetogen) {
                 desc: "Expand your knowledge on Electromagnetic Waves! Learn about formation of Electromagnetic Waves, its real-world applications, characterstics, polarization, frequency and wavelength. Get ready to broaden your horizons.This seminar was presented on Electromagnetic Waves."
             }
         ];
-        for (let i = 0; i < arr.length; i++) {
-            const _data = arr[i];
-            title = _data.title || null; if (!title) continue; // Set the title and if thats not possible, skip the loop
-            link = _data.link || `s${i + 1}`;
-            date = _data.date ? _data.date : `${gendate(def_date)}`;
-            desc = _data.desc || `${title} ${i}`;
-            codetype = _data.codetype ? `Physics | ${_data.codetype}` : `Physics | Seminar`;
-            readtime = _data.readtime || r(5);
-            author = _data.author || def_author;
-            body_blockcards(link, date, title, desc, codetype, readtime, author);
-        }
+        body_genmenu.processData(arr, def_date, def_author);
     }
     function get_assignment(def_date, def_author) {
         const arr = [
@@ -102,32 +72,11 @@ function get_menu_list(datetogen) {
                 desc: "Dive into Magnetic Materials & Laser Applications! Learn about different types of magnetic materials, their properties, and the cutting-edge applications of laser technology. Get ready to be amazed by the power of magnetism and light!"
             }
         ];
-        for (let i = 0; i < arr.length; i++) {
-            const _data = arr[i];
-            title = _data.title || null; if (!title) continue; // Set the title and if thats not possible, skip the loop
-            link = _data.link || `a${i + 1}`;
-            date = _data.date ? _data.date : `${gendate(def_date)}`;
-            desc = _data.desc || `${title} ${i}`;
-            codetype = _data.codetype ? `Physics | ${_data.codetype}` : `Physics | Assignment`;
-            readtime = _data.readtime || r(6);
-            author = _data.author || def_author;
-            body_blockcards(link, date, title, desc, codetype, readtime, author);
-        }
+        body_genmenu.processData(arr, def_date, def_author);
     }
 
     /**********  AUTOMATION CONTROL **********/
-    // Get Random date near the entered date. 
-    function gendate(date) {
-        var inputDate = new Date(date);
-        var offset = Math.floor(Math.random() * 20 - 10) * 24 * 60 * 60 * 1000;
-        var newDate = new Date(inputDate.getTime() + offset);
-        var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-        var weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-        var outputDate = weekdays[newDate.getUTCDay()] + " " + months[newDate.getUTCMonth()] + " " + newDate.getUTCDate() + ", " + newDate.getUTCFullYear();
-        return outputDate;
-    }
-    function r(t) { return Math.floor(Math.random() * 10) + t }
-    var title, desc, codetype, readtime, author = 1, link;
+    let title, link, date, desc, codetype, readtime, author = 1, semester, cardimage, continuereading;
     const functions = {
         insight: get_insight,
         // seminar: get_seminar,

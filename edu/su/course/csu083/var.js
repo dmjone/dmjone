@@ -22,20 +22,7 @@ function get_menu_list(datetogen) {
             },
 
         ];
-
-        for (let i = 0; i < arr.length; i++) {
-            const _data = arr[i];
-            title = _data.title || null; if (!title) continue; // Set the title and if thats not possible, skip the loop
-            link = _data.link || null;
-            date = _data.date ? _data.date : `${gendate(def_date)}`;
-            desc = _data.desc || `${title}`;
-            codetype = _data.codetype ? `${_data.codetype}` : `CSU1291`;
-            readtime = _data.readtime || r(4); readtime = null; // Null readtime - Special Case
-            author = _data.author || def_author; author = null; // Null author - Special Case
-            cardimage = _data.cardimage || null;
-            semester = _data.semester || null;
-            body_blockcards(link, date, title, desc, codetype, readtime, author, semester, cardimage);
-        }
+        body_genmenu.processData(arr, def_date, def_author, { isMainCategory: true });
     }
     function get_class(def_date, def_author) {
         const arr = [
@@ -43,39 +30,25 @@ function get_menu_list(datetogen) {
                 title: "Priori vs. Posteriori Analysis: Navigating Algorithmic Efficiency",
                 desc: "Dive deep into the world of algorithm analysis with our comprehensive guide. Unravel the theoretical predictions of a priori and contrast them with the empirical insights of a posteriori. From foundational concepts to advanced nuances, this guide offers a holistic perspective. Begin your journey into the heart of algorithmic efficiency now!",
                 codetype: "Algorithm Analysis",
-                readtime: r(5),
+                readtime: 5,
                 link: "priori-posteriori-analysis"
             },
             {
                 title: "Almost Complete Binary Trees: Unveiling Structural Efficiency",
                 desc: "Embark on an exploratory odyssey into the world of Almost Complete Binary Trees with our in-depth guide. Discover the delicate balance and optimized structure of ACBTs, bridging theoretical principles with practical execution. From elemental concepts to complex applications, this guide encapsulates a comprehensive view of ACBTs. Initiate your intellectual venture into the essence of data structural efficiency today!",
                 codetype: "Data Structures",
-                readtime: r(5),
+                readtime: 5,
                 link: "almost-complete-binary-tree"
             },
             {
                 title: "Revision of Concepts",
                 desc: "Delve deep into the intricate world with our extensive revision of concepts. Unravel the complexities and strategic approaches of fundamental theories with advanced problem-solving techniques. This guide provides a overview of all the concepts, from basic recursion to advanced tabulation strategies. Embark on your journey to mastering efficient algorithms and optimal solutions in the realm of Design and Analysis of Algorithm!",
                 codetype: "Revision",
-                readtime: r(6),
+                readtime: 6,
                 link: "revision"
             }
-
-
         ];
-        for (let i = 0; i < arr.length; i++) {
-            const _data = arr[i];
-            title = _data.title || null; if (!title) continue; // Set the title and if thats not possible, skip the loop
-            link = _data.link || `c${i + 1}`;
-            date = _data.date ? _data.date : `${gendate(def_date)}`;
-            desc = _data.desc || `${title} ${i}`;
-            codetype = _data.codetype ? `CSU1291 | ${_data.codetype}` : `CSU1291 | Concepts`;
-            readtime = _data.readtime || r(4);
-            author = _data.author || def_author;
-            cardimage = _data.cardimage || null;
-            semester = _data.semester || null;
-            body_blockcards(link, date, title, desc, codetype, readtime, author, semester, cardimage);
-        }
+        body_genmenu.processData(arr, def_date, def_author);
     }
     function get_lab(def_date, def_author) {
         const arr = [
@@ -161,35 +134,12 @@ function get_menu_list(datetogen) {
                 date: "Thursday, November 15, 2023"
             },
         ];
-        for (let i = 0; i < arr.length; i++) {
-            const _data = arr[i];
-            title = _data.title || null; if (!title) continue; // Set the title and if thats not possible, skip the loop
-            link = _data.link || `p${i + 1}`;
-            date = _data.date ? _data.date : `${gendate(def_date)}`;
-            desc = _data.desc || `${title} ${i}`;
-            codetype = _data.codetype ? `CSU1291P | ${_data.codetype}` : `CSU1291P | Lab`;
-            readtime = _data.readtime || r(5);
-            author = _data.author || def_author;
-            cardimage = _data.cardimage || null;
-            semester = _data.semester || null;
-            body_blockcards(link, date, title, desc, codetype, readtime, author, semester, cardimage);
-        }
+        body_genmenu.processData(arr, def_date, def_author);
     }
 
 
-    /**********  AUTOMATION CONTROL **********/
-    // Get Random date near the entered date. 
-    function gendate(date) {
-        var inputDate = new Date(date);
-        var offset = Math.floor(Math.random() * 20 - 10) * 24 * 60 * 60 * 1000;
-        var newDate = new Date(inputDate.getTime() + offset);
-        var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-        var weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-        var outputDate = weekdays[newDate.getUTCDay()] + " " + months[newDate.getUTCMonth()] + " " + newDate.getUTCDate() + ", " + newDate.getUTCFullYear();
-        return outputDate;
-    }
-    function r(t) { return Math.floor(Math.random() * 10) + t }
-    var title, desc, codetype, readtime, author = 1, link, semester, cardimage;
+    /**********  AUTOMATION CONTROL **********/    
+    let title, link, date, desc, codetype, readtime, author = 1, semester, cardimage, continuereading;
     const functions = {
         theory: get_class,
         lab: get_lab,

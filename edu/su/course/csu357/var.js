@@ -29,20 +29,7 @@ function get_menu_list(datetogen) {
             }, 
         ];
 
-        for (let i = 0; i < arr.length; i++) {
-            const _data = arr[i];
-            title = _data.title || null; if (!title) continue; // Set the title and if thats not possible, skip the loop
-            link = _data.link || null;
-            date = _data.date ? _data.date : `${gendate(def_date)}`;            
-            desc = _data.desc || `${title}`;
-            codetype = _data.codetype ? `${_data.codetype}` : `CSU1162`;
-            readtime = _data.readtime || r(4); readtime = null; // Null readtime - Special Case
-            author = _data.author || def_author; author = null; // Null author - Special Case
-            semester = _data.semester || null;
-            cardimage = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? _data.cardimage_dark : _data.cardimage || null;
-            continuereading = _data.continuereading || null;
-            body_blockcards(link, date, title, desc, codetype, readtime, author, semester, cardimage, continuereading);
-        }
+        body_genmenu.processData(arr, def_date, def_author, { isMainCategory: true });
     }
     function get_class(def_date, def_author) {
         const arr = [
@@ -203,20 +190,7 @@ function get_menu_list(datetogen) {
 
 
         ];
-        for (let i = 0; i < arr.length; i++) {
-            const _data = arr[i];
-            title = _data.title || null; if (!title) continue; // Set the title and if thats not possible, skip the loop
-            link = _data.link || null;
-            date = _data.date ? _data.date : `${gendate(def_date)}`;
-            desc = _data.desc || `${title}`;
-            codetype = _data.codetype ? `${_data.codetype}` : `CSU1162`;
-            readtime = _data.readtime || r(4);
-            author = _data.author || def_author;
-            semester = _data.semester || null;
-            cardimage = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? _data.cardimage_dark : _data.cardimage || null;
-            continuereading = _data.continuereading || null;
-            body_blockcards(link, date, title, desc, codetype, readtime, author, semester, cardimage, continuereading);
-        }
+        body_genmenu.processData(arr, def_date, def_author);
     }
     function get_lab(def_date, def_author) {
         const arr = [
@@ -404,36 +378,12 @@ function get_menu_list(datetogen) {
             // },
         ];
 
-        for (let i = 0; i < arr.length; i++) {
-            const _data = arr[i];
-            title = _data.title || null; if (!title) continue; // Set the title and if thats not possible, skip the loop
-            link = _data.link || null;
-            date = _data.date ? _data.date : `${gendate(def_date)}`;
-            desc = _data.desc || `${title}`;
-            codetype = _data.codetype ? `${_data.codetype}` : `CSU1162`;
-            readtime = _data.readtime || r(4); 
-            author = _data.author || def_author;
-            semester = _data.semester || null;
-            cardimage = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? _data.cardimage_dark : _data.cardimage || null;
-            continuereading = _data.continuereading || null;
-            body_blockcards(link, date, title, desc, codetype, readtime, author, semester, cardimage, continuereading);
-        }
+        body_genmenu.processData(arr, def_date, def_author);
     }
 
 
     /**********  AUTOMATION CONTROL **********/
-    // Get Random date near the entered date. 
-    function gendate(date) {
-        var inputDate = new Date(date);
-        var offset = Math.floor(Math.random() * 20 - 10) * 24 * 60 * 60 * 1000;
-        var newDate = new Date(inputDate.getTime() + offset);
-        var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-        var weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-        var outputDate = weekdays[newDate.getUTCDay()] + " " + months[newDate.getUTCMonth()] + " " + newDate.getUTCDate() + ", " + newDate.getUTCFullYear();
-        return outputDate;
-    }
-    function r(t) { return Math.floor(Math.random() * 10) + t }
-    var title, desc, codetype, readtime, author = 1, link, semester, cardimage;
+    let title, link, date, desc, codetype, readtime, author = 1, semester, cardimage, continuereading;
     const functions = {
         theory: get_class,
         lab: get_lab,
