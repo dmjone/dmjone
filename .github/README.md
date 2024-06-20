@@ -1,10 +1,3 @@
-<!--Code Efficiency: [![CodeFactor](https://www.codefactor.io/repository/github/dmjone/dmjone/badge)](https://www.codefactor.io/repository/github/dmjone/dmjone)-->
-![Website](https://img.shields.io/website?url=https%3A%2F%2Fdmj.one&style=for-the-badge&logo=internetarchive&label=https%3A%2F%2Fdmj.one)  ![GitHub last commit](https://img.shields.io/github/last-commit/dmjone/dmjone?style=for-the-badge&label=last%20updated&logo=github)
-
-![CodeFactor Grade](https://img.shields.io/codefactor/grade/github/dmjone/dmjone?style=for-the-badge&label=CodeFactor%20Efficiency&logo=codefactor)  ![GitHub repo size](https://img.shields.io/github/repo-size/dmjone/dmjone?style=for-the-badge&label=code%20size&logo=cloudflare)  ![GitHub language count](https://img.shields.io/github/languages/count/dmjone/dmjone?style=for-the-badge&label=top/total%20language&logo=html5) 
-
-![GitHub Created At](https://img.shields.io/github/created-at/divyamohan1993/divyamohan1993.github.io?style=for-the-badge&logo=windowsterminal&label=live%20since&color=gold)  ![GitHub Created At](https://img.shields.io/github/created-at/dmjone/dmjone?style=for-the-badge&label=transferred%20here&logo=github)  ![Static Badge](https://img.shields.io/badge/initiative%20started-april%202007-auto?style=for-the-badge&color=darkred)
-
 <!-- [![Deploy static content to Pages](https://github.com/dmjone/dmjone.github.io/actions/workflows/pages.yml/badge.svg)](https://github.com/dmjone/dmjone.github.io/actions/workflows/pages.yml)  |  [![CodeQL](https://github.com/dmjone/dmjone.github.io/actions/workflows/codeql.yml/badge.svg)](https://github.com/dmjone/dmjone.github.io/actions/workflows/codeql.yml) |  [![Dependency Review](https://github.com/dmjone/dmjone.github.io/actions/workflows/dependency-review.yml/badge.svg)](https://github.com/dmjone/dmjone.github.io/actions/workflows/dependency-review.yml)-->
 ***
 
