@@ -14,8 +14,9 @@ const cdnjs_katex_autorender = "https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.1
 const cdnjs_font_awesome = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js";
 const cdnjs_cryptoJS = "https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js";
 const google_login_js = "https://accounts.google.com/gsi/client";
-const randomidgenerator = (i = 10) => [...Array(i)].map(() => 'abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRTUVWXYZ23456789'[Math.floor(Math.random() * 55)]).join('');
+const cdnjs_DOMPurify = "https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.5/purify.min.js";
 
+const randomidgenerator = (i = 10) => [...Array(i)].map(() => 'abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRTUVWXYZ23456789'[Math.floor(Math.random() * 55)]).join('');
 const maintainence_mode = 1;
 const maintainence_message = "Some links, images, and features may not work as expected. Thank you for your patience.";
 
@@ -411,7 +412,7 @@ const body_pomodoro_helptext = `
     var qrcode_js = "/js/qrcode.js";
     document.write(`<script src='${qrcode_js}'></script>`);
 
-    const allScripts = [google_login_js, cdnjs_jquery, cdnjs_bootstrap, cdnjs_highlightjs, cdnjs_font_awesome, cdnjs_cryptoJS, cdnjs_highlightjs_asm];
+    const allScripts = [google_login_js, cdnjs_jquery, cdnjs_bootstrap, cdnjs_DOMPurify, cdnjs_highlightjs, cdnjs_font_awesome, cdnjs_cryptoJS, cdnjs_highlightjs_asm];
     var loadScript = function (src) {
         return new Promise(function (resolve, reject) {
             var script = document.createElement('script');
@@ -6557,7 +6558,7 @@ const certifications = {
 //             const accordionId = randomidgenerator();
 //             const collapseId = randomidgenerator();
 
-//             // Check if a ToC does not already exist                           
+//             // Check if a ToC does not already exist
 //             const tocHTML = `
 //                         <div class="container mt-4 w-100 w-xl-75 d-print-none">
 //                             <div class="accordion" id="toc">
@@ -6606,74 +6607,149 @@ const certifications = {
 //     }
 // });
 // })();
+// (function () {
+//     document.addEventListener('DOMContentLoaded', () => {
+//         try {
+//             // Select all article elements with class 'borderart', 'auto_id', or 'genautoid'
+//             const articlesWithBorderArt = document.querySelectorAll('article.auto_id, article.borderart, article.genautoid, article.autoid, article.auto-id');
+
+//             // Loop through each article and assign a random ID
+//             articlesWithBorderArt.forEach(article => {
+//                 const randomId = 'article-' + randomidgenerator();
+//                 article.id = randomId;
+//             });
+
+//             const main = document.querySelector('main');
+//             const existingToc = main.querySelector('.accordion#toc');
+//             const autogenTableOfContents = main.querySelector('.agen-tableofcontents');
+
+//             // Check if there are any articles with IDs to be listed in the ToC
+//             const articles = main.querySelectorAll('article[id]');
+
+//             if (autogenTableOfContents && !existingToc && articles.length > 0) {
+//                 // Generate a random ID for the accordion
+//                 const accordionId = randomidgenerator();
+//                 const collapseId = randomidgenerator();
+
+//                 // Check if a ToC does not already exist
+//                 const tocHTML = `
+//                         <div class="container mt-4 w-100 w-xl-75 d-print-none">
+//                             <div class="accordion" id="${accordionId}">
+//                                 <div class="accordion-item">
+//                                     <h2 class="accordion-header" id="h1">
+//                                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#${collapseId}" aria-controls="${collapseId}" aria-expanded="false">
+//                                             <i class="fas fa-book"></i> <strong>&nbsp;Table of Contents</strong>
+//                                         </button>
+//                                     </h2>
+//                                     <div id="${collapseId}" class="accordion-collapse collapse" aria-labelledby="h1" data-bs-parent="#${accordionId}">
+//                                         <div class="accordion-body">
+//                                             <ol class="list-unstyled p-0 m-0"></ol>
+//                                         </div>
+//                                     </div>
+//                                 </div>
+//                             </div>
+//                         </div>`;
+
+//                 // Append the ToC HTML to the autogen_tableofcontents
+//                 autogenTableOfContents.innerHTML += tocHTML;
+
+//                 // Proceed to populate the ToC with entries as necessary
+//                 const tocList = document.querySelector('.accordion-body ol');
+
+//                 articles.forEach(article => {
+//                     const id = article.id;
+//                     const heading = article.querySelector('h3, h4');
+//                     if (heading && id) {
+//                         const li = document.createElement('li');
+//                         li.className = 'p-1';
+//                         const anchor = document.createElement('a');
+//                         anchor.href = `#${id}`;
+//                         // anchor.innerHTML = `<i class="fas fa-chevron-circle-right"></i> ${heading.textContent.trim()}`;
+//                         // Use DOMPurify to sanitize the HTML
+//                         console.log('DOMPurify is:', DOMPurify);
+//                         // const cleanHTML = DOMPurify.sanitize(`<i class="fas fa-chevron-circle-right"></i> ${heading.textContent.trim()}`);
+//                         anchor.innerHTML = cleanHTML;
+//                         console.log('Sanitized HTML:', cleanHTML);
+//                         li.appendChild(anchor);
+//                         tocList.appendChild(li);
+//                     }
+//                 });
+//             }
+//         } catch (e) {
+//             console.log('Could not insert Automatically Generated Table of Contents', e);
+//         }
+//     });
+// })();
+
 (function () {
     document.addEventListener('DOMContentLoaded', () => {
-        try {
-            // Select all article elements with class 'borderart', 'auto_id', or 'genautoid'
-            const articlesWithBorderArt = document.querySelectorAll('article.auto_id, article.borderart, article.genautoid, article.autoid, article.auto-id');
+        function checkAndExecute() {
+            if (typeof DOMPurify !== 'undefined' && DOMPurify.sanitize) {
+                // Your code that requires DOMPurify
+                try {
+                    const articlesWithBorderArt = document.querySelectorAll('article.auto_id, article.borderart, article.genautoid, article.autoid, article.auto-id');
+                    articlesWithBorderArt.forEach(article => {
+                        const randomId = 'article-' + Math.random().toString(36).substr(2, 9);
+                        article.id = randomId;
+                    });
 
-            // Loop through each article and assign a random ID
-            articlesWithBorderArt.forEach(article => {
-                const randomId = 'article-' + randomidgenerator();
-                article.id = randomId;
-            });
+                    const main = document.querySelector('main');
+                    const existingToc = main.querySelector('.accordion#toc');
+                    const autogenTableOfContents = main.querySelector('.agen-tableofcontents');
+                    const articles = main.querySelectorAll('article[id]');
 
-            const main = document.querySelector('main');
-            const existingToc = main.querySelector('.accordion#toc');
-            const autogenTableOfContents = main.querySelector('.agen-tableofcontents');
+                    if (autogenTableOfContents && !existingToc && articles.length > 0) {
+                        const accordionId = Math.random().toString(36).substr(2, 9);
+                        const collapseId = Math.random().toString(36).substr(2, 9);
 
-            // Check if there are any articles with IDs to be listed in the ToC
-            const articles = main.querySelectorAll('article[id]');
-
-            if (autogenTableOfContents && !existingToc && articles.length > 0) {
-                // Generate a random ID for the accordion
-                const accordionId = randomidgenerator();
-                const collapseId = randomidgenerator();
-
-                // Check if a ToC does not already exist
-                const tocHTML = `
-                        <div class="container mt-4 w-100 w-xl-75 d-print-none">
-                            <div class="accordion" id="${accordionId}">
-                                <div class="accordion-item">
-                                    <h2 class="accordion-header" id="h1">
-                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#${collapseId}" aria-controls="${collapseId}" aria-expanded="false">
-                                            <i class="fas fa-book"></i> <strong>&nbsp;Table of Contents</strong>
-                                        </button>
-                                    </h2>
-                                    <div id="${collapseId}" class="accordion-collapse collapse" aria-labelledby="h1" data-bs-parent="#${accordionId}">
-                                        <div class="accordion-body">
-                                            <ol class="list-unstyled p-0 m-0"></ol>
+                        const tocHTML = `
+                            <div class="container mt-4 w-100 w-xl-75 d-print-none">
+                                <div class="accordion" id="${accordionId}">
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="h1">
+                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#${collapseId}" aria-controls="${collapseId}" aria-expanded="false">
+                                                <i class="fas fa-book"></i> <strong>&nbsp;Table of Contents</strong>
+                                            </button>
+                                        </h2>
+                                        <div id="${collapseId}" class="accordion-collapse collapse" aria-labelledby="h1" data-bs-parent="#${accordionId}">
+                                            <div class="accordion-body">
+                                                <ol class="list-unstyled p-0 m-0"></ol>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>`;
+                            </div>`;
+                        autogenTableOfContents.innerHTML += tocHTML;
+                        const tocList = document.querySelector('.accordion-body ol');
 
-                // Append the ToC HTML to the autogen_tableofcontents
-                autogenTableOfContents.innerHTML += tocHTML;
-
-                // Proceed to populate the ToC with entries as necessary
-                const tocList = document.querySelector('.accordion-body ol');
-
-                articles.forEach(article => {
-                    const id = article.id;
-                    const heading = article.querySelector('h3, h4');
-                    if (heading && id) {
-                        const li = document.createElement('li');
-                        li.className = 'p-1';
-                        const anchor = document.createElement('a');
-                        anchor.href = `#${id}`;
-                        anchor.innerHTML = `<i class="fas fa-chevron-circle-right"></i> ${heading.textContent.trim()}`;
-                        li.appendChild(anchor);
-                        tocList.appendChild(li);
+                        articles.forEach(article => {
+                            const id = article.id;
+                            const heading = article.querySelector('h3, h4');
+                            if (heading && id) {
+                                const li = document.createElement('li');
+                                li.className = 'p-1';
+                                const anchor = document.createElement('a');
+                                anchor.href = `#${id}`;
+                                const cleanHTML = DOMPurify.sanitize(`<i class="fas fa-chevron-circle-right"></i> ${heading.textContent.trim()}`);
+                                anchor.innerHTML = cleanHTML;
+                                li.appendChild(anchor);
+                                tocList.appendChild(li);
+                            }
+                        });
                     }
-                });
+                } catch (e) {
+                    console.log('Could not insert Automatically Generated Table of Contents', e);
+                }
+            } else {
+                // Retry after 100 milliseconds
+                setTimeout(checkAndExecute, 1000);
             }
-        } catch (e) {
-            console.log('Could not insert Automatically Generated Table of Contents');
         }
+
+        checkAndExecute();
     });
 })();
+
 
 
 /********* Add Spaced Repeatition LocalStorage ************/
