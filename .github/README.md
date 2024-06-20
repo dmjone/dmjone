@@ -8,7 +8,7 @@
 <!-- [![Deploy static content to Pages](https://github.com/dmjone/dmjone.github.io/actions/workflows/pages.yml/badge.svg)](https://github.com/dmjone/dmjone.github.io/actions/workflows/pages.yml)  |  [![CodeQL](https://github.com/dmjone/dmjone.github.io/actions/workflows/codeql.yml/badge.svg)](https://github.com/dmjone/dmjone.github.io/actions/workflows/codeql.yml) |  [![Dependency Review](https://github.com/dmjone/dmjone.github.io/actions/workflows/dependency-review.yml/badge.svg)](https://github.com/dmjone/dmjone.github.io/actions/workflows/dependency-review.yml)-->
 ***
 
-# dmj.one
+# dmj.one | ***Dream, Manifest, and Journey as One***
 
 [![GitHub issues](https://img.shields.io/github/issues/dmjone/dmjone?style=for-the-badge&logo=github)](https://github.com/dmjone/dmjone/issues)
 [![GitHub forks](https://img.shields.io/github/forks/dmjone/dmjone?style=for-the-badge&logo=github)](https://github.com/dmjone/dmjone/network)
@@ -35,7 +35,19 @@ dmj.one is a platform dedicated to bridging the education gap by providing free 
 
 Our mission is to empower learners by equipping them with the knowledge and skills they need to excel in computer science and engineering. We believe that education is a fundamental right, and it should be available to everyone. By leveraging technology and digital platforms, we strive to make educational resources accessible to those who need them the most.
 
+### Dream, Manifest, Journey
+
+- **Dream:** Aim high with your unique ambitions. The "D" in DMJ encourages you to dream boldly and creatively.
+- **Manifest:** Realize your dreams through consistent effort. The "M" reflects the journey of transforming your ambitions into achievements.
+- **Journey:** Learn and grow continuously. The "J" signifies the ongoing adventure of personal and professional development.
+
+### The Essence of .one
+
+The ".one" TLD signifies unity, focus, and purpose, embodying the spirit of our mission at dmj.one.
+
 ### What We Offer
+
+At dmj.one, we offer more than just educational resources—we provide a supportive community dedicated to helping you achieve your dreams. Our platform empowers you with the tools, guidance, and inspiration needed to succeed.
 
 - **Comprehensive Educational Resources**: We provide a wide range of educational materials for CSE learners, including textbooks, video tutorials, interactive exercises, and more. Our resources cover various subjects such as programming, data structures, algorithms, operating systems, computer networks, and advanced topics for higher education and research.
 - **User-Friendly Interface**: Our platform is designed to be intuitive and easy to navigate, making it accessible for learners of all ages and educational levels.
@@ -51,32 +63,6 @@ We operate on a not-for-profit basis, relying on the support of volunteers, dono
 We invite educators, industry experts, students, and supporters to join us in our mission. Whether it's by contributing content, providing financial support, or helping to spread the word, every bit of assistance helps us move closer to our goal of making quality education accessible to all CSE learners.
 
 Visit our [website](https://dmj.one) to learn more about our initiatives, explore our educational resources, and find out how you can get involved.
-
-
-<!-- ## About dmj.one
-
-dmj.one is a platform dedicated to bridging the education gap by providing free and accessible educational resources to children from all walks of life. Our primary goal is to ensure that every child, regardless of their socio-economic background, has the opportunity to receive a high-quality education.
-
-### Mission and Vision
-
-Our mission is to empower underprivileged children by equipping them with the knowledge and skills they need to succeed in life. We believe that education is a fundamental right, and it should be available to everyone. By leveraging technology and digital platforms, we strive to make educational resources available to those who need them the most.
-
-### What We Offer
-
-- **Comprehensive Educational Resources**: We provide a wide range of educational materials, including textbooks, video tutorials, interactive exercises, and more. Our resources cover various subjects and are tailored to different learning levels.
-- **User-Friendly Interface**: Our platform is designed to be intuitive and easy to navigate, making it accessible for children and educators alike.
-- **Regular Updates**: We continuously update our content to ensure that it remains relevant and up-to-date with the latest educational standards and practices.
-- **Multilingual Support**: To reach a broader audience, our resources are available in multiple languages.
-
-### How We Operate
-
-We operate on a not-for-profit basis, relying on the support of volunteers, donors, and partners who share our vision of quality education for all. Our platform is powered by open-source technologies, and we encourage community contributions to help us improve and expand our offerings.
-
-### Get Involved
-
-We invite educators, volunteers, and supporters to join us in our mission. Whether it's by contributing content, providing financial support, or helping to spread the word, every bit of assistance helps us move closer to our goal of making quality education accessible to all children.
-
-Visit our [website](https://dmj.one) to learn more about our initiatives, explore our educational resources, and find out how you can get involved. -->
 
 ## Getting Started
 
@@ -231,22 +217,32 @@ Project Link: [https://dmj.one/](https://dmj.one)
 
 Founder / Project Lead / Legal: Divya Mohan - [LinkedIn](https://www.linkedin.com/in/divyamohan1993/) - [Email](mailto:divyamohan1993@gmail.com)
 
-Contributors: 
+## Acknowledgements
 
-<!--
-# Welcome to the educational initiative of [dmj.one](https://dmj.one)!
+To view the full list of contributors, please visit our [GitHub Contributors Page](https://github.com/dmjone/dmjone/graphs/contributors).
 
-🎓 Are you a student studying computer science and engineering? Or maybe a teacher or industry expert who wants to share their knowledge with the next generation? We invite you to join our community and contribute to our educational content!
+### Special Thanks to Our Esteemed Contributors
 
-🌟 Our mission is to provide high-quality educational resources to students and teachers alike. The world is moving at an incredible pace, and we believe that education is the key to unlocking its full potential. By sharing knowledge, we empower individuals to achieve great things and make a positive impact on the world.
+We extend our heartfelt gratitude to our distinguished contributors:
 
-👋 Join our community and take part in our discussions, ask questions, and share your ideas. The power of community lies in its diversity. We welcome people from all backgrounds and levels of expertise to come together and collaborate on our educational platform.
+#### Distinguished Experts
+| Dr. Pankaj Vaidya | Dr. Gaurav Gupta | Dr. Anurag Rana |
+|:---------------:|:-----------------------:|:---------------:|
+| Dr. Brij Bhushan Sharma | Dr. Ravinder Thakur | Dr. Sonia |
 
-📚 This repository contains the frontend for our educational platform. We believe that education should be accessible to everyone, regardless of their socioeconomic status or geographic location. By leveraging technology, we aim to create a platform that breaks down barriers and enables anyone to access high-quality educational content.
+#### Asst. Prof. cum PhD Scholars
+||||
+|:-----------------------:|:------------------------:|:------------------------:|
+| Aarchit Joshi | Abhishek Tomar | Piyush Sewal | Ruchika Sharma |
 
-💻 We welcome contributions from anyone who is passionate about education and tech. Whether you're a seasoned expert or just starting out, your unique perspective and knowledge can help shape the future of tech education. Together, we can make a difference and empower the next generation of tech leaders.
+#### Aspiring Authors
+||||||
+|:--------------:|:---------------:|:-------------:|:----------:|:----------------:|
+| Aarushi Sharma | Anugraha Tamang | Ashutosh Rana | Asmi Goyal | Astha Chandel |
+| Harshal Khajuria | Jatin Sharma | Kamaksha Dogra | Kaustuv Sharma | Lakshika Tanwar |
+| Prithak Thapa | Rijul Chaudhary | Shrestha Shrivastava | Vanshika Painuly | Vinayak Awasthi |
 
-🌎 We believe that education has the power to change the world. By sharing our knowledge and working together, we can create a better future for everyone. Join our community and let's make a difference, together.
--->
+Your dedication and hard work make this project possible. Thank you!
+
 ***
 &copy; dmj.one
