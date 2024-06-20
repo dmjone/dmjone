@@ -189,12 +189,15 @@ We extend our heartfelt gratitude to our distinguished contributors:
 #### Distinguished Experts
 | Dr. Pankaj Vaidya | Dr. Gaurav Gupta | Dr. Anurag Rana |
 |:---------------:|:-----------------------:|:---------------:|
-| Dr. Brij Bhushan Sharma | Dr. Ravinder Thakur | Dr. Sonia |
+| Dr. Brij Bhushan Sharma | Dr. Bharti Thakur | Dr. Laxman Kathait |
+| Dr. Ravinder Thakur | Dr. Sonia |
 
 #### Asst. Prof. cum PhD Scholars
-||||
-|:-----------------------:|:------------------------:|:------------------------:|
-| Aarchit Joshi | Abhishek Tomar | Piyush Sewal | Ruchika Sharma |
+|||||
+|:-----------------------:|:------------------------:|:------------------------:|:------------------------:|
+| Aarchit Joshi | Abhishek Tomar | Abdullahi Adem | Anandita Garg |
+| Piyush Sewal | Puneet Kapoor | Raghav Sharma | Ruchika Sharma | 
+| Sahil Mishra | | | |
 
 #### Aspiring Authors
 ||||||
