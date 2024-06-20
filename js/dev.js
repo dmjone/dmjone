@@ -3711,7 +3711,7 @@ function maintenance_mode() {
             }
         } else {
             // Retry showing the toast after a delay if Bootstrap is not ready
-            setTimeout(() => showToast(settings), 100);
+            setTimeout(() => showToast(settings), 2000);
         }
     };
 
