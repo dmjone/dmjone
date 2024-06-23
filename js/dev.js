@@ -1037,6 +1037,8 @@ let header_author = function (...args) {
 
 /************************* Print Specific Layout Generator ****************************/
 (function () {
+
+    // support functions ----- adds a link to the print-article-APA6.css file if the path length is 6
     document.addEventListener('DOMContentLoaded', function () {
         const path = window.location.pathname.split('/').filter(Boolean); // Split the path and remove empty segments
 
@@ -1051,6 +1053,24 @@ let header_author = function (...args) {
             document.head.appendChild(linkElement);
         }
     });
+
+    // Print event listener ----- adds a print event listener to the document to handle Ctrl+P and scroll to top
+    document.addEventListener('keydown', function (event) {
+        // Check if Ctrl key is pressed along with the 'P' key
+        if (event.ctrlKey && event.key === 'p') {
+            // Prevent the default print behavior
+            event.preventDefault();
+
+            // Scroll to the top of the page
+            window.scrollTo(0, 0);
+
+            // Allow some time for the scroll action to complete before opening the print preview
+            setTimeout(function () {
+                window.print();
+            }, 100);
+        }
+    });
+
 })();
 
 (function () {
