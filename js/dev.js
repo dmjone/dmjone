@@ -962,7 +962,7 @@ let header_navbar = function (flags) {
 
     const allLinksHTML = (year1_links ? dropdown(year1_links) : '') + (year2_links ? dropdown(year2_links) : '') + (visible_links ? mainNav(visible_links) : '');
 
-    const finallinks = `
+    const finallinks = `    
     <nav class="navbar navbar-expand-md navbar-dark bg-dark sticky-top mw-100 px-3 py-3 shadow-lg" data-bs-theme="dark">
         <div class="container-fluid">
             ${headerNavHTML}
@@ -975,7 +975,9 @@ let header_navbar = function (flags) {
                 </ul>
             </div>
         </div>
-    </nav>`;
+    </nav>
+    <div class="breathing-animation sticky-top cursor-pointer m-1 p-0 mx-auto breathe21" onclick="location.href='/techniques/breathing'"></div>
+`;
 
     return finallinks;
 };
@@ -2400,7 +2402,7 @@ let header_author = function (...args) {
         if (!isloggedin) {
             console.log('User not logged in from displayLogin');
             // Redirect to login page if not logged in and currently on the account page
-            // if (window.location.pathname !== local_login_page_path || window.location.pathname !== '/') { globalautologinprompt(); }
+            if (window.location.pathname !== local_login_page_path || window.location.pathname !== '/') { globalautologinprompt(); }
             if (window.location.pathname === local_account_page_path) {
                 window.location.href = local_login_page_path + '?redirect=' + encodeURIComponent(window.location.pathname);
             }
