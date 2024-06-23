@@ -15,7 +15,7 @@ function Insert-Header {
 }
 
 # Get the files to process
-$files = Get-ChildItem -Path "C:\wamp64\www\my" -Filter *.html -Recurse
+$files = Get-ChildItem -Path "C:\wamp64\www" -Filter *.html -Recurse
 
 # Process each file
 foreach ($file in $files) {
