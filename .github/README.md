@@ -6,6 +6,7 @@
 [![GitHub issues](https://img.shields.io/github/issues/dmjone/dmjone?style=for-the-badge&logo=github)](https://github.com/dmjone/dmjone/issues)
 [![GitHub forks](https://img.shields.io/github/forks/dmjone/dmjone?style=for-the-badge&logo=github)](https://github.com/dmjone/dmjone/network)
 [![GitHub stars](https://img.shields.io/github/stars/dmjone/dmjone?style=for-the-badge&logo=github)](https://github.com/dmjone/dmjone/stargazers)
+![CII Best Practices](https://img.shields.io/cii/level/8790?style=for-the-badge&logo=OpenSSF)
 <!-- [![GitHub license](https://img.shields.io/github/license/dmjone/dmjone?style=for-the-badge&logo=github)](https://github.com/dmjone/dmjone/blob/main/LICENSE) -->
 
 Welcome to the official repository of **dmj.one**, an initiative dedicated to providing quality education for all, especially for underprivileged children.
