@@ -4304,7 +4304,10 @@ function copyright(rights, noprint) {
 /********************* Custom made dmj.one Plugins *********************/
 /******* Generate Blockquote **********/
 function gen_blockquote() {
-    var quoteblock = '<figure class="text-center shadow p-4 rounded bg-warning bg-gradient bg-opacity-25 p-5"><blockquote class="blockquote showquote"></blockquote><figcaption class="blockquote-footer showauthor"></figcaption>';
+    var quoteblock = `
+    <figure class="text-center bg-warning bg-gradient bg-opacity-25 pt-3 rounded-5 border border-1 border-warning shadow-lg">
+        <div class="showquote py-1 h5 blockquote px-2"></div>
+        <figcaption class="showauthor p-2 shadow-lg" style="background:var(--background-color)"></figcaption>`;
     document.write(quoteblock);
 
     async function quote() {

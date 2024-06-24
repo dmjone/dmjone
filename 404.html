@@ -35,24 +35,89 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
 
+        <style>
+            p {
+                font-size: 1rem;
+            }
+        </style>
+
     </head>
 
     <body class="position-absolute w-100">
 
-        <header class="p-5 py-3 bg-success bg-opacity-10">
-            <h1 style="font-family: inherit;" class=" shadow rounded text-center bg-danger bg-gradient bg-opacity-75 p-3 my-4">
-                Error 404 <br /> Page Not Found
-            </h1>
-            <p class="shadow rounded text-black text-center bg-info bg-gradient bg-opacity-25 p-3 my-4">While the page
-                you were trying to view does not exist, you can relax your mind with this thought before you go back!
-                <span style="font: menu; font-size: small; ">(Refresh for more quotes)</span>
+        <div class="container-fluid bg-success bg-opacity-10">
+            <div class="shadow rounded-bottom-5 text-center bg-danger bg-gradient bg-opacity-75 mt-4 border border-1 border-danger">
+                <h1 id="e404_dmjone_error404" class="display-1 text-uppercase py-3 neon-effect" style="background:var(--background-color)">
+                    Error 404
+                </h1>
+                <h3 id="e404_dmjone_pagenotfound" class="text-white py-1">Page Not Found</h3>
+                </div>
+                <p id="instruction" class="shadow rounded text-center bg-info bg-gradient bg-opacity-25 p-3 my-4">Oops! The page you were looking for is off exploring new knowledge. Take a break with this quote while we guide you back in <span id="countdownspace" class="fw-bold"></span> seconds! (Refresh for more quotes)</p>
             </p>
-        </header>
+        </div>
 
-        <main class="p-5  bg-danger bg-opacity-10">
+        <main id="main" class="container-fluid mt-4 mb-2">
             <script>gen_blockquote()</script>
         </main>
         <script>copyright("all")</script>
+        <script>
+                (function () {
+                    document.addEventListener('DOMContentLoaded', function () {
+                        var countdownElement = document.getElementById('countdownspace');
+                        var error404 = document.getElementById('e404_dmjone_error404');
+                        var pageNotFoundElement = document.getElementById('e404_dmjone_pagenotfound');
+                        var mainElement = document.getElementById('main');
+                        var instructionElement = document.getElementById('instruction');
+                        var footerElement = document.getElementById('defaultcopyrightfooter');
+
+                        var countdown = 15;
+                        var referrer = document.referrer;
+                        var origin = window.location.origin;
+
+                        countdownElement.textContent = countdown;
+
+                        var messages = [
+                            { time: 13, text: "Relax!" },
+                            { time: 12, text: "Take a Break!" },
+                            { time: 11, text: "Read the quote!" },
+                            { time: 6, text: "Done?" },
+                            { time: 4, text: referrer && referrer.includes(origin) ? "Let's go back!" : "Let's go home!" },
+                            { time: 2, text: "Redirecting..." }
+                        ];
+
+                        var interval = setInterval(function () {
+                            countdown--;
+                            countdownElement.textContent = countdown;
+
+                            messages.forEach(function (message) {
+                                if (countdown < message.time) {
+                                    error404.textContent = message.text;
+                                }
+                            });
+
+                            if (countdown < 2) {
+                                var disqusThread = document.getElementById('disqus_thread');
+                                var disqusRecommendations = document.getElementById('disqus_recommendations');
+                                mainElement.classList.add('d-none');
+                                instructionElement.classList.add('d-none');
+                                footerElement.classList.add('d-none');
+                                if (disqusThread) disqusThread.classList.add('d-none');
+                                if (disqusRecommendations) disqusRecommendations.classList.add('d-none');
+                            }
+
+                            if (countdown < 4) pageNotFoundElement.textContent = `in ${countdown}...`;
+                            if (countdown < 3) pageNotFoundElement.textContent = `in ${countdown}..`;
+                            if (countdown < 2) pageNotFoundElement.textContent = `in ${countdown}.`;
+                            if (countdown < 1) pageNotFoundElement.classList.add('d-none');
+
+                            if (countdown === 1) {
+                                clearInterval(interval);
+                                window.location.href = referrer && referrer.includes(origin) ? referrer : origin;
+                            }
+                        }, 1000);
+                    });
+                })();
+        </script>
     </body>
 
 </html>
