@@ -41,6 +41,20 @@
         const animationToggle = document.getElementById("animationToggle");
         const animationSelection = document.getElementById("animationSelection");
         const animationSelect = document.getElementById("animationSelect");
+        const label = document.querySelector('label[for="animationToggle"]');
+
+        // Function to update button text and style
+        const updateButtonStyle = (isEnabled) => {
+            if (isEnabled) {
+                label.classList.remove('btn-outline-success');
+                label.classList.add('btn-danger','btn-opacity-75');
+                label.textContent = 'Disable Breathing Technique';
+            } else {
+                label.classList.remove('btn-danger');
+                label.classList.add('btn-success');
+                label.textContent = 'Enable Breathing Animation';
+            }
+        };
 
         const applyBreathingOption = () => {
             const storedPreference = JSON.parse(localStorage.getItem("breathingAnimation"));
@@ -69,19 +83,17 @@
                 animationSelection.style.display = "block";
                 animationSelect.value = selectedAnimation;
                 checkAndApplyBreathingOption();
+                updateButtonStyle(isEnabled);
             }
         }
 
         // Toggle animation selection visibility and apply changes
         animationToggle.addEventListener("change", () => {
-            if (animationToggle.checked) {
-                animationSelection.style.display = "block";
-                savePreference(true, animationSelect.value);
-            } else {
-                animationSelection.style.display = "none";
-                savePreference(false, "");
-            }
+            const isChecked = animationToggle.checked;
+            animationSelection.style.display = isChecked ? "block" : "none";
+            savePreference(isChecked, isChecked ? animationSelect.value : "");
             checkAndApplyBreathingOption();
+            updateButtonStyle(isChecked);
         });
 
         // Save selected animation and apply changes immediately
@@ -98,5 +110,6 @@
             };
             localStorage.setItem("breathingAnimation", JSON.stringify(preference));
         };
+        
     });
 })();

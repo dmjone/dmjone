@@ -15,10 +15,25 @@ const cdnjs_font_awesome = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/
 const cdnjs_cryptoJS = "https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js";
 const google_login_js = "https://accounts.google.com/gsi/client";
 const cdnjs_DOMPurify = "https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.5/purify.min.js";
+const GLOBAL_login_page_path = window.location.hostname === 'localhost' ? '/login.html' : '/login';
+
 
 const randomidgenerator = (i = 10) => [...Array(i)].map(() => 'abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRTUVWXYZ23456789'[Math.floor(Math.random() * 55)]).join('');
-const maintainence_mode = 1;
-const maintainence_message = "Some links, images, and features may not work as expected. Thank you for your patience.";
+
+const notification_maintainence_mode = 1;
+const GLOBAL_maintainence_message = "Some links, images, and features may not work as expected. Thank you for your patience.";
+
+const notification_feature_update = 1;
+const GLOBAL_FeatureUpdate_message = `Learn about different breathing techniques to enhance your focus and relaxation. <a href="/my/features/breathing-techniques" class="alert-link">Read more</a>.`;
+
+const notification_new_article = 0;
+const GLOBAL_NewArticle_message = `A new article has been published. <a href="/my/articles/2022/01/01/sample-article" class="alert-link">Read more</a>.`;
+
+const notification_article_update = 0;
+const GLOBAL_ArticleUpdate_message = `An article has been updated. <a href="/my/articles/2022/01/01/sample-article" class="alert-link">Read more</a>.`;
+
+const notification_new_course = 0;
+const GLOBAL_NewCourse_message = `A new course has been added. <a href="/edu/su/course/sample-course" class="alert-link">Explore now</a>.`;
 
 // const body_pomodoro_helptext = "The Pomodoro Technique is a time management method developed by Francesco Cirillo in the late 1980s. The technique uses a timer to break down work into intervals, traditionally 25 minutes in length, separated by short breaks. These intervals are named pomodoros, the plural in English of the Italian word pomodoro (tomato), after the tomato-shaped kitchen timer that Cirillo used as a university student. The technique has been widely popularized by dozens of apps and websites providing timers and instructions. Closely related to concepts such as timeboxing and iterative and incremental development used in software design, the method has been adopted in pair programming contexts.";
 const body_pomodoro_helptext = `
@@ -70,10 +85,12 @@ const body_pomodoro_helptext = `
         document.documentElement.setAttribute('data-bs-theme', theme);
     };
 
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', setTheme);
+    if (window.location.pathname !== GLOBAL_login_page_path) {
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', setTheme);
 
-    // Initial theme setting
-    setTheme();
+        // Initial theme setting
+        setTheme();
+    }
 })();
 /*************** Fixed Functions and Variables END **************/
 
@@ -980,7 +997,6 @@ let header_navbar = function (flags) {
         return storedPreference && storedPreference.isEnabled ? storedPreference.selectedAnimation : "";
     };
     const breathingoption = (!document.getElementById('global_breathinganimationblock')) ? getBreathingOption() : '';
-    
 
     const finallinks = `    
     <nav class="navbar navbar-expand-md navbar-dark bg-dark sticky-top mw-100 px-3 py-3 shadow-lg" data-bs-theme="dark">
@@ -991,7 +1007,13 @@ let header_navbar = function (flags) {
             <div class="collapse navbar-collapse" id="navbar">
                 <ul class="navbar-nav ms-auto">
                     ${allLinksHTML}
-                    <div id="userMenu"></div>
+                    <div id="userMenu">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link" href="${GLOBAL_login_page_path}?redirect=${encodeURIComponent(window.location.pathname)}">
+                                Login
+                            </a>
+                        </li>
+                    </div>
                 </ul>
             </div>
         </div>
@@ -1827,9 +1849,10 @@ let header_author = function (...args) {
 
             function getUserName() {
                 let name = localStorage.getItem('userName');
+                // const GLOBAL_login_page_path = window.location.hostname === 'localhost' ? '/login' : '/login.html';
                 if (!name) {
                     const redirectUrl = encodeURIComponent(window.location.pathname);
-                    window.location.href = `/login?redirect=${redirectUrl}`;
+                    window.location.href = `${GLOBAL_login_page_path}?redirect=${redirectUrl}`;
                 } else {
                     document.getElementById(NAME_CONTAINER_ID).textContent = name;
                 }
@@ -2345,9 +2368,9 @@ let header_author = function (...args) {
 /************************** GOOGLE OAUTH LOGIN SYSTEM WITH MYACCOUNT ****************************/
 (function () {
 
-    // const local_login_page_path = '/test/google/signin/alogin';
+    // const GLOBAL_login_page_path = '/test/google/signin/alogin';
     // const local_account_page_path = '/test/google/signin/account';
-    const local_login_page_path = '/login';
+    // if its localhost then use /login else use.html    
     const local_account_page_path = '/my/';
 
     function setCookie(name, value, expiryTime) {
@@ -2445,9 +2468,9 @@ let header_author = function (...args) {
         if (!isloggedin) {
             console.log('User not logged in from displayLogin');
             // Redirect to login page if not logged in and currently on the account page
-            if (window.location.pathname !== local_login_page_path || window.location.pathname !== '/') { globalautologinprompt(); }
+            if (window.location.pathname !== GLOBAL_login_page_path && window.location.pathname !== '/') { globalautologinprompt(); }
             if (window.location.pathname === local_account_page_path) {
-                window.location.href = local_login_page_path + '?redirect=' + encodeURIComponent(window.location.pathname);
+                window.location.href = GLOBAL_login_page_path + '?redirect=' + encodeURIComponent(window.location.pathname);
             }
         } else {
             console.log('User logged in');
@@ -2456,7 +2479,7 @@ let header_author = function (...args) {
                 window.location.href = redirectto;
             } else {
                 // Redirect to the account page if no specific redirect provided and currently on the login page
-                if (window.location.pathname === local_login_page_path) {
+                if (window.location.pathname === GLOBAL_login_page_path) {
                     window.location.href = local_account_page_path;
                 }
             }
@@ -2477,6 +2500,42 @@ let header_author = function (...args) {
                     </div>`;
     }
 
+    // function displayUserLoggedInNav() {
+    //     isloggedin = checkLogin();
+    //     if (!isloggedin) {
+    //         console.log('User not logged in from displayUserLoggedInNav');
+    //         return;
+    //     }
+    //     if (isloggedin && localStorage.getItem('google_user')) {
+    //         try {
+    //             const userDetails = JSON.parse(localStorage.getItem('google_user'));
+    //             const userMenu = document.getElementById('userMenu');
+    //             userMenu.innerHTML = `<li class="nav-item dropdown">
+    //                 <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">
+    //                     <img src="${userDetails.picture}" alt="User Picture" class="rounded-circle" width="25" height="25" id="userPic">
+    //                 </a>
+    //                 <ul class="dropdown-menu">
+    //                     <li>
+    //                         <a class="dropdown-item" href="${GLOBAL_login_page_path}">My Account</a>
+    //                     </li>
+    //                         <!-- <a class="dropdown-item" href="#">${userDetails.name}</a>                
+    //                         <a class="dropdown-item" href="#">${userDetails.email}</a> -->
+    //                     <li>                
+    //                         <div class="dropdown-divider"></div>
+    //                         <button class="dropdown-item signOutButton">Logout</button>
+    //                     </li>        
+    //                 </ul>
+    //                 </li>`;
+    //             const signOutButtons = document.querySelectorAll('.signOutButton');
+    //             signOutButtons.forEach(button => {
+    //                 button.addEventListener('click', signOut);
+    //             });
+    //         } catch (e) {
+    //             console.log('Could not parse user details from localStorage', e);
+    //         }
+    //     }
+    // }
+
     function displayUserLoggedInNav() {
         isloggedin = checkLogin();
         if (!isloggedin) {
@@ -2486,32 +2545,75 @@ let header_author = function (...args) {
         if (isloggedin && localStorage.getItem('google_user')) {
             try {
                 const userDetails = JSON.parse(localStorage.getItem('google_user'));
-                const userMenu = document.getElementById('userMenu');
-                userMenu.innerHTML = `<li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">
-                        <img src="${userDetails.picture}" alt="User Picture" class="rounded-circle" width="25" height="25" id="userPic">
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li>
-                            <a class="dropdown-item" href="${local_login_page_path}">My Account</a>
-                        </li>
-                            <!-- <a class="dropdown-item" href="#">${userDetails.name}</a>                
-                            <a class="dropdown-item" href="#">${userDetails.email}</a> -->
-                        <li>                
-                            <div class="dropdown-divider"></div>
-                            <button class="dropdown-item signOutButton">Logout</button>
-                        </li>        
-                    </ul>
+                const startTime = Date.now();
+
+                (function pollForUserMenu() {
+                    const userMenu = document.getElementById('userMenu');
+                    if (userMenu) {
+                        userMenu.innerHTML = `<li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img src="${userDetails.picture}" alt="User Picture" class="rounded-circle" width="25" height="25" id="userPic">
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a class="dropdown-item" href="${local_account_page_path}">My Account</a>
+                            </li>
+                            <li>
+                                <div class="dropdown-divider"></div>
+                                <button class="dropdown-item signOutButton">Logout</button>
+                            </li>
+                        </ul>
                     </li>`;
-                const signOutButtons = document.querySelectorAll('.signOutButton');
-                signOutButtons.forEach(button => {
-                    button.addEventListener('click', signOut);
-                });
+                        const signOutButtons = document.querySelectorAll('.signOutButton');
+                        signOutButtons.forEach(button => {
+                            button.addEventListener('click', signOut);
+                        });
+                    } else if (Date.now() - startTime < 3000) { // 3 seconds
+                        setTimeout(pollForUserMenu, 666); // Check every 100ms
+                    } else {
+                        console.log('userMenu element not found within 3 seconds');
+                    }
+                })();
             } catch (e) {
                 console.log('Could not parse user details from localStorage', e);
             }
         }
     }
+
+
+    window.cL = () => {
+        try {
+            let l = checkLogin();
+            let main = document.querySelector('main');
+            if (!l) {
+                // get the main tag                        
+                const redirectUrl = encodeURIComponent(window.location.pathname);
+                window.location.href = `${GLOBAL_login_page_path}?redirect=${redirectUrl}`;
+                main.innerHTML = `<div class="alert alert-danger container my-10 text-center" role="alert">You must be logged in to access this content. Please <a href="${GLOBAL_login_page_path}?redirect=${redirectUrl}">log in</a> to continue.</div>`;
+                main.classList.remove('d-none');
+                main.style.display = '';
+            } else {
+                main.classList.remove('d-none');
+                main.style.display = '';
+            }
+            return l;
+        } catch (e) {
+            console.log('Error: ', e)
+        }
+    };
+
+    (() => {
+        // Calls cL for sure if the path is under /my/ or else it has 0.3 (30%) chance that it will require login on any page. Don't run on the host url
+        if (window.location.pathname.match(/\/my\/(.*)/)) {
+            document.addEventListener('DOMContentLoaded', cL);
+        } else {
+            if (window.location.pathname !== GLOBAL_login_page_path && window.location.pathname !== '/') {
+                document.addEventListener('DOMContentLoaded', Math.random() < 0.1 && cL());
+            }
+        }
+    })();
+
+
     document.addEventListener('DOMContentLoaded', displayLogin);
 })();
 
@@ -3224,7 +3326,7 @@ function body_genmenu(course) {
             const _data = arr[i];
             const title = _data.title || options.title || null;
             if (!title) continue;
-            const link = _data.link || options.link || null;
+            const link = window.location.hostname === 'localhost' ? _data.link.endsWith('/') ? _data.link : _data.link + '.html' || options.link || null : _data.link || options.link || null;
             const date = _data.date || options.date || `${gendate(def_date)}`;
             const desc = _data.desc || options.desc || null;
             const codetype = _data.codetype || options.codetype;
@@ -3236,7 +3338,7 @@ function body_genmenu(course) {
             const cardimage = _data.cardimage || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? _data.cardimage_dark : null) || options.cardimage || null;
             const continuereading = _data.continuereading || options.continuereading || null;
             body_blockcards(link, date, title, desc, codetype, readtime, author, semester, cardimage, continuereading);
-        }                
+        }
     }
 
 
@@ -3414,7 +3516,7 @@ function body_blockcards(link, date, title, desc, codetype, readtime, author, se
             </ul>
         </div>
         <div class="postcard__bar"></div>
-        <div class="postcard__preview-txt d-none ${desc ?'d-sm-block':''}"><p>${desc}</p></div>
+        <div class="postcard__preview-txt d-none ${desc ? 'd-sm-block' : ''}"><p>${desc}</p></div>
         <ul class="postcard__tagbox tagtox-read my-3">
             <a href="${link}">
                 <li class="tag__item read-more play ${getcolor} fw-bold text-center" id="article_userclickguide" style="cursor: inherit;" data-toggle="tooltip" data-placement="top" title="Click here to continue reading." data-original-title="Click to continue reading."><i class="bi bi-book"></i>  ${continueReading}...</li>
@@ -3700,23 +3802,115 @@ function maintenance_mode() {
 
 
 /***************** Toast Notification Generator - GLOBAL Function ******************/
-(function () {
-    // TO USE DO THIS --------- EXAMPLE
-    // showNotification('Your system will undergo maintenance tonight.');
-    // showNotification('Your system will undergo maintenance tonight.', { autohide: false, delay: 10000, playSound: false });
-    // showNotification('Update completed successfully.', {
-    //     headerText: 'Update Notification',
-    //     bodyClass: 'toast-body bg-success text-white',
-    //     delay: 3000,
-    //     autohide: true
-    // });
-    // showNotification('A new feature has been enabled.', {
-    //     headerText: 'Feature Update',
-    //     playSound: true,
-    //     soundSrc: '/media/music/notification-sound.mp3',
-    //     autohide: false
-    // });
+// (function () {
+//     // TO USE DO THIS --------- EXAMPLE
+//     // showNotification('Your system will undergo maintenance tonight.');
+//     // showNotification('Your system will undergo maintenance tonight.', { autohide: false, delay: 10000, playSound: false });
+//     // showNotification('Update completed successfully.', {
+//     //     headerText: 'Update Notification',
+//     //     bodyClass: 'toast-body bg-success text-white',
+//     //     delay: 3000,
+//     //     autohide: true
+//     // });
+//     // showNotification('A new feature has been enabled.', {
+//     //     headerText: 'Feature Update',
+//     //     playSound: true,
+//     //     soundSrc: '/media/music/notification-sound.mp3',
+//     //     autohide: false
+//     // });
 
+//     // Configuration defaults
+//     const defaults = {
+//         id: randomidgenerator(),
+//         headerClass: 'toast-header bg-primary',
+//         headerIcon: 'bi bi-exclamation-triangle-fill',
+//         headerText: 'Notification',
+//         bodyClass: 'toast-body',
+//         autohide: true,
+//         delay: 5000,
+//         playSound: true,
+//         soundSrc: '/media/music/click-sound.mp3'
+//     };
+
+//     // Sound manager to handle audio elements
+//     const soundManager = {
+//         alertSound: null,
+//         playSound: function (src) {
+//             if (!this.alertSound) {
+//                 this.alertSound = document.createElement("audio");
+//                 this.alertSound.id = 'toastAlertSound';
+//                 this.alertSound.src = src;
+//                 document.body.appendChild(this.alertSound);
+//             }
+//             this.alertSound.src = src; // Ensure the src is always up-to-date
+//             this.alertSound.play().catch(err => console.error("Sound play failed:", err));
+//         }
+//     };
+
+//     // Function to show the toast
+//     const showToast = (settings) => {
+//         const toastElement = document.querySelector(`#${settings.id}-toast`);
+//         if (toastElement && typeof bootstrap !== 'undefined' && bootstrap.Toast) {
+//             const toast = new bootstrap.Toast(toastElement, { autohide: settings.autohide, delay: settings.delay });
+//             toast.show();
+//             if (settings.playSound) {
+//                 soundManager.playSound(settings.soundSrc);
+//             }
+//         } else {
+//             // Retry showing the toast after a delay if Bootstrap is not ready
+//             setTimeout(() => showToast(settings), 2000);
+//         }
+//     };
+
+//     // Function to generate and append toast HTML
+//     const generateToast = (settings) => {
+//         const toastHTML = `
+//             <div id="${settings.id}-toast" class="toast position-fixed bottom-0 end-0 m-2 mx-2 shadow-lg" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="${settings.autohide}" data-bs-delay="${settings.delay}">
+//                 <div class="${settings.headerClass} d-flex align-items-center">
+//                     <i class="${settings.headerIcon} me-2"></i>
+//                     <strong class="me-auto">${settings.headerText}</strong>
+//                     <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+//                 </div>
+//                 <div class="${settings.bodyClass}">${settings.bodyText}</div>
+//             </div>
+//         `;
+//         let toastContainer = document.getElementById('toastContainer');
+//         if (!toastContainer) {
+//             toastContainer = document.createElement('div');
+//             toastContainer.id = randomidgenerator();
+//             toastContainer.setAttribute('aria-live', 'polite');
+//             toastContainer.setAttribute('aria-atomic', 'true');
+//             toastContainer.classList.add('position-fixed', 'bottom-0', 'end-0', 'p-3', 'd-none', 'd-sm-block');            
+//             document.body.appendChild(toastContainer);
+//         }
+//         toastContainer.innerHTML = toastHTML;
+//         showToast(settings);
+//     };
+
+//     // Initialization on user interaction, executes only once
+//     const onUserInteraction = (fn) => {
+//         const events = ['click', 'mousemove', 'keydown', 'touchstart'];
+//         const handler = () => {
+//             fn();  // Execute the passed function
+//             // Remove all event listeners after the function has executed
+//             events.forEach(event => window.removeEventListener(event, handler));
+//         };
+//         events.forEach(event => window.addEventListener(event, handler));
+//     };
+
+//     const showNotification = (message = '', options = {}) => {
+//         if (!message) return;
+//         const settings = { ...defaults, ...options, bodyText: message };
+//         document.readyState === 'loading' ?
+//             document.addEventListener('DOMContentLoaded', () => onUserInteraction(() => generateToast(settings))) :
+//             onUserInteraction(() => generateToast(settings));
+//     };
+
+//     window.showNotification = showNotification;
+// })();
+
+
+(function () {
     // Configuration defaults
     const defaults = {
         id: randomidgenerator(),
@@ -3745,15 +3939,37 @@ function maintenance_mode() {
         }
     };
 
+    // Notification queue
+    const notificationQueue = [];
+    let isShowingNotification = false;
+
+    const showNextNotification = () => {
+        if (notificationQueue.length === 0) {
+            isShowingNotification = false;
+            return;
+        }
+
+        isShowingNotification = true;
+        const settings = notificationQueue.shift();
+        generateToast(settings);
+    };
+
     // Function to show the toast
     const showToast = (settings) => {
         const toastElement = document.querySelector(`#${settings.id}-toast`);
         if (toastElement && typeof bootstrap !== 'undefined' && bootstrap.Toast) {
-            const toast = new bootstrap.Toast(toastElement, { autohide: settings.autohide, delay: settings.delay });
+            const toast = new bootstrap.Toast(toastElement, {
+                autohide: settings.autohide,
+                delay: settings.delay
+            });
             toast.show();
             if (settings.playSound) {
                 soundManager.playSound(settings.soundSrc);
             }
+            toastElement.addEventListener('hidden.bs.toast', () => {
+                toastElement.remove();  // Remove the toast element after it is hidden
+                showNextNotification(); // Show the next notification in the queue
+            });
         } else {
             // Retry showing the toast after a delay if Bootstrap is not ready
             setTimeout(() => showToast(settings), 2000);
@@ -3763,7 +3979,7 @@ function maintenance_mode() {
     // Function to generate and append toast HTML
     const generateToast = (settings) => {
         const toastHTML = `
-            <div id="${settings.id}-toast" class="toast position-fixed bottom-0 end-0 m-5 mx-2 shadow-lg" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="${settings.autohide}" data-bs-delay="${settings.delay}">
+            <div id="${settings.id}-toast" class="toast shadow-lg m-2" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="${settings.autohide}" data-bs-delay="${settings.delay}">
                 <div class="${settings.headerClass} d-flex align-items-center">
                     <i class="${settings.headerIcon} me-2"></i>
                     <strong class="me-auto">${settings.headerText}</strong>
@@ -3772,16 +3988,13 @@ function maintenance_mode() {
                 <div class="${settings.bodyClass}">${settings.bodyText}</div>
             </div>
         `;
-        let toastContainer = document.getElementById('toastContainer');
+        let toastContainer = document.querySelector('.toast-container');
         if (!toastContainer) {
             toastContainer = document.createElement('div');
-            toastContainer.id = randomidgenerator();
-            toastContainer.setAttribute('aria-live', 'polite');
-            toastContainer.setAttribute('aria-atomic', 'true');
-            toastContainer.classList.add('position-fixed', 'bottom-0', 'end-0', 'p-3', 'd-none', 'd-sm-block');
+            toastContainer.classList.add('toast-container', 'position-fixed', 'bottom-0', 'end-0', 'p-3');
             document.body.appendChild(toastContainer);
         }
-        toastContainer.innerHTML = toastHTML;
+        toastContainer.innerHTML += toastHTML;
         showToast(settings);
     };
 
@@ -3796,17 +4009,40 @@ function maintenance_mode() {
         events.forEach(event => window.addEventListener(event, handler));
     };
 
+    // const showNotification = (message = '', options = {}) => {
+    //     if (!message) return;
+    //     const settings = { ...defaults, ...options, bodyText: message };       
+    //     notificationQueue.push(settings);
+    //     if (!isShowingNotification) {
+    //         showNextNotification();
+    //     }
+    // };
+
+    // window.showNotification = showNotification;
+
+    // Wrapped showNotification to trigger on user interaction
+
     const showNotification = (message = '', options = {}) => {
         if (!message) return;
         const settings = { ...defaults, ...options, bodyText: message };
         document.readyState === 'loading' ?
-            document.addEventListener('DOMContentLoaded', () => onUserInteraction(() => generateToast(settings))) :
-            onUserInteraction(() => generateToast(settings));
+            document.addEventListener('DOMContentLoaded', () => onUserInteraction(() => {
+                notificationQueue.push(settings);
+                if (!isShowingNotification) {
+                    showNextNotification();
+                }
+            })) :
+            onUserInteraction(() => {
+                notificationQueue.push(settings);
+                if (!isShowingNotification) {
+                    showNextNotification();
+                }
+            });
     };
 
+    // Initialize notifications on first user interaction    
     window.showNotification = showNotification;
 })();
-
 
 
 /******** Footer ***********/
@@ -4141,7 +4377,7 @@ function copyright(rights, noprint) {
         ////////////// DISQUS comments and recommendations section /////////////
         (function () {
             try {
-                if (window.nodisqus) return;
+                if (window.nodisqus || window.page == 404) return;
                 // const urlPattern = /^\/edu\/su\/course\/\w+\/(theory|lab)\/\w+/;
                 const urlPattern = /^\/edu\/su\/course\/\w+\/\w+\/\w+/;
                 if (!urlPattern.test(window.location.pathname)) return;
@@ -7457,13 +7693,50 @@ window.addEventListener("load", async function () {
     }
 
     // Maintenence Mode    
-    maintainence_mode ? showNotification(maintainence_message, {
+    notification_maintainence_mode ? showNotification(GLOBAL_maintainence_message, {
         headerClass: 'toast-header bg-warning bg-opacity-50',
         headerIcon: 'bi bi-tools',
         headerText: 'Undergoing Maintenance',
-        bodyClass: 'toast-body text-justify',
+        bodyClass: 'toast-body text-justify bg-warning-subtle',
         playSound: false,
     }) : null;
+
+    // Feature Update
+    notification_feature_update ? showNotification(GLOBAL_FeatureUpdate_message, {
+        headerClass: 'toast-header bg-info bg-opacity-50',
+        headerIcon: 'bi bi-bell',
+        headerText: 'New Feature Available!',
+        bodyClass: 'toast-body text-justify bg-info-subtle',
+        playSound: false,
+    }) : null;
+
+    // New Article
+    notification_new_article ? showNotification(GLOBAL_NewArticle_message, {
+        headerClass: 'toast-header bg-info bg-opacity-50',
+        headerIcon: 'bi bi-bell',
+        headerText: 'New Article Available!',
+        bodyClass: 'toast-body text-justify bg-info-subtle',
+        playSound: false,
+    }) : null;
+
+    // Article Update
+    notification_article_update ? showNotification(GLOBAL_ArticleUpdate_message, {
+        headerClass: 'toast-header bg-info bg-opacity-50',
+        headerIcon: 'bi bi-bell',
+        headerText: 'Article Updated!',
+        bodyClass: 'toast-body text-justify bg-info-subtle',
+        playSound: false,
+    }) : null;
+
+    // New Course
+    notification_new_course ? showNotification(GLOBAL_NewCourse_message, {
+        headerClass: 'toast-header bg-info bg-opacity-50',
+        headerIcon: 'bi bi-bell',
+        headerText: 'New Course Available!',
+        bodyClass: 'toast-body text-justify bg-info-subtle',
+        playSound: false,
+    }) : null;
+
 });
 
 
