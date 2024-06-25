@@ -62,6 +62,19 @@ const body_pomodoro_helptext = `
         }
     }
 })();
+
+////////// Set dark mode ot light mode for bootstrap.
+(() => {
+    const setTheme = () => {
+        const theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-bs-theme', theme);
+    };
+
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', setTheme);
+
+    // Initial theme setting
+    setTheme();
+})();
 /*************** Fixed Functions and Variables END **************/
 
 
@@ -962,6 +975,13 @@ let header_navbar = function (flags) {
 
     const allLinksHTML = (year1_links ? dropdown(year1_links) : '') + (year2_links ? dropdown(year2_links) : '') + (visible_links ? mainNav(visible_links) : '');
 
+    const getBreathingOption = () => {
+        const storedPreference = JSON.parse(localStorage.getItem("breathingAnimation"));
+        return storedPreference && storedPreference.isEnabled ? storedPreference.selectedAnimation : "";
+    };
+    const breathingoption = (!document.getElementById('global_breathinganimationblock')) ? getBreathingOption() : '';
+    
+
     const finallinks = `    
     <nav class="navbar navbar-expand-md navbar-dark bg-dark sticky-top mw-100 px-3 py-3 shadow-lg" data-bs-theme="dark">
         <div class="container-fluid">
@@ -976,7 +996,7 @@ let header_navbar = function (flags) {
             </div>
         </div>
     </nav>
-    <div class="breathing-animation sticky-top cursor-pointer m-1 p-0 mx-auto breathe21" onclick="location.href='/techniques/breathing'"></div>
+    ${breathingoption ? `<div class="breathing-animation sticky-top cursor-pointer m-1 p-0 mx-auto ${breathingoption}" id="global_breathinganimationblock" onclick="location.href='/my/features/breathing-techniques'"></div>` : ''}
 `;
 
     return finallinks;
@@ -1314,6 +1334,9 @@ let header_author = function (...args) {
     });
 })();
 // })(forprint_manualmode,forprint_authorname, forprint_subjectcode, forprint_teachername);
+
+
+
 
 
 /***********************  Random Quiz **************************/
@@ -2485,7 +2508,7 @@ let header_author = function (...args) {
                     button.addEventListener('click', signOut);
                 });
             } catch (e) {
-                console.log('Could not parse user details from localStorage');
+                console.log('Could not parse user details from localStorage', e);
             }
         }
     }
@@ -3697,7 +3720,7 @@ function maintenance_mode() {
     // Configuration defaults
     const defaults = {
         id: randomidgenerator(),
-        headerClass: 'toast-header bg-primary text-white',
+        headerClass: 'toast-header bg-primary',
         headerIcon: 'bi bi-exclamation-triangle-fill',
         headerText: 'Notification',
         bodyClass: 'toast-body',
@@ -4305,9 +4328,10 @@ function copyright(rights, noprint) {
 /******* Generate Blockquote **********/
 function gen_blockquote() {
     var quoteblock = `
-    <figure class="text-center bg-warning bg-gradient bg-opacity-25 pt-3 rounded-5 border border-1 border-warning shadow-lg">
-        <div class="showquote py-1 h5 blockquote px-2"></div>
-        <figcaption class="showauthor p-2 shadow-lg" style="background:var(--background-color)"></figcaption>`;
+    <div class="text-center bg-warning bg-gradient bg-opacity-25 pt-2 rounded-5 border border-1 border-warning shadow-lg lh-lg">
+        <div class="showquote py-3 h5 px-2 syne-mono fs-4"></div>
+        <div class="showauthor p-2 rounded-bottom-5 bebas-neue fs-5" style="background:var(--background-color)"></div>
+    </div>`;
     document.write(quoteblock);
 
     async function quote() {
@@ -6373,14 +6397,14 @@ const certifications = {
             const isSmallScreen = window.matchMedia('(max-width: 768px)').matches;
 
             if (isSmallScreen) {
-                return `<div class="container p-4 m-4 rounded-3 shadow-lg" style="background-color: var(--background-color) !important;">
+                return `<div class="container p-4 m-4 rounded-3 border shadow-lg" style="background-color: var(--background-color) !important;">
   <h4 class="text-center">Quick Break Time!</h4>
   <p class="p-2">Let's take a moment to stand up, stretch, and take a few deep breaths. A quick pause can significantly boost your focus and productivity!</p>
   <div id="${timerId}" class="fs-1 text-center text-danger">⏳</div>
   <p class="text-muted text-center">Cannot wait? Refresh the page to remove the timer.</p>
 </div>`;
             } else {
-                return `<div class="container p-4 m-4 rounded-3 shadow-lg" style="background-color: var(--background-color) !important;">
+                return `<div class="container p-4 m-4 rounded-3 shadow-lg border border-1 border-warning-subtle" style="background-color: var(--background-color) !important;">
   <h3 class="mb-3 text-center">Time to Refresh & Recharge!</h3>
   <p class="">You've been pushing the limits, and it's nothing short of incredible! Now, let's take a strategic pause to supercharge. Ever wonder why the Pomodoro Technique is so effective? It's because these short breaks enhance cognitive function, allowing for better retention, creativity, and problem-solving skills. You're not just resting; you're setting the stage for even greater achievements.</p>
   <h5 class="">Let us make this technique work for you. Here are the things you should do now:</h5>
@@ -6427,9 +6451,9 @@ const certifications = {
             const toastId = generateUniqueId('toast');
             // Note: settings.toastContent removed, as it's not dynamically setting `toastId`
             const toastContent = `
-<div id="${toastId}" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="10000" style="background-color: var(--background-color) !important;">
-  <div class="toast-header bg-danger bg-opacity-50" style="color: var(--text-color)">
-    <strong class="me-auto">Break Reminder</strong>
+<div id="${toastId}" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="10000" >
+  <div class="toast-header bg-danger bg-opacity-50" ">
+    <strong class="me-auto"> <i class="fas fa-exclamation-triangle"></i> Break Reminder</strong>
     <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
   </div>
   <div class="toast-body bg-danger bg-opacity-10">
