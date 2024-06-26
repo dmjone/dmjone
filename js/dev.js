@@ -2608,7 +2608,11 @@ let header_author = function (...args) {
             document.addEventListener('DOMContentLoaded', cL);
         } else {
             if (window.location.pathname !== GLOBAL_login_page_path && window.location.pathname !== '/') {
-                document.addEventListener('DOMContentLoaded', Math.random() < 0.1 && cL());
+                document.addEventListener('DOMContentLoaded', () => {
+                    if (Math.random() < 0.1) {
+                        cL();
+                    }
+                });
             }
         }
     })();
