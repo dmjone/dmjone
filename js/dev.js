@@ -385,54 +385,136 @@ const body_pomodoro_helptext = `
     //     }
     // })();
 
+    // (function () {
+    //     if (!window.dnfetchenc) {
+    //         try {
+    //             fetch(getJsUrl("encvar.json"))
+    //                 .then(response => {
+    //                     if (!response.ok) {
+    //                         if (response.status === 404) {
+    //                             throw new Error('404');
+    //                         } else {
+    //                             throw response;
+    //                         }
+    //                     }
+    //                     // if responce is empty json throw it
+    //                     if (response.headers.get('content-length') === '0') {
+    //                         return;
+    //                     }
+    //                     return response.json();
+    //                 })
+    //                 .then(data => {
+    //                     // your code here
+    //                     if (!data) {
+    //                         return;
+    //                     }
+    //                     let cryptojs_enc_map = data;
+    //                     let urlParts = window.location.pathname.split('/').filter(Boolean);
+    //                     let current_map = cryptojs_enc_map;
+    //                     for (let part of urlParts) {
+    //                         current_map = current_map[part.replace('.html', '')];
+    //                         if (typeof current_map === "string") {
+    //                             let cryptojs_enc_data = window["cryptojs_enc_data"] = current_map;
+    //                             // console.log('cryptojs_enc_data:', current_map);
+    //                             return;
+    //                         }
+    //                     }
+    //                 })
+    //                 .catch((error) => {
+    //                     if (error.message === '404') {
+    //                         console.log('Resource not found. Exiting function.');
+    //                         return; // Exit early
+    //                     } else {
+    //                         console.error('Error:', error);
+    //                     }
+    //                 });
+    //         } catch (e) {
+    //             console.error('Could not load encryption.');
+    //         }
+    //     }
+    // })();
+    
+    // Version 3.0
     (function () {
-        if (!window.dnfetchenc) {
-            try {
-                fetch(getJsUrl("encvar.json"))
-                    .then(response => {
-                        if (!response.ok) {
-                            if (response.status === 404) {
-                                throw new Error('404');
-                            } else {
-                                throw response;
-                            }
-                        }
-                        // if responce is empty json throw it
-                        if (response.headers.get('content-length') === '0') {
-                            return;
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        // your code here
-                        if (!data) {
-                            return;
-                        }
-                        let cryptojs_enc_map = data;
-                        let urlParts = window.location.pathname.split('/').filter(Boolean);
-                        let current_map = cryptojs_enc_map;
-                        for (let part of urlParts) {
-                            current_map = current_map[part.replace('.html', '')];
-                            if (typeof current_map === "string") {
-                                let cryptojs_enc_data = window["cryptojs_enc_data"] = current_map;
-                                // console.log('cryptojs_enc_data:', current_map);
-                                return;
-                            }
-                        }
-                    })
-                    .catch((error) => {
-                        if (error.message === '404') {
-                            console.log('Resource not found. Exiting function.');
-                            return; // Exit early
+        try {
+            // Fetch the automation-control-panel-exceptions.json
+            fetch('/js/automation-control-panel-exceptions.json')
+                .then(response => {
+                    if (!response.ok) {
+                        if (response.status === 404) {
+                            throw new Error('404');
                         } else {
-                            console.error('Error:', error);
+                            throw response;
                         }
-                    });
-            } catch (e) {
-                console.error('Could not load encryption.');
-            }
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (!data) {
+                        return;
+                    }
+                    const cryptojsUrls = data.cryptojsUrls;
+                    const currentUrl = window.location.pathname.replace(/\.html$/, '');
+
+                    // Check if the current URL (with or without .html) is in the list of cryptojsUrls
+                    if (cryptojsUrls.includes(currentUrl) || cryptojsUrls.includes(currentUrl + '.html')) {
+                        // Fetch the encvar.json only if the URL is in the list
+                        fetch(getJsUrl("encvar.json"))
+                            .then(response => {
+                                if (!response.ok) {
+                                    if (response.status === 404) {
+                                        throw new Error('404');
+                                    } else {
+                                        throw response;
+                                    }
+                                }
+                                // if response is empty json throw it
+                                if (response.headers.get('content-length') === '0') {
+                                    return;
+                                }
+                                return response.json();
+                            })
+                            .then(data => {
+                                // your code here
+                                if (!data) {
+                                    return;
+                                }
+                                let cryptojs_enc_map = data;
+                                let urlParts = window.location.pathname.split('/').filter(Boolean);
+                                let current_map = cryptojs_enc_map;
+                                for (let part of urlParts) {
+                                    current_map = current_map[part.replace('.html', '')];
+                                    if (typeof current_map === "string") {
+                                        let cryptojs_enc_data = window["cryptojs_enc_data"] = current_map;
+                                        // console.log('cryptojs_enc_data:', current_map);
+                                        return;
+                                    }
+                                }
+                            })
+                            .catch((error) => {
+                                if (error.message === '404') {
+                                    console.log('Resource not found. Exiting function.');
+                                    return; // Exit early
+                                } else {
+                                    console.error('Error:', error);
+                                }
+                            });
+                    }
+                })
+                .catch((error) => {
+                    if (error.message === '404') {
+                        console.log('Resource not found. Exiting function.');
+                        return; // Exit early
+                    } else {
+                        console.error('Error:', error);
+                    }
+                });
+        } catch (e) {
+            console.error('Could not load encryption.');
         }
+
     })();
+
 
 
     var common_variables = "/js/comvar.js";
@@ -1063,8 +1145,7 @@ let header_author = function (...args) {
             window.GLOBAL_get_Author_Name_ = pA_author;
             // console.log(extractTextFromStrongTag(pA_author));
             window.GLOBAL_get_formatted_Author_Name_ = extractTextFromStrongTag(pA_author);
-
-
+            
             const { line1, line2, line3, line4 } = processFolder(allAuthors, author_bio);
 
             const finalheaders = "<header>" + line1 + line2 + line3 + line4 + "</header>" + header_navbar();
@@ -3194,7 +3275,7 @@ function ContentEncryptionManager(cryptojs_encrypted_data) {
 
         window.addEventListener("resize", handleResize);
         handleResize();
-        copyright("all");
+        if (!window.loaded_copyright) copyright("all");
 
         let tries = 3;
 
@@ -3243,7 +3324,7 @@ function ContentEncryptionManager(cryptojs_encrypted_data) {
                 [document.getElementById('crypto-password-prompt'), document.querySelector('header'), document.querySelector('footer-dummy')].forEach(el => el?.classList.add('d-none'));
                 document.getElementById('cryptojs_decrypted-content')?.classList.remove('d-none');
                 addtoast();
-                header_author("NavOnly");
+                if (!window.loaded_header_author) { header_author("NavOnly") }
             } catch (e) {
                 tries--;
                 if (tries >= 1) {
@@ -4387,9 +4468,51 @@ function copyright(rights, noprint) {
                 if (!urlPattern.test(window.location.pathname)) return;
 
                 const disqus = document.createElement("article");
-                disqus.id = "disqus_thread";
-                disqus.className = "container my-5 d-print-none";
+                const disqusdiv = document.createElement("div");
+                let isDarkTheme = document.documentElement.getAttribute('data-bs-theme') === 'dark';
+
+                disqus.className = `mb-0 p-5 d-print-none text-center ${isDarkTheme ? '' : ''}`;
+
+                disqusdiv.id = "disqus_thread";
+                disqusdiv.className = "container";
+                disqus.appendChild(disqusdiv);
                 document.body.appendChild(disqus);
+
+                const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+                if (mediaQuery.matches) {
+                    // Add the IntersectionObserver code here
+                    const observerOptions = {
+                        root: null, // use the viewport as the root
+                        rootMargin: '0px',
+                        threshold: 0.05 // 5% of the element should be visible
+                    };
+
+                    const observerCallback = (entries, observer) => {
+                        entries.forEach(entry => {
+                            console.log('IntersectionObserver entry:', entry); // Debug log
+                            if (entry.isIntersecting) {
+                                console.log('disqus_thread is visible'); // Debug log
+                                if (document.documentElement.getAttribute('data-bs-theme') === 'dark') {
+                                    document.documentElement.setAttribute('data-bs-theme', 'light');
+                                }
+                            } else {
+                                console.log('disqus_thread is not visible'); // Debug log
+                                if (document.documentElement.getAttribute('data-bs-theme') === 'light') {
+                                    document.documentElement.setAttribute('data-bs-theme', 'dark');
+                                }
+                            }
+                        });
+                    };
+
+
+                    const observer = new IntersectionObserver(observerCallback, observerOptions);
+                    observer.observe(disqusdiv);
+
+                    // Cleanup the observer if needed (e.g., on page unload)
+                    window.addEventListener('beforeunload', () => observer.disconnect());
+                }
+
 
                 ////////////// Disqus recomendation section ////////////////////
                 // const disqusrecomendation = document.createElement("div");//

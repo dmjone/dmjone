@@ -722,7 +722,7 @@ function processFolder(allAuthors, author_bio) {
         
     // console.log(prof, prof_href, prof_bio);
     const line2 = getrandomline2(allAuthors, pA_author ? pA_author : "");
-    const line3 = window.location.pathname.split("/")[5]?.length ? author_bio : (pA_bio + author_bio);
+    const line3 = window.location.pathname.split("/")[6]?.length ? author_bio : (pA_bio); // If there is a 6th part in the URL, then show the author_bio, else show the prof_bio. Previous: (pA_bio + author_bio);
     const line4 = generatebutton(course);
 
     return { line1, line2, line3, line4 };
@@ -876,6 +876,7 @@ function getrandomline2(allAuthors, allprof) {
     const randomFirstPart = firstPart[Math.floor(Math.random() * firstPart.length)];
     const randomSecondPart = secondPart[Math.floor(Math.random() * secondPart.length)];
 
+    // allAuthors = window.location.pathname.split("/")[4]?.length ? 'data' : '';
 
     if (allprof) {
         return `<p class="authorslistline">${randomFirstPart} by ${allAuthors} ${randomSecondPart}</p>`;
