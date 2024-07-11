@@ -61,7 +61,15 @@ function get_menu_list(datetogen) {
                 author: "Divya Mohan",
                 link: "input-in-java",
                 codetype: 'Input in Java'
-            }
+            },
+            {
+                title: "Tokenization in Java",
+                desc: "Dive into the world of tokenization in Java. From understanding the concept of tokens, exploring the StringTokenizer class, to learning about the split() method, this course module offers a comprehensive guide.",
+                date: "Sun September 10, 2023",
+                author: "Divya Mohan",
+                link: "tokenization-in-java",
+                codetype: 'Tokenization in Java'
+            },
         ];
         body_genmenu.processData(arr, def_date, def_author, {codetype: 'CSU1291 | Concepts'});
     }
