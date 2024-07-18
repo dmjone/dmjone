@@ -1007,7 +1007,7 @@ let head_FormatAuthor = function (...args) {
                 authorTextArr.slice(0, -1).join(", ") + `, and ${authorTextArr.slice(-1)}`;
 };
 
-let header_navbar = function (flags) {
+/* let header_navbar = function (flags) {
     if (flags) return 0;
 
     const url = new URL(window.location.href);
@@ -1104,7 +1104,546 @@ let header_navbar = function (flags) {
 `;
 
     return finallinks;
+}; */
+
+/* let header_navbar = async function (flags) {
+    if (flags) return 0;
+
+    const url = new URL(window.location.href);
+    const pathname = url.pathname.split('/');
+    const base = '/edu/su/';
+    const courses = `${base}course/`;
+    const nav_folder = pathname[4] ? `${courses}${pathname[4]}` : '';
+    const nav_subfolder = pathname[5] || '';
+    const nav_filename = pathname.pop() || '';
+
+    const breadcrumb = [
+        { href: `//${window.location.host}`, icon: 'house-fill', title: 'Home' },
+        nav_folder && { href: `${nav_folder}/`, icon: 'journals', title: nav_folder },
+        nav_subfolder && { href: `${nav_folder}/${nav_subfolder}/`, icon: 'card-list', title: nav_subfolder },
+        nav_filename && { href: nav_filename, icon: 'journal-code', title: nav_filename }
+    ].filter(Boolean);
+
+    const breadcrumbHTML = breadcrumb.map(({ href, icon, title }) =>
+        `<li class="breadcrumb-item${title === nav_filename ? ' active' : ''}"${title === nav_filename ? ' aria-current="page"' : ''}>` +
+        `<a href="${href}" data-toggle="tooltip" data-placement="top" title="${title}">` +
+        `<i class="bi bi-${icon} text-light"></i></a></li>`
+    ).join('');
+
+    const headerNavHTML = `<nav aria-label="breadcrumb" class="navbar-brand text-light">` +
+        `<ol class="breadcrumb" style="margin:auto">${breadcrumbHTML}</ol></nav>`;
+
+    const navItem = (folder, specialLinks) => {
+        const linkActive = folder === pathname[4] ? ' active" aria-current="page"' : '"';
+        if (specialLinks.hasOwnProperty(folder.toLowerCase())) {
+            const specialHref = specialLinks[folder.toLowerCase()];
+            if (specialHref === 'WIP') {
+                return `<li><a class="dropdown-item disabled" href="#" title="Work In Progress">${folder.toUpperCase()} [WIP]</a></li>`;
+            } else {
+                const formattedFolder = folder.charAt(0).toUpperCase() + folder.slice(1).toLowerCase();
+                return `<li class="nav-item"><a class="nav-link${linkActive}" href="${specialHref}" title="Go to ${formattedFolder}">${formattedFolder}</a></li>`;
+            }
+        } else {
+            return `<a class="dropdown-item${linkActive}" href="${courses}${folder}/">${folder.toUpperCase()}</a>`;
+        }
+    };
+
+    const dropdown = (year, links) => {
+        links.sort();
+        const dropdownItems = links.map(link =>
+            `<li>${navItem(link, { 'wip': 'WIP', 'csu5543': 'WIP' })}</li>`
+        ).join('');
+
+        return `<li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">${year}</a>` +
+            `<ul class="dropdown-menu">${dropdownItems}</ul></li>`;
+    }
+
+    const mainNav = links => {
+        links.sort();
+        const navItems = links.map(link => `<li class="nav-item">${navItem(link, { 'wip': 'WIP', 'news': '/updates/', 'contact': 'mailto:contact@dmj.one' })}</li>`).join('');
+        return navItems;
+    }
+
+    const fetchCourseData = async () => {
+        const response = await fetch('/js/courselist.json');
+        const courses = await response.json();
+        return courses;
+    }
+
+    const groupCoursesBySemester = (courses) => {
+        const semesters = {};
+
+        courses.forEach(course => {
+            const semester = course.details.semester;
+            if (!semesters[semester]) {
+                semesters[semester] = [];
+            }
+            semesters[semester].push(course.id);
+        });
+
+        return semesters;
+    }
+
+    const generateNavLinks = async () => {
+        const courses = await fetchCourseData();
+        const semesters = groupCoursesBySemester(courses);
+
+        let allLinksHTML = '';
+
+        Object.keys(semesters).forEach((semester, index) => {
+            const yearLabel = `${index + 1}<sup>${index === 0 ? 'st' : (index === 1 ? 'nd' : 'rd')}</sup> Year`;
+            const links = [yearLabel, ...semesters[semester]];
+            allLinksHTML += dropdown(links[0], links.slice(1));
+        });
+
+        const visible_links = ["wip"];
+        allLinksHTML += mainNav(visible_links);
+
+        return allLinksHTML;
+    }
+
+    const allLinksHTML = await generateNavLinks();
+
+    const getBreathingOption = () => {
+        const storedPreference = JSON.parse(localStorage.getItem("breathingAnimation"));
+        return storedPreference && storedPreference.isEnabled ? storedPreference.selectedAnimation : "";
+    };
+    const breathingoption = (!document.getElementById('global_breathinganimationblock')) ? getBreathingOption() : '';
+
+    const finallinks = `    
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark sticky-top mw-100 px-3 py-3 shadow-lg" data-bs-theme="dark">
+        <div class="container-fluid">
+            ${headerNavHTML}
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse" id="navbar">
+                <ul class="navbar-nav ms-auto">
+                    ${allLinksHTML}
+                    <div id="userMenu">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link" href="${GLOBAL_login_page_path}?redirect=${encodeURIComponent(window.location.pathname)}">
+                                Login
+                            </a>
+                        </li>
+                    </div>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    ${breathingoption ? `<div class="breathing-animation sticky-top cursor-pointer m-1 p-0 mx-auto ${breathingoption}" id="global_breathinganimationblock" onclick="location.href='/my/features/breathing-techniques'"></div>` : ''}
+    `;
+    return finallinks;
+}; */
+
+/* let header_navbar = async function (flags) {
+    if (flags) return 0;
+
+    const url = new URL(window.location.href);
+    const pathname = url.pathname.split('/');
+    const base = '/edu/su/';
+    const coursesBase = `${base}course/`;
+    const nav_folder = pathname[4] ? `${coursesBase}${pathname[4]}` : '';
+    const nav_subfolder = pathname[5] || '';
+    const nav_filename = pathname.pop() || '';
+
+    const breadcrumb = [
+        { href: `//${window.location.host}`, icon: 'house-fill', title: 'Home' },
+        nav_folder && { href: `${nav_folder}/`, icon: 'journals', title: nav_folder },
+        nav_subfolder && { href: `${nav_folder}/${nav_subfolder}/`, icon: 'card-list', title: nav_subfolder },
+        nav_filename && { href: nav_filename, icon: 'journal-code', title: nav_filename }
+    ].filter(Boolean);
+
+    const breadcrumbHTML = breadcrumb.map(({ href, icon, title }) =>
+        `<li class="breadcrumb-item${title === nav_filename ? ' active' : ''}"${title === nav_filename ? ' aria-current="page"' : ''}>` +
+        `<a href="${href}" data-toggle="tooltip" data-placement="top" title="${title}">` +
+        `<i class="bi bi-${icon}"></i></a></li>`
+    ).join('');
+
+    const headerNavHTML = `<nav aria-label="breadcrumb" class="navbar-brand">` +
+        `<ol class="breadcrumb" style="margin:auto">${breadcrumbHTML}</ol></nav>`;
+   
+    const navItem = (link, specialLinks) => {
+        const linkPath = `${coursesBase}${link.id}/`;
+        const linkActive = window.location.pathname.startsWith(linkPath) ? 'active" aria-current="page' : '';
+
+        if (specialLinks.hasOwnProperty(link.id.toLowerCase())) {
+            const specialHref = specialLinks[link.id.toLowerCase()];
+            if (specialHref === 'WIP') {
+                return `<li><a class="dropdown-item disabled" href="#" title="Work In Progress">${link.title} [WIP]</a></li>`;
+            } else {
+                return `<li class="nav-item"><a class="nav-link ${linkActive}" href="${specialHref}" title="Go to ${link.title}">${link.title}</a></li>`;
+            }
+        } else {
+            return `<a class="dropdown-item ${linkActive}" href="${linkPath}">${link.title}</a>`;
+        }
+    };
+
+
+    const dropdown = (year, links) => {
+        links.sort((a, b) => a.title.localeCompare(b.title));
+        const dropdownItems = links.map(link =>
+            `<li>${navItem(link, { 'wip': 'WIP', 'csu5543': 'WIP' })}</li>`
+        ).join('');
+
+        return `<li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">${year}</a>` +
+            `<ul class="dropdown-menu mt-3">${dropdownItems}</ul></li>`;
+    }
+
+    const mainNav = links => {
+        links.sort((a, b) => a.title.localeCompare(b.title));
+        const navItems = links.map(link => `<li class="nav-item">${navItem(link, { 'wip': 'WIP', 'news': '/updates/', 'contact': 'mailto:contact@dmj.one' })}</li>`).join('');
+        return navItems;
+    }
+
+    const fetchCourseData = async () => {
+        const response = await fetch('/js/courselist.json');
+        const courses = await response.json();
+        return courses;
+    }
+
+    const groupCoursesBySemester = (courses) => {
+        const semesters = {};
+
+        courses.forEach(course => {
+            const semester = course.details.semester;
+            if (!semesters[semester]) {
+                semesters[semester] = [];
+            }
+            semesters[semester].push({ id: course.id, title: course.title });
+        });
+
+        return semesters;
+    }
+
+    const generateNavLinks = async () => {
+        const courses = await fetchCourseData();
+        const semesters = groupCoursesBySemester(courses);
+
+        let allLinksHTML = '';
+
+        Object.keys(semesters).forEach((semester, index) => {
+            // const yearLabel = `Semester ${index + 1}<sup>${index === 0 ? 'st' : (index === 1 ? 'nd' : 'rd')}</sup>`;
+            const yearLabel = `Semester ${index + 1}`;
+            const links = [yearLabel, ...semesters[semester]];
+            allLinksHTML += dropdown(links[0], links.slice(1));
+        });
+
+        const visible_links = [{ id: "wip", title: "WIP" }];
+        allLinksHTML += mainNav(visible_links);
+
+        return allLinksHTML;
+    }
+
+    const allLinksHTML = await generateNavLinks();
+
+    const getBreathingOption = () => {
+        const storedPreference = JSON.parse(localStorage.getItem("breathingAnimation"));
+        return storedPreference && storedPreference.isEnabled ? storedPreference.selectedAnimation : "";
+    };
+    const breathingoption = (!document.getElementById('global_breathinganimationblock')) ? getBreathingOption() : '';
+
+    const finallinks = `    
+    <nav class="navbar navbar-expand-md sticky-top mw-100 px-3 py-3 shadow-lg bg-blur-2">
+        <div class="container-fluid">
+            ${headerNavHTML}
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse" id="navbar">
+                <ul class="navbar-nav ms-auto">
+                    ${allLinksHTML}
+                    <div id="userMenu">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link" href="${GLOBAL_login_page_path}?redirect=${encodeURIComponent(window.location.pathname)}">
+                                Login
+                            </a>
+                        </li>
+                    </div>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    ${breathingoption ? `<div class="breathing-animation sticky-top cursor-pointer m-1 p-0 mx-auto ${breathingoption}" id="global_breathinganimationblock" onclick="location.href='/my/features/breathing-techniques'"></div>` : ''}
+    `;
+    return finallinks;
+}; */
+
+/* let header_navbar = async function (flags) {
+    if (flags) return 0;
+
+    const url = new URL(window.location.href);
+    const pathname = url.pathname.split('/');
+    const base = '/edu/su/';
+    const coursesBase = `${base}course/`;
+    const nav_folder = pathname[4] ? `${coursesBase}${pathname[4]}` : '';
+    const nav_subfolder = pathname[5] || '';
+    const nav_filename = pathname.pop() || '';
+
+    const breadcrumb = [
+        { href: `//${window.location.host}`, icon: 'house-fill', title: 'Home' },
+        nav_folder && { href: `${nav_folder}/`, icon: 'journals', title: nav_folder },
+        nav_subfolder && { href: `${nav_folder}/${nav_subfolder}/`, icon: 'card-list', title: nav_subfolder },
+        nav_filename && { href: nav_filename, icon: 'journal-code', title: nav_filename }
+    ].filter(Boolean);
+
+    const breadcrumbHTML = breadcrumb.map(({ href, icon, title }) =>
+        `<li class="breadcrumb-item${title === nav_filename ? ' active' : ''}"${title === nav_filename ? ' aria-current="page"' : ''}>` +
+        `<a href="${href}" data-toggle="tooltip" data-placement="top" title="${title}">` +
+        `<i class="bi bi-${icon}"></i></a></li>`
+    ).join('');
+
+    const headerNavHTML = `<nav aria-label="breadcrumb" class="navbar-brand">` +
+        `<ol class="breadcrumb" style="margin:auto">${breadcrumbHTML}</ol></nav>`;
+
+    const navItem = (link, specialLinks) => {
+        const linkPath = `${coursesBase}${link.id}/`;
+        const linkActive = window.location.pathname.startsWith(linkPath) ? 'active" aria-current="page' : '';
+
+        if (specialLinks.hasOwnProperty(link.id.toLowerCase())) {
+            const specialHref = specialLinks[link.id.toLowerCase()];
+            if (specialHref === 'WIP') {
+                return `<li><a class="dropdown-item disabled" href="#" title="Work In Progress">${link.title} [WIP]</a></li>`;
+            } else {
+                return `<li class="nav-item"><a class="nav-link ${linkActive}" href="${specialHref}" title="Go to ${link.title}">${link.title}</a></li>`;
+            }
+        } else {
+            return `<a class="dropdown-item ${linkActive}" href="${linkPath}">${link.title}</a>`;
+        }
+    };
+
+    const dropdown = (year, links) => {
+        links.sort((a, b) => a.title.localeCompare(b.title));
+        const dropdownItems = links.map(link =>
+            `<li>${navItem(link, { 'wip': 'WIP', 'csu5543': 'WIP' })}</li>`
+        ).join('');
+
+        return `<li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">${year}</a>` +
+            `<ul class="dropdown-menu mt-3">${dropdownItems}</ul></li>`;
+    }
+
+    const mainNav = links => {
+        links.sort((a, b) => a.title.localeCompare(b.title));
+        const navItems = links.map(link => `<li class="nav-item">${navItem(link, { 'wip': 'WIP', 'news': '/updates/', 'contact': 'mailto:contact@dmj.one' })}</li>`).join('');
+        return navItems;
+    }
+
+    const fetchCourseData = async () => {
+        const response = await fetch('/js/courselist.json');
+        const courses = await response.json();
+        return courses;
+    }
+
+    const groupCoursesBySemester = (courses) => {
+        const semesters = {};
+
+        courses.forEach(course => {
+            const semester = course.details.semester;
+            if (!semesters[semester]) {
+                semesters[semester] = [];
+            }
+            semesters[semester].push({ id: course.id, title: course.title });
+        });
+
+        return semesters;
+    }
+
+    const generateNavLinks = async () => {
+        const courses = await fetchCourseData();
+        const semesters = groupCoursesBySemester(courses);
+
+        let allLinksHTML = '';
+
+        Object.keys(semesters).forEach((semester) => {
+            const yearLabel = semester;
+            const links = [yearLabel, ...semesters[semester]];
+            allLinksHTML += dropdown(links[0], links.slice(1));
+        });
+
+        const visible_links = [{ id: "wip", title: "WIP" }];
+        allLinksHTML += mainNav(visible_links);
+
+        return allLinksHTML;
+    }
+
+    const allLinksHTML = await generateNavLinks();
+
+    const getBreathingOption = () => {
+        const storedPreference = JSON.parse(localStorage.getItem("breathingAnimation"));
+        return storedPreference && storedPreference.isEnabled ? storedPreference.selectedAnimation : "";
+    };
+    const breathingoption = (!document.getElementById('global_breathinganimationblock')) ? getBreathingOption() : '';
+
+    const finallinks = `    
+    <nav class="navbar navbar-expand-md sticky-top mw-100 px-3 py-3 shadow-lg bg-blur-2">
+        <div class="container-fluid">
+            ${headerNavHTML}
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse" id="navbar">
+                <ul class="navbar-nav ms-auto">
+                    ${allLinksHTML}
+                    <div id="userMenu">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link" href="${GLOBAL_login_page_path}?redirect=${encodeURIComponent(window.location.pathname)}">
+                                Login
+                            </a>
+                        </li>
+                    </div>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    ${breathingoption ? `<div class="breathing-animation sticky-top cursor-pointer m-1 p-0 mx-auto ${breathingoption}" id="global_breathinganimationblock" onclick="location.href='/my/features/breathing-techniques'"></div>` : ''}
+    `;
+    return finallinks;
 };
+ */
+
+let header_navbar = async function (flags) {
+    if (flags) return 0;
+
+    const url = new URL(window.location.href);
+    const pathname = url.pathname.split('/');
+    // const base = '/edu/su/';
+    const base = `/${pathname[1]}/${pathname[2]}/`;    
+    const coursesBase = `${base}${pathname[3]}/`;
+    const courseID = pathname[4]; // Extracting the course ID from the URL
+    const nav_folder = pathname[4] ? `${coursesBase}${pathname[4]}` : '';
+    console.log(base, coursesBase, courseID, nav_folder);
+    const nav_subfolder = pathname[5] || '';
+    const nav_filename = pathname.pop() || '';
+
+    const breadcrumb = [
+        { href: `//${window.location.host}`, icon: 'house-fill', title: 'Home' },
+        nav_folder && { href: `${nav_folder}/`, icon: 'journals', title: nav_folder },
+        nav_subfolder && { href: `${nav_folder}/${nav_subfolder}/`, icon: 'card-list', title: nav_subfolder },
+        nav_filename && { href: nav_filename, icon: 'journal-code', title: nav_filename }
+    ].filter(Boolean);
+
+    const breadcrumbHTML = breadcrumb.map(({ href, icon, title }) =>
+        `<li class="breadcrumb-item${title === nav_filename ? ' active' : ''}"${title === nav_filename ? ' aria-current="page"' : ''}>` +
+        `<a href="${href}" data-toggle="tooltip" data-placement="top" title="${title}">` +
+        `<i class="bi bi-${icon}"></i></a></li>`
+    ).join('');
+
+    const headerNavHTML = `<nav aria-label="breadcrumb" class="navbar-brand">` +
+        `<ol class="breadcrumb m-auto text-decoration-none text-black">${breadcrumbHTML}</ol></nav>`;
+
+    const navItem = (link, specialLinks) => {
+        const linkPath = `${coursesBase}${link.id}/`;
+        const linkActive = window.location.pathname.startsWith(linkPath) ? 'active" aria-current="page' : '';
+
+        if (specialLinks.hasOwnProperty(link.id.toLowerCase())) {
+            const specialHref = specialLinks[link.id.toLowerCase()];
+            if (specialHref === 'WIP') {
+                return `<li><a class="dropdown-item disabled" href="#" title="Work In Progress">${link.title} [WIP]</a></li>`;
+            } else {
+                return `<li class="nav-item"><a class="nav-link ${linkActive}" href="${specialHref}" title="Go to ${link.title}">${link.title}</a></li>`;
+            }
+        } else {
+            return `<a class="dropdown-item ${linkActive}" href="${linkPath}">${link.title}</a>`;
+        }
+    };
+
+    const dropdown = (year, links) => {
+        links.sort((a, b) => a.title.localeCompare(b.title));
+        const dropdownItems = links.map(link =>
+            `<li>${navItem(link, { 'wip': 'WIP', 'csu5543': 'WIP' })}</li>`
+        ).join('');
+
+        return `<li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">${year}</a>` +
+            `<ul class="dropdown-menu mt-3">${dropdownItems}</ul></li>`;
+    }
+
+    const mainNav = links => {
+        links.sort((a, b) => a.title.localeCompare(b.title));
+        const navItems = links.map(link => `<li class="nav-item">${navItem(link, { 'wip': 'WIP', 'news': '/updates/', 'contact': 'mailto:contact@dmj.one' })}</li>`).join('');
+        return navItems;
+    }
+
+    const fetchCourseData = async () => {
+        const response = await fetch('/js/courselist.json');
+        const courses = await response.json();
+        return courses;
+    }
+
+    const getProgramForCourse = (courses, courseID) => {
+        const course = courses.find(course => course.id === courseID);
+        return course ? course.details.program : null;
+    }
+
+    const groupCoursesBySemester = (courses, program) => {
+        const semesters = {};
+
+        courses.forEach(course => {
+            if (course.details.program === program) {
+                const semester = course.details.semester;
+                if (!semesters[semester]) {
+                    semesters[semester] = [];
+                }
+                semesters[semester].push({ id: course.id, title: course.title });
+            }
+        });
+
+        return semesters;
+    }
+
+    const generateNavLinks = async (courseID) => {
+        const courses = await fetchCourseData();
+        const program = getProgramForCourse(courses, courseID);
+
+        if (!program) {
+            console.error(`Program not found for course ID: ${courseID}`);
+            return '';
+        }
+
+        const semesters = groupCoursesBySemester(courses, program);
+        let allLinksHTML = '';
+
+        Object.keys(semesters).forEach((semester) => {
+            const yearLabel = semester;
+            const links = [yearLabel, ...semesters[semester]];
+            allLinksHTML += dropdown(links[0], links.slice(1));
+        });
+
+        const visible_links = [{ id: "wip", title: "WIP" }];
+        allLinksHTML += mainNav(visible_links);
+
+        return allLinksHTML;
+    }
+
+    const allLinksHTML = await generateNavLinks(courseID);
+
+    const getBreathingOption = () => {
+        const storedPreference = JSON.parse(localStorage.getItem("breathingAnimation"));
+        return storedPreference && storedPreference.isEnabled ? storedPreference.selectedAnimation : "";
+    };
+    const breathingoption = (!document.getElementById('global_breathinganimationblock')) ? getBreathingOption() : '';
+
+    const finallinks = `    
+    <nav class="navbar navbar-expand-md sticky-top mw-100 text-auto px-3 py-sm-1 shadow-lg bg-blur-7">
+        <div class="container-fluid">
+            ${headerNavHTML}
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse" id="navbar">
+                <ul class="navbar-nav ms-auto">
+                    ${allLinksHTML}
+                    <div id="userMenu">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link" href="${GLOBAL_login_page_path}?redirect=${encodeURIComponent(window.location.pathname)}">
+                                Login
+                            </a>
+                        </li>
+                    </div>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    ${breathingoption ? `<div class="breathing-animation sticky-top cursor-pointer m-1 p-0 mx-auto ${breathingoption}" id="global_breathinganimationblock" onclick="location.href='/my/features/breathing-techniques'"></div>` : ''}
+    `;
+    return finallinks;
+};
+
 
 /********************** Public the author to window variable **************************/
 function extractTextFromStrongTag(htmlString) {
@@ -1122,7 +1661,7 @@ function extractTextFromStrongTag(htmlString) {
     }
 }
 
-let header_author = function (...args) {
+/* let header_author = function (...args) {
     const header_author_internal = {
         activateNavbar() {
             const navLinks = document.querySelectorAll('.navbar-nav a');
@@ -1155,7 +1694,64 @@ let header_author = function (...args) {
 
     header_author_internal.header_author_main(...args);
     header_author_internal.activateNavbar();
+}; */
+
+let header_author = async function (...args) {
+    const header_author_internal = {        
+        activateNavbar() {
+            const navLinks = document.querySelectorAll('.navbar-nav a');
+            const currentUrl = window.location.pathname;
+            navLinks.forEach(link => {
+                if (currentUrl.startsWith(link.getAttribute('href'))) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+        },
+        async header_author_main(...args) {
+            if (args[0] === "off") { window.loaded_header_author = 1; return null; }
+            if (args[0] === "WriteManually") {
+                window.loaded_header_author = 1;
+                const finalheaders = "<header>" + args[1] + "</header>" + await header_navbar();
+                document.body.insertAdjacentHTML('afterbegin', finalheaders);
+                return null;
+            }
+            if (args[0] === "WriteManuallyNoNav") {
+                window.loaded_header_author = 1;
+                const finalheaders = "<header>" + args[1] + "</header>";
+                document.body.insertAdjacentHTML('afterbegin', finalheaders);
+                return null;
+            }
+            if (args[0] === "NavOnly") {
+                window.loaded_header_author = 1;
+                const navOnlyHTML = await header_navbar();
+                document.body.insertAdjacentHTML('afterbegin', navOnlyHTML);
+                return null;
+            }
+
+            window["loaded_header_author"] = 1;
+
+            const { pA_author, pA_bio } = processAuthors(args);
+            const allAuthors = `<span id="authorlist">${pA_author}</span>`, author_bio = pA_bio;
+
+            // Added to display when user prints the article
+            window.GLOBAL_get_Author_Name_ = pA_author;
+            // console.log(extractTextFromStrongTag(pA_author));
+            window.GLOBAL_get_formatted_Author_Name_ = extractTextFromStrongTag(pA_author);
+
+            const { line1, line2, line3, line4 } = processFolder(allAuthors, author_bio);
+
+            const finalheaders = "<header>" + line1 + line2 + line3 + line4 + "</header>" + await header_navbar();
+            document.body.insertAdjacentHTML('afterbegin', finalheaders);
+        },
+    };
+
+    await header_author_internal.header_author_main(...args);
+    header_author_internal.activateNavbar();
 };
+
+
 
 
 /************************* Print Specific Layout Generator ****************************/
@@ -7791,14 +8387,14 @@ window.addEventListener("load", async function () {
     // Header Automation
     if (!window["loaded_header_author"] == 1 || window["page"] === 404) {
         if (data.vp_headerurls.some(url => url === currentUrl || url === currentUrlWithoutHtml)) {
-            header_author("vp");
+            await header_author("vp");
         } else if (data.harshal_headerurls.some(url => url === currentUrl || url === currentUrlWithoutHtml)) {
-            header_author("harshal");
+            await header_author("harshal");
         } else if (window["page"] == 404) {
-            document.body.insertAdjacentHTML('afterbegin', header_navbar());  // special case of 404 page
+            document.body.insertAdjacentHTML('afterbegin', await header_navbar());  // special case of 404 page
         } else {
             // header_author();
-            document.body.insertAdjacentHTML('afterbegin', header_navbar());  // special case of 404 page
+            document.body.insertAdjacentHTML('afterbegin', await header_navbar());  // special case of 404 page
         }
     }
 

@@ -18,8 +18,8 @@ function get_menu_list(datetogen) {
                 title: "Understanding Database Management Systems",
                 desc: "Explore the intricacies of Database Management Systems with Shoolini University's CSU357 DBMS course, detailed on dmj.one. Delve into the core principles, architectures, and applications of DBMS. Click to discover how DBMS serves as the foundation for storing, retrieving, and managing data across various industries. Learn about data models, database design, SQL, and more, to effectively manage and manipulate data. This course equips you with the knowledge to design robust databases and enhance your data management skills.",
                 codetype: "CSU357 | DBMS Concepts",
-                cardimage: "//cdn.dmj.one/img/csu357.webp",
-                cardimage_dark: "//cdn.dmj.one/img/csu357_dark.webp"
+                cardimage: "//cdn.dmj.one/edu/su/course/csu357/img/logo.webp",
+                cardimage_dark: "//cdn.dmj.one/edu/su/course/csu357/img/logo_dark.webp"
             },
             {
                 link: "lab/",

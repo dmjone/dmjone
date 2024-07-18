@@ -35,7 +35,7 @@
         <meta name="twitter:image" content="/logo.png">
 
         <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width,initial-scale=1" />        
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
 
         <meta name="author" content="Divya Mohan">
 
@@ -849,10 +849,28 @@ to { opacity: 1; }
                         styledata = `style="color:#FF7F50"`;
                         break;
                 }
+                GLOBAL_accessurl = () => {
+                    if (course.details.program.toLowerCase() === 'professional') {
+                        return `/edu/professional/course/${course.id}/`;
+                    } else {
+                        return `/edu/su/course/${course.id}/`;
+                    }
+                }
+                index_coursecode = () => {
+                    if (course.details.program.toLowerCase() === 'professional') {
+                        return course.details.certification_organization;
+                    } else {
+                        return course.id.toUpperCase();
+                    }
+                }
                 return `
         <div class="col-lg-4 d-flex align-items-stretch justify-content-center py-4">
-            <a href="/edu/su/course/${course.id}/">
+            <a href="${GLOBAL_accessurl()}">
                 <div class="card rounded hoverable border-0 border-danger border-top border-opacity-50 border-bottom">
+                    <div class="card-header m-0 p-0 justify-content-center align-items-center">
+                        <img src="${course.image}" class="card-img-top img-fluid vw-100" alt="${course.title}" style="height: 200px; object-fit: fit;">
+                        <!-- <h2 class="p-3 d-none d-sm-block"><strong>${course.title}</strong></h2> -->
+                    </div>
                     <div class="card-body justify-content-center align-items-center">
                         <div class="d-flex flex-column text-center ">
                             <div class="flex-grow-1 my-3">
@@ -861,25 +879,27 @@ to { opacity: 1; }
                                     <i class="fas fa-building d-none"></i>
                                     <strong class="text-muted d-none"> Course Details:</strong>
                                     <div class="badge-box">
-                                        <span class="badge rounded-pill bg-success bg-gradient bg-opacity-75 text-light p-2 m-1">${course.details.semester}</span>
-                                        <span class="badge rounded-pill bg-success bg-gradient bg-opacity-75 text-light p-2 m-1">${course.details.program}</span>
+                                        <span class="badge bg-warning-subtle bg-gradient bg-opacity-25 shadow p-2 m-1 fw-normal text-auto" style="letter-spacing:0.02rem"><i class="fas fa-graduation-cap"></i> &nbsp;${course.details.semester}</span>
+                                        <span class="badge bg-warning-subtle bg-gradient bg-opacity-25 shadow p-2 m-1 fw-normal text-auto" style="letter-spacing:0.02rem"><i class="fas fa-briefcase"></i> &nbsp;${course.details.program}</span>
                                     </div>
                                 </div>
                                 <!-- <h5 class="card-text flex-fill text-reset" style="color:black !important"><strong>${course.id.toUpperCase()}</strong></h5> -->
                                 <div class="my-3">                                
-                                    <div class="h5 text-muted"><strong>${course.id.toUpperCase()}</strong></div>
+                                    <div class="h5 text-muted"><strong>${index_coursecode()}</strong></div>
                                 </div>                                
-                                <div class="p-0 mb-1 text-center d-none d-sm-block">
-                                        <i class="fas fa-lightbulb" style="var(--text-color) !important"></i>
-                                        <strong class="text-muted"> Competencies Acquired:</strong>
+                                <div class="p-0 mb-1 text-center d-none d-sm-block pt-3 ">
+                                        <div class="mb-2">
+                                            <i class="fas fa-user-tie" style="var(--text-color) !important"></i> &nbsp;Skills Acquired:
+                                        </div>
                                         <div class="badge-box">
-                                            ${course.competencies.map(comp => `<span class="badge rounded-pill bg-primary bg-opacity-25 p-2 m-1" style="color: var(--text-color)">${comp}</span>`).join('')}
+                                            ${course.competencies.map(comp => `<span class="badge fw-normal rounded-pill bg-primary bg-opacity-25 p-2 m-1" style="color: var(--text-color); letter-spacing:0.01rem">${comp}</span>`).join('')}
                                         </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="card-footer py-0 border-top border-1 border-dark bg-opacity-10 bg-dark bg-gradient ">
+                    ${(course.details.program.toLowerCase() !== 'professional') ? 
+                    `<div class="card-footer py-0 border-top border-1 border-dark bg-opacity-10 bg-dark bg-gradient d-none d-sm-block">
                         <div class="row text-center justify-content-center align-items-center">
                             <div class="col p-3">
                                 <h4 class="fs-5 mb-1 pt-3 ${classdata}" ${styledata}><i class="fas fa-tachometer-alt"></i></h4>
@@ -899,7 +919,7 @@ to { opacity: 1; }
                                 <span class="d-block font-size-sm text-muted">Topics & Articles</span>
                             </div>
                         </div>
-                    </div>
+                    </div>` : ''}
                 </div>
             </a>
         </div>
@@ -949,7 +969,7 @@ to { opacity: 1; }
                 return courses;
             } */
 
-            function sortCourses(courses, criteria) {
+            /* function sortCourses(courses, criteria) {
                 if (criteria.startsWith('semester')) {
                     courses.sort((a, b) => {
                         let semesterA = parseInt(a.details.semester.match(/\d+/)[0], 10);
@@ -975,7 +995,44 @@ to { opacity: 1; }
                     courses.sort((a, b) => a[criteria].localeCompare(b[criteria]));
                 }
                 return courses;
-            }
+            } */
+
+            function sortCourses(courses, criteria) {
+                    const skipSorting = (course) => course.details.program.toLowerCase() === 'professional';
+
+                    courses.sort((a, b) => {
+                        if (skipSorting(a) || skipSorting(b)) {
+                            return 0; // Skip sorting for professional courses
+                        }
+
+                        if (criteria.startsWith('semester')) {
+                            let semesterA = parseInt(a.details.semester.match(/\d+/)[0], 10);
+                            let semesterB = parseInt(b.details.semester.match(/\d+/)[0], 10);
+                            return criteria.endsWith('asc') ? semesterA - semesterB : semesterB - semesterA;
+                        }
+
+                        if (criteria.startsWith('difficulty')) {
+                            const difficultyOrder = { 'Easy': 1, 'Medium': 2, 'Hard': 3 };
+                            let diffA = difficultyOrder[a.difficulty];
+                            let diffB = difficultyOrder[b.difficulty];
+                            return criteria.endsWith('asc') ? diffA - diffB : diffB - diffA;
+                        }
+
+                        if (criteria.startsWith('topics')) {
+                            let topicsA = typeof a.topics === 'string' ? parseInt(a.topics.replace(/[^\d]/g, ''), 10) : a.topics;
+                            let topicsB = typeof b.topics === 'string' ? parseInt(b.topics.replace(/[^\d]/g, ''), 10) : b.topics;
+                            return criteria.endsWith('asc') ? topicsA - topicsB : topicsB - topicsA;
+                        }
+
+                        if (criteria === 'code') {
+                            return a.id.localeCompare(b.id);
+                        }
+
+                        return a[criteria].localeCompare(b[criteria]);
+                    });
+
+                    return courses;
+                }
 
 
 
@@ -1074,7 +1131,7 @@ to { opacity: 1; }
                             }
                             acc[semester].push(course);
                             return acc;
-                        }, {});                        
+                        }, {});
 
                         const navbarContainer = document.getElementById('navbar-container');
                         navbarContainer.innerHTML = generateNavbarHTML(coursesBySemester);
@@ -1136,7 +1193,14 @@ to { opacity: 1; }
                 `;
 
                     courses.forEach(course => {
-                        navbarHTML += `<li><a class="dropdown-item" href="/edu/su/course/${course.id}/">${course.title}</a></li>`;
+                        GLOBAL_accessurl = () => {
+                            if (course.details.program.toLowerCase() === 'professional') {
+                                return `/edu/professional/course/${course.id}/`;
+                            } else {
+                                return `/edu/su/course/${course.id}/`;
+                            }
+                        }
+                        navbarHTML += `<li><a class="dropdown-item" href="${GLOBAL_accessurl()}">${course.title}</a></li>`;
                     });
 
                     navbarHTML += `
@@ -1144,7 +1208,7 @@ to { opacity: 1; }
                             </li>
                             `;
                 }
-                
+
                 navbarHTML += `
                         </ul>
                     </li>

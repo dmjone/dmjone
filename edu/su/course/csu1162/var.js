@@ -7,8 +7,8 @@ function get_menu_list(datetogen) {
                 title: "Mastering Python Programming",
                 desc: "Dive into the world of Python programming with Shoolini University's CSU1162 Python Programming course, detailed on dmj.one. Unravel the power of Python for software development, data analysis, and automation. Click to explore foundational concepts, advanced techniques, and practical applications that empower you to solve real-world problems efficiently. Discover how to enhance your coding skills, develop sophisticated programs, and significantly boost your career prospects.",
                 codetype: "CSU1162 | Python Programming",
-                cardimage: "//cdn.dmj.one/img/csu1162.webp",
-                cardimage_dark: "//cdn.dmj.one/img/csu1162_dark.webp"
+                cardimage: "//cdn.dmj.one/edu/su/course/csu1162/img/logo.webp",
+                cardimage_dark: "//cdn.dmj.one/edu/su/course/csu1162/img/logo_dark.webp"
                 
             },
             {
