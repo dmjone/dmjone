@@ -80,7 +80,7 @@ const body_pomodoro_helptext = `
     }
 })();
 
-////////// Set dark mode ot light mode for bootstrap.
+////////// Set dark mode to light mode for bootstrap.
 (() => {
     if (GLOBAL_crawler_mode) {
         return;
@@ -99,6 +99,18 @@ const body_pomodoro_helptext = `
     }
 })();
 /*************** Fixed Functions and Variables END **************/
+
+/*************** Disallow robots on dev.dmj.one, localhost, test.dmj.one ******************/
+(() => {
+    document.addEventListener("DOMContentLoaded", () => {
+        if (["dev.dmj.one", "test.dmj.one", "localhost"].includes(window.location.hostname)) {
+            const metaTag = document.createElement('meta');
+            metaTag.name = "robots";
+            metaTag.content = "noindex, nofollow";
+            document.head.appendChild(metaTag);
+        }
+    });
+})();
 
 
 //****Highlight Js****//
@@ -4340,6 +4352,30 @@ function maintenance_mode() {
     }
 }());
 
+(function () {
+    function applyBackground() {
+        const today = new Date();
+        const month = today.getMonth() + 1; // JavaScript months are 0-11
+        const day = today.getDate();
+
+        const isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        document.body.classList.remove('indian-flag-background', 'default-background');
+
+        if (!isDarkMode) {
+            if ((month === 1 && day === 26) || (month === 8 && day === 15)) {
+                document.body.classList.add('indian-flag-background');
+            } else {
+                document.body.classList.add('default-background');
+            }
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', applyBackground);
+
+    const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    darkModeMediaQuery.addEventListener('change', applyBackground);
+})();
 
 /************* Truncate the whitespace of all the codes inside pre code for highlight js **************/
 // (function () {

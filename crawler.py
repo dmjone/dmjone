@@ -10,13 +10,20 @@ import time
 import os
 import urllib.parse
 
+# Customizable Variables
+BASE_URL = "https://localhost/edu/su/csu1162/"
+CHROME_BINARY_LOCATION = "C:/Program Files/Google/Chrome Beta/Application/chrome.exe"
+CHROMEDRIVER_PATH = "C:/chromedriver/chromedriver.exe"
+OUTPUT_FILENAME = 'sitemap.txt'
+WAIT_TIME = 0
+
 def get_driver():
     options = Options()
     options.add_argument('--headless')
     options.add_argument('--disable-gpu')
     options.add_argument('--ignore-certificate-errors')
-    options.binary_location = "C:/Program Files/Google/Chrome Beta/Application/chrome.exe"  # Update this path
-    service = ChromeService(executable_path='C:/chromedriver/chromedriver.exe')  # Update this path
+    options.binary_location = CHROME_BINARY_LOCATION
+    service = ChromeService(executable_path=CHROMEDRIVER_PATH)
     driver = webdriver.Chrome(service=service, options=options)
     return driver
 
@@ -26,7 +33,7 @@ def extract_links(driver, url):
         WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.TAG_NAME, 'body'))
         )
-        time.sleep(1)  # Wait for additional JS to load
+        time.sleep(WAIT_TIME)  # Wait for additional JS to load
     except Exception as e:
         print(f"Error loading page: {e}")
         return set()
@@ -59,6 +66,13 @@ def remove_fragment(url):
     parsed_url = urllib.parse.urlparse(url)
     return urllib.parse.urlunparse(parsed_url._replace(fragment=''))
 
+def clean_link(link):
+    """Replace 'localhost' with 'dmj.one' and remove '.html' extension."""
+    link = link.replace("localhost", "dmj.one")
+    if link.endswith('.html'):
+        link = link[:-5]
+    return link
+
 def crawl_website(base_url):
     visited = set()
     to_visit = set([base_url])
@@ -80,14 +94,13 @@ def crawl_website(base_url):
     driver.quit()
     return visited
 
-def save_sitemap(links, filename='sitemap.txt'):
+def save_sitemap(links, filename):
     sorted_links = sorted(links, key=lambda x: urllib.parse.urlparse(x).path)
     with open(filename, 'w') as f:
         for link in sorted_links:
-            f.write(f"{link}\n")
+            f.write(f"{clean_link(link)}\n")
 
 if __name__ == "__main__":
-    base_url = "https://dmj.one/"
-    links = crawl_website(base_url)
-    save_sitemap(links)
-    print(f"Sitemap saved to sitemap.txt with {len(links)} links.")
+    links = crawl_website(BASE_URL)
+    save_sitemap(links, OUTPUT_FILENAME)
+    print(f"Sitemap saved to {OUTPUT_FILENAME} with {len(links)} links.")
