@@ -35,6 +35,8 @@ const GLOBAL_ArticleUpdate_message = `An article has been updated. <a href="/my/
 const notification_new_course = 0;
 const GLOBAL_NewCourse_message = `A new course has been added. <a href="/edu/su/course/sample-course" class="alert-link">Explore now</a>.`;
 
+const GLOBAL_crawler_mode = 0;
+
 // const body_pomodoro_helptext = "The Pomodoro Technique is a time management method developed by Francesco Cirillo in the late 1980s. The technique uses a timer to break down work into intervals, traditionally 25 minutes in length, separated by short breaks. These intervals are named pomodoros, the plural in English of the Italian word pomodoro (tomato), after the tomato-shaped kitchen timer that Cirillo used as a university student. The technique has been widely popularized by dozens of apps and websites providing timers and instructions. Closely related to concepts such as timeboxing and iterative and incremental development used in software design, the method has been adopted in pair programming contexts.";
 const body_pomodoro_helptext = `
 <h2 style="color: #FFD700; margin-bottom: 1rem;">Time for a Break!</h2>
@@ -72,14 +74,18 @@ const body_pomodoro_helptext = `
         i++;
     }
     for (const variable in window) { // Displayed for Debug
-        if (variable.startsWith("urlpart")) {
-            console.log(`${variable} = ${window[variable]}`);
+        if (variable.startsWith("urlpart")) {        
+            GLOBAL_crawler_mode ? '' : console.log(`${variable} = ${window[variable]}`);
         }
     }
 })();
 
 ////////// Set dark mode ot light mode for bootstrap.
 (() => {
+    if (GLOBAL_crawler_mode) {
+        return;
+    }
+    
     const setTheme = () => {
         const theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
         document.documentElement.setAttribute('data-bs-theme', theme);
@@ -524,7 +530,13 @@ const body_pomodoro_helptext = `
     var qrcode_js = "/js/qrcode.js";
     document.write(`<script src='${qrcode_js}'></script>`);
 
-    const allScripts = [google_login_js, cdnjs_jquery, cdnjs_bootstrap, cdnjs_DOMPurify, cdnjs_highlightjs, cdnjs_font_awesome, cdnjs_cryptoJS, cdnjs_highlightjs_asm];
+    let allScripts;
+    if (GLOBAL_crawler_mode) {
+        allScripts = [cdnjs_jquery, cdnjs_bootstrap, cdnjs_DOMPurify];
+    } else {
+        allScripts = [google_login_js, cdnjs_jquery, cdnjs_bootstrap, cdnjs_DOMPurify, cdnjs_highlightjs, cdnjs_font_awesome, cdnjs_cryptoJS, cdnjs_highlightjs_asm];
+    }
+
     var loadScript = function (src) {
         return new Promise(function (resolve, reject) {
             var script = document.createElement('script');
@@ -539,10 +551,13 @@ const body_pomodoro_helptext = `
 
     // Load katex.min.js first. Once katex.min.js is loaded, load auto-render.min.js
     loadScript(cdnjs_katex).then(function () {
-        return loadScript(cdnjs_katex_autorender);
+        if (!GLOBAL_crawler_mode) return loadScript(cdnjs_katex_autorender);
     }).then(function () {
         return Promise.all(allScripts.map(loadScript));
     }).then(function () {
+        if (GLOBAL_crawler_mode) {
+            return;
+        }
         hljs.highlightAll(); // Highlight Js Automatic rendering init 
         renderMathInElement(document.body, {
             delimiters: [
@@ -1504,16 +1519,16 @@ let header_navbar = async function (flags) {
     const url = new URL(window.location.href);
     const pathname = url.pathname.split('/');
     // const base = '/edu/su/';
-    const base = `/${pathname[1]}/${pathname[2]}/`;    
+    const base = `/${pathname[1]}/${pathname[2]}/`;
     const coursesBase = `${base}${pathname[3]}/`;
     const courseID = pathname[4]; // Extracting the course ID from the URL
     const nav_folder = pathname[4] ? `${coursesBase}${pathname[4]}` : '';
-    console.log(base, coursesBase, courseID, nav_folder);
+    // console.log(base, coursesBase, courseID, nav_folder);
     const nav_subfolder = pathname[5] || '';
     const nav_filename = pathname.pop() || '';
 
     const breadcrumb = [
-        { href: `//${window.location.host}`, icon: 'house-fill', title: 'Home' },
+        // { href: `//${window.location.host}`, icon: 'house-fill', title: 'Home' },
         nav_folder && { href: `${nav_folder}/`, icon: 'journals', title: nav_folder },
         nav_subfolder && { href: `${nav_folder}/${nav_subfolder}/`, icon: 'card-list', title: nav_subfolder },
         nav_filename && { href: nav_filename, icon: 'journal-code', title: nav_filename }
@@ -1526,7 +1541,7 @@ let header_navbar = async function (flags) {
     ).join('');
 
     const headerNavHTML = `<nav aria-label="breadcrumb" class="navbar-brand">` +
-        `<ol class="breadcrumb m-auto text-decoration-none text-black">${breadcrumbHTML}</ol></nav>`;
+        `<ol class="breadcrumb m-auto text-decoration-none">${breadcrumbHTML}</ol></nav>`;
 
     const navItem = (link, specialLinks) => {
         const linkPath = `${coursesBase}${link.id}/`;
@@ -1620,27 +1635,31 @@ let header_navbar = async function (flags) {
     const breathingoption = (!document.getElementById('global_breathinganimationblock')) ? getBreathingOption() : '';
 
     const finallinks = `    
-    <nav class="navbar navbar-expand-md sticky-top mw-100 text-auto px-3 py-sm-1 shadow-lg bg-blur-7">
+    <nav class="navbar navbar-expand-md sticky-top mw-100 px-3 py-sm-0 shadow-lg bg-blur-12">
         <div class="container-fluid">
-            ${headerNavHTML}
+        <a href="/"><img src="/logo.png" alt="DMJ Logo" class="navbar-brand" style="height: 50px;"></a>            
+            ${headerNavHTML}            
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span></button>
-            <div class="collapse navbar-collapse" id="navbar">
+                <span class="navbar-toggler-icon"></span></button>            
+            <div class="collapse navbar-collapse" id="navbar">            
                 <ul class="navbar-nav ms-auto">
                     ${allLinksHTML}
                     <div id="userMenu">
                         <li class="nav-item dropdown">
+                        ${GLOBAL_crawler_mode ? '' : `
                             <a class="nav-link" href="${GLOBAL_login_page_path}?redirect=${encodeURIComponent(window.location.pathname)}">
                                 Login
-                            </a>
+                            </a>`}
                         </li>
                     </div>
                 </ul>
+                <div id="time" class="fw-bold cursor-default"></div>
             </div>
         </div>
-    </nav>
+    </nav>    
     ${breathingoption ? `<div class="breathing-animation sticky-top cursor-pointer m-1 p-0 mx-auto ${breathingoption}" id="global_breathinganimationblock" onclick="location.href='/my/features/breathing-techniques'"></div>` : ''}
-    `;
+    `;    
+    
     return finallinks;
 };
 
@@ -1708,6 +1727,23 @@ let header_author = async function (...args) {
                     link.classList.remove('active');
                 }
             });
+            
+            (async () => {
+                const timeElement = document.getElementById('time');
+
+                const padZero = number => number.toString().padStart(2, '0');
+
+                const updateTime = () => {
+                    const now = new Date();
+                    const hours = padZero(now.getHours());
+                    const minutes = padZero(now.getMinutes());
+                    const seconds = padZero(now.getSeconds());
+                    timeElement.textContent = `${hours}:${minutes}:${seconds}`;
+                };
+
+                setInterval(updateTime, 1000);
+                updateTime(); // initial call to display time immediately
+            })();
         },
         async header_author_main(...args) {
             if (args[0] === "off") { window.loaded_header_author = 1; return null; }
@@ -2443,6 +2479,10 @@ let header_author = async function (...args) {
 
 ////////////////////  Version 1.1 - Working
 (function () {
+    if (GLOBAL_crawler_mode) {
+        return;
+    }
+
     document.addEventListener("DOMContentLoaded", function () {
         if (!(window.PlacementQuiz || window.SubjectQuiz || window.ReviewSubjectQuestions)) {
             return null;
@@ -3045,6 +3085,10 @@ let header_author = async function (...args) {
 /************************** GOOGLE OAUTH LOGIN SYSTEM WITH MYACCOUNT ****************************/
 (function () {
 
+    if (GLOBAL_crawler_mode) {
+        return;
+    }
+
     // const GLOBAL_login_page_path = '/test/google/signin/alogin';
     // const local_account_page_path = '/test/google/signin/account';
     // if its localhost then use /login else use.html    
@@ -3229,7 +3273,7 @@ let header_author = async function (...args) {
                     if (userMenu) {
                         userMenu.innerHTML = `<li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">
-                            <img src="${userDetails.picture}" alt="User Picture" class="rounded-circle" width="25" height="25" id="userPic">
+                            <img src="${userDetails.picture}" alt="User Picture" class="rounded-circle" height="25" id="userPic">
                         </a>
                         <ul class="dropdown-menu mt-3">
                             <li>
@@ -3259,6 +3303,10 @@ let header_author = async function (...args) {
 
 
     window.cL = () => {
+        if (GLOBAL_crawler_mode) {
+            return;
+        }
+
         try {
             let l = checkLogin();
             let main = document.querySelector('main');
@@ -3279,7 +3327,7 @@ let header_author = async function (...args) {
         }
     };
 
-    (() => {
+    (() => {        
         // Calls cL for sure if the path is under /my/ or else it has 0.3 (30%) chance that it will require login on any page. Don't run on the host url
         if (window.location.pathname.match(/\/my\/(.*)/)) {
             document.addEventListener('DOMContentLoaded', cL);
@@ -5057,6 +5105,10 @@ function copyright(rights, noprint) {
 
         ////////////// DISQUS comments and recommendations section /////////////
         (function () {
+            if (GLOBAL_crawler_mode) {
+                return;
+            }
+
             try {
                 if (window.nodisqus || window.page == 404) return;
                 // const urlPattern = /^\/edu\/su\/course\/\w+\/(theory|lab)\/\w+/;
@@ -5327,6 +5379,10 @@ function gen_blockquote() {
 //     });
 // })();
 (function () {
+    if (GLOBAL_crawler_mode) {
+        return;
+    }
+
     document.addEventListener("DOMContentLoaded", function () {
         function applyIndentation() {
             var paragraphs = document.querySelectorAll('p');
@@ -5355,6 +5411,10 @@ function gen_blockquote() {
 
 /******** Display Cookie Notice ********/
 (function () {
+    if (GLOBAL_crawler_mode) {
+        return;
+    }
+
     if (!localStorage.getItem("noshow")) {
         document.addEventListener('DOMContentLoaded', function () {
             const cookieNotice = document.createElement("div");
@@ -6347,6 +6407,10 @@ function gen_blockquote() {
 
 /********** Add-On: Message Us Button **********/
 var messageUsButtonCaller = function () {
+    if (GLOBAL_crawler_mode) {
+        return;
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
         const htmlContent = `
         <div id="btn_focus-class-message" class="btn_focus-class-message position-fixed">
@@ -6542,6 +6606,10 @@ messageUsButtonCaller();
 
 /********** Add-On: Bing Search Button **********/
 (function () {
+    if (GLOBAL_crawler_mode) {
+        return;
+    }
+
     let showSearchButton = false;
 
     document.addEventListener('DOMContentLoaded', function () {
@@ -7339,6 +7407,10 @@ const certifications = {
 // })();
 
 (function () {
+    if (GLOBAL_crawler_mode) {
+        return;
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
         // Storage for settings and reusable elements
         const settings = {
@@ -7690,6 +7762,10 @@ const certifications = {
 // })();
 
 (function () {
+    if (GLOBAL_crawler_mode) {
+        return;
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
         function checkAndExecute() {
             if (typeof DOMPurify !== 'undefined' && DOMPurify.sanitize) {
@@ -8472,3 +8548,4 @@ window.addEventListener("load", async function () {
     }
 })(); */
 (function () { if (window.location.hostname === "dmj.one") { window.addEventListener('load', function () { console.clear(); }); } })();
+
