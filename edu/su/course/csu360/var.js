@@ -7,6 +7,7 @@ function get_menu_list(datetogen) {
                 title: "Understanding Operating Systems",
                 desc: "Explore the intricacies of Operating Systems with Shoolini University's CSU360 Operating Systems course, detailed on dmj.one. Delve into the core functions of modern operating systems, including process management, memory management, file systems, and security. Click to uncover the principles and practices that underpin efficient and secure computer operations. Learn how operating systems serve as the backbone of software development and computing, preparing you for advanced topics in computer science and enhancing your problem-solving skills.",
                 codetype: "CSU360 | Operating Systems",
+                cardimage: "https://cdn.dmj.one/edu/su/course/csu360/img/logo.webp"
             },
             {
                 link: "lab/",                

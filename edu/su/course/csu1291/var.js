@@ -6,7 +6,8 @@ function get_menu_list(datetogen) {
                 link: "theory/",
                 title: "Theory: Dive into the World of Java Programming: A Comprehensive Guide",
                 desc: "Unlock the full potential of Java with our in-depth guide to all the concepts. Take your programming skills to the next level and discover a world of endless coding possibilities. Click now to embark on your Java journey.",
-                codetype: "CSU1291 | Concepts"
+                codetype: "CSU1291 | Concepts",
+                cardimage: "https://cdn.dmj.one/edu/su/course/csu1291/img/logo.webp"
             },
             {
                 link: "lab/",

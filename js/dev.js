@@ -3231,7 +3231,7 @@ let header_author = async function (...args) {
                         <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">
                             <img src="${userDetails.picture}" alt="User Picture" class="rounded-circle" width="25" height="25" id="userPic">
                         </a>
-                        <ul class="dropdown-menu">
+                        <ul class="dropdown-menu mt-3">
                             <li>
                                 <a class="dropdown-item" href="${local_account_page_path}">My Account</a>
                             </li>

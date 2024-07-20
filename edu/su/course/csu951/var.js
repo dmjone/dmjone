@@ -6,7 +6,8 @@ function get_menu_list(datetogen) {
                 link: "matrix/",
                 title: "Matrix",
                 desc: "Dive into the exciting world of matrices! Discover how these powerful mathematical tools are used to solve linear equations, analyze data, and more. Explore basic and advanced concepts, including matrix properties, operations, and applications. Get ready to transform your understanding of mathematics!",
-                codetype: "Matrix"
+                codetype: "Matrix",
+                cardimage: "https://cdn.dmj.one/edu/su/course/csu951/img/logo.webp"
             },
             /* {
                 link: "seminar/",

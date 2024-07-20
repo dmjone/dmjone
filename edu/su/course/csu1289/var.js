@@ -23,6 +23,7 @@ function get_menu_list(datetogen) {
                 title: "The Digital Revolution: A Thrilling Introduction to Digital Electronics",
                 desc: "Join the revolution and discover the magic of digital electronics with our exciting introduction to the world of digital circuits and systems. From binary code to microprocessors, our guide covers all the essentials. Click now to embark on an electrifying journey into the digital realm!",
                 codetype: "Introduction",
+                link: "introduction",
             },
             {
                 title: "Cracking the Code: Demystifying the Fascinating World of Number Systems",
