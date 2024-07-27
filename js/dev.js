@@ -17,6 +17,10 @@ const google_login_js = "https://accounts.google.com/gsi/client";
 const cdnjs_DOMPurify = "https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.5/purify.min.js";
 const GLOBAL_login_page_path = window.location.hostname === 'localhost' ? '/login.html' : '/login';
 
+const GLOBAL_SERVICEWORKER_REINSTALL = 0
+const GLOBAL_SERVICEWORKER_INSTALL = 0
+const GLOBAL_SERVICEWORKER_UNINSTALL = 1
+
 
 const randomidgenerator = (i = 10) => [...Array(i)].map(() => 'abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRTUVWXYZ23456789'[Math.floor(Math.random() * 55)]).join('');
 
@@ -5310,9 +5314,47 @@ function copyright(rights, noprint) {
 
         setTimeout(() => observer.disconnect(), 5000);
 
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js');
+        if (GLOBAL_SERVICEWORKER_INSTALL) {
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('/sw.js');
+            }
         }
+
+        if (GLOBAL_SERVICEWORKER_REINSTALL) {
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistrations().then(function (registrations) {
+                    for (let registration of registrations) {
+                        registration.unregister();
+                    }
+                }).then(function () {
+                    // Register the new service worker
+                    navigator.serviceWorker.register('/sw.js').then(function (registration) {
+                        console.log('Service worker registered with scope:', registration.scope);
+                    }).catch(function (error) {
+                        console.error('Service worker registration failed:', error);
+                    });
+                }).catch(function (error) {
+                    console.error('Error unregistering service workers:', error);
+                });
+            }
+        }
+
+        if (GLOBAL_SERVICEWORKER_UNINSTALL) {
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistrations().then(function (registrations) {
+                    for (let registration of registrations) {
+                        registration.unregister().then(function () {
+                            console.log('Service worker unregistered:', registration);
+                        }).catch(function (error) {
+                            console.error('Error unregistering service worker:', error);
+                        });
+                    }
+                }).catch(function (error) {
+                    console.error('Error getting service worker registrations:', error);
+                });
+            }
+        }
+
 
         window.onload = function () { };
     }
