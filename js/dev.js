@@ -23,7 +23,7 @@ const randomidgenerator = (i = 10) => [...Array(i)].map(() => 'abcdefghijkmnpqrs
 const notification_maintainence_mode = 0;
 const GLOBAL_maintainence_message = "Some links, images, and features may not work as expected. Thank you for your patience.";
 
-const notification_feature_update = 0;
+const notification_feature_update = 1;
 // const GLOBAL_FeatureUpdate_message = `Learn about different breathing techniques to enhance your focus and relaxation. <a href="/my/features/breathing-techniques" class="alert-link">Read more</a>.`;
 const GLOBAL_FeatureUpdate_message = `Follow the Billionaire's Checklist everyday and become one! <a href="/my/features/billionaires-checklist" class="alert-link">Start today</a>.`;
 
