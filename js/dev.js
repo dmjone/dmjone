@@ -6474,7 +6474,7 @@ var messageUsButtonCaller = function () {
         
         <div class="modal fade" id="common_msg_us_model" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog">
-                <div class="modal-content" style="background: var(--background-color)">
+                <div class="modal-content bg-auto">
                     <div class="modal-header">
                         <h5 class="modal-title">Message Us</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -6675,12 +6675,12 @@ messageUsButtonCaller();
         
         <div class="modal fade shadow-lg" id="searchbox" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
-                <div class="modal-content " style="background: var(--background-color)">
-                    <div class="modal-header bg-light">
+                <div class="modal-content bg-auto">
+                    <div class="modal-header">
                         <h5 class="modal-title" id="searchModalLabel">Search with Bing</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <div class="modal-body bg-light">
+                    <div class="modal-body">
                         <form>
                             <div class="form-group mb-3">
                                 <input class="form-control px-4" type="search" placeholder="Search" aria-label="Search">
