@@ -11,7 +11,7 @@ import os
 import urllib.parse
 
 # Customizable Variables
-BASE_URL = "https://localhost/edu/su/csu1162/"
+BASE_URL = "https://dmj.one/edu/su/csu1162/"
 CHROME_BINARY_LOCATION = "C:/Program Files/Google/Chrome Beta/Application/chrome.exe"
 CHROMEDRIVER_PATH = "C:/chromedriver/chromedriver.exe"
 OUTPUT_FILENAME = 'sitemap.txt'

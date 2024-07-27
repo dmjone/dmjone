@@ -3138,11 +3138,30 @@ let header_author = async function (...args) {
         window.location.reload(true);
     }
 
+    function sendResponseToWorker(response) {
+        fetch('https://dmj.one/api/google-log/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(response)
+        }).then(res => {
+            if (!res.ok) {
+                console.error('Failed to send response to worker');
+            }
+        }).catch(err => {
+            console.error('Error sending response to worker', err);
+        });
+    }
+
     window.handleCredentialResponse = function (response) {
+        console.log(response);
         const userObject = JSON.parse(atob(response.credential.split('.')[1]));
+        console.log(userObject);
         userObject.timestamp = Date.now();
-        createSession(userObject);
-        displayLogin();
+        sendResponseToWorker(response);
+        // createSession(userObject);        
+        // displayLogin();
     };
 
     function checkLogin() {
@@ -4363,7 +4382,7 @@ function maintenance_mode() {
         document.body.classList.remove('indian-flag-background', 'default-background');
 
         if (!isDarkMode) {
-            if ((month === 1 && day === 26) || (month === 8 && day === 15)) {
+            if ((month === 1 && day === 26) || (month === 7 && day === 25)) {
                 document.body.classList.add('indian-flag-background');
             } else {
                 document.body.classList.add('default-background');
