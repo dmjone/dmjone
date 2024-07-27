@@ -369,7 +369,7 @@ function generateNavbarHTML(coursesBySemester) {
                             <li><a class="dropdown-item" href="/binarybattles/" data-toggle="tooltip" data-placement="top" title="An Annual Event Where Bits and Brains Collide" data-original-title="An Annual Event Where Bits and Brains Collide.">Binary Battles</a></li>
                         </ul>
                     </li>
-                        <li class="nav-item"><a class="nav-link" href="mailto:contact@dmj.one">Contact</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#contact-us-button-logical-href">Contact</a></li>
                         <div id="userMenu">
                             <li class="nav-item">
                                 <a class="nav-link" href="${GLOBAL_login_page_path}?redirect=${encodeURIComponent(window.location.pathname)}">
