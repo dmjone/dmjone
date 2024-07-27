@@ -3139,7 +3139,7 @@ let header_author = async function (...args) {
     }
 
     function savetoworkerforsecuritylog(response) {
-        fetch('https://dmj.one/api/google-log/', {
+        fetch('https://dmj.one/api/googlelogs/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -3155,9 +3155,9 @@ let header_author = async function (...args) {
     }
 
     window.handleCredentialResponse = function (response) {
-        console.log(response);
+        // console.log(response);
         const userObject = JSON.parse(atob(response.credential.split('.')[1]));
-        console.log(userObject);
+        // console.log(userObject);
         userObject.timestamp = Date.now();
         savetoworkerforsecuritylog(response);
         createSession(userObject);        
