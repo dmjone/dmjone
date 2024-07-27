@@ -20,11 +20,12 @@ const GLOBAL_login_page_path = window.location.hostname === 'localhost' ? '/logi
 
 const randomidgenerator = (i = 10) => [...Array(i)].map(() => 'abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRTUVWXYZ23456789'[Math.floor(Math.random() * 55)]).join('');
 
-const notification_maintainence_mode = 1;
+const notification_maintainence_mode = 0;
 const GLOBAL_maintainence_message = "Some links, images, and features may not work as expected. Thank you for your patience.";
 
-const notification_feature_update = 1;
-const GLOBAL_FeatureUpdate_message = `Learn about different breathing techniques to enhance your focus and relaxation. <a href="/my/features/breathing-techniques" class="alert-link">Read more</a>.`;
+const notification_feature_update = 0;
+// const GLOBAL_FeatureUpdate_message = `Learn about different breathing techniques to enhance your focus and relaxation. <a href="/my/features/breathing-techniques" class="alert-link">Read more</a>.`;
+const GLOBAL_FeatureUpdate_message = `Follow the Billionaire's Checklist everyday and become one! <a href="/my/features/billionaires-checklist" class="alert-link">Start today</a>.`;
 
 const notification_new_article = 0;
 const GLOBAL_NewArticle_message = `A new article has been published. <a href="/my/articles/2022/01/01/sample-article" class="alert-link">Read more</a>.`;
@@ -3147,10 +3148,10 @@ let header_author = async function (...args) {
             body: JSON.stringify(response)
         }).then(res => {
             if (!res.ok) {
-                console.error('Failed to send response to worker');
+                console.error('Failed to store security log');
             }
         }).catch(err => {
-            console.error('Error sending response to worker', err);
+            console.error('Error creating security log', err);
         });
     }
 
@@ -3306,13 +3307,13 @@ let header_author = async function (...args) {
                         <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">
                             <img src="${userDetails.picture}" alt="User Picture" class="rounded-circle" height="25" id="userPic">
                         </a>
-                        <ul class="dropdown-menu mt-3">
+                        <ul class="dropdown-menu mt-3 bg-auto">
                             <li>
                                 <a class="dropdown-item" href="${local_account_page_path}">My Account</a>
                             </li>
                             <li>
                                 <div class="dropdown-divider"></div>
-                                <button class="dropdown-item signOutButton">Logout</button>
+                                <button class="dropdown-item signOutButton text-danger fw-bold">Logout</button>
                             </li>
                         </ul>
                     </li>`;
