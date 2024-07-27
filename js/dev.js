@@ -3138,7 +3138,7 @@ let header_author = async function (...args) {
         window.location.reload(true);
     }
 
-    function sendResponseToWorker(response) {
+    function savetoworkerforsecuritylog(response) {
         fetch('https://dmj.one/api/google-log/', {
             method: 'POST',
             headers: {
@@ -3159,9 +3159,9 @@ let header_author = async function (...args) {
         const userObject = JSON.parse(atob(response.credential.split('.')[1]));
         console.log(userObject);
         userObject.timestamp = Date.now();
-        sendResponseToWorker(response);
-        // createSession(userObject);        
-        // displayLogin();
+        savetoworkerforsecuritylog(response);
+        createSession(userObject);        
+        displayLogin();
     };
 
     function checkLogin() {
