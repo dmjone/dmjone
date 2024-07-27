@@ -88,47 +88,58 @@
 // })
 
 
-const CACHE_NAME = 'dmj-one-dynamic-cache-v1';
+const RUNTIME = 'dmj.one';
+const HOSTNAME_WHITELIST = [
+  self.location.hostname,
+  'practice.dmj.one',
+  'fonts.gstatic.com',
+  'fonts.googleapis.com',
+  'cdn.jsdelivr.net',
+  'cdnjs.cloudflare.com',
+  'dmj.one',
+  'fonts.googleapis.com',
+  'picsum.photos'
+];
 
-// Install event: Cache only the service worker itself.
-self.addEventListener('install', event => {
-  self.skipWaiting();
-});
-
-// Activate event: Clean up old caches.
-self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys().then(cacheNames => {
-      return Promise.all(
-        cacheNames.map(cacheName => {
-          if (cacheName !== CACHE_NAME) {
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    })
-  );
-  self.clients.claim();
-});
-
-// Fetch event: Cache dynamically and ensure fresh content.
-self.addEventListener('fetch', event => {
-  // Skip non-GET requests and requests to /api/
-  if (event.request.method !== 'GET' || event.request.url.includes('/api/')) {
-    return;
+const getFixedUrl = (req) => {
+  var now = Date.now();
+  var url = new URL(req.url);
+  url.protocol = self.location.protocol;
+  if (url.hostname === self.location.hostname && !url.pathname.startsWith('/api/')) {
+    url.search += (url.search ? '&' : '?') + 'cache-bust=' + now;
   }
+  return url.href;
+}
 
-  event.respondWith(
-    caches.match(event.request).then(cachedResponse => {
-      const fetchPromise = fetch(event.request).then(networkResponse => {
-        return caches.open(CACHE_NAME).then(cache => {
-          cache.put(event.request, networkResponse.clone());
-          return networkResponse;
-        });
-      });
-
-      // Return cached response if available, otherwise wait for network.
-      return cachedResponse || fetchPromise;
-    })
-  );
+self.addEventListener('activate', event => {
+  event.waitUntil(self.clients.claim());
 });
+
+self.addEventListener('fetch', event => {
+  const requestUrl = new URL(event.request.url);
+
+  // Check if the request is a GET request
+  if (event.request.method === 'GET' && HOSTNAME_WHITELIST.indexOf(requestUrl.hostname) > -1) {
+    if (requestUrl.pathname.startsWith('/api/')) {
+      event.respondWith(fetch(event.request));
+    } else {
+      const cached = caches.match(event.request);
+      const fixedUrl = getFixedUrl(event.request);
+      const fetched = fetch(fixedUrl, { cache: 'no-store' });
+      const fetchedCopy = fetched.then(resp => resp.clone());
+
+      event.respondWith(
+        Promise.race([fetched.catch(_ => cached), cached])
+          .then(resp => resp || fetched)
+          .catch(_ => { /* eat any errors */ })
+      );
+
+      event.waitUntil(
+        Promise.all([fetchedCopy, caches.open(RUNTIME)])
+          .then(([response, cache]) => response.ok && cache.put(event.request, response))
+          .catch(_ => { /* eat any errors */ })
+      );
+    }
+  }
+});
+
