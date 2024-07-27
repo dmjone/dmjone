@@ -17,9 +17,9 @@ const google_login_js = "https://accounts.google.com/gsi/client";
 const cdnjs_DOMPurify = "https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.5/purify.min.js";
 const GLOBAL_login_page_path = window.location.hostname === 'localhost' ? '/login.html' : '/login';
 
-const GLOBAL_SERVICEWORKER_REINSTALL = 0
-const GLOBAL_SERVICEWORKER_INSTALL = 0
-const GLOBAL_SERVICEWORKER_UNINSTALL = 1
+const GLOBAL_SERVICEWORKER_REINSTALL = 0;
+const GLOBAL_SERVICEWORKER_INSTALL = 1;
+const GLOBAL_SERVICEWORKER_UNINSTALL = 0;
 
 
 const randomidgenerator = (i = 10) => [...Array(i)].map(() => 'abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRTUVWXYZ23456789'[Math.floor(Math.random() * 55)]).join('');
