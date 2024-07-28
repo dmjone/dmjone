@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Web Crypto API Key Derivation Demo</title>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+        <script>
+            async function deriveKeyPBKDF2() {
+                const password = document.getElementById('pbkdf2Password').value;
+                const salt = crypto.getRandomValues(new Uint8Array(16));
+                const baseKey = await crypto.subtle.importKey(
+                    'raw',
+                    new TextEncoder().encode(password),
+                    { name: 'PBKDF2' },
+                    false,
+                    ['deriveKey']
+                );
+                const derivedKey = await crypto.subtle.deriveKey(
+                    {
+                        name: 'PBKDF2',
+                        salt: salt,
+                        iterations: 100000,
+                        hash: 'SHA-256'
+                    },
+                    baseKey,
+                    { name: 'AES-GCM', length: 256 },
+                    true,
+                    ['encrypt', 'decrypt']
+                );
+                document.getElementById('pbkdf2DerivedKey').textContent = JSON.stringify(await crypto.subtle.exportKey('jwk', derivedKey));
+            }
+
+            async function deriveKeyECDH() {
+                const keyPairA = await crypto.subtle.generateKey(
+                    { name: 'ECDH', namedCurve: 'P-256' },
+                    true,
+                    ['deriveKey']
+                );
+                const keyPairB = await crypto.subtle.generateKey(
+                    { name: 'ECDH', namedCurve: 'P-256' },
+                    true,
+                    ['deriveKey']
+                );
+                const derivedKeyA = await crypto.subtle.deriveKey(
+                    {
+                        name: 'ECDH',
+                        public: keyPairB.publicKey
+                    },
+                    keyPairA.privateKey,
+                    { name: 'AES-GCM', length: 256 },
+                    true,
+                    ['encrypt', 'decrypt']
+                );
+                const derivedKeyB = await crypto.subtle.deriveKey(
+                    {
+                        name: 'ECDH',
+                        public: keyPairA.publicKey
+                    },
+                    keyPairB.privateKey,
+                    { name: 'AES-GCM', length: 256 },
+                    true,
+                    ['encrypt', 'decrypt']
+                );
+                document.getElementById('ecdhDerivedKeyA').textContent = JSON.stringify(await crypto.subtle.exportKey('jwk', derivedKeyA));
+                document.getElementById('ecdhDerivedKeyB').textContent = JSON.stringify(await crypto.subtle.exportKey('jwk', derivedKeyB));
+            }
+
+            document.addEventListener('DOMContentLoaded', () => {
+                document.getElementById('deriveKeyPBKDF2Btn').addEventListener('click', deriveKeyPBKDF2);
+                document.getElementById('deriveKeyECDHBtn').addEventListener('click', deriveKeyECDH);
+            });
+        </script>
+    </head>
+
+    <body>
+        <div class="container">
+            <h1 class="mt-5">Web Crypto API Key Derivation Demo</h1>
+
+            <div class="mt-4">
+                <h2>Key Derivation using PBKDF2</h2>
+                <div class="mb-3">
+                    <label for="pbkdf2Password" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="pbkdf2Password" placeholder="Enter password">
+                </div>
+                <button id="deriveKeyPBKDF2Btn" class="btn btn-primary mb-3">Derive Key using PBKDF2</button>
+                <pre id="pbkdf2DerivedKey"></pre>
+            </div>
+
+            <div class="mt-4">
+                <h2>Key Derivation using ECDH</h2>
+                <button id="deriveKeyECDHBtn" class="btn btn-primary mb-3">Derive Key using ECDH</button>
+                <h4>Derived Key A</h4>
+                <pre id="ecdhDerivedKeyA"></pre>
+                <h4>Derived Key B</h4>
+                <pre id="ecdhDerivedKeyB"></pre>
+            </div>
+        </div>
+    </body>
+
+</html>

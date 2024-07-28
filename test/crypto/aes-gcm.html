@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Encrypt and Decrypt with AES-GCM</title>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    </head>
+
+    <body>
+        <div class="container">
+            <h1 class="mt-5">Encrypt and Decrypt with AES-GCM</h1>
+
+            <div class="mt-4">
+                <h2>Encrypt Data</h2>
+                <textarea id="inputData" class="form-control mb-3" rows="5" placeholder="Enter data to encrypt..."></textarea>
+                <button id="encryptBtn" class="btn btn-primary mb-3">Encrypt Data</button>
+                <pre id="encryptedData"></pre>
+            </div>
+
+            <div class="mt-4">
+                <h2>Decrypt Data</h2>
+                <textarea id="inputEncryptedData" class="form-control mb-3" rows="5" placeholder="Enter encrypted data..."></textarea>
+                <button id="decryptBtn" class="btn btn-primary mb-3">Decrypt Data</button>
+                <pre id="decryptedData"></pre>
+            </div>
+
+            <div class="mt-4">
+                <h4>Status</h4>
+                <pre id="status"></pre>
+            </div>
+        </div>
+
+        <script>
+            let aesKey;
+
+            async function generateKey() {
+                aesKey = await crypto.subtle.generateKey(
+                    { name: "AES-GCM", length: 256 },
+                    true,
+                    ["encrypt", "decrypt"]
+                );
+                console.log(aesKey);
+                document.getElementById('status').textContent = "AES-GCM key generated.";
+            }
+
+            function arrayBufferToBase64(buffer) {
+                return btoa(String.fromCharCode.apply(null, new Uint8Array(buffer)));
+            }
+
+            function base64ToArrayBuffer(base64) {
+                const binaryString = atob(base64);
+                const len = binaryString.length;
+                const bytes = new Uint8Array(len);
+                for (let i = 0; i < len; i++) {
+                    bytes[i] = binaryString.charCodeAt(i);
+                }
+                return bytes.buffer;
+            }
+
+            async function encryptData() {
+                const inputData = document.getElementById('inputData').value;
+                const encoded = new TextEncoder().encode(inputData);
+                const iv = window.crypto.getRandomValues(new Uint8Array(12)); // Initialization vector
+                const encrypted = await crypto.subtle.encrypt(
+                    { name: "AES-GCM", iv: iv },
+                    aesKey,
+                    encoded
+                );
+
+                const ivStr = arrayBufferToBase64(iv);
+                const encryptedStr = arrayBufferToBase64(encrypted);
+                const combinedStr = ivStr + ':' + encryptedStr;
+                document.getElementById('encryptedData').textContent = combinedStr;
+                document.getElementById('inputEncryptedData').value = combinedStr;
+                document.getElementById('status').textContent = "Data encrypted.";
+            }
+
+            async function decryptData() {
+                const inputEncryptedData = document.getElementById('inputEncryptedData').value;
+                const [ivStr, encryptedStr] = inputEncryptedData.split(':');
+                const iv = base64ToArrayBuffer(ivStr);
+                const encryptedData = base64ToArrayBuffer(encryptedStr);
+
+                try {
+                    const decrypted = await crypto.subtle.decrypt(
+                        { name: "AES-GCM", iv: iv },
+                        aesKey,
+                        encryptedData
+                    );
+                    const decoded = new TextDecoder().decode(decrypted);
+                    document.getElementById('decryptedData').textContent = decoded;
+                    document.getElementById('status').textContent = "Data decrypted.";
+                } catch (e) {
+                    document.getElementById('status').textContent = "Failed to decrypt data: " + e.message;
+                }
+            }
+
+            document.addEventListener('DOMContentLoaded', () => {
+                document.getElementById('encryptBtn').addEventListener('click', encryptData);
+                document.getElementById('decryptBtn').addEventListener('click', decryptData);
+
+                generateKey(); // Generate key on page load
+            });
+        </script>
+    </body>
+
+</html>

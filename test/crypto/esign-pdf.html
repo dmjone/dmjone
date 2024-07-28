@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>PDF Document Signing with Digital Certificate</title>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/node-forge@0.10.0/dist/forge.all.min.js"></script>
+        <script>
+            let privateKey;
+            let certificate;
+
+            async function generateCertificate() {
+                // Generate a key pair
+                const keys = forge.pki.rsa.generateKeyPair(2048);
+                privateKey = keys.privateKey;
+
+                // Create a self-signed certificate
+                certificate = forge.pki.createCertificate();
+                certificate.publicKey = keys.publicKey;
+                certificate.serialNumber = '01';
+                certificate.validity.notBefore = new Date();
+                certificate.validity.notAfter = new Date();
+                certificate.validity.notAfter.setFullYear(certificate.validity.notAfter.getFullYear() + 1);
+
+                const attrs = [{
+                    name: 'commonName',
+                    value: 'example.org'
+                }, {
+                    name: 'countryName',
+                    value: 'US'
+                }, {
+                    shortName: 'ST',
+                    value: 'Virginia'
+                }, {
+                    name: 'localityName',
+                    value: 'Blacksburg'
+                }, {
+                    name: 'organizationName',
+                    value: 'Test'
+                }, {
+                    shortName: 'OU',
+                    value: 'Test'
+                }];
+                certificate.setSubject(attrs);
+                certificate.setIssuer(attrs);
+
+                // Self-sign the certificate
+                certificate.sign(privateKey, forge.md.sha256.create());
+
+                document.getElementById('status').textContent = "Certificate generated.";
+            }
+
+            async function signPDF() {
+                const fileInput = document.getElementById('pdfInput');
+                const file = fileInput.files[0];
+                if (!file) {
+                    alert('Please upload a PDF file.');
+                    return;
+                }
+
+                const arrayBuffer = await file.arrayBuffer();
+                const pdfDoc = await PDFLib.PDFDocument.load(arrayBuffer);
+
+                // Define the signature placeholder
+                const form = pdfDoc.getForm();
+                const signatureField = form.createSignature('sig');
+                const pages = pdfDoc.getPages();
+                const firstPage = pages[0];
+                signatureField.addToPage(firstPage, {
+                    x: 50,
+                    y: 50,
+                    width: 200,
+                    height: 50,
+                });
+
+                // Convert PDF to Uint8Array
+                const pdfBytes = await pdfDoc.save();
+                const pdfUint8Array = new Uint8Array(pdfBytes);
+
+                // Generate a cryptographic signature
+                const signatureValue = await generateSignature(pdfUint8Array);
+
+                // Embed the signature in the PDF
+                signatureField.acroField.setSignature({
+                    Type: 'Sig',
+                    Filter: 'Adobe.PPKLite',
+                    SubFilter: 'adbe.pkcs7.detached',
+                    ByteRange: [0, 0, 0, 0],
+                    Contents: signatureValue,
+                    Reason: 'Document signed by dmj.one',
+                    M: new Date(),
+                });
+
+                // Update the ByteRange to cover the entire document
+                const signedPdfBytes = await pdfDoc.save({ useObjectStreams: false });
+
+                const blob = new Blob([signedPdfBytes], { type: 'application/pdf' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = 'signed_document.pdf';
+                link.textContent = 'Download Signed PDF';
+                document.getElementById('downloadLink').appendChild(link);
+
+                document.getElementById('status').textContent = "Document signed.";
+            }
+
+            async function generateSignature(pdfData) {
+                // Create PKCS#7 signed data
+                const p7 = forge.pkcs7.createSignedData();
+                p7.content = forge.util.createBuffer(pdfData);
+                p7.addCertificate(certificate);
+                p7.addSigner({
+                    key: privateKey,
+                    certificate: certificate,
+                    digestAlgorithm: forge.pki.oids.sha256,
+                    authenticatedAttributes: [
+                        {
+                            type: forge.pki.oids.contentType,
+                            value: forge.pki.oids.data,
+                        },
+                        {
+                            type: forge.pki.oids.messageDigest,
+                        },
+                        {
+                            type: forge.pki.oids.signingTime,
+                            value: new Date(),
+                        },
+                    ],
+                });
+
+                // Sign the PKCS#7 message
+                p7.sign();
+
+                // Convert to DER
+                const signatureValue = forge.util.encode64(p7.toAsn1().toDer().getBytes());
+
+                return signatureValue;
+            }
+
+            document.addEventListener('DOMContentLoaded', () => {
+                document.getElementById('generateCertificateBtn').addEventListener('click', generateCertificate);
+                document.getElementById('signPDFBtn').addEventListener('click', signPDF);
+            });
+        </script>
+    </head>
+
+    <body>
+        <div class="container">
+            <h1 class="mt-5">PDF Document Signing with Digital Certificate</h1>
+
+            <div class="mt-4">
+                <h2>Generate Certificate</h2>
+                <button id="generateCertificateBtn" class="btn btn-primary mb-3">Generate Certificate</button>
+            </div>
+
+            <div class="mt-4">
+                <h2>Sign PDF Document</h2>
+                <input type="file" id="pdfInput" accept="application/pdf" class="form-control mb-3" />
+                <button id="signPDFBtn" class="btn btn-primary mb-3">Sign PDF</button>
+                <div id="downloadLink"></div>
+            </div>
+
+            <div class="mt-4">
+                <h4>Status</h4>
+                <pre id="status"></pre>
+            </div>
+        </div>
+    </body>
+
+</html>

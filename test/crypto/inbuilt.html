@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Web Cryptography Examples</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    </head>
+
+    <body>
+        <div class="container mt-5">
+            <h1 class="text-center">Web Cryptography Examples</h1>
+            <div class="card mt-4">
+                <div class="card-body">
+                    <form id="cryptoForm">
+                        <div class="mb-3">
+                            <label for="message" class="form-label">Message</label>
+                            <input type="text" class="form-control" id="message" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="operation" class="form-label">Operation</label>
+                            <select class="form-select" id="operation" required>
+                                <option value="hash">Hash (SHA-256)</option>
+                                <option value="encrypt">Encrypt (AES-GCM)</option>
+                                <option value="decrypt">Decrypt (AES-GCM)</option>
+                                <option value="asymEncrypt">Asymmetric Encrypt (RSA-OAEP)</option>
+                                <option value="asymDecrypt">Asymmetric Decrypt (RSA-OAEP)</option>
+                                <option value="sign">Sign (ECDSA)</option>
+                                <option value="verify">Verify (ECDSA)</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Execute</button>
+                    </form>
+                    <div class="mt-4">
+                        <h5>Output:</h5>
+                        <pre id="output"></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            const aesKeyPromise = window.crypto.subtle.generateKey(
+                {
+                    name: "AES-GCM",
+                    length: 256,
+                },
+                true,
+                ["encrypt", "decrypt"]
+            );
+
+            const rsaKeyPairPromise = window.crypto.subtle.generateKey(
+                {
+                    name: "RSA-OAEP",
+                    modulusLength: 2048,
+                    publicExponent: new Uint8Array([1, 0, 1]),
+                    hash: "SHA-256",
+                },
+                true,
+                ["encrypt", "decrypt"]
+            );
+
+            const ecdsaKeyPairPromise = window.crypto.subtle.generateKey(
+                {
+                    name: "ECDSA",
+                    namedCurve: "P-256",
+                },
+                true,
+                ["sign", "verify"]
+            );
+
+            let iv;
+
+            document.getElementById('cryptoForm').addEventListener('submit', async function (event) {
+                event.preventDefault();
+
+                const message = document.getElementById('message').value;
+                const operation = document.getElementById('operation').value;
+                const outputElement = document.getElementById('output');
+                outputElement.textContent = '';
+
+                switch (operation) {
+                    case 'hash':
+                        const hash = await hashMessage(message);
+                        outputElement.textContent = `Hashed Message (SHA-256): ${hash}`;
+                        break;
+                    case 'encrypt':
+                        const encryptedMessage = await encryptMessage(message);
+                        outputElement.textContent = `Encrypted Message (AES-GCM): ${encryptedMessage}`;
+                        break;
+                    case 'decrypt':
+                        const decryptedMessage = await decryptMessage(message);
+                        outputElement.textContent = `Decrypted Message (AES-GCM): ${decryptedMessage}`;
+                        break;
+                    case 'asymEncrypt':
+                        const asymEncryptedMessage = await asymEncryptMessage(message);
+                        outputElement.textContent = `Encrypted Message (RSA-OAEP): ${asymEncryptedMessage}`;
+                        break;
+                    case 'asymDecrypt':
+                        const asymDecryptedMessage = await asymDecryptMessage(message);
+                        outputElement.textContent = `Decrypted Message (RSA-OAEP): ${asymDecryptedMessage}`;
+                        break;
+                    case 'sign':
+                        const signature = await signMessage(message);
+                        outputElement.textContent = `Signature (ECDSA): ${signature}`;
+                        break;
+                    case 'verify':
+                        const verification = await verifyMessage(message);
+                        outputElement.textContent = `Verification (ECDSA): ${verification}`;
+                        break;
+                }
+            });
+
+            async function hashMessage(message) {
+                const enc = new TextEncoder();
+                const encodedMessage = enc.encode(message);
+                const hashBuffer = await window.crypto.subtle.digest('SHA-256', encodedMessage);
+                return bufferToHex(hashBuffer);
+            }
+
+            async function encryptMessage(message) {
+                const key = await aesKeyPromise;
+                const enc = new TextEncoder();
+                const encodedMessage = enc.encode(message);
+
+                iv = window.crypto.getRandomValues(new Uint8Array(12));
+
+                const encryptedBuffer = await window.crypto.subtle.encrypt(
+                    {
+                        name: "AES-GCM",
+                        iv: iv,
+                    },
+                    key,
+                    encodedMessage
+                );
+
+                return `${bufferToHex(iv)}:${bufferToHex(encryptedBuffer)}`;
+            }
+
+            async function decryptMessage(encryptedMessage) {
+                const key = await aesKeyPromise;
+                const [ivHex, encryptedHex] = encryptedMessage.split(':');
+                const iv = hexToBuffer(ivHex);
+                const encryptedBuffer = hexToBuffer(encryptedHex);
+
+                const decryptedBuffer = await window.crypto.subtle.decrypt(
+                    {
+                        name: "AES-GCM",
+                        iv: iv,
+                    },
+                    key,
+                    encryptedBuffer
+                );
+
+                const dec = new TextDecoder();
+                return dec.decode(decryptedBuffer);
+            }
+
+            async function asymEncryptMessage(message) {
+                const keyPair = await rsaKeyPairPromise;
+                const enc = new TextEncoder();
+                const encodedMessage = enc.encode(message);
+
+                const encryptedBuffer = await window.crypto.subtle.encrypt(
+                    {
+                        name: "RSA-OAEP"
+                    },
+                    keyPair.publicKey,
+                    encodedMessage
+                );
+
+                return bufferToHex(encryptedBuffer);
+            }
+
+            async function asymDecryptMessage(encryptedMessage) {
+                const keyPair = await rsaKeyPairPromise;
+                const encryptedBuffer = hexToBuffer(encryptedMessage);
+
+                const decryptedBuffer = await window.crypto.subtle.decrypt(
+                    {
+                        name: "RSA-OAEP"
+                    },
+                    keyPair.privateKey,
+                    encryptedBuffer
+                );
+
+                const dec = new TextDecoder();
+                return dec.decode(decryptedBuffer);
+            }
+
+            async function signMessage(message) {
+                const keyPair = await ecdsaKeyPairPromise;
+                const enc = new TextEncoder();
+                const encodedMessage = enc.encode(message);
+
+                const signatureBuffer = await window.crypto.subtle.sign(
+                    {
+                        name: "ECDSA",
+                        hash: { name: "SHA-256" },
+                    },
+                    keyPair.privateKey,
+                    encodedMessage
+                );
+
+                return bufferToHex(signatureBuffer);
+            }
+
+            async function verifyMessage(message) {
+                const keyPair = await ecdsaKeyPairPromise;
+                const enc = new TextEncoder();
+                const encodedMessage = enc.encode(message);
+
+                const signature = await signMessage(message);
+                const signatureBuffer = hexToBuffer(signature);
+
+                const isValid = await window.crypto.subtle.verify(
+                    {
+                        name: "ECDSA",
+                        hash: { name: "SHA-256" },
+                    },
+                    keyPair.publicKey,
+                    signatureBuffer,
+                    encodedMessage
+                );
+
+                return isValid ? 'Signature is valid' : 'Signature is invalid';
+            }
+
+            function bufferToHex(buffer) {
+                return Array.prototype.map.call(new Uint8Array(buffer), x => ('00' + x.toString(16)).slice(-2)).join('');
+            }
+
+            function hexToBuffer(hex) {
+                const bytes = new Uint8Array(hex.length / 2);
+                for (let i = 0; i < hex.length; i += 2) {
+                    bytes[i / 2] = parseInt(hex.substr(i, 2), 16);
+                }
+                return bytes.buffer;
+            }
+        </script>
+    </body>
+
+</html>

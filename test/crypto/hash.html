@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Hash Functions Demo</title>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>        
+        <script>
+            async function hashWithWebCrypto(algorithm, message) {
+                const encoder = new TextEncoder();
+                const data = encoder.encode(message);
+                const hashBuffer = await crypto.subtle.digest(algorithm, data);
+                const hashArray = Array.from(new Uint8Array(hashBuffer));
+                return hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
+            }
+
+            function hashWithCryptoJS(algorithm, message) {
+                let hash;
+                switch (algorithm) {
+                    case 'MD5':
+                        hash = CryptoJS.MD5(message);
+                        break;
+                    case 'SHA1':
+                        hash = CryptoJS.SHA1(message);
+                        break;
+                    case 'SHA256':
+                        hash = CryptoJS.SHA256(message);
+                        break;
+                    case 'SHA512':
+                        hash = CryptoJS.SHA512(message);
+                        break;
+                    case 'SHA3':
+                        hash = CryptoJS.SHA3(message);
+                        break;
+                    case 'RIPEMD160':
+                        hash = CryptoJS.RIPEMD160(message);
+                        break;
+                    default:
+                        return 'Unknown algorithm';
+                }
+                return hash.toString(CryptoJS.enc.Hex);
+            }
+            
+
+            async function hashMessage() {
+                const message = document.getElementById('message').value;
+                const results = {
+                    'SHA-1 (Web Crypto API)': await hashWithWebCrypto('SHA-1', message),
+                    'SHA-256 (Web Crypto API)': await hashWithWebCrypto('SHA-256', message),
+                    'SHA-384 (Web Crypto API)': await hashWithWebCrypto('SHA-384', message),
+                    'SHA-512 (Web Crypto API)': await hashWithWebCrypto('SHA-512', message),
+                    'MD5 (CryptoJS)': hashWithCryptoJS('MD5', message),
+                    'SHA-1 (CryptoJS)': hashWithCryptoJS('SHA1', message),
+                    'SHA-256 (CryptoJS)': hashWithCryptoJS('SHA256', message),
+                    'SHA-512 (CryptoJS)': hashWithCryptoJS('SHA512', message),
+                    'SHA-3 (CryptoJS)': hashWithCryptoJS('SHA3', message),
+                    'RIPEMD-160 (CryptoJS)': hashWithCryptoJS('RIPEMD160', message),                    
+                };
+
+                const output = document.getElementById('hashOutput');
+                output.innerHTML = '';
+                for (const [algorithm, hash] of Object.entries(results)) {
+                    const p = document.createElement('p');
+                    p.innerHTML = `<strong>${algorithm}:</strong> ${hash}`;
+                    output.appendChild(p);
+                }
+            }
+
+            document.addEventListener('DOMContentLoaded', () => {
+                document.getElementById('hashMessageBtn').addEventListener('click', hashMessage);
+            });
+        </script>
+    </head>
+
+    <body>
+        <div class="container">
+            <h1 class="mt-5">Hash Functions Demo</h1>
+
+            <div class="mt-4">
+                <div class="mb-3">
+                    <label for="message" class="form-label">Message</label>
+                    <input type="text" class="form-control" id="message" placeholder="Enter message">
+                </div>
+                <button id="hashMessageBtn" class="btn btn-primary mb-3">Hash Message</button>
+
+                <h4>Hash Output</h4>
+                <div id="hashOutput"></div>
+            </div>
+        </div>
+    </body>
+
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Web Crypto API Key Generation Demo</title>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+        <script>
+            async function generateSymmetricKey() {
+                const key = await crypto.subtle.generateKey(
+                    { name: "AES-GCM", length: 256 },
+                    true,
+                    ["encrypt", "decrypt"]
+                );
+                document.getElementById('symmetricKey').textContent = JSON.stringify(await crypto.subtle.exportKey('jwk', key));
+            }
+
+            async function generateAsymmetricRSAKey() {
+                const keyPair = await crypto.subtle.generateKey(
+                    { name: "RSA-OAEP", modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: "SHA-256" },
+                    true,
+                    ["encrypt", "decrypt"]
+                );
+                document.getElementById('rsaPublicKey').textContent = JSON.stringify(await crypto.subtle.exportKey('jwk', keyPair.publicKey));
+                document.getElementById('rsaPrivateKey').textContent = JSON.stringify(await crypto.subtle.exportKey('jwk', keyPair.privateKey));
+            }
+
+            async function generateAsymmetricECDSAKey() {
+                const keyPair = await crypto.subtle.generateKey(
+                    { name: "ECDSA", namedCurve: "P-256" },
+                    true,
+                    ["sign", "verify"]
+                );
+                document.getElementById('ecdsaPublicKey').textContent = JSON.stringify(await crypto.subtle.exportKey('jwk', keyPair.publicKey));
+                document.getElementById('ecdsaPrivateKey').textContent = JSON.stringify(await crypto.subtle.exportKey('jwk', keyPair.privateKey));
+            }
+
+            document.addEventListener('DOMContentLoaded', () => {
+                document.getElementById('generateSymmetricKeyBtn').addEventListener('click', generateSymmetricKey);
+                document.getElementById('generateAsymmetricRSAKeyBtn').addEventListener('click', generateAsymmetricRSAKey);
+                document.getElementById('generateAsymmetricECDSAKeyBtn').addEventListener('click', generateAsymmetricECDSAKey);
+            });
+        </script>
+    </head>
+
+    <body>
+        <div class="container">
+            <h1 class="mt-5">Web Crypto API Key Generation Demo</h1>
+
+            <div class="mt-4">
+                <h2>Symmetric Key (AES-GCM)</h2>
+                <button id="generateSymmetricKeyBtn" class="btn btn-primary mb-3">Generate Symmetric Key</button>
+                <pre id="symmetricKey"></pre>
+            </div>
+
+            <div class="mt-4">
+                <h2>Asymmetric Key (RSA-OAEP)</h2>
+                <button id="generateAsymmetricRSAKeyBtn" class="btn btn-primary mb-3">Generate RSA Key Pair</button>
+                <h4>Public Key</h4>
+                <pre id="rsaPublicKey"></pre>
+                <h4>Private Key</h4>
+                <pre id="rsaPrivateKey"></pre>
+            </div>
+
+            <div class="mt-4">
+                <h2>Asymmetric Key (ECDSA)</h2>
+                <button id="generateAsymmetricECDSAKeyBtn" class="btn btn-primary mb-3">Generate ECDSA Key Pair</button>
+                <h4>Public Key</h4>
+                <pre id="ecdsaPublicKey"></pre>
+                <h4>Private Key</h4>
+                <pre id="ecdsaPrivateKey"></pre>
+            </div>
+        </div>
+    </body>
+
+</html>

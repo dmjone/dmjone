@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Web Crypto API HMAC Demo</title>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+        <script>
+            let hmacKey;
+
+            async function generateHMACKey() {
+                hmacKey = await crypto.subtle.generateKey(
+                    {
+                        name: "HMAC",
+                        hash: { name: "SHA-256" },
+                    },
+                    true,
+                    ["sign", "verify"]
+                );
+                document.getElementById('hmacKey').textContent = JSON.stringify(await crypto.subtle.exportKey('jwk', hmacKey));
+            }
+
+            async function computeHMAC() {
+                if (!hmacKey) {
+                    alert("Please generate an HMAC key first.");
+                    return;
+                }
+                const message = document.getElementById('message').value;
+                const encoder = new TextEncoder();
+                const data = encoder.encode(message);
+                const signature = await crypto.subtle.sign("HMAC", hmacKey, data);
+                const hexSignature = Array.from(new Uint8Array(signature)).map(byte => byte.toString(16).padStart(2, '0')).join('');
+                document.getElementById('hmacSignature').textContent = hexSignature;
+            }
+
+            document.addEventListener('DOMContentLoaded', () => {
+                document.getElementById('generateHMACKeyBtn').addEventListener('click', generateHMACKey);
+                document.getElementById('computeHMACBtn').addEventListener('click', computeHMAC);
+            });
+        </script>
+    </head>
+
+    <body>
+        <div class="container">
+            <h1 class="mt-5">Web Crypto API HMAC Demo</h1>
+
+            <div class="mt-4">
+                <h2>Generate HMAC Key</h2>
+                <button id="generateHMACKeyBtn" class="btn btn-primary mb-3">Generate HMAC Key</button>
+                <pre id="hmacKey"></pre>
+            </div>
+
+            <div class="mt-4">
+                <h2>Compute HMAC</h2>
+                <div class="mb-3">
+                    <label for="message" class="form-label">Message</label>
+                    <input type="text" class="form-control" id="message" placeholder="Enter message">
+                </div>
+                <button id="computeHMACBtn" class="btn btn-primary mb-3">Compute HMAC</button>
+                <h4>HMAC Signature</h4>
+                <pre id="hmacSignature"></pre>
+            </div>
+        </div>
+    </body>
+
+</html>

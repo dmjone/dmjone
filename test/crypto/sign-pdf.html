@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>PDF Document Signing with Web Crypto API</title>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+        <script>
+            let privateKey;
+            let publicKey;
+
+            async function generateKeyPair() {
+                const keyPair = await crypto.subtle.generateKey(
+                    { name: "ECDSA", namedCurve: "P-256" },
+                    true,
+                    ["sign", "verify"]
+                );
+                privateKey = keyPair.privateKey;
+                publicKey = keyPair.publicKey;
+
+                document.getElementById('publicKey').textContent = JSON.stringify(await crypto.subtle.exportKey('jwk', publicKey));
+                document.getElementById('status').textContent = "Key pair generated.";
+            }
+
+            async function signPDF() {
+                const fileInput = document.getElementById('pdfInputSign');
+                const file = fileInput.files[0];
+                if (!file) {
+                    alert('Please upload a PDF file.');
+                    return;
+                }
+
+                const arrayBuffer = await file.arrayBuffer();
+                const pdfDoc = await PDFLib.PDFDocument.load(arrayBuffer);
+
+                const documentArray = new Uint8Array(arrayBuffer);
+                const signature = await crypto.subtle.sign(
+                    { name: "ECDSA", hash: "SHA-256" },
+                    privateKey,
+                    documentArray
+                );
+
+                const signatureString = btoa(String.fromCharCode(...new Uint8Array(signature)));
+                console.log(atob(signatureString));
+
+                // Add signature text field to the PDF
+                const pages = pdfDoc.getPages();
+                const firstPage = pages[0];
+                const { width, height } = firstPage.getSize();
+                firstPage.drawText(`Digitally signed: ${signatureString}`, {
+                    x: 30,
+                    y: height - 30,
+                    size: 9,
+                    color: PDFLib.rgb(0, 0, 0),
+                });
+
+                // Add metadata
+                const prevTitle = pdfDoc.getTitle() || 'Digitally Signed PDF';
+                const prevProducer = pdfDoc.getProducer() || 'dmj.one';
+                const prevAuthor = pdfDoc.getAuthor() || 'dmj.one';
+                const prevKeywords = pdfDoc.getKeywords() || ['e-signed by dmj.one', `digitally signed: ${signatureString}`];
+                const prevCreationDate = pdfDoc.getCreationDate() || new Date();
+                pdfDoc.setTitle(prevTitle);
+                pdfDoc.setSubject('e-Signed by dmj.one');
+                pdfDoc.setKeywords(prevKeywords);
+                pdfDoc.setProducer(prevProducer);
+                pdfDoc.setAuthor(prevAuthor);
+                pdfDoc.setCreator('dmj.one');
+                pdfDoc.setCreationDate(prevCreationDate);
+
+                const pdfBytes = await pdfDoc.save();
+                const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = 'signed_document.pdf';
+                link.textContent = 'Download Signed PDF';
+                document.getElementById('downloadLink').appendChild(link);
+
+                document.getElementById('status').textContent = "Document signed.";
+            }
+
+            async function verifyPDF() {
+                const fileInput = document.getElementById('pdfInputVerify');
+                const file = fileInput.files[0];
+                if (!file) {
+                    alert('Please upload a PDF file.');
+                    return;
+                }
+
+                const arrayBuffer = await file.arrayBuffer();
+                const pdfDoc = await PDFLib.PDFDocument.load(arrayBuffer);
+
+                // Get custom metadata
+                const keywords = pdfDoc.getKeywords();
+                const signatureString = keywords.split(', ').find(keyword => keyword.startsWith('digitally signed: '));
+                if (!signatureString) {
+                    document.getElementById('status').textContent = "No digital signature found.";
+                    return;
+                }
+
+                const signature = Uint8Array.from(atob(signatureString.replace('digitally signed: ', '')), c => c.charCodeAt(0));
+
+                const documentArray = new Uint8Array(arrayBuffer);
+                const isValid = await crypto.subtle.verify(
+                    { name: "ECDSA", hash: "SHA-256" },
+                    publicKey,
+                    signature,
+                    documentArray
+                );
+
+                document.getElementById('status').textContent = isValid ? "Signature is valid." : "Signature is invalid.";
+            }
+
+            document.addEventListener('DOMContentLoaded', () => {
+                document.getElementById('generateKeyPairBtn').addEventListener('click', generateKeyPair);
+                document.getElementById('signPDFBtn').addEventListener('click', signPDF);
+                document.getElementById('verifyPDFBtn').addEventListener('click', verifyPDF);
+            });
+        </script>
+    </head>
+
+    <body>
+        <div class="container">
+            <h1 class="mt-5">PDF Document Signing with Web Crypto API</h1>
+
+            <div class="mt-4">
+                <h2>Generate Key Pair</h2>
+                <button id="generateKeyPairBtn" class="btn btn-primary mb-3">Generate Key Pair</button>
+                <pre id="publicKey"></pre>
+            </div>
+
+            <div class="mt-4">
+                <h2>Sign PDF Document</h2>
+                <input type="file" id="pdfInputSign" accept="application/pdf" class="form-control mb-3" />
+                <button id="signPDFBtn" class="btn btn-primary mb-3">Sign PDF</button>
+                <div id="downloadLink"></div>
+            </div>
+
+            <div class="mt-4">
+                <h2>Verify PDF Document</h2>
+                <input type="file" id="pdfInputVerify" accept="application/pdf" class="form-control mb-3" />
+                <button id="verifyPDFBtn" class="btn btn-primary mb-3">Verify PDF</button>
+            </div>
+
+            <div class="mt-4">
+                <h4>Status</h4>
+                <pre id="status"></pre>
+            </div>
+        </div>
+    </body>
+
+</html>

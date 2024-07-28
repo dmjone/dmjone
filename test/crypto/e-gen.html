@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Digital Signature Certificate</title>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/asmcrypto.js/2.3.2/asmcrypto.all.es8.umd.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/pkijs/2.1.97/pkijs.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/PKI.js/1.2.1/common.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/PKI.js/1.2.1/x509_simpl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/asn1js/2.0.25/asn1js.min.js"></script>
+    </head>
+
+    <body>
+        <div class="container mt-5">
+            <h1 class="text-center">Digital Signature Certificate</h1>
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <h3>Generate Certificate</h3>
+                    <form id="certForm">
+                        <button type="submit" class="btn btn-primary">Generate Certificate</button>
+                    </form>
+                    <div class="mt-3">
+                        <h5>Certificate:</h5>
+                        <textarea id="certificateOutput" class="form-control" rows="10" readonly></textarea>
+                    </div>
+                    <div class="mt-3">
+                        <h5>Private Key:</h5>
+                        <textarea id="privateKeyOutput" class="form-control" rows="10" readonly></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+        <script>
+            async function generateCertificate() {
+                    const crypto = window.crypto || window.msCrypto;
+
+                    // Generate RSA key pair
+                    const keyPair = await crypto.subtle.generateKey(
+                        {
+                            name: "RSASSA-PKCS1-v1_5",
+                            modulusLength: 2048,
+                            publicExponent: new Uint8Array([1, 0, 1]),
+                            hash: "SHA-256"
+                        },
+                        true,
+                        ["sign", "verify"]
+                    );
+
+                    // Export the public and private keys
+                    const publicKey = await crypto.subtle.exportKey("spki", keyPair.publicKey);
+                    const privateKey = await crypto.subtle.exportKey("pkcs8", keyPair.privateKey);
+
+                    // Create a new X.509 certificate
+                    const certificate = new pkijs.Certificate();
+
+                    certificate.version = 2;
+                    certificate.serialNumber = new asn1js.Integer({ value: 1 });
+                    certificate.issuer.typesAndValues.push(new pkijs.AttributeTypeAndValue({
+                        type: "2.5.4.3",
+                        value: new asn1js.Utf8String({ value: "Test CA" })
+                    }));
+                    certificate.subject.typesAndValues.push(new pkijs.AttributeTypeAndValue({
+                        type: "2.5.4.3",
+                        value: new asn1js.Utf8String({ value: "Test Certificate" })
+                    }));
+
+                    certificate.notBefore.value = new Date();
+                    certificate.notAfter.value = new Date();
+                    certificate.notAfter.value.setFullYear(certificate.notBefore.value.getFullYear() + 1);
+
+                    certificate.extensions = [];
+
+                    // Set the public key in the certificate
+                    await certificate.subjectPublicKeyInfo.importKey(keyPair.publicKey);
+
+                    // Sign the certificate with the private key
+                    await certificate.sign(keyPair.privateKey, "SHA-256");
+
+                    // Convert the certificate to PEM format
+                    const certificatePEM = `-----BEGIN CERTIFICATE-----\n${btoa(String.fromCharCode(...new Uint8Array(certificate.toSchema().toBER())))}\n-----END CERTIFICATE-----`;
+                    const privateKeyPEM = `-----BEGIN PRIVATE KEY-----\n${btoa(String.fromCharCode(...new Uint8Array(privateKey)))}\n-----END PRIVATE KEY-----`;
+
+                    document.getElementById('certificateOutput').value = certificatePEM;
+                    document.getElementById('privateKeyOutput').value = privateKeyPEM;
+                }
+
+                document.getElementById('certForm').addEventListener('submit', function (event) {
+                    event.preventDefault();
+                    generateCertificate();
+                });
+        </script>
+    </body>
+
+</html>
