@@ -2505,6 +2505,8 @@ let header_author = async function (...args) {
             return null;
         }
 
+        window.cL(); // Force Login
+
         ////////// Control Panel //////////
 
         const MIN_QUESTIONS = 3;
