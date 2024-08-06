@@ -14,7 +14,13 @@ function get_menu_list(datetogen) {
                 title: "Hands-on Operating Systems Lab: Enhance Your System Management Skills",
                 desc: "Advance your understanding of Operating Systems in the practical lab with code CSU360P. This lab course offers a hands-on approach to learning about operating system concepts, including process synchronization, scheduling algorithms, and memory allocation techniques. Click to engage in interactive sessions that will improve your technical skills in managing and optimizing operating systems, preparing you for the complexities of real-world IT environments.",
                 codetype: "CSU360P | Operating Systems Lab",
-            }
+            },    
+            // {
+            //     link: "practice/",
+            //     title: "Challenge Yourself with Operating Systems Practice MCQs",
+            //     desc: "Test your knowledge of Operating Systems with a series of multiple-choice questions (MCQs) designed to assess your understanding of core concepts and principles. Click to challenge yourself and reinforce your learning of operating system fundamentals, preparing you for exams and real-world applications.",
+            //     codetype: "CSU360 | Operating Systems"
+            // }
         ];
 
         body_genmenu.processData(arr, def_date, def_author, { isMainCategory: true });
