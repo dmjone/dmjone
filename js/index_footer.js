@@ -20,13 +20,24 @@ function createCourseCard(course) {
             styledata = `style="color:#FF7F50"`;
             break;
     }
+    // GLOBAL_accessurl = () => {
+    //     if (course.details.program.toLowerCase() === 'professional') {
+    //         return `/edu/professional/course/${course.id}/`;
+    //     } else {
+    //         return `/edu/su/course/${course.id}/`;
+    //     }
+    // }
     GLOBAL_accessurl = () => {
-        if (course.details.program.toLowerCase() === 'professional') {
+        if (course.details.link) {
+            return course.details.link;
+        }
+        if (course.details.program.toLowerCase().includes('professional')) {
             return `/edu/professional/course/${course.id}/`;
         } else {
             return `/edu/su/course/${course.id}/`;
         }
     }
+
     index_coursecode = () => {
         if (course.details.program.toLowerCase() === 'professional') {
             return course.details.certification_organization;
