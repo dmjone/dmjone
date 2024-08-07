@@ -48,7 +48,7 @@ function createCourseCard(course) {
     return `
         <div class="col-lg-4 d-flex align-items-stretch justify-content-center py-4">
             <a href="${GLOBAL_accessurl()}">
-                <div class="card rounded hoverable border-0 border-danger border-top border-opacity-50 border-bottom">
+                <div class="card shadow-on-hover scale-2 rounded border-0 border-danger border-top border-opacity-50 border-bottom">
                     <div class="card-header m-0 p-0 justify-content-center align-items-center ">
                         <img src="${course.image}" class="card-img-top img-fluid vw-100" alt="${course.title}" style="height: 200px; object-fit: cover;">
                         <!-- <h2 class="p-3 d-none d-sm-block"><strong>${course.title}</strong></h2> -->

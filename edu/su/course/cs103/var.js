@@ -26,7 +26,7 @@ function get_menu_list(datetogen) {
                 title: "Week 2 : Programming Assignment 2",
                 desc: "Sort a large shipment of books in your New York bookstore by popularity rankings to boost sales. Hire as many workers as needed, each sorting a segment independently. Determine the maximum number of workers you can hire to ensure all books are sorted by popularity ranking by the end of the day.",
                 codetype: "CS103 | Getting Started with Competitive Programing",
-
+                
             },
 
         ];
