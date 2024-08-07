@@ -533,6 +533,11 @@ const profDetailsBio = {
         bio: "<p class='professorbio header-p-author-description'>Dr. Gaurav Gupta, with a BE from Dr B R Ambedkar University (2006), PG and PhD in Computer Science Engineering from KSOU-VIT and Shoolini University (2011, 2019), boasts 13 years of teaching experience. His academic achievements include numerous publications across prestigious platforms like IEEE and Springer, with 138 citations and notable indices (h-index: 5, i10-index: 4), alongside authoring over 12 books. His research focuses on machine learning applications in healthcare and agriculture, leading to the development of innovative mobile applications for Alzheimer's care and AI tools for various sectors. Dr. Gupta's contributions have earned him multiple IEEE awards and reviewer/editorial roles in several scientific journals, underscoring his prominence in smart healthcare/agriculture innovation.</p>",
         href: "gauravgupta@shooliniouniversity.com"
     },
+    'Dr. Sonia':
+    {
+        bio: "<p class='professorbio header-p-author-description'>Dr. Sonia, Associate Professor at Yogananda School of AI, Computer and Data Sciences, Shoolini University, holds a PhD in Computer Science from the University of Delhi. Specializing in Cyber Security and AI, she has 16 years of teaching experience and has published around 30 research papers. Currently, she supervises two PhD students and serves as the Syllabus & Scheme Coordinator for YSAICDS. Dr. Sonia has also completed 24 certifications from Edx, Coursera, and IBM.</p>",
+        href: "contact@dmj.one"
+    }
 };
 const courseDetailsMap = {
     'csu1128': { 'default': ["Dr. Pankaj Vaidya", "CSU1128", "Logic Building with Computer Programming"] },
@@ -589,6 +594,7 @@ const courseDetailsMap = {
     'seaap004': { 'default': ["Anandita", "SEA-AP004", "Aptitude Development 004"]},
     'seaws004': { 'default': ["Chen Chun", "SEA-WS004", "Writing Seminar 004"]},
     'csu1806': { 'default': ["Payal Khanna", "CSU1806", "Enhancing Leadership through Coaching Skills"]},
+    'cs103': {'default': ["Dr. Sonia", "CS103", "Getting Started with Competitive Programming"]},
 };
 
 ///////////////// VERSION 2.0

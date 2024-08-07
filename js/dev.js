@@ -1579,7 +1579,7 @@ let header_navbar = async function (flags) {
     const dropdown = (year, links) => {
         links.sort((a, b) => a.title.localeCompare(b.title));
         const dropdownItems = links.map(link =>
-            `<li>${navItem(link, { 'wip': 'WIP', 'csu5543': 'WIP' })}</li>`
+            `<li>${navItem(link, { 'wip': 'WIP', 'csu359': 'WIP' })}</li>`
         ).join('');
 
         return `<li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">${year}</a>` +
@@ -3098,6 +3098,52 @@ let header_author = async function (...args) {
             })();
 
         }
+    });
+})();
+
+/************************** CHANGE SVG COLOR TO CONTRAST THE DISPLAY ***************************/
+(function () {
+    document.addEventListener('DOMContentLoaded', (event) => {
+        function applyColorScheme(scheme) {
+            // Select all SVG elements
+            const svgs = document.querySelectorAll('svg');
+            svgs.forEach(svg => {
+                // Set SVG background to transparent
+                svg.style.backgroundColor = 'transparent';
+
+                // Update text color based on the color scheme
+                svg.querySelectorAll('text').forEach(text => {
+                    text.style.fill = scheme === 'dark' ? '#FFFFFF' : '#000000';
+                });
+
+                // Update the stroke for ellipses and paths
+                svg.querySelectorAll('ellipse, path').forEach(shape => {
+                    shape.style.stroke = scheme === 'dark' ? '#FFFFFF' : '#000000';
+                });
+
+                // Handle polygons - the first polygon is typically the background
+                const polygons = svg.querySelectorAll('polygon');
+                if (polygons.length > 0) {
+                    //polygons[0].style.fill = 'transparent'; // Make the background transparent
+                    // polygons[0].style.stroke = 'transparent';
+                    // Style the remaining polygons (arrowheads) accordingly
+                    for (let i = 0; i < polygons.length; i++) {
+                        polygons[i].style.fill = scheme === 'dark' ? '#FFFFFF' : '#000000';
+                        polygons[i].style.stroke = scheme === 'dark' ? '#FFFFFF' : '#000000';
+                    }
+                }
+            });
+        }
+
+        // Apply initial color scheme
+        const colorScheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        applyColorScheme(colorScheme);
+
+        // Listen for changes in the color scheme
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            applyColorScheme(event.matches ? 'dark' : 'light');
+        });
+
     });
 })();
 
