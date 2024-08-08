@@ -3458,6 +3458,42 @@ function dcevars(s) {
     document.body.appendChild(div);
 }
 
+/************ Update --bs-box-shadow values **********/
+(function () {
+    function lightenColor(color, percent) {
+        let num = parseInt(color.slice(1), 16),
+            amt = Math.round(2.55 * percent),
+            R = (num >> 16) + amt,
+            G = (num >> 8 & 0x00FF) + amt,
+            B = (num & 0x0000FF) + amt;
+
+        return "#" + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
+            (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 +
+            (B < 255 ? B < 1 ? 0 : B : 255))
+            .toString(16).slice(1).toUpperCase();
+    }
+
+    function hexToRgba(hex, alpha) {
+        let r = parseInt(hex.slice(1, 3), 16),
+            g = parseInt(hex.slice(3, 5), 16),
+            b = parseInt(hex.slice(5, 7), 16);
+
+        return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+
+    function updateBoxShadowVariables(baseColor) {
+        const lightColor = lightenColor(baseColor, 40); // Lighten the color by 40%
+        const lightColorRGBA = hexToRgba(lightColor, 0.15);
+        const lightColorLGRBA = hexToRgba(lightColor, 0.175);
+
+        document.documentElement.style.setProperty('--bs-box-shadow', `0 0.5rem 1rem ${lightColorRGBA}`);
+        document.documentElement.style.setProperty('--bs-box-shadow-lg', `0 1rem 3rem ${lightColorLGRBA}`);
+    }
+
+    // Call the function with the base color
+    const baseColor = '#ffffff'; // Example base color
+    updateBoxShadowVariables(baseColor);
+})();
 
 
 /******** CryptoJS Encryption System ********/
