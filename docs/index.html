@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Collaborative Document Editor</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+            }
+
+            #editor {
+                width: 100%;
+                height: 100vh;
+                border: 1px solid #ccc;
+                padding: 10px;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div id="editor" contenteditable="true"></div>
+
+        <script>
+            const pathSegments = window.location.pathname.split('/');
+            const documentId = pathSegments[2] || crypto.randomUUID();
+
+            if (!pathSegments[2]) {
+                window.history.replaceState(null, null, `/docs/${documentId}`);
+            }
+
+            const ws = new WebSocket(`wss://${location.host}/docs/${documentId}`);
+            const editor = document.getElementById('editor');
+
+            // Wait until the WebSocket connection is open before sending messages
+            ws.addEventListener('open', () => {
+                editor.addEventListener('input', () => {
+                    if (ws.readyState === WebSocket.OPEN) {
+                        console.log("Sending data: ", editor.innerHTML); // Add this line to debug
+                        ws.send(editor.innerHTML);
+                    }
+                });
+            });
+
+
+            ws.onmessage = (event) => {
+                editor.innerHTML = event.data;
+            };
+        </script>
+    </body>
+
+</html>
