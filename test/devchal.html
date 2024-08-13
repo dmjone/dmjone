@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>    
+    <script>
+        const developermode = true;
+       (function () {
+            // Modes: Set either to 'hash' or 'validate'
+            const mode = 'validate';  // Change this to 'validate' when verifying
+            let storedHashData;  // Placeholder for manually storing the hashed password and salt
+            storedHashData = { "hash": "568ace71f6032199b15b60c731c81ec48e487191fbff5c971847c7922dc95787", "salt": "0e1c2a7e536fcb2cd4ada84271cb451d" }
+
+            // Helper function to derive a key from the password using PBKDF2
+            async function deriveKey(password, salt) {
+                const encoder = new TextEncoder();
+                const keyMaterial = await window.crypto.subtle.importKey(
+                    "raw",
+                    encoder.encode(password),
+                    "PBKDF2",
+                    false,
+                    ["deriveBits"]
+                );
+
+                return window.crypto.subtle.deriveBits(
+                    {
+                        name: "PBKDF2",
+                        salt: salt,
+                        iterations: 100000,  // Increase this number for better security (at the cost of performance)
+                        hash: "SHA-256"
+                    },
+                    keyMaterial,
+                    256  // Length of the key in bits
+                );
+            }
+
+            // Convert ArrayBuffer to Hex String for easier storage
+            function arrayBufferToHex(buffer) {
+                return Array.from(new Uint8Array(buffer))
+                    .map(b => b.toString(16).padStart(2, '0'))
+                    .join('');
+            }
+
+            // Convert Hex String to ArrayBuffer
+            function hexToArrayBuffer(hexString) {
+                const bytes = new Uint8Array(hexString.length / 2);
+                for (let i = 0; i < bytes.length; i++) {
+                    bytes[i] = parseInt(hexString.substr(i * 2, 2), 16);
+                }
+                return bytes.buffer;
+            }
+
+            // Hashing mode: Hash the password and display the hash and salt in the console
+            if (mode === 'hash') {
+                (async () => {
+                    const passwordToHash = prompt("Enter the password you want to hash:");
+                    if (!passwordToHash) {
+                        console.error("No password entered. Hashing aborted.");
+                        return;
+                    }
+
+                    // Generate a random salt
+                    const salt = window.crypto.getRandomValues(new Uint8Array(16));
+
+                    // Derive the key (hash) from the password and salt
+                    const derivedBits = await deriveKey(passwordToHash, salt);
+                    const hashHex = arrayBufferToHex(derivedBits);
+                    const saltHex = arrayBufferToHex(salt);
+
+                    storedHashData = { hash: hashHex, salt: saltHex };
+
+                    console.log('Hashed password (copy and store this securely):');
+                    console.log(JSON.stringify(storedHashData));
+                })();
+            }
+
+            // Validation mode: Prompt for password and compare with stored hash
+            else if (mode === 'validate') {
+                (async () => {
+                    if (!storedHashData) {
+                        console.error('No hashed password is stored. Please run in hash mode first.');
+                        return;
+                    }
+
+                    const inputPassword = prompt("Enter the password to switch to Developer Mode:");
+                    if (!inputPassword) return;
+
+                    const salt = hexToArrayBuffer(storedHashData.salt);
+                    const derivedBits = await deriveKey(inputPassword, salt);
+                    const hashHex = arrayBufferToHex(derivedBits);
+
+                    if (hashHex === storedHashData.hash) {
+                        if (confirm("Developer Mode is requested from Global. Do you want to switch?")) {
+                            console.log("Developer Mode activated.");
+                            // Place your developer mode code here
+                        } else {
+                            console.log("Developer Mode activation canceled.");
+                        }
+                    } else {
+                        alert("Password verification failed. Developer Mode access denied.");
+                    }
+                })();
+            }
+
+        })();
+
+    </script>
+</body>
+</html>

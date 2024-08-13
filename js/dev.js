@@ -24,10 +24,24 @@ const GLOBAL_SERVICEWORKER_UNINSTALL = 0;
 
 const randomidgenerator = (i = 10) => [...Array(i)].map(() => 'abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRTUVWXYZ23456789'[Math.floor(Math.random() * 55)]).join('');
 
+(function () {
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('article').forEach(article => {
+            if (!article.id) {
+                article.id = randomidgenerator(20);
+            }
+        });
+    });
+})();
+
+(function () {
+    const devmode = false;
+    window.indevmode = devmode && window.location.host === "localhost";
+})();
 const notification_maintainence_mode = 0;
 const GLOBAL_maintainence_message = "Some links, images, and features may not work as expected. Thank you for your patience.";
 
-const notification_feature_update = 1;
+const notification_feature_update = 0;
 // const GLOBAL_FeatureUpdate_message = `Learn about different breathing techniques to enhance your focus and relaxation. <a href="/my/features/breathing-techniques" class="alert-link">Read more</a>.`;
 const GLOBAL_FeatureUpdate_message = `Follow the Billionaire's Checklist everyday and become one! <a href="/my/features/billionaires-checklist" class="alert-link">Start today</a>.`;
 
@@ -79,7 +93,7 @@ const body_pomodoro_helptext = `
         i++;
     }
     for (const variable in window) { // Displayed for Debug
-        if (variable.startsWith("urlpart")) {        
+        if (variable.startsWith("urlpart")) {
             GLOBAL_crawler_mode ? '' : console.log(`${variable} = ${window[variable]}`);
         }
     }
@@ -90,7 +104,7 @@ const body_pomodoro_helptext = `
     if (GLOBAL_crawler_mode) {
         return;
     }
-    
+
     const setTheme = () => {
         const theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
         document.documentElement.setAttribute('data-bs-theme', theme);
@@ -456,7 +470,7 @@ const body_pomodoro_helptext = `
     //         }
     //     }
     // })();
-    
+
     // Version 3.0
     (function () {
         try {
@@ -1675,8 +1689,8 @@ let header_navbar = async function (flags) {
         </div>
     </nav>    
     ${breathingoption ? `<div class="breathing-animation sticky-top cursor-pointer m-1 p-0 mx-auto ${breathingoption}" id="global_breathinganimationblock" onclick="location.href='/my/features/breathing-techniques'"></div>` : ''}
-    `;    
-    
+    `;
+
     return finallinks;
 };
 
@@ -1733,7 +1747,7 @@ function extractTextFromStrongTag(htmlString) {
 }; */
 
 let header_author = async function (...args) {
-    const header_author_internal = {        
+    const header_author_internal = {
         activateNavbar() {
             const navLinks = document.querySelectorAll('.navbar-nav a');
             const currentUrl = window.location.pathname;
@@ -1744,7 +1758,7 @@ let header_author = async function (...args) {
                     link.classList.remove('active');
                 }
             });
-            
+
             (async () => {
                 const timeElement = document.getElementById('time');
 
@@ -3213,7 +3227,7 @@ let header_author = async function (...args) {
         // console.log(userObject);
         userObject.timestamp = Date.now();
         savetoworkerforsecuritylog(response);
-        createSession(userObject);        
+        createSession(userObject);
         displayLogin();
     };
 
@@ -3411,7 +3425,7 @@ let header_author = async function (...args) {
         }
     };
 
-    (() => {        
+    (() => {
         // Calls cL for sure if the path is under /my/ or else it has 0.3 (30%) chance that it will require login on any page. Don't run on the host url
         if (window.location.pathname.match(/\/my\/(.*)/)) {
             document.addEventListener('DOMContentLoaded', cL);
@@ -3460,39 +3474,157 @@ function dcevars(s) {
 
 /************ Update --bs-box-shadow values **********/
 (function () {
-    function lightenColor(color, percent) {
-        let num = parseInt(color.slice(1), 16),
-            amt = Math.round(2.55 * percent),
-            R = (num >> 16) + amt,
-            G = (num >> 8 & 0x00FF) + amt,
-            B = (num & 0x0000FF) + amt;
-
-        return "#" + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
-            (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 +
-            (B < 255 ? B < 1 ? 0 : B : 255))
-            .toString(16).slice(1).toUpperCase();
+    function getRandomHexPair(isLight) {
+        const hexChars = isLight ? '56789ABCDEF' : '0123456789A';
+        return hexChars[Math.floor(Math.random() * hexChars.length)];
     }
 
-    function hexToRgba(hex, alpha) {
-        let r = parseInt(hex.slice(1, 3), 16),
-            g = parseInt(hex.slice(3, 5), 16),
-            b = parseInt(hex.slice(5, 7), 16);
-
-        return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    function getRandomColor(isLight) {
+        let color = '#';
+        for (let i = 0; i < 6; i++) {
+            color += getRandomHexPair(isLight);
+        }
+        return color;
     }
 
     function updateBoxShadowVariables(baseColor) {
-        const lightColor = lightenColor(baseColor, 40); // Lighten the color by 40%
-        const lightColorRGBA = hexToRgba(lightColor, 0.15);
-        const lightColorLGRBA = hexToRgba(lightColor, 0.175);
+        const shadowColor = `${baseColor}50`; // 26 Adding 15% opacity in hex
+        const shadowColorLg = `${baseColor}50`; // 2C Adding 17.5% opacity in hex
+        const shadowColorSm = `${baseColor}50`; // 2C Adding 17.5% opacity in hex
 
-        document.documentElement.style.setProperty('--bs-box-shadow', `0 0.5rem 1rem ${lightColorRGBA}`);
-        document.documentElement.style.setProperty('--bs-box-shadow-lg', `0 1rem 3rem ${lightColorLGRBA}`);
+        document.documentElement.style.setProperty('--bs-box-shadow', `0 0.5rem 1rem ${shadowColor}`);
+        document.documentElement.style.setProperty('--bs-box-shadow-lg', `0 1rem 3rem ${shadowColorLg}`);
+        document.documentElement.style.setProperty('--bs-box-shadow-sm', `0 0.125rem 0.25rem ${shadowColorSm}`);
     }
 
-    // Call the function with the base color
-    const baseColor = '#ffffff'; // Example base color
+    // Detect if dark mode is enabled
+    const isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+    // Set isLight based on the mode
+    const isLight = isDarkMode ? true : false;
+
+    // Generate and apply random color based on the mode
+    const baseColor = getRandomColor(isLight);
     updateBoxShadowVariables(baseColor);
+
+    // Listen for changes in color scheme and update the shadows accordingly
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+        const isLight = event.matches;
+        const baseColor = getRandomColor(isLight);
+        updateBoxShadowVariables(baseColor);
+    });
+})();
+
+/******************** Style Cards with gradient Globally anywhere ***********/
+(function () {
+    function getRandomLightColor() {
+        var letters = 'BCDEF'.split('');
+        var color = '#';
+        for (var i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * letters.length)];
+        }
+        return color;
+    }
+
+    function getRandomDarkColor() {
+        var letters = '012345'.split('');
+        var color = '#';
+        for (var i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * letters.length)];
+        }
+        return color;
+    }
+
+    function styleCards() {
+        var prefersDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        var cards = document.querySelectorAll('.card');
+        for (var i = 0; i < cards.length; i++) {
+            var randomColor1, randomColor2;
+
+            if (prefersDarkMode) {
+                randomColor1 = getRandomDarkColor();
+                randomColor2 = getRandomDarkColor();
+            } else {
+                randomColor1 = getRandomLightColor();
+                randomColor2 = getRandomLightColor();
+            }
+
+            cards[i].style.background = `linear-gradient(270deg, ${randomColor1}, ${randomColor2})`;
+        }
+    }
+
+    // Expose the styleCards function to the global window object
+    window.applyCardStyles = styleCards;
+
+    // Call styleCards to apply the styles
+    // styleCards();
+
+    // Listen for changes in the color scheme preference to re-apply styles
+    window.matchMedia('(prefers-color-scheme: dark)').addListener(styleCards);
+    window.matchMedia('(prefers-color-scheme: light)').addListener(styleCards);
+})();
+
+
+/******************** Hide / Show on scroll **********************/
+(function () {
+    // Function to generate a random ID
+    function generateRandomID() {
+        return 'navbar-' + Math.random().toString(36).substr(2, 9);
+    }
+
+    // Function to wait until the navbar is available in the DOM
+    async function waitForNavbar() {
+        return new Promise((resolve) => {
+            const checkNavbar = () => {
+                const navbarElement = document.querySelector('.navbar');
+                if (navbarElement) {
+                    resolve(navbarElement);
+                } else {
+                    requestAnimationFrame(checkNavbar);
+                }
+            };
+            checkNavbar();
+        });
+    }
+
+    // Function to handle the navbar behavior
+    async function handleNavbar() {
+        const navbarElement = await waitForNavbar();
+
+        // Check if the navbar already has an ID
+        let navbarID = navbarElement.id;
+
+        if (!navbarID) {
+            // Generate a random ID and assign it to the navbar if no ID exists
+            navbarID = generateRandomID();
+            navbarElement.id = navbarID;
+        }
+
+        let lastScrollTop = 0;
+        let navbarHidden = false;
+        const scrollThreshold = 50; // Scroll threshold in pixels
+
+        window.addEventListener('scroll', function () {
+            let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+
+            // Check if user has scrolled more than the threshold
+            if (Math.abs(scrollTop - lastScrollTop) > scrollThreshold) {
+                if (scrollTop > lastScrollTop && !navbarHidden) {
+                    // Scroll down and navbar is not hidden - hide it
+                    navbarElement.classList.add('d-none');
+                    navbarHidden = true;
+                } else if (scrollTop < lastScrollTop && navbarHidden) {
+                    // Scroll up and navbar is hidden - show it
+                    navbarElement.classList.remove('d-none');
+                    navbarHidden = false;
+                }
+                lastScrollTop = scrollTop <= 0 ? 0 : scrollTop; // Update lastScrollTop only if threshold is met
+            }
+        });
+    }
+
+    // Invoke the function to handle navbar behavior
+    handleNavbar();
 })();
 
 
@@ -4276,7 +4408,7 @@ function body_blockcards(link, date, title, desc, codetype, readtime, author, se
     var imgAlt = is_qr ? "QR code of the URL" : "A Random Image from picsum.photo";
     var imgStyle = is_qr ? 'object-fit:contain;padding:2.5rem' : "";
     var imgClass = is_qr ? 'postcard__img is_qr' : 'postcard__img';
-    var imgTag = `<img class="${imgClass}" src="${imgsrc}" alt="${imgAlt}" style="${imgStyle}"/>`;
+    var imgTag = `<img class="${imgClass}" src="${imgsrc}" alt="${imgAlt}" style="${imgStyle}" loading="lazy"/>`;
 
     // qrblock = qr_link ? `<div id="qrcode"></div> ${imgsrc}` : "";
 
@@ -5237,8 +5369,10 @@ function createSharingButtons(text, url, iconName, btnClass) {
 function copyright(rights, noprint) {
     function initializeCopyright() {
         window["loaded_copyright"] = 1;
+        let onlyrights;
         if (rights === "off") return null;
         if (noprint) return null;
+        if (rights === "onlyrights") onlyrights = true;
 
         const footer_all_rights = ' &#8226; All rights reserved';
         const footer_some_rights = ' &#8226; Some rights reserved';
@@ -5372,7 +5506,7 @@ function copyright(rights, noprint) {
                 </div>
             </span>`;
 
-        div.innerHTML = footerNotice;
+        div.innerHTML = onlyrights ? '' : footerNotice;
         strong.innerHTML = `${modified}&copy; 2007 - ${new Date().getFullYear()} ${window.GLOBAL_get_formatted_Author_Name_ ? window.GLOBAL_get_formatted_Author_Name_ + ' |' : ''} dmj.one ${rights} ${footer_link_privacy} ${footer_link_tos}`;
         span.appendChild(strong);
         footer.appendChild(div);
@@ -5381,7 +5515,8 @@ function copyright(rights, noprint) {
         const article = document.createElement("article");
         article.className = 'agen-the-end d-none d-print-flex';
         article.innerHTML = `<div class="text-center theend fw-bold"><img class="img-fluid" src="${window.GLOBAL_get_qr_code_data}" alt="QR Code of the link" width="400px" height="400px"></div>`;
-        footer.appendChild(article);
+
+        onlyrights ? '' : footer.appendChild(article); // dont append the qr code if onlyrights is true
 
         document.body.appendChild(footer);
 

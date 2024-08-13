@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Efficient QR Code Cards</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.1/css/bootstrap.min.css">
+        <style>
+            .card-container {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .card {
+                width: 18rem;
+                margin: 10px;
+            }
+
+            .card-img-top {
+                width: 100%;
+                height: 180px;
+                object-fit: contain;
+                background-color: #f8f9fa;
+            }
+        </style>
+    </head>
+
+    <body>
+
+        <div class="container">
+            <h1 class="text-center my-4">QR Code Cards</h1>
+            <div id="card-container" class="card-container"></div>
+        </div>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.1/js/bootstrap.bundle.min.js"></script>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const cardContainer = document.getElementById('card-container');
+                const totalCards = 100;
+
+                function createCard(index) {
+                    const card = document.createElement('div');
+                    card.className = 'card';
+
+                    const img = document.createElement('img');
+                    img.className = 'card-img-top';
+                    img.alt = `QR Code ${index}`;
+                    img.src = 'https://via.placeholder.com/150';
+
+                    const cardBody = document.createElement('div');
+                    cardBody.className = 'card-body';
+
+                    const cardTitle = document.createElement('h5');
+                    cardTitle.className = 'card-title';
+                    cardTitle.innerText = `Card ${index}`;
+
+                    cardBody.appendChild(cardTitle);
+                    card.appendChild(img);
+                    card.appendChild(cardBody);
+
+                    cardContainer.appendChild(card);
+                    return img;
+                }
+
+                function generateQRCode(index, imgElement) {
+                    const qrContainer = document.createElement('div');
+                    new QRCode(qrContainer, {
+                        text: `Sample Text ${index}`,
+                        width: 150,
+                        height: 150,
+                        colorDark: "#000000",
+                        colorLight: "#ffffff",
+                        correctLevel: QRCode.CorrectLevel.H
+                    });
+
+                    setTimeout(() => {
+                        imgElement.src = qrContainer.querySelector('img').src;
+                    }, 0);
+                }
+
+                function startGeneratingQRCodes() {
+                    const images = [];
+                    for (let i = 0; i < totalCards; i++) {
+                        images.push(createCard(i));
+                    }
+
+                    function processQRCode(index) {
+                        if (index >= totalCards) return;
+                        generateQRCode(index, images[index]);
+                        setTimeout(() => processQRCode(index + 1), 50); // Process one QR code every 50ms
+                    }
+
+                    processQRCode(0);
+                }
+
+                window.addEventListener('load', function () {
+                    setTimeout(startGeneratingQRCodes, 100); // Delay to ensure resources are fully loaded
+                });
+            });
+        </script>
+
+    </body>
+
+</html>

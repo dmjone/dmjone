@@ -50,7 +50,7 @@ function createCourseCard(course) {
             <a href="${GLOBAL_accessurl()}">
                 <div class="card shadow-on-hover scale-2 rounded border-0 border-danger border-top border-opacity-50 border-bottom">
                     <div class="card-header m-0 p-0 justify-content-center align-items-center ">
-                        <img src="${course.image}" class="card-img-top img-fluid vw-100" alt="${course.title}" style="height: 200px; object-fit: cover;">
+                        <img src="${course.image}" class="card-img-top img-fluid vw-100" alt="${course.title}" style="height: 200px; object-fit: cover;" loading="lazy">
                         <!-- <h2 class="p-3 d-none d-sm-block"><strong>${course.title}</strong></h2> -->
                     </div>
                     <div class="card-body justify-content-center align-items-center">
@@ -62,11 +62,12 @@ function createCourseCard(course) {
                                     <strong class="text-muted d-none"> Course Details:</strong>
                                     <div class="badge-box">
                                         <span class="badge bg-warning-subtle bg-gradient bg-opacity-25 shadow p-2 m-1 fw-normal text-auto" style="letter-spacing:0.02rem"><i class="fas fa-graduation-cap"></i> &nbsp;${course.details.semester}</span>
-                                        <span class="badge bg-warning-subtle bg-gradient bg-opacity-25 shadow p-2 m-1 fw-normal text-auto" style="letter-spacing:0.02rem"><i class="fas fa-briefcase"></i> &nbsp;${course.details.program}</span>
+                                        <span class="badge bg-info-subtle bg-gradient bg-opacity-10 shadow p-2 m-1 fw-normal text-auto" style="letter-spacing:0.02rem"><i class="fas fa-briefcase"></i> &nbsp;${course.details.program}</span>
+                                        <span class="badge bg-success-subtle bg-gradient bg-opacity-50 shadow p-2 m-1 fw-normal text-auto" style="letter-spacing:0.02rem"><i class="fas fa-university"></i> &nbsp;${index_coursecode()}</span>
                                     </div>
                                 </div>
                                 <!-- <h5 class="card-text flex-fill text-reset" style="color:black !important"><strong>${course.id.toUpperCase()}</strong></h5> -->
-                                <div class="my-3">                                
+                                <div class="my-3 d-none">                                
                                     <div class="h5 text-muted"><strong>${index_coursecode()}</strong></div>
                                 </div>                                
                                 <div class="p-0 mb-1 text-center d-none d-sm-block pt-3 ">
@@ -83,22 +84,22 @@ function createCourseCard(course) {
                     ${(course.details.program.toLowerCase() !== 'professional') ?
             `<div class="card-footer py-0 border-top border-1 border-dark bg-opacity-10 bg-dark bg-gradient d-none d-sm-block">
                         <div class="row text-center justify-content-center align-items-center">
-                            <div class="col p-3">
-                                <h4 class="fs-5 mb-1 pt-3 ${classdata}" ${styledata}><i class="fas fa-tachometer-alt"></i></h4>
-                                <h4 class="fs-5 mb-1 ${classdata}" ${styledata}> ${course.difficulty}</h4>
-                                <span class="d-block font-size-sm text-muted pb-3">Difficulty Level</span>
+                            <div class="col py-3">
+                                <h5 class="fs-5 ${classdata}" ${styledata}><i class="fas fa-tachometer-alt"></i></h4>
+                                <h5 class="fs-5 ${classdata}" ${styledata}> ${course.difficulty}</h4>
+                                <span class="d-block font-size-sm text-muted">Difficulty</span>
                             </div>
 
-                            <div class="col p-3">
-                                <h4 class="fs-5 mb-1"><i class="fas fa-clock"></i></h4>
-                                <h4 class="fs-5 mb-1"> ${course.hours}</h4>
-                                <span class="d-block font-size-sm text-muted">Hours Required</span>
+                            <div class="col-sm d-none d-sm-block">
+                                <h5 class="fs-5 text-auto"><i class="fas fa-book"></i></h4>
+                                <h5 class="fs-5 text-auto"> ${course.topics}</h4>
+                                <span class="d-block font-size-sm text-muted">Topics</span>
                             </div>
 
-                            <div class="col-sm p-3 d-none d-sm-block">
-                                <h4 class="fs-5 mb-1 text-black"><i class="fas fa-book"></i></h4>
-                                <h4 class="fs-5 mb-1 text-black"> ${course.topics}</h4>
-                                <span class="d-block font-size-sm text-muted">Topics & Articles</span>
+                            <div class="col">
+                                <h5 class="fs-5 "><i class="fas fa-clock"></i></h4>
+                                <h5 class="fs-5 "> ${course.hours}</h4>
+                                <span class="d-block font-size-sm text-muted">Hours</span>
                             </div>
                         </div>
                     </div>` : ''}
