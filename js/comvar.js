@@ -595,6 +595,11 @@ const courseDetailsMap = {
     'seaws004': { 'default': ["Chen Chun", "SEA-WS004", "Writing Seminar 004"]},
     'csu1806': { 'default': ["Payal Khanna", "CSU1806", "Enhancing Leadership through Coaching Skills"]},
     'cs103': {'default': ["Dr. Sonia", "CS103", "Getting Started with Competitive Programming"]},
+    'csu677': {
+        'default': ["Dr. Gaurav Gupta", "CSU677", "Web Technology"],
+        'lab': ["Dr. Gaurav Gupta", "CSU677P", "Web Technology Lab"]
+    },
+    
 };
 
 ///////////////// VERSION 2.0
