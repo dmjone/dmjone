@@ -4,22 +4,22 @@ function get_menu_list(datetogen) {
         const arr = [
             {
                 link: "theory/",
-                title: "Understanding Operating Systems",
-                desc: "Explore the intricacies of Operating Systems with Shoolini University's CSU360 Operating Systems course, detailed on dmj.one. Delve into the core functions of modern operating systems, including process management, memory management, file systems, and security. Click to uncover the principles and practices that underpin efficient and secure computer operations. Learn how operating systems serve as the backbone of software development and computing, preparing you for advanced topics in computer science and enhancing your problem-solving skills.",
-                codetype: "CSU360 | Operating Systems",
-                cardimage: "https://cdn.dmj.one/edu/su/course/csu360/img/logo.webp"
+                title: "Theory of Web Technology",
+                desc: "Explore the web technology, including web development tools, programming languages, and web design principles. This course covers essential concepts such as HTML, CSS, JavaScript, and responsive web design, providing a solid foundation for building modern websites and web applications. Click to learn more about web technology and enhance your skills in web development.",
+                codetype: "CSU677 | Web Technology",
+                cardimage: "https://cdn.dmj.one/edu/su/course/csu677/img/logo.webp"
             },
             {
-                link: "lab/",
-                title: "Hands-on Operating Systems Lab: Enhance Your System Management Skills",
-                desc: "Advance your understanding of Operating Systems in the practical lab with code CSU360P. This lab course offers a hands-on approach to learning about operating system concepts, including process synchronization, scheduling algorithms, and memory allocation techniques. Click to engage in interactive sessions that will improve your technical skills in managing and optimizing operating systems, preparing you for the complexities of real-world IT environments.",
-                codetype: "CSU360P | Operating Systems Lab",
+                link: "#",
+                title: "Hands-on Web Development Lab [WIP]",
+                desc: "Practice web development concepts and techniques with hands-on lab exercises. This section offers a range of practical activities to help you apply your knowledge of HTML, CSS, JavaScript, and other web technologies. Click to access interactive coding challenges, projects, and tutorials that will enhance your skills in web development and design.",
+                codetype: "CSU677P | Web Technology Lab",
             },
             {
-                link: "practice/",
-                title: "Practice Operating Systems Concepts: Strengthen Your Knowledge",
-                desc: "Reinforce your understanding of Operating Systems with practice exercises and interactive tools. This section offers a range of resources to help you master operating system concepts, including sorting algorithms, virtual machine installation, and more. Click to access hands-on exercises that will enhance your comprehension of operating system principles and prepare you for advanced topics in computer science.",
-                codetype: "Practice | Operating Systems",                
+                link: "#",
+                title: "Practice MCQs and Quizzes [WIP]",
+                desc: "Test your knowledge of web technology with practice quizzes and multiple-choice questions. This section offers a variety of quizzes covering essential topics such as HTML, CSS, JavaScript, and responsive web design. Click to take quizzes and assess your understanding of web development concepts.",
+                codetype: "Practice | Web Technology",
             }
         ];
 
@@ -28,12 +28,19 @@ function get_menu_list(datetogen) {
     function get_class(def_date, def_author) {
         const arr = [
             {
-                title: "Exploring Operating Systems: Fundamentals to Advanced Concepts",
-                desc: "A comprehensive guide on operating systems, covering essential functions, types, and process management to advanced networking and memory concepts.",
+                title: "Introduction to Web Technology",
+                desc: "Explore the fundamentals of web technology, including the history of the internet, web development tools, and the role of web technologies in modern society. This introductory class provides an overview of essential concepts such as HTML, CSS, JavaScript, and responsive web design, setting the foundation for further exploration of web development principles and practices.",
                 codetype: "Concepts",
-                readtime: 45,
-                link: "operating-system-concepts"
-            },            
+                readtime: 5,
+                link: "web-technology-concepts"
+            },
+            {
+                title: "Number Utilities Made with JavaScript",
+                desc: "Explore essential number utilities in JavaScript, including leap year detection, prime number checking, odd or even determination, factorial calculation, and more. This guide provides a comprehensive overview of working with numbers in JavaScript, covering concepts such as number conversion, rounding, precision, and practical algorithms.",
+                codetype: "JavaScript",
+                readtime: 5,
+                link: "number-utilities"
+            }
         ];
         body_genmenu.processData(arr, def_date, def_author);
     }
@@ -52,8 +59,8 @@ function get_menu_list(datetogen) {
                 codetype: "Installation",
                 readtime: 2,
                 date: "Wed February 07, 2024",
-                link: "installing-virtualbox"              
-            },            
+                link: "installing-virtualbox"
+            },
         ];
         body_genmenu.processData(arr, def_date, def_author);
     }
