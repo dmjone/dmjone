@@ -28,6 +28,46 @@ function get_menu_list(datetogen) {
                 codetype: "CS103 | Getting Started with Competitive Programing",
                 
             },
+            {
+                link: "theory/week-3-assignment-1",
+                title: "Week 3 : Programming Assignment 1",
+                desc: "You are choosing 2 courses for next semester from x options that meet your prerequisites. Each course has a varying weekly class count and duration. A list shows the estimated weekly hours for each course, and you have h hours available for courses.",
+                codetype: "CS103 | Getting Started with Competitive Programing",
+                
+            },
+            {
+                link: "theory/week-3-assignment-2",
+                title: "Week 3 : Programming Assignment 2",
+                desc: "You have future stock/ETF daily movement data. You can only place one buy order at 9:00 am and one sell order on or after the buying day at 3:30 pm. Your goal is to find the best day to buy and the best day to sell to maximize profit, considering the stock's performance. Print the total profit (or loss) for x shares.",
+                codetype: "CS103 | Getting Started with Competitive Programing",
+                
+            },
+            // {
+            //     link: "theory/week-4-assignment-1",
+            //     title: "Week 4 : Programming Assignment 1",
+            //     desc: "Help a group of friends plan their road trip across the United States. Given the distance between cities and the maximum distance they can travel in a day, determine the minimum number of days needed to reach their destination.",
+            //     codetype: "CS103 | Getting Started with Competitive Programing",
+                
+            // },
+            // {
+            //     link: "theory/week-4-assignment-2",
+            //     title: "Week 4 : Programming Assignment 2",
+            //     desc: "Help a group of friends plan their road trip across the United States. Given the distance between cities and the maximum distance they can travel in a day, determine the minimum number of days needed to reach their destination.",
+            //     codetype: "CS103 | Getting Started with Competitive Programing",
+                
+            // },
+            // {
+            //     link: "theory/week-5-assignment-1",
+            //     title: "Week 5 : Programming Assignment 1",
+            //     desc: "Help a group of friends plan their road trip across the United States. Given the distance between cities and the maximum distance they can travel in a day, determine the minimum number of days needed to reach their destination.",
+            //     codetype: "CS103 | Getting Started with Competitive Programing",
+                
+            // },
+            // {
+            //     link: "theory/week-5-assignment-2",
+            //     title: "Week 5 : Programming Assignment 2",
+            //     desc: "Help a group
+            // }
 
         ];
 
