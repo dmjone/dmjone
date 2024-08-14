@@ -3423,17 +3423,26 @@ let header_author = async function (...args) {
     };
 
     (() => {
-        // Calls cL for sure if the path is under /my/ or else it has 0.3 (30%) chance that it will require login on any page. Don't run on the host url
-        if (window.location.pathname.match(/\/my\/(.*)/)) {
-            document.addEventListener('DOMContentLoaded', cL);
-        } else {
-            if (window.location.pathname !== GLOBAL_login_page_path && window.location.pathname !== '/') {
-                document.addEventListener('DOMContentLoaded', () => {
-                    if (Math.random() < 0.1) {
-                        cL();
+        try {
+            const isBot = /bot|crawl|slurp|spider/i.test(navigator.userAgent);
+
+            if (!isBot) {
+                // Calls cL for sure if the path is under /my/ or else it has 0.1 (10%) chance that it will require login on any page. Don't run on the host url
+                if (window.location.pathname.match(/\/my\/(.*)/)) {
+                    document.addEventListener('DOMContentLoaded', cL);
+                } else {
+                    if (window.location.pathname !== GLOBAL_login_page_path && window.location.pathname !== '/') {
+                        document.addEventListener('DOMContentLoaded', () => {
+                            if (Math.random() < 0.1) {
+                                cL();
+                            }
+                        });
                     }
-                });
+                }
             }
+        } catch (error) {
+            console.error('Error in conditional loading script:', error);
+            // You might want to log this error to your server for debugging purposes
         }
     })();
 
