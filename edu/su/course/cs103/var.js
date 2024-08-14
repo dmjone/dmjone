@@ -42,20 +42,18 @@ function get_menu_list(datetogen) {
                 codetype: "CS103 | Getting Started with Competitive Programing",
                 
             },
-            // {
-            //     link: "theory/week-4-assignment-1",
-            //     title: "Week 4 : Programming Assignment 1",
-            //     desc: "Help a group of friends plan their road trip across the United States. Given the distance between cities and the maximum distance they can travel in a day, determine the minimum number of days needed to reach their destination.",
-            //     codetype: "CS103 | Getting Started with Competitive Programing",
-                
-            // },
-            // {
-            //     link: "theory/week-4-assignment-2",
-            //     title: "Week 4 : Programming Assignment 2",
-            //     desc: "Help a group of friends plan their road trip across the United States. Given the distance between cities and the maximum distance they can travel in a day, determine the minimum number of days needed to reach their destination.",
-            //     codetype: "CS103 | Getting Started with Competitive Programing",
-                
-            // },
+            {
+                link: "theory/week-4-assignment-1",
+                title: "Week 4 : Programming Assignment 1",
+                desc: "As a public health official in Mumbai during the 2020 COVID - 19 pandemic, you have a 2D map showing infections('1') and non- infections('0') .Your task is to find and return the population of the largest cluster of connected infected individuals.",
+                codetype: "CS103 | Getting Started with Competitive Programing",            
+            },
+            {
+                link: "theory/week-4-assignment-2",
+                title: "Week 4 : Programming Assignment 2",
+                desc: "Given a list of islands and the boat tours connecting them, your task is to determine the number of separate archipelagos. Each archipelago consists of islands connected by boat tours, with no connections between different archipelagos.",
+                codetype: "CS103 | Getting Started with Competitive Programing",
+            },
             // {
             //     link: "theory/week-5-assignment-1",
             //     title: "Week 5 : Programming Assignment 1",
