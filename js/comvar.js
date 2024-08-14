@@ -537,15 +537,23 @@ const profDetailsBio = {
     {
         bio: "<p class='professorbio header-p-author-description'>Dr. Sonia, Associate Professor at Yogananda School of AI, Computer and Data Sciences, Shoolini University, holds a PhD in Computer Science from the University of Delhi. Specializing in Cyber Security and AI, she has 16 years of teaching experience and has published around 30 research papers. Currently, she supervises two PhD students and serves as the Syllabus & Scheme Coordinator for YSAICDS. Dr. Sonia has also completed 24 certifications from Edx, Coursera, and IBM.</p>",
         href: "contact@dmj.one"
+    },
+    'Narinder Verma':
+    {
+        bio: "<p class='professorbio header-p-author-description'>Prof. Narinder Verma is an accomplished academic and researcher with a background in Mechanical Engineering from IIT Delhi (1992), a Post-Graduate Diploma in Management (Finance) from IIM Calcutta (1996), and a Post-Graduate Diploma in Advanced Computing from C-DAC, Pune (2001). His research and consultancy work focuses on Financial Management, with a particular interest in developing sustainable methods for monetizing gold in India. Prof. Verma has made significant contributions to the field, including developing a Behavioral Finance Model for investment in Gold and Gold ETFs. His academic output includes multiple international research papers, book chapters, and popular articles, with a notable record of 69 citations, a 5 h-index, and a 4 i10-index. He is an active member of various professional organizations, including the Academy of International Business (AIB), USA, and the Financial Management Research & Resource Society of India (FMRRS).</p>",
+        href: "narinderverma@shooliniuniversity.com",        
     }
 };
 const courseDetailsMap = {
+    // Semester 1
     'csu1128': { 'default': ["Dr. Pankaj Vaidya", "CSU1128", "Logic Building with Computer Programming"] },
     'csu1128p': { 'default': ["Dr. Pankaj Vaidya", "CSU1128(P)", "Logic Building with Computer Programming Lab"] },
     'csu953': { 'default': ["Dr. Bharti Thakur", "CSU953", "Front End Development Lab"] },
     'fsu030': { 'default': ["Dr. Pawan Kumar", "FSU030", "Engineering Physics"] },
     'csu951': { 'default': ["Dr. Ravinder Thakur", "CSU951", "Basic Mathematics"] },
     'csu730': { 'default': ["Rajesh Williams", "CSU730", "Functional English - 1"] },
+
+    // Semester 2
     'csu585': { 'default': ["Dr. Ruchika Sharma", "CSU585", "Design Thinking"] },
     'csu1287': { 'default': ["Dr. Pankaj Vaidya", "CSU1287", "OOPS Using C++ Language"] },
     'csu1287p': { 'default': ["Dr. Pankaj Vaidya", "CSU1287p", "OOPS Using C++ Language Lab"] },
@@ -560,6 +568,8 @@ const courseDetailsMap = {
         'default': ["Dr. Laxman Kathait", "CSU1051", "Algorithms and Data Structure"],
         'lab': ["Aarchit Joshi", "CSU1051", "Algorithms and Data Structure Lab"]
     },
+
+    // Semester 3
     'csu1291': {
         'default': ["Dr. Anurag Rana", "CSU1291", "Java Programming"],
         'lab': ["Dr. Anurag Rana", "CSU1291", "Java Programming Lab"]
@@ -573,6 +583,8 @@ const courseDetailsMap = {
     'seaap003': { 'default': ["Sahil Kashyap", "SEA-AP003", "Aptitude Development 003"] },
     'csu716': { 'default': ["Sangeeta Kakkar and Isha Jaswal", "CSU716", "Life Skills Training"] },
     'csu1627': { 'default': ["Dr. Anita Chauhan and Dr. Garima Rana", "CSU716", "Mind Wellness"] },
+    
+    // Semester 4
     'csu1162': {
         'default': ["Dr. Ruchika Sharma", "CSU1162", "Python Programming"],
         'lab': ["Dr. Ruchika Sharma", "CSU1162P", "Python Programming Lab"]
@@ -594,10 +606,20 @@ const courseDetailsMap = {
     'seaap004': { 'default': ["Anandita", "SEA-AP004", "Aptitude Development 004"]},
     'seaws004': { 'default': ["Chen Chun", "SEA-WS004", "Writing Seminar 004"]},
     'csu1806': { 'default': ["Payal Khanna", "CSU1806", "Enhancing Leadership through Coaching Skills"]},
-    'cs103': {'default': ["Dr. Sonia", "CS103", "Getting Started with Competitive Programming"]},
+    
+    // Semester 5
+    'cs103': { 'default': ["Dr. Sonia", "CS103", "Getting Started with Competitive Programming"] },
+    'csu2029': { 'default': ["Narinder Verma", "CSU2029", "Thinking Unboxed: Strategies for Critical Analysis"]},
+    'csu359': { 'default': ["Abhishek Tomar", "CSU2029", "Computer Networks"]},
+    'csu1530': { 'default': ["Dr. Sonia", "CSU1530", "Biometric Security"]},
+    'seaap005': { 'default': ["Anandita", "SEA-AP005", "Aptitude Development 005"]},    
     'csu677': {
         'default': ["Dr. Gaurav Gupta", "CSU677", "Web Technology"],
         'lab': ["Dr. Gaurav Gupta", "CSU677P", "Web Technology Lab"]
+    },
+    'csu1899': {
+        'default': ["Piyush Sewal", "CSU1899", "Ethical Hacking"],
+        'lab': ["Piyush Sewal", "CSU1899P", "Ethical Hacking Lab"]
     },
     
 };

@@ -4,16 +4,18 @@ function get_menu_list(datetogen) {
         const arr = [
             {
                 link: "theory/",
-                title: "Understanding Operating Systems",
-                desc: "Explore the intricacies of Operating Systems with Shoolini University's CSU360 Operating Systems course, detailed on dmj.one. Delve into the core functions of modern operating systems, including process management, memory management, file systems, and security. Click to uncover the principles and practices that underpin efficient and secure computer operations. Learn how operating systems serve as the backbone of software development and computing, preparing you for advanced topics in computer science and enhancing your problem-solving skills.",
-                codetype: "CSU360 | Operating Systems",
-                cardimage: "https://cdn.dmj.one/edu/su/course/csu360/img/logo.webp"
+                title: "Theory: Course Overview and Concepts",
+                desc: "Description of the topic. This section provides an overview of the key concepts and principles related to the topic. Click to explore the fundamentals and advanced aspects of the subject, including real-world applications and case studies.",
+                codetype: "CSUCODE | Course",
+                cardimage: "https://cdn.dmj.one/edu/su/course/csuCODE/img/logo.webp",                
+                // cardimage_dark: "//cdn.dmj.one/img/needhelp.webp",               
+                // continuereading: " Click here to reach out to Faculty directly through email"
             },
             {
                 link: "lab/",
-                title: "Hands-on Operating Systems Lab: Enhance Your System Management Skills",
-                desc: "Advance your understanding of Operating Systems in the practical lab with code CSU360P. This lab course offers a hands-on approach to learning about operating system concepts, including process synchronization, scheduling algorithms, and memory allocation techniques. Click to engage in interactive sessions that will improve your technical skills in managing and optimizing operating systems, preparing you for the complexities of real-world IT environments.",
-                codetype: "CSU360P | Operating Systems Lab",
+                title: "Lab: Hands-On Practice and Exercises",
+                desc: "Description of the topic. This section offers practical exercises and interactive tools to help you apply the concepts learned in the theory section. Click to access hands-on labs, coding exercises, and simulations that will enhance your understanding of the topic.",
+                codetype: "CSUCODE | Course",
             },
             {
                 link: "practice/",
@@ -28,11 +30,11 @@ function get_menu_list(datetogen) {
     function get_class(def_date, def_author) {
         const arr = [
             {
-                title: "Exploring Operating Systems: Fundamentals to Advanced Concepts",
-                desc: "A comprehensive guide on operating systems, covering essential functions, types, and process management to advanced networking and memory concepts.",
+                title: "Topic Name",
+                desc: "Description of the topic.",
                 codetype: "Concepts",
-                readtime: 45,
-                link: "operating-system-concepts"
+                readtime: 5,
+                link: "link-to-the-topic"
             },            
         ];
         body_genmenu.processData(arr, def_date, def_author);

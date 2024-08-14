@@ -34,10 +34,6 @@ const randomidgenerator = (i = 10) => [...Array(i)].map(() => 'abcdefghijkmnpqrs
     });
 })();
 
-(function () {
-    const devmode = false;
-    window.indevmode = devmode && window.location.host === "localhost";
-})();
 const notification_maintainence_mode = 0;
 const GLOBAL_maintainence_message = "Some links, images, and features may not work as expected. Thank you for your patience.";
 
@@ -51,8 +47,8 @@ const GLOBAL_NewArticle_message = `A new article has been published. <a href="/m
 const notification_article_update = 0;
 const GLOBAL_ArticleUpdate_message = `An article has been updated. <a href="/my/articles/2022/01/01/sample-article" class="alert-link">Read more</a>.`;
 
-const notification_new_course = 0;
-const GLOBAL_NewCourse_message = `A new course has been added. <a href="/edu/su/course/sample-course" class="alert-link">Explore now</a>.`;
+const notification_new_course = 1;
+const GLOBAL_NewCourse_message = `A new course has been added. <a href="/edu/su/course/csu2029/" class="alert-link">Explore now</a>.`;
 
 const GLOBAL_crawler_mode = 0;
 
@@ -597,7 +593,8 @@ const body_pomodoro_helptext = `
                 { left: '\\(', right: '\\)', display: false },
                 { left: '\\[', right: '\\]', display: true }
             ],
-            throwOnError: false
+            throwOnError: false,
+            ignoredClasses: ['no-katex'] // Ignore the class no-math-render
         }); // Once all scripts are loaded, run the KaTeX rendering function
     });
 })();
@@ -4603,7 +4600,7 @@ function maintenance_mode() {
         document.body.classList.remove('indian-flag-background', 'default-background');
 
         if (!isDarkMode) {
-            if ((month === 1 && day === 26) || (month === 7 && day === 25)) {
+            if ((month === 1 && day === 26) || (month === 8 && day === 15)) {
                 document.body.classList.add('indian-flag-background');
             } else {
                 document.body.classList.add('default-background');
@@ -4762,6 +4759,10 @@ function maintenance_mode() {
     }
 
     function applyChanges(element) {
+        // Check if the element has the class 'no-code-change'
+        if (element.classList.contains('no-code-change')) {
+            return;
+        }
         const lines = element.textContent.split('\n');
         if (Math.random() < 0.5) {
             removelines(element, lines);
