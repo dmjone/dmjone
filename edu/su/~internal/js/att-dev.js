@@ -30,8 +30,7 @@
         const encryptedNamesDS = 'U2FsdGVkX1/BbUmmcWWELA6R9C3zST3PlzyG63Iahx1LyHheFSVMejBjhLQvbtWqFBPN1tFf+wIg7jGskdUQYLNoCwF7c3W5gq+YzVYcEghfhnotkr2Snlto8qMA1BP37pwjY1rdUKFYBib9akwuyK734TW9J94hVMUqKe0n2gP4bH5ENh6a8tNgBD+EuisZjbpNYlmodifyaw35sG8sHDrO60GZEZMi0KnELvVJ3Pv/aMEUlxS+bUDG+dztZxdd2Ilx3SS6y/zR+6IOGYKfqJEQiAaFV4DSbQlp5H74Xblk1FFDRhAGEqWAEXADCwqNdIVmrsY/Xaj5E4MC0CMUIgeJ2GFXnydrfwY0IkQzxa/WxhHu6N38wSuzIQlFiDmlZZNhVfLM6USIdW59O2DkMHOLRbWuPW/6TqZY5/7BqmNgGWazMb5lr/tdT5YOJzAvWWLqL76+l0c0AS/OPajQAw5IwE8H/zjAg5tcBCNfd7UHhGt1HXetLkJldgosxvMDsbrmoj2WjxpFIKEhtdyLdrL6gcc2emnqt0t2ShuI9J6VBGanhqF3tQ72TMRWo1Kv8p5gQ1jQzlQio8RjYWi3undkElyQVGDTsKP/V3ZJCzfOHNpRjK3Kc2pbIVUaQcGI';
         const encryptednameRollMapDS = 'U2FsdGVkX181Kq37oxhRSJSQJBnAQKQGLn4ih6Zkv5WjcFrIymHkP9aU3+y+WCRng3J76uymT1P6kAGnOYbMu7jaBDCp+k0lddVoTGzJonwdIzeTYFA5y+H3fiA3CK2yvfU2gC+0SDe9gP+srpXuXgwBK95MK4ZpCmp2gMwWPAPC+AB28bH9ysqQVEBRcvDe1fv4SpZo+sVpzlmmhNXt5icpZ411tSIo/DdlPQbYw/fwBoR/HxdA6OrlvSvcaVOPbumYcWPWj/sjzqf/cdDtjzaSDB+iDeU9TDCFRzO5489rmNqcxwRYBzr5XdskBruC9Oumo/A8zZMvPG9cSjoRzWjcFjGWyc2/9KsaylKd7e7AJNZhxGIG93ILoIRIl95dU6xAdpbrgMNN4sLJtLbgrJXhujNelzWPj5/yJyoQQW64I3XRMgYeWfCdHyB1RM8xkKDxLfs+6FJurY6AfwbewQQdR102JA82ASLbXFAtsRupOGpg4l5QqKxVkKPxOI4E6nWEGfBa8tiHjhENEIwTSKizoXrzArpuAGKjtZ32l863Xc1nl/dP081VrgPvxpH14X2dUyNM+wL4/jDFgzJ6LtOmDpZ7KPdts1N9AQj5+wDMUZcGepxTr6+PA8r1jlEqu9OXeuXaIOdT3DGw/PSJ2l4WM+ONt5T2JiEduwCyce/9xpxmvUdOJteMZY3R5GUqQ8BQWsoItEBi53zMy+WBIyrml8OvMDazH9tgLvBtGTx47HZQig8BzRI7HSD9KpmBmhj/00Jn8djnIL6xKkjcPSLtsJh3OfIpPx0CrIQ2LN9aL+6CRb301kHLjP4ZzSjgxLLaPL3j/nKFeFr9AC+pgt36KSGTC6PJyLiTibdm0PLrz/rv25rklRqjhe295Dk0m/9zieVX6ZC53+gdYjfHkX9nBony4YwmBWkGcPKNMxzD8GfZzoIk/Yi41YEKSLXpXmbDjPYFrK0IlHgAdSu+Vqjkzcs1lqg4r4EFVKxn1cDwStt1ABF7R4TS+U7ZBsEcaYl7wCo5utnY4euSXH7ZNGyGMfE/l5qcgym2yMEfvrnhhc0KBW2pxXGV0X/Gbo6eqUQ0R2aX3nlwcnHK/5OtSg2diR9rlz5VkncozeQ/3/t2NYCF0w/R6p8Y0n3IWZdo5ujFBH7ZQAh8Qq0ZozQlig==';
 
-        document.getElementById('classSelector').addEventListener('change', function () {
-            alert('Selected class method: ' + this.value);
+        document.getElementById('classSelector').addEventListener('change', function () {            
             switch (this.value) {
                 case 'merged':
                     encryptedNames = encryptedNamesMerged;
@@ -62,7 +61,6 @@
             const NAMES = decryptData(encryptedNames, secretKey);
             const nameRollMap = decryptData(encryptednameRollMap, secretKey);
             let isAbsent = new Array(NAMES.length).fill(false);
-            console.log(nameRollMap)
 
             document.getElementById('generate').addEventListener('click', generateRandomList);
             document.getElementById('copyBtn').addEventListener('click', copyAbsenteesToClipboard);
