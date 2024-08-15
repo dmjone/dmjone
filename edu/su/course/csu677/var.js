@@ -10,17 +10,17 @@ function get_menu_list(datetogen) {
                 cardimage: "https://cdn.dmj.one/edu/su/course/csu677/img/logo.webp"
             },
             {
-                link: "#",
-                title: "Hands-on Web Development Lab [WIP]",
+                link: "lab/",
+                title: "Hands-on Web Development Lab",
                 desc: "Practice web development concepts and techniques with hands-on lab exercises. This section offers a range of practical activities to help you apply your knowledge of HTML, CSS, JavaScript, and other web technologies. Click to access interactive coding challenges, projects, and tutorials that will enhance your skills in web development and design.",
                 codetype: "CSU677P | Web Technology Lab",
             },
-            {
-                link: "#",
-                title: "Practice MCQs and Quizzes [WIP]",
-                desc: "Test your knowledge of web technology with practice quizzes and multiple-choice questions. This section offers a variety of quizzes covering essential topics such as HTML, CSS, JavaScript, and responsive web design. Click to take quizzes and assess your understanding of web development concepts.",
-                codetype: "Practice | Web Technology",
-            }
+            // {
+                // link: "#",
+                // title: "Practice MCQs and Quizzes [WIP]",
+                // desc: "Test your knowledge of web technology with practice quizzes and multiple-choice questions. This section offers a variety of quizzes covering essential topics such as HTML, CSS, JavaScript, and responsive web design. Click to take quizzes and assess your understanding of web development concepts.",
+                // codetype: "Practice | Web Technology",
+            // }
         ];
 
         body_genmenu.processData(arr, def_date, def_author, { isMainCategory: true });
@@ -334,12 +334,12 @@ function get_menu_list(datetogen) {
             //     // cardimage: "_url_"
             // },
             {
-                title: "Practical 1: Procedure for VirtualBox Installation and Configuration",
-                desc: "Learn to set up your operating system lab environment with VirtualBox, a powerful virtualization tool for creating and managing virtual machines. This practical exercise will guide you through the installation and configuration of VirtualBox, enabling you to create a virtualized environment for hands-on learning and experimentation.",
-                codetype: "Installation",
+                title: "Practical 1: Employee Registration Form",
+                desc: "Create an employee registration form using HTML, CSS, and JavaScript. This hands-on lab exercise will help you practice form design, validation, and submission, enhancing your skills in web development.",
+                codetype: "HTML, CSS",
                 readtime: 2,
-                date: "Wed February 07, 2024",
-                link: "installing-virtualbox"
+                date: "Thu August 8, 2024",
+                link: "employee-registration-form"
             },
         ];
         body_genmenu.processData(arr, def_date, def_author);
