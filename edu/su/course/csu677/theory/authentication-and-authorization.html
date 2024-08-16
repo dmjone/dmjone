@@ -1,0 +1,295 @@
+<!-------------------------- © 2007 - present, dmj.one and contributors. ----------------------------------
+   Part of the dmjone project. Licensed under the GNU AGPL. Provided as-is, without warranty of any kind. 
+-------------------- Redistribution and modifications must retain this notice. --------------------------->
+
+
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+	<!--<![endif]-->
+
+	<head>
+		<script src="/js/edu_su_common.js"></script>
+		<noscript>
+			<style>
+				html,
+				body {
+					margin: 0;
+					overflow: hidden;
+				}
+			</style>
+			<iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+		</noscript>
+
+		<title>Authentication and Authorization - CSU677 - Shoolini U</title>
+		<meta name="description" content="Learn about the concepts of authentication and authorization in web development, and how they are used to secure access to resources and data.">
+
+		<meta property=" og:image" content="/logo.png">
+		<meta property="og:type" content="article">
+
+		<meta name="twitter:card" content="summary">
+		<meta name="twitter:site" content="@divyamohan1993">
+		<meta name="twitter:creator" content="@divyamohan1993">
+		<meta name="twitter:image" content="/logo.png">
+
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width,initial-scale=1" />
+
+		<meta name="author" content="Divya Mohan">
+		<meta name="robots" content="index, follow">
+
+	</head>
+
+	<body>
+
+		<script> header_author("dm"); </script>
+
+		<main>
+			<article class="agen-tableofcontents">
+				<h2 class="text-center">Authentication and Authorization</h2>
+			</article>
+
+			<article>
+				<h3>1. Introduction to Authentication and Authorization</h3>
+				<p>Authentication and authorization are fundamental concepts in cybersecurity, crucial for controlling access to resources in any system. Authentication is the process of verifying the identity of a user or entity, ensuring they are who they claim to be. Authorization, on the other hand, determines what resources or actions the authenticated user is permitted to access or perform.</p>
+			</article>
+
+			<article>
+				<h3>2. Authentication: Verifying Identity</h3>
+				<p>Authentication is the first step in securing a system. It involves validating the identity of users or entities before granting them access to the system. This process can be achieved through various methods:</p>
+
+				<h4>2.1 Password-Based Authentication</h4>
+				<p>Password-based authentication is the most common method, where users provide a secret password that matches a stored hash in the system. Strong passwords and secure storage mechanisms, like hashing with salt, are essential to prevent unauthorized access.</p>
+
+				<h5>2.1.1 Example: Password Hashing</h5>
+				<pre><code class="language-python">
+import hashlib
+import os
+
+password = "securepassword123"
+salt = os.urandom(16)
+hashed_password = hashlib.pbkdf2_hmac('sha256', password.encode(), salt, 100000)
+</code></pre>
+
+				<h4>2.2 Multi-Factor Authentication (MFA)</h4>
+				<p>Multi-Factor Authentication (MFA) enhances security by requiring multiple forms of verification, such as something you know (password), something you have (a mobile device), and something you are (biometric data). This reduces the likelihood of unauthorized access, even if one factor is compromised.</p>
+
+				<h5>2.2.1 Example: MFA with OTP</h5>
+				<pre><code class="language-python">
+import pyotp
+
+totp = pyotp.TOTP('base32secret3232')
+print("Your OTP is:", totp.now())
+</code></pre>
+
+				<h4>2.3 Biometric Authentication</h4>
+				<p>Biometric authentication uses physical characteristics, such as fingerprints, facial recognition, or iris scans, to verify identity. This method is highly secure, as biometric data is unique to each individual, but it also raises privacy and ethical concerns.</p>
+
+				<h5>2.3.1 Example: Basic Fingerprint Authentication</h5>
+				<pre><code class="language-python">
+// Pseudocode representation of a fingerprint match
+if fingerprint_scan() == stored_fingerprint_data:
+    grant_access()
+else:
+    deny_access()
+</code></pre>
+
+				<h4>2.4 Token-Based Authentication</h4>
+				<p>Token-based authentication involves issuing a token to a user after they successfully authenticate. This token, often a JSON Web Token (JWT), is then used to access protected resources without requiring the user to authenticate again for each request. Tokens can be time-limited and securely transmitted to prevent misuse.</p>
+
+				<h5>2.4.1 Example: JWT Creation and Validation</h5>
+				<pre><code class="language-python">
+import jwt
+import datetime
+
+payload = {
+    'user_id': 123,
+    'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=3600)
+}
+token = jwt.encode(payload, "secret_key", algorithm="HS256")
+decoded_payload = jwt.decode(token, "secret_key", algorithms=["HS256"])
+</code></pre>
+			</article>
+
+			<article>
+				<h3>3. Authorization: Granting Access</h3>
+				<p>Authorization occurs after authentication and involves determining what actions the authenticated user is allowed to perform. It ensures that users can only access resources and perform actions that they are permitted to, based on predefined policies and roles.</p>
+
+				<h4>3.1 Role-Based Access Control (RBAC)</h4>
+				<p>Role-Based Access Control (RBAC) assigns permissions to users based on their roles within an organization. For example, an "Admin" role may have full access to all resources, while a "User" role may have limited access. RBAC simplifies management by grouping permissions under roles, making it easier to update and enforce access policies.</p>
+
+				<h5>3.1.1 Example: Defining and Enforcing Roles in RBAC</h5>
+				<pre><code class="language-python">
+roles = {
+    "admin": ["create", "read", "update", "delete"],
+    "user": ["read"]
+}
+
+def check_permission(role, action):
+    if action in roles.get(role, []):
+        return True
+    return False
+</code></pre>
+
+				<h4>3.2 Attribute-Based Access Control (ABAC)</h4>
+				<p>Attribute-Based Access Control (ABAC) provides more granular control by evaluating attributes (e.g., user attributes, resource attributes, and environment conditions) rather than just roles. This allows for more complex and dynamic access control policies.</p>
+
+				<h5>3.2.1 Example: ABAC Policy Implementation</h5>
+				<pre><code class="language-python">
+def check_abac_policy(user_attributes, resource_attributes, action):
+    if user_attributes["department"] == "HR" and action == "edit" and resource_attributes["type"] == "employee_record":
+        return True
+    return False
+</code></pre>
+
+				<h4>3.3 Access Control Lists (ACLs)</h4>
+				<p>Access Control Lists (ACLs) are a traditional method of authorization where specific permissions are granted to individual users or groups for each resource. Each resource has an associated list that explicitly states which users or systems are allowed to access it and what operations they can perform.</p>
+
+				<h5>3.3.1 Example: Basic ACL Implementation</h5>
+				<pre><code class="language-python">
+acl = {
+    "/data/resource1": {"read": ["user1", "user2"], "write": ["admin"]},
+    "/data/resource2": {"read": ["user3"], "write": ["admin", "user3"]}
+}
+
+def check_acl(user, resource, action):
+    if user in acl.get(resource, {}).get(action, []):
+        return True
+    return False
+</code></pre>
+			</article>
+
+			<article>
+				<h3>4. OAuth 2.0 and OpenID Connect</h3>
+				<p>OAuth 2.0 and OpenID Connect are widely used protocols for delegated authorization and authentication, respectively. OAuth 2.0 allows third-party applications to access resources on behalf of a user without exposing their credentials, while OpenID Connect builds on OAuth 2.0 to provide authentication services.</p>
+
+				<h4>4.1 OAuth 2.0 Flow</h4>
+				<p>The OAuth 2.0 flow involves several steps:</p>
+				<ul>
+					<li><strong>Authorization Request:</strong> The client requests authorization from the user to access resources.</li>
+					<li><strong>Authorization Grant:</strong> The user provides authorization, which is then exchanged for an access token.</li>
+					<li><strong>Access Token:</strong> The client uses the access token to request resources from the server.</li>
+					<li><strong>Refresh Token:</strong> If the access token expires, the client can use a refresh token to obtain a new access token.</li>
+				</ul>
+
+				<h5>4.1.1 Example: OAuth 2.0 Authorization Code Flow</h5>
+				<pre><code class="language-http">
+GET /authorize?response_type=code&client_id=client123&redirect_uri=https://client.example.com/callback&scope=read_profile
+</code></pre>
+
+				<h4>4.2 OpenID Connect</h4>
+				<p>OpenID Connect is an identity layer on top of OAuth 2.0 that allows clients to verify the identity of users. It provides information about the authenticated user, including their identity and claims, such as name, email, and profile information.</p>
+
+				<h5>4.2.1 Example: Retrieving User Info with OpenID Connect</h5>
+				<pre><code class="language-http">
+POST /token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=authorization_code&code=authcode123&redirect_uri=https://client.example.com/callback&client_id=client123&client_secret=secret
+
+GET /userinfo
+Authorization: Bearer access_token
+</code></pre>
+			</article>
+
+			<article>
+				<h3>5. Session Management and Security</h3>
+				<p>Session management is critical for maintaining the state of authenticated users as they interact with a system. Proper session management ensures that sessions are secure, preventing unauthorized access through session hijacking or fixation attacks.</p>
+
+				<h4>5.1 Session Tokens</h4>
+				<p>Session tokens are unique identifiers generated by the server and sent to the client upon successful authentication. These tokens are stored in cookies or local storage and are used to maintain the user’s session across multiple requests.</p>
+
+				<h5>5.1.1 Example: Generating and Validating Session Tokens</h5>
+				<pre><code class="language-python">
+import uuid
+
+session_tokens = {}
+
+def create_session(user_id):
+    token = str(uuid.uuid4())
+    session_tokens[token] = user_id
+    return token
+
+def validate_session(token):
+    return session_tokens.get(token)
+</code></pre>
+
+				<h4>5.2 Secure Cookie Attributes</h4>
+				<p>Cookies used to store session tokens should be configured with secure attributes to mitigate risks:</p>
+				<ul>
+					<li><strong>Secure:</strong> Ensures the cookie is only sent over HTTPS.</li>
+					<li><strong>HttpOnly:</strong> Prevents JavaScript from accessing the cookie, reducing the risk of XSS attacks.</li>
+					<li><strong>SameSite:</strong> Controls whether the cookie is sent with cross-site requests, helping to prevent CSRF attacks.</li>
+				</ul>
+
+				<h5>5.2.1 Example: Setting Secure Cookie Attributes</h5>
+				<pre><code class="language-http">
+Set-Cookie: sessionid=abc123; Secure; HttpOnly; SameSite=Strict
+</code></pre>
+			</article>
+
+			<article>
+				<h3>6. Common Authentication and Authorization Attacks</h3>
+				<p>Understanding common attacks against authentication and authorization mechanisms is essential for building secure systems. These attacks exploit weaknesses in the implementation or configuration of these processes.</p>
+
+				<h4>6.1 Brute Force Attacks</h4>
+				<p>Brute force attacks involve trying many different combinations of usernames and passwords until the correct one is found. To mitigate this, implement account lockout mechanisms, CAPTCHA, or rate-limiting.</p>
+
+				<h5>6.1.1 Example: Account Lockout Logic</h5>
+				<pre><code class="language-python">
+failed_attempts = {}
+
+def check_login(username, password):
+    if failed_attempts.get(username, 0) >= 5:
+        return "Account locked. Try again later."
+    
+    if authenticate(username, password):
+        failed_attempts[username] = 0
+        return "Login successful"
+    else:
+        failed_attempts[username] = failed_attempts.get(username, 0) + 1
+        return "Invalid credentials"
+</code></pre>
+
+				<h4>6.2 Session Hijacking</h4>
+				<p>Session hijacking occurs when an attacker steals a user's session token, allowing them to impersonate the user. Mitigation techniques include using secure cookies, rotating session tokens, and implementing secure logout mechanisms.</p>
+
+				<h4>6.3 Cross-Site Request Forgery (CSRF)</h4>
+				<p>CSRF attacks trick authenticated users into performing unwanted actions. Mitigation involves implementing anti-CSRF tokens and using the SameSite cookie attribute.</p>
+
+				<h4>6.4 Privilege Escalation</h4>
+				<p>Privilege escalation occurs when a user gains unauthorized access to resources or actions that should be restricted. Implementing RBAC or ABAC and ensuring proper validation of user roles can mitigate this risk.</p>
+			</article>
+
+			<article>
+				<h3>7. Best Practices for Secure Authentication and Authorization</h3>
+				<p>Adopting best practices for authentication and authorization helps secure systems against common threats and vulnerabilities.</p>
+
+				<h4>7.1 Use Strong Password Policies</h4>
+				<p>Implement policies that enforce the use of strong passwords, including requirements for length, complexity, and periodic changes. Avoid common passwords and use password hashing with salt for storage.</p>
+
+				<h4>7.2 Implement Multi-Factor Authentication (MFA)</h4>
+				<p>MFA adds an extra layer of security by requiring multiple forms of verification. This greatly reduces the risk of unauthorized access, even if one authentication factor is compromised.</p>
+
+				<h4>7.3 Regularly Review and Update Access Controls</h4>
+				<p>Regularly audit and update access control policies to ensure they align with the current roles and responsibilities within the organization. This includes reviewing RBAC roles, ACLs, and ABAC policies.</p>
+
+				<h4>7.4 Secure API Endpoints</h4>
+				<p>For systems exposing APIs, ensure that endpoints are secured with proper authentication mechanisms, such as OAuth 2.0 or API keys, and limit access based on roles or attributes.</p>
+
+				<h4>7.5 Monitor and Log Authentication Attempts</h4>
+				<p>Implement logging and monitoring for authentication attempts, including both successful and failed logins. This helps detect and respond to suspicious activity, such as brute force attacks or attempted privilege escalation.</p>
+
+				<h4>7.6 Educate Users on Security Practices</h4>
+				<p>Educate users on the importance of security practices, such as recognizing phishing attempts, using strong passwords, and securing their devices. A well-informed user base is a critical component of overall system security.</p>
+			</article>
+
+		</main>
+
+		<script> copyright("all"); </script>
+
+
+	</body>
+
+</html>

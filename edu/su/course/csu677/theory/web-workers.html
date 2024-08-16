@@ -1,0 +1,270 @@
+<!-------------------------- © 2007 - present, dmj.one and contributors. ----------------------------------
+   Part of the dmjone project. Licensed under the GNU AGPL. Provided as-is, without warranty of any kind. 
+-------------------- Redistribution and modifications must retain this notice. --------------------------->
+
+
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+	<!--<![endif]-->
+
+	<head>
+		<script src="/js/edu_su_common.js"></script>
+		<noscript>
+			<style>
+				html,
+				body {
+					margin: 0;
+					overflow: hidden;
+				}
+			</style>
+			<iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+		</noscript>
+
+		<title>Web Workers - CSU677 - Shoolini U</title>
+		<meta name="description" content="Learn about web workers, a feature of HTML5 that allows web applications to run scripts in the background, separate from the main page. Understand the benefits of using web workers, how to create and communicate with them, and best practices for implementing web workers in your web applications.">
+
+		<meta property=" og:image" content="/logo.png">
+		<meta property="og:type" content="article">
+
+		<meta name="twitter:card" content="summary">
+		<meta name="twitter:site" content="@divyamohan1993">
+		<meta name="twitter:creator" content="@divyamohan1993">
+		<meta name="twitter:image" content="/logo.png">
+
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width,initial-scale=1" />
+
+		<meta name="author" content="Divya Mohan">
+		<meta name="robots" content="index, follow">
+
+	</head>
+
+	<body>
+
+		<script> header_author("dm"); </script>
+
+		<main>
+			<article class="agen-tableofcontents">
+				<h2 class="text-center">Web Workers</h2>
+			</article>
+
+			<article>
+				<h3>1. Introduction to Web Workers</h3>
+				<p>Web Workers are a feature of modern web browsers that allow JavaScript code to run in the background, on a separate thread from the main execution thread of a web application. This enables web applications to perform intensive tasks, such as data processing or complex computations, without blocking the user interface or making the application unresponsive.</p>
+			</article>
+
+			<article>
+				<h3>2. Why Use Web Workers?</h3>
+				<p>JavaScript traditionally runs on a single thread, meaning that heavy computations or long-running tasks can block the main thread, causing the user interface to freeze or lag. Web Workers provide a way to offload these tasks to a background thread, ensuring that the main thread remains free to handle user interactions and render updates smoothly.</p>
+
+				<h4>2.1 Improving Performance</h4>
+				<p>By running resource-intensive tasks in the background, Web Workers can significantly improve the performance of a web application, especially for tasks like image processing, data manipulation, or handling large datasets.</p>
+
+				<h4>2.2 Enhancing User Experience</h4>
+				<p>When tasks are offloaded to Web Workers, the user interface remains responsive, enhancing the overall user experience. Users can continue to interact with the application while background tasks are being processed, without experiencing delays or lag.</p>
+			</article>
+
+			<article>
+				<h3>3. Types of Web Workers</h3>
+				<p>There are different types of Web Workers, each serving specific purposes:</p>
+
+				<h4>3.1 Dedicated Workers</h4>
+				<p>Dedicated Workers are the most common type of Web Workers. They are created by a single script and can only be accessed by that script. Dedicated Workers are ideal for running tasks that are specific to a particular part of an application.</p>
+
+				<h5>3.1.1 Example: Creating a Dedicated Worker</h5>
+				<pre><code class="language-javascript">
+// main.js
+const worker = new Worker('worker.js');
+worker.postMessage('Hello, Worker!');
+
+// worker.js
+onmessage = function(event) {
+    console.log('Message received from main script:', event.data);
+    postMessage('Hello, Main Thread!');
+};
+</code></pre>
+
+				<h4>3.2 Shared Workers</h4>
+				<p>Shared Workers can be accessed by multiple scripts, even if they are running in different windows, tabs, or iframes. This makes Shared Workers useful for scenarios where different parts of a web application need to communicate with each other or share data.</p>
+
+				<h5>3.2.1 Example: Creating a Shared Worker</h5>
+				<pre><code class="language-javascript">
+// main1.js
+const sharedWorker = new SharedWorker('sharedWorker.js');
+sharedWorker.port.postMessage('Message from main1');
+
+// main2.js
+const sharedWorker = new SharedWorker('sharedWorker.js');
+sharedWorker.port.postMessage('Message from main2');
+
+// sharedWorker.js
+onconnect = function(event) {
+    const port = event.ports[0];
+    port.onmessage = function(event) {
+        console.log('Received:', event.data);
+        port.postMessage('Reply from Shared Worker');
+    };
+};
+</code></pre>
+
+				<h4>3.3 Service Workers</h4>
+				<p>Service Workers are a special type of Web Workers designed to intercept and control network requests, enabling features such as offline capabilities, push notifications, and background data synchronization. Service Workers are essential for building Progressive Web Apps (PWAs).</p>
+
+				<h5>3.3.1 Example: Registering a Service Worker</h5>
+				<pre><code class="language-javascript">
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/service-worker.js')
+    .then(function(registration) {
+        console.log('Service Worker registered with scope:', registration.scope);
+    })
+    .catch(function(error) {
+        console.log('Service Worker registration failed:', error);
+    });
+}
+
+// service-worker.js
+self.addEventListener('install', function(event) {
+    console.log('Service Worker installed');
+});
+
+self.addEventListener('fetch', function(event) {
+    event.respondWith(
+        caches.match(event.request)
+        .then(function(response) {
+            return response || fetch(event.request);
+        })
+    );
+});
+</code></pre>
+			</article>
+
+			<article>
+				<h3>4. Communication Between Main Thread and Web Workers</h3>
+				<p>Web Workers communicate with the main thread using a messaging system. Messages can be sent to the worker using the <code>postMessage()</code> method, and the worker can send messages back to the main thread using the same method. Data is passed through the message event, which is an instance of the <code>MessageEvent</code> interface.</p>
+
+				<h4>4.1 Sending and Receiving Messages</h4>
+				<pre><code class="language-javascript">
+// main.js
+const worker = new Worker('worker.js');
+
+worker.onmessage = function(event) {
+    console.log('Message from Worker:', event.data);
+};
+
+worker.postMessage('Start processing');
+
+// worker.js
+onmessage = function(event) {
+    console.log('Message from Main Thread:', event.data);
+    // Perform some processing
+    const result = event.data + ' processed';
+    postMessage(result);
+};
+</code></pre>
+
+				<h4>4.2 Transferring Data</h4>
+				<p>For large amounts of data, Web Workers can use <em>transferable objects</em> to transfer data ownership to the worker without copying the data, improving performance. Transferable objects include <code>ArrayBuffer</code>, <code>MessagePort</code>, and <code>ImageBitmap</code>.</p>
+
+				<h5>4.2.1 Example: Transferring an ArrayBuffer</h5>
+				<pre><code class="language-javascript">
+// main.js
+const buffer = new ArrayBuffer(1024);
+worker.postMessage(buffer, [buffer]);
+
+// worker.js
+onmessage = function(event) {
+    const buffer = event.data;
+    console.log('Received buffer:', buffer);
+};
+</code></pre>
+			</article>
+
+			<article>
+				<h3>5. Limitations and Security Considerations</h3>
+				<p>While Web Workers are powerful, they come with certain limitations and security considerations:</p>
+
+				<h4>5.1 No DOM Access</h4>
+				<p>Web Workers run in a separate execution context and do not have access to the Document Object Model (DOM). This means they cannot directly manipulate the UI or interact with elements on the page. Instead, they must communicate with the main thread to make any changes to the UI.</p>
+
+				<h4>5.2 Restricted APIs</h4>
+				<p>Web Workers have access to a limited set of APIs compared to the main thread. They can access features like timers (<code>setTimeout</code>, <code>setInterval</code>), XMLHttpRequest, WebSockets, and IndexedDB, but do not have access to the DOM, localStorage, or cookies.</p>
+
+				<h4>5.3 Same-Origin Policy</h4>
+				<p>Web Workers are subject to the same-origin policy, meaning they can only be loaded from the same origin as the main script. This helps to prevent cross-origin attacks and ensures that the worker is executing trusted code.</p>
+
+				<h4>5.4 Performance Considerations</h4>
+				<p>While Web Workers can improve performance by offloading tasks to a background thread, they also consume system resources. Excessive use of Web Workers can lead to increased memory and CPU usage, potentially degrading overall application performance. Developers should use Web Workers judiciously, especially in resource-constrained environments like mobile devices.</p>
+			</article>
+
+			<article>
+				<h3>6. Practical Use Cases for Web Workers</h3>
+				<p>Web Workers are useful in scenarios where heavy computations or background tasks are required without blocking the main thread. Here are some practical use cases:</p>
+
+				<h4>6.1 Background Data Processing</h4>
+				<p>Web Workers can be used to perform complex data processing tasks, such as parsing large JSON files, performing calculations, or processing images, without freezing the UI. This is especially useful in data-intensive applications where responsiveness is critical.</p>
+
+				<h5>6.1.1 Example: Processing Data in a Worker</h5>
+				<pre><code class="language-javascript">
+// worker.js
+onmessage = function(event) {
+    const data = event.data;
+    const processedData = processData(data); // Perform heavy computation
+    postMessage(processedData);
+};
+
+function processData(data) {
+    // Simulate heavy computation
+    return data.map(item => item * 2);
+}
+</code></pre>
+
+				<h4>6.2 Real-Time Data Visualization</h4>
+				<p>In applications that involve real-time data visualization, Web Workers can handle data updates and transformations in the background, ensuring that the charts and graphs remain responsive and up-to-date without lag.</p>
+
+				<h4>6.3 Background Sync in PWAs</h4>
+				<p>In Progressive Web Apps (PWAs), Service Workers (a type of Web Worker) can be used to synchronize data with the server when the application is offline. This ensures that user data is stored locally and uploaded once the connection is restored, providing a seamless offline experience.</p>
+
+				<h4>6.4 AI and Machine Learning in the Browser</h4>
+				<p>Web Workers can be used to run machine learning models directly in the browser without blocking the main thread. This allows for real-time predictions and processing, such as image recognition or natural language processing, within web applications.</p>
+			</article>
+
+			<article>
+				<h3>7. Debugging Web Workers</h3>
+				<p>Debugging Web Workers can be more challenging than debugging main thread code due to the separate execution context. However, modern browsers provide tools to help with this.</p>
+
+				<h4>7.1 Using Browser Developer Tools</h4>
+				<p>Most modern browsers allow you to inspect and debug Web Workers through their developer tools. For example, in Chrome DevTools, you can see active workers under the "Sources" panel and set breakpoints, inspect variables, and step through the worker code as it executes.</p>
+
+				<h4>7.2 Logging from Web Workers</h4>
+				<p>Web Workers can use <code>console.log()</code> to output messages to the browser's console. This is useful for debugging, but keep in mind that logs from Web Workers may appear in a different context than logs from the main thread, so they should be clearly labeled or formatted for clarity.</p>
+			</article>
+
+			<article>
+				<h3>8. Best Practices for Using Web Workers</h3>
+				<p>To make the most of Web Workers while ensuring performance and maintainability, follow these best practices:</p>
+
+				<h4>8.1 Offload Heavy Tasks</h4>
+				<p>Use Web Workers for tasks that are computationally expensive or run for an extended period, such as data parsing, image processing, or algorithmic calculations. Avoid using them for simple tasks that can be efficiently handled on the main thread.</p>
+
+				<h4>8.2 Keep Communication Efficient</h4>
+				<p>Since Web Workers communicate with the main thread through messages, minimize the data transferred between the two to avoid performance bottlenecks. Use transferable objects for large data to optimize performance.</p>
+
+				<h4>8.3 Clean Up Workers</h4>
+				<p>When a Web Worker is no longer needed, terminate it using the <code>worker.terminate()</code> method to free up resources. This helps prevent memory leaks and ensures that the application remains efficient.</p>
+
+				<h4>8.4 Use Service Workers for Network-Related Tasks</h4>
+				<p>If your application needs to handle network requests or caching, consider using Service Workers, which are specifically designed for these tasks. Service Workers provide additional capabilities like offline support, push notifications, and background sync.</p>
+
+				<h4>8.5 Handle Errors Gracefully</h4>
+				<p>Always include error handling in your Web Workers to manage unexpected issues. Use the <code>onerror</code> event handler to capture and log errors, ensuring that the application can recover or notify the user appropriately.</p>
+			</article>
+
+		</main>
+
+		<script> copyright("all"); </script>
+
+	</body>
+
+</html>

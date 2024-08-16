@@ -1,0 +1,217 @@
+<!-------------------------- © 2007 - present, dmj.one and contributors. ----------------------------------
+   Part of the dmjone project. Licensed under the GNU AGPL. Provided as-is, without warranty of any kind. 
+-------------------- Redistribution and modifications must retain this notice. --------------------------->
+
+
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+    <!--<![endif]-->
+
+    <head>
+        <script src="/js/edu_su_common.js"></script>
+        <noscript>
+            <style>
+                html,
+                body {
+                    margin: 0;
+                    overflow: hidden;
+                }
+            </style>
+            <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+        </noscript>
+
+        <title>Introduction to WebRTC - CSU677 - Shoolini U</title>
+        <meta name="description" content="Learn about WebRTC (Web Real-Time Communication), a technology that enables peer-to-peer communication between browsers and mobile applications.">
+
+        <meta property=" og:image" content="/logo.png">
+        <meta property="og:type" content="article">
+
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:site" content="@divyamohan1993">
+        <meta name="twitter:creator" content="@divyamohan1993">
+        <meta name="twitter:image" content="/logo.png">
+
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+        <meta name="author" content="Divya Mohan">
+        <meta name="robots" content="index, follow">
+
+    </head>
+
+    <body>
+
+        <script> header_author("dm"); </script>
+
+        <main>
+            <article class="agen-tableofcontents">
+                <h2 class="text-center">WebRTC</h2>
+            </article>
+
+            <article>
+                <h3>1. Introduction to WebRTC</h3>
+                <p>WebRTC (Web Real-Time Communication) is a technology that enables peer-to-peer communication between browsers and mobile applications. It allows for real-time audio, video, and data sharing directly between devices without the need for intermediary servers. WebRTC is widely used in applications like video conferencing, live streaming, and file sharing.</p>
+                <p>WebRTC is supported by most modern browsers, including Chrome, Firefox, Safari, and Edge, and provides APIs for handling multimedia content and establishing peer-to-peer connections.</p>
+            </article>
+
+            <article>
+                <h3>2. How WebRTC Works</h3>
+                <p>WebRTC works by establishing a direct connection between two peers. The connection setup involves several steps, including signaling, network traversal (using ICE, STUN, and TURN servers), and media exchange.</p>
+
+                <h4>2.1 Signaling</h4>
+                <p>Signaling is the process of exchanging connection information between peers. It involves negotiating session details like codecs, network configurations, and more. Although WebRTC itself does not define a signaling protocol, it typically uses WebSockets, SIP, or other methods to exchange this data.</p>
+
+                <h5>2.1.1 Example: Signaling Process</h5>
+                <pre><code class="language-javascript">
+// Example of signaling using WebSockets
+const socket = new WebSocket('ws://example.com/signaling');
+
+// Sending an offer to the signaling server
+socket.send(JSON.stringify({ type: 'offer', sdp: offer }));
+
+// Receiving an answer from the signaling server
+socket.onmessage = (event) => {
+  const message = JSON.parse(event.data);
+  if (message.type === 'answer') {
+    peerConnection.setRemoteDescription(new RTCSessionDescription(message.sdp));
+  }
+};
+</code></pre>
+
+                <h4>2.2 Network Traversal (ICE, STUN, and TURN)</h4>
+                <p>WebRTC uses the Interactive Connectivity Establishment (ICE) framework to find the best path to connect peers. ICE works with STUN (Session Traversal Utilities for NAT) and TURN (Traversal Using Relays around NAT) servers to handle NAT traversal and firewall issues, ensuring that the peers can connect to each other regardless of their network configurations.</p>
+
+                <ul>
+                    <li><strong>STUN:</strong> Helps discover the public IP address and port of the peers behind a NAT.</li>
+                    <li><strong>TURN:</strong> Relays the media between peers if direct peer-to-peer communication is not possible.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>3. WebRTC APIs</h3>
+                <p>WebRTC provides several JavaScript APIs that enable developers to manage media streams, handle peer connections, and establish data channels.</p>
+
+                <h4>3.1 MediaStream API</h4>
+                <p>The <code>MediaStream</code> API is used to capture audio and video from the user's device. This media can then be sent over the peer-to-peer connection.</p>
+
+                <h5>3.1.1 Example: Capturing Media Stream</h5>
+                <pre><code class="language-javascript">
+navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+  .then((stream) => {
+    const videoElement = document.querySelector('video');
+    videoElement.srcObject = stream;
+    // You can also add the stream to a peer connection
+    peerConnection.addStream(stream);
+  })
+  .catch((error) => {
+    console.error('Error accessing media devices.', error);
+  });
+</code></pre>
+                <p>This example captures the user's video and audio and displays it in a video element. The captured stream can also be added to a WebRTC peer connection.</p>
+
+                <h4>3.2 RTCPeerConnection API</h4>
+                <p>The <code>RTCPeerConnection</code> API is the core of WebRTC. It is used to establish, manage, and maintain the peer-to-peer connection. It handles the signaling, ICE candidates, and media exchange between peers.</p>
+
+                <h5>3.2.1 Example: Creating a Peer Connection</h5>
+                <pre><code class="language-javascript">
+const peerConnection = new RTCPeerConnection();
+
+// Adding ICE candidate from the signaling server
+peerConnection.onicecandidate = (event) => {
+  if (event.candidate) {
+    socket.send(JSON.stringify({ type: 'candidate', candidate: event.candidate }));
+  }
+};
+
+// Adding remote stream to the local video element
+peerConnection.ontrack = (event) => {
+  const remoteVideo = document.querySelector('#remoteVideo');
+  remoteVideo.srcObject = event.streams[0];
+};
+
+// Creating and sending an offer
+peerConnection.createOffer()
+  .then((offer) => peerConnection.setLocalDescription(offer))
+  .then(() => {
+    socket.send(JSON.stringify({ type: 'offer', sdp: peerConnection.localDescription }));
+  });
+</code></pre>
+                <p>This example shows how to create a peer connection, handle ICE candidates, and manage the remote stream. The peer connection is initiated by creating and sending an offer to the other peer.</p>
+
+                <h4>3.3 RTCDataChannel API</h4>
+                <p>The <code>RTCDataChannel</code> API enables peer-to-peer data exchange, such as sending text messages, files, or arbitrary data between peers. This API is often used in conjunction with <code>RTCPeerConnection</code>.</p>
+
+                <h5>3.3.1 Example: Creating a Data Channel</h5>
+                <pre><code class="language-javascript">
+// Creating a data channel
+const dataChannel = peerConnection.createDataChannel('chat');
+
+// Event listener for receiving messages
+dataChannel.onmessage = (event) => {
+  console.log('Received message:', event.data);
+};
+
+// Sending a message
+dataChannel.send('Hello, peer!');
+</code></pre>
+                <p>This example demonstrates how to create a data channel, send messages, and handle incoming messages.</p>
+            </article>
+
+            <article>
+                <h3>4. Handling WebRTC Events</h3>
+                <p>WebRTC connections generate several events that can be handled to manage the connection lifecycle, media streams, and data channels.</p>
+
+                <h4>4.1 Key Events in RTCPeerConnection</h4>
+                <ul>
+                    <li><strong>onicecandidate:</strong> Fired when a new ICE candidate is discovered. This candidate should be sent to the remote peer through the signaling channel.</li>
+                    <li><strong>ontrack:</strong> Fired when a remote media stream is added to the peer connection. This stream can be attached to media elements to play the remote media.</li>
+                    <li><strong>oniceconnectionstatechange:</strong> Fired when the ICE connection state changes. This event can be used to detect when the connection is established, failed, or closed.</li>
+                    <li><strong>ondatachannel:</strong> Fired when a data channel is created by the remote peer.</li>
+                </ul>
+
+                <h5>4.1.1 Example: Handling ICE Connection State Changes</h5>
+                <pre><code class="language-javascript">
+peerConnection.oniceconnectionstatechange = () => {
+  console.log('ICE connection state:', peerConnection.iceConnectionState);
+  if (peerConnection.iceConnectionState === 'disconnected') {
+    console.log('Peer disconnected');
+  }
+};
+</code></pre>
+                <p>This example logs the ICE connection state changes and checks if the connection is disconnected, which can be useful for handling peer disconnections.</p>
+            </article>
+
+            <article>
+                <h3>5. Security Considerations in WebRTC</h3>
+                <p>WebRTC comes with several built-in security features, but there are still important considerations to ensure that the communication is secure:</p>
+
+                <ul>
+                    <li><strong>Encryption:</strong> All WebRTC communications (audio, video, and data channels) are encrypted using DTLS-SRTP, ensuring that the media streams and data are secure from eavesdropping.</li>
+                    <li><strong>Authentication:</strong> Implementing proper authentication mechanisms for the signaling process is crucial to prevent unauthorized access to the WebRTC sessions.</li>
+                    <li><strong>Access Control:</strong> Ensure that media device access (e.g., camera and microphone) is only granted to trusted sites and that users are informed whenever these devices are being accessed.</li>
+                    <li><strong>Firewall and NAT Traversal:</strong> Use secure STUN/TURN servers to assist in NAT traversal while ensuring that these servers are properly configured to prevent abuse.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>6. Use Cases for WebRTC</h3>
+                <p>WebRTC is a versatile technology used in various real-time communication applications. Here are some common use cases:</p>
+
+                <ul>
+                    <li><strong>Video Conferencing:</strong> WebRTC enables high-quality video calls between two or more participants directly in the browser, with no need for plugins.</li>
+                    <li><strong>Live Streaming:</strong> WebRTC can be used to broadcast live audio and video streams to multiple viewers with low latency.</li>
+                    <li><strong>Online Gaming:</strong> WebRTC’s low-latency communication is ideal for real-time multiplayer games, allowing players to interact in real-time.</li>
+                    <li><strong>File Sharing:</strong> Peer-to-peer file sharing can be implemented using WebRTC’s data channels, allowing users to transfer files directly between devices.</li>
+                    <li><strong>Remote Collaboration Tools:</strong> WebRTC powers tools that enable real-time collaboration, such as shared whiteboards, document editing, and more.</li>
+                </ul>
+            </article>
+        </main>
+
+        <script> copyright("all"); </script>
+
+
+    </body>
+
+</html>

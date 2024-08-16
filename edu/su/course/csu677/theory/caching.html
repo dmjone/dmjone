@@ -1,0 +1,320 @@
+<!-------------------------- © 2007 - present, dmj.one and contributors. ----------------------------------
+   Part of the dmjone project. Licensed under the GNU AGPL. Provided as-is, without warranty of any kind. 
+-------------------- Redistribution and modifications must retain this notice. --------------------------->
+
+
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+	<!--<![endif]-->
+
+	<head>
+		<script src="/js/edu_su_common.js"></script>
+		<noscript>
+			<style>
+				html,
+				body {
+					margin: 0;
+					overflow: hidden;
+				}
+			</style>
+			<iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+		</noscript>
+
+		<title>Introduction to Caching - CSU677 - Shoolini U</title>
+		<meta name="description" content="Learn about caching, a technique used to store copies of web pages or assets to reduce load times and improve performance.">
+
+		<meta property=" og:image" content="/logo.png">
+		<meta property="og:type" content="article">
+
+		<meta name="twitter:card" content="summary">
+		<meta name="twitter:site" content="@divyamohan1993">
+		<meta name="twitter:creator" content="@divyamohan1993">
+		<meta name="twitter:image" content="/logo.png">
+
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width,initial-scale=1" />
+
+		<meta name="author" content="Divya Mohan">
+		<meta name="robots" content="index, follow">
+
+	</head>
+
+	<body>
+
+		<script> header_author("dm"); </script>
+
+		<main>
+			<article class="agen-tableofcontents">
+				<h2 class="text-center">Caching</h2>
+			</article>
+
+			<article>
+				<h3>1. Introduction to Caching</h3>
+				<p>Caching is the process of storing copies of files or data in a temporary storage location, known as a cache, to reduce the time required to access that data in the future. By storing frequently accessed data closer to the requesting source, caching significantly improves performance and reduces the load on the primary data source.</p>
+			</article>
+
+			<article>
+				<h3>2. Types of Caching</h3>
+				<p>Caching can be implemented in various layers of an application or system, each serving different purposes and providing different benefits. Understanding the types of caching available helps in selecting the appropriate strategy for a given scenario.</p>
+
+				<h4>2.1 Browser Caching</h4>
+				<p>Browser caching stores resources such as images, stylesheets, and JavaScript files on the user's local device. This allows the browser to reuse these resources instead of downloading them again on subsequent visits, reducing load times and bandwidth usage.</p>
+
+				<h5>2.1.1 Example: Setting Cache-Control Headers</h5>
+				<pre><code class="language-http">
+Cache-Control: max-age=3600, must-revalidate
+</code></pre>
+				<p>This header instructs the browser to cache the resource for 3600 seconds (1 hour) and revalidate it after that time.</p>
+
+				<h4>2.2 Server-Side Caching</h4>
+				<p>Server-side caching involves storing data on the server to reduce the need for repeated database queries or computations. Common examples include query caching, object caching, and full-page caching.</p>
+
+				<h5>2.2.1 Example: Implementing Query Caching in MySQL</h5>
+				<pre><code class="language-sql">
+# Enable query cache in MySQL
+SET GLOBAL query_cache_size = 1048576;  # 1MB of cache size
+SET GLOBAL query_cache_type = ON;
+</code></pre>
+
+				<h4>2.3 Content Delivery Network (CDN) Caching</h4>
+				<p>CDN caching stores copies of your content on servers located in different geographic locations. When a user requests content, the CDN serves it from the nearest location, reducing latency and improving load times.</p>
+
+				<h5>2.3.1 Example: Configuring CDN Caching with Cloudflare</h5>
+				<pre><code class="language-bash">
+# Log in to your Cloudflare account and select your website
+# Navigate to the Caching section
+# Set the caching level and configure TTL (Time-To-Live) for cached content
+</code></pre>
+
+				<h4>2.4 Application-Level Caching</h4>
+				<p>Application-level caching is implemented within the application code to store frequently used data or computation results. This can be done using in-memory data stores like Redis or Memcached.</p>
+
+				<h5>2.4.1 Example: Caching Data with Redis in Python</h5>
+				<pre><code class="language-python">
+import redis
+
+# Connect to the Redis server
+r = redis.Redis(host='localhost', port=6379, db=0)
+
+# Set a cache value
+r.set('my_key', 'my_value')
+
+# Get the cached value
+cached_value = r.get('my_key')
+print(cached_value)
+</code></pre>
+			</article>
+
+			<article>
+				<h3>3. Caching Strategies</h3>
+				<p>Different caching strategies can be applied depending on the specific needs and characteristics of an application. Choosing the right strategy can greatly impact the effectiveness of caching.</p>
+
+				<h4>3.1 Cache-Aside (Lazy Loading)</h4>
+				<p>In the cache-aside strategy, the application checks the cache first. If the data is not found (a cache miss), it retrieves the data from the primary data source, stores it in the cache, and then returns it to the client. This strategy is useful when caching data that is expensive to retrieve or compute.</p>
+
+				<h5>3.1.1 Example: Implementing Cache-Aside in Python</h5>
+				<pre><code class="language-python">
+def get_data(key):
+    # Try to get data from the cache
+    data = r.get(key)
+    if data is None:
+        # Cache miss; retrieve data from the primary source
+        data = database_query(key)
+        # Store data in the cache
+        r.set(key, data)
+    return data
+</code></pre>
+
+				<h4>3.2 Write-Through Caching</h4>
+				<p>In write-through caching, every time data is written to the database, it is also written to the cache. This ensures that the cache is always up-to-date with the latest data, reducing the chance of cache misses at the cost of increased write latency.</p>
+
+				<h5>3.2.1 Example: Implementing Write-Through Caching</h5>
+				<pre><code class="language-python">
+def update_data(key, value):
+    # Update the database
+    update_database(key, value)
+    # Write-through to the cache
+    r.set(key, value)
+</code></pre>
+
+				<h4>3.3 Write-Back Caching</h4>
+				<p>In write-back caching, data is first written to the cache and then written to the primary data source asynchronously. This strategy improves write performance but requires careful handling to ensure data consistency in case of failures.</p>
+
+				<h5>3.3.1 Example: Implementing Write-Back Caching</h5>
+				<pre><code class="language-python">
+def write_back_data(key, value):
+    # Write to the cache
+    r.set(key, value)
+    # Asynchronously write to the database
+    async_update_database(key, value)
+</code></pre>
+
+				<h4>3.4 Time-to-Live (TTL) and Expiration</h4>
+				<p>TTL and expiration settings determine how long data remains in the cache before it is automatically invalidated. This is useful for ensuring that stale data is not served to users and for controlling cache size.</p>
+
+				<h5>3.4.1 Example: Setting TTL in Redis</h5>
+				<pre><code class="language-python">
+# Set a key with a TTL of 3600 seconds (1 hour)
+r.setex('my_key', 3600, 'my_value')
+</code></pre>
+			</article>
+
+			<article>
+				<h3>4. Cache Invalidation</h3>
+				<p>Cache invalidation is the process of removing or updating cached data when it becomes outdated or irrelevant. Proper cache invalidation is crucial for maintaining data consistency across the system.</p>
+
+				<h4>4.1 Manual Invalidation</h4>
+				<p>Manual invalidation requires explicit actions by the application or administrators to remove or update cached data. This is often done when there is a known change in the underlying data source.</p>
+
+				<h5>4.1.1 Example: Manual Cache Invalidation</h5>
+				<pre><code class="language-python">
+# Invalidate a specific key in the cache
+r.delete('my_key')
+</code></pre>
+
+				<h4>4.2 Automatic Invalidation</h4>
+				<p>Automatic invalidation uses TTL or event-driven mechanisms to automatically remove or update cached data. This approach reduces the risk of serving stale data and ensures that the cache remains consistent with the primary data source.</p>
+
+				<h5>4.2.1 Example: Using TTL for Automatic Invalidation</h5>
+				<pre><code class="language-python">
+# Data will automatically expire after the specified TTL
+r.setex('my_key', 3600, 'my_value')
+</code></pre>
+
+				<h4>4.3 Invalidation Patterns</h4>
+				<p>Various patterns exist for cache invalidation, such as:</p>
+				<ul>
+					<li><strong>Cache Purge:</strong> Clear the entire cache when a significant update occurs.</li>
+					<li><strong>Cache Refresh:</strong> Refresh cache entries when they are about to expire.</li>
+					<li><strong>Event-Driven Invalidation:</strong> Invalidate cache entries based on specific events, such as data updates.</li>
+				</ul>
+			</article>
+
+			<article>
+				<h3>5. Benefits and Challenges of Caching</h3>
+				<p>Caching offers numerous benefits but also comes with challenges that must be carefully managed to ensure its effectiveness.</p>
+
+				<h4>5.1 Benefits</h4>
+				<ul>
+					<li><strong>Improved Performance:</strong> Caching reduces latency by serving data from a faster, closer location.</li>
+					<li><strong>Reduced Load on Primary Data Sources:</strong> By handling repeated requests, caching reduces the demand on databases and servers.</li>
+					<li><strong>Cost Efficiency:</strong> Caching can lower operational costs by reducing the need for expensive compute resources to handle frequent queries.</li>
+				</ul>
+
+				<h4>5.2 Challenges</h4>
+				<ul>
+					<li><strong>Cache Inconsistency:</strong> Maintaining consistency between the cache and the primary data source can be difficult, especially in distributed systems.</li>
+					<li><strong>Cache Expiration Management:</strong> Determining the appropriate TTL for cached data requires careful consideration of how frequently the data changes.</li>
+					<li><strong>Cache Overhead:</strong> Caching introduces additional complexity to the system, requiring resources for management and monitoring.</li>
+				</ul>
+			</article>
+
+			<article>
+				<h3>6. Advanced Caching Techniques</h3>
+				<p>For applications with more complex requirements, advanced caching techniques can be employed to optimize performance further.</p>
+
+				<h4>6.1 Distributed Caching</h4>
+				<p>Distributed caching involves spreading the cache across multiple servers or nodes, enabling it to scale horizontally. This is essential for large-scale applications with high traffic and large data sets.</p>
+
+				<h5>6.1
+
+					.1 Example: Setting Up a Redis Cluster</h5>
+				<pre><code class="language-bash">
+# Start Redis instances on multiple nodes
+redis-server --port 7000
+redis-server --port 7001
+redis-server --port 7002
+
+# Create a Redis cluster using the Redis CLI
+redis-cli --cluster create 127.0.0.1:7000 127.0.0.1:7001 127.0.0.1:7002 --cluster-replicas 1
+</code></pre>
+
+				<h4>6.2 Content-Aware Caching</h4>
+				<p>Content-aware caching involves tailoring the cache behavior based on the type of content. For example, static assets like images might be cached for a longer duration, while dynamic content may have a shorter TTL.</p>
+
+				<h5>6.2.1 Example: Implementing Content-Aware Caching</h5>
+				<pre><code class="language-bash">
+# Use different caching rules for different content types in your CDN or caching layer
+# Example: Configure different TTL values based on the file type
+if ($request_uri ~* ".(jpg|png|gif)$") {
+    set $ttl 3600;
+}
+else if ($request_uri ~* ".html$") {
+    set $ttl 600;
+}
+</code></pre>
+
+				<h4>6.3 Hybrid Caching</h4>
+				<p>Hybrid caching combines multiple caching strategies to optimize performance across different parts of an application. For example, a combination of in-memory caching for fast access and disk-based caching for larger datasets can be employed.</p>
+
+				<h5>6.3.1 Example: Using Hybrid Caching with Redis and Disk Storage</h5>
+				<pre><code class="language-python">
+# Store frequently accessed data in Redis for quick access
+r.set('key1', 'value1')
+
+# Store less frequently accessed data on disk
+with open('cache.txt', 'w') as f:
+    f.write('key2:value2')
+</code></pre>
+			</article>
+
+			<article>
+				<h3>7. Tools and Technologies for Caching</h3>
+				<p>Several tools and technologies are available to implement caching in your applications, each offering different features and capabilities.</p>
+
+				<h4>7.1 Redis</h4>
+				<p>Redis is an in-memory data structure store that can be used as a cache, database, and message broker. Its high performance and support for various data structures make it a popular choice for caching.</p>
+
+				<h4>7.2 Memcached</h4>
+				<p>Memcached is a high-performance, distributed memory caching system designed to speed up dynamic web applications by reducing the database load. It is simple to deploy and use, making it ideal for straightforward caching needs.</p>
+
+				<h4>7.3 Varnish Cache</h4>
+				<p>Varnish Cache is an HTTP accelerator designed for content-heavy dynamic websites. It stores copies of pages in memory so that future requests can be served quickly without having to regenerate the entire page.</p>
+
+				<h4>7.4 Apache Kafka</h4>
+				<p>While primarily used for stream processing, Apache Kafka can also be used for caching by retaining messages for a specified period, allowing consumers to replay and cache data as needed.</p>
+			</article>
+
+			<article>
+				<h3>8. Monitoring and Managing Cache Performance</h3>
+				<p>To ensure that your caching strategy is effective, it’s crucial to monitor cache performance and manage it over time. This involves tracking metrics, detecting cache-related issues, and adjusting configurations as needed.</p>
+
+				<h4>8.1 Key Metrics to Monitor</h4>
+				<p>Important metrics to monitor include:</p>
+				<ul>
+					<li><strong>Cache Hit Rate:</strong> The percentage of requests that are served from the cache.</li>
+					<li><strong>Cache Miss Rate:</strong> The percentage of requests that result in a cache miss, requiring data to be fetched from the primary source.</li>
+					<li><strong>Latency:</strong> The time it takes to retrieve data from the cache versus the primary source.</li>
+					<li><strong>Eviction Rate:</strong> The frequency at which cache entries are evicted, either due to expiration or to make space for new entries.</li>
+				</ul>
+
+				<h4>8.2 Tools for Monitoring Cache Performance</h4>
+				<p>Various tools can be used to monitor cache performance:</p>
+				<ul>
+					<li><strong>Redis CLI:</strong> Provides commands like <code>INFO</code> to monitor Redis metrics.</li>
+					<li><strong>Prometheus:</strong> A monitoring tool that can collect and visualize metrics from Redis, Memcached, and other caching systems.</li>
+					<li><strong>Grafana:</strong> An open-source platform for monitoring and observability, often used in conjunction with Prometheus to create dashboards for cache performance.</li>
+				</ul>
+
+				<h5>8.2.1 Example: Monitoring Redis with Prometheus</h5>
+				<pre><code class="language-bash">
+# Install the Prometheus Redis Exporter
+docker run --name redis_exporter -d -p 9121:9121 oliver006/redis_exporter
+
+# Configure Prometheus to scrape metrics from the Redis exporter
+scrape_configs:
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['localhost:9121']
+</code></pre>
+			</article>
+
+		</main>
+
+		<script> copyright("all"); </script>
+
+	</body>
+
+</html>

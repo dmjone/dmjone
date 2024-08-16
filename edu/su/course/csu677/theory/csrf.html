@@ -1,0 +1,240 @@
+<!-------------------------- © 2007 - present, dmj.one and contributors. ----------------------------------
+   Part of the dmjone project. Licensed under the GNU AGPL. Provided as-is, without warranty of any kind. 
+-------------------- Redistribution and modifications must retain this notice. --------------------------->
+
+
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+	<!--<![endif]-->
+
+	<head>
+		<script src="/js/edu_su_common.js"></script>
+		<noscript>
+			<style>
+				html,
+				body {
+					margin: 0;
+					overflow: hidden;
+				}
+			</style>
+			<iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+		</noscript>
+
+		<title>CSRF - CSU677 - Shoolini U</title>
+		<meta name="description" content="Learn about Cross-Site Request Forgery (CSRF), a common web security vulnerability that allows attackers to perform unauthorized actions on behalf of authenticated users. Understand how CSRF attacks work, their impact, and best practices for preventing CSRF in web applications.">
+
+		<meta property=" og:image" content="/logo.png">
+		<meta property="og:type" content="article">
+
+		<meta name="twitter:card" content="summary">
+		<meta name="twitter:site" content="@divyamohan1993">
+		<meta name="twitter:creator" content="@divyamohan1993">
+		<meta name="twitter:image" content="/logo.png">
+
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width,initial-scale=1" />
+
+		<meta name="author" content="Divya Mohan">
+		<meta name="robots" content="index, follow">
+
+	</head>
+
+	<body>
+
+		<script> header_author("dm"); </script>
+
+		<main>
+			<article class="agen-tableofcontents">
+				<h2 class="text-center">CSRF</h2>
+			</article>
+
+			<article>
+				<h3>1. Introduction to Cross-Site Request Forgery (CSRF)</h3>
+				<p>Cross-Site Request Forgery (CSRF) is a type of security vulnerability that allows an attacker to trick a user into performing actions on a web application where the user is authenticated. This exploit takes advantage of the trust that a web application has in the user’s browser, causing the application to execute unwanted actions on behalf of the attacker.</p>
+			</article>
+
+			<article>
+				<h3>2. Understanding CSRF Attacks</h3>
+				<p>In a CSRF attack, the attacker creates a malicious request that automatically executes when the victim visits a specially crafted webpage or clicks a link. Because the request originates from the victim's browser, which already has an authenticated session with the target website, the site treats the request as legitimate.</p>
+
+				<h4>2.1 Basic CSRF Attack Flow</h4>
+				<ul>
+					<li><strong>Step 1:</strong> The victim logs into a website, establishing an authenticated session.</li>
+					<li><strong>Step 2:</strong> The attacker tricks the victim into visiting a malicious site or clicking on a link that makes a request to the target site.</li>
+					<li><strong>Step 3:</strong> The victim’s browser sends the request to the target site, including any session cookies.</li>
+					<li><strong>Step 4:</strong> The target site processes the request as if it were legitimate, because it includes valid session credentials.</li>
+				</ul>
+			</article>
+
+			<article>
+				<h3>3. Real-World Examples of CSRF Attacks</h3>
+				<p>CSRF attacks can be used to perform various malicious actions, depending on the capabilities of the targeted web application. Some common examples include:</p>
+
+				<h4>3.1 Unauthorized Fund Transfers</h4>
+				<p>An attacker can trick a user into submitting a form that triggers a funds transfer from the user’s bank account to the attacker’s account, exploiting the user’s authenticated session with their online banking service.</p>
+
+				<h4>3.2 Changing Account Settings</h4>
+				<p>An attacker might craft a request that changes a user’s email address or password on a web service, taking over the user’s account.</p>
+
+				<h4>3.3 Posting Unauthorized Content</h4>
+				<p>An attacker could exploit CSRF to make a user post unwanted content on their social media profile, such as spam or malicious links, without the user’s knowledge.</p>
+			</article>
+
+			<article>
+				<h3>4. Identifying CSRF Vulnerabilities</h3>
+				<p>Identifying CSRF vulnerabilities involves testing web applications to see if they properly validate the origin of requests. Developers and security testers can look for the following signs of potential CSRF vulnerabilities:</p>
+
+				<h4>4.1 Lack of Anti-CSRF Tokens</h4>
+				<p>One of the most common indicators of a CSRF vulnerability is the absence of anti-CSRF tokens in forms and requests. If a web application does not include a unique token that must be submitted with sensitive requests, it may be vulnerable to CSRF attacks.</p>
+
+				<h4>4.2 Cookie-Based Authentication Without Additional Verification</h4>
+				<p>Applications that rely solely on session cookies for authentication without verifying the origin of requests (such as by checking a referrer header) are more susceptible to CSRF attacks.</p>
+
+				<h4>4.3 Vulnerable GET Requests</h4>
+				<p>CSRF vulnerabilities are more likely when sensitive operations can be performed using GET requests, as these can be triggered simply by loading an image or visiting a URL.</p>
+			</article>
+
+			<article>
+				<h3>5. Preventing CSRF Attacks</h3>
+				<p>Preventing CSRF attacks requires implementing several security measures to ensure that requests are genuine and not forged. Key techniques include:</p>
+
+				<h4>5.1 Anti-CSRF Tokens</h4>
+				<p>An anti-CSRF token is a unique, unpredictable value generated by the server and included in forms or requests. When a user submits a form, the token is sent back to the server, where it is validated. Since the attacker cannot predict or access the token, they cannot forge a valid request.</p>
+
+				<h5>5.1.1 Example: Implementing Anti-CSRF Tokens</h5>
+				<pre><code class="language-html">
+&lt;form method="post" action="/change-email"&gt;
+    &lt;input type="hidden" name="csrf_token" value="RANDOM_GENERATED_TOKEN"&gt;
+    &lt;input type="email" name="new_email" placeholder="New Email"&gt;
+    &lt;button type="submit"&gt;Change Email&lt;/button&gt;
+&lt;/form&gt;
+</code></pre>
+
+				<h4>5.2 SameSite Cookie Attribute</h4>
+				<p>The SameSite attribute can be set on cookies to control whether they are sent along with cross-site requests. Setting this attribute to <code>Strict</code> or <code>Lax</code> helps prevent CSRF by ensuring cookies are only sent with same-origin requests.</p>
+
+				<h5>5.2.1 Example: Setting the SameSite Attribute</h5>
+				<pre><code class="language-http">
+Set-Cookie: sessionid=abc123; SameSite=Strict; Secure; HttpOnly
+</code></pre>
+
+				<h4>5.3 Verifying HTTP Headers</h4>
+				<p>Another technique is to check the <code>Origin</code> and <code>Referer</code> HTTP headers of incoming requests to ensure they match the expected domain. If these headers indicate the request originated from a different domain, the server can reject it.</p>
+
+				<h5>5.3.1 Example: Verifying Origin Header in Server Code</h5>
+				<pre><code class="language-python">
+from flask import request, abort
+
+@app.route('/transfer', methods=['POST'])
+def transfer_funds():
+    if request.headers.get('Origin') != 'https://www.example.com':
+        abort(403)
+    # Proceed with transfer
+</code></pre>
+			</article>
+
+			<article>
+				<h3>6. Limitations and Challenges in CSRF Mitigation</h3>
+				<p>While the above techniques are effective, they come with certain limitations and challenges that developers should be aware of:</p>
+
+				<h4>6.1 Usability vs. Security Trade-offs</h4>
+				<p>Implementing strict CSRF protections, such as SameSite cookies, can sometimes lead to usability issues. For example, cross-site requests that are legitimate, such as those used in certain third-party integrations, might be blocked.</p>
+
+				<h4>6.2 Browser Support</h4>
+				<p>Not all browsers support the SameSite cookie attribute or handle it consistently. Developers must ensure compatibility across different browsers to avoid breaking the application for some users.</p>
+
+				<h4>6.3 Token Management</h4>
+				<p>Anti-CSRF tokens require careful management on both the client and server sides. Developers must ensure that tokens are properly generated, included in every form, and validated on the server. This can add complexity to the application code.</p>
+			</article>
+
+			<article>
+				<h3>7. Advanced CSRF Protection Techniques</h3>
+				<p>In addition to standard CSRF prevention techniques, there are advanced methods that can be used to further enhance security:</p>
+
+				<h4>7.1 Double Submit Cookie Pattern</h4>
+				<p>In this pattern, the server sets a CSRF token as a cookie and also requires it to be submitted as a request parameter. The server then verifies that the token in the cookie matches the token in the request. Since the token is stored in a cookie, it is automatically sent with every request, but the attacker cannot forge the matching request parameter.</p>
+
+				<h5>7.1.1 Example: Double Submit Cookie Pattern</h5>
+				<pre><code class="language-javascript">
+// Setting the CSRF cookie
+document.cookie = "csrf_token=RANDOM_GENERATED_TOKEN";
+
+// Including the token in the request
+let csrfToken = document.cookie.match(/csrf_token=([^;]+)/)[1];
+fetch('/submit', {
+    method: 'POST',
+    headers: {
+        'X-CSRF-Token': csrfToken
+    },
+    body: new URLSearchParams({
+        csrf_token: csrfToken,
+        data: 'example data'
+    })
+});
+</code></pre>
+
+				<h4>7.2 Enforcing Secure Connections (HTTPS)</h4>
+				<p>CSRF tokens and other sensitive data should always be transmitted over secure connections (HTTPS) to prevent interception by attackers. This ensures that the tokens cannot be stolen through man-in-the-middle attacks.</p>
+
+				<h4>7.3 User Interaction Verification</h4>
+				<p>Requiring explicit user interaction, such as a CAPTCHA or two-factor authentication (2FA), for sensitive operations can mitigate CSRF attacks by ensuring that automated requests cannot execute critical actions.</p>
+
+				<h5>7.3.1 Example: Adding CAPTCHA for Sensitive Actions</h5>
+				<pre><code class="language-html">
+&lt;form method="post" action="/update-account"&gt;
+    &lt;!-- Account update fields here --&gt;
+    &lt;input type="text" name="captcha" placeholder="Enter CAPTCHA"&gt;
+    &lt;button type="submit"&gt;Update Account&lt;/button&gt;
+&lt;/form&gt;
+</code></pre>
+			</article>
+
+			<article>
+				<h3>8. CSRF in Single-Page Applications (SPAs)</h3>
+				<p>Single-Page Applications (SPAs) present unique challenges for CSRF protection. Since SPAs rely heavily on JavaScript for making API calls, developers must ensure that API endpoints are protected against CSRF attacks.</p>
+
+				<h4>8.1 Handling
+
+					CSRF in SPAs</h4>
+				<p>For SPAs, it is essential to implement CSRF protection at the API level. This can be done by including anti-CSRF tokens in AJAX requests and validating these tokens on the server side.</p>
+
+				<h5>8.1.1 Example: Including CSRF Token in an AJAX Request</h5>
+				<pre><code class="language-javascript">
+// Fetch CSRF token from meta tag or cookie
+let csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+// Include the token in AJAX request headers
+fetch('/api/submit', {
+    method: 'POST',
+    headers: {
+        'X-CSRF-Token': csrfToken,
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ data: 'example data' })
+});
+</code></pre>
+
+				<h4>8.2 Protecting REST APIs</h4>
+				<p>CSRF protection for REST APIs can be challenging because RESTful services are designed to be stateless. However, it is still possible to implement CSRF protection by requiring tokens or using techniques like the Double Submit Cookie pattern.</p>
+			</article>
+
+			<article>
+				<h3>9. Testing for CSRF Vulnerabilities</h3>
+				<p>Regularly testing web applications for CSRF vulnerabilities is crucial to maintaining security. Security testers can use both manual testing and automated tools to identify potential weaknesses.</p>
+
+				<h4>9.1 Manual Testing Techniques</h4>
+				<p>Manual testing for CSRF involves crafting custom requests with tools like Postman or cURL and observing whether the application processes them without proper validation. This can help identify missing anti-CSRF tokens or improper session handling.</p>
+
+				<h4>9.2 Automated Tools for CSRF Testing</h4>
+				<p>There are several automated tools available that can scan web applications for CSRF vulnerabilities. These tools include OWASP ZAP, Burp Suite, and others. Automated tools can efficiently identify common CSRF issues, but manual verification is often necessary to confirm findings.</p>
+			</article>
+
+		</main>
+
+		<script> copyright("all"); </script>
+
+	</body>
+
+</html>
