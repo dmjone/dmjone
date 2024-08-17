@@ -54,19 +54,18 @@ function get_menu_list(datetogen) {
                 desc: "Given a list of islands and the boat tours connecting them, your task is to determine the number of separate archipelagos. Each archipelago consists of islands connected by boat tours, with no connections between different archipelagos.",
                 codetype: "CS103 | Getting Started with Competitive Programing",
             },
-            // {
-            //     link: "theory/week-5-assignment-1",
-            //     title: "Week 5 : Programming Assignment 1",
-            //     desc: "Help a group of friends plan their road trip across the United States. Given the distance between cities and the maximum distance they can travel in a day, determine the minimum number of days needed to reach their destination.",
-            //     codetype: "CS103 | Getting Started with Competitive Programing",
-                
-            // },
-            // {
-            //     link: "theory/week-5-assignment-2",
-            //     title: "Week 5 : Programming Assignment 2",
-            //     desc: "Help a group
-            // }
-
+            {
+                link: "theory/week-5-assignment-1",
+                title: "Week 5 : Programming Assignment 1",
+                desc: "Given a maze map, find the quickest path to the exit by always exploring paths to nodes with lower indices first. Output the concatenated indices of the junction nodes along the path from start to end.",
+                codetype: "CS103 | Getting Started with Competitive Programing",                
+            },
+            {
+                link: "theory/week-5-assignment-2",
+                title: "Week 5 : Programming Assignment 2",
+                desc: "Given the seating arrangement of students in a rectangular classroom, determine the number of groups where each group consists of students who are either directly friends (sitting adjacent horizontally or vertically) or connected through mutual friends. The output should be the total number of such groups formed.",
+                codetype: "CS103 | Getting Started with Competitive Programing",                
+            },            
         ];
 
         body_genmenu.processData(arr, def_date, def_author, { isMainCategory: true });
