@@ -21,6 +21,7 @@ const GLOBAL_SERVICEWORKER_REINSTALL = 0;
 const GLOBAL_SERVICEWORKER_INSTALL = 1;
 const GLOBAL_SERVICEWORKER_UNINSTALL = 0;
 
+const indevmode = false;
 
 const randomidgenerator = (i = 10) => [...Array(i)].map(() => 'abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRTUVWXYZ23456789'[Math.floor(Math.random() * 55)]).join('');
 
@@ -8502,7 +8503,7 @@ window.onload = function () {
 })();
 /***************** SECURITY SUITE START *************************/
 (function () {
-    if (location.hostname === "dmj.one" && !window.dontdisable) {
+    if (location.hostname === "dmj.one" && !window.dontdisable && !indevmode) {
         const clearinteral_sakjds = window.setInterval(function () {
             if (localStorage.getItem("noshow") === "1" && window.scriptsremoved != 1) {
                 (function () {

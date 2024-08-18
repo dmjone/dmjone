@@ -1,5 +1,4 @@
-(function () {
-    const indevmode = false;
+(function () {    
     const DisplaySkills = true;    
 
     let linkarray = [];
