@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Array Length Calculation for Multiple Folders</title>
+    </head>
+
+    <body>
+        <h1>Array Length Calculation for Multiple Folders</h1>
+        <div id="results"></div>
+
+        <script>
+            const folders = [
+                'cs103', 'csu083', 'csu357', 'csu359', 'csu360',
+                'csu585', 'csu677', 'csu716', 'csu730', 'csu951',
+                'csu953', 'csu1051', 'csu1075', 'csu1105', 'csu1128',
+                'csu1128p', 'csu1162', 'csu1287', 'csu1289', 'csu1291',
+                'csu1526', 'csu1530', 'csu1627', 'csu1641', 'csu1806',
+                'csu1899', 'csu2029', 'ctf', 'demo', 'fsu013',
+                'fsu030', 'projects', 'seaap002', 'seaap003', 'seaap004',
+                'seaws002', 'seaws004', 'subjectindex'
+            ];
+
+            const batchSize = 5; // Process 5 folders at a time
+            const delayBetweenBatches = 20; // 2 seconds delay between batches
+
+            async function calculateArrayLength(fileUrl) {
+                try {
+                    const response = await fetch(fileUrl);
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    const data = await response.text();
+
+                    // Remove single-line comments
+                    let cleanedData = data.replace(/\/\/.*$/gm, '');
+
+                    // Remove multi-line comments
+                    cleanedData = cleanedData.replace(/\/\*[\s\S]*?\*\//g, '');
+
+                    // Regular expression to match the arrays in the var.js file
+                    const arrRegex = /const arr = \[([\s\S]*?)\];/g;
+                    let match;
+                    let totalLength = 0;
+
+                    // Iterate over each match found in the file
+                    while ((match = arrRegex.exec(cleanedData)) !== null) {
+                        const arrContent = match[1];
+
+                        // Calculate the number of objects in the array
+                        const arrLength = (arrContent.match(/{/g) || []).length;
+                        totalLength += arrLength;
+                    }
+
+                    return totalLength;
+                } catch (error) {
+                    console.error('Error:', error);
+                    return -1; // Return -1 in case of error
+                }
+            }
+
+            function formatTimeOutput(folder, topics) {
+                const totalMinutes = topics * 25;
+                const hours = Math.round((totalMinutes / 60).toFixed(1));
+                const roundedHours = Number.isInteger(parseFloat(hours)) ? parseInt(hours) : hours;
+
+                return {
+                    id: folder,
+                    hours: `${roundedHours}+`,
+                    topics: topics-2
+                };
+            }
+
+            async function processFoldersInBatches(folders) {
+                const resultsDiv = document.getElementById('results');
+                for (let i = 0; i < folders.length; i += batchSize) {
+                    const batch = folders.slice(i, i + batchSize);
+
+                    // Process the current batch of folders
+                    const promises = batch.map(async (folder) => {
+                        const fileUrl = `/edu/su/course/${folder}/var.js`;
+                        const topics = await calculateArrayLength(fileUrl);
+
+                        const result = formatTimeOutput(folder, topics);
+                        const resultParagraph = document.createElement('p');
+                        resultParagraph.textContent = JSON.stringify(result);
+                        resultsDiv.appendChild(resultParagraph);
+                    });
+
+                    // Wait for the current batch to complete
+                    await Promise.all(promises);
+
+                    // Introduce delay before processing the next batch
+                    if (i + batchSize < folders.length) {
+                        await new Promise(resolve => setTimeout(resolve, delayBetweenBatches));
+                    }
+                }
+            }
+
+            // Call the function with the list of folders
+            processFoldersInBatches(folders);
+        </script>
+    </body>
+
+</html>

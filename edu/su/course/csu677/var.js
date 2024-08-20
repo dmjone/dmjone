@@ -321,7 +321,7 @@ function get_menu_list(datetogen) {
                 readtime: 5,
                 link: "service-workers"
             }
-        ];
+        ];        
         body_genmenu.processData(arr, def_date, def_author);
     }
     function get_lab(def_date, def_author) {
