@@ -3,67 +3,51 @@
 
 async function fetchCourses() {
     const response = await fetch('js/courselist.json');
-    return response.json();
+    const courses = await response.json();
+    return courses;
 }
 
-async function fetchVarData(courseId) {
-    try {
-        const fileUrl = `/edu/su/course/${courseId}/var.js`;
-        const response = await fetch(fileUrl);
-        if (!response.ok) throw new Error('Network response was not ok');
-
-        let data = await response.text();
-        data = data.replace(/\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, ''); // Remove comments
-
-        const arrRegex = /const arr = \[([\s\S]*?)\];/g;
-        let totalLength = 0, match;
-
-        while ((match = arrRegex.exec(data)) !== null) {
-            totalLength += (match[1].match(/{/g) || []).length;
-        }
-
-        return totalLength;
-    } catch (error) {
-        console.error('Error:', error);
-        return -1;
+function createCourseCard(course) {
+    let classdata, styledata;
+    switch (course.difficulty) {
+        case "Hard":
+            classdata = "text-danger";
+            break;
+        case "Easy":
+            classdata = "text-success";
+            break;
+        default:
+            styledata = `style="color:#FF7F50"`;
+            break;
     }
-}
+    // GLOBAL_accessurl = () => {
+    //     if (course.details.program.toLowerCase() === 'professional') {
+    //         return `/edu/professional/course/${course.id}/`;
+    //     } else {
+    //         return `/edu/su/course/${course.id}/`;
+    //     }
+    // }
+    GLOBAL_accessurl = () => {
+        if (course.details.link) {
+            return course.details.link;
+        }
+        if (course.details.program.toLowerCase().includes('professional')) {
+            return `/edu/professional/course/${course.id}/`;
+        } else {
+            return `/edu/su/course/${course.id}/`;
+        }
+    }
 
-function formatTimeOutput(topics) {
-    const totalMinutes = topics * 25;
-    const hours = Math.round((totalMinutes / 60).toFixed(1));
-    if (topics === -1) return { hours: '0', topics: '0' }
-    else if (hours < 2) return { hours: '<1', topics: topics };
-    else return {
-        hours: `${Number.isInteger(hours) ? hours : parseInt(hours)}`,
-        topics: topics - 2
-    };
-}
-
-async function getTopicsAndHours(course) {
-    const varData = await fetchVarData(course.id);
-    return formatTimeOutput(varData);
-}
-
-async function createCourseCard(course) {
-    let classdata = "text-success", styledata = '';
-    if (course.difficulty === "Hard") classdata = "text-danger";
-    else if (course.difficulty !== "Easy") styledata = `style="color:#FF7F50"`;
-
-    const dynamic = await getTopicsAndHours(course);
-
-    const accessUrl = course.details.link ||
-        (course.details.program.toLowerCase().includes('professional')
-            ? `/edu/professional/course/${course.id}/`
-            : `/edu/su/course/${course.id}/`);
-
-    const courseCode = course.details.program.toLowerCase() === 'professional'
-        ? course.details.certification_organization
-        : course.id.toUpperCase();
-
+    index_coursecode = () => {
+        if (course.details.program.toLowerCase() === 'professional') {
+            return course.details.certification_organization;
+        } else {
+            return course.id.toUpperCase();
+        }
+    }
     return `
         <div class="col-lg-4 d-flex align-items-stretch justify-content-center py-4">
-            <a href="${accessUrl}">
+            <a href="${GLOBAL_accessurl()}">
                 <div class="card shadow-on-hover scale-2 rounded border-0 border-danger border-top border-opacity-50 border-bottom">
                     <div class="card-header m-0 p-0 justify-content-center align-items-center ">
                         <img src="${course.image}" class="card-img-top img-fluid vw-100" alt="${course.title}" style="height: 200px; object-fit: cover;" loading="lazy">
@@ -79,12 +63,12 @@ async function createCourseCard(course) {
                                     <div class="badge-box">
                                         <span class="badge bg-warning-subtle bg-gradient bg-opacity-25 shadow p-2 m-1 fw-normal text-auto" style="letter-spacing:0.02rem"><i class="fas fa-graduation-cap"></i> &nbsp;${course.details.semester}</span>
                                         <span class="badge bg-info-subtle bg-gradient bg-opacity-10 shadow p-2 m-1 fw-normal text-auto" style="letter-spacing:0.02rem"><i class="fas fa-briefcase"></i> &nbsp;${course.details.program}</span>
-                                        <span class="badge bg-success-subtle bg-gradient bg-opacity-50 shadow p-2 m-1 fw-normal text-auto" style="letter-spacing:0.02rem"><i class="fas fa-university"></i> &nbsp;${courseCode}</span>
+                                        <span class="badge bg-success-subtle bg-gradient bg-opacity-50 shadow p-2 m-1 fw-normal text-auto" style="letter-spacing:0.02rem"><i class="fas fa-university"></i> &nbsp;${index_coursecode()}</span>
                                     </div>
                                 </div>
                                 <!-- <h5 class="card-text flex-fill text-reset" style="color:black !important"><strong>${course.id.toUpperCase()}</strong></h5> -->
                                 <div class="my-3 d-none">                                
-                                    <div class="h5 text-muted"><strong>${courseCode}</strong></div>
+                                    <div class="h5 text-muted"><strong>${index_coursecode()}</strong></div>
                                 </div>                                
                                 <div class="p-0 mb-1 text-center d-none d-sm-block pt-3 ">
                                         <div class="mb-2">
@@ -108,13 +92,13 @@ async function createCourseCard(course) {
 
                             <div class="col-sm d-none d-sm-block">
                                 <h5 class="fs-5 text-auto"><i class="fas fa-book"></i></h4>
-                                <h5 class="fs-5 text-auto"> ${dynamic.topics}</h4>
+                                <h5 class="fs-5 text-auto"> ${course.topics}</h4>
                                 <span class="d-block font-size-sm text-muted">Topics</span>
                             </div>
 
                             <div class="col">
                                 <h5 class="fs-5 "><i class="fas fa-clock"></i></h4>
-                                <h5 class="fs-5 "> ${dynamic.hours}</h4>
+                                <h5 class="fs-5 "> ${course.hours}</h4>
                                 <span class="d-block font-size-sm text-muted">Hours</span>
                             </div>
                         </div>
@@ -122,48 +106,105 @@ async function createCourseCard(course) {
                 </div>
             </a>
         </div>
-    `;
+                                                                    `;
 }
 
-async function renderCourses(courses) {
+
+
+
+function renderCourses(courses) {
     const container = document.querySelector('.row.fadein-13.justify-content-center');
-    container.innerHTML = '';
-
-    const courseCards = await Promise.all(courses.map(createCourseCard));
-    container.innerHTML = courseCards.join('');
-
-    styleCards();
+    container.innerHTML = courses.map(createCourseCard).join('');
+    styleCards(); // Call the function to style cards right after rendering them
 }
 
-async function sortCourses(courses, criteria) {
+/* function sortCourses(courses, criteria) {
+    if (criteria === 'semester') {
+        return courses.sort((a, b) => {
+            return parseInt(a.details.semester.match(/\d+/)[0], 10) - parseInt(b.details.semester.match(/\d+/)[0], 10);
+        });
+    } else if (criteria === 'topics') {
+        return courses.sort((a, b) => a[criteria] - b[criteria]);
+    } else {
+        return courses.sort((a, b) => a[criteria].localeCompare(b[criteria]));
+    }
+} */
+
+/* function sortCourses(courses, criteria) {
+    if (criteria.startsWith('semester')) {
+        courses.sort((a, b) => {
+            let semesterA = parseInt(a.details.semester.match(/\d+/)[0], 10);
+            let semesterB = parseInt(b.details.semester.match(/\d+/)[0], 10);
+            return criteria.endsWith('asc') ? semesterA - semesterB : semesterB - semesterA;
+        });
+    } else if (criteria.startsWith('difficulty')) {
+        const difficultyOrder = { 'Easy': 1, 'Medium': 2, 'Hard': 3 };
+        courses.sort((a, b) => {
+            let diffA = difficultyOrder[a.difficulty];
+            let diffB = difficultyOrder[b.difficulty];
+            return criteria.endsWith('asc') ? diffA - diffB : diffB - diffA;
+        });
+    } else if (criteria === 'topics') {
+        return courses.sort((a, b) => a[criteria] - b[criteria]);
+    } else {
+        return courses.sort((a, b) => a[criteria].localeCompare(b[criteria]));
+    }
+    return courses;
+} */
+
+/* function sortCourses(courses, criteria) {
+    if (criteria.startsWith('semester')) {
+        courses.sort((a, b) => {
+            let semesterA = parseInt(a.details.semester.match(/\d+/)[0], 10);
+            let semesterB = parseInt(b.details.semester.match(/\d+/)[0], 10);
+            return criteria.endsWith('asc') ? semesterA - semesterB : semesterB - semesterA;
+        });
+    } else if (criteria.startsWith('difficulty')) {
+        const difficultyOrder = { 'Easy': 1, 'Medium': 2, 'Hard': 3 };
+        courses.sort((a, b) => {
+            let diffA = difficultyOrder[a.difficulty];
+            let diffB = difficultyOrder[b.difficulty];
+            return criteria.endsWith('asc') ? diffA - diffB : diffB - diffA;
+        });
+    } else if (criteria.startsWith('topics')) {
+        courses.sort((a, b) => {
+            let topicsA = typeof a.topics === 'string' ? parseInt(a.topics.replace(/[^\d]/g, ''), 10) : a.topics;
+            let topicsB = typeof b.topics === 'string' ? parseInt(b.topics.replace(/[^\d]/g, ''), 10) : b.topics;
+            return criteria.endsWith('asc') ? topicsA - topicsB : topicsB - topicsA;
+        });
+    } else if (criteria === 'code') {
+        courses.sort((a, b) => a.id.localeCompare(b.id));
+    } else {
+        courses.sort((a, b) => a[criteria].localeCompare(b[criteria]));
+    }
+    return courses;
+} */
+
+function sortCourses(courses, criteria) {
     const skipSorting = (course) => course.details.program.toLowerCase() === 'professional';
 
-    for (const course of courses) {
-        const data = await getTopicsAndHours(course);
-        course.topics = data.topics;
-        course.hours = data.hours;
-    }
-
-    return courses.sort((a, b) => {
-        if (skipSorting(a) || skipSorting(b)) return 0;
+    courses.sort((a, b) => {
+        if (skipSorting(a) || skipSorting(b)) {
+            return 0; // Skip sorting for professional courses
+        }
 
         if (criteria.startsWith('semester')) {
-            return criteria.endsWith('asc')
-                ? parseInt(a.details.semester.match(/\d+/)[0], 10) - parseInt(b.details.semester.match(/\d+/)[0], 10)
-                : parseInt(b.details.semester.match(/\d+/)[0], 10) - parseInt(a.details.semester.match(/\d+/)[0], 10);
+            let semesterA = parseInt(a.details.semester.match(/\d+/)[0], 10);
+            let semesterB = parseInt(b.details.semester.match(/\d+/)[0], 10);
+            return criteria.endsWith('asc') ? semesterA - semesterB : semesterB - semesterA;
         }
 
         if (criteria.startsWith('difficulty')) {
             const difficultyOrder = { 'Easy': 1, 'Medium': 2, 'Hard': 3 };
-            return criteria.endsWith('asc')
-                ? difficultyOrder[a.difficulty] - difficultyOrder[b.difficulty]
-                : difficultyOrder[b.difficulty] - difficultyOrder[a.difficulty];
+            let diffA = difficultyOrder[a.difficulty];
+            let diffB = difficultyOrder[b.difficulty];
+            return criteria.endsWith('asc') ? diffA - diffB : diffB - diffA;
         }
 
         if (criteria.startsWith('topics')) {
-            return criteria.endsWith('asc')
-                ? a.topics - b.topics
-                : b.topics - a.topics;
+            let topicsA = typeof a.topics === 'string' ? parseInt(a.topics.replace(/[^\d]/g, ''), 10) : a.topics;
+            let topicsB = typeof b.topics === 'string' ? parseInt(b.topics.replace(/[^\d]/g, ''), 10) : b.topics;
+            return criteria.endsWith('asc') ? topicsA - topicsB : topicsB - topicsA;
         }
 
         if (criteria === 'code') {
@@ -172,21 +213,11 @@ async function sortCourses(courses, criteria) {
 
         return a[criteria].localeCompare(b[criteria]);
     });
+
+    return courses;
 }
 
-document.addEventListener('DOMContentLoaded', async () => {
-    let courses = await fetchCourses();
 
-    let sortedCourses = await sortCourses([...courses], 'semester-desc');
-    renderCourses(sortedCourses);
-
-    document.getElementById('sortCourses').addEventListener('change', async function () {
-        if (this.value) {
-            sortedCourses = await sortCourses([...courses], this.value);
-            renderCourses(sortedCourses);
-        }
-    });
-});
 
 
 function getRandomLightColor() {
@@ -231,6 +262,23 @@ styleCards();
 // Optionally, listen for changes in the color scheme preference to re-apply styles
 window.matchMedia('(prefers-color-scheme: dark)').addListener(styleCards);
 window.matchMedia('(prefers-color-scheme: light)').addListener(styleCards);
+
+
+document.addEventListener('DOMContentLoaded', async () => {
+    let courses = await fetchCourses();
+    // Initially sort courses by semester in descending order
+    const sortedCourses = sortCourses([...courses], 'semester-desc');
+    renderCourses(sortedCourses);
+
+    document.getElementById('sortCourses').addEventListener('change', function () {
+        if (this.value) {
+            const sortedCourses = sortCourses([...courses], this.value);
+            renderCourses(sortedCourses);
+        }
+    });
+});
+
+
 
 
 ////////////// Generate Nav Menu //////////////
@@ -359,8 +407,8 @@ document.addEventListener('DOMContentLoaded', function () {
         window.addEventListener('scroll', function () {
             blurElements.forEach(element => {
                 if (window.scrollY > 0) {
-                    element.classList.remove('blur-8');                    
-                } else {                    
+                    element.classList.remove('blur-8');
+                } else {
                     element.classList.add('blur-8');
                 }
             });

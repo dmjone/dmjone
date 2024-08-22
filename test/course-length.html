@@ -5,10 +5,48 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Array Length Calculation for Multiple Folders</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+            }
+
+            h1 {
+                text-align: center;
+            }
+
+            #results {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            p {
+                margin: 10px;
+                padding: 10px;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                cursor: pointer;
+            }
+
+            p:hover {
+                background-color: #f0f0f0;
+            }
+
+            div {
+                margin: 10px;
+                padding: 10px;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+            }
+
+            h3 {
+                margin: 0;
+            }
+        </style>
     </head>
 
     <body>
-        <h1>Array Length Calculation for Multiple Folders</h1>
+        <h1>Array Length Generation from var.js for All Course Folders</h1>
         <div id="results"></div>
 
         <script>
@@ -66,38 +104,60 @@
                 const hours = Math.round((totalMinutes / 60).toFixed(1));
                 const roundedHours = Number.isInteger(parseFloat(hours)) ? parseInt(hours) : hours;
 
+                if (topics < 1) return { id: folder, hours: '0', topics: '0' }
+                else if (topics >= 1 && topics <= 2) return { id: folder, hours: '<1', topics: topics };
+                else
                 return {
                     id: folder,
-                    hours: `${roundedHours}+`,
+                    hours: `${roundedHours}`,
                     topics: topics-2
                 };
             }
 
             async function processFoldersInBatches(folders) {
-                const resultsDiv = document.getElementById('results');
-                for (let i = 0; i < folders.length; i += batchSize) {
-                    const batch = folders.slice(i, i + batchSize);
+                    const resultsDiv = document.getElementById('results');
+                    for (let i = 0; i < folders.length; i += batchSize) {
+                        const batch = folders.slice(i, i + batchSize);
 
-                    // Process the current batch of folders
-                    const promises = batch.map(async (folder) => {
-                        const fileUrl = `/edu/su/course/${folder}/var.js`;
-                        const topics = await calculateArrayLength(fileUrl);
+                        // Process the current batch of folders
+                        const promises = batch.map(async (folder) => {
+                            const fileUrl = `/edu/su/course/${folder}/var.js`;
+                            const topics = await calculateArrayLength(fileUrl);
 
-                        const result = formatTimeOutput(folder, topics);
-                        const resultParagraph = document.createElement('p');
-                        resultParagraph.textContent = JSON.stringify(result);
-                        resultsDiv.appendChild(resultParagraph);
-                    });
+                            const result = formatTimeOutput(folder, topics);
+                            const resultParagraph = document.createElement('p');
+                            const subject = `<div><h3>${result.id}</h3>:`
+                            const contenttocopy = `"hours": "${result.hours}", "topics": "${result.topics}"`;
+                            resultParagraph.innerHTML = subject + contenttocopy + '<br>' + JSON.stringify(result) + '</div>';
 
-                    // Wait for the current batch to complete
-                    await Promise.all(promises);
+                            // Add event listener to copy the content when clicked
+                            resultParagraph.addEventListener('click', () => {
+                                copyToClipboard(contenttocopy);
+                            });
 
-                    // Introduce delay before processing the next batch
-                    if (i + batchSize < folders.length) {
-                        await new Promise(resolve => setTimeout(resolve, delayBetweenBatches));
+                            resultsDiv.appendChild(resultParagraph);
+                        });
+
+                        // Wait for the current batch to complete
+                        await Promise.all(promises);
+
+                        // Introduce delay before processing the next batch
+                        if (i + batchSize < folders.length) {
+                            await new Promise(resolve => setTimeout(resolve, delayBetweenBatches));
+                        }
                     }
                 }
-            }
+
+                // Function to copy text to the clipboard
+                function copyToClipboard(text) {
+                    const tempInput = document.createElement('textarea');
+                    tempInput.value = text;
+                    document.body.appendChild(tempInput);
+                    tempInput.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(tempInput);
+                }
+
 
             // Call the function with the list of folders
             processFoldersInBatches(folders);
