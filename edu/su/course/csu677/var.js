@@ -341,6 +341,14 @@ function get_menu_list(datetogen) {
                 date: "Thu August 8, 2024",
                 link: "employee-registration-form"
             },
+            {
+                title: "Practical 2: Student Marks Calculator from JSON",
+                desc: "Build a student marks calculator using HTML, CSS, and JavaScript. This hands-on lab exercise will help you practice JSON data manipulation, dynamic content generation, and result calculation, enhancing your skills in web development.",
+                codetype: "HTML, CSS, JS, JSON",
+                readtime: 2,
+                date: "Thu August 22, 2024",
+                link: "student-marks"
+            }            
         ];
         body_genmenu.processData(arr, def_date, def_author);
     }
