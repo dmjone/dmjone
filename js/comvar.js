@@ -538,11 +538,16 @@ const profDetailsBio = {
         bio: "<p class='professorbio header-p-author-description'>Dr. Sonia, Associate Professor at Yogananda School of AI, Computer and Data Sciences, Shoolini University, holds a PhD in Computer Science from the University of Delhi. Specializing in Cyber Security and AI, she has 16 years of teaching experience and has published around 30 research papers. Currently, she supervises two PhD students and serves as the Syllabus & Scheme Coordinator for YSAICDS. Dr. Sonia has also completed 24 certifications from Edx, Coursera, and IBM.</p>",
         href: "contact@dmj.one"
     },
-    'Narinder Verma':
+    'Prof. Narinder Verma':
     {
         bio: "<p class='professorbio header-p-author-description'>Prof. Narinder Verma is an accomplished academic and researcher with a background in Mechanical Engineering from IIT Delhi (1992), a Post-Graduate Diploma in Management (Finance) from IIM Calcutta (1996), and a Post-Graduate Diploma in Advanced Computing from C-DAC, Pune (2001). His research and consultancy work focuses on Financial Management, with a particular interest in developing sustainable methods for monetizing gold in India. Prof. Verma has made significant contributions to the field, including developing a Behavioral Finance Model for investment in Gold and Gold ETFs. His academic output includes multiple international research papers, book chapters, and popular articles, with a notable record of 69 citations, a 5 h-index, and a 4 i10-index. He is an active member of various professional organizations, including the Academy of International Business (AIB), USA, and the Financial Management Research & Resource Society of India (FMRRS).</p>",
         href: "narinderverma@shooliniuniversity.com",        
-    }
+    },
+    'Divya Mohan':
+    {
+        bio: "<p class='professorbio header-p-author-description'>Divya Mohan is a driven computer science student from India, pursuing his B.Tech in Computer Science and Engineering. With a unique approach to teaching, he breaks down complex concepts into simple, digestible chunks to make tech accessible to all learners. Dedicated to delivering top-quality results, Divya is fueled by his passion for technology and education, constantly striving to improve his skills and make an impact in the field.</p>",
+        href: "contact@dmj.one",
+    },
 };
 const courseDetailsMap = {
     // Semester 1
@@ -609,10 +614,11 @@ const courseDetailsMap = {
     
     // Semester 5
     'cs103': { 'default': ["Dr. Sonia", "CS103", "Getting Started with Competitive Programming"] },
-    'csu2029': { 'default': ["Narinder Verma", "CSU2029", "Thinking Unboxed: Strategies for Critical Analysis"]},
+    'csu2029': { 'default': ["Prof. Narinder Verma", "CSU2029", "Thinking Unboxed: Strategies for Critical Analysis"]},
     'csu359': { 'default': ["Abhishek Tomar", "CSU2029", "Computer Networks"]},
     'csu1530': { 'default': ["Dr. Sonia", "CSU1530", "Biometric Security"]},
     'seaap005': { 'default': ["Anandita", "SEA-AP005", "Aptitude Development 005"]},    
+    'projects': { 'default': ["", "List of Projects", "Academic"]},    
     'csu677': {
         'default': ["Dr. Gaurav Gupta", "CSU677", "Web Technology"],
         'lab': ["Dr. Gaurav Gupta", "CSU677P", "Web Technology Lab"]
