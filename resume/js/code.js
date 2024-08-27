@@ -145,7 +145,7 @@
                                                         </span>                                    
                                                         <span class="badge bg-success-subtle bg-gradient bg-opacity-50 shadow p-2 m-1 fw-normal text-auto scale-2 no-shadow-on-hover cursor-pointer" 
                                                               title="Copy certification details for your resume" 
-                                                              onclick="navigator.clipboard.writeText('${cert.name} - <strong>${cert.by}</strong> (via ${certifications.platform}) - ${url}').then(() => alert('Certification details copied to clipboard!'));">
+                                                              onclick="navigator.clipboard.writeText('${cert.name} by <strong>${cert.by}</strong> (via ${certifications.platform}) on ${formattedDate} ${url}').then(() => alert('Certification details copied to clipboard!'));">
                                                             <i class="fas fa-calendar-alt"></i> &nbsp;${formattedDate}
                                                         </span>
                                                     </div>
