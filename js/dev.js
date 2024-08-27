@@ -5380,10 +5380,12 @@ function createSharingButtons(text, url, iconName, btnClass) {
 function copyright(rights, noprint) {
     function initializeCopyright() {
         window["loaded_copyright"] = 1;
-        let onlyrights;
+        let onlyrights, dontprint;
         if (rights === "off") return null;
         if (noprint) return null;
         if (rights === "onlyrights") onlyrights = true;
+        if (rights === "d-print-none") dontprint = true;
+
 
         const footer_all_rights = ' &#8226; All rights reserved';
         const footer_some_rights = ' &#8226; Some rights reserved';
@@ -5488,12 +5490,13 @@ function copyright(rights, noprint) {
 
         const footer = document.createElement("footer");
         footer.id = "defaultcopyrightfooter";
+        footer.className = dontprint ? 'd-print-none' : '';
 
         footer.appendChild(createSharingButtons());
 
         const div = document.createElement("div");
-        const span = document.createElement("span");
-        const strong = document.createElement("strong");
+        const span = document.createElement("span");        
+        const strong = document.createElement("strong");        
 
         const date = new Date();
         let isServer = "";
@@ -5517,7 +5520,7 @@ function copyright(rights, noprint) {
                 </div>
             </span>`;
 
-        div.innerHTML = onlyrights ? '' : footerNotice;
+        div.innerHTML = onlyrights || noprint ? '' : footerNotice;
         strong.innerHTML = `${modified}&copy; 2007 - ${new Date().getFullYear()} ${window.GLOBAL_get_formatted_Author_Name_ ? window.GLOBAL_get_formatted_Author_Name_ + ' |' : ''} dmj.one ${rights} ${footer_link_privacy} ${footer_link_tos}`;
         span.appendChild(strong);
         footer.appendChild(div);
