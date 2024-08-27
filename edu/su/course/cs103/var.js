@@ -66,6 +66,18 @@ function get_menu_list(datetogen) {
                 desc: "Given the seating arrangement of students in a rectangular classroom, determine the number of groups where each group consists of students who are either directly friends (sitting adjacent horizontally or vertically) or connected through mutual friends. The output should be the total number of such groups formed.",
                 codetype: "CS103 | Getting Started with Competitive Programing",                
             },            
+            {
+                link: "theory/week-6-assignment-1",
+                title: "Week 6 : Programming Assignment 1",
+                desc: "Guide your cyclist from checkpoint 1 to checkpoint n in the shortest time possible using the city's complex network of roads. Choose the most efficient route to ensure a win.",
+                codetype: "CS103 | Getting Started with Competitive Programing",                
+            },
+            {
+                link: "theory/week-6-assignment-2",
+                title: "Week 6 : Programming Assignment 2",
+                desc: "You need to determine which department can communicate with the most other departments within a given time cutoff, considering the shortest communication time and prioritizing departments with the highest number in case of a tie.",
+                codetype: "CS103 | Getting Started with Competitive Programing",                
+            },            
         ];
 
         body_genmenu.processData(arr, def_date, def_author, { isMainCategory: true });
