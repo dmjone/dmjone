@@ -1,5 +1,13 @@
 function get_menu_list(datetogen) {
     function get_main(def_date, def_author) {
+
+        let download_link;
+        if (navigator.platform.startsWith('Win')) {
+            download_link = "https://cdn.dmj.one/edu/su/course/csu1128/csu1128_all.exe"
+        } else {
+            download_link = "https://cdn.dmj.one/edu/su/course/csu1128/csu1128_all";
+        }
+
         const arr = [
             {
                 link: "theory/",
@@ -20,13 +28,13 @@ function get_menu_list(datetogen) {
                 title: "Programs done in Lab File",
                 desc: "Get Your Coding Skills to the Next Level with This Section! Discover a Wide Range of Programs, From Basic to Advanced, Written in the Dynamic C Language. Join the Coding Revolution and Unleash Your Inner Prodigy - Let's Get Labbing!",
                 codetype: "CSU1128P | Lab File",
-            },
+            },        
             {
-                link: "misc/download",
-                date: "Last Updated: Mon January 2, 2023",
                 title: "All Programs Compiled",
-                desc: "Unleash the Power of Coding with This Section - All the Programs you read, are Compiled and Ready to Use! From Basic to Advanced, This Collection is Written in C and a Compatible file for Both Windows and Linux is available to download. Get Ready to Run Your Code with Confidence - Let's Get Executing!",
-                codetype: "CSU1128 | Miscellaneous",
+                date: "Mon January 2, 2023",
+                desc: "Unleash the Power of Coding with This Section - All the Programs you read, are Compiled and Ready to Use! From Basic to Advanced, This Collection is Written in C and a Compatible file for Both Windows and Linux is available to download. Get Ready to Run Your Code with Confidence - Let's Get Executing! <br><br><a href=\"https://cdn.dmj.one/edu/su/course/csu1128/csu1128_all.exe\" class=\"text-primary\"><strong>Click here </strong></a> to download <mark>For Windows</mark><br><a href=\"https://cdn.dmj.one/edu/su/course/csu1128/csu1128_all\" class=\"text-primary\"><strong>Click here</strong> </a> to download <mark>For Linux</mark>",
+                codetype: "CSU1128 | Download Code",
+                link: download_link,
             },
             {
                 link: "misc/",
@@ -408,7 +416,7 @@ function get_menu_list(datetogen) {
         body_genmenu.processData(arr, def_date, def_author);
     }
     function get_misc(def_date, def_author) {
-        const arr = [
+        const arr = [            
             {
                 link: "program",
                 title: "Miscellaneous Programs",
