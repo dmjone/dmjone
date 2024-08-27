@@ -231,18 +231,17 @@ function get_menu_list(datetogen) {
 
         const arr = [
             {
-                title: "100 Programs in C++",
-                desc: "Section contains 100 Programs written in CPP",
-                link: "100programs",
-                codetype: "100 Programs in C++"
-            },
-            {
                 title: "Download C++ Project File's Executable",
                 desc: "The project is based on the inventory which takes part names, and issues them to employee when required.<br><br><a href=\"https://cdn.dmj.one/edu/su/course/csu1287/misc/project.exe\" class=\"text-primary\"><strong>Click here </strong></a> to download <mark>For Windows</mark><br><a href=\"https://cdn.dmj.one/edu/su/course/csu1287/misc/project\" class=\"text-primary\"><strong>Click here</strong> </a> to download <mark>For Linux</mark>",
                 link: download_link,
                 codetype: "Project Executable",
                 readtime: "off"
-            },
+            }, {
+                title: "100 Programs in C++",
+                desc: "Section contains 100 Programs written in CPP",
+                link: "100programs",
+                codetype: "100 Programs in C++"
+            }            
         ];
         body_genmenu.processData(arr, def_date, def_author);
     }
