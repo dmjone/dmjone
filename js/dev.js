@@ -1592,7 +1592,7 @@ let header_navbar = async function (flags) {
     const dropdown = (year, links) => {
         links.sort((a, b) => a.title.localeCompare(b.title));
         const dropdownItems = links.map(link =>
-            `<li>${navItem(link, { 'wip': 'WIP', 'csu359': 'WIP' })}</li>`
+            `<li>${navItem(link, { 'wip': 'WIP', 'csu35888': 'WIP' })}</li>`
         ).join('');
 
         return `<li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">${year}</a>` +
