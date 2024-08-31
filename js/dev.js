@@ -28,12 +28,13 @@ const randomidgenerator = (i = 10) => [...Array(i)].map(() => 'abcdefghijkmnpqrs
 (function () {
     document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('article').forEach(article => {
-            if (!article.id) {
+            if (!article.id && !article.classList.contains('nogenid')) {
                 article.id = randomidgenerator(20);
             }
         });
     });
 })();
+
 
 const notification_maintainence_mode = 0;
 const GLOBAL_maintainence_message = "Some links, images, and features may not work as expected. Thank you for your patience.";
@@ -49,7 +50,7 @@ const notification_article_update = 0;
 const GLOBAL_ArticleUpdate_message = `An article has been updated. <a href="/my/articles/2022/01/01/sample-article" class="alert-link">Read more</a>.`;
 
 const notification_new_course = 1;
-const GLOBAL_NewCourse_message = `A new course has been added. <a href="/edu/su/course/csu2029/" class="alert-link">Explore now</a>.`;
+const GLOBAL_NewCourse_message = `A new course CN has been added. <a href="/edu/su/course/csu359/" class="alert-link">Explore now</a>.`;
 
 const GLOBAL_crawler_mode = 0;
 
