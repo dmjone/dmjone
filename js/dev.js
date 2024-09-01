@@ -43,14 +43,14 @@ const notification_feature_update = 0;
 // const GLOBAL_FeatureUpdate_message = `Learn about different breathing techniques to enhance your focus and relaxation. <a href="/my/features/breathing-techniques" class="alert-link">Read more</a>.`;
 const GLOBAL_FeatureUpdate_message = `Follow the Billionaire's Checklist everyday and become one! <a href="/my/features/billionaires-checklist" class="alert-link">Start today</a>.`;
 
-const notification_new_article = 0;
-const GLOBAL_NewArticle_message = `A new article has been published. <a href="/my/articles/2022/01/01/sample-article" class="alert-link">Read more</a>.`;
+const notification_new_article = 1;
+const GLOBAL_NewArticle_message = `A new article has been published. <a href="/edu/su/course/cs103/theory/week-7-assignment-1" class="alert-link">Read more</a>.`;
 
 const notification_article_update = 0;
 const GLOBAL_ArticleUpdate_message = `An article has been updated. <a href="/my/articles/2022/01/01/sample-article" class="alert-link">Read more</a>.`;
 
 const notification_new_course = 1;
-const GLOBAL_NewCourse_message = `A new course on Computer Networks has been added. <a href="/edu/su/course/csu359/" class="alert-link">Explore now</a>.`;
+const GLOBAL_NewCourse_message = `A new course on <strong>Computer Networks</strong> has been added. <a href="/edu/su/course/csu359/" class="alert-link">Explore now</a>.`;
 
 const GLOBAL_crawler_mode = 0;
 
