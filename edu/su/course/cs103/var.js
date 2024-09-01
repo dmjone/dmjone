@@ -78,6 +78,18 @@ function get_menu_list(datetogen) {
                 desc: "You need to determine which department can communicate with the most other departments within a given time cutoff, considering the shortest communication time and prioritizing departments with the highest number in case of a tie.",
                 codetype: "CS103 | Getting Started with Competitive Programing",                
             },            
+            {
+                link: "theory/week-7-assignment-1",
+                title: "Week 7 : Programming Assignment 1",
+                desc: "As a sewer manager, your task is to connect all village houses with the least amount of piping, ensuring every house is connected either directly or indirectly while minimizing costs.",
+                codetype: "CS103 | Getting Started with Competitive Programing",                
+            },
+            {
+                link: "theory/week-7-assignment-2",
+                title: "Week 7 : Programming Assignment 2",
+                desc: "Find the minimum cost to connect all destination cities using RedDart's shipping routes, ensuring all cities are connected with the least total expense.",
+                codetype: "CS103 | Getting Started with Competitive Programing",                
+            },            
         ];
 
         body_genmenu.processData(arr, def_date, def_author, { isMainCategory: true });
