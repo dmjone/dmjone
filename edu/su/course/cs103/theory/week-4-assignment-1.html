@@ -237,6 +237,84 @@ if __name__ == "__main__":
 </code></pre>
             </article>
 
+            <article>
+                <h4>Sample Solution Provided by Instructor</h4>
+                <pre class="language-python"><code>from collections import defaultdict
+
+# Disjoint Set Union (DSU) or Union-Find class
+class DSU:
+    def __init__(self, n):
+        # Initialize parent array where each element is its own parent (self-loop)
+        self.parent = [i for i in range(n)]
+        # Initialize rank array to keep track of the depth of trees
+        self.rank = [0] * n
+
+    # Find the representative of the set containing 'x' with path compression
+    def find(self, x):
+        # If 'x' is not its own parent, recursively find its parent and perform path compression
+        if self.parent[x] != x:
+            self.parent[x] = self.find(self.parent[x])
+        return self.parent[x]
+
+    # Union by rank - combine two sets containing 'x' and 'y'
+    def union(self, x, y):
+        rootX = self.find(x)
+        rootY = self.find(y)
+
+        # Only union if 'x' and 'y' are in different sets
+        if rootX != rootY:
+            # Union by rank: attach smaller tree under the root of the larger tree
+            if self.rank[rootX] < self.rank[rootY]:
+                self.parent[rootX] = rootY
+            elif self.rank[rootX] > self.rank[rootY]:
+                self.parent[rootY] = rootX
+            else:
+                # If ranks are equal, arbitrarily make one the root and increase its rank
+                self.parent[rootX] = rootY
+                self.rank[rootY] += 1
+
+if __name__ == '__main__':
+    t = int(input())  # Number of test cases
+
+    for tt in range(t):
+        m, n = map(int, input().split())  # Dimensions of the grid
+        covid_map = []
+        for i in range(m):
+            covid_map.append(list(map(int, input().split())))  # Read the grid map
+
+        # Initialize DSU with 'm * n' elements (one for each cell in the grid)
+        dsu = DSU(m * n)
+
+        # Helper function to convert 2D grid coordinates to 1D DSU index
+        def index(i, j):
+            return i * n + j
+
+        # Iterate over the grid to union adjacent infected cells (i.e., with value 1)
+        for i in range(m):
+            for j in range(n):
+                if covid_map[i][j] == 1:
+                    # Union with the cell above it if it's also infected
+                    if i > 0 and covid_map[i - 1][j] == 1:
+                        dsu.union(index(i, j), index(i - 1, j))
+                    # Union with the cell to the left if it's also infected
+                    if j > 0 and covid_map[i][j - 1] == 1:
+                        dsu.union(index(i, j), index(i, j - 1))
+
+        # Use a dictionary to count the size of each connected component
+        neighbourhood = defaultdict(int)
+        for i in range(m):
+            for j in range(n):
+                if covid_map[i][j] == 1:
+                    # Find the root of the current infected cell and count it in the neighbourhood
+                    neighbourhood[dsu.find(index(i, j))] += 1
+
+        # Determine the size of the largest connected component
+        highest_population = max(neighbourhood.values(), default=0)
+        print(highest_population)
+</code></pre>
+            </article>
+
+
         </main>
 
         <script> copyright("all"); </script>

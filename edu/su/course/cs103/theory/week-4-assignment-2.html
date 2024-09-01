@@ -225,6 +225,64 @@ if __name__ == "__main__":
 </code></pre>
             </article>
 
+            <article>
+                <h4>Sample Solution Provided by Instructor</h4>
+                <pre class="language-python"><code>def make_set(parent, rank, n):
+    # Initialize the parent and rank arrays for 'n' nodes.
+    # Each node starts as its own parent (self-loop), and the rank is initially set to 0.
+    for i in range(1, n + 1):
+        parent[i] = i
+        rank[i] = 0
+
+def find_parent(node, parent):
+    # This function finds the representative (root) of the set containing 'node'.
+    # It uses path compression to make future queries faster by directly linking nodes to the root.
+    if node == parent[node]:
+        return node
+    # Recursively find the root and compress the path by setting the parent of 'node' to the root.
+    parent[node] = find_parent(parent[node], parent)
+    return parent[node]
+
+if __name__ == "__main__":
+    t = int(input())  # Read the number of test cases.
+    while t > 0:
+        islands, boat_tours = map(int, input().split())  # Number of islands and boat tours.
+
+        # Initialize parent and rank arrays for all islands.
+        parent = [0] * (islands + 1)
+        rank = [0] * (islands + 1)
+        make_set(parent, rank, islands)  # Create the initial sets where each island is its own set.
+
+        # Process each boat tour (connection between two islands).
+        for _ in range(boat_tours):
+            u, v = map(int, input().split())  # Read the two islands connected by this boat tour.
+
+            # Find the representatives (roots) of the sets containing 'u' and 'v'.
+            u = find_parent(u, parent)
+            v = find_parent(v, parent)
+
+            # Union by rank: attach the tree with the lower rank under the root of the higher rank tree.
+            if rank[u] < rank[v]:
+                parent[u] = v
+            elif rank[v] < rank[u]:
+                parent[v] = u
+            else:
+                # If ranks are equal, arbitrarily choose one as the root and increase its rank.
+                parent[v] = u
+                rank[u] += 1
+
+        # Count the number of distinct sets (archipelagos) by checking how many nodes are their own parent.
+        archipelagos = 0
+        for i in range(1, islands + 1):
+            if find_parent(i, parent) == i:
+                archipelagos += 1
+
+        print(archipelagos)  # Output the number of archipelagos.
+        t -= 1  # Move to the next test case.
+</code></pre>
+            </article>
+
+
         </main>
 
         <script> copyright("all"); </script>
