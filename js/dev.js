@@ -50,7 +50,7 @@ const notification_article_update = 0;
 const GLOBAL_ArticleUpdate_message = `An article has been updated. <a href="/my/articles/2022/01/01/sample-article" class="alert-link">Read more</a>.`;
 
 const notification_new_course = 1;
-const GLOBAL_NewCourse_message = `A new course CN has been added. <a href="/edu/su/course/csu359/" class="alert-link">Explore now</a>.`;
+const GLOBAL_NewCourse_message = `A new course on Computer Networks has been added. <a href="/edu/su/course/csu359/" class="alert-link">Explore now</a>.`;
 
 const GLOBAL_crawler_mode = 0;
 
@@ -3426,21 +3426,29 @@ let header_author = async function (...args) {
 
     (() => {
         try {
-            const isBot = /bot|crawl|slurp|spider/i.test(navigator.userAgent);
+            const isBotUserAgent = /bot|crawl|slurp|spider/i.test(navigator.userAgent);
+            const isBotGlobalVariables = typeof window.googlebot !== 'undefined' || typeof window._phantom !== 'undefined' || typeof window.callPhantom !== 'undefined';
+            const isBot = isBotUserAgent || isBotGlobalVariables;
 
             if (!isBot) {
-                // Calls cL for sure if the path is under /my/ or else it has 0.1 (10%) chance that it will require login on any page. Don't run on the host url
-                if (window.location.pathname.match(/\/my\/(.*)/)) {
-                    document.addEventListener('DOMContentLoaded', cL);
-                } else {
-                    if (window.location.pathname !== GLOBAL_login_page_path && window.location.pathname !== '/') {
-                        document.addEventListener('DOMContentLoaded', () => {
-                            if (Math.random() < 0.1) {
-                                cL();
-                            }
-                        });
+                const shouldRunCL = () => {
+                    // Double-check just before running cL
+                    const isBotAgain = /bot|crawl|slurp|spider/i.test(navigator.userAgent);
+                    if (isBotAgain) return false;
+                    // Calls cL for sure if the path is under /my/ or else it has 0.1 (10%) chance that it will require login on any page. Don't run on the host url
+                    if (window.location.pathname.match(/\/my\/(.*)/)) {
+                        document.addEventListener('DOMContentLoaded', cL);
+                    } else {
+                        if (window.location.pathname !== GLOBAL_login_page_path && window.location.pathname !== '/') {
+                            document.addEventListener('DOMContentLoaded', () => {
+                                if (Math.random() < 0.1) {
+                                    cL();
+                                }
+                            });
+                        }
                     }
-                }
+                };
+                document.addEventListener('DOMContentLoaded', shouldRunCL);
             }
         } catch (error) {
             console.error('Error in conditional loading script:', error);
@@ -5496,8 +5504,8 @@ function copyright(rights, noprint) {
         footer.appendChild(createSharingButtons());
 
         const div = document.createElement("div");
-        const span = document.createElement("span");        
-        const strong = document.createElement("strong");        
+        const span = document.createElement("span");
+        const strong = document.createElement("strong");
 
         const date = new Date();
         let isServer = "";
