@@ -133,6 +133,22 @@ function get_menu_list(datetogen) {
                 date: "Mon September 2, 2024",
                 link: "switching-concepts"
             },
+            {
+                title: "Configure and verify VLANs (normal range) spanning multiple switches",
+                desc: "Learn how to configure and verify VLANs spanning multiple switches in computer networks. Understand the concept of VLANs and how they are used to segment networks and improve performance.",
+                codetype: "Concepts",
+                readtime: 25,
+                date: "Tue September 3, 2024",
+                link: "configure-and-verify-vlans-spanning-multiple-switches"
+            },
+            {
+                title: "Configure and verify interswitch connectivity",
+                desc: "Learn how to configure and verify interswitch connectivity in computer networks. Understand the different methods of connecting switches and configuring trunking to enable communication between switches.",
+                codetype: "Concepts",
+                readtime: 25,
+                date: "Tue September 3, 2024",
+                link: "configure-and-verify-interswitch-connectivity"
+            }
             
             
         ];
