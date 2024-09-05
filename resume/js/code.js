@@ -1,5 +1,6 @@
 (function () {    
     const DisplaySkills = true;    
+    const indevmode = true;    
 
     let linkarray = [];
     let certificate_code_downloader = [];
