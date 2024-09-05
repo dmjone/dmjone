@@ -43,13 +43,13 @@ const notification_feature_update = 0;
 // const GLOBAL_FeatureUpdate_message = `Learn about different breathing techniques to enhance your focus and relaxation. <a href="/my/features/breathing-techniques" class="alert-link">Read more</a>.`;
 const GLOBAL_FeatureUpdate_message = `Follow the Billionaire's Checklist everyday and become one! <a href="/my/features/billionaires-checklist" class="alert-link">Start today</a>.`;
 
-const notification_new_article = 1;
+const notification_new_article = 0;
 const GLOBAL_NewArticle_message = `A new article has been published. <a href="/edu/su/course/cs103/theory/week-7-assignment-1" class="alert-link">Read more</a>.`;
 
 const notification_article_update = 0;
 const GLOBAL_ArticleUpdate_message = `An article has been updated. <a href="/my/articles/2022/01/01/sample-article" class="alert-link">Read more</a>.`;
 
-const notification_new_course = 1;
+const notification_new_course = 0;
 const GLOBAL_NewCourse_message = `A new course on <strong>Computer Networks</strong> has been added. <a href="/edu/su/course/csu359/" class="alert-link">Explore now</a>.`;
 
 const GLOBAL_crawler_mode = 0;
@@ -6111,6 +6111,7 @@ function gen_blockquote() {
         { day: 19, month: 8, year: 2004, occasion: 'birthday', name: 'Shruti' },
         { day: 20, month: 8, year: 2004, occasion: 'birthday', name: 'Piyush' },
         { day: 4, month: 9, year: 2004, occasion: 'birthday', name: 'Kamaksha' },
+        { day: 5, month: 9, occasion: 'teachersday' },
         { day: 28, month: 9, year: 1998, occasion: 'birthday', name: 'Stephen' },
         { day: 31, month: 10, year: 2004, occasion: 'birthday', name: 'Vedansh' },
         { day: 14, month: 12, year: 2002, occasion: 'birthday', name: 'Subhojeet' },
@@ -6169,9 +6170,9 @@ function gen_blockquote() {
     const todaysDate = new Date().toDateString();
     const todaysEvents = getTodaysEvents();
     const FIREWORKS_DISPLAYED_KEY = 'fireworks_displayed';
-    const forcedisplay = 0;
-    const fireworksDisplayedInfo = forcedisplay ? false : JSON.parse(localStorage.getItem(FIREWORKS_DISPLAYED_KEY))
-
+    const forcedisplay = 1;
+    const fireworksDisplayedInfo = forcedisplay ? false : JSON.parse(localStorage.getItem(FIREWORKS_DISPLAYED_KEY));
+    let playbirthdaymusic;
 
     if (todaysEvents.length > 0 && (!fireworksDisplayedInfo || fireworksDisplayedInfo.date !== todaysDate)) {
         let messages = [];
@@ -6195,6 +6196,7 @@ function gen_blockquote() {
                         console.log(0);
                         randomMessage = `${randomEmoji1}Happy <span class="fw-bold">${age}</span><sup>${getSuffix(age)}</sup>${randomEmoji2}<br><span class ="display-6">${getRandomItem(birthdayMessages)}</span><p class="text-muted text-sm-center small" style="font-size:1.1rem">Click for a musical melody!</p>`
                     }
+                    playbirthdaymusic = true;
                     messages.push(randomMessage);
                     break;
                 case 'diwali':
@@ -6202,6 +6204,9 @@ function gen_blockquote() {
                     break;
                 case 'childrensday':
                     messages.push(`${randomEmoji1} Happy Children's Day! ${randomEmoji2}`);
+                    break;
+                case 'teachersday':
+                    messages.push(`${randomEmoji1} Happy Teacher's Day! ${randomEmoji2}`);
                     break;
             }
         });
@@ -6348,10 +6353,15 @@ function gen_blockquote() {
                 };
 
                 ['click', 'keypress', 'touchstart', 'scroll'].forEach(event => {
-                    document.addEventListener(event, playAudio);
+                    document.addEventListener(event, () => {
+                        if (playbirthdaymusic) {
+                            playAudio();
+                        }
+                    });
                 });
 
-                playAudio(); // Attempt to play on load
+
+                if(playbirthdaymusic) playAudio(); // Attempt to play on load
             });
         })();
     }
