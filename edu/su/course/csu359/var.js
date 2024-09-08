@@ -5,15 +5,15 @@ function get_menu_list(datetogen) {
             {
                 link: "theory/",
                 title: "Computer Networks - Based on CCNA Exam v1.1 (200-301)",
-                desc: "A comprehensive guide to computer networks, covering essential concepts, protocols, and network security. Learn the fundamentals of networking and prepare for the CCNA exam with this detailed guidance.",            
+                desc: "A comprehensive guide to computer networks, covering essential concepts, protocols, and network security. Learn the fundamentals of networking and prepare for the CCNA exam with this detailed guidance.",
                 codetype: "CSU359 | Computer Networks",
                 cardimage: "https://cdn.dmj.one/edu/su/course/csu359/img/logo.webp"
-            },            
+            },
             {
                 link: "practice/",
                 title: "Practice ",
                 desc: "Test your knowledge and skills in computer networks with these practice exercises. Explore a range of topics including IP addressing, subnetting, network security, and more to enhance your understanding of networking concepts.",
-                codetype: "Practice | Computer Networks",                
+                codetype: "Practice | Computer Networks",
             }
         ];
 
@@ -148,9 +148,188 @@ function get_menu_list(datetogen) {
                 readtime: 25,
                 date: "Tue September 3, 2024",
                 link: "configure-and-verify-interswitch-connectivity"
+            },
+            {
+                title: "Configure and verify Layer 2 discovery protocols (CDP, LLDP)",
+                desc: "Learn how to configure and verify Layer 2 discovery protocols such as CDP and LLDP in computer networks. Understand the role of discovery protocols in network management and device discovery.",
+                codetype: "Concepts",
+                readtime: 20,
+                date: "Tue September 3, 2024",
+                link: "configure-and-verify-layer-2-discovery-protocols"
+            },
+            {
+                title: "Configure and verify (Layer 2/Layer 3) EtherChannel (LACP)",
+                desc: "Learn how to configure and verify EtherChannel using LACP in computer networks. Understand the benefits of EtherChannel and how it is used to aggregate links and improve network performance.",
+                codetype: "Concepts",
+                readtime: 25,
+                date: "Fri September 6, 2024",
+                link: "configure-and-verify-etherchannel-lacp"
+            },
+            {
+                title: "Basic Operations of Rapid PVST+ Spanning Tree Protocol",
+                desc: "Explore the basic operations of Rapid PVST+ Spanning Tree Protocol in computer networks. Learn how STP and RSTP are used to prevent loops and ensure network stability.",
+                codetype: "Concepts",
+                readtime: 25,
+                date: "Fri September 6, 2024",
+                link: "basic-operations-of-rapid-pvst-spanning-tree-protocol"
+            },
+            {
+                title: "Cisco Wireless Architectures and AP Modes",
+                desc: "Discover Cisco wireless architectures and access point modes used in wireless networks. Learn about the different wireless architectures and access point modes supported by Cisco devices.",
+                codetype: "Concepts",
+                readtime: 30,
+                date: "Fri September 6, 2024",
+                link: "cisco-wireless-architectures-and-ap-modes"
+            },
+            {
+                title: "Physical infrastructure connections of WLAN components",
+                desc: "Learn about the physical infrastructure connections of WLAN components in wireless networks. Understand how wireless components are connected to the network infrastructure to provide wireless connectivity.",
+                codetype: "Concepts",
+                readtime: 25,
+                date: "Fri September 6, 2024",
+                link: "physical-infrastructure-connections-of-wlan-components"
+            },
+            {
+                title: "Network Device Management Access",
+                desc: "Learn how to manage network devices and access them remotely in computer networks. Understand the different methods of accessing network devices for configuration and monitoring.",
+                codetype: "Concepts",
+                readtime: 20,
+                date: "Mon September 9, 2024",
+                link: "network-device-management-access"
+            },
+            {
+                title: "Wireless LAN GUI Configuration",
+                desc: "Explore the GUI configuration of wireless LANs in computer networks. Learn how to configure wireless LANs using graphical user interfaces to manage wireless networks effectively.",
+                codetype: "Concepts",
+                readtime: 25,
+                date: "Mon September 9, 2024",
+                link: "wireless-lan-gui-configuration"
+            },
+            {
+                title: "IP Connectivity",
+                desc: "Learn about IP connectivity in computer networks, including the concepts of IP routing, static routing, and dynamic routing. Understand how IP connectivity is established and maintained in network environments.",
+                codetype: "Concepts",
+                readtime: 30,
+                date: "Mon September 9, 2024",
+                link: "ip-connectivity"
+            },
+            {
+                title: "Router Packet Forwarding Decisions",
+                desc: "Explore the packet forwarding decisions made by routers in computer networks. Learn how routers forward packets based on routing tables, destination IP addresses, and routing protocols.",
+                codetype: "Concepts",
+                readtime: 25,
+                date: "Mon September 9, 2024",
+                link: "router-packet-forwarding-decisions"
+            },
+            {
+                title: "Configure and verify IPv4 and IPv6 static routing",
+                desc: "Learn how to configure and verify IPv4 and IPv6 static routing in computer networks. Understand the concept of static routing and how it is used to manually configure routing paths.",
+                codetype: "Concepts",
+                readtime: 25,
+                date: "Mon September 9, 2024",
+                link: "configure-and-verify-ipv4-and-ipv6-static-routing"
+            },
+            {
+                title: "OSPF Configuration and Verification",
+                desc: "Explore the essential concepts of OSPF, including neighbor relationships, authentication, metric calculation, VLSM support, and more. Learn how to configure and verify OSPF for efficient and secure network routing.",
+                codetype: "Concepts",
+                readtime: 35,
+                date: "Mon September 9, 2024",
+                link: "ospf-configuration-and-verification"
+            },
+            {
+                title: "Configure and verify single area OSPFv2",
+                desc: "Learn how to configure and verify single area OSPFv2 in computer networks. Understand the concepts of OSPF and how it is used to establish routing paths within a single OSPF area.",
+                codetype: "Concepts",
+                readtime: 25,
+                date: "Mon September 9, 2024",
+                link: "configure-and-verify-single-area-ospfv2"
+            },
+            {
+                title: "First Hop Redundancy Protocols",
+                desc: "Explore first hop redundancy protocols used in computer networks to provide network redundancy and high availability. Learn about HSRP, VRRP, and GLBP and how they are used to ensure network reliability.",
+                codetype: "Concepts",
+                readtime: 30,
+                date: "Mon September 9, 2024",
+                link: "first-hop-redundancy-protocols"
+            },
+            {
+                title: "Configure and verify inside source NAT using static and pools",
+                desc: "Learn how to configure and verify inside source NAT using static and pools in computer networks. Understand the concept of NAT and how it is used to translate private IP addresses to public IP addresses.",
+                codetype: "Concepts",
+                readtime: 25,
+                date: "Mon September 9, 2024",
+                link: "configure-and-verify-inside-source-nat"
+            },
+            {
+                title: "Configure and verify NTP operating in a client and server mode",
+                desc: "Learn how to configure and verify NTP operating in client and server mode in computer networks. Understand the importance of NTP in network synchronization and time management.",
+                codetype: "Concepts",
+                readtime: 25,
+                date: "Mon September 9, 2024",
+                link: "configure-and-verify-ntp-operating-in-client-and-server-mode"
+            },
+            {
+                title: "Role of DHCP and DNS within the network",
+                desc: "Explore the role of DHCP and DNS within computer networks. Learn how DHCP is used to assign IP addresses dynamically, and how DNS is used to resolve domain names to IP addresses.",
+                codetype: "Concepts",
+                readtime: 30,
+                date: "Mon September 9, 2024",
+                link: "role-of-dhcp-and-dns-within-the-network"
+            },
+            {
+                title: "Function of SNMP in network operations",
+                desc: "Learn about the function of SNMP in network operations and management. Understand how SNMP is used to monitor network devices, collect data, and manage network performance.",
+                codetype: "Concepts",
+                readtime: 25,
+                date: "Mon September 9, 2024",
+                link: "function-of-snmp-in-network-operations"
+            },
+            {
+                title: "Use of syslog features, including facilities and severity levels",
+                desc: "Explore the use of syslog features, including facilities and severity levels in computer networks. Learn how syslog is used for logging and monitoring network events and activities.",
+                codetype: "Concepts",
+                readtime: 25,
+                date: "Mon September 9, 2024",
+                link: "use-of-syslog-features"
+            },
+            {
+                title: "Configure and verify DHCP client and relay",
+                desc: "Learn how to configure and verify DHCP client and relay in computer networks. Understand the role of DHCP clients and relays in obtaining IP addresses and configuring network settings.",
+                codetype: "Concepts",
+                readtime: 25,
+                date: "Mon September 9, 2024",
+                link: "configure-and-verify-dhcp-client-and-relay"
+            },
+            {
+                title: "Forwarding per-hop behavior (PHB) for QoS",
+                desc: "Explore the forwarding per-hop behavior (PHB) for QoS in computer networks. Learn how QoS is used to prioritize network traffic and ensure quality of service for critical applications.",
+                codetype: "Concepts",
+                readtime: 25,
+                date: "Mon September 9, 2024",
+                link: "forwarding-per-hop-behavior-for-qos"
+            },
+            {
+                title: "Configure network devices for remote access using SSH",
+                desc: "Learn how to configure network devices for remote access using SSH in computer networks. Understand the benefits of SSH and how it is used to securely manage network devices.",
+                codetype: "Concepts",
+                readtime: 25,
+                date: "Mon September 9, 2024",
+                link: "configure-network-devices-for-remote-access-using-ssh"
+            },
+            {
+                title: "Capabilities and functions of TFTP/FTP in the network",
+                desc: "Explore the capabilities and functions of TFTP and FTP in computer networks. Learn how TFTP and FTP are used for file transfer and configuration management in network environments.",
+                codetype: "Concepts",
+                readtime: 25,
+                date: "Mon September 9, 2024",
+                link: "capabilities-and-functions-of-tftp-ftp"
             }
-            
-            
+
+
+
+
+
         ];
         body_genmenu.processData(arr, def_date, def_author);
     }
@@ -158,7 +337,7 @@ function get_menu_list(datetogen) {
     /**********  AUTOMATION CONTROL **********/
     let title, link, date, desc, codetype, readtime, author = 1, semester, cardimage, continuereading;
     const functions = {
-        theory: get_class,        
+        theory: get_class,
         default: get_main
     };
     (functions[window.urlpart5] || functions.default)(datetogen, author);

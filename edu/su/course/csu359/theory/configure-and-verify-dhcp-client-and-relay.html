@@ -1,0 +1,231 @@
+<!-------------------------- © 2007 - present, dmj.one and contributors. ----------------------------------
+   Part of the dmjone project. Licensed under the GNU AGPL. Provided as-is, without warranty of any kind. 
+-------------------- Redistribution and modifications must retain this notice. --------------------------->
+
+
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+    <!--<![endif]-->
+
+    <head>
+        <script src="/js/edu_su_common.js"></script>
+        <noscript>
+            <style>
+                html,
+                body {
+                    margin: 0;
+                    overflow: hidden;
+                }
+            </style>
+            <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+        </noscript>
+
+        <title>Configure and verify DHCP client and relay - CSU359 - Shoolini University</title>
+        <meta name="description" content="Learn about the DHCP client and relay configuration and verification in the Computer Networks course at Shoolini University via dmj.one">
+
+        <meta property=" og:image" content="/logo.png">
+        <meta property="og:type" content="article">
+
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:site" content="@divyamohan1993">
+        <meta name="twitter:creator" content="@divyamohan1993">
+        <meta name="twitter:image" content="/logo.png">
+
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+        <meta name="author" content="Divya Mohan">
+        <meta name="robots" content="index, follow">
+    </head>
+
+    <body>
+
+        <script> header_author("dm"); </script>
+
+        <main>
+
+            <article class="agen-tableofcontents">
+                <h2 class="text-center">
+                    Configure and Verify DHCP Client and Relay
+                </h2>
+                <div class="d-none contentdate">2024, September 9</div>
+            </article>
+            <article>
+                <h3>1. DHCP Client</h3>
+                <p>A DHCP client is a device on a network that automatically requests IP address configuration information from a DHCP server. This process is essential for devices to join the network without manual IP configuration. Below is a detailed breakdown of how the DHCP client works and how it is configured on network devices.</p>
+            </article>
+            <article>
+                <h4>1.1 How DHCP Client Works</h4>
+                <p>The DHCP client operates in the following stages:</p>
+                <ul>
+                    <li><strong>DHCP Discover</strong>: The client sends a broadcast message (DHCP Discover) to find available DHCP servers.</li>
+                    <li><strong>DHCP Offer</strong>: Upon receiving the Discover message, a DHCP server replies with an IP offer, which includes configuration details such as IP address, subnet mask, and gateway.</li>
+                    <li><strong>DHCP Request</strong>: The client sends a DHCP Request message to the server, indicating it accepts the offer.</li>
+                    <li><strong>DHCP Acknowledgment</strong>: The server responds with an acknowledgment (DHCP ACK) and finalizes the IP address lease to the client.</li>
+                </ul>
+
+                <h5>1.1.1 DHCP Client Lease Process</h5>
+                <p>During the lease process, the client is temporarily assigned an IP address for a specified lease duration. Before the lease expires, the client will try to renew the lease.</p>
+            </article>
+            <article>
+                <h4>1.2 Configuring DHCP Client on Cisco Routers</h4>
+                <p>To configure a DHCP client on a Cisco router, follow these steps:</p>
+
+                <pre><code class="language-auto">
+Router(config)# interface <interface_name>
+Router(config-if)# ip address dhcp
+Router(config-if)# no shutdown
+</code></pre>
+
+                <p><strong>Explanation:</strong></p>
+                <ul>
+                    <li><code>interface <interface_name></code>: Selects the interface that will receive the DHCP-assigned IP.</li>
+                    <li><code>ip address dhcp</code>: Enables DHCP on the interface to dynamically request an IP address from a DHCP server.</li>
+                    <li><code>no shutdown</code>: Activates the interface.</li>
+                </ul>
+            </article>
+            <article>
+                <h4>1.3 Verifying DHCP Client Configuration</h4>
+                <p>Once the client is configured, you can verify the IP address assignment using the following command:</p>
+
+                <pre><code class="language-auto">
+Router# show ip interface brief
+</code></pre>
+
+                <p>This command will show the IP addresses assigned to each interface, including those obtained via DHCP.</p>
+
+                <p><strong>Key Points:</strong></p>
+                <ul>
+                    <li>Ensure the DHCP server is reachable for the DHCP client to get a valid IP configuration.</li>
+                    <li>If no IP is obtained, check for connectivity issues or incorrect DHCP server settings.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>2. DHCP Relay</h3>
+                <p>DHCP Relay is used when the DHCP server is located on a different subnet from the client. Since DHCP Discover messages are broadcast and do not cross routers by default, a DHCP relay is necessary to forward these messages between the client and the server, enabling IP address assignment across different subnets.</p>
+            </article>
+            <article>
+                <h4>2.1 How DHCP Relay Works</h4>
+                <p>DHCP relay agents facilitate communication between clients and servers located on different networks. The process works as follows:</p>
+                <ul>
+                    <li><strong>Client Broadcast:</strong> The client broadcasts a DHCP Discover message on its local network.</li>
+                    <li><strong>Relay Forward:</strong> The DHCP relay agent listens for this broadcast and forwards it to the DHCP server using a unicast transmission.</li>
+                    <li><strong>Server Reply:</strong> The DHCP server sends the offer message back to the relay agent.</li>
+                    <li><strong>Relay Broadcast:</strong> The relay agent then broadcasts the DHCP offer back to the client, completing the IP assignment process.</li>
+                </ul>
+
+            </article>
+            <h4>2.2 Configuring DHCP Relay on Cisco Routers</h4>
+            <p>To configure a router as a DHCP relay agent, follow these steps:</p>
+
+            <pre><code class="language-auto">
+Router(config)# interface <interface_name>
+Router(config-if)# ip helper-address <DHCP_server_IP>
+Router(config-if)# no shutdown
+</code></pre>
+
+            <p><strong>Explanation:</strong></p>
+            <ul>
+                <li><code>interface <interface_name></code>: Selects the interface connected to the client network.</li>
+                <li><code>ip helper-address <DHCP_server_IP></code>: Configures the relay to forward DHCP requests to the specified DHCP server's IP address.</li>
+                <li><code>no shutdown</code>: Activates the interface.</li>
+            </ul>
+
+            <h5>2.2.1 Multiple DHCP Helper Addresses</h5>
+            <p>You can configure multiple DHCP servers by adding additional <code>ip helper-address</code> commands to the same interface. The router will relay client requests to all configured DHCP servers.</p>
+            </article>
+            <article>
+                <h4>2.3 Verifying DHCP Relay Configuration</h4>
+                <p>Once the relay is configured, verify the setup using the following command:</p>
+
+                <pre><code class="language-auto">
+Router# show ip interface <interface_name>
+</code></pre>
+
+                <p>This command will display the IP helper address configured for the interface, confirming that the relay is active.</p>
+
+                <p><strong>Key Points:</strong></p>
+                <ul>
+                    <li>Ensure the DHCP relay is properly forwarding client requests to the correct DHCP server.</li>
+                    <li>Check connectivity between the relay and DHCP server to avoid communication issues.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>3. Configure and Verify DHCP Client and Relay</h3>
+                <p>Dynamic Host Configuration Protocol (DHCP) simplifies the process of assigning IP addresses to devices on a network. Instead of manual configuration, DHCP allows automatic assignment, reducing human error and network administration overhead. In this section, we will cover how to configure a DHCP client and relay, ensuring smooth IP address allocation across different networks.</p>
+            </article>
+
+            <article>
+                <h4>3.1 DHCP Client</h4>
+                <p>The DHCP client is a device or node that requests IP address information from the DHCP server. The process follows these steps:</p>
+                <ul>
+                    <li><strong>DHCP Discover</strong>: The client broadcasts a discover message to locate a DHCP server.</li>
+                    <li><strong>DHCP Offer</strong>: The server responds with an IP offer that contains configuration details such as the IP address, subnet mask, gateway, and DNS servers.</li>
+                    <li><strong>DHCP Request</strong>: The client responds with a request message to accept the offered configuration.</li>
+                    <li><strong>DHCP Acknowledgment</strong>: The server sends an acknowledgment, confirming the IP address lease to the client.</li>
+                </ul>
+
+                <h5>3.1.1 Configuration of DHCP Client (Cisco Routers)</h5>
+                <p>To configure a device as a DHCP client on Cisco routers, use the following steps:</p>
+                <pre><code class="language-auto">
+Router(config)# interface <interface_name>
+Router(config-if)# ip address dhcp
+Router(config-if)# no shutdown
+</code></pre>
+                <p>This will enable DHCP on the interface, allowing it to dynamically request an IP from a DHCP server.</p>
+            </article>
+            <article>
+
+                <h4>3.2 DHCP Relay</h4>
+                <p>A DHCP relay is used when the DHCP server is located on a different network from the client. Since DHCP Discover messages are broadcast and do not traverse routers, a DHCP relay is necessary to forward these messages between clients and the server.</p>
+
+                <h5>3.2.1 How DHCP Relay Works</h5>
+                <p>The DHCP relay listens for client broadcast messages and forwards them to the DHCP server using a unicast transmission. The DHCP server then replies to the relay, which broadcasts the response back to the client. The steps involved are:</p>
+                <ul>
+                    <li><strong>Client Broadcast</strong>: The client sends a DHCP Discover message.</li>
+                    <li><strong>Relay Forward</strong>: The relay agent receives this broadcast and forwards it to the DHCP server.</li>
+                    <li><strong>Server Reply</strong>: The DHCP server sends the offer back to the relay.</li>
+                    <li><strong>Relay Broadcast</strong>: The relay agent broadcasts the response to the client.</li>
+                </ul>
+
+                <h5>3.2.2 Configuration of DHCP Relay (Cisco Routers)</h5>
+                <p>To configure a router as a DHCP relay agent, use the following commands:</p>
+                <pre><code class="language-auto">
+Router(config)# interface <interface_name>
+Router(config-if)# ip helper-address <DHCP_server_IP>
+Router(config-if)# no shutdown
+</code></pre>
+                <p>This command sets up the router interface to forward DHCP requests to the specified DHCP server IP address.</p>
+            </article>
+            <article>
+
+                <h4>3.3 Verification of DHCP Client and Relay</h4>
+                <p>After configuring the DHCP client and relay, verification is essential to ensure the setup is working correctly.</p>
+
+                <h5>3.3.1 Verifying DHCP Client</h5>
+                <p>Use the following command to check the IP address assigned to the interface:</p>
+                <pre><code class="language-auto">
+Router# show ip interface brief
+</code></pre>
+                <p>This will display the IP addresses assigned to the interfaces, including the one obtained via DHCP.</p>
+
+                <h5>3.3.2 Verifying DHCP Relay</h5>
+                <p>To check if the DHCP relay is functioning, use:</p>
+                <pre><code class="language-auto">
+Router# show ip interface <interface_name>
+</code></pre>
+                <p>This should show that the interface has an IP helper address configured, verifying the relay function.</p>
+
+            </article>
+
+        </main>
+
+        <script> copyright("all"); </script>
+
+    </body>
+
+</html>

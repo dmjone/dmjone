@@ -1,0 +1,346 @@
+<!-------------------------- © 2007 - present, dmj.one and contributors. ----------------------------------
+   Part of the dmjone project. Licensed under the GNU AGPL. Provided as-is, without warranty of any kind. 
+-------------------- Redistribution and modifications must retain this notice. --------------------------->
+
+
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+    <!--<![endif]-->
+
+    <head>
+        <script src="/js/edu_su_common.js"></script>
+        <noscript>
+            <style>
+                html,
+                body {
+                    margin: 0;
+                    overflow: hidden;
+                }
+            </style>
+            <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+        </noscript>
+
+        <title>Configure and verify inside source NAT using static and pools - CSU359 - Shoolini University</title>
+        <meta name="description" content="Learn about the configuration and verification of inside source NAT using static and pools in a network environment.">
+
+        <meta property=" og:image" content="/logo.png">
+        <meta property="og:type" content="article">
+
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:site" content="@divyamohan1993">
+        <meta name="twitter:creator" content="@divyamohan1993">
+        <meta name="twitter:image" content="/logo.png">
+
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+        <meta name="author" content="Divya Mohan">
+        <meta name="robots" content="index, follow">
+    </head>
+
+    <body>
+
+        <script> header_author("dm"); </script>
+
+        <main>
+
+            <article class="agen-tableofcontents">
+                <h2 class="text-center">
+                    Configure and verify inside source NAT using static and pools
+                </h2>
+                <div class="d-none contentdate">2024, September 9</div>
+            </article>
+
+            <article>
+                <h3>0. Inside Source NAT</h3>
+                <p><strong>Inside Source NAT</strong> is a technique where the source IP address of packets originating from inside a private network is translated to a public IP address before the packet reaches the external (public) network. This allows internal devices with private IP addresses to communicate with external networks, such as the internet, using a public IP address.</p>
+                <p>If you did not understand the above paragraph, don't worry. We will break it down into simpler terms below.</p>
+            </article>
+
+            <article>
+                <h4>0.1 Key Concepts of Inside Source NAT</h4>
+                <ul>
+                    <li><strong>Inside Local Address:</strong> The private IP address of the device within the internal network.</li>
+                    <li><strong>Inside Global Address:</strong> The public IP address assigned to represent the inside device on the external network.</li>
+                    <li><strong>Translation:</strong> The process of converting the inside local address to an inside global address as packets leave the internal network.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h4>0.2 Types of Inside Source NAT</h4>
+                <p>There are two primary types of Inside Source NAT:</p>
+                <ul>
+                    <li><strong>Static NAT:</strong> A one-to-one mapping between a private (inside local) IP and a public (inside global) IP. This is used when a device needs a fixed, public-facing IP address for external communication.</li>
+                    <li><strong>Dynamic NAT:</strong> A dynamic mapping between private IPs and public IPs using a pool of available public addresses. This allows multiple devices to share a pool of public IPs.</li>
+                    <li><strong>PAT (Port Address Translation):</strong> Also known as NAT overload, this allows multiple internal devices to share a single public IP by using different port numbers for each session.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h4>0.3 Inside Source NAT Configuration</h4>
+                <p>To configure Inside Source NAT, the router or firewall must be configured to translate the private inside local address to a public inside global address.</p>
+                <p>For Static NAT:</p>
+                <pre><code class="language-auto">Router(config)# ip nat inside source static {inside-local} {inside-global}</code></pre>
+
+                <p>For Dynamic NAT (using a pool):</p>
+                <pre><code class="language-auto">
+Router(config)# ip nat pool {pool-name} {start-ip} {end-ip} netmask {netmask}
+Router(config)# access-list {access-list-number} permit {inside-local-subnet}
+Router(config)# ip nat inside source list {access-list-number} pool {pool-name}
+</code></pre>
+
+                <p><strong>Example:</strong> Configure a NAT pool for dynamic NAT:</p>
+                <pre><code class="language-auto">
+Router(config)# ip nat pool PUBLIC_POOL 203.0.113.10 203.0.113.20 netmask 255.255.255.0
+Router(config)# access-list 1 permit 192.168.1.0 0.0.0.255
+Router(config)# ip nat inside source list 1 pool PUBLIC_POOL
+</code></pre>
+            </article>
+
+            <article>
+                <h4>0.4 Verifying Inside Source NAT</h4>
+                <p>Once Inside Source NAT is configured, you can verify it using the following command:</p>
+                <pre><code class="language-auto">Router# show ip nat translations</code></pre>
+                <p>This command will display the NAT translations, showing how inside local IPs are mapped to inside global IPs.</p>
+            </article>
+
+            <article>
+                <h4>0.5 Inside Source NAT Use Cases</h4>
+                <p>Inside Source NAT is widely used in scenarios where internal devices with private IPs need to access external networks. For instance, in a corporate network, employees' computers with private IP addresses can access the internet by having their internal IPs translated into the organization's public IP range.</p>
+            </article>
+
+
+
+            <article>
+                <h3>1. Static NAT</h3>
+                <p><strong>Static NAT</strong> provides a fixed, one-to-one mapping between a private IP address and a public IP address. This method is suitable when you need a specific device, such as a web server, to be reachable from the outside network using the same public IP address.</p>
+            </article>
+
+            <article>
+                <h4>1.1 Key Concepts of Static NAT</h4>
+                <ul>
+                    <li><strong>Inside Local Address:</strong> The private IP address assigned to a device within the internal network.</li>
+                    <li><strong>Inside Global Address:</strong> The public IP address used to represent the internal device to the external world.</li>
+                    <li><strong>One-to-One Mapping:</strong> A unique public IP is mapped to a unique private IP, ensuring that all traffic from the internal device appears to come from the same public address.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h4>1.2 Static NAT Configuration</h4>
+                <p>To configure Static NAT, you create a direct mapping between the inside local (private) IP and the inside global (public) IP. This mapping remains constant and does not change unless manually reconfigured.</p>
+                <p>Use the following command syntax to configure Static NAT:</p>
+                <pre><code class="language-auto">Router(config)# ip nat inside source static {inside-local} {inside-global}</code></pre>
+
+                <p><strong>Example:</strong> Map internal IP 192.168.1.10 to public IP 203.0.113.10.</p>
+                <pre><code class="language-auto">Router(config)# ip nat inside source static 192.168.1.10 203.0.113.10</code></pre>
+            </article>
+
+            <article>
+                <h4>1.3 Verifying Static NAT</h4>
+                <p>Once Static NAT is configured, you can verify that the translation has been established and is functioning properly by using the following command:</p>
+                <pre><code class="language-auto">Router# show ip nat translations</code></pre>
+                <p>This command will display the static NAT mappings, showing the relationship between the inside local and inside global addresses.</p>
+            </article>
+
+            <article>
+                <h4>1.4 Static NAT Use Case</h4>
+                <p>Static NAT is commonly used in scenarios where a specific device, such as a web server, must always be accessible using a particular public IP. For example, a business may map its web server’s internal IP address to a fixed public IP so that users can consistently access the website.</p>
+            </article>
+
+            <article>
+                <h3>2. NAT Pools</h3>
+                <p><strong>NAT Pools</strong> allow dynamic translation of multiple inside local (private) IP addresses to a pool of inside global (public) IP addresses. This is more flexible than Static NAT, as multiple devices inside the network can share a pool of public IPs for outbound communication.</p>
+            </article>
+
+            <article>
+                <h4>2.1 Key Concepts of NAT Pools</h4>
+                <ul>
+                    <li><strong>Inside Local Address:</strong> The private IP address assigned to a device within the internal network.</li>
+                    <li><strong>Inside Global Address:</strong> The public IP address from the pool, assigned dynamically for each internal device that initiates outbound traffic.</li>
+                    <li><strong>Dynamic Mapping:</strong> IP addresses are dynamically selected from a pool of available public IP addresses when an internal device communicates with the outside world.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h4>2.2 NAT Pool Configuration</h4>
+                <p>To configure a NAT Pool, define a range of public IP addresses and associate it with an access list that defines which internal devices (inside local addresses) are eligible for translation. The router will dynamically assign IPs from this pool as internal devices send traffic to the external network.</p>
+                <p>Use the following commands to configure a NAT Pool:</p>
+                <pre><code class="language-auto">
+Router(config)# ip nat pool {pool-name} {start-ip} {end-ip} netmask {netmask}
+Router(config)# access-list {access-list-number} permit {inside-local-subnet}
+Router(config)# ip nat inside source list {access-list-number} pool {pool-name}
+</code></pre>
+
+                <p><strong>Example:</strong> Create a NAT pool with public IP addresses from 203.0.113.10 to 203.0.113.20 and apply it to devices in the 192.168.1.0/24 subnet:</p>
+                <pre><code class="language-auto">
+Router(config)# ip nat pool PUBLIC_POOL 203.0.113.10 203.0.113.20 netmask 255.255.255.0
+Router(config)# access-list 1 permit 192.168.1.0 0.0.0.255
+Router(config)# ip nat inside source list 1 pool PUBLIC_POOL
+</code></pre>
+            </article>
+
+            <article>
+                <h4>2.3 Verifying NAT Pools</h4>
+                <p>To verify that the NAT Pool is functioning correctly and that public IP addresses are being dynamically assigned from the pool, use the following command:</p>
+                <pre><code class="language-auto">Router# show ip nat translations</code></pre>
+                <p>This command displays all current NAT translations, showing the inside local addresses (private IPs) and the inside global addresses (public IPs) assigned from the pool.</p>
+
+                <p>To check the utilization of the NAT pool and see how many addresses have been used, you can use:</p>
+                <pre><code class="language-auto">Router# show ip nat statistics</code></pre>
+                <p>This command shows pool utilization, the number of translations, and translation hits and misses.</p>
+            </article>
+
+            <article>
+                <h4>2.4 NAT Pools Use Case</h4>
+                <p>NAT Pools are ideal for networks where multiple internal devices need to communicate with the internet but do not require a fixed public IP. For example, a company with many employees could use NAT Pools to dynamically assign public IPs to users when they access the internet.</p>
+            </article>
+
+            <article>
+                <h3>3. NAT (Network Address Translation)</h3>
+                <p><strong>Network Address Translation (NAT)</strong> is a method used to modify IP address information in packet headers while they are in transit. It is primarily used to translate private IP addresses, which are not routable on the internet, into public IP addresses. NAT facilitates the communication between internal private networks and external public networks, like the internet.</p>
+            </article>
+
+            <article>
+                <h4>3.1 Types of NAT</h4>
+                <p>There are several types of NAT, each serving a different purpose depending on the network's needs:</p>
+                <ul>
+                    <li><strong>Static NAT:</strong> Provides a one-to-one mapping between a private IP address and a public IP address. This is used when a device needs to be consistently reachable from outside the network.</li>
+                    <li><strong>Dynamic NAT:</strong> Maps an internal private IP address to a public IP address from a pool. The mapping changes dynamically based on availability.</li>
+                    <li><strong>PAT (Port Address Translation):</strong> Also called "NAT Overload," this allows multiple internal devices to share a single public IP address by differentiating them through port numbers.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h4>3.2 Source NAT</h4>
+                <p><strong>Source NAT (SNAT)</strong> is a specific type of NAT where the source IP address in the packet header is translated from a private IP to a public IP as the packet leaves the internal network and heads to the external network.</p>
+                <p>This is commonly used to allow devices in a private network to communicate with external networks, like the internet, by using the public IP address of the NAT-enabled router or firewall.</p>
+
+                <h5>3.2.1 How Source NAT Works</h5>
+                <p>When a packet is sent from a device in the internal network, the device’s private IP (inside local) is replaced with a public IP (inside global) at the NAT router or firewall. The return packet is then routed back to the correct internal device based on this translation.</p>
+
+                <h5>3.2.2 Configuration of Source NAT</h5>
+                <p>There are two primary methods to configure Source NAT:</p>
+                <ul>
+                    <li><strong>Static Source NAT:</strong> A fixed mapping between a private and public IP.</li>
+                    <li><strong>Dynamic Source NAT (with Pools):</strong> Public IPs are assigned from a pool of available addresses, allowing multiple internal devices to share public IP addresses dynamically.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h4>3.3 Source NAT Configuration</h4>
+                <p>To configure Source NAT using dynamic NAT Pools:</p>
+                <pre><code class="language-auto">
+Router(config)# ip nat pool {pool-name} {start-ip} {end-ip} netmask {netmask}
+Router(config)# access-list {access-list-number} permit {inside-local-subnet}
+Router(config)# ip nat inside source list {access-list-number} pool {pool-name}
+</code></pre>
+
+                <p><strong>Example:</strong> Set up a pool with addresses 203.0.113.10 to 203.0.113.20 and apply it to the 192.168.1.0/24 internal network:</p>
+                <pre><code class="language-auto">
+Router(config)# ip nat pool PUBLIC_POOL 203.0.113.10 203.0.113.20 netmask 255.255.255.0
+Router(config)# access-list 1 permit 192.168.1.0 0.0.0.255
+Router(config)# ip nat inside source list 1 pool PUBLIC_POOL
+</code></pre>
+            </article>
+
+            <article>
+                <h4>3.4 Verifying Source NAT</h4>
+                <p>After configuring Source NAT, verify it using:</p>
+                <pre><code class="language-auto">Router# show ip nat translations</code></pre>
+                <p>This command will show the mappings between inside local and inside global addresses.</p>
+            </article>
+
+            <article>
+                <h3>4. Configure and Verify Inside Source NAT Using Static and Pools</h3>
+                <p>Network Address Translation (NAT) is essential for translating private, internal IP addresses to public, external IP addresses, and vice versa. "Inside source NAT" focuses on translating the source address of packets originating from inside a network to a globally routable address. The two main methods of configuring inside source NAT are <strong>Static NAT</strong> and <strong>NAT Pools</strong>. We will explore both methods below.</p>
+            </article>
+
+            <article>
+                <h4>4.1 Static NAT</h4>
+                <p><strong>Static NAT</strong> is a one-to-one mapping between an internal (private) IP address and a public IP address. It is ideal for devices that need to be accessible from the outside world with the same IP, like web servers.</p>
+
+                <h5>4.1.1 How Static NAT Works</h5>
+                <p>Static NAT provides a fixed mapping. For each inside local IP (private), there is an inside global IP (public). This mapping never changes.</p>
+                <ul>
+                    <li><strong>Inside local address</strong>: The private IP address assigned to a device inside the network.</li>
+                    <li><strong>Inside global address</strong>: The public IP address that the outside world uses to access the device.</li>
+                </ul>
+
+                <h5>4.1.2 Static NAT Configuration</h5>
+                <p>To configure Static NAT, use the following command:</p>
+                <pre><code class="language-auto">Router(config)# ip nat inside source static {inside-local} {inside-global}</code></pre>
+                <p><strong>Example:</strong> Map internal IP 192.168.1.10 to public IP 203.0.113.10.</p>
+                <pre><code class="language-auto">Router(config)# ip nat inside source static 192.168.1.10 203.0.113.10</code></pre>
+
+                <h5>4.1.3 Verifying Static NAT</h5>
+                <p>To verify the Static NAT configuration, use the following command:</p>
+                <pre><code class="language-auto">Router# show ip nat translations</code></pre>
+                <p>This command will display the static mapping and any active translations.</p>
+            </article>
+
+            <article>
+                <h4>4.2 NAT Pools</h4>
+                <p><strong>NAT Pools</strong> allow you to dynamically map a range of inside local addresses to a pool of inside global addresses. This is useful when there are multiple internal devices needing translation to a pool of public addresses.</p>
+
+                <h5>4.2.1 How NAT Pools Work</h5>
+                <p>Unlike static NAT, where each inside device is assigned a fixed public IP, NAT Pools provide a dynamic translation, assigning available public IPs from a defined pool. When an internal device initiates communication with the outside, the router selects an available public IP from the pool.</p>
+
+                <h5>4.2.2 NAT Pool Configuration</h5>
+                <p>To configure a NAT Pool, use the following commands:</p>
+                <pre><code class="language-auto">
+Router(config)# ip nat pool {pool-name} {start-ip} {end-ip} netmask {netmask}
+Router(config)# ip nat inside source list {access-list-number} pool {pool-name}
+</code></pre>
+                <p><strong>Example:</strong> Define a pool with IPs ranging from 203.0.113.10 to 203.0.113.20 and associate it with an access list:</p>
+                <pre><code class="language-auto">
+Router(config)# ip nat pool PUBLIC_POOL 203.0.113.10 203.0.113.20 netmask 255.255.255.0
+Router(config)# access-list 1 permit 192.168.1.0 0.0.0.255
+Router(config)# ip nat inside source list 1 pool PUBLIC_POOL
+</code></pre>
+
+                <h5>4.2.3 Verifying NAT Pools</h5>
+                <p>To verify the NAT Pool configuration, use the following commands:</p>
+                <pre><code class="language-auto">Router# show ip nat translations</code></pre>
+                <p>This command displays active translations, showing the mappings between inside local and inside global addresses.</p>
+                <pre><code class="language-auto">Router# show ip nat statistics</code></pre>
+                <p>This command shows pool utilization, translation hits, and misses.</p>
+            </article>
+
+            <article>
+                <h4>4.3 Inside/Outside NAT Interface Configuration</h4>
+                <p>NAT requires defining which interfaces are <em>inside</em> and <em>outside</em>. The inside interface is connected to the internal network, and the outside interface is connected to the external (public) network.</p>
+
+                <pre><code class="language-auto">
+Router(config)# interface {interface-name}
+Router(config-if)# ip nat inside
+Router(config)# interface {outside-interface-name}
+Router(config-if)# ip nat outside
+</code></pre>
+
+                <p><strong>Example:</strong> Configure the inside interface as GigabitEthernet 0/0 and the outside interface as Serial 0/1:</p>
+                <pre><code class="language-auto">
+Router(config)# interface gigabitEthernet 0/0
+Router(config-if)# ip nat inside
+Router(config)# interface serial 0/1
+Router(config-if)# ip nat outside
+</code></pre>
+            </article>
+
+            <article>
+                <h4>4.4 Troubleshooting NAT</h4>
+                <p>Common commands for troubleshooting NAT:</p>
+                <ul>
+                    <li><strong>Clear translations:</strong> To clear NAT translations, use: <code>clear ip nat translation *</code></li>
+                    <li><strong>Check interfaces:</strong> Use <code>show ip interface brief</code> to ensure inside and outside interfaces are correctly assigned.</li>
+                    <li><strong>Check access lists:</strong> Verify that the correct access list is applied using <code>show access-lists</code>.</li>
+                </ul>
+            </article>
+        </main>
+
+        <script> copyright("all"); </script>
+
+    </body>
+
+</html>
