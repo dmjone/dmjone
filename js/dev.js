@@ -2512,6 +2512,8 @@ let header_author = async function (...args) {
     if (GLOBAL_crawler_mode) {
         return;
     }
+    
+    // ^\d+\.\s  - Regex To remove 1. 2. etx question number from each question.
 
     document.addEventListener("DOMContentLoaded", function () {
         if (!(window.PlacementQuiz || window.SubjectQuiz || window.ReviewSubjectQuestions)) {
