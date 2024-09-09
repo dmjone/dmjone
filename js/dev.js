@@ -4501,6 +4501,25 @@ function body_blockcards(link, date, title, desc, codetype, readtime, author, se
     // </div>
     // `;
     // body_generated += `<div class="m-0 my-5 postcard light shadow-lg ${getcolor}">
+
+    function authorlink(author) {
+        switch (author) {
+            case "Divya Mohan":
+                output = `<a href="/resume/"><li class="tag__item tag__item_author text-muted d-none d-sm-inline-block list-inline-item cursor-pointer"><i class="bi bi-pencil-square"></i>  ${author}</li></a>`;
+                break;
+            case undefined:
+            case null:
+            case "":
+                output = ""; // No output when author is not defined
+                break;
+            default:
+                output = `<li class="tag__item tag__item_author text-muted d-none d-sm-inline-block list-inline-item"><i class="bi bi-pencil-square"></i>  ${author}</li>`;
+                break;
+        }
+
+        return output;
+    }
+
     body_generated += `<div class="m-0 my-5 postcard ${window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'} shadow-lg ${getcolor}">
     <a class="postcard__img_link" href="${link}">${imgTag}</a>
     <div class="postcard__text t-dark">
@@ -4511,7 +4530,7 @@ function body_blockcards(link, date, title, desc, codetype, readtime, author, se
                 ${semester ? `<li class="tag__item text-muted d-none d-sm-inline-block list-inline-item"><i class="bi bi-collection"></i>  ${semester}</li>` : ""}
                 ${codetype ? `<li class="tag__item text-muted d-none d-lg-inline-block list-inline-item"><i class="bi bi-file-earmark-code"></i>  ${codetype}</li>` : ""}
                 ${readtime ? `<li class="tag__item text-muted d-none d-lg-inline-block list-inline-item"><i class="bi bi-clock"></i>  ${readtime} minute read</li>` : ""}
-                ${author ? `<li class="tag__item tag__item_author text-muted d-none d-sm-inline-block list-inline-item"><i class="bi bi-pencil-square"></i>  ${author}</li>` : ""}
+                ${author ? authorlink(author) : ""}               
             </ul>
         </div>
         <div class="postcard__bar"></div>
