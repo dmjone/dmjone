@@ -35,7 +35,8 @@ function get_menu_list(datetogen) {
                 codetype: "Prerequisite",
                 readtime: 45,
                 date: "Tue August 5, 2024",
-                link: "computer-networks-introduction"
+                link: "computer-networks-introduction",
+                
             },
             {
                 title: "Components of a Computer Network",
@@ -43,7 +44,8 @@ function get_menu_list(datetogen) {
                 codetype: "Prerequisite",
                 readtime: 45,
                 date: "Tue August 5, 2024",
-                link: "components-of-a-computer-network"
+                link: "components-of-a-computer-network",
+                
             },
             {
                 title: "Types of Computer Networks",
@@ -51,7 +53,8 @@ function get_menu_list(datetogen) {
                 codetype: "Prerequisite",
                 readtime: 45,
                 date: "Tue August 5, 2024",
-                link: "types-of-computer-networks"
+                link: "types-of-computer-networks",
+                
             },       
             {
                 title: "Network Topologies",
@@ -59,7 +62,8 @@ function get_menu_list(datetogen) {
                 codetype: "Prerequisite",
                 readtime: 45,
                 date: "Tue August 5, 2024",
-                link: "network-topologies"                
+                link: "network-topologies",
+                
             },
             {
                 title: "Network Protocols",
@@ -67,7 +71,8 @@ function get_menu_list(datetogen) {
                 codetype: "Prerequisite",
                 readtime: 45,
                 date: "Tue August 5, 2024",
-                link: "network-protocols"
+                link: "network-protocols",
+                
             },
             {
                 title: "Network Devices",
@@ -75,7 +80,8 @@ function get_menu_list(datetogen) {
                 codetype: "Prerequisite",
                 readtime: 45,
                 date: "Tue August 5, 2024",
-                link: "network-devices"
+                link: "network-devices",
+                
             },
             {
                 title: "OSI Model",
@@ -83,7 +89,8 @@ function get_menu_list(datetogen) {
                 codetype: "Prerequisite",
                 readtime: 30,
                 date: "Tue August 6, 2024",
-                link: "osi-model"
+                link: "osi-model",
+                
             },
             {
                 title: "Internet vs. Intranet vs. Extranet",
@@ -91,7 +98,8 @@ function get_menu_list(datetogen) {
                 codetype: "Prerequisite",
                 readtime: 30,
                 date: "Tue August 6, 2024",
-                link: "internet-vs-intranet-vs-extranet"
+                link: "internet-vs-intranet-vs-extranet",
+                
             },
             {
                 title: "Network Security",
@@ -99,7 +107,8 @@ function get_menu_list(datetogen) {
                 codetype: "Prerequisite",
                 readtime: 45,
                 date: "Tue August 6, 2024",
-                link: "network-security"
+                link: "network-security",
+                
             },
             {
                 title: "Network Architecture",
@@ -107,7 +116,8 @@ function get_menu_list(datetogen) {
                 codetype: "Prerequisite",
                 readtime: 45,
                 date: "Tue August 5, 2024",
-                link: "network-architecture"
+                link: "network-architecture",
+                
             },                        
             {
                 title: "OSI Model vs TCP/IP Model",
@@ -115,7 +125,8 @@ function get_menu_list(datetogen) {
                 codetype: "Prerequisite",
                 readtime: 30,
                 date: "Sat August 10, 2024",
-                link: "osi-model-vs-tcp-ip-model"
+                link: "osi-model-vs-tcp-ip-model",
+                
             },
             {
                 title: "Role and Function of Network Components",
@@ -123,7 +134,8 @@ function get_menu_list(datetogen) {
                 codetype: "CCNA v1.1 Concepts",
                 readtime: 35,
                 date: "Mon August 12, 2024",
-                link: "role-and-function-of-network-components"
+                link: "role-and-function-of-network-components",
+                
             },
             {
                 title: "Characteristics of network topology architectures",
@@ -131,7 +143,8 @@ function get_menu_list(datetogen) {
                 codetype: "CCNA v1.1 Concepts",
                 readtime: 30,
                 date: "Tue August 13, 2024",
-                link: "characteristics-of-network-topology-architectures"
+                link: "characteristics-of-network-topology-architectures",
+                
             },
             {
                 title: "Physical interface and cabling types",
@@ -139,7 +152,8 @@ function get_menu_list(datetogen) {
                 codetype: "CCNA v1.1 Concepts",
                 readtime: 25,
                 date: "Fri August 16, 2024",
-                link: "physical-interface-and-cabling-types"
+                link: "physical-interface-and-cabling-types",
+                
             },
             {
                 title: "Identify interface and cable issues (collisions, errors, mismatch duplex, and/or speed)",
@@ -147,7 +161,8 @@ function get_menu_list(datetogen) {
                 codetype: "CCNA v1.1 Concepts",
                 readtime: 20,
                 date: "Mon August 19, 2024",
-                link: "identify-interface-and-cable-issues"
+                link: "identify-interface-and-cable-issues",
+                
             },
             {
                 title: "TCP and UDP",
@@ -155,7 +170,8 @@ function get_menu_list(datetogen) {
                 codetype: "CCNA v1.1 Concepts",
                 readtime: 25,
                 date: "Tue August 20, 2024",
-                link: "tcp-and-udp"
+                link: "tcp-and-udp",
+                
             },
             {
                 title: "Configure and verify IPv4 addressing and subnetting",
@@ -163,7 +179,8 @@ function get_menu_list(datetogen) {
                 codetype: "CCNA v1.1 Concepts",
                 readtime: 30,
                 date: "Fri August 23, 2024",
-                link: "configure-and-verify-ipv4-addressing-and-subnetting"
+                link: "configure-and-verify-ipv4-addressing-and-subnetting",
+                
             },
             {
                 title: "Private IPv4 addressing",
@@ -171,7 +188,8 @@ function get_menu_list(datetogen) {
                 codetype: "CCNA v1.1 Concepts",
                 readtime: 20,
                 date: "Mon August 26, 2024",
-                link: "private-ipv4-addressing"
+                link: "private-ipv4-addressing",
+                
             },
             {
                 title: "IPv6 addressing and Prefix",
@@ -179,7 +197,8 @@ function get_menu_list(datetogen) {
                 codetype: "CCNA v1.1 Concepts",
                 readtime: 25,
                 date: "Tue August 27, 2024",
-                link: "ipv6-addressing-and-prefix"
+                link: "ipv6-addressing-and-prefix",
+                
             },
             {
                 title: "Verify IP parameters for Client OS (Windows, Mac OS, Linux)",
@@ -187,7 +206,8 @@ function get_menu_list(datetogen) {
                 codetype: "CCNA v1.1 Concepts",
                 readtime: 20,
                 date: "Fri August 30, 2024",
-                link: "verify-ip-parameters-for-client-os"
+                link: "verify-ip-parameters-for-client-os",
+                
             },
             {
                 title: "Wireless Principles",
@@ -195,7 +215,8 @@ function get_menu_list(datetogen) {
                 codetype: "CCNA v1.1 Concepts",
                 readtime: 25,
                 date: "Fri August 30, 2024",
-                link: "wireless-principles"
+                link: "wireless-principles",
+                
             },
             {
                 title: "Virtualization fundamentals (server virtualization, containers, and VRFs)",
@@ -203,7 +224,8 @@ function get_menu_list(datetogen) {
                 codetype: "CCNA v1.1 Concepts",
                 readtime: 30,
                 date: "Fri August 30, 2024",
-                link: "virtualization-fundamentals"
+                link: "virtualization-fundamentals",
+                
             },
             {
                 title: "Switching Concepts",
@@ -211,7 +233,8 @@ function get_menu_list(datetogen) {
                 codetype: "CCNA v1.1 Concepts",
                 readtime: 35,
                 date: "Mon September 2, 2024",
-                link: "switching-concepts"
+                link: "switching-concepts",
+                
             },
             {
                 title: "Configure and verify VLANs (normal range) spanning multiple switches",
@@ -219,7 +242,8 @@ function get_menu_list(datetogen) {
                 codetype: "CCNA v1.1 Concepts",
                 readtime: 25,
                 date: "Tue September 3, 2024",
-                link: "configure-and-verify-vlans-spanning-multiple-switches"
+                link: "configure-and-verify-vlans-spanning-multiple-switches",
+                
             },
             {
                 title: "Configure and verify interswitch connectivity",
@@ -227,7 +251,8 @@ function get_menu_list(datetogen) {
                 codetype: "CCNA v1.1 Concepts",
                 readtime: 25,
                 date: "Tue September 3, 2024",
-                link: "configure-and-verify-interswitch-connectivity"
+                link: "configure-and-verify-interswitch-connectivity",
+                
             },
             {
                 title: "Configure and verify Layer 2 discovery protocols (CDP, LLDP)",
@@ -235,7 +260,8 @@ function get_menu_list(datetogen) {
                 codetype: "CCNA v1.1 Concepts",
                 readtime: 20,
                 date: "Tue September 3, 2024",
-                link: "configure-and-verify-layer-2-discovery-protocols"
+                link: "configure-and-verify-layer-2-discovery-protocols",
+                
             },
             {
                 title: "Configure and verify (Layer 2/Layer 3) EtherChannel (LACP)",
@@ -243,7 +269,8 @@ function get_menu_list(datetogen) {
                 codetype: "CCNA v1.1 Concepts",
                 readtime: 25,
                 date: "Fri September 6, 2024",
-                link: "configure-and-verify-etherchannel-lacp"
+                link: "configure-and-verify-etherchannel-lacp",
+                
             },
             {
                 title: "Basic Operations of Rapid PVST+ Spanning Tree Protocol",
@@ -251,7 +278,8 @@ function get_menu_list(datetogen) {
                 codetype: "CCNA v1.1 Concepts",
                 readtime: 25,
                 date: "Fri September 6, 2024",
-                link: "basic-operations-of-rapid-pvst-spanning-tree-protocol"
+                link: "basic-operations-of-rapid-pvst-spanning-tree-protocol",
+                
             },
             {
                 title: "Cisco Wireless Architectures and AP Modes",
@@ -259,7 +287,8 @@ function get_menu_list(datetogen) {
                 codetype: "CCNA v1.1 Concepts",
                 readtime: 30,
                 date: "Fri September 6, 2024",
-                link: "cisco-wireless-architectures-and-ap-modes"
+                link: "cisco-wireless-architectures-and-ap-modes",
+                
             },
             {
                 title: "Physical infrastructure connections of WLAN components",
@@ -267,7 +296,8 @@ function get_menu_list(datetogen) {
                 codetype: "CCNA v1.1 Concepts",
                 readtime: 25,
                 date: "Fri September 6, 2024",
-                link: "physical-infrastructure-connections-of-wlan-components"
+                link: "physical-infrastructure-connections-of-wlan-components",
+                
             },
             {
                 title: "Network Device Management Access",
@@ -275,7 +305,8 @@ function get_menu_list(datetogen) {
                 codetype: "CCNA v1.1 Concepts",
                 readtime: 20,
                 date: "Mon September 9, 2024",
-                link: "network-device-management-access"
+                link: "network-device-management-access",
+                
             },
             {
                 title: "Wireless LAN GUI Configuration",
@@ -283,7 +314,8 @@ function get_menu_list(datetogen) {
                 codetype: "CCNA v1.1 Concepts",
                 readtime: 25,
                 date: "Mon September 9, 2024",
-                link: "wireless-lan-gui-configuration"
+                link: "wireless-lan-gui-configuration",
+                
             },
             {
                 title: "IP Connectivity",
@@ -291,7 +323,8 @@ function get_menu_list(datetogen) {
                 codetype: "CCNA v1.1 Concepts",
                 readtime: 30,
                 date: "Mon September 9, 2024",
-                link: "ip-connectivity"
+                link: "ip-connectivity",
+                
             },
             {
                 title: "Router Packet Forwarding Decisions",
@@ -299,7 +332,8 @@ function get_menu_list(datetogen) {
                 codetype: "CCNA v1.1 Concepts",
                 readtime: 25,
                 date: "Mon September 9, 2024",
-                link: "router-packet-forwarding-decisions"
+                link: "router-packet-forwarding-decisions",
+                
             },
             {
                 title: "Configure and verify IPv4 and IPv6 static routing",
@@ -307,7 +341,8 @@ function get_menu_list(datetogen) {
                 codetype: "CCNA v1.1 Concepts",
                 readtime: 25,
                 date: "Mon September 9, 2024",
-                link: "configure-and-verify-ipv4-and-ipv6-static-routing"
+                link: "configure-and-verify-ipv4-and-ipv6-static-routing",
+                
             },
             {
                 title: "OSPF Configuration and Verification",
@@ -315,7 +350,8 @@ function get_menu_list(datetogen) {
                 codetype: "CCNA v1.1 Concepts",
                 readtime: 35,
                 date: "Mon September 9, 2024",
-                link: "ospf-configuration-and-verification"
+                link: "ospf-configuration-and-verification",
+                
             },
             {
                 title: "Configure and verify single area OSPFv2",
@@ -323,7 +359,8 @@ function get_menu_list(datetogen) {
                 codetype: "CCNA v1.1 Concepts",
                 readtime: 25,
                 date: "Mon September 9, 2024",
-                link: "configure-and-verify-single-area-ospfv2"
+                link: "configure-and-verify-single-area-ospfv2",
+                
             },
             {
                 title: "First Hop Redundancy Protocols",
@@ -331,7 +368,8 @@ function get_menu_list(datetogen) {
                 codetype: "CCNA v1.1 Concepts",
                 readtime: 30,
                 date: "Mon September 9, 2024",
-                link: "first-hop-redundancy-protocols"
+                link: "first-hop-redundancy-protocols",
+                
             },
             {
                 title: "Configure and verify inside source NAT using static and pools",
@@ -339,7 +377,8 @@ function get_menu_list(datetogen) {
                 codetype: "CCNA v1.1 Concepts",
                 readtime: 25,
                 date: "Mon September 9, 2024",
-                link: "configure-and-verify-inside-source-nat"
+                link: "configure-and-verify-inside-source-nat",
+                
             },
             {
                 title: "Configure and verify NTP operating in a client and server mode",
@@ -347,7 +386,8 @@ function get_menu_list(datetogen) {
                 codetype: "CCNA v1.1 Concepts",
                 readtime: 25,
                 date: "Mon September 9, 2024",
-                link: "configure-and-verify-ntp-operating-in-client-and-server-mode"
+                link: "configure-and-verify-ntp-operating-in-client-and-server-mode",
+                
             },
             {
                 title: "Role of DHCP and DNS within the network",
@@ -355,7 +395,8 @@ function get_menu_list(datetogen) {
                 codetype: "CCNA v1.1 Concepts",
                 readtime: 30,
                 date: "Mon September 9, 2024",
-                link: "role-of-dhcp-and-dns-within-the-network"
+                link: "role-of-dhcp-and-dns-within-the-network",
+                
             },
             {
                 title: "Function of SNMP in network operations",
@@ -363,7 +404,8 @@ function get_menu_list(datetogen) {
                 codetype: "CCNA v1.1 Concepts",
                 readtime: 25,
                 date: "Mon September 9, 2024",
-                link: "function-of-snmp-in-network-operations"
+                link: "function-of-snmp-in-network-operations",
+                
             },
             {
                 title: "Use of syslog features, including facilities and severity levels",
@@ -371,7 +413,8 @@ function get_menu_list(datetogen) {
                 codetype: "CCNA v1.1 Concepts",
                 readtime: 25,
                 date: "Mon September 9, 2024",
-                link: "use-of-syslog-features"
+                link: "use-of-syslog-features",
+                
             },
             {
                 title: "Configure and verify DHCP client and relay",
@@ -379,7 +422,8 @@ function get_menu_list(datetogen) {
                 codetype: "CCNA v1.1 Concepts",
                 readtime: 25,
                 date: "Mon September 9, 2024",
-                link: "configure-and-verify-dhcp-client-and-relay"
+                link: "configure-and-verify-dhcp-client-and-relay",
+                
             },
             {
                 title: "Forwarding per-hop behavior (PHB) for QoS",
@@ -387,7 +431,8 @@ function get_menu_list(datetogen) {
                 codetype: "CCNA v1.1 Concepts",
                 readtime: 25,
                 date: "Mon September 9, 2024",
-                link: "forwarding-per-hop-behavior-for-qos"
+                link: "forwarding-per-hop-behavior-for-qos",
+                
             },
             {
                 title: "Configure network devices for remote access using SSH",
@@ -395,7 +440,8 @@ function get_menu_list(datetogen) {
                 codetype: "CCNA v1.1 Concepts",
                 readtime: 25,
                 date: "Mon September 9, 2024",
-                link: "configure-network-devices-for-remote-access-using-ssh"
+                link: "configure-network-devices-for-remote-access-using-ssh",
+                
             },
             {
                 title: "Capabilities and functions of TFTP/FTP in the network",
@@ -403,7 +449,8 @@ function get_menu_list(datetogen) {
                 codetype: "CCNA v1.1 Concepts",
                 readtime: 25,
                 date: "Mon September 9, 2024",
-                link: "capabilities-and-functions-of-tftp-ftp"
+                link: "capabilities-and-functions-of-tftp-ftp",
+                
             },
             {
                 title: "Key Security Concepts",
@@ -411,7 +458,8 @@ function get_menu_list(datetogen) {
                 codetype: "CCNA v1.1 Concepts",
                 readtime: 30,
                 date: "Mon September 9, 2024",
-                link: "key-security-concepts"
+                link: "key-security-concepts",
+                
             },
             {
                 title: "Security Program Elements",
@@ -419,7 +467,8 @@ function get_menu_list(datetogen) {
                 codetype: "CCNA v1.1 Concepts",
                 readtime: 30,
                 date: "Mon September 9, 2024",
-                link: "security-program-elements"            
+                link: "security-program-elements",
+                    
             },
             {
                 title: "Configure and verify device access control using local passwords",
@@ -427,7 +476,8 @@ function get_menu_list(datetogen) {
                 codetype: "CCNA v1.1 Concepts",
                 readtime: 25,
                 date: "Mon September 9, 2024",
-                link: "configure-and-verify-device-access-control-using-local-passwords"
+                link: "configure-and-verify-device-access-control-using-local-passwords",
+                
             },
             {
                 title: "Security Password Policy",
@@ -435,7 +485,8 @@ function get_menu_list(datetogen) {
                 codetype: "CCNA v1.1 Concepts",
                 readtime: 25,
                 date: "Mon September 9, 2024",
-                link: "security-password-policy"
+                link: "security-password-policy",
+                
             },
             {
                 title: "IPsec Remote Access",
@@ -443,7 +494,8 @@ function get_menu_list(datetogen) {
                 codetype: "CCNA v1.1 Concepts",
                 readtime: 30,
                 date: "Mon September 9, 2024",
-                link: "ipsec-remote-access"
+                link: "ipsec-remote-access",
+                
             },
             {
                 title: "Site-to-site VPN",
@@ -451,7 +503,8 @@ function get_menu_list(datetogen) {
                 codetype: "CCNA v1.1 Concepts",
                 readtime: 30,
                 date: "Mon September 9, 2024",
-                link: "site-to-site-vpn"
+                link: "site-to-site-vpn",
+                
             },
             {
                 title: "Configure and verify access control lists",
@@ -459,7 +512,8 @@ function get_menu_list(datetogen) {
                 codetype: "CCNA v1.1 Concepts",
                 readtime: 25,
                 date: "Mon September 9, 2024",
-                link: "configure-and-verify-access-control-lists"
+                link: "configure-and-verify-access-control-lists",
+                
             },
             {
                 title: "Configure and verify Layer 2 security features",
@@ -467,7 +521,8 @@ function get_menu_list(datetogen) {
                 codetype: "CCNA v1.1 Concepts",
                 readtime: 25,
                 date: "Mon September 9, 2024",
-                link: "configure-and-verify-layer-2-security-features"                
+                link: "configure-and-verify-layer-2-security-features",
+                              
             },
             {
                 title: "3A Pillars of Security - Authentication, Authorization, and Accounting",
@@ -475,7 +530,8 @@ function get_menu_list(datetogen) {
                 codetype: "CCNA v1.1 Concepts",
                 readtime: 30,
                 date: "Mon September 9, 2024",
-                link: "3a-pillars-of-security"
+                link: "3a-pillars-of-security",
+                
             },
             {
                 title: "Wireless Security Protocols",
@@ -483,7 +539,8 @@ function get_menu_list(datetogen) {
                 codetype: "CCNA v1.1 Concepts",
                 readtime: 30,
                 date: "Mon September 9, 2024",
-                link: "wireless-security-protocols"
+                link: "wireless-security-protocols",
+                
             },
             {
                 title: "Configure and verify WLAN within the GUI using WPA2 PSK",
@@ -491,7 +548,8 @@ function get_menu_list(datetogen) {
                 codetype: "CCNA v1.1 Concepts",
                 readtime: 25,
                 date: "Mon September 9, 2024",
-                link: "configure-and-verify-wlan-within-the-gui-using-wpa2-psk"
+                link: "configure-and-verify-wlan-within-the-gui-using-wpa2-psk",
+                
             },
             {
                 title: "Automation and Programmability",
@@ -499,7 +557,8 @@ function get_menu_list(datetogen) {
                 codetype: "CCNA v1.1 Concepts",
                 readtime: 30,
                 date: "Mon September 9, 2024",
-                link: "automation-and-programmability"
+                link: "automation-and-programmability",
+                
             },
             {
                 title: "Faculty Lecture 1: Overview of Computer Networks",
@@ -507,7 +566,8 @@ function get_menu_list(datetogen) {
                 codetype: "Lecture",
                 readtime: 45,
                 date: "Tue August 6, 2024",
-                link: "faculty-lecture-history-overview"
+                link: "faculty-lecture-history-overview",
+                
             },
             {
                 title: "Faculty Lecture 2: Data Communication",
@@ -515,7 +575,8 @@ function get_menu_list(datetogen) {
                 codetype: "Lecture",
                 readtime: 45,
                 date: "Tue August 6, 2024",
-                link: "faculty-lecture-data-communication"
+                link: "faculty-lecture-data-communication",
+                
             },
             {
                 title: "Faculty Lecture 3: Data Communication and Networking",
@@ -524,7 +585,8 @@ function get_menu_list(datetogen) {
                 codetype: "Lecture",
                 readtime: 45,
                 date: "Tue August 6, 2024",
-                link: "faculty-lecture-data-communication-networking"
+                link: "faculty-lecture-data-communication-networking",
+                
                 // link: "#",
                 // continuereading: false
             },
