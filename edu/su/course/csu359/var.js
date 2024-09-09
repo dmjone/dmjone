@@ -324,9 +324,95 @@ function get_menu_list(datetogen) {
                 readtime: 25,
                 date: "Mon September 9, 2024",
                 link: "capabilities-and-functions-of-tftp-ftp"
+            },
+            {
+                title: "Key Security Concepts",
+                desc: "Learn about key security concepts in computer networks, including the principles of network security, security protocols, and best practices. Understand the importance of security in network design and implementation.",
+                codetype: "Concepts",
+                readtime: 30,
+                date: "Mon September 9, 2024",
+                link: "key-security-concepts"
+            },
+            {
+                title: "Security Program Elements",
+                desc: "Explore the elements of a security program in computer networks, including security policies, procedures, standards, and guidelines. Learn how security programs are designed and implemented to protect network assets.",
+                codetype: "Concepts",
+                readtime: 30,
+                date: "Mon September 9, 2024",
+                link: "security-program-elements"            
+            },
+            {
+                title: "Configure and verify device access control using local passwords",
+                desc: "Learn how to configure and verify device access control using local passwords in computer networks. Understand the importance of access control and how it is used to secure network devices.",
+                codetype: "Concepts",
+                readtime: 25,
+                date: "Mon September 9, 2024",
+                link: "configure-and-verify-device-access-control-using-local-passwords"
+            },
+            {
+                title: "Security Password Policy",
+                desc: "Explore security password policies in computer networks, including password complexity, expiration, and reuse. Learn how password policies are used to enhance network security and protect user accounts.",
+                codetype: "Concepts",
+                readtime: 25,
+                date: "Mon September 9, 2024",
+                link: "security-password-policy"
+            },
+            {
+                title: "IPsec Remote Access",
+                desc: "Learn about IPsec remote access in computer networks, including VPN technologies, encryption, and authentication protocols. Understand how IPsec is used to secure remote access connections.",
+                codetype: "Concepts",
+                readtime: 30,
+                date: "Mon September 9, 2024",
+                link: "ipsec-remote-access"
+            },
+            {
+                title: "Site-to-site VPN",
+                desc: "Explore site-to-site VPNs in computer networks, including tunneling protocols, encryption, and authentication methods. Learn how site-to-site VPNs are used to connect remote sites securely over the internet.",
+                codetype: "Concepts",
+                readtime: 30,
+                date: "Mon September 9, 2024",
+                link: "site-to-site-vpn"
+            },
+            {
+                title: "Configure and verify access control lists",
+                desc: "Learn how to configure and verify access control lists (ACLs) in computer networks. Understand the role of ACLs in controlling traffic flow and securing network devices.",
+                codetype: "Concepts",
+                readtime: 25,
+                date: "Mon September 9, 2024",
+                link: "configure-and-verify-access-control-lists"
+            },
+            {
+                title: "Configure and verify Layer 2 security features",
+                desc: "Learn how to configure and verify Layer 2 security features in computer networks. Understand the security features used to protect Layer 2 protocols and prevent network attacks.",
+                codetype: "Concepts",
+                readtime: 25,
+                date: "Mon September 9, 2024",
+                link: "configure-and-verify-layer-2-security-features"                
+            },
+            {
+                title: "3A Pillars of Security - Authentication, Authorization, and Accounting",
+                desc: "Explore the concepts of 3A (Authentication, Authorization, and Accounting) in computer networks. Learn how 3A is used to control access to network resources and monitor user activities.",
+                codetype: "Concepts",
+                readtime: 30,
+                date: "Mon September 9, 2024",
+                link: "3a-pillars-of-security"
+            },
+            {
+                title: "Wireless Security Protocols",
+                desc: "Learn about wireless security protocols used in computer networks to secure wireless communications. Explore WEP, WPA, WPA2, and WPA3 protocols and their encryption methods.",
+                codetype: "Concepts",
+                readtime: 30,
+                date: "Mon September 9, 2024",
+                link: "wireless-security-protocols"
+            },
+            {
+                title: "Configure and verify WLAN within the GUI using WPA2 PSK",
+                desc: "Learn how to configure and verify WLAN within the GUI using WPA2 PSK in computer networks. Understand the steps to configure a wireless LAN with WPA2 PSK security using graphical user interfaces.",
+                codetype: "Concepts",
+                readtime: 25,
+                date: "Mon September 9, 2024",
+                link: "configure-and-verify-wlan-within-the-gui-using-wpa2-psk"
             }
-
-
 
 
 
