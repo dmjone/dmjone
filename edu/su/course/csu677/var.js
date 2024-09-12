@@ -337,7 +337,7 @@ function get_menu_list(datetogen) {
                 title: "Practical 1: Employee Registration Form",
                 desc: "Create an employee registration form using HTML, CSS, and JavaScript. This hands-on lab exercise will help you practice form design, validation, and submission, enhancing your skills in web development.",
                 codetype: "HTML, CSS",
-                readtime: 2,
+                readtime: 4,
                 date: "Thu August 8, 2024",
                 link: "employee-registration-form"
             },
@@ -345,10 +345,19 @@ function get_menu_list(datetogen) {
                 title: "Practical 2: Student Marks Calculator from JSON",
                 desc: "Build a student marks calculator using HTML, CSS, and JavaScript. This hands-on lab exercise will help you practice JSON data manipulation, dynamic content generation, and result calculation, enhancing your skills in web development.",
                 codetype: "HTML, CSS, JS, JSON",
-                readtime: 2,
+                readtime: 4,
                 date: "Thu August 22, 2024",
                 link: "student-marks"
-            }            
+            },
+            {
+                title: "Practical 3: Temperature and Unit Conversion",
+                desc: "Develop a temperature and unit conversion tool using HTML, CSS, and JavaScript. This hands-on lab exercise will help you practice user input handling, conversion logic, and output display, enhancing your skills in web development.",
+                codetype: "HTML, CSS, JS",
+                readtime: 4,
+                date: "Thu September 12, 2024",
+                link: "unit-conversion"
+            },
+            
         ];
         body_genmenu.processData(arr, def_date, def_author);
     }
