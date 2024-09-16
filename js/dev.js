@@ -6134,12 +6134,19 @@ function gen_blockquote() {
         { day: 20, month: 8, year: 2004, occasion: 'birthday', name: 'Piyush' },
         { day: 4, month: 9, year: 2004, occasion: 'birthday', name: 'Kamaksha' },
         { day: 5, month: 9, occasion: 'teachersday' },
+        { day: 10, month: 9, year: 2004, occasion: 'birthday', name: 'Atul Chauhan' },
+        { day: 16, month: 9, year: 2004, occasion: 'birthday', name: 'Chauhan Sahab' },
+        { day: 25, month: 9, year: 2004, occasion: 'birthday', name: 'Anugraha' },
         { day: 28, month: 9, year: 1998, occasion: 'birthday', name: 'Stephen' },
+        { day: 14, month: 10, year: 2004, occasion: 'birthday', name: 'Rijul' },
+        { day: 15, month: 10, year: 1970, occasion: 'birthday', name: 'dmj' },
+        { day: 18, month: 10, year: 2004, occasion: 'birthday', name: 'Anurag' },
+        { day: 24, month: 10, year: 2003, occasion: 'birthday', name: 'Rishu' },
         { day: 31, month: 10, year: 2004, occasion: 'birthday', name: 'Vedansh' },
-        { day: 14, month: 12, year: 2002, occasion: 'birthday', name: 'Subhojeet' },
         { day: 12, month: 11, occasion: 'diwali' },
         { day: 13, month: 11, occasion: 'childrensday' },
         { day: 15, month: 11, year: 2004, occasion: 'birthday', name: 'Asmi' },
+        { day: 14, month: 12, year: 2002, occasion: 'birthday', name: 'Subhojeet' },        
     ];
 
     const birthdayEmojis = [
@@ -6210,7 +6217,7 @@ function gen_blockquote() {
                     if (!(event.name === "dmj")) {
                         console.log(1);
                         randomMessage = age ?
-                            `${randomEmoji1}Happy <span class="fw-bold">${age}</span><sup>${getSuffix(age)}</sup> ${event.name}!${randomEmoji2}<br><span class ="display-6">${getRandomItem(birthdayMessages)}</span>` :
+                            `${randomEmoji1}Belated Happy <span class="fw-bold">${age}</span><sup>${getSuffix(age)}</sup> ${event.name}!${randomEmoji2}<br><span class ="display-6">${getRandomItem(birthdayMessages)}</span>` :
                             `${randomEmoji1}Happy Birthday, ${initial}!${randomEmoji2}<br>${getRandomItem(birthdayMessages)}`;
                         // `${randomEmoji1}Enjoy the day ${event.name}!${randomEmoji2}<br><span class ="display-6">${getRandomItem(birthdayMessages)}</span>`;
                         // `<p class="text-center" style="font-size:1rem">${'❤️'.repeat(10)}<p><p class="text-center" style="font-size:1rem">${'❤️'.repeat(10)}<p><p class="text-center" style="font-size:1rem">${'❤️'.repeat(10)}<p><p class="text-center" style="font-size:1.5rem">${'❤️'.repeat(1)}<p><p class="mt-10 text-muted text-sm-center small" style="font-size:1.1rem">Click for a musical melody!</p>`;
