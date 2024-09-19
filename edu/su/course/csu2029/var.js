@@ -150,6 +150,14 @@ function get_menu_list(datetogen) {
                 readtime: 5,
                 date: "Wed August 15, 2024",
                 link: "ten-core-life-skills"
+            },
+            {
+                title: "The Mystery of sqrt Function",
+                desc: "Exploring the mathematical function sqrt(x) and how its calculated in the backend when you call that function from within the code.",
+                codetype: "Concepts",
+                readtime: 5,
+                date: "Wed August 15, 2024",
+                link: "mystery-of-sqrt-function"
             }
          
         ];
