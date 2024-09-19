@@ -89,8 +89,15 @@ function get_menu_list(datetogen) {
                 codetype: "Prerequisite",
                 readtime: 30,
                 date: "Tue August 6, 2024",
-                link: "osi-model",
-                
+                link: "osi-model",                
+            },
+            {
+                title: "TCP/IP Model",
+                desc: "Explore the TCP/IP model, a protocol suite used in computer networks to enable communication between devices. Learn the layers of the TCP/IP model and their functions in network communication.",
+                codetype: "Prerequisite",
+                readtime: 30,
+                date: "Tue August 6, 2024",
+                link: "tcp-ip-model",
             },
             {
                 title: "Internet vs. Intranet vs. Extranet",
