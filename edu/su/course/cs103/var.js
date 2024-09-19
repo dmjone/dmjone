@@ -89,7 +89,19 @@ function get_menu_list(datetogen) {
                 title: "Week 7 : Programming Assignment 2",
                 desc: "Find the minimum cost to connect all destination cities using RedDart's shipping routes, ensuring all cities are connected with the least total expense.",
                 codetype: "CS103 | Getting Started with Competitive Programing",                
-            },            
+            },       
+            {
+                link: "theory/week-8-assignment-1",
+                title: "Week 8 : Programming Assignment 1",
+                desc: "Guide the last human population from Earth to a sanctuary planet using one-way, collapsing wormholes while maximizing the number of unique paths.",
+                codetype: "CS103 | Getting Started with Competitive Programing",
+            },
+            {
+                link: "theory/week-9-assignment-1",
+                title: "Week 9 : Programming Assignment 1",
+                desc: "Determine the minimum time required for SpaceZ's limited number of spaceships, each with fixed speed, to explore M planets without duplication, ensuring that K spaceships complete their mission.",
+                codetype: "CS103 | Getting Started with Competitive Programing",
+            }
         ];
 
         body_genmenu.processData(arr, def_date, def_author, { isMainCategory: true });
