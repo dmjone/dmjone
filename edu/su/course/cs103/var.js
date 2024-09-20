@@ -82,7 +82,7 @@ function get_menu_list(datetogen) {
                 link: "theory/week-7-assignment-1",
                 title: "Week 7 : Programming Assignment 1",
                 desc: "As a sewer manager, your task is to connect all village houses with the least amount of piping, ensuring every house is connected either directly or indirectly while minimizing costs.",
-                codetype: "CS103 | Getting Started with Competitive Programing",                
+                codetype: "CS103 | Getting Started with Competitive Programing",
             },
             {
                 link: "theory/week-7-assignment-2",
