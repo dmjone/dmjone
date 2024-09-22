@@ -30,6 +30,13 @@ function get_menu_list(datetogen) {
     function get_class(def_date, def_author) {
         const arr = [
             {
+                title: "First Occurrence of Events",
+                desc: "The first occurrence of events in Ethical Hacking. This module covers the key events and milestones in the history of Ethical Hacking, highlighting the evolution of hacking techniques, tools, and practices over time.",
+                codetype: "Trivia",
+                readtime: 5,
+                link: "first-occurrence-events"
+            },
+            {
                 title: "Lecture 1 - Ethical Hacking Overview",
                 desc: "Explore the fundamentals of Ethical Hacking, including key concepts, principles, and practices. This introductory module provides an overview of Ethical Hacking, its applications, and the role of Ethical Hackers in safeguarding digital assets and information.",
                 codetype: "Faculty Lecture",
@@ -105,7 +112,8 @@ function get_menu_list(datetogen) {
                 codetype: "Faculty Lecture",
                 readtime: 5,
                 link: "proxy-servers-vpns"
-            },            
+            },         
+            
         ];
         body_genmenu.processData(arr, def_date, def_author);
     }
