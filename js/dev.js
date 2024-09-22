@@ -2524,10 +2524,10 @@ let header_author = async function (...args) {
 
         ////////// Control Panel //////////
 
-        const MIN_QUESTIONS = 3;
-        const MAX_QUESTIONS = 11;
-        const MIN_TIME_PER_QUESTION = 5;
-        const MAX_TIME_PER_QUESTION = 45;
+        const MIN_QUESTIONS = 21; // 3
+        const MAX_QUESTIONS = 29; // 11
+        const MIN_TIME_PER_QUESTION = 5; // 5
+        const MAX_TIME_PER_QUESTION = 30; // 45
         const SCORE_CONTAINER_ID = 'score-container';
         const TIMER_ELEMENT_ID = 'timer';
         const NAME_CONTAINER_ID = 'name-container';
@@ -2570,11 +2570,12 @@ let header_author = async function (...args) {
                                     <h2 id="final-score"></h2>
                                     <p id="congrats-message"></p>
                                     <p id="time-taken" class="text-center"></p>
-                                    <p class="text-center fw-bold">The page will refresh automatically in 15 seconds.</p>
+                                    <!-- <p class="text-center fw-bold">The page will refresh automatically in 7 seconds.</p> -->                                    
+                                    <p id="countdown-message" class="text-center fw-bold">Take a deep breath, 7 seconds to go!</p>
                                 </div>
                             </div>
                         </div>`;
-
+                
 
             ////////// LOGIC /////////////                
 
@@ -2911,9 +2912,24 @@ let header_author = async function (...args) {
                 const endModal = new bootstrap.Modal(document.getElementById(END_MODAL_ID));
                 endModal.show();
 
+                (function () {
+                    let countdown = 7;
+                    const countdownElement = document.getElementById('countdown-message');
+
+                    const interval = setInterval(() => {
+                        countdown--;
+                        countdownElement.textContent = `Take a deep breath, ${countdown} seconds to go!`;
+
+                        if (countdown === 0) {
+                            clearInterval(interval);
+                            // location.reload(); // Refresh the page when countdown reaches 0
+                        }
+                    }, 1000);
+                })();
+
                 setTimeout(() => {
                     location.reload();
-                }, 15000);
+                }, 6000);
             }
 
             function checkCompletion() {
