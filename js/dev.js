@@ -1634,10 +1634,11 @@ let header_navbar = async function (flags) {
 
     const generateNavLinks = async (courseID) => {
         const courses = await fetchCourseData();
-        const program = getProgramForCourse(courses, courseID);
-
+        let program = getProgramForCourse(courses, courseID);
+        
+        console.log(program)
         if (!program) {
-            console.error(`Program not found for course ID: ${courseID}`);
+            console.error(`Program not found for course ID: ${courseID}. Setting default`);            
             return '';
         }
 
@@ -3420,8 +3421,10 @@ let header_author = async function (...args) {
     window.cL = () => {
         if (GLOBAL_crawler_mode) {
             return;
-        }
-
+        }        
+    };
+    
+    function hidemainuntillogin() {        
         try {
             let l = checkLogin();
             let main = document.querySelector('main');
@@ -3438,10 +3441,10 @@ let header_author = async function (...args) {
             }
             return l;
         } catch (e) {
-            console.log('Error: ', e)
+            console.log('Error Displaying Main: ', e)
         }
-    };
-
+    }
+    
     (() => {
         try {
             const isBotUserAgent = /bot|crawl|slurp|spider/i.test(navigator.userAgent);
@@ -3456,11 +3459,13 @@ let header_author = async function (...args) {
                     // Calls cL for sure if the path is under /my/ or else it has 0.1 (10%) chance that it will require login on any page. Don't run on the host url
                     if (window.location.pathname.match(/\/my\/(.*)/)) {
                         document.addEventListener('DOMContentLoaded', cL);
+                        hidemainuntillogin();
                     } else {
                         if (window.location.pathname !== GLOBAL_login_page_path && window.location.pathname !== '/') {
                             document.addEventListener('DOMContentLoaded', () => {
                                 if (Math.random() < 0.1) {
                                     cL();
+                                    hidemainuntillogin();
                                 }
                             });
                         }
