@@ -6222,7 +6222,7 @@ function gen_blockquote() {
     const todaysDate = new Date().toDateString();
     const todaysEvents = getTodaysEvents();
     const FIREWORKS_DISPLAYED_KEY = 'fireworks_displayed';
-    const forcedisplay = 1;
+    const forcedisplay = 0;
     const fireworksDisplayedInfo = forcedisplay ? false : JSON.parse(localStorage.getItem(FIREWORKS_DISPLAYED_KEY));
     let playbirthdaymusic;
 
