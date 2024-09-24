@@ -15,12 +15,12 @@ function get_menu_list(datetogen) {
                 desc: "Practice web development concepts and techniques with hands-on lab exercises. This section offers a range of practical activities to help you apply your knowledge of HTML, CSS, JavaScript, and other web technologies. Click to access interactive coding challenges, projects, and tutorials that will enhance your skills in web development and design.",
                 codetype: "CSU677P | Web Technology Lab",
             },
-            // {
-                // link: "#",
-                // title: "Practice MCQs and Quizzes [WIP]",
-                // desc: "Test your knowledge of web technology with practice quizzes and multiple-choice questions. This section offers a variety of quizzes covering essential topics such as HTML, CSS, JavaScript, and responsive web design. Click to take quizzes and assess your understanding of web development concepts.",
-                // codetype: "Practice | Web Technology",
-            // }
+            {
+                link: "practice/",
+                title: "Practice MCQs and Quizzes",
+                desc: "Test your knowledge of web technology with practice quizzes and multiple-choice questions. This section offers a variety of quizzes covering essential topics such as HTML, CSS, JavaScript, and responsive web design. Click to take quizzes and assess your understanding of web development concepts.",
+                codetype: "Practice | Web Technology",
+            }
         ];
 
         body_genmenu.processData(arr, def_date, def_author, { isMainCategory: true });
