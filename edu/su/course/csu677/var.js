@@ -70,6 +70,20 @@ function get_menu_list(datetogen) {
                 link: "history-of-javascript"
             },
             {
+                title: "Javascript Data Types",
+                desc: "Learn about JavaScript data types, including primitive types, composite types, and special values. This class covers essential concepts for working with data in JavaScript, including numbers, strings, booleans, arrays, objects, and null/undefined values. Explore how to declare variables, assign values, perform type conversions, and manipulate data using JavaScript.",
+                codetype: "JavaScript",
+                readtime: 5,
+                link: "javascript-data-types"
+            },
+            {
+                title: "JavaScript Operator Precedence and Associativity",
+                desc: "Explore JavaScript operator precedence and associativity rules to understand how expressions are evaluated. This class covers essential concepts for working with operators in JavaScript, including arithmetic, comparison, logical, assignment, and bitwise operators. Learn how to use parentheses to control evaluation order, avoid common pitfalls, and write clear and concise code.",
+                codetype: "JavaScript",
+                readtime: 5,
+                link: "operator-precedence-associativity"                
+            },
+            {
                 title: "Number Utilities Made with JavaScript",
                 desc: "Explore essential number utilities in JavaScript, including leap year detection, prime number checking, odd or even determination, factorial calculation, and more. This guide provides a comprehensive overview of working with numbers in JavaScript, covering concepts such as number conversion, rounding, precision, and practical algorithms.",
                 codetype: "JavaScript",
