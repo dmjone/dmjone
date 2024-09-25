@@ -91,6 +91,13 @@ function get_menu_list(datetogen) {
                 link: "number-utilities"
             },
             {
+                title: "Built in JavaScript Functions",
+                desc: "Learn about built-in functions in JavaScript, including string, array, math, date, and global functions. This class covers essential concepts for working with JavaScript functions, including function invocation, arguments, return values, and scope. Explore how to use built-in functions to perform common tasks, manipulate data, and enhance your JavaScript code.",
+                codetype: "JavaScript",
+                readtime: 5,
+                link: "built-in-functions"
+            },
+            {
                 title: "Document Object Model (DOM)",
                 desc: "Learn about the Document Object Model (DOM), including nodes, elements, attributes, and events. This class covers essential concepts for manipulating web pages with the DOM, including element selection, content modification, event handling, and style changes. Explore how to interact with the DOM, create dynamic web content, and enhance user interactivity using JavaScript.",
                 codetype: "DOM",
