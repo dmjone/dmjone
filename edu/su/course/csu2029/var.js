@@ -7,7 +7,7 @@ function get_menu_list(datetogen) {
                 title: "Theory: Thinking Unboxed: Strategies for Critical Analysis",
                 desc: "Theoretical concepts and principles related to Thinking Unboxed: Strategies for Critical Analysis. Click to explore the fundamentals and advanced aspects of the subject, including real-world applications and case studies.",
                 codetype: "Theory | CSU2029",
-                cardimage: "https://cdn.dmj.one/edu/su/course/csuCODE/img/logo.webp",                
+                cardimage: "https://cdn.dmj.one/edu/su/course/csu2029/img/logo.webp",                
                 // cardimage_dark: "//cdn.dmj.one/img/needhelp.webp",               
                 // continuereading: " Click here to reach out to Faculty directly through email"
             },
@@ -15,7 +15,7 @@ function get_menu_list(datetogen) {
                 link: "practice/",
                 title: "Practice Thinking Unboxed: Strategies for Critical Analysis Concepts with MCQ's",
                 desc: "Reinforce your understanding of Thinking Unboxed: Strategies for Critical Analysis with practice exercises and MCQ's. Click to access hands-on exercises that will enhance your comprehension of Thinking Unboxed: Strategies for Critical Analysis principles and prepare you.",
-                codetype: "Practice | Thinking Unboxed: Strategies for Critical Analysis",                
+                codetype: "Practice | CSU2029",                
             }
         ];
 
