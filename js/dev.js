@@ -612,6 +612,7 @@ const body_pomodoro_helptext = `
         { rel: pr, href: "https://dmj.one" },
         { rel: pr, href: "https://dev.dmj.one" },
         { rel: pr, href: "https://cdn.dmj.one" },
+        { rel: pr, href: "https://bgimg.dmj.one" },
         { rel: pr, href: "https://fonts.gstatic.com" },
         { rel: pr, href: "https://picsum.photos" },
         { rel: pr, href: "https://type.fit" },
@@ -4327,6 +4328,8 @@ function body_genmenu(course) {
 
     /**********  AUTOMATION CONTROL **********/
     body_genmenu.processData = function (arr, def_date, def_author, options = {}) {
+        let htmlContent = '';
+        
         // Get Random date near the entered date.
         function gendate(date) {
             var inputDate = new Date(date);
@@ -4357,8 +4360,14 @@ function body_genmenu(course) {
             const semester = _data.semester || options.semester || null;
             const cardimage = _data.cardimage || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? _data.cardimage_dark : null) || options.cardimage || null;
             const continuereading = _data.continuereading || options.continuereading || null;
-            body_blockcards(link, date, title, desc, codetype, readtime, author, semester, cardimage, continuereading);
+            // body_blockcards(link, date, title, desc, codetype, readtime, author, semester, cardimage, continuereading);
+            const html = body_blockcards(link, date, title, desc, codetype, readtime, author, semester, cardimage, continuereading);
+            htmlContent += html;
         }
+
+        // After the loop, append htmlContent to the DOM in one operation
+        var genclass = document.querySelector(".genmenu");
+        genclass.innerHTML += htmlContent;
     }
 
 
@@ -4374,6 +4383,17 @@ function body_genmenu(course) {
 }
 
 
+function genqr(data) {
+    var qr = qrcode(0, 'H');
+    qr.addData(data);
+    qr.make();
+    fetch(qr.createDataURL(4, "")).then(res => res.blob()).then(blob => {
+        var img = document.createElement('img');
+        img.src = URL.createObjectURL(blob);
+        console.log(img);
+        // document.body.appendChild(img);
+    });
+}
 
 
 
@@ -4416,8 +4436,9 @@ function body_blockcards(link, date, title, desc, codetype, readtime, author, se
     //     var randomNum = Math.floor(Math.random() * 10) + 1;
     //     return (randomNum <= val) ? 1 : 0;
     // };
-    const randomNum01 = (val = 7) => Math.random() * 10 + 1 <= val ? 1 : 0;
-    randomNum01(5);
+    // const randomNum01 = (val = 7) => Math.random() * 10 + 1 <= val ? 1 : 0;
+    const randomNum01 = (val = 70) => Math.random() * 100 < val ? 1 : 0;
+    // randomNum01(5);
 
     // Generate QR if qr_link is available or generate the picsum.photo image
     // var qrcode_data = (function () {
@@ -4435,20 +4456,26 @@ function body_blockcards(link, date, title, desc, codetype, readtime, author, se
         return qr.createDataURL(4, "");
     })();
 
+    function createImageTagForcards() {
+        const randomUrl = () => `https://bgimg.dmj.one/${Math.floor(Math.random() * (54228 - 50000 + 1)) + 50000}.webp`;
 
-    let unsplash_categories = ["programming", "robot", "space", "script", "tech", "network", "electronic", "server", "code"];
-    unsplash_categories = unsplash_categories[randomNum(0, unsplash_categories.length - 1)];
+        let unsplash_categories = ["programming", "robot", "space", "script", "tech", "network", "electronic", "server", "code"];
+        unsplash_categories = unsplash_categories[randomNum(0, unsplash_categories.length - 1)];
 
-    // var imgsrc = randomNum01(5) === 0 ? qrcode_data : `https://picsum.photos/${randomNum(200, 400)}`;
-    // var imgsrc = randomNum01(1) === 0 ? `https://picsum.photos/${randomNum(200, 400)}` : `https://source.unsplash.com/${randomNum(200, 300)}x${randomNum(200, 300)}/?${unsplash_categories}`;
-    var imgsrc = `https://picsum.photos/${randomNum(200, 400)}`;
-    imgsrc = randomNum01(2) === 0 ? imgsrc : qrcode_data;
-    imgsrc = cardimage || imgsrc; // forces to choose supplied image
-    var is_qr = Number(imgsrc === qrcode_data);
-    var imgAlt = is_qr ? "QR code of the URL" : "A Random Image from picsum.photo";
-    var imgStyle = is_qr ? 'object-fit:contain;padding:2.5rem' : "";
-    var imgClass = is_qr ? 'postcard__img is_qr' : 'postcard__img';
-    var imgTag = `<img class="${imgClass}" src="${imgsrc}" alt="${imgAlt}" style="${imgStyle}" loading="lazy"/>`;
+        // var imgsrc = randomNum01(5) === 0 ? qrcode_data : `https://picsum.photos/${randomNum(200, 400)}`;
+        // var imgsrc = randomNum01(1) === 0 ? `https://picsum.photos/${randomNum(200, 400)}` : `https://source.unsplash.com/${randomNum(200, 300)}x${randomNum(200, 300)}/?${unsplash_categories}`;
+        var imgsrc2 = randomNum01(50) === 1 ? randomUrl() : `https://picsum.photos/${randomNum(200, 400)}`;
+        imgsrc = randomNum01(90) === 1 ? imgsrc2 : qrcode_data;
+        imgsrc = cardimage || imgsrc; // forces to choose supplied image
+        var is_qr = Number(imgsrc === qrcode_data);
+        var imgAlt = is_qr ? "QR code of the URL" : "A Random Image from picsum.photo";
+        var imgStyle = is_qr ? 'object-fit:contain;padding:2.5rem' : "";
+        var imgClass = is_qr ? 'postcard__img is_qr' : 'postcard__img';
+        var imgTag = `<img class="${imgClass}" src="${imgsrc}" alt="${imgAlt}" style="${imgStyle}" loading="lazy"/>`;
+        return imgTag;
+    }
+
+    var imgTag = createImageTagForcards();
 
     // qrblock = qr_link ? `<div id="qrcode"></div> ${imgsrc}` : "";
 
@@ -4457,7 +4484,7 @@ function body_blockcards(link, date, title, desc, codetype, readtime, author, se
     var getcolor = color[randomNum(0, color.length)];
     // https://picsum.photos/
 
-    const continueReading = continuereading || body_blockcards_continuereading_options[Math.floor(Math.random() * body_blockcards_continuereading_options.length)]; // Gets the options list from the global variable.
+    const continueReading = continuereading || body_blockcards_continuereading_options[Math.floor(Math.random() * body_blockcards_continuereading_options.length)]; // Gets the options list from the global variable.    
 
     /**** Backup ***/
     // body_generated += `<div class="m-0 my-5 postcard light shadow ${getcolor}">`;
@@ -4563,8 +4590,43 @@ function body_blockcards(link, date, title, desc, codetype, readtime, author, se
             </a>
         </ul>
     </div>
-</div>`;
+    </div>`;
 
+    // document.addEventListener('DOMContentLoaded', () => {
+    //     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+    //     const applyTheme = () => {
+    //         document.querySelectorAll('.postcard').forEach(card => {
+    //             if (mediaQuery.matches) {
+    //                 card.classList.add('dark');
+    //                 card.classList.remove('light');
+    //             } else {
+    //                 card.classList.add('light');
+    //                 card.classList.remove('dark');
+    //             }
+    //         });
+    //     };
+
+    //     // Apply theme on initial load
+    //     applyTheme();
+
+    //     // Listen for changes in the color scheme preference
+    //     mediaQuery.addEventListener('change', applyTheme);
+    // });
+
+
+
+    let finaltowrite = body_generated
+    // document.write(body_generated + m + m1 + m2 + m3 + m4 + m5 + m6 + m7 + m8 + m9 + gen_end);
+    // document.addEventListener("DOMContentLoaded", function () {
+      // var genclass = document.querySelector(".genmenu");
+      // genclass.innerHTML += finaltowrite;
+    // });
+    return body_generated;
+
+}
+
+(function () {
     document.addEventListener('DOMContentLoaded', () => {
         const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
@@ -4586,17 +4648,7 @@ function body_blockcards(link, date, title, desc, codetype, readtime, author, se
         // Listen for changes in the color scheme preference
         mediaQuery.addEventListener('change', applyTheme);
     });
-
-
-
-    let finaltowrite = body_generated
-    // document.write(body_generated + m + m1 + m2 + m3 + m4 + m5 + m6 + m7 + m8 + m9 + gen_end);
-    // document.addEventListener("DOMContentLoaded", function () {
-    var genclass = document.querySelector(".genmenu");
-    genclass.innerHTML += finaltowrite;
-    // });
-
-}
+})();
 
 function sitemap_var_gen_clipboard() {
     // function called at around line 700 in the footer block
