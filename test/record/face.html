@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Emotion Detection with Stability</title>
+        <style>
+            body {
+                text-align: center;
+                margin-top: 20px;
+            }
+
+            #videoWrapper {
+                position: relative;
+                display: inline-block;
+            }
+
+            #video {
+                width: 640px;
+                height: 480px;
+                background-color: black;
+                z-index: 1;
+            }
+
+            #canvas {
+                position: absolute;
+                top: 0;
+                left: 0;
+                z-index: 999 !important;
+                /* Canvas on top of the video */
+                width: 640px;
+                height: 480px;
+                pointer-events: none;
+                /* Ensure canvas does not block interactions */
+            }
+
+            #emotionDisplay {
+                margin-top: 10px;
+                font-size: 24px;
+                color: green;
+            }
+        </style>
+    </head>
+
+    <body>
+
+        <h1>Real-time Emotion Detection</h1>
+
+        <!-- Wrapper to position canvas above the video -->
+        <div id="videoWrapper">
+            <canvas id="canvas"></canvas>
+            <video id="video" autoplay muted></video>
+        </div>
+
+        <div id="emotionDisplay">Detecting emotion...</div>
+
+        <script defer src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+        <script defer src="https://cdn.jsdelivr.net/npm/@tensorflow-models/blazeface"></script>
+        <script>
+            let model, video, ctx, canvas, recentEmotions = [];
+            let currentEmotion = null;
+            let cooldown = false;
+            const emotionHistoryLimit = 10;  // Keep track of last 10 emotions
+            const cooldownTime = 2000;  // 2 seconds cooldown
+            const confidenceThreshold = 0.7;  // Confidence threshold for dominant emotion
+            const emotionDisplay = document.getElementById('emotionDisplay');
+
+            // Load the BlazeFace model
+            async function loadModel() {
+                model = await blazeface.load();
+                console.log('BlazeFace model loaded');
+            }
+
+            // Start video stream
+            async function startVideo() {
+                video = document.getElementById('video');
+                canvas = document.getElementById('canvas');
+                ctx = canvas.getContext('2d');
+                navigator.mediaDevices.getUserMedia({ video: {} })
+                    .then(stream => video.srcObject = stream)
+                    .catch(err => console.error("Error accessing webcam: ", err));
+            }
+
+            // Detect emotion and apply majority voting + confidence threshold + cooldown
+            function detectEmotion(face) {
+                // Placeholder for real emotion detection logic
+                const emotions = {
+                    happy: Math.random(),
+                    sad: Math.random(),
+                    angry: Math.random(),
+                    surprised: Math.random(),
+                    neutral: Math.random()
+                };
+
+                const dominantEmotion = Object.keys(emotions).reduce((a, b) => emotions[a] > emotions[b] ? a : b);
+
+                // Check if dominant emotion passes confidence threshold
+                if (emotions[dominantEmotion] < confidenceThreshold) {
+                    return currentEmotion;  // Continue with current emotion if confidence is low
+                }
+
+                // Add the detected emotion to recentEmotions array
+                recentEmotions.push(dominantEmotion);
+                if (recentEmotions.length > emotionHistoryLimit) {
+                    recentEmotions.shift();  // Keep only the last 10 emotions
+                }
+
+                // Determine the most frequent emotion from recentEmotions
+                const emotionCounts = recentEmotions.reduce((acc, emotion) => {
+                    acc[emotion] = (acc[emotion] || 0) + 1;
+                    return acc;
+                }, {});
+
+                const mostCommonEmotion = Object.keys(emotionCounts).reduce((a, b) => emotionCounts[a] > emotionCounts[b] ? a : b);
+
+                // Apply cooldown to prevent rapid emotion switching
+                if (!cooldown) {
+                    currentEmotion = mostCommonEmotion;
+                    cooldown = true;
+                    setTimeout(() => {
+                        cooldown = false;  // Allow emotion change after cooldown time
+                    }, cooldownTime);
+                }
+
+                return currentEmotion;
+            }
+
+            // Detect faces and draw results on canvas
+            async function detectFaces() {
+                const predictions = await model.estimateFaces(video, false);
+
+                // Clear canvas
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                predictions.forEach(prediction => {
+                    const topLeft = prediction.topLeft;
+                    const bottomRight = prediction.bottomRight;
+                    const width = bottomRight[0] - topLeft[0];
+                    const height = bottomRight[1] - topLeft[1];
+
+                    // Draw bounding box around the face
+                    ctx.strokeStyle = "green";
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(topLeft[0], topLeft[1], width, height);
+
+                    // Call emotion detection
+                    const detectedEmotion = detectEmotion(prediction);
+                    emotionDisplay.textContent = `Emotion: ${detectedEmotion}`;
+
+                    // Draw emotion label above the bounding box
+                    ctx.font = "20px Arial";
+                    ctx.fillStyle = "green";
+                    ctx.fillText(detectedEmotion, topLeft[0], topLeft[1] - 10);
+                });
+
+                // Keep detecting faces
+                requestAnimationFrame(detectFaces);
+            }
+
+            // Initialize the application
+            async function init() {
+                await loadModel();
+                startVideo();
+                video.addEventListener('loadeddata', detectFaces);
+            }
+
+            window.onload = init;
+        </script>
+    </body>
+
+</html>
