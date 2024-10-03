@@ -2540,7 +2540,7 @@ let header_author = async function (...args) {
         const END_MODAL_ID = 'endModal';
         const FETCH_FILE_NAME = 'qb.txt';
         const FETCH_FILE_NAME_WITH_DYNAMIC_PATH = GetCourseSpecificBaseFile(FETCH_FILE_NAME);
-        const FETCH_FILE_NAMES = ['qb.txt', '/edu/su/course/csu360/qb.txt']; // All Subject QuestionBank files
+        const FETCH_FILE_NAMES = ['/edu/su/course/csu359/qb.txt', '/edu/su/course/csu360/qb.txt', '/edu/su/course/csu677/qb.txt', '/edu/su/course/csu1105/qb.txt', '/edu/su/course/csu1291/qb.txt', '/edu/su/course/csu1530/qb.txt', '/edu/su/course/csu1899/qb.txt', '/edu/su/course/csu2029/qb.txt',]; // All Subject QuestionBank files
         let NEGATIVE_MARKING_ENABLED = 'auto';
         let negativeMarkingValue;
         let fetchQuestions;
@@ -2945,7 +2945,7 @@ let header_author = async function (...args) {
         }
 
         if (window.ReviewSubjectQuestions) {
-            (function () {
+            (function () {                
                 const reviewcss = document.createElement('link');
                 reviewcss.setAttribute('rel', 'stylesheet');
                 reviewcss.setAttribute('href', '/css/reviewaiken.css');
@@ -3423,6 +3423,7 @@ let header_author = async function (...args) {
         if (GLOBAL_crawler_mode) {
             return;
         }
+        hidemainuntillogin();
     };
 
     function hidemainuntillogin() {
@@ -3460,13 +3461,13 @@ let header_author = async function (...args) {
                     // Calls cL for sure if the path is under /my/ or else it has 0.1 (10%) chance that it will require login on any page. Don't run on the host url
                     if (window.location.pathname.match(/\/my\/(.*)/)) {
                         document.addEventListener('DOMContentLoaded', cL);
-                        hidemainuntillogin();
+                        // hidemainuntillogin();
                     } else {
                         if (window.location.pathname !== GLOBAL_login_page_path && window.location.pathname !== '/') {
                             document.addEventListener('DOMContentLoaded', () => {
                                 if (Math.random() < 0.1) {
                                     cL();
-                                    hidemainuntillogin();
+                                    // hidemainuntillogin();
                                 }
                             });
                         }
@@ -9041,6 +9042,11 @@ window.addEventListener("load", async function () {
     // // Fetch the data from the JSON file
     const response = await fetch('/js/automation-control-panel-exceptions.json');
     const data = await response.json();
+
+    if (window.headerfooteroff) {
+        window["loaded_header_author"] = 1;
+        window.loaded_copyright = 1;
+    }
 
     var currentUrl = document.location.pathname;
     var currentUrlWithoutHtml = currentUrl.endsWith('.html') ? currentUrl.slice(0, -5) : currentUrl;
