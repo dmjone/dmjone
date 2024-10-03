@@ -1636,10 +1636,10 @@ let header_navbar = async function (flags) {
     const generateNavLinks = async (courseID) => {
         const courses = await fetchCourseData();
         let program = getProgramForCourse(courses, courseID);
-        
+
         console.log(program)
         if (!program) {
-            console.error(`Program not found for course ID: ${courseID}. Setting default`);            
+            console.error(`Program not found for course ID: ${courseID}. Setting default`);
             return '';
         }
 
@@ -2514,7 +2514,7 @@ let header_author = async function (...args) {
     if (GLOBAL_crawler_mode) {
         return;
     }
-    
+
     // ^\d+\.\s  - Regex To remove 1. 2. etx question number from each question.
 
     document.addEventListener("DOMContentLoaded", function () {
@@ -2577,7 +2577,7 @@ let header_author = async function (...args) {
                                 </div>
                             </div>
                         </div>`;
-                
+
 
             ////////// LOGIC /////////////                
 
@@ -3422,10 +3422,10 @@ let header_author = async function (...args) {
     window.cL = () => {
         if (GLOBAL_crawler_mode) {
             return;
-        }        
+        }
     };
-    
-    function hidemainuntillogin() {        
+
+    function hidemainuntillogin() {
         try {
             let l = checkLogin();
             let main = document.querySelector('main');
@@ -3445,7 +3445,7 @@ let header_author = async function (...args) {
             console.log('Error Displaying Main: ', e)
         }
     }
-    
+
     (() => {
         try {
             const isBotUserAgent = /bot|crawl|slurp|spider/i.test(navigator.userAgent);
@@ -4329,7 +4329,7 @@ function body_genmenu(course) {
     /**********  AUTOMATION CONTROL **********/
     body_genmenu.processData = function (arr, def_date, def_author, options = {}) {
         let htmlContent = '';
-        
+
         // Get Random date near the entered date.
         function gendate(date) {
             var inputDate = new Date(date);
@@ -4646,8 +4646,8 @@ function body_blockcards(link, date, title, desc, codetype, readtime, author, se
     let finaltowrite = body_generated
     // document.write(body_generated + m + m1 + m2 + m3 + m4 + m5 + m6 + m7 + m8 + m9 + gen_end);
     // document.addEventListener("DOMContentLoaded", function () {
-      // var genclass = document.querySelector(".genmenu");
-      // genclass.innerHTML += finaltowrite;
+    // var genclass = document.querySelector(".genmenu");
+    // genclass.innerHTML += finaltowrite;
     // });
     return body_generated;
 
@@ -6237,7 +6237,7 @@ function gen_blockquote() {
         { day: 20, month: 8, year: 2004, occasion: 'birthday', name: 'Piyush' },
         { day: 4, month: 9, year: 2004, occasion: 'birthday', name: 'Kamaksha' },
         { day: 5, month: 9, occasion: 'teachersday' },
-        { day: 10, month: 9, year: 2004, occasion: 'birthday', name: 'Atul' },        
+        { day: 10, month: 9, year: 2004, occasion: 'birthday', name: 'Atul' },
         { day: 25, month: 9, year: 2004, occasion: 'birthday', name: 'Anugraha' },
         { day: 28, month: 9, year: 1998, occasion: 'birthday', name: 'Stephen' },
         { day: 14, month: 10, year: 2004, occasion: 'birthday', name: 'Rijul' },
@@ -6248,7 +6248,7 @@ function gen_blockquote() {
         { day: 1, month: 11, occasion: 'diwali' },
         { day: 13, month: 11, occasion: 'childrensday' },
         { day: 15, month: 11, year: 2004, occasion: 'birthday', name: 'Asmi' },
-        { day: 14, month: 12, year: 2002, occasion: 'birthday', name: 'Subhojeet' },       
+        { day: 14, month: 12, year: 2002, occasion: 'birthday', name: 'Subhojeet' },
     ];
 
     const birthdayEmojis = [
@@ -6492,7 +6492,7 @@ function gen_blockquote() {
                 });
 
 
-                if(playbirthdaymusic) playAudio(); // Attempt to play on load
+                if (playbirthdaymusic) playAudio(); // Attempt to play on load
             });
         })();
     }
@@ -6895,7 +6895,7 @@ var messageUsButtonCaller = function () {
     document.addEventListener('DOMContentLoaded', function () {
         const htmlContent = `
         <div id="btn_focus-class-message" class="btn_focus-class-message position-fixed">
-            <button id="common-message-us-button" type="button" class="btn bg-opacity-10 button_slide slide_right" data-bs-toggle="modal" data-bs-target="#common_msg_us_model"><i class="bi bi-envelope-plus-fill"></i> Message Us</button>
+            <button id="common-message-us-button" type="button" class="btn bg-opacity-10 button_slide slide_right" data-bs-toggle="modal" data-bs-target="#common_msg_us_model"><i class="bi bi-envelope-plus"></i>&nbsp;Message Us</button>
         </div>
         
         <div class="modal fade" id="common_msg_us_model" tabindex="-1" aria-hidden="true">
@@ -6968,7 +6968,7 @@ var messageUsButtonCaller = function () {
             }
 
             .btn_focus-class-message {
-                right: -97px;
+                right: -98px;
                 bottom: 30%;
             }
 
@@ -7130,16 +7130,7 @@ messageUsButtonCaller();
         </div>
         `;
 
-        const styles = `.button_slide {
-                border: 2px solid rgb(216, 2, 134);
-                cursor: pointer;
-                color: #d80286;
-                animation: leave 0.4s forwards;
-                backdrop-filter: blur(3px);
-                -webkit-backdrop-filter: blur(3px);
-                transition: right 0.4s;
-            }
-
+        const styles = `
             .btn_focus-class_search {
                 right: -62px;
                 bottom: 37%;
@@ -7147,32 +7138,6 @@ messageUsButtonCaller();
 
             .btn_focus-class_search:hover {
                 right: -5px;
-            }
-
-            .slide_right:hover {
-                animation: hover 0.4s forwards;
-            }
-
-            @keyframes hover {
-                from {
-                    box-shadow: inset 0 0 0 0.01px #d80286;
-                }
-
-                to {
-                    box-shadow: inset 8.79928em 0 0 0.01px #d80286;
-                    color: #fff;
-                }
-            }
-
-            @keyframes leave {
-                from {
-                    box-shadow: inset -8.79928em 0 0 0.01px #d80286;
-                    color: #fff;
-                }
-
-                to {
-                    box-shadow: inset 0 0 0 0.01px #d80286;
-                }
             }`;
 
         const container = document.createElement('div');
@@ -7209,6 +7174,155 @@ messageUsButtonCaller();
         $('#searchbox').modal('hide');
     }
 })();
+
+/********** Add-On: Font Size Adjuster **********/
+(function () {
+    if (GLOBAL_crawler_mode) {
+        return;
+    }
+
+    let showZoomButton = false;
+    let scaleFactor = 1.0;
+    let tvMode = false; // Initialize tv mode to false
+    let scrollInterval;
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const htmlContent = `        
+            <div class="btn_focus-class_zoom position-fixed">
+                <button id="font-size-adjuster" type="button" class="btn bg-opacity-10 button_slide slide_right">
+                    <i class="bi bi-tv"></i> TV Mode
+                </button>
+            </div>
+        `;
+
+        const styles = `
+            .btn_focus-class_zoom {
+                right: -76px;
+                bottom: 44%;
+            }
+
+            .btn_focus-class_zoom:hover {
+                right: -5px;
+            }
+            
+            .scroll-btn-7492uyeyg2378y2gew {
+                position: fixed;
+                right: 20px;
+                background-color: var(--header-background);
+                color: white;
+                border-radius: 40%;                
+                padding: 10px;
+                cursor: pointer;
+                display: none; /* Hidden until tvMode is true */
+                z-index: 999;
+            }
+
+            .scroll-up-7492uyeyg2378y2gew {
+                bottom: 80px;
+            }
+
+            .scroll-down-7492uyeyg2378y2gew {
+                bottom: 20px;
+            }
+        `;
+
+        const container = document.createElement('div');
+        container.innerHTML = htmlContent;
+        document.body.appendChild(container);
+
+        const styleSheet = document.createElement('style');
+        styleSheet.innerText = styles;
+        document.head.appendChild(styleSheet);
+
+        // Add the scroll buttons (hidden by default)
+        const scrollUpBtn = document.createElement('div');
+        scrollUpBtn.classList.add('scroll-btn-7492uyeyg2378y2gew', 'scroll-up-7492uyeyg2378y2gew', 'shadow-lg');
+        scrollUpBtn.innerHTML = '<i class="fas fa-arrow-up fw-bold"></i>';
+        document.body.appendChild(scrollUpBtn);
+
+        const scrollDownBtn = document.createElement('div');
+        scrollDownBtn.classList.add('scroll-btn-7492uyeyg2378y2gew', 'scroll-down-7492uyeyg2378y2gew', 'shadow-lg');
+        scrollDownBtn.innerHTML = '<i class="fas fa-arrow-down fw-bold"></i>';
+        document.body.appendChild(scrollDownBtn);
+
+        const zoomButton = document.querySelector('.btn_focus-class_zoom');
+        zoomButton.style.display = 'none';
+
+        zoomButton.classList.add('d-none');
+        window.addEventListener('scroll', function () {
+            zoomButton.classList.toggle('d-none', window.scrollY < 200);
+        });
+        window.addEventListener('scroll', function () {
+            if (window.scrollY > 200) {
+                if (!showZoomButton) {
+                    showZoomButton = true;
+                    zoomButton.style.display = 'block';
+                }
+            } else {
+                if (showZoomButton) {
+                    showZoomButton = false;
+                    zoomButton.style.display = 'none';
+                }
+            }
+        });
+
+        document.getElementById('font-size-adjuster').addEventListener('click', function () {
+            scaleFactor += 0.01; // Increase the scale factor by 0.1 on each click
+            const mainContent = document.querySelector('main'); // Target <main> tag
+
+            if (mainContent) {
+                const allElementsInMain = mainContent.querySelectorAll('*'); // Only target elements inside <main>
+
+                // Ensure no horizontal overflow
+                mainContent.style.overflowX = 'hidden';
+                mainContent.style.wordWrap = 'break-word'; // Prevent words from overflowing
+                mainContent.style.maxWidth = '100%'; // Ensure content doesn't exceed viewport width
+
+                allElementsInMain.forEach(function (element) {
+                    const currentFontSize = window.getComputedStyle(element).fontSize;
+                    const newSize = parseFloat(currentFontSize) * scaleFactor + 'px';
+                    element.style.fontSize = newSize;
+                    element.style.overflowWrap = 'break-word'; // Ensure text breaks to fit within the container
+                    element.style.maxWidth = '100%'; // Make sure the elements don't exceed the container's width
+                });
+            }
+
+            // Activate TV Mode
+            tvMode = true;
+
+            // Display scroll buttons when TV Mode is active
+            if (tvMode) {
+                scrollUpBtn.style.display = 'block';
+                scrollDownBtn.style.display = 'block';
+            }
+        });
+
+        // Scroll up/down when hovering on the buttons
+        scrollUpBtn.addEventListener('mouseover', function () {
+            scrollInterval = setInterval(() => {
+                window.scrollBy(0, -5); // Scroll up
+            }, 20);
+        });
+
+        scrollDownBtn.addEventListener('mouseover', function () {
+            scrollInterval = setInterval(() => {
+                window.scrollBy(0, 1); // Scroll down
+            }, 20);
+        });
+
+        // Stop scrolling when hover ends
+        scrollUpBtn.addEventListener('mouseout', function () {
+            clearInterval(scrollInterval);
+        });
+
+        scrollDownBtn.addEventListener('mouseout', function () {
+            clearInterval(scrollInterval);
+        });
+
+    });
+
+})();
+
 
 /********** Add-On: User Click Guide **********/
 // (function () {
