@@ -4,7 +4,7 @@ function get_menu_list(datetogen) {
         const arr = [
             {
                 link: "../csu1051/",
-                title: "Prerequisites: DSA <i class=\"bi bi-box-arrow-up-right\"></i>",
+                title: "Prerequisites: DSA <i class='bi bi-box-arrow-up-right'></i>",
                 desc: "It is recommended that you master Data Structures & Algorithms with our comprehensive collection of Data Structures & Algorithms Class Topics before continuing to the Theory below! The topics below build upon the concepts present in DSA. Click on the topic to visit.",
                 codetype: "CSU1051 | Class"
             },
