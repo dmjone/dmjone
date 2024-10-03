@@ -4449,26 +4449,53 @@ function body_blockcards(link, date, title, desc, codetype, readtime, author, se
     //     qr.make();
     //     return qr.createDataURL(4, "");
     // })();
+    // var qrcode_data = (function () {
+    //     var qr = qrcode(0, 'H');
+    //     qr.addData(window.location.href + link);
+    //     qr.make();
+    //     return qr.createDataURL(4, "");        
+    // })();
+
     var qrcode_data = (function () {
         var qr = qrcode(0, 'H');
         qr.addData(window.location.href + link);
         qr.make();
-        return qr.createDataURL(4, "");
+
+        // Create a Data URL for the QR code
+        var dataURL = qr.createDataURL(4, "");
+
+        // Convert the Data URL to a Blob
+        function dataURLToBlob(dataURL) {
+            var byteString = atob(dataURL.split(',')[1]);
+            var mimeString = dataURL.split(',')[0].split(':')[1].split(';')[0];
+            var ab = new ArrayBuffer(byteString.length);
+            var ia = new Uint8Array(ab);
+            for (var i = 0; i < byteString.length; i++) {
+                ia[i] = byteString.charCodeAt(i);
+            }
+            return new Blob([ab], { type: mimeString });
+        }
+
+        // Convert the Data URL to a Blob and create a Blob URL
+        var blob = dataURLToBlob(dataURL);
+        return URL.createObjectURL(blob);
     })();
 
+
     function createImageTagForcards() {
-        const randomUrl = () => `https://bgimg.dmj.one/${Math.floor(Math.random() * (54228 - 50000 + 1)) + 50000}.webp`;
+        // const randomUrl = () => `https://bgimg.dmj.one/${Math.floor(Math.random() * (54228 - 50000 + 1)) + 50000}.webp`;
 
         let unsplash_categories = ["programming", "robot", "space", "script", "tech", "network", "electronic", "server", "code"];
         unsplash_categories = unsplash_categories[randomNum(0, unsplash_categories.length - 1)];
 
         // var imgsrc = randomNum01(5) === 0 ? qrcode_data : `https://picsum.photos/${randomNum(200, 400)}`;
         // var imgsrc = randomNum01(1) === 0 ? `https://picsum.photos/${randomNum(200, 400)}` : `https://source.unsplash.com/${randomNum(200, 300)}x${randomNum(200, 300)}/?${unsplash_categories}`;
-        var imgsrc2 = randomNum01(50) === 1 ? randomUrl() : `https://picsum.photos/${randomNum(200, 400)}`;
-        imgsrc = randomNum01(90) === 1 ? imgsrc2 : qrcode_data;
-        imgsrc = cardimage || imgsrc; // forces to choose supplied image
+        // var imgsrc2 = randomNum01(50) === 1 ? randomUrl() : `https://picsum.photos/${randomNum(200, 400)}`;
+        var imgsrc2 = randomNum01(50) === 1 ? `https://agen-bgimg.dmj.one/?cb=${Math.random()}` : `https://picsum.photos/${randomNum(200, 400)}`;
+        imgsrc = cardimage || randomNum01(80) === 1 ? imgsrc2 : qrcode_data; // forces to choose supplied image        
+        imgsrc = window.location.host === "localhost" ? `https://agen-bgimg.dmj.one/?cb=${Math.random()}` : imgsrc;
         var is_qr = Number(imgsrc === qrcode_data);
-        var imgAlt = is_qr ? "QR code of the URL" : "A Random Image from picsum.photo";
+        var imgAlt = is_qr ? "QR code of the URL" : `A Random Image for ${title}`;
         var imgStyle = is_qr ? 'object-fit:contain;padding:2.5rem' : "";
         var imgClass = is_qr ? 'postcard__img is_qr' : 'postcard__img';
         var imgTag = `<img class="${imgClass}" src="${imgsrc}" alt="${imgAlt}" style="${imgStyle}" loading="lazy"/>`;
@@ -4569,7 +4596,7 @@ function body_blockcards(link, date, title, desc, codetype, readtime, author, se
         return output;
     }
 
-    body_generated += `<div class="m-0 my-5 postcard ${window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'} shadow-lg ${getcolor}">
+    body_generated += `<div class="m-0 my-5 postcard ${window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'} ${getcolor} shadow-lg">
     <a class="postcard__img_link" href="${link}">${imgTag}</a>
     <div class="postcard__text t-dark">
         <h2 class="postcard__title ${getcolor}"><a href="${link}">${title}</a></h2>
