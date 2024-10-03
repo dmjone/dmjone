@@ -1,0 +1,430 @@
+<!-------------------------- © 2007 - present, dmj.one and contributors. ----------------------------------
+   Part of the dmjone project. Licensed under the GNU AGPL. Provided as-is, without warranty of any kind. 
+-------------------- Redistribution and modifications must retain this notice. --------------------------->
+
+
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+    <!--<![endif]-->
+
+    <head>
+        <script src="/js/edu_su_common.js"></script>
+        <noscript>
+            <style>
+                html,
+                body {
+                    margin: 0;
+                    overflow: hidden;
+                }
+            </style>
+            <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+        </noscript>
+
+        <title>Multi-Biometrics - CSU1530 - Shoolini U</title>
+        <meta name="description" content="Learn about the theory and implementation of multi-biometrics in security systems at Shoolini University.">
+
+        <meta property="og:image" content="/logo.png">
+        <meta property="og:type" content="article">
+
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:site" content="@divyamohan1993">
+        <meta name="twitter:creator" content="@divyamohan1993">
+        <meta name="twitter:image" content="/logo.png">
+
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+        <meta name="author" content="Divya Mohan">
+        <meta name="robots" content="index, follow">
+
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js" integrity="sha512-sHSNLECRJSK+BFs7E8DiFc6pf6n90bLI85Emiw1jhreduZhK3VXgq9l4kAt9eTIHYAcuQBKHL01QKs4/3Xgl8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js" integrity="sha512-iWiuBS5nt6r60fCz26Nd0Zqe0nbk1ZTIQbl3Kv7kYsX+yKMUFHzjaH2+AnM6vp2Xs+gNmaBAVWJjSmuPw76Efg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                renderMathInElement(document.body, {
+                    // customised options
+                    // • auto-render specific keys, e.g.:
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false },
+                        { left: '\\(', right: '\\)', display: false },
+                        { left: '\\[', right: '\\]', display: true }
+                    ],
+                    // • rendering keys, e.g.:
+                    throwOnError: false
+                });
+            });
+        </script> -->
+
+    </head>
+
+    <body>
+
+        <script> header_author("dm"); </script>
+
+        <main>
+            <article class="agen-tableofcontents">
+                <h2 class="text-center">
+                    Multi-Biometrics
+                </h2>
+                <div class="d-none contentdate">2024, September 25</div>
+            </article>
+
+
+            <article>
+                <h3>1. Introduction to Multibiometrics</h3>
+                <p>Multibiometrics involves the use of multiple biometric indicators to identify or verify an individual. By combining different biometric modalities, such as fingerprint, face, voice, or iris, multibiometric systems enhance recognition accuracy and reliability compared to systems relying on a single biometric trait.</p>
+                <p>Key applications include:</p>
+                <ul>
+                    <li><strong>Secure Access Control</strong>: Enhancing security by requiring multiple biometric proofs.</li>
+                    <li><strong>Identity Verification</strong>: Reducing fraud in financial transactions and official documentation.</li>
+                    <li><strong>Border Security</strong>: Strengthening traveler identification at checkpoints.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>2. Types of Multibiometric Systems</h3>
+                <p>Multibiometric systems can be categorized based on how and where the fusion of biometric data occurs. Fusion can happen at various levels within the biometric recognition process.</p>
+            </article>
+
+            <article>
+                <h4>2.1 Sensor-Level Fusion</h4>
+                <p>Combines raw data from multiple sensors capturing the same or different biometric traits.</p>
+                <p>Characteristics:</p>
+                <ul>
+                    <li><strong>Data Combination</strong>: Merging raw data streams before feature extraction.</li>
+                    <li><strong>Example</strong>: Combining images from visible and infrared cameras.</li>
+                    <li><strong>Challenges</strong>: Requires compatible data formats and synchronization.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h4>2.2 Feature-Level Fusion</h4>
+                <p>Integrates feature sets extracted from multiple biometric modalities.</p>
+                <p>Methods:</p>
+                <ul>
+                    <li><strong>Feature Concatenation</strong>: Combining feature vectors into a single vector.</li>
+                    <li><strong>Dimensionality Reduction</strong>: Techniques like PCA to manage high-dimensional data.</li>
+                </ul>
+                <p>Mathematical representation:</p>
+                <p>Given feature vectors \( \mathbf{f}_1 \in \mathbb{R}^{n} \) and \( \mathbf{f}_2 \in \mathbb{R}^{m} \), the fused feature vector \( \mathbf{F} \) is:</p>
+                <p>$$ \mathbf{F} = [\mathbf{f}_1; \mathbf{f}_2] \in \mathbb{R}^{n+m} $$</p>
+            </article>
+
+            <article>
+                <h4>2.3 Score-Level Fusion</h4>
+                <p>Combines matching scores obtained from individual biometric matchers.</p>
+                <p>Techniques:</p>
+                <ul>
+                    <li><strong>Sum Rule</strong>: Adding scores from different matchers.</li>
+                    <li><strong>Weighted Sum</strong>: Applying weights to scores based on matcher performance.</li>
+                    <li><strong>Product Rule</strong>: Multiplying scores for joint probability estimation.</li>
+                </ul>
+                <p>Weighted sum formula:</p>
+                <p>$$ S_{\text{fused}} = w_1 S_1 + w_2 S_2 + \dots + w_k S_k $$</p>
+                <ul>
+                    <li><strong>\( S_i \)</strong>: Score from matcher \( i \).</li>
+                    <li><strong>\( w_i \)</strong>: Weight assigned to matcher \( i \).</li>
+                    <li><strong>\( k \)</strong>: Number of matchers.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h4>2.4 Decision-Level Fusion</h4>
+                <p>Combines the final decisions (accept/reject) from individual biometric systems.</p>
+                <p>Approaches:</p>
+                <ul>
+                    <li><strong>Majority Voting</strong>: The final decision is based on the majority of individual decisions.</li>
+                    <li><strong>AND Rule</strong>: Accept only if all systems agree on acceptance.</li>
+                    <li><strong>OR Rule</strong>: Accept if any system accepts the individual.</li>
+                </ul>
+                <p>Example of majority voting:</p>
+                <p>If three systems provide decisions \( D_1, D_2, D_3 \in \{\text{Accept}, \text{Reject}\} \), the fused decision \( D_{\text{fused}} \) is:</p>
+                <p>$$ D_{\text{fused}} = \text{mode}(D_1, D_2, D_3) $$</p>
+            </article>
+
+            <article>
+                <h3>3. Advantages of Multibiometrics</h3>
+                <p>Multibiometric systems offer several benefits over unibiometric systems.</p>
+            </article>
+
+            <article>
+                <h4>3.1 Increased Accuracy</h4>
+                <p>By combining multiple biometric traits, the system reduces the chance of misidentification.</p>
+                <p>Benefits:</p>
+                <ul>
+                    <li><strong>Error Reduction</strong>: Lower false acceptance and rejection rates.</li>
+                    <li><strong>Enhanced Reliability</strong>: More robust against individual sensor or matcher failures.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h4>3.2 Improved Security</h4>
+                <p>Using multiple biometrics makes it more difficult for unauthorized individuals to deceive the system.</p>
+                <p>Aspects:</p>
+                <ul>
+                    <li><strong>Spoofing Resistance</strong>: Harder to counterfeit multiple biometric traits simultaneously.</li>
+                    <li><strong>Fraud Detection</strong>: Increased ability to detect fraudulent attempts.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h4>3.3 Flexibility and Convenience</h4>
+                <p>Allows users to authenticate using different modalities based on context or accessibility.</p>
+                <p>Advantages:</p>
+                <ul>
+                    <li><strong>User Accommodation</strong>: Supports individuals who may have difficulty providing certain biometrics.</li>
+                    <li><strong>Adaptive Security Policies</strong>: Adjusts required modalities based on threat levels.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>4. Challenges in Multibiometrics</h3>
+                <p>Despite the benefits, multibiometric systems face specific challenges.</p>
+            </article>
+
+            <article>
+                <h4>4.1 Data Synchronization</h4>
+                <p>Ensuring that biometric data from different sources are correctly aligned in time and space.</p>
+                <p>Considerations:</p>
+                <ul>
+                    <li><strong>Temporal Alignment</strong>: Especially important for dynamic traits like voice and gait.</li>
+                    <li><strong>Spatial Alignment</strong>: Necessary when combining images from different sensors.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h4>4.2 Computational Complexity</h4>
+                <p>Processing multiple biometric modalities increases computational demands.</p>
+                <p>Implications:</p>
+                <ul>
+                    <li><strong>Processing Time</strong>: May require optimization for real-time applications.</li>
+                    <li><strong>Resource Requirements</strong>: Needs more memory and processing power.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h4>4.3 Fusion Strategy Selection</h4>
+                <p>Choosing the appropriate fusion method impacts system performance.</p>
+                <p>Factors:</p>
+                <ul>
+                    <li><strong>Compatibility</strong>: Not all modalities may be suitable for certain fusion levels.</li>
+                    <li><strong>Performance Trade-offs</strong>: Balancing accuracy with computational efficiency.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>5. Fusion Techniques</h3>
+                <p>Different methods are used to combine biometric data at various levels of the recognition process.</p>
+            </article>
+
+            <article>
+                <h4>5.1 Sensor-Level Fusion Techniques</h4>
+                <p>Combining raw data from multiple sensors.</p>
+                <p>Methods:</p>
+                <ul>
+                    <li><strong>Image Stitching</strong>: Merging images from multiple cameras to create a composite image.</li>
+                    <li><strong>Data Averaging</strong>: Averaging sensor readings to reduce noise.</li>
+                </ul>
+                <p>Example:</p>
+                <p>Combining fingerprint images from multiple fingers to form a single composite image for feature extraction.</p>
+            </article>
+
+            <article>
+                <h4>5.2 Feature-Level Fusion Techniques</h4>
+                <p>Integrating feature sets into a single feature vector.</p>
+                <p>Approaches:</p>
+                <ul>
+                    <li><strong>Vector Concatenation</strong>: Directly concatenating feature vectors.</li>
+                    <li><strong>Dimensionality Reduction</strong>: Using PCA or LDA to reduce the dimensionality of the concatenated vector.</li>
+                </ul>
+                <p>PCA transformation:</p>
+                <p>Given a high-dimensional feature vector \( \mathbf{F} \), PCA projects it onto a lower-dimensional subspace:</p>
+                <p>$$ \mathbf{F}_{\text{reduced}} = W^T \mathbf{F} $$</p>
+                <ul>
+                    <li><strong>\( W \)</strong>: Projection matrix consisting of principal components.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h4>5.3 Score-Level Fusion Techniques</h4>
+                <p>Combining matching scores from different biometric systems.</p>
+                <p>Common rules:</p>
+                <ul>
+                    <li><strong>Sum Rule</strong>: \( S_{\text{fused}} = \sum_{i=1}^{k} S_i \)</li>
+                    <li><strong>Weighted Sum Rule</strong>: \( S_{\text{fused}} = \sum_{i=1}^{k} w_i S_i \)</li>
+                    <li><strong>Max Rule</strong>: \( S_{\text{fused}} = \max\{ S_1, S_2, \dots, S_k \} \)</li>
+                    <li><strong>Min Rule</strong>: \( S_{\text{fused}} = \min\{ S_1, S_2, \dots, S_k \} \)</li>
+                </ul>
+                <p>Weights can be assigned based on the performance of each biometric system.</p>
+            </article>
+
+            <article>
+                <h4>5.4 Decision-Level Fusion Techniques</h4>
+                <p>Combining accept/reject decisions from multiple systems.</p>
+                <p>Strategies:</p>
+                <ul>
+                    <li><strong>Majority Voting</strong>: The decision agreed upon by the majority is selected.</li>
+                    <li><strong>Boolean Operations</strong>: Using logical AND/OR to combine decisions.</li>
+                </ul>
+                <p>Logical AND operation:</p>
+                <p>$$ D_{\text{fused}} = D_1 \land D_2 \land \dots \land D_k $$</p>
+                <p>The individual is accepted only if all systems agree on acceptance.</p>
+            </article>
+
+            <article>
+                <h3>6. Evaluation Metrics</h3>
+                <p>Assessing the performance of multibiometric systems requires appropriate metrics.</p>
+            </article>
+
+            <article>
+                <h4>6.1 False Acceptance Rate (FAR)</h4>
+                <p>The probability that unauthorized individuals are incorrectly accepted.</p>
+                <p>Formula:</p>
+                <p>$$ \text{FAR} = \frac{\text{Number of False Acceptances}}{\text{Total Number of Impostor Attempts}} $$</p>
+            </article>
+
+            <article>
+                <h4>6.2 False Rejection Rate (FRR)</h4>
+                <p>The probability that authorized individuals are incorrectly rejected.</p>
+                <p>Formula:</p>
+                <p>$$ \text{FRR} = \frac{\text{Number of False Rejections}}{\text{Total Number of Genuine Attempts}} $$</p>
+            </article>
+
+            <article>
+                <h4>6.3 Receiver Operating Characteristic (ROC) Curve</h4>
+                <p>Plots the trade-off between FAR and FRR at various thresholds.</p>
+                <p>Features:</p>
+                <ul>
+                    <li><strong>Area Under Curve (AUC)</strong>: A higher AUC indicates better system performance.</li>
+                    <li><strong>Equal Error Rate (EER)</strong>: The point where FAR equals FRR; a lower EER signifies higher accuracy.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>7. Implementation Example</h3>
+                <p>An example of a multibiometric system combining fingerprint and face recognition at the score level.</p>
+            </article>
+
+            <article>
+                <h4>7.1 Data Acquisition</h4>
+                <p>Collect fingerprint images and face images for each individual.</p>
+            </article>
+
+            <article>
+                <h4>7.2 Feature Extraction</h4>
+                <p>Extract features from both modalities.</p>
+                <ul>
+                    <li><strong>Fingerprint Features</strong>: Use minutiae extraction algorithms.</li>
+                    <li><strong>Face Features</strong>: Apply PCA or LBP for facial feature extraction.</li>
+                </ul>
+                <pre><code class="language-python"># Fingerprint feature extraction
+fingerprint_features = extract_minutiae(fingerprint_image)
+
+# Face feature extraction using PCA
+face_features = pca.transform(face_image_flattened)
+</code></pre>
+            </article>
+
+            <article>
+                <h4>7.3 Matching Scores Computation</h4>
+                <p>Compute matching scores for each modality.</p>
+                <pre><code class="language-python"># Fingerprint matching score
+fingerprint_score = fingerprint_matcher.compare(fingerprint_features, stored_fingerprint_template)
+
+# Face matching score
+face_score = face_matcher.compare(face_features, stored_face_template)
+</code></pre>
+            </article>
+
+            <article>
+                <h4>7.4 Score-Level Fusion</h4>
+                <p>Combine the scores using the weighted sum rule.</p>
+                <pre><code class="language-python"># Assign weights based on modality performance
+w_fingerprint = 0.6
+w_face = 0.4
+
+# Compute fused score
+fused_score = w_fingerprint * fingerprint_score + w_face * face_score
+</code></pre>
+                <p>Set a threshold to decide acceptance or rejection.</p>
+                <pre><code class="language-python"># Threshold for acceptance
+threshold = 0.75
+
+if fused_score &gt;= threshold:
+    decision = 'Accept'
+else:
+    decision = 'Reject'
+</code></pre>
+            </article>
+
+            <article>
+                <h4>7.5 System Evaluation</h4>
+                <p>Evaluate the system using test data to calculate FAR, FRR, and plot ROC curves.</p>
+                <pre><code class="language-python">from sklearn.metrics import roc_curve
+
+# Compute scores for genuine and impostor attempts
+genuine_scores = []
+impostor_scores = []
+
+for attempt in genuine_attempts:
+    # Compute fused score for genuine attempts
+    # Append to genuine_scores
+    pass
+
+for attempt in impostor_attempts:
+    # Compute fused score for impostor attempts
+    # Append to impostor_scores
+    pass
+
+# Combine scores and labels
+scores = genuine_scores + impostor_scores
+labels = [1]*len(genuine_scores) + [0]*len(impostor_scores)
+
+# Compute ROC curve
+fpr, tpr, thresholds = roc_curve(labels, scores)
+
+# Plot ROC curve
+import matplotlib.pyplot as plt
+plt.plot(fpr, tpr)
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('ROC Curve for Multibiometric System')
+plt.show()
+</code></pre>
+            </article>
+
+            <article>
+                <h3>8. Applications and Use Cases</h3>
+                <p>Multibiometric systems are employed in various domains requiring high security and reliability.</p>
+            </article>
+
+            <article>
+                <h4>8.1 Border Control</h4>
+                <p>Enhancing traveler identification by combining multiple biometrics, reducing the risk of identity fraud.</p>
+            </article>
+
+            <article>
+                <h4>8.2 Secure Access Facilities</h4>
+                <p>Restricting access to sensitive areas by requiring multiple forms of biometric verification.</p>
+            </article>
+
+            <article>
+                <h4>8.3 Financial Transactions</h4>
+                <p>Securing banking and payment systems through robust user authentication.</p>
+            </article>
+
+            <article>
+                <h3>9. Conclusion</h3>
+                <p>Multibiometrics leverages the strengths of multiple biometric modalities to improve identification accuracy, security, and user convenience. By understanding the various fusion techniques and addressing associated challenges, effective multibiometric systems can be designed for a wide range of applications.</p>
+            </article>
+
+        </main>
+
+        <script> copyright("all"); </script>
+
+    </body>
+
+</html>
