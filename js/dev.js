@@ -15,6 +15,7 @@ const cdnjs_font_awesome = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/
 const cdnjs_cryptoJS = "https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js";
 const google_login_js = "https://accounts.google.com/gsi/client";
 const cdnjs_DOMPurify = "https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.5/purify.min.js";
+const cdnjs_markdown = "https://cdnjs.cloudflare.com/ajax/libs/marked/14.1.2/marked.min.js";
 const GLOBAL_login_page_path = window.location.hostname === 'localhost' ? '/login.html' : '/login';
 
 const GLOBAL_SERVICEWORKER_REINSTALL = 0;
@@ -563,7 +564,7 @@ const body_pomodoro_helptext = `
     if (GLOBAL_crawler_mode) {
         allScripts = [cdnjs_jquery, cdnjs_bootstrap, cdnjs_DOMPurify];
     } else {
-        allScripts = [google_login_js, cdnjs_jquery, cdnjs_bootstrap, cdnjs_DOMPurify, cdnjs_highlightjs, cdnjs_font_awesome, cdnjs_cryptoJS, cdnjs_highlightjs_asm];
+        allScripts = [google_login_js, cdnjs_jquery, cdnjs_bootstrap, cdnjs_DOMPurify, cdnjs_highlightjs, cdnjs_font_awesome, cdnjs_cryptoJS, cdnjs_highlightjs_asm, cdnjs_markdown];
     }
 
     var loadScript = function (src) {
@@ -7323,6 +7324,122 @@ messageUsButtonCaller();
     });
 
 })();
+
+/********** Functionality: Markdown Renderer **********/
+(function () {
+    document.addEventListener('DOMContentLoaded', () => {
+        try {
+            // Check for the markdown element with id="markdown-raw"
+            const markdownElement = document.querySelector('#markdown-raw');
+
+            // If no markdown element is found, skip the rendering process
+            if (!markdownElement) {
+                console.log('No markdown-raw element found. Skipping...');
+                return;
+            }
+
+            // Ensure the markdown element has the 'd-none' class to keep it hidden
+            markdownElement.classList.add('d-none');
+
+            // Get the Markdown content from the element
+            const markdownText = markdownElement.textContent || markdownElement.innerText;
+
+            // Process and clean Markdown text only once, using a single pass
+            const cleanedMarkdownText = markdownText.split('\n').map(line => {
+                // Preserve indentation for list items ('-', '*'), but trim other lines
+                return line.trim().startsWith('-') || line.trim().startsWith('*') ? line : line.trimStart();
+            }).join('\n');
+
+            // Try rendering the Markdown to HTML using marked.js
+            let renderedHtml;
+            try {
+                renderedHtml = marked.parse(cleanedMarkdownText);
+            } catch (err) {
+                console.error('Error parsing Markdown:', err);
+                return;
+            }
+
+            // Efficiently split the content at <h1>, <h2>, <h3> tags and wrap them in <article>
+            const splitContent = renderedHtml.split(/(?=<h[1-3]>)/g);
+
+            // Create a document fragment for batching DOM updates
+            const fragment = document.createDocumentFragment();
+            splitContent.forEach(section => {
+                const article = document.createElement('article');
+                article.innerHTML = section;
+                fragment.appendChild(article);
+            });
+
+            // Inject the entire document fragment into the <main> element at once
+            const mainElement = document.querySelector('main');
+            if (mainElement) {
+                mainElement.appendChild(fragment);
+            } else {
+                console.error('No <main> element found to inject the rendered Markdown.');
+            }
+        } catch (globalErr) {
+            // Global error handling to ensure script execution continues
+            console.error('An unexpected error occurred:', globalErr);
+        }
+    });
+})();
+
+/********** Functionality: Markdown Renderer from GitHub Raw URL **********/
+(function () {
+    window.renderMDFromUrl = async function (url) {
+        try {
+            // Fetch the Markdown content from the given URL
+            const response = await fetch(url);
+
+            if (!response.ok) {
+                console.error(`Failed to fetch Markdown from URL: ${url}`);
+                return;
+            }
+
+            // Get the raw markdown text from the response
+            const markdownText = await response.text();
+
+            // Process and clean Markdown text only once, using a single pass
+            const cleanedMarkdownText = markdownText.split('\n').map(line => {
+                // Preserve indentation for list items ('-', '*'), but trim other lines
+                return line.trim().startsWith('-') || line.trim().startsWith('*') ? line : line.trimStart();
+            }).join('\n');
+
+            // Try rendering the Markdown to HTML using marked.js
+            let renderedHtml;
+            try {
+                renderedHtml = marked.parse(cleanedMarkdownText);
+            } catch (err) {
+                console.error('Error parsing Markdown:', err);
+                return;
+            }
+
+            // Efficiently split the content at <h1>, <h2>, <h3> tags and wrap them in <article>
+            const splitContent = renderedHtml.split(/(?=<h[1-3]>)/g);
+
+            // Create a document fragment for batching DOM updates
+            const fragment = document.createDocumentFragment();
+            splitContent.forEach(section => {
+                const article = document.createElement('article');
+                article.innerHTML = section;
+                fragment.appendChild(article);
+            });
+
+            // Inject the entire document fragment into the <main> element at once
+            const mainElement = document.querySelector('main');
+            if (mainElement) {
+                // mainElement.innerHTML = ''; // Clear existing content before injecting new
+                mainElement.appendChild(fragment);
+            } else {
+                console.error('No <main> element found to inject the rendered Markdown.');
+            }
+        } catch (globalErr) {
+            // Global error handling to ensure script execution continues
+            console.error('An unexpected error occurred:', globalErr);
+        }
+    };
+})();
+
 
 
 /********** Add-On: User Click Guide **********/
