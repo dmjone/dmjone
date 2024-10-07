@@ -73,6 +73,13 @@ function get_menu_list(datetogen) {
                 link: "palmprint-biometric-system",
             },
             {
+                title: "Hand Recognition in Biometrics",
+                desc: "Discover hand recognition in biometrics, a biometric modality used for authentication and identification. This topic covers hand recognition, hand geometry, hand image acquisition, hand feature extraction, hand matching, and hand biometric system applications. Click to learn more about hand recognition in biometrics and its relevance in modern security systems.",
+                codetype: "Concepts",
+                readtime: 10,
+                link: "hand-recognition-in-biometrics",
+            },
+            {
                 title: "2D Face Biometric System",
                 desc: "Discover the 2D face biometric system, a popular biometric modality used for authentication and identification. This topic covers 2D face recognition, 2D face image acquisition, 2D face feature extraction, 2D face matching, and 2D face biometric system applications. Click to learn more about the 2D face biometric system and its relevance in modern security systems.",
                 codetype: "Concepts",
