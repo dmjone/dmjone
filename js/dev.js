@@ -3209,6 +3209,7 @@ let header_author = async function (...args) {
         const expiryTime = userData.exp * 1000; // Convert exp to milliseconds                 
         localStorage.setItem('google_user', JSON.stringify(userData));
         localStorage.setItem('userName', userData.name);
+        localStorage.setItem('userEmail', userData.email);
         setCookie('sid', 'true', expiryTime);
     }
 
