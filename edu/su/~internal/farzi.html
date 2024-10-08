@@ -25,10 +25,7 @@
             <button type="submit">Mark Attendance</button>
         </form>
 
-        <br>
-
-        <!-- Button to reset attendance (visible only to admin) -->
-        <button id="adminResetButton">Admin Reset Attendance</button>
+        <br>        
 
         <div class="absentees" id="absenteesList">
             <h2>Absentees List</h2>
@@ -60,20 +57,7 @@
                     });
             });
 
-            // Function to reset attendance (admin only)
-            document.getElementById("adminResetButton").addEventListener("click", function () {
-                if (confirm("Are you sure you want to reset attendance for all users?")) {
-                    fetch("https://dmj.one/api/attendance/?admin_reset=true")
-                        .then(response => response.text())
-                        .then(result => {
-                            alert(result); // Display result of reset
-                            loadAbsentees(); // Reload absentee list after reset
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                        });
-                }
-            });
+            
 
             // Function to load the absentee list
             function loadAbsentees() {
@@ -82,11 +66,16 @@
                     .then(data => {
                         const absenteesList = document.getElementById("absentees");
                         absenteesList.innerHTML = ''; // Clear current list
-                        data.forEach(item => {
-                            const listItem = document.createElement('li');
-                            listItem.textContent = `${item.name} (${item.roll})`;
-                            absenteesList.appendChild(listItem);
-                        });
+
+                        if (data.results && data.results.length > 0) {
+                            data.results.forEach(item => {
+                                const listItem = document.createElement('li');
+                                listItem.textContent = `${item.name} (${item.roll})`;
+                                absenteesList.appendChild(listItem);
+                            });
+                        } else {
+                            absenteesList.innerHTML = '<li>No absentees found!</li>';
+                        }
                     })
                     .catch(error => {
                         console.error('Error:', error);
