@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Attendance System</title>
+        <style>
+            .absentees {
+                margin-top: 20px;
+                border: 1px solid #ccc;
+                padding: 10px;
+                width: 300px;
+            }
+        </style>
+    </head>
+
+    <body>
+        <h1>Mark Your Attendance</h1>
+
+        <!-- Form to enter roll number and mark attendance -->
+        <form id="attendanceForm">
+            <label for="rollInput">Enter your Roll Number:</label>
+            <input type="text" id="rollInput" name="rollInput" required>
+            <button type="submit">Mark Attendance</button>
+        </form>
+
+        <br>
+
+        <!-- Button to reset attendance (visible only to admin) -->
+        <button id="adminResetButton">Admin Reset Attendance</button>
+
+        <div class="absentees" id="absenteesList">
+            <h2>Absentees List</h2>
+            <ul id="absentees"></ul>
+        </div>
+
+        <script>
+            // Function to mark attendance
+            document.getElementById("attendanceForm").addEventListener("submit", function (event) {
+                event.preventDefault();
+
+                const userRoll = document.getElementById("rollInput").value;
+                const userEmail = localStorage.getItem('userEmail');
+
+                if (!userEmail) {
+                    alert("You must be logged in to mark attendance.");
+                    return;
+                }
+
+                // Send request to the Worker to mark attendance
+                fetch(`https://dmj.one/api/attendance?userRoll=${encodeURIComponent(userRoll)}&userEmail=${encodeURIComponent(userEmail)}`)
+                    .then(response => response.text())
+                    .then(result => {
+                        alert(result); // Display the response from the server (success or error message)
+                        loadAbsentees(); // Reload absentee list after attendance is marked
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            });
+
+            // Function to reset attendance (admin only)
+            document.getElementById("adminResetButton").addEventListener("click", function () {
+                if (confirm("Are you sure you want to reset attendance for all users?")) {
+                    fetch("https://dmj.one/api/attendance?admin_reset=true")
+                        .then(response => response.text())
+                        .then(result => {
+                            alert(result); // Display result of reset
+                            loadAbsentees(); // Reload absentee list after reset
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                        });
+                }
+            });
+
+            // Function to load the absentee list
+            function loadAbsentees() {
+                fetch("https://dmj.one/api/attendance?view_absentees=true")
+                    .then(response => response.json())
+                    .then(data => {
+                        const absenteesList = document.getElementById("absentees");
+                        absenteesList.innerHTML = ''; // Clear current list
+                        data.forEach(item => {
+                            const listItem = document.createElement('li');
+                            listItem.textContent = `${item.name} (${item.roll})`;
+                            absenteesList.appendChild(listItem);
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            }
+
+            // Load the absentee list on page load
+            document.addEventListener("DOMContentLoaded", function () {
+                loadAbsentees();
+            });
+        </script>
+    </body>
+
+</html>
