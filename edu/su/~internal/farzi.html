@@ -25,7 +25,10 @@
             <button type="submit">Mark Attendance</button>
         </form>
 
-        <br>        
+        <br>
+
+        <!-- Button to copy absentees list to clipboard -->
+        <button id="copyAbsenteesButton">Copy Absentees to Clipboard</button>
 
         <div class="absentees" id="absenteesList">
             <h2>Absentees List</h2>
@@ -33,6 +36,8 @@
         </div>
 
         <script>
+            let absenteeData = [];
+
             // Function to mark attendance
             document.getElementById("attendanceForm").addEventListener("submit", function (event) {
                 event.preventDefault();
@@ -57,18 +62,17 @@
                     });
             });
 
-            
-
             // Function to load the absentee list
             function loadAbsentees() {
                 fetch("https://dmj.one/api/attendance/?view_absentees=true")
                     .then(response => response.json())
                     .then(data => {
                         const absenteesList = document.getElementById("absentees");
+                        absenteeData = data.results || []; // Save data to be used in the clipboard function
                         absenteesList.innerHTML = ''; // Clear current list
 
-                        if (data.results && data.results.length > 0) {
-                            data.results.forEach(item => {
+                        if (absenteeData.length > 0) {
+                            absenteeData.forEach(item => {
                                 const listItem = document.createElement('li');
                                 listItem.textContent = `${item.name} (${item.roll})`;
                                 absenteesList.appendChild(listItem);
@@ -82,7 +86,33 @@
                     });
             }
 
-            // Load the absentee list on page load
+            // Copy absentees to clipboard function
+            function copyAbsenteesToClipboard() {
+                const datetime = new Date().toLocaleString('en-US', {
+                    year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                });
+
+                const absentees = absenteeData.map(item => `${item.name} _${item.roll}_`).join('\n');
+
+                const totalAbsent = absenteeData.length;
+                const totalPresent = 68 - totalAbsent; // Assuming 68 students in total
+
+                let messageHeader = `Dear Professor,\n\nI hope this message finds you well. Please find the absentee list for *your course* on *${datetime}* below:\n\n`;
+                let messageFooter = `\n\n> Total Present: *${totalPresent}*\n> Total Absent: *${totalAbsent}*\n\nKindly let me know if further details are needed.\n\nThank you. 🙏\nDivya Mohan\n_Make the world yours at_ *dmj.one*\nStudent/CR - CSE 2026\nShoolini University, 🇮🇳`;
+
+                let finalMessage = messageHeader + absentees + messageFooter;
+
+                navigator.clipboard.writeText(finalMessage).then(() => {
+                    alert('Absentees list successfully copied to clipboard.');
+                }, err => {
+                    console.error('Failed to copy text: ', err);
+                });
+            }
+
+            // Attach copy function to button
+            document.getElementById("copyAbsenteesButton").addEventListener("click", copyAbsenteesToClipboard);
+
+            // Load absentee list on page load
             document.addEventListener("DOMContentLoaded", function () {
                 loadAbsentees();
             });
