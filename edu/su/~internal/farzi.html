@@ -24,166 +24,169 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Attendance System</title>
-<style>
-    .container {
-        max-width: 600px;
-        margin: auto;
-    }
-
-    .absentees {
-        margin-top: 20px;
-    }
-
-    #copyAbsenteesButton {
-        display: none;
-        /* Initially hide the button */
-    }
-
-    .message-box {
-        margin-top: 15px;
-    }
-</style>
-</head>
-
-<body>
-    <main class="container my-4">
-        <div class="text-center">
-            <h1 class="mb-4">Mark Your Attendance</h1>
-        </div>
-
-        <!-- Message Display Area -->
-        <div id="messageBox" class="message-box"></div>
-
-        <!-- Form to enter roll number and mark attendance -->
-        <form id="attendanceForm" class="mb-4">
-            <div class="mb-3">
-                <label for="rollInput" class="form-label">Enter your Roll Number</label>
-                <input type="text" id="rollInput" name="rollInput" class="form-control" placeholder="Enter your roll number" required>
-            </div>
-            <div class="d-grid">
-                <button type="submit" class="btn btn-primary">Mark Attendance</button>
-            </div>
-        </form>
-
-        <!-- Button to copy absentees list to clipboard -->
-        <div class="d-grid mb-4">
-            <button id="copyAbsenteesButton" class="btn btn-outline-secondary">Copy Absentees to Clipboard</button>
-        </div>
-
-        <!-- Absentees List -->
-        <div class="absentees">
-            <h2 class="h5">Absentees List</h2>
-            <ul id="absentees" class="list-group list-group-flush"></ul>
-        </div>
-    </main>
-
-    
-
-    <script>
-        let absenteeData = [];
-
-        // Function to show messages in the HTML
-        function showMessage(type, message) {
-            const messageBox = document.getElementById("messageBox");
-            messageBox.innerHTML = `<div class="alert alert-${type}" role="alert">${message}</div>`;
-        }
-
-        // Function to mark attendance
-        document.getElementById("attendanceForm").addEventListener("submit", function (event) {
-            event.preventDefault();
-
-            const userRoll = document.getElementById("rollInput").value;
-            const userEmail = localStorage.getItem('userEmail');
-
-            if (!userEmail) {
-                showMessage('danger', "You must be logged in to mark attendance.");
-                return;
+        <style>
+            .container {
+                max-width: 600px;
+                margin: auto;
             }
 
-            // Send request to the Worker to mark attendance
-            fetch(`https://dmj.one/api/attendance/?userRoll=${encodeURIComponent(userRoll)}&userEmail=${encodeURIComponent(userEmail)}`)
-                .then(response => response.text())
-                .then(result => {
-                    showMessage('success', result); // Display the success message in the HTML
-                    loadAbsentees(); // Reload absentee list after attendance is marked
-                })
-                .catch(error => {
-                    showMessage('danger', 'Error: ' + error); // Display the error message in the HTML
-                    console.error('Error:', error);
-                });
-        });
-
-        // Function to load the absentee list
-        function loadAbsentees() {
-            fetch("https://dmj.one/api/attendance/?view_absentees=true")
-                .then(response => response.json())
-                .then(data => {
-                    const absenteesList = document.getElementById("absentees");
-                    absenteeData = data.results || []; // Save data to be used in the clipboard function
-                    absenteesList.innerHTML = ''; // Clear current list
-
-                    if (absenteeData.length > 0) {
-                        absenteeData.forEach(item => {
-                            const listItem = document.createElement('li');
-                            listItem.textContent = `${item.name} (${item.roll})`;
-                            listItem.classList.add('list-group-item');
-                            absenteesList.appendChild(listItem);
-                        });
-                    } else {
-                        absenteesList.innerHTML = '<li class="list-group-item">No absentees found!</li>';
-                    }
-                })
-                .catch(error => {
-                    showMessage('danger', 'Error loading absentees list: ' + error);
-                    console.error('Error:', error);
-                });
-        }
-
-        // Copy absentees to clipboard function
-        function copyAbsenteesToClipboard() {
-            const datetime = new Date().toLocaleString('en-US', {
-                year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
-            });
-
-            const absentees = absenteeData.map(item => `- ${item.name} _${item.roll}_`).join('\n');
-
-            const totalAbsent = absenteeData.length;
-            const totalPresent = 68 - totalAbsent; // Assuming 68 students in total
-
-            let messageHeader = `Dear Professor,\n\nI hope this message finds you well. Please find the absentee list for *your course* on *${datetime}* below:\n\n`;
-            let messageFooter = `\n\n> Total Present: *${totalPresent}*\n> Total Absent: *${totalAbsent}*\n\nKindly let me know if further details are needed.\n\nThank you. 🙏\nDivya Mohan\n_Make the world yours at_ *dmj.one*\nStudent/CR - CSE 2026\nShoolini University, 🇮🇳`;
-
-            let finalMessage = messageHeader + absentees + messageFooter;
-
-            navigator.clipboard.writeText(finalMessage).then(() => {
-                showMessage('success', 'Absentees list successfully copied to clipboard.');
-            }, err => {
-                showMessage('danger', 'Failed to copy absentees list: ' + err);
-                console.error('Failed to copy text: ', err);
-            });
-        }
-
-        // Attach copy function to button
-        document.getElementById("copyAbsenteesButton").addEventListener("click", copyAbsenteesToClipboard);
-
-        // Show "Copy Absentees" button if user is Divya Mohan
-        function checkUserEmail() {
-            const userEmail = localStorage.getItem('userEmail');
-            const copyButton = document.getElementById("copyAbsenteesButton");
-
-            if (userEmail === atob('ZGl2eWFtb2hhbjE5OTNAZ21haWwuY29t')) {
-                copyButton.style.display = 'block'; // Show the button
-            } else {
-                copyButton.style.display = 'none'; // Hide the button
+            .absentees {
+                margin-top: 20px;
             }
-        }
 
-        // Check email and load absentee list on page load
-        document.addEventListener("DOMContentLoaded", function () {
-            checkUserEmail();
-            loadAbsentees();
-        });
-    </script>
-</body>
+            #copyAbsenteesButton {
+                display: none;
+                /* Initially hide the button */
+            }
+
+            .message-box {
+                margin-top: 15px;
+            }
+        </style>
+    </head>
+
+    <body>
+        <main class="container my-4">
+            <div class="text-center">
+                <h1 class="mb-4">Mark Your Attendance</h1>
+            </div>
+
+            <!-- Message Display Area -->
+            <div id="messageBox" class="message-box"></div>
+
+            <!-- Form to enter roll number and mark attendance -->
+            <form id="attendanceForm" class="mb-4">
+                <div class="mb-3">
+                    <label for="rollInput" class="form-label">Enter your Roll Number</label>
+                    <input type="text" id="rollInput" name="rollInput" class="form-control" placeholder="Enter your roll number" required>
+                </div>
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary">Mark Attendance</button>
+                </div>
+            </form>
+
+            <!-- Button to copy absentees list to clipboard -->
+            <div class="d-grid mb-4">
+                <button id="copyAbsenteesButton" class="btn btn-outline-secondary">Copy Absentees to Clipboard</button>
+            </div>
+
+            <!-- Absentees List -->
+            <div class="absentees">
+                <h2 class="h5">Absentees List</h2>
+                <ul id="absentees" class="list-group list-group-flush"></ul>
+            </div>
+        </main>
+
+
+
+        <script>
+            let absenteeData = [];
+            // Get URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const subjectCode = urlParams.get('subject') || 'CSUXXXX'; // Default subject code
+
+            // Function to show messages in the HTML
+            function showMessage(type, message) {
+                const messageBox = document.getElementById("messageBox");
+                messageBox.innerHTML = `<div class="alert alert-${type}" role="alert">${message}</div>`;
+            }
+
+            // Function to mark attendance
+            document.getElementById("attendanceForm").addEventListener("submit", function (event) {
+                event.preventDefault();
+
+                const userRoll = document.getElementById("rollInput").value;
+                const userEmail = localStorage.getItem('userEmail');
+
+                if (!userEmail) {
+                    showMessage('danger', "You must be logged in to mark attendance.");
+                    return;
+                }
+
+                // Send request to the Worker to mark attendance
+                fetch(`https://dmj.one/api/attendance/?userRoll=${encodeURIComponent(userRoll)}&userEmail=${encodeURIComponent(userEmail)}`)
+                    .then(response => response.text())
+                    .then(result => {
+                        showMessage('success', result); // Display the success message in the HTML
+                        loadAbsentees(); // Reload absentee list after attendance is marked
+                    })
+                    .catch(error => {
+                        showMessage('danger', 'Error: ' + error); // Display the error message in the HTML
+                        console.error('Error:', error);
+                    });
+            });
+
+            // Function to load the absentee list
+            function loadAbsentees() {
+                fetch("https://dmj.one/api/attendance/?view_absentees=true")
+                    .then(response => response.json())
+                    .then(data => {
+                        const absenteesList = document.getElementById("absentees");
+                        absenteeData = data.results || []; // Save data to be used in the clipboard function
+                        absenteesList.innerHTML = ''; // Clear current list
+
+                        if (absenteeData.length > 0) {
+                            absenteeData.forEach(item => {
+                                const listItem = document.createElement('li');
+                                listItem.textContent = `${item.name} (${item.roll})`;
+                                listItem.classList.add('list-group-item');
+                                absenteesList.appendChild(listItem);
+                            });
+                        } else {
+                            absenteesList.innerHTML = '<li class="list-group-item">No absentees found!</li>';
+                        }
+                    })
+                    .catch(error => {
+                        showMessage('danger', 'Error loading absentees list: ' + error);
+                        console.error('Error:', error);
+                    });
+            }
+
+            // Copy absentees to clipboard function
+            function copyAbsenteesToClipboard() {
+                const datetime = new Date().toLocaleString('en-US', {
+                    year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                });
+
+                const absentees = absenteeData.map(item => `- ${item.name} _${item.roll}_`).join('\n');
+
+                const totalAbsent = absenteeData.length;
+                const totalPresent = 68 - totalAbsent; // Assuming 68 students in total
+
+                let messageHeader = `Dear Professor,\n\nI hope this message finds you well. Please find the absentee list for *${subjectCode}* on *${datetime}* below:\n\n`;
+                let messageFooter = `\n\n> Total Present: *${totalPresent}*\n> Total Absent: *${totalAbsent}*\n\nKindly let me know if further details are needed.\n\nThank you. 🙏\nDivya Mohan\n_Make the world yours at_ *dmj.one*\nStudent/CR - CSE 2026\nShoolini University, 🇮🇳`;
+
+                let finalMessage = messageHeader + absentees + messageFooter;
+
+                navigator.clipboard.writeText(finalMessage).then(() => {
+                    showMessage('success', 'Absentees list successfully copied to clipboard.');
+                }, err => {
+                    showMessage('danger', 'Failed to copy absentees list: ' + err);
+                    console.error('Failed to copy text: ', err);
+                });
+            }
+
+            // Attach copy function to button
+            document.getElementById("copyAbsenteesButton").addEventListener("click", copyAbsenteesToClipboard);
+
+            // Show "Copy Absentees" button if user is Divya Mohan
+            function checkUserEmail() {
+                const userEmail = localStorage.getItem('userEmail');
+                const copyButton = document.getElementById("copyAbsenteesButton");
+
+                if (userEmail === atob('ZGl2eWFtb2hhbjE5OTNAZ21haWwuY29t')) {
+                    copyButton.style.display = 'block'; // Show the button
+                } else {
+                    copyButton.style.display = 'none'; // Hide the button
+                }
+            }
+
+            // Check email and load absentee list on page load
+            document.addEventListener("DOMContentLoaded", function () {
+                checkUserEmail();
+                loadAbsentees();
+            });
+        </script>
+    </body>
 
 </html>
