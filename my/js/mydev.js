@@ -34,6 +34,34 @@
     });
 })();
 
+// (function () {
+//     document.addEventListener('DOMContentLoaded', () => {
+
+//         function markAttendance() {
+//             const userName = localStorage.getItem('userName');
+//             const userEmail = localStorage.getItem('userEmail');
+
+//             if (!userName || !userEmail) {
+//                 alert("You must be logged in to mark attendance.");
+//                 return;
+//             }
+
+//             // Send attendance request with userName and userEmail in query parameters
+//             fetch(`https://dmj.one/api/attendance/?userName=${encodeURIComponent(userName)}&userEmail=${encodeURIComponent(userEmail)}`)
+//                 .then(response => response.text())
+//                 .then(result => {
+//                     alert(result); // Displays the success or error message
+//                 })
+//                 .catch(error => {
+//                     console.error('Error:', error);
+//                 });
+//         }
+
+//         // Example of calling markAttendance after Google One-Click login
+//         document.getElementById("mark-attendance-btn").addEventListener("click", markAttendance);
+//     });
+// })();
+
 
 /************** 2.0 - Breathing Animation **************/
 (function () {
@@ -47,7 +75,7 @@
         const updateButtonStyle = (isEnabled) => {
             if (isEnabled) {
                 label.classList.remove('btn-outline-success');
-                label.classList.add('btn-danger','btn-opacity-75');
+                label.classList.add('btn-danger', 'btn-opacity-75');
                 label.textContent = 'Disable Breathing Technique';
             } else {
                 label.classList.remove('btn-danger');
@@ -110,6 +138,6 @@
             };
             localStorage.setItem("breathingAnimation", JSON.stringify(preference));
         };
-        
+
     });
 })();
