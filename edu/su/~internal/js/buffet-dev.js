@@ -89,7 +89,7 @@ document.getElementById("copyAbsenteesButton").addEventListener("click", copyAbs
 
 // Show "Copy Absentees" button if user is Divya Mohan
 function checkUserEmail() {
-    const userEmail = localStorage.getItem('userEmail');
+    const userEmail = localStorage.getItem('userEmail').toLowerCase();
     const copyButton = document.getElementById("copyAbsenteesButton");
 
     if (userEmail === atob('ZGl2eWFtb2hhbjE5OTNAZ21haWwuY29t')) {
