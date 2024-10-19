@@ -84,18 +84,35 @@ function copyAbsenteesToClipboard() {
     });
 }
 
-// Attach copy function to button
+function takeattendance() {
+    fetch('https://dmj.one/api/attendance/?take_attendance=true')
+        .then(response => response.text())
+        .then(result => {
+            showMessage('success', result); // Display the success message in the HTML
+            loadAbsentees(); // Reload absentee list after attendance is marked
+        })
+        .catch(error => {
+            showMessage('danger', 'Error: ' + error); // Display the error message in the HTML
+            console.error('Error:', error);
+        });
+}
+
+// Attach functions to the button
 document.getElementById("copyAbsenteesButton").addEventListener("click", copyAbsenteesToClipboard);
+document.getElementById("takeattendance").addEventListener("click", takeattendance);
 
 // Show "Copy Absentees" button if user is Divya Mohan
 function checkUserEmail() {
     const userEmail = localStorage.getItem('userEmail').toLowerCase();
     const copyButton = document.getElementById("copyAbsenteesButton");
+    const takeattendance = document.getElementById("takeattendance");
 
     if (userEmail === atob('ZGl2eWFtb2hhbjE5OTNAZ21haWwuY29t')) {
         copyButton.style.display = 'block'; // Show the button
+        takeattendance.style.display = 'block'; // Show the button
     } else {
         copyButton.style.display = 'none'; // Hide the button
+        takeattendance.style.display = 'none'; // Hide the button
     }
 }
 
