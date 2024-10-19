@@ -84,22 +84,53 @@ function copyAbsenteesToClipboard() {
     });
 }
 
-function takeattendance() {
-    fetch('https://dmj.one/api/attendance/?take_attendance=true')
+// function takeattendance() {
+//     fetch('https://dmj.one/api/attendance/?take_attendance=true')
+//         .then(response => response.text())
+//         .then(result => {
+//             showMessage('success', result); // Display the success message in the HTML
+//             loadAbsentees(); // Reload absentee list after attendance is marked
+//         })
+//         .catch(error => {
+//             showMessage('danger', 'Error: ' + error); // Display the error message in the HTML
+//             console.error('Error:', error);
+//         });
+// }
+// document.getElementById("takeattendance").addEventListener("click", takeattendance);
+
+function getURLparams(params) {
+    const url = new URL('https://dmj.one/api/attendance/');
+    Object.entries(params).forEach(([key, value]) => url.searchParams.append(key, value));
+
+    fetch(url)
         .then(response => response.text())
         .then(result => {
-            showMessage('success', result); // Display the success message in the HTML
-            loadAbsentees(); // Reload absentee list after attendance is marked
+            showMessage('success', result);
+            loadAbsentees();
         })
         .catch(error => {
-            showMessage('danger', 'Error: ' + error); // Display the error message in the HTML
+            showMessage('danger', 'Error: ' + error);
             console.error('Error:', error);
         });
 }
 
+const paramMap = {
+    takeattendance: { take_attendance: 'true' },
+    simulate: { simulate: 'true' },
+    allabsent: { all_absent: 'true' },
+    allpresent: { all_present: 'true' }
+};
+
+Object.keys(paramMap).forEach(id => {
+    document.getElementById(id).addEventListener('click', () =>
+        getURLparams(paramMap[id])
+    );
+});
+
+
+
 // Attach functions to the button
 document.getElementById("copyAbsenteesButton").addEventListener("click", copyAbsenteesToClipboard);
-document.getElementById("takeattendance").addEventListener("click", takeattendance);
 
 // Show "Copy Absentees" button if user is Divya Mohan
 function checkUserEmail() {

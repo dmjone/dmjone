@@ -63,9 +63,7 @@
 
 
             const secretKey = promptForSecretKey();
-            if (!secretKey) return;
-
-            const sorteddata = document.getElementById('sortAlphabetically').checked;
+            if (!secretKey) return;            
 
             const courseCode = prompt("Enter the course code:", "") || "Unknown Course Code";
 
@@ -145,7 +143,7 @@
                 let filteredNames = NAMES.filter((_, index) => isAbsent[index]);
 
                 // Check if alphabetical sorting is enabled
-                if (sorteddata) {
+                if (document.getElementById('sortAlphabetically').checked) {
                     filteredNames.sort();
                 }
 
@@ -201,13 +199,13 @@
                 const absentees = NAMES.filter((_, index) => isAbsent[index]);
 
                 // Check if alphabetical sorting is enabled
-                if (sorteddata) {
+                if (document.getElementById('sortAlphabetically').checked) {
                     absentees.sort();
                 }
 
                 const presentCount = NAMES.length - absentees.length;
 
-                let messageHeader = `Dear Professor,\n\nI hope this message finds you well. Please find the ${sorteddata ? 'alphabetically sorted ' : ''}${markPresent ? 'present' : 'absentee'} list for *${courseCode}* on *${datetime}* below:\n\n`;
+                let messageHeader = `Dear Professor,\n\nI hope this message finds you well. Please find the ${document.getElementById('sortAlphabetically').checked ? 'alphabetically sorted ' : ''}${markPresent ? 'present' : 'absentee'} list for *${courseCode}* on *${datetime}* below:\n\n`;
                 let absenteesList = absentees
                     .map((name) => `- ${name} _${nameRollMap[name]}_`)
                     .join('\n');
