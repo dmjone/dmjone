@@ -65,6 +65,8 @@
             const secretKey = promptForSecretKey();
             if (!secretKey) return;
 
+            const sorteddata = document.getElementById('sortAlphabetically').checked;
+
             const courseCode = prompt("Enter the course code:", "") || "Unknown Course Code";
 
             const NAMES = decryptData(encryptedNames, secretKey);
@@ -143,7 +145,7 @@
                 let filteredNames = NAMES.filter((_, index) => isAbsent[index]);
 
                 // Check if alphabetical sorting is enabled
-                if (document.getElementById('sortAlphabetically').checked) {
+                if (sorteddata) {
                     filteredNames.sort();
                 }
 
@@ -199,13 +201,13 @@
                 const absentees = NAMES.filter((_, index) => isAbsent[index]);
 
                 // Check if alphabetical sorting is enabled
-                if (document.getElementById('sortAlphabetically').checked) {
+                if (sorteddata) {
                     absentees.sort();
                 }
 
                 const presentCount = NAMES.length - absentees.length;
 
-                let messageHeader = `Dear Professor,\n\nI hope this message finds you well. Please find the ${markPresent ? 'present' : 'absentee'} list for *${courseCode}* on *${datetime}* below:\n\n`;
+                let messageHeader = `Dear Professor,\n\nI hope this message finds you well. Please find the ${sorteddata ? 'alphabetically sorted ' : ''}${markPresent ? 'present' : 'absentee'} list for *${courseCode}* on *${datetime}* below:\n\n`;
                 let absenteesList = absentees
                     .map((name) => `- ${name} _${nameRollMap[name]}_`)
                     .join('\n');
