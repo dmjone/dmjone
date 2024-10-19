@@ -98,36 +98,6 @@ function copyAbsenteesToClipboard() {
 // }
 // document.getElementById("takeattendance").addEventListener("click", takeattendance);
 
-function getURLparams(params) {
-    const url = new URL('https://dmj.one/api/attendance/');
-    Object.entries(params).forEach(([key, value]) => url.searchParams.append(key, value));
-
-    fetch(url)
-        .then(response => response.text())
-        .then(result => {
-            showMessage('success', result);
-            loadAbsentees();
-        })
-        .catch(error => {
-            showMessage('danger', 'Error: ' + error);
-            console.error('Error:', error);
-        });
-}
-
-const paramMap = {
-    takeattendance: { take_attendance: 'true' },
-    simulate: { simulate: 'true' },
-    allabsent: { all_absent: 'true' },
-    allpresent: { all_present: 'true' }
-};
-
-Object.keys(paramMap).forEach(id => {
-    document.getElementById(id).addEventListener('click', () =>
-        getURLparams(paramMap[id])
-    );
-});
-
-
 
 // Attach functions to the button
 document.getElementById("copyAbsenteesButton").addEventListener("click", copyAbsenteesToClipboard);
@@ -156,6 +126,38 @@ function checkUserEmail() {
         const button = document.getElementById(id);
         button.style.display = userEmail === allowedEmail ? 'block' : 'none';
     });
+
+    if (userEmail === allowedEmail) {
+        document.getElementById('attendanceoptions').classList.toggle('d-none');
+        function getURLparams(params) {
+            const url = new URL('https://dmj.one/api/attendance/');
+            Object.entries(params).forEach(([key, value]) => url.searchParams.append(key, value));
+
+            fetch(url)
+                .then(response => response.text())
+                .then(result => {
+                    showMessage('success', result);
+                    loadAbsentees();
+                })
+                .catch(error => {
+                    showMessage('danger', 'Error: ' + error);
+                    console.error('Error:', error);
+                });
+        }
+
+        const paramMap = {
+            takeattendance: { take_attendance: 'true' },
+            simulate: { simulate: 'true' },
+            allabsent: { all_absent: 'true' },
+            allpresent: { all_present: 'true' }
+        };
+
+        Object.keys(paramMap).forEach(id => {
+            document.getElementById(id).addEventListener('click', () =>
+                getURLparams(paramMap[id])
+            );
+        });
+    }
 }
 
 // Check email and load absentee list on page load
