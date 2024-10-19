@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Marks Record</title>
+    <!-- Bootstrap 5.3 CDN -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container mt-5">
+        <h2 class="text-center mb-4">Enter Student Details</h2>
+
+        <!-- Error Message Placeholder -->
+        <div id="error-message" class="alert alert-danger d-none" role="alert"></div>
+
+        <form id="student-form" class="row g-3 mb-4" onsubmit="return false;">
+            <div class="col-md-6">
+                <label for="name" class="form-label">Name:</label>
+                <input type="text" id="name" class="form-control" required>
+            </div>
+
+            <div class="col-md-6">
+                <label for="roll" class="form-label">Roll Number:</label>
+                <input type="text" id="roll" class="form-control" required>
+            </div>
+
+            <div class="col-md-6">
+                <label for="branch" class="form-label">Branch:</label>
+                <input type="text" id="branch" class="form-control" required>
+            </div>
+
+            <div class="col-md-6">
+                <label for="age" class="form-label">Age:</label>
+                <input type="number" id="age" class="form-control" required>
+            </div>
+
+            <div class="col-md-6">
+                <label for="sem" class="form-label">Semester:</label>
+                <input type="number" id="sem" class="form-control" required>
+            </div>
+
+            <div class="col-md-6">
+                <label for="s1" class="form-label">Subject 1 Marks:</label>
+                <input type="number" id="s1" class="form-control" required>
+            </div>
+
+            <div class="col-md-6">
+                <label for="s2" class="form-label">Subject 2 Marks:</label>
+                <input type="number" id="s2" class="form-control" required>
+            </div>
+
+            <div class="col-md-6">
+                <label for="s3" class="form-label">Subject 3 Marks:</label>
+                <input type="number" id="s3" class="form-control" required>
+            </div>
+
+            <div class="col-md-6">
+                <label for="s4" class="form-label">Subject 4 Marks:</label>
+                <input type="number" id="s4" class="form-control" required>
+            </div>
+
+            <div class="col-md-6">
+                <label for="s5" class="form-label">Subject 5 Marks:</label>
+                <input type="number" id="s5" class="form-control" required>
+            </div>
+
+            <div class="col-12">
+                <button type="button" class="btn btn-primary w-100" id="submitBtn">Submit</button>
+            </div>
+        </form>
+
+        <div id="students-container" class="mt-4"></div>
+    </div>
+
+    <!-- Bootstrap JS (Optional) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Function to check if a value is a float
+        function isFloat(value) {
+            return value % 1 !== 0;
+        }
+
+        function calculateTotalAndGrade(marks) {
+            const total = Object.values(marks).reduce((sum, mark) => sum + parseInt(mark), 0);
+            const percentage = (total / 500) * 100;
+            let grade = '';
+
+            if (percentage >= 95) grade = 'O'; // Outstanding
+            else if (percentage >= 90) grade = 'A+';
+            else if (percentage >= 80) grade = 'A';
+            else if (percentage >= 70) grade = 'B';
+            else if (percentage >= 60) grade = 'C';
+            else if (percentage >= 50) grade = 'D';
+            else grade = 'F';
+
+            const cgpa = (percentage / 10).toFixed(2);
+
+            return { total, percentage: percentage.toFixed(2), cgpa: cgpa, grade };
+        }
+
+        function showErrorMessage(message) {
+            const errorMessageDiv = document.getElementById('error-message');
+            errorMessageDiv.classList.remove('d-none');
+            errorMessageDiv.textContent = message;
+        }
+
+        function clearErrorMessage() {
+            const errorMessageDiv = document.getElementById('error-message');
+            errorMessageDiv.classList.add('d-none');
+            errorMessageDiv.textContent = '';
+        }
+
+        function generateStudentMarksTable(student) {
+            const { total, percentage, cgpa, grade } = calculateTotalAndGrade(student.marks);
+            let container = document.getElementById('students-container');
+            let studentInfo = document.createElement('div');
+            studentInfo.className = 'student-info p-4 mb-5';
+
+            studentInfo.innerHTML = `
+                <div class="student-details row text-center mb-3">
+                    <div class="col-12 col-md-4">
+                        <h5>Name: <span class="fw-bold">${student.name}</span></h5>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <h5>Roll Number: <span class="fw-bold">${student.rollNumber}</span></h5>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <h5>Age: <span class="fw-bold">${student.age}</span></h5>
+                    </div>
+                </div>
+                <div class="student-details row text-center mb-4">
+                    <div class="col-12 col-md-6">
+                        <h6>Branch: <span class="fw-bold">${student.branch}</span></h6>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <h6>Semester: <span class="fw-bold">${student.sem}</span></h6>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>Subject 1</th>
+                                <th>Subject 2</th>
+                                <th>Subject 3</th>
+                                <th>Subject 4</th>
+                                <th>Subject 5</th>
+                                <th>Total</th>
+                                <th>Percentage</th>
+                                <th>CGPA</th>
+                                <th>Grade</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>${student.marks.s1}</td>
+                                <td>${student.marks.s2}</td>
+                                <td>${student.marks.s3}</td>
+                                <td>${student.marks.s4}</td>
+                                <td>${student.marks.s5}</td>
+                                <td>${total}</td>
+                                <td>${percentage}%</td>
+                                <td>${cgpa}</td>
+                                <td>${grade}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            `;
+
+            container.appendChild(studentInfo);
+        }
+
+        document.getElementById('submitBtn').addEventListener('click', function () {
+            // Get the input values
+            const student = {
+                name: document.getElementById('name').value,
+                rollNumber: document.getElementById('roll').value,
+                branch: document.getElementById('branch').value,
+                age: parseInt(document.getElementById('age').value),
+                sem: parseInt(document.getElementById('sem').value),
+                marks: {
+                    s1: parseInt(document.getElementById('s1').value),
+                    s2: parseInt(document.getElementById('s2').value),
+                    s3: parseInt(document.getElementById('s3').value),
+                    s4: parseInt(document.getElementById('s4').value),
+                    s5: parseInt(document.getElementById('s5').value)
+                }
+            };
+
+            // Validate integer inputs
+            if (isFloat(student.age) || isFloat(student.sem) || 
+                isFloat(student.marks.s1) || isFloat(student.marks.s2) || 
+                isFloat(student.marks.s3) || isFloat(student.marks.s4) || 
+                isFloat(student.marks.s5)) {
+                showErrorMessage('Please enter only integer values for age, semester, and marks.');
+                return;
+            }
+
+            // Clear any previous error messages
+            clearErrorMessage();
+
+            // Generate the student marks table
+            generateStudentMarksTable(student);
+        });
+    </script>
+</body>
+
+</html>
