@@ -215,7 +215,8 @@
                 let finalMessage = encodeURIComponent(messageHeader + absenteesList + messageFooter);
 
                 // WhatsApp sharing URL
-                let whatsappUrl = `https://wa.me/?text=${finalMessage}`;
+                // let whatsappUrl = `https://wa.me/?text=${finalMessage}`;
+                let whatsappUrl = `whatsapp://send?text=${finalMessage}`;
 
                 // Ask user for action: Copy or Send via WhatsApp
                 let userChoice = confirm("Do you want to send the list via WhatsApp? Click 'Cancel' to copy to clipboard.");
