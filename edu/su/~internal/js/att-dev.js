@@ -16,6 +16,15 @@
     // wait for the page to load
     document.addEventListener('DOMContentLoaded', function () {
 
+        document.getElementById('sortAlphabetically').addEventListener('change', function () {
+            updateAbsentList(); // Re-render the list whenever the toggle changes
+        });
+        
+        // Update the generated list dynamically when the toggle changes
+        document.getElementById('toggleSwitch').addEventListener('change', function () {
+            updateAbsentList(); // Refresh the list when mark present/absent toggle is switched
+        });
+
         let encryptedNames, encryptednameRollMap;
 
         const encryptedNamesMerged = 'U2FsdGVkX1/JSHMEO7weKOf7x6DoIijgIHsUwRgrozxWQ88dCfG8Y2VQgF69HyJdg1YTe2ta80OJ5OpVv0vQaMa4QcQlbJYQ+VRf4lOhMDtFPoxbqfCaskSNnjK94zTd9zefqKFQzBFRXUMTEDQ+nuZ4BGVToOMdHMtKvXQ2FKsc88MM8Rc2fnZySgnakgGdLf0BdSU0+UI2B7AHw5cwR1zi+Oyy1avfZqh2e0byuqwxlG2qjKpR+KgaQ+l5Rh/1c3uYXUIYs5G0cZBIqm6U3Tg9U83AGjvE02S5+0KwnX6D7bsPHB/Kevme0rWHt5RP7x2AtAXXdbfI54fY5HsULNaJ0yXMqlHVX5WUyi7THtNoezP0PvTHoKuc4t45679LNEHuhlRrj1PfRd4soxTGOvUnT8BplM+5lF7TSKf+HkSpLh/qJGa6XEoVTR4Xgn5JTWc6og+KOBhaMYHjaJO3oAvDoVXS/JYg8NgukIfEXh5rNnQLCchl7w7RYWsLFzYBXGxNDzNv9v2YV2/YHRV12DZYofH/GV+lUZ+KyJaXjLbNPMKbupQ75irFyqii2L4e4tuhv/ZwbDlqN1dHZ5599L7/r23WHvJwpVFrikcgE6rvoDamsSDWYbSUO0ci2QVBCI37CRwR21ekYCni2338FWptP3v8eybfRJ+MFm+jZu5RBtxCsDzoacNgT+ydsnHoqQ8o8aMeRsiBWAw5F4U/bNLjxlzrbN67+Pf88WM4Nph6z7WNw8eFwZnZK7SuupuLx/ZSx2QazJv5LohhevbvNrVnHaqOx8ttFx2TY7bFRXcozPQPx88sioCs9Y2ClLwbe6OZoPtT1lpwNxq9LZnn/aQhuTb4NzetrP3OG1JTa9puwKFRPWIgkToaBDbMgotVAGPVaOByV/Ia/J39d5Wnsve99lrIvQ1og5hADkiF0BTDERpCbArNJWyWgtoDHPkUqnLwXPMyJeC2v6HDE5qMvxZA0dDlNZHMUF+az/gUAMcFy0TtO+Rw7oxKYVyElfcjUAJ0kEipX/PMZ9GiELnA3wgXEgwb0eB97YZKlaP0mfpJI34f6Jq+dljfwxRDY3/vrhF40pG5L+/uHqIDOx+b4IWx3bTqbVD64Opz284Fzwi3B3T7JF01GiRj/5Z/UDeYiNfDfbE6Rx1siqv7V1LaMfSNFma1xB6jaF5fGeWy8kOfQjs6HGkj74Lc1e97NwWitd4BAPN/4t2VEYGNXogGpZ01nLQEDRNrFgKtNM/s+T/xs19nv8apXvRqk9VVSnZxr1GoUAIp3Akg2YSUE8ARibQm0S4Tzk9cQVWRdzWE04q1ndYNVig/ERC7uGWIQFpnYxRjyr9RY15oSJyEo304cthIO9KOJ7marGPpxmpDAY9a2qKJYE+8HJAQcfYCBHlXRmaSc5T8jVnFzLCbJ9Z65g==';
@@ -63,10 +72,11 @@
             let isAbsent = new Array(NAMES.length).fill(false);
 
             document.getElementById('generate').addEventListener('click', generateRandomList);
-            document.getElementById('copyBtn').addEventListener('click', copyAbsenteesToClipboard);
+            // document.getElementById('copyBtn').addEventListener('click', copyAbsenteesToClipboard);
+            document.getElementById('copyBtn').addEventListener('click', copyOrSendAbsentees);
             document.getElementById('toggleSwitch').addEventListener('change', updateToggleState);
 
-            function promptForSecretKey() {
+            function promptForSecretKey() {                
                 let secretKey = prompt("Please enter the password:", "");
                 if (!secretKey || secretKey.length < 5) {
                     alert('A valid password is required to access this information. Please refresh the page to try again.');
@@ -105,19 +115,43 @@
                 });
             }
 
+            // function updateAbsentList() {
+            //     const absentListElement = document.getElementById('absentList');
+            //     absentListElement.innerHTML = '';
+
+            //     const markPresent = document.getElementById('toggleSwitch').checked;
+
+            //     NAMES.forEach((name, index) => {
+            //         if ((markPresent && !isAbsent[index]) || (!markPresent && isAbsent[index])) {
+            //             const li = document.createElement('li');
+            //             li.className = 'list-group-item p-1';
+            //             li.textContent = `${name} - ${nameRollMap[name]}`;
+            //             absentListElement.appendChild(li);
+            //         }
+            //     });
+            // }
+
             function updateAbsentList() {
                 const absentListElement = document.getElementById('absentList');
                 absentListElement.innerHTML = '';
 
                 const markPresent = document.getElementById('toggleSwitch').checked;
 
-                NAMES.forEach((name, index) => {
-                    if ((markPresent && !isAbsent[index]) || (!markPresent && isAbsent[index])) {
-                        const li = document.createElement('li');
-                        li.className = 'list-group-item p-1';
-                        li.textContent = `${name} - ${nameRollMap[name]}`;
-                        absentListElement.appendChild(li);
-                    }
+                // let filteredNames = NAMES.filter((_, index) =>
+                //     // (markPresent && !isAbsent[index]) || (!markPresent && isAbsent[index])                    
+                // );
+                let filteredNames = NAMES.filter((_, index) => isAbsent[index]);
+
+                // Check if alphabetical sorting is enabled
+                if (document.getElementById('sortAlphabetically').checked) {
+                    filteredNames.sort();
+                }
+
+                filteredNames.forEach((name) => {
+                    const li = document.createElement('li');
+                    li.className = 'list-group-item p-1';
+                    li.textContent = `${name} - ${nameRollMap[name]}`;
+                    absentListElement.appendChild(li);
                 });
             }
 
@@ -125,15 +159,51 @@
                 updateAbsentList();
             }
 
-            function copyAbsenteesToClipboard() {
+            // function copyAbsenteesToClipboard() {
+            //     const datetime = new Date().toLocaleString('en-US', {
+            //         year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
+            //     });
+
+            //     const markPresent = document.getElementById('toggleSwitch').checked;
+            //     const absentees = NAMES.filter((_, index) => isAbsent[index]);
+
+            //     // Check if alphabetical sorting is enabled
+            //     if (document.getElementById('sortAlphabetically').checked) {
+            //         absentees.sort();
+            //     }
+
+            //     const presentCount = NAMES.length - absentees.length;
+
+
+            //     let messageHeader = `Dear Professor,\n\nI hope this message finds you well. Please find the ${markPresent ? 'present' : 'absentee'} list for *${courseCode}* on *${datetime}* below:\n\n`;
+            //     let absenteesList = absentees
+            //         .map((name) => `- ${name} _${nameRollMap[name]}_`)
+            //         .join('\n');
+
+            //     let messageFooter = `\n\n> Total Present: ${markPresent ? `*${absentees.length}*` : `*${presentCount}*`} \n> Total Absent: ${!markPresent ? `*${absentees.length}*` : `*${presentCount}*`}\n\nKindly let me know if further details are needed.\n\nThank you. 🙏\nDivya Mohan\n_Make the world yours at_ *dmj.one*\nStudent/CR - CSE 2026\nShoolini University, 🇮🇳`;
+
+            //     let finalMessage = messageHeader + absenteesList + messageFooter;
+
+            //     navigator.clipboard.writeText(finalMessage).then(() => {
+            //         alert('Absentees list successfully copied to clipboard.');
+            //     }, err => {
+            //         console.error('Failed to copy text: ', err);
+            //     });
+            // }  
+            function copyOrSendAbsentees() {
                 const datetime = new Date().toLocaleString('en-US', {
                     year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
                 });
 
                 const markPresent = document.getElementById('toggleSwitch').checked;
                 const absentees = NAMES.filter((_, index) => isAbsent[index]);
-                const presentCount = NAMES.length - absentees.length;
 
+                // Check if alphabetical sorting is enabled
+                if (document.getElementById('sortAlphabetically').checked) {
+                    absentees.sort();
+                }
+
+                const presentCount = NAMES.length - absentees.length;
 
                 let messageHeader = `Dear Professor,\n\nI hope this message finds you well. Please find the ${markPresent ? 'present' : 'absentee'} list for *${courseCode}* on *${datetime}* below:\n\n`;
                 let absenteesList = absentees
@@ -142,14 +212,28 @@
 
                 let messageFooter = `\n\n> Total Present: ${markPresent ? `*${absentees.length}*` : `*${presentCount}*`} \n> Total Absent: ${!markPresent ? `*${absentees.length}*` : `*${presentCount}*`}\n\nKindly let me know if further details are needed.\n\nThank you. 🙏\nDivya Mohan\n_Make the world yours at_ *dmj.one*\nStudent/CR - CSE 2026\nShoolini University, 🇮🇳`;
 
-                let finalMessage = messageHeader + absenteesList + messageFooter;
+                let finalMessage = encodeURIComponent(messageHeader + absenteesList + messageFooter);
 
-                navigator.clipboard.writeText(finalMessage).then(() => {
-                    alert('Absentees list successfully copied to clipboard.');
-                }, err => {
-                    console.error('Failed to copy text: ', err);
-                });
+                // WhatsApp sharing URL
+                let whatsappUrl = `https://wa.me/?text=${finalMessage}`;
+
+                // Ask user for action: Copy or Send via WhatsApp
+                let userChoice = confirm("Do you want to send the list via WhatsApp? Click 'Cancel' to copy to clipboard.");
+
+                if (userChoice) {
+                    // Open WhatsApp with pre-filled message
+                    window.open(whatsappUrl, '_blank');
+                } else {
+                    // Copy to clipboard if user chooses not to send via WhatsApp
+                    navigator.clipboard.writeText(decodeURIComponent(finalMessage)).then(() => {
+                        alert('Absentees list successfully copied to clipboard.');
+                    }, err => {
+                        console.error('Failed to copy text: ', err);
+                    });
+                }
             }
-        });
+
+        });                
+        
     });
 })();
