@@ -133,18 +133,29 @@ Object.keys(paramMap).forEach(id => {
 document.getElementById("copyAbsenteesButton").addEventListener("click", copyAbsenteesToClipboard);
 
 // Show "Copy Absentees" button if user is Divya Mohan
-function checkUserEmail() {
-    const userEmail = localStorage.getItem('userEmail').toLowerCase();
-    const copyButton = document.getElementById("copyAbsenteesButton");
-    const takeattendance = document.getElementById("takeattendance");
+// function checkUserEmail() {
+//     const userEmail = localStorage.getItem('userEmail').toLowerCase();
+//     const copyButton = document.getElementById("copyAbsenteesButton");
+//     const takeattendance = document.getElementById("takeattendance");
 
-    if (userEmail === atob('ZGl2eWFtb2hhbjE5OTNAZ21haWwuY29t')) {
-        copyButton.style.display = 'block'; // Show the button
-        takeattendance.style.display = 'block'; // Show the button
-    } else {
-        copyButton.style.display = 'none'; // Hide the button
-        takeattendance.style.display = 'none'; // Hide the button
-    }
+//     if (userEmail === atob('ZGl2eWFtb2hhbjE5OTNAZ21haWwuY29t')) {
+//         copyButton.style.display = 'block'; // Show the button
+//         takeattendance.style.display = 'block'; // Show the button
+//     } else {
+//         copyButton.style.display = 'none'; // Hide the button
+//         takeattendance.style.display = 'none'; // Hide the button
+//     }
+// }
+
+function checkUserEmail() {
+    const userEmail = localStorage.getItem('userEmail')?.toLowerCase();
+    const allowedEmail = atob('ZGl2eWFtb2hhbjE5OTNAZ21haWwuY29t');
+    const buttons = ['copyAbsenteesButton', 'takeattendance', 'simulate', 'allabsent', 'allpresent'];
+
+    buttons.forEach(id => {
+        const button = document.getElementById(id);
+        button.style.display = userEmail === allowedEmail ? 'block' : 'none';
+    });
 }
 
 // Check email and load absentee list on page load
