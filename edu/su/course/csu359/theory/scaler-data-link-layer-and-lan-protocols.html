@@ -1,0 +1,1553 @@
+<!-------------------------- © 2007 - present, dmj.one and contributors. ----------------------------------
+   Part of the dmjone project. Licensed under the GNU AGPL. Provided as-is, without warranty of any kind. 
+-------------------- Redistribution and modifications must retain this notice. --------------------------->
+
+
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+    <!--<![endif]-->
+
+    <head>
+        <script src="/js/edu_su_common.js"></script>
+        <noscript>
+            <style>
+                html,
+                body {
+                    margin: 0;
+                    overflow: hidden;
+                }
+            </style>
+            <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+        </noscript>
+
+        <title>Data Link Layer and LAN Protocols - CSU359 - Shoolini University</title>
+        <meta name="description" content="Learn about the Data Link Layer and LAN Protocols and their core functions with CSU359.">
+
+        <meta property="og:image" content="/logo.png">
+        <meta property="og:type" content="article">
+
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:site" content="@divyamohan1993">
+        <meta name="twitter:creator" content="@divyamohan1993">
+        <meta name="twitter:image" content="/logo.png">
+
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+        <meta name="author" content="Divya Mohan">
+        <meta name="robots" content="index, follow">
+    </head>
+
+    <body>
+
+        <script> header_author("dm"); </script>
+
+        <main>
+
+            <article class="agen-tableofcontents">
+                <h2 class="text-center">
+                    Data Link Layer and LAN Protocol
+                </h2>
+                <div class="d-none contentdate">2024, October 28</div>
+            </article>
+
+            <article>
+                <h3 class="">Introduction</h3>
+                <p>This documentation presents an analytical exploration of networking principles, focusing on protocols, transmission mechanisms, and error handling strategies within the Data Link Layer. By examining protocols such as Stop-and-Wait ARQ and Sliding Window, the content outlines their operational logic, efficiency models, and applicability across different networking scenarios. Protocols for managing shared media, including ALOHA and CSMA, are critically examined, emphasizing their role in minimizing collision risks and ensuring optimal media access.</p>
+
+                <p>In-depth coverage is provided for controlled access methods like Polling, Reservation, and Token Passing, which regulate communication and enhance transmission efficiency. Further discussion on Ethernet-specific protocols, such as CSMA/CD, and wireless alternatives like CSMA/CA, highlights the trade-offs involved in choosing appropriate protocols for different network topologies. The mathematical models associated with these protocols are articulated to aid in understanding their efficiency and performance limitations.</p>
+
+                <p>The sections on error detection and framing detail essential mechanisms like parity checks, CRC, and bit stuffing, providing an examination of their utility in maintaining data integrity. Additional sections address advanced strategies such as Exponential Backoff and Token Reinsertion, offering insights into managing congestion and maintaining network fairness. Key metrics such as transmission delays, throughput, and bandwidth utilization are systematically introduced to quantify protocol efficiency.</p>
+
+                <p>This documentation serves as a reference for students, researchers, and practitioners, presenting theoretical foundations alongside real-world applications and computational examples. The structured presentation of topics and precise use of mathematical formulations facilitate a rigorous understanding of networking concepts and their practical implementations.</p>
+            </article>
+
+            <article>
+                <h3>1. Data Link Layer</h3>
+                <p>The Data Link Layer acts as a bridge between the physical medium and the network layer, responsible for reliable data transfer over a shared medium. This layer ensures data is properly framed, transmitted, and received without conflicts or errors.</p>
+            </article>
+
+            <article>
+                <h4>1.1 Core Functions of the Data Link Layer</h4>
+                <ul>
+                    <li><strong>Medium Access Control:</strong> Controls access to the shared transmission medium, preventing data collisions.</li>
+                    <li><strong>Error Detection and Handling:</strong> Identifies and manages errors during data transmission, requesting retransmission if necessary.</li>
+                    <li><strong>Flow Control:</strong> Coordinates data transmission rates to match the processing speeds of communicating devices.</li>
+                    <li><strong>Framing:</strong> Encapsulates network layer packets into frames for transmission.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h5>1.1.1 Sub-layers: Logical Link Control and Media Access Control</h5>
+                <p>The Data Link Layer is divided into two sub-layers:</p>
+                <ul>
+                    <li><strong>Logical Link Control (LLC):</strong> Handles flow control and error notifications.</li>
+                    <li><strong>Media Access Control (MAC):</strong> Determines which devices can access the medium, with each device identified by a unique MAC address.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h4>1.2 Addressing with MAC Addresses</h4>
+                <p>Every network interface card (NIC) or Wi-Fi card is assigned a unique 12-digit alphanumeric MAC address. MAC addresses help identify the destination device on a shared medium.</p>
+                <pre><code class="">
+Example MAC Address: F0:18:98:97:F2:59
+            </code></pre>
+                <p>Devices ignore frames that do not match their MAC address, ensuring data reaches the intended recipient only.</p>
+            </article>
+
+            <article>
+                <h4>1.3 Layer 2 Switches</h4>
+                <p>Layer 2 switches operate at the data link layer, directing frames based on MAC addresses. These switches help reduce congestion and extend the network’s reach.</p>
+            </article>
+
+            <article>
+                <h4>1.4 Transmission and Propagation Delays</h4>
+                <p>Transmission and propagation delays impact data transfer efficiency:</p>
+                <ul>
+                    <li><strong>Transmission Delay (T<sub>t</sub>):</strong> Time taken to place a frame onto the medium.
+                        <pre><code class="">
+T<sub>t</sub> = L / B
+Where L = Frame size (bits), B = Bandwidth (bits per second)
+            </code></pre>
+                    </li>
+                    <li><strong>Propagation Delay (T<sub>p</sub>):</strong> Time for a signal to travel through the medium.
+                        <pre><code class="">
+T<sub>p</sub> = D / V
+Where D = Distance (meters), V = Signal velocity (meters/second)
+            </code></pre>
+                    </li>
+                </ul>
+            </article>
+
+            <article>
+                <h4>1.5 Practical Protocols and Concepts</h4>
+                <p>Protocols define how devices manage flow control, error detection, and media access. Common examples include:</p>
+                <ul>
+                    <li><strong>Flow Control:</strong> Adjusts transmission speed to prevent overflow.</li>
+                    <li><strong>Multiple Access Protocols:</strong> Determines access rules for shared media (e.g., CSMA/CD).</li>
+                    <li><strong>Error Control:</strong> Ensures data integrity with mechanisms like parity bits or CRC.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h4>1.6 Bandwidth Conventions</h4>
+                <p>In data networks, two conventions are used:</p>
+                <ul>
+                    <li><strong>Data:</strong> Measured in powers of 2 (e.g., 1 KB = 1024 bytes).</li>
+                    <li><strong>Bandwidth:</strong> Measured in decimal units (e.g., 1 Kbps = 1000 bits/second).</li>
+                </ul>
+                <p>Understanding these conventions helps avoid calculation errors when determining delays or transmission rates.</p>
+            </article>
+
+            <article>
+                <h4>1.7 Conclusion of Concepts</h4>
+                <p>By coordinating transmission timing, managing access, and implementing error checks, the Data Link Layer ensures seamless communication across shared networks. Practical tools like <strong>Wireshark</strong> allow users to observe these protocols in real-time, enhancing comprehension and troubleshooting skills.</p>
+            </article>
+
+            <article>
+                <h3>2. Stop-and-Wait ARQ Protocol</h3>
+                <p>The Stop-and-Wait ARQ is a flow control protocol ensuring that data is sent and acknowledged frame-by-frame. Each frame transmission must be acknowledged by the receiver before the next frame can be sent. This method simplifies communication by alternating between sending data and waiting for acknowledgments.</p>
+            </article>
+
+            <article>
+                <h4>2.1 Basic Working of Stop-and-Wait ARQ</h4>
+                <ul>
+                    <li><strong>Binary Variables:</strong> Both the sender and receiver maintain binary variables (S and R) to track frame numbers (0 and 1 alternately).</li>
+                    <li><strong>Frame Transmission:</strong> Sender transmits frame 0 and waits for acknowledgment (ACK1). Once received, it switches to frame 1.</li>
+                    <li><strong>Acknowledgment Mechanism:</strong> After receiving a frame, the receiver sends an acknowledgment with the number of the next expected frame (e.g., ACK1 for frame 0).</li>
+                </ul>
+            </article>
+
+            <article>
+                <h5>2.1.1 Flow Control Logic</h5>
+                <p>The protocol alternates between sending frames 0 and 1. If no acknowledgment is received within a defined timeout, the sender retransmits the same frame.</p>
+                <pre><code class="">
+Send Frame 0 -> Wait for ACK1
+If ACK1 received: Send Frame 1
+If no ACK1 (timeout): Retransmit Frame 0
+</code></pre>
+            </article>
+
+            <article>
+                <h4>2.2 Efficiency Calculation</h4>
+                <p>Efficiency of Stop-and-Wait ARQ is measured as the ratio of useful time (transmission time) to the total time:</p>
+                <pre><code class="">
+η = T<sub>t</sub> / (T<sub>t</sub> + 2 * T<sub>p</sub>)
+Where T<sub>t</sub> = Transmission Time, T<sub>p</sub> = Propagation Time
+</code></pre>
+                <p>Efficiency (η) can also be expressed in terms of A = T<sub>p</sub> / T<sub>t</sub>:</p>
+                <pre><code class="">
+η = 1 / (1 + 2A)
+</code></pre>
+            </article>
+
+            <article>
+                <h4>2.3 Throughput Calculation</h4>
+                <p>Throughput measures the number of bits transmitted per second:</p>
+                <pre><code class="">
+Throughput = L / (T<sub>t</sub> + 2 * T<sub>p</sub>)
+Where L = Number of Bits in Frame
+</code></pre>
+                <p>It indicates the effective bandwidth utilization of the protocol.</p>
+            </article>
+
+            <article>
+                <h4>2.4 Handling Errors and Timeouts</h4>
+                <p>If a frame or acknowledgment is lost, the protocol uses a timeout mechanism to retransmit the frame:</p>
+                <ul>
+                    <li><strong>Lost Data Frame:</strong> If the receiver does not receive the frame, it won’t send an acknowledgment, prompting the sender to resend the frame after the timeout.</li>
+                    <li><strong>Lost Acknowledgment:</strong> If an acknowledgment is lost, the sender resends the previous frame, which the receiver discards but acknowledges with the expected frame number.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h5>2.4.1 Example of Timeout Handling</h5>
+                <pre><code class="">
+Frame 0 Sent -> No ACK1 Received -> Timer Expires -> Retransmit Frame 0
+</code></pre>
+            </article>
+
+            <article>
+                <h4>2.5 Summary of Concepts</h4>
+                <p>Stop-and-Wait ARQ is a simple yet effective protocol for error control. It ensures reliable data transfer through acknowledgments and retransmissions. While it is easy to implement, its efficiency can decrease over long propagation delays, making it suitable for low-latency communication environments.</p>
+            </article>
+
+            <article>
+                <h3>3. Delayed Acknowledgement in Stop-and-Wait ARQ</h3>
+                <p>Delayed acknowledgments occur when the acknowledgment (ACK) takes longer than expected to reach the sender, potentially leading to retransmissions and duplicate frames.</p>
+            </article>
+
+            <article>
+                <h4>3.1 How Delayed Acknowledgement Works</h4>
+                <ul>
+                    <li>The sender transmits frame 0 and expects ACK1 within a set timeout.</li>
+                    <li>The receiver receives frame 0, processes it, and sends ACK1.</li>
+                    <li>Due to the delayed ACK1, the sender times out and retransmits frame 0, unaware that the receiver is waiting for frame 1.</li>
+                    <li>The receiver discards the duplicate frame 0 and re-sends ACK1, signaling the need for frame 1.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h5>3.1.1 Handling Delayed Acknowledgements</h5>
+                <p>If the sender receives the delayed ACK1 after a retransmission, it uses the latest ACK to confirm that frame 0 was successfully received and moves on to sending frame 1. Duplicate ACKs are ignored.</p>
+            </article>
+
+            <article>
+                <h4>3.2 Piggybacking Concept</h4>
+                <p>Piggybacking combines data and acknowledgments into a single frame in half-duplex communication channels, enhancing efficiency by reducing the number of separate ACK frames.</p>
+                <pre><code class="">
+Data Frame: Host1 -> Host2 (with ACK from Host2 to Host1 piggybacked)
+</code></pre>
+                <p>Both hosts act as senders and receivers, alternating data and acknowledgment piggybacks within the same frames to optimize transmission.</p>
+            </article>
+
+            <article>
+                <h4>3.3 Solving Packet Loss Scenarios</h4>
+                <h5>3.3.1 Example: Packet Loss Every 4th Packet</h5>
+                <p>If every 4th packet is lost, the sender must retransmit each lost packet, increasing the total number of transmissions.</p>
+                <pre><code class="">
+Sent: 1, 2, 3, (4 lost) -> Resend 4
+Sent: 5, 6, 7, (8 lost) -> Resend 8
+Sent: 9, 10 -> (10 lost) -> Resend 10
+Total Transmissions: 13 packets
+</code></pre>
+            </article>
+
+            <article>
+                <h4>3.4 Computing Transmissions with Error Probability</h4>
+                <p>If the error probability is given, the total number of transmissions required can be calculated using geometric progression.</p>
+                <pre><code class="">
+Total Transmissions = n / (1 - P)
+Where n = Number of packets, P = Error Probability
+</code></pre>
+                <p>For example, if 1000 packets are sent with an 80% error probability:
+                <pre><code class="">
+Total Transmissions = 1000 / (1 - 0.8) = 5000 packets
+</code></pre>
+            </article>
+
+            <article>
+                <h4>3.5 Channel Capacity</h4>
+                <p>The capacity of a channel measures the maximum number of bits that can be present on the wire at any given moment.</p>
+                <pre><code class="">
+Capacity = Bandwidth * Propagation Delay
+</code></pre>
+                <p>If the bandwidth is 2.1 Mbps and propagation delay is 1 second, the capacity is:</p>
+                <pre><code class="">
+Capacity = 2.1 * 10^6 bits = 2100 frames (with frame size 1000 bits)
+</code></pre>
+            </article>
+
+            <article>
+                <h4>3.6 Efficiency in Stop-and-Wait ARQ</h4>
+                <p>The efficiency of Stop-and-Wait ARQ can be expressed as:</p>
+                <pre><code class="">
+Efficiency (η) = 1 / (1 + 2 * A)
+Where A = Propagation Delay / Transmission Time
+</code></pre>
+                <p>If the transmission time (T<sub>t</sub>) and propagation time (T<sub>p</sub>) are both 1 millisecond, then:</p>
+                <pre><code class="">
+η = 1 / (1 + 2 * 1) = 1/3
+</code></pre>
+            </article>
+
+            <article>
+                <h4>3.7 Optimizing with Sliding Window Protocols</h4>
+                <p>Stop-and-Wait ARQ transmits one frame at a time, limiting efficiency. Sliding Window Protocols improve efficiency by sending multiple frames without waiting for individual acknowledgments.</p>
+                <p>These protocols will be discussed in subsequent sections to address the limitations of Stop-and-Wait ARQ.</p>
+            </article>
+
+            <article>
+                <h3>4. Sliding Window Protocols</h3>
+                <p>Sliding Window Protocols aim to improve the efficiency of data transmission by allowing multiple packets to be sent before waiting for cumulative acknowledgments. This section explores the core concepts of sliding window protocols and how they address the limitations of the Stop-and-Wait ARQ.</p>
+            </article>
+
+            <article>
+                <h4>4.1 Key Concept of Sliding Window Protocols</h4>
+                <ul>
+                    <li>Instead of sending a single packet and waiting for its acknowledgment, multiple packets are transmitted within a *window* before waiting for an acknowledgment.</li>
+                    <li>The size of the window determines the number of packets that can be sent before stopping for acknowledgment.</li>
+                    <li>Acknowledgments can be cumulative, meaning one acknowledgment confirms the successful receipt of multiple frames.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h5>4.1.1 Sequence Numbers and Windows</h5>
+                <p>Each packet in sliding window protocols is assigned a sequence number. If the sequence number uses <code>m</code> bits, the total sequence numbers range from 0 to \(2^m - 1\).</p>
+                <pre><code class="">
+If m = 2, sequence numbers = 0, 1, 2, 3 (repeating in cycles)
+</code></pre>
+                <p>The sliding window shifts forward with each acknowledgment received, hence the name 'sliding window'.</p>
+            </article>
+
+            <article>
+                <h4>4.2 Sender and Receiver Window Size</h4>
+                <p>The size of the sender’s window is denoted as <code>WS</code>. The maximum window size is constrained by:</p>
+                <pre><code class="">
+WS ≤ min(2^m, 1 + 2A)
+Where A = Propagation Delay / Transmission Time
+</code></pre>
+                <p>Each time a cumulative acknowledgment is received, the window slides, and new frames are sent within the updated window.</p>
+            </article>
+
+            <article>
+                <h4>4.3 Problem: Window Size and Efficiency</h4>
+                <pre><code class="">
+Given: Propagation Delay = 49.5 ms, Transmission Time = 1 ms
+
+1 + 2A = 1 + 2 * (49.5 / 1) = 100
+Maximum Window Size = min(2^m, 100)
+
+If 5 bits are used for the sequence number (2^5 = 32):
+Window Size = 32
+Efficiency = Window Size / (1 + 2A) = 32 / 100 = 32%
+</code></pre>
+                <p>Thus, increasing the window size increases efficiency by transmitting more frames simultaneously.</p>
+            </article>
+
+            <article>
+                <h4>4.4 Efficiency and Throughput Calculation</h4>
+                <p>The efficiency \( \eta \) of a sliding window protocol is calculated as:</p>
+                <p>$$\eta = \frac{WS}{1 + 2A}$$</p>
+                <p>The throughput or effective bandwidth is:</p>
+                <pre><code class="">
+Throughput = η * Bandwidth
+</code></pre>
+                <p>In sliding window protocols, the goal is to maximize \(WS\) while keeping it within the allowed capacity to increase throughput.</p>
+            </article>
+
+            <article>
+                <h4>4.5 Types of Sliding Window Protocols</h4>
+                <ul>
+                    <li><strong>Go-Back-N Protocol:</strong> The sender sends multiple frames but must resend all frames after a lost frame.</li>
+                    <li><strong>Selective Repeat Protocol:</strong> Only the lost frames are retransmitted, improving efficiency over Go-Back-N.</li>
+                </ul>
+                <p>Selective Repeat is widely used in practical scenarios due to its higher efficiency and bandwidth utilization.</p>
+            </article>
+
+            <article>
+                <h4>4.6 Practical Example</h4>
+                <p>If the channel capacity is 100 packets and 7 bits are available for sequence numbering:</p>
+                <pre><code class="">
+Max Window Size = min(2^7, 100) = 100
+If WS = 32, Efficiency = 32 / 100 = 32%
+</code></pre>
+                <p>This demonstrates the trade-off between the available sequence bits and channel capacity in sliding window protocols.</p>
+            </article>
+
+            <article>
+                <h3>5. Go-Back-N Protocol</h3>
+                <p>The Go-Back-N (GBN) protocol is a practical implementation of the sliding window concept, aiming to enhance transmission efficiency by allowing the sender to transmit multiple frames without waiting for individual acknowledgments.</p>
+            </article>
+
+            <article>
+                <h4>5.1 Overview of Go-Back-N Protocol</h4>
+                <ul>
+                    <li><strong>Sender’s Window:</strong> Maintains a sliding window of size <code>WS</code>, allowing the sender to send multiple frames before waiting for an acknowledgment.</li>
+                    <li><strong>Receiver’s Window:</strong> The window size at the receiver is always 1, meaning the receiver only accepts frames in sequence and discards out-of-order frames.</li>
+                    <li><strong>Cumulative Acknowledgment:</strong> Acknowledgments are cumulative, indicating that all frames up to a specific sequence number have been received successfully.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h5>5.1.1 Window Size and Sequence Numbers</h5>
+                <p>The maximum sender window size is constrained by the number of sequence bits \(m\):</p>
+                <pre><code class="">
+WS ≤ 2^m - 1
+</code></pre>
+                <p>This prevents ambiguous frame re-acceptance due to repeated sequence numbers.</p>
+            </article>
+
+            <article>
+                <h4>5.2 How Go-Back-N Works</h4>
+                <ul>
+                    <li>Sender sends multiple frames within the window.</li>
+                    <li>Receiver expects frames in order (starting with 0).</li>
+                    <li>If a frame is lost or arrives out of order, the receiver discards all subsequent frames.</li>
+                    <li>Sender starts a timer for each frame and retransmits all frames within the window if a timeout occurs.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h4>5.3 Handling Lost Frames and Timeouts</h4>
+                <ul>
+                    <li><strong>Lost Frame:</strong> If a frame is lost, the receiver discards any following frames and waits for the missing frame.</li>
+                    <li><strong>Timeout:</strong> If the sender's timer expires, it retransmits all frames within the window, starting from the first unacknowledged frame.</li>
+                    <li><strong>Delayed Acknowledgment:</strong> If an acknowledgment arrives after timeout, the sender ignores it and proceeds with the retransmissions.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h5>5.3.1 Example: Lost Frame</h5>
+                <ul>
+                    <li>Sender sends frames 0, 1, 2.</li>
+                    <li>Frame 2 is lost.</li>
+                    <li>Receiver discards frame 3 since it was expecting frame 2.</li>
+                    <li>Sender times out and resends frames 2 and 3.</li>
+                </ul>
+                <p>This shows how Go-Back-N handles out-of-order frames by discarding and retransmitting from the missing frame.</p>
+            </article>
+
+            <article>
+                <h4>5.4 Efficiency of Go-Back-N Protocol</h4>
+                <p>The efficiency \(\eta\) of the Go-Back-N protocol is defined as:</p>
+                <p>$$\eta = \frac{WS}{1 + 2A}$$</p>
+                <p>Where:</p>
+                <ul>
+                    <li><strong>WS:</strong> Sender’s window size.</li>
+                    <li><strong>A:</strong> Propagation delay to transmission time ratio.</li>
+                </ul>
+                <p>The protocol's efficiency decreases when frames are lost frequently due to unnecessary retransmissions.</p>
+            </article>
+
+            <article>
+                <h4>5.5 Example Problem: Calculating Frames Transmitted</h4>
+                <p>Window Size = 3, Total Frames = 10, Every 5th Frame Lost</p>
+                <ul>
+                    <li>Send frames 0, 1, 2 (ACK received)</li>
+                    <li>Send frames 3, 4, 5 (frame 5 lost, no ACK)</li>
+                    <li>Resend 3, 4, 5 (ACK received)</li>
+                    <li>Continue for remaining frames with similar pattern.</li>
+                </ul>
+                <p>Total Frames Transmitted = 18</p>
+                <p>This example illustrates how unnecessary retransmissions occur when frames are lost, leading to lower efficiency.</p>
+            </article>
+
+            <article>
+                <h4>5.6 Why Go-Back-N Uses <code>WS &lt;= 2^m - 1</code></h4>
+                <p>To avoid ambiguous acceptance, Go-Back-N restricts the sender's window size to <code>2^m - 1</code>:</p>
+                <ul>
+                    <li>If the window size equals <code>2^m</code>, the receiver may incorrectly accept retransmitted frames with the same sequence number.</li>
+                    <li>This leads to data corruption and loss of frame order.</li>
+                </ul>
+                <p>Using <code>WS &lt;= 2^m - 1</code> ensures that all frames are correctly acknowledged and retransmitted only when necessary.</p>
+            </article>
+
+            <article>
+                <h4>5.7 Conclusion</h4>
+                <p>Go-Back-N is an efficient protocol for data transmission but suffers from redundant retransmissions when frames are lost. In the next section, we will explore the Selective Repeat protocol, which addresses these issues by retransmitting only the lost frames.</p>
+            </article>
+            <article>
+                <h3>6. Selective Repeat Protocol (SR)</h3>
+                <p>The Selective Repeat protocol (SR) is an enhanced sliding window protocol designed to avoid redundant retransmissions by only retransmitting the specific frames that are lost or corrupted. It optimizes bandwidth usage by sending individual negative acknowledgments (NAK) for problematic frames.</p>
+            </article>
+
+            <article>
+                <h4>6.1 Overview of Selective Repeat Protocol</h4>
+                <ul>
+                    <li><strong>Sender and Receiver Windows:</strong> Both the sender and receiver windows have the same size, with width > 1.</li>
+                    <li><strong>Selective Retransmission:</strong> Only lost or corrupted frames are retransmitted, minimizing unnecessary bandwidth usage.</li>
+                    <li><strong>Negative Acknowledgments (NAK):</strong> Used to explicitly notify the sender about missing frames.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h5>6.1.1 Key Differences from Go-Back-N</h5>
+                <ul>
+                    <li>In SR, the receiver window can accept out-of-order frames and store them in a buffer.</li>
+                    <li>Go-Back-N retransmits all frames after a lost one, while SR retransmits only the missing frames.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h4>6.2 How Selective Repeat Works</h4>
+                <ul>
+                    <li>Sender sends frames 0, 1.</li>
+                    <li>Receiver receives and stores both frames in a buffer, then sends an acknowledgment (ACK) for both.</li>
+                    <li>Sender slides its window and sends frames 2, 3.</li>
+                    <li>Frame 2 is lost, but frame 3 is accepted and stored.</li>
+                    <li>Receiver sends a NAK for frame 2.</li>
+                    <li>Sender retransmits frame 2.</li>
+                    <li>Receiver sends an ACK for frame 2, and both windows slide forward.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h4>6.3 Handling Lost Acknowledgments</h4>
+                <ul>
+                    <li>If an acknowledgment is lost, the sender will wait for a NAK or a timeout to detect the problem.</li>
+                    <li>The sender retransmits only the required frame, avoiding the inefficiency of resending entire windows.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h4>6.4 Window Size Constraints in SR</h4>
+                <p>The maximum window size is constrained to avoid frame sequence ambiguity:</p>
+                <pre><code class="">
+WS ≤ (2^m) / 2
+</code></pre>
+                <p>Where <code>m</code> is the number of bits used for sequence numbers. This ensures no erroneous re-acceptance of old frames occurs.</p>
+            </article>
+
+            <article>
+                <h4>6.5 Efficiency of Selective Repeat Protocol</h4>
+                <p>The efficiency of SR is defined similarly to Go-Back-N:</p>
+                <p>$$\eta = \frac{WS}{1 + 2A}$$</p>
+                <p>Where:</p>
+                <ul>
+                    <li><strong>WS:</strong> Window size.</li>
+                    <li><strong>A:</strong> Propagation delay to transmission time ratio.</li>
+                </ul>
+                <p>The use of selective retransmissions helps optimize bandwidth in scenarios with frequent errors.</p>
+            </article>
+
+            <article>
+                <h4>6.6 Comparison with Other Protocols</h4>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <thead class="">
+                            <tr>
+                                <th>Feature</th>
+                                <th>Stop-and-Wait</th>
+                                <th>Go-Back-N</th>
+                                <th>Selective Repeat</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Window Size</td>
+                                <td>1</td>
+                                <td><code>WS ≤ 2^m - 1</code></td>
+                                <td><code>WS ≤ (2^m) / 2</code></td>
+                            </tr>
+                            <tr>
+                                <td>Retransmissions</td>
+                                <td>1 at a time</td>
+                                <td>Entire window after loss</td>
+                                <td>Only missing frames</td>
+                            </tr>
+                            <tr>
+                                <td>Buffers Needed</td>
+                                <td>1</td>
+                                <td>n at sender, 1 at receiver</td>
+                                <td>n at both sender and receiver</td>
+                            </tr>
+                            <tr>
+                                <td>Bandwidth Efficiency</td>
+                                <td>Low</td>
+                                <td>Moderate</td>
+                                <td>High</td>
+                            </tr>
+                            <tr>
+                                <td>Best Use Case</td>
+                                <td>Low bandwidth</td>
+                                <td>High bandwidth with low errors</td>
+                                <td>Wireless networks with moderate bandwidth</td>
+                            </tr>
+                        </tbody>
+                    </table>
+            </article>
+
+            <article>
+                <h4>6.7 Implementation Considerations</h4>
+                <ul>
+                    <li>Selective Repeat requires more memory and computational resources than Go-Back-N due to the need to buffer out-of-order frames.</li>
+                    <li>It is ideal for error-prone networks, such as wireless networks, where minimizing retransmissions is crucial.</li>
+                    <li>Modern network interface cards (NICs) often have built-in buffers to handle selective repeat efficiently.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h4>6.8 Conclusion</h4>
+                <p>The Selective Repeat protocol strikes a balance between efficiency and complexity, making it suitable for networks with moderate bandwidth and higher error rates, such as wireless networks. While its implementation is more complex, the benefits of reduced retransmissions and better bandwidth utilization make it a preferred choice in many practical scenarios.</p>
+            </article>
+            <article>
+                <h3>7. Multiple Access Protocols (Media Access Protocols)</h3>
+                <p>Multiple Access Protocols (MAP), also called Media Access Protocols, manage how multiple stations (or hosts) share a communication medium to avoid collisions. These protocols ensure smooth data transmission through a shared medium, preventing interference and corrupted data.</p>
+            </article>
+
+            <article>
+                <h4>7.1 Types of Multiple Access Protocols</h4>
+                <p>MAPs are broadly classified into three categories:</p>
+                <ul>
+                    <li><strong>Channelization Protocols:</strong> Divide the medium using frequency, time, or code.</li>
+                    <li><strong>Controlled Access Protocols:</strong> Access is coordinated to avoid collisions.</li>
+                    <li><strong>Random Access Protocols:</strong> Stations transmit without pre-coordination, using strategies to handle collisions.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h4>7.2 Channelization Protocols</h4>
+                <p>Channelization protocols split the communication medium based on different factors. Below are three key types:</p>
+            </article>
+
+            <article>
+                <h5>7.2.1 Frequency Division Multiple Access (FDMA)</h5>
+                <p>FDMA divides the available frequency range into non-overlapping intervals, each allocated to a station. This prevents overlap and ensures efficient transmission.</p>
+                <pre><code class="">
+Example:
+Total Frequency: 100 MHz to 1000 MHz
+Station 1: 100-199 MHz
+Station 2: 200-299 MHz
+...
+Station 9: 900-999 MHz
+</code></pre>
+                <p>This approach ensures that each station transmits in a unique frequency range, avoiding collisions.</p>
+            </article>
+
+            <article>
+                <h5>7.2.2 Time Division Multiple Access (TDMA)</h5>
+                <p>TDMA allocates time intervals to stations, allowing them to transmit one at a time in a cyclical order. Each station can transmit only during its assigned time slot.</p>
+                <pre><code class="">
+Efficiency:
+η = TT / (TT + TP)
+Where:
+TT = Transmission time
+TP = Propagation time
+</code></pre>
+                <p>A drawback of TDMA is wasted slots, which occur when a station has no data to send during its assigned slot, reducing overall efficiency.</p>
+            </article>
+
+            <article>
+                <h5>7.2.3 Code Division Multiple Access (CDMA)</h5>
+                <p>CDMA assigns a unique code to each station. All stations transmit their data simultaneously, with each data frame multiplied by the station's code. The receiver uses these codes to decode the data meant for it.</p>
+                <pre><code class="">
+Signal on Bus: 
+C1D1 + C2D2 + C3D3 + C4D4
+</code></pre>
+                <p>CDMA is widely used in telecommunications due to its ability to handle multiple simultaneous transmissions without collisions.</p>
+            </article>
+
+            <article>
+                <h4>7.3 Mathematical Model for TDMA Efficiency</h4>
+                <p>The efficiency of TDMA can be derived using the following formula:</p>
+                <p>$$\eta = \frac{TT}{TT + TP} = \frac{1}{1 + A}$$</p>
+                <p>Where \(A = \frac{TP}{TT}\) represents the ratio of propagation time to transmission time.</p>
+                <p>The throughput, or effective bandwidth, is calculated as:</p>
+                <p>$$\text{Throughput} = \eta \times B$$</p>
+                <p>Where \(B\) is the total bandwidth.</p>
+            </article>
+
+            <article>
+                <h4>7.4 Comparison of Channelization Protocols</h4>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <thead class="">
+                            <tr>
+                                <th>Protocol</th>
+                                <th>Key Concept</th>
+                                <th>Drawbacks</th>
+                                <th>Use Cases</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>FDMA</td>
+                                <td>Frequency-based division</td>
+                                <td>Limited frequency resources</td>
+                                <td>Radio communication</td>
+                            </tr>
+                            <tr>
+                                <td>TDMA</td>
+                                <td>Time-based division</td>
+                                <td>Wasted slots</td>
+                                <td>Satellite communication</td>
+                            </tr>
+                            <tr>
+                                <td>CDMA</td>
+                                <td>Code-based division</td>
+                                <td>Complex mathematics</td>
+                                <td>Mobile networks</td>
+                            </tr>
+                        </tbody>
+                    </table>
+            </article>
+
+            <article>
+                <h4>7.5 Practical Example for TDMA</h4>
+                <pre><code class="">
+TT = 1 ms
+TP = 1 ms
+η = 1 / (1 + 1) = 0.5 (50%)
+Bandwidth (B) = 4 Mbps
+
+Throughput = η × B = 2 Mbps
+
+Number of stations that can be supported:
+Total throughput / Required throughput per station = 2 Mbps / 1 Kbps = 2000 stations
+</code></pre>
+                <p>This calculation shows that with a throughput of 2 Mbps, 2000 stations, each requiring 1 Kbps, can be connected.</p>
+            </article>
+
+            <article>
+                <h4>7.6 Summary</h4>
+                <p>Multiple Access Protocols are crucial for managing shared media in computer networks and telecommunications. FDMA, TDMA, and CDMA offer distinct ways to divide the medium based on frequency, time, and code, respectively. Each has its unique advantages and drawbacks, making them suitable for different use cases such as radio, satellite, and mobile communications.</p>
+            </article>
+
+            <article>
+                <h3>8. Controlled Access Protocols</h3>
+                <p>Controlled access protocols ensure that access to the shared medium is regulated to avoid collisions. These protocols involve a central authority or logic to manage communication, unlike random access protocols. Let’s explore three key controlled access strategies: Polling, Reservation, and Token Passing.</p>
+            </article>
+
+            <article>
+                <h4>8.1 Polling Protocol</h4>
+                <p>In the polling protocol, a <strong>master node</strong> or <strong>controller</strong> manages communication. The master polls each host sequentially, asking if it has data to send. If a host has data, it sends it; otherwise, it sends a negative acknowledgment.</p>
+                <p>This protocol suits star topologies but can also be implemented in bus topologies.</p>
+
+                <h5>8.1.1 Polling Process</h5>
+                <ul>
+                    <li>Master sends poll packet to Host 1.</li>
+                    <li>If Host 1 has no data: sends negative acknowledgment.</li>
+                    <li>If Host 1 has data: sends it to the master.</li>
+                    <li>Master forwards the data to the destination host (if needed).</li>
+                    <li>Process repeats for the next host in the cycle.</li>
+                </ul>
+
+                <h5>8.1.2 Advantages and Drawbacks</h5>
+                <ul>
+                    <li><strong>Prioritization:</strong> The master can poll important hosts more frequently.</li>
+                    <li><strong>Bandwidth Utilization:</strong> Low, due to time spent on polling and acknowledgments.</li>
+                    <li><strong>Single Point of Failure:</strong> If the master fails, the entire network stalls.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h4>8.2 Reservation Protocol</h4>
+                <p>The reservation protocol optimizes time division by allowing hosts to indicate if they have data to send before the transmission begins. A <strong>reservation frame</strong> is used to gather this information.</p>
+
+                <h5>8.2.1 Reservation Process</h5>
+                <ul>
+                    <li>A reservation frame with mini slots is broadcasted.</li>
+                    <li>Each host places a bit in its allocated mini slot:</li>
+                    <ul>
+                        <li>1: Host wants to transmit.</li>
+                        <li>0: Host has no data to transmit.</li>
+                    </ul>
+                    <li>Hosts transmit in the order indicated by the reservation frame.</li>
+                    <li>The process repeats with a new reservation frame.</li>
+                </ul>
+
+                <h5>8.2.2 Key Features</h5>
+                <ul>
+                    <li>Reduces wasted slots compared to TDMA by only allowing hosts with data to transmit.</li>
+                    <li>Some overhead is incurred by the reservation frame but is manageable with few hosts.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h4>8.3 Token Passing Protocol</h4>
+                <p>In the token passing protocol, a <strong>token</strong> gives permission to transmit. Only the host holding the token can send data. The token is passed along a logical ring, ensuring orderly transmission without collisions.</p>
+
+                <h5>8.3.1 Token Passing Process</h5>
+                <ul>
+                    <li>Host 1 holds the token and sends data to Host 3.</li>
+                    <li>Data flows through intermediate hosts (e.g., Host 2).</li>
+                    <li>Host 3 copies the data and forwards it.</li>
+                    <li>When the data returns to Host 1, it is discarded, confirming delivery.</li>
+                    <li>If Host 1 has more data, it sends it; otherwise, it passes the token to Host 2.</li>
+                    <li>The process repeats with the token moving cyclically among the hosts.</li>
+                </ul>
+
+                <h5>8.3.2 Advantages of Token Passing</h5>
+                <ul>
+                    <li><strong>No Acknowledgments Required:</strong> The returning packet confirms successful delivery.</li>
+                    <li><strong>Efficient Broadcasting:</strong> Suitable for sending data to all hosts in the network.</li>
+                    <li><strong>No Collisions:</strong> Only the host with the token can transmit.</li>
+                </ul>
+
+                <h5>8.3.3 Challenges</h5>
+                <ul>
+                    <li><strong>Token Management:</strong> Ensuring the orderly passing of tokens requires careful logic.</li>
+                    <li><strong>Recovery from Token Loss:</strong> If a token is lost, it must be regenerated.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h4>8.4 Comparison of Controlled Access Protocols</h4>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <thead class="">
+                            <tr>
+                                <th>Protocol</th>
+                                <th>Key Feature</th>
+                                <th>Advantages</th>
+                                <th>Drawbacks</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Polling</td>
+                                <td>Master polls each host sequentially</td>
+                                <td>Simple, allows prioritization</td>
+                                <td>Single point of failure, low bandwidth utilization</td>
+                            </tr>
+                            <tr>
+                                <td>Reservation</td>
+                                <td>Hosts reserve slots before transmitting</td>
+                                <td>Reduces wasted slots</td>
+                                <td>Overhead from reservation frame</td>
+                            </tr>
+                            <tr>
+                                <td>Token Passing</td>
+                                <td>Only host with token transmits</td>
+                                <td>No collisions, efficient broadcasting</td>
+                                <td>Token management and loss recovery challenges</td>
+                            </tr>
+                        </tbody>
+                    </table>
+            </article>
+
+            <article>
+                <h4>8.5 Summary</h4>
+                <p>Controlled access protocols regulate communication to avoid collisions and ensure orderly data transmission. Polling, reservation, and token passing offer different strategies with unique advantages and drawbacks. Polling provides control but risks inefficiency. Reservation protocols optimize time division by eliminating wasted slots. Token passing ensures collision-free transmission and facilitates broadcasting, though it requires careful token management.</p>
+            </article>
+
+            <article>
+                <h3>9. Efficiency of Token Passing Protocols</h3>
+                <p>Token passing schemes are a form of controlled access protocol where only the host holding the token can transmit data. To analyze their efficiency, we need to compute the key parameters involved in token passing systems and understand the difference between <strong>Delayed Token Reinsertion (DTR)</strong> and <strong>Early Token Reinsertion (ETR)</strong>.</p>
+            </article>
+
+            <article>
+                <h4>9.1 Concept of k-bit Delay</h4>
+                <p>In computer networks, the term <strong>k-bit delay</strong> is often used to represent delay. Here’s how it is computed:</p>
+                <ul>
+                    <li><strong>Bandwidth (B)</strong>: Number of bits transmitted per second.</li>
+                    <li><strong>Velocity (V)</strong>: Speed of signal propagation in meters per second.</li>
+                    <li><strong>k-bit Delay</strong>: Delay in transferring k bits, represented as $k / B$ seconds.</li>
+                    <li><strong>k-bit Distance</strong>: The distance traveled by the signal in $k / B \cdot V$ meters.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h4>9.2 Key Metrics in Token Passing</h4>
+                <ul>
+                    <li><strong>Ring Latency</strong>: Total time for one bit to travel through the ring.
+                        <p>$$\text{Ring Latency} = \frac{D}{V} + \frac{n \cdot k}{B}$$</p>
+                        Where:
+                        <ul>
+                            <li>D: Total distance in meters.</li>
+                            <li>V: Signal velocity (meters per second).</li>
+                            <li>n: Number of stations.</li>
+                            <li>k: Bit delay per station.</li>
+                        </ul>
+                    </li>
+
+                    <li><strong>Token Holding Time (THT)</strong>: Time a host holds the token.</li>
+                    <li><strong>Cycle Time</strong>: Time for the token to travel through the entire cycle and return to the origin.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h4>9.3 Efficiency of Token Passing</h4>
+                <p>The formula for efficiency is:</p>
+                <p>$$\text{Efficiency} = \frac{\text{Useful Time}}{\text{Cycle Time}}$$</p>
+                <p>Assuming each station sends one frame per cycle, the efficiency becomes:</p>
+                <p>$$\text{Efficiency} = \frac{n \cdot T_t}{T_p + n \cdot THT}$$</p>
+                Where:
+                <ul>
+                    <li>$n$: Number of stations.</li>
+                    <li>$T_t$: Transmission time for one frame.</li>
+                    <li>$T_p$: Propagation delay ($D / V$).</li>
+                    <li>$THT$: Token holding time.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h4>9.4 Delayed Token Reinsertion (DTR)</h4>
+                <p>In DTR, a host holds the token until its packet returns. The token holding time is:</p>
+                <p>$$THT_{DTR} = T_t + \text{Ring Latency}$$</p>
+                <p>The efficiency of DTR is:</p>
+                <p>$$\eta_{DTR} = \frac{1}{1 + (n - 1) \cdot A}$$</p>
+                Where $A = \frac{T_p}{T_t}$.</p>
+            </article>
+
+            <article>
+                <h4>9.5 Early Token Reinsertion (ETR)</h4>
+                <p>In ETR, the token is released immediately after the packet is sent, allowing multiple packets to coexist on the ring. The token holding time is:</p>
+                <p>$$THT_{ETR} = T_t$$</p>
+                <p>The efficiency of ETR is:</p>
+                <p>$$\eta_{ETR} = \frac{1}{1 + \frac{A}{n}}$$</p>
+            </article>
+
+            <article>
+                <h4>9.6 Comparison: DTR vs. ETR</h4>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <thead class="">
+                            <tr>
+                                <th>Metric</th>
+                                <th>DTR</th>
+                                <th>ETR</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Efficiency</td>
+                                <td>$\frac{1}{1 + (n - 1) \cdot A}$</td>
+                                <td>$\frac{1}{1 + \frac{A}{n}}$</td>
+                            </tr>
+                            <tr>
+                                <td>Packets on Ring</td>
+                                <td>One at a time</td>
+                                <td>Multiple packets</td>
+                            </tr>
+                            <tr>
+                                <td>Reliability</td>
+                                <td>High (less chance of corruption)</td>
+                                <td>Lower (higher chance of corruption)</td>
+                            </tr>
+                            <tr>
+                                <td>Use Case</td>
+                                <td>Low-error environments (e.g., fiber optics)</td>
+                                <td>Moderate-error environments (e.g., wireless)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+            </article>
+
+            <article>
+                <h4>9.7 Summary</h4>
+                <p>Both DTR and ETR provide mechanisms to manage token holding and improve efficiency. While ETR offers higher efficiency by allowing multiple packets to traverse the ring simultaneously, it may result in lower reliability. DTR, on the other hand, ensures higher reliability by allowing only one packet at a time on the ring, reducing the chance of collisions.</p>
+            </article>
+
+            <article>
+                <h3>10. ALOHA Protocol: An Introduction to Random Access Protocols</h3>
+                <p>The ALOHA protocol, developed at the University of Hawaii, is one of the earliest random access protocols. It was originally designed for wireless communication but can also be applied to wired networks. ALOHA enables hosts to transmit data without coordination, introducing the possibility of collisions.</p>
+            </article>
+
+            <article>
+                <h4>10.1 Types of ALOHA Protocols</h4>
+                <ul>
+                    <li><strong>Pure ALOHA</strong>: Hosts transmit whenever they have data to send, without waiting or coordination.</li>
+                    <li><strong>Slotted ALOHA</strong>: Hosts are restricted to sending only at predefined time slots to reduce the chances of collisions.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h4>10.2 Pure ALOHA Protocol</h4>
+                <p>The core idea is simple: A host sends its frame as soon as it is ready. However, collisions can occur if two hosts transmit simultaneously. If a frame collides, the sender waits for a random backoff time and retransmits after the timeout period.</p>
+                <p><strong>Collisions:</strong> Collisions occur when two frames overlap on the time axis. If an overlap occurs, the data becomes corrupted, requiring retransmission.</p>
+
+                <h5>10.2.1 Vulnerable Time in Pure ALOHA</h5>
+                <p>The vulnerable time is the duration when a frame is at risk of collision:</p>
+                <p>$$\text{Vulnerable Time} = 2 \cdot T_t$$</p>
+                <p>This occurs because the frame can collide if another frame starts transmission within the duration before or after the original frame.</p>
+
+                <h5>10.2.2 Efficiency of Pure ALOHA</h5>
+                <p>The efficiency of pure ALOHA, derived using Poisson distribution, is given by:</p>
+                <p>$$\eta_{\text{Pure ALOHA}} = G \cdot e^{-2G}$$</p>
+                <ul>
+                    <li><strong>G</strong>: Number of hosts trying to transmit within a time slot of length $T_t$.</li>
+                </ul>
+                <p><strong>Maximum Efficiency:</strong></p>
+                <p>The maximum efficiency occurs when $G = 0.5$, giving:</p>
+                <p>$$\eta_{\text{Pure ALOHA Max}} = 0.184 \, (18.4\%)$$</p>
+            </article>
+
+            <article>
+                <h4>10.3 Slotted ALOHA Protocol</h4>
+                <p>In slotted ALOHA, time is divided into fixed slots of duration $T_t$. Hosts can only transmit at the start of a time slot, reducing the chance of collisions.</p>
+
+                <h5>10.3.1 Vulnerable Time in Slotted ALOHA</h5>
+                <p>The vulnerable time in slotted ALOHA is reduced to:</p>
+                <p>$$\text{Vulnerable Time} = T_t$$</p>
+
+                <h5>10.3.2 Efficiency of Slotted ALOHA</h5>
+                <p>The efficiency of slotted ALOHA is given by:</p>
+                <p>$$\eta_{\text{Slotted ALOHA}} = G \cdot e^{-G}$$</p>
+                <p><strong>Maximum Efficiency:</strong></p>
+                <p>Using calculus, we find the maximum efficiency when $G = 1$:</p>
+                <p>$$\eta_{\text{Slotted ALOHA Max}} = \frac{1}{e} \approx 0.368 \, (36.8\%)$$</p>
+            </article>
+
+            <article>
+                <h4>10.4 Comparison of Pure ALOHA and Slotted ALOHA</h4>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <thead class="">
+                            <tr>
+                                <th>Metric</th>
+                                <th>Pure ALOHA</th>
+                                <th>Slotted ALOHA</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Vulnerable Time</td>
+                                <td>$2 \cdot T_t$</td>
+                                <td>$T_t$</td>
+                            </tr>
+                            <tr>
+                                <td>Maximum Efficiency</td>
+                                <td>18.4%</td>
+                                <td>36.8%</td>
+                            </tr>
+                            <tr>
+                                <td>Transmission Time</td>
+                                <td>Anytime</td>
+                                <td>At slot boundaries</td>
+                            </tr>
+                            <tr>
+                                <td>Collision Probability</td>
+                                <td>Higher</td>
+                                <td>Lower</td>
+                            </tr>
+                        </tbody>
+                    </table>
+            </article>
+
+            <article>
+                <h4>10.5 Summary</h4>
+                <p>The ALOHA protocol introduced a novel approach to random access communication. While pure ALOHA is simpler, it has lower efficiency due to a larger vulnerable time. Slotted ALOHA improves efficiency by reducing the window of collision but requires synchronization among hosts. Both protocols laid the foundation for modern wireless communication systems.</p>
+            </article>
+
+            <article>
+                <h3>11. Carrier Sense Multiple Access (CSMA): A Group of Protocols</h3>
+                <p>Carrier Sense Multiple Access (CSMA) protocols aim to improve the efficiency of networks by sensing the medium before transmitting data, unlike ALOHA. The term "carrier" refers to the communication medium. Before transmitting, a host checks if the medium is busy with other transmissions. If busy, it waits before attempting again. Multiple CSMA variants exist, each enhancing collision management in unique ways.</p>
+            </article>
+
+            <article>
+                <h4>11.1 Variants of CSMA Protocols</h4>
+                <ul>
+                    <li><strong>One-Persistent CSMA:</strong> Transmits as soon as the medium is sensed free, with a probability of 1.</li>
+                    <li><strong>Non-Persistent CSMA:</strong> Waits for a random period if the medium is busy, reducing continuous sensing.</li>
+                    <li><strong>P-Persistent CSMA:</strong> Introduces probabilistic transmission at the beginning of time slots, useful in wireless networks.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h4>11.2 One-Persistent CSMA</h4>
+                <p>In one-persistent CSMA, the host transmits its frame immediately if the medium is idle. If the medium is busy, it continuously senses it until it becomes free. Collisions may occur due to propagation delay, as hosts can sense an idle medium while another frame is still in transit.</p>
+            </article>
+
+            <article>
+                <h5>11.2.1 Key Characteristics</h5>
+                <ul>
+                    <li>Immediate transmission with probability 1 when medium is free.</li>
+                    <li>Continuous sensing if the medium is busy.</li>
+                    <li>Collisions occur due to propagation delay.</li>
+                </ul>
+            </article>
+
+
+            <article>
+                <h5>11.2.2 Handling Collisions</h5>
+                <p>If a collision occurs, the sender waits for a random back-off time before sensing the medium again. The timeout mechanism ensures the host does not reattempt transmission too quickly.</p>
+            </article>
+
+            <article>
+                <h4>11.3 Non-Persistent CSMA</h4>
+                <p>This protocol avoids continuous sensing by waiting a random period before sensing the carrier again if the medium is busy. This reduces resource usage but introduces additional delay.</p>
+
+                <h5>11.3.1 Key Characteristics</h5>
+                <ul>
+                    <li>Random wait period if medium is busy.</li>
+                    <li>Lower resource usage compared to one-persistent CSMA.</li>
+                    <li>Increased transmission delay.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h4>11.4 P-Persistent CSMA</h4>
+                <p>P-persistent CSMA works by slotting time and transmitting with a probability P at the start of each time slot. It is particularly useful in wireless networks to manage collision risks.</p>
+
+                <h5>11.4.1 Key Characteristics</h5>
+                <ul>
+                    <li>Time-slotted transmission.</li>
+                    <li>Transmission with probability P, waiting otherwise.</li>
+                    <li>Reduced collisions due to randomized transmissions.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h4>11.5 CSMA with Collision Detection (CSMA/CD)</h4>
+                <p>CSMA/CD detects collisions during transmission. If a collision is detected, the transmission halts, and the host waits before retrying. This method is widely used in Ethernet networks.</p>
+
+                <h5>11.5.1 Key Characteristics</h5>
+                <ul>
+                    <li>Collisions detected during transmission.</li>
+                    <li>Immediate halt upon collision detection.</li>
+                    <li>Random back-off period before reattempting.</li>
+                </ul>
+                <pre class="mermaid text-center">
+flowchart TD
+    A[Start Transmission] --> B{Carrier Idle?}
+    B -- No --> A
+    B -- Yes --> C[Transmit Frame]
+    C --> D{Collision Detected?}
+    D -- No --> E[Successful Transmission]
+    D -- Yes --> F[Wait Random Time] --> A
+</code></pre>
+            </article>
+
+            <article>
+                <h4>11.6 CSMA with Collision Avoidance (CSMA/CA)</h4>
+                <p>CSMA/CA, used in wireless LANs (IEEE 802.11), aims to avoid collisions entirely. It uses a <strong>Request to Send (RTS)</strong> and <strong>Clear to Send (CTS)</strong> mechanism to ensure that nodes do not transmit simultaneously.</p>
+
+                <h5>11.6.1 RTS/CTS Mechanism</h5>
+                <p>The RTS/CTS exchange ensures that a central access point (AP) confirms availability before allowing transmission, mitigating the hidden node problem.</p>
+
+                <pre class="mermaid text-center">
+flowchart TD
+    A[Node A wants to transmit] --> B[Send RTS to AP]
+    B --> C{CTS Received?}
+    C -- Yes --> D[Transmit Data]
+    C -- No --> E[Wait Random Time] --> B
+</code></pre>
+            </article>
+
+            <article>
+                <h4>11.7 Comparison of CSMA Variants</h4>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <thead class="">
+                            <tr>
+                                <th>Protocol</th>
+                                <th>Transmission Strategy</th>
+                                <th>Collision Handling</th>
+                                <th>Use Case</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>One-Persistent CSMA</td>
+                                <td>Immediate</td>
+                                <td>Random Back-off</td>
+                                <td>Wired LANs</td>
+                            </tr>
+                            <tr>
+                                <td>Non-Persistent CSMA</td>
+                                <td>Random Wait</td>
+                                <td>Random Back-off</td>
+                                <td>Wired LANs</td>
+                            </tr>
+                            <tr>
+                                <td>P-Persistent CSMA</td>
+                                <td>Probabilistic</td>
+                                <td>Random Back-off</td>
+                                <td>Wireless LANs</td>
+                            </tr>
+                            <tr>
+                                <td>CSMA/CD</td>
+                                <td>Collision Detection</td>
+                                <td>Immediate Halt</td>
+                                <td>Ethernet Networks</td>
+                            </tr>
+                            <tr>
+                                <td>CSMA/CA</td>
+                                <td>Collision Avoidance</td>
+                                <td>RTS/CTS Exchange</td>
+                                <td>Wireless LANs</td>
+                            </tr>
+                        </tbody>
+                    </table>
+            </article>
+
+            <article>
+                <h4>11.8 Conclusion</h4>
+                <p>CSMA protocols play a crucial role in network communication by reducing collisions and improving efficiency. Depending on the network type, different CSMA variants offer tailored solutions to manage collision risks effectively, with CSMA/CA being widely used in wireless networks for collision avoidance.</p>
+            </article>
+
+            <article>
+                <h3>12. Analysis of CSMA/CD (Carrier Sense Multiple Access with Collision Detection)</h3>
+                <p>CSMA/CD is a protocol used in networks to detect and handle collisions during data transmission. This analysis explores key concepts, assumptions, and mathematical analysis for understanding the behavior and efficiency of CSMA/CD. It is commonly used in Ethernet networks where short distances make it effective.</p>
+            </article>
+
+            <article>
+                <h4>12.1 Collision Detection Mechanism</h4>
+                <p>The most popular strategy to detect a collision is by observing whether the sender receives a signal while it is still transmitting. If this happens, it is a clear indication that a collision has occurred.</p>
+
+                <h5>12.1.1 Worst Case Collision Scenario</h5>
+                <ul>
+                    <li>If Host H1 sends the first bit, it takes <strong>propagation time (Tp)</strong> to reach Host H2.</li>
+                    <li>If H2 starts transmitting just before receiving H1’s bit, both transmissions will collide.</li>
+                    <li>The collided bit takes another <strong>Tp</strong> to return to H1.</li>
+                </ul>
+                <p>In the worst-case scenario, collision detection takes <strong>2Tp</strong>.</p>
+
+                <pre class="mermaid text-center">
+flowchart TD
+    A[H1 sends first bit] --> B{H2 detects idle?}
+    B -- Yes --> C[H2 sends its bit]
+    C --> D[Collision occurs]
+    D --> E[Collision travels back in Tp]
+</code></pre>
+            </article>
+
+            <article>
+                <h4>12.2 Mathematical Analysis</h4>
+                <p>The frame size and transmission time must meet specific conditions to detect collisions effectively. The minimum frame size is calculated as:</p>
+
+                <p>$$L \geq \frac{2 \cdot D \cdot B}{V}$$</p>
+
+                <ul>
+                    <li><strong>L</strong>: Frame size (bits)</li>
+                    <li><strong>D</strong>: Distance between hosts</li>
+                    <li><strong>B</strong>: Bandwidth (bits per second)</li>
+                    <li><strong>V</strong>: Velocity of signal in the medium</li>
+                </ul>
+
+                <h5>12.2.1 Example Calculation</h5>
+                <p>If <strong>Tp</strong> is 1 millisecond and <strong>B</strong> is 1 Mbps, the minimum frame size required is:</p>
+                <p>$$L \geq 2 \cdot 1 \, ms \cdot 1 \, Mbps = 2000 \, bits$$</p>
+            </article>
+
+            <article>
+                <h4>12.3 Efficiency of CSMA/CD</h4>
+                <p>The efficiency of CSMA/CD is calculated as:</p>
+                <p>$$Efficiency = \frac{T_t}{T_t + 2 \cdot T_p \cdot C}$$</p>
+                <ul>
+                    <li><strong>Tt</strong>: Transmission time</li>
+                    <li><strong>Tp</strong>: Propagation time</li>
+                    <li><strong>C</strong>: Number of contention slots</li>
+                </ul>
+
+                <h5>12.3.1 Calculating Expected Collisions</h5>
+                <p>The expected number of collisions, <strong>C</strong>, can be calculated using probability:</p>
+                <p>$$C \approx e \, (E = 2.718)$$</p>
+                <p>This means, on average, a packet may encounter <em>e</em> collisions before successful transmission.</p>
+            </article>
+
+            <article>
+                <h4>12.4 Factors Affecting Efficiency</h4>
+                <ul>
+                    <li><strong>Frame Size (L):</strong> Larger frames increase efficiency as the relative impact of collisions decreases.</li>
+                    <li><strong>Distance (D):</strong> Increased distance leads to more collisions, decreasing efficiency. CSMA/CD is ideal for small networks (like LANs).</li>
+                </ul>
+                <pre class="mermaid text-center">
+graph LR
+    A[Increase in Frame Size] --> B[Higher Efficiency]
+    C[Increase in Distance] --> D[Lower Efficiency]
+</code></pre>
+                <p>This is why CSMA/CD works well in Ethernet networks but not in WANs or metropolitan networks.</p>
+            </article>
+
+            <article>
+                <h4>12.5 Summary of Key Takeaways</h4>
+                <ul>
+                    <li>Collision detection takes <strong>2Tp</strong> in worst-case scenarios.</li>
+                    <li>The minimum frame size must be large enough to allow collision detection.</li>
+                    <li>CSMA/CD is effective in Ethernet networks due to shorter distances and higher efficiency.</li>
+                    <li>On average, <strong>e</strong> attempts are needed for a successful transmission after collisions.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>13. Exponential Backoff Algorithm in CSMA/CD</h3>
+                <p>The exponential backoff algorithm plays a crucial role in handling repeated collisions in CSMA/CD networks by introducing a randomized waiting time after each collision. This reduces the probability of repeated collisions and ensures fair access to the medium.</p>
+            </article>
+
+            <article>
+                <h4>13.1 Concept of Backoff Time</h4>
+                <p>After detecting a collision, both hosts stop transmitting and wait for a random amount of time before attempting retransmission. This waiting time is called <strong>backoff time</strong>.</p>
+                <p>The challenge lies in ensuring that both hosts do not choose the same waiting time, which would lead to another collision. This is where the exponential backoff algorithm is applied.</p>
+            </article>
+
+            <article>
+                <h4>13.2 Working of Exponential Backoff Algorithm</h4>
+                <ul>
+                    <li>For each packet, a <strong>collision number (n)</strong> is tracked, representing how many times the packet has collided.</li>
+                    <li>The waiting time for each host is calculated as:
+                        <p>$$W = K \cdot \text{Time Slot}$$</p>
+                    </li>
+                    <li><strong>K</strong> is chosen randomly from the range \( [0, 2^n - 1] \).</li>
+                </ul>
+
+                <pre class="mermaid text-center">
+flowchart TD
+    A[Collision Detected] --> B[Choose Random K between 0 and 2^n - 1]
+    B --> C[Wait for K * Time Slot]
+    C --> D[Attempt Retransmission]
+</code></pre>
+                <p>The exponential backoff algorithm ensures that with each collision, the waiting time window grows exponentially, reducing the probability of repeated collisions.</p>
+            </article>
+
+            <article>
+                <h4>13.3 Example Scenarios</h4>
+                <p>Assume Host 1 (H1) and Host 2 (H2) collided during transmission. The steps are:</p>
+
+                <ol>
+                    <li>After the first collision: \(n = 1\)</li>
+                    <li>Both hosts choose a random K from \( [0, 1] \)</li>
+                </ol>
+
+                <ul>
+                    <li>If both choose 0, a second collision occurs.</li>
+                    <li>If one chooses 0 and the other 1, the one with K = 0 will transmit successfully.</li>
+                </ul>
+
+                <p>After the second collision, the range increases to \( [0, 3] \), reducing the chance of another collision.</p>
+            </article>
+
+            <article>
+                <h4>13.4 Probability of Collisions</h4>
+                <p>The probability of collisions decreases with each attempt:</p>
+                <ul>
+                    <li>Probability of the first collision: \(1\)</li>
+                    <li>Probability of the second collision, given the first: \(1/2\)</li>
+                    <li>Probability of the third collision, given the second: \(1/4\)</li>
+                </ul>
+                <p>This pattern follows an exponential decay, expressed as:</p>
+                <p>$$P(\text{Collision n} \mid \text{Collision n-1}) = \left( \frac{1}{2} \right)^{n-1}$$</p>
+            </article>
+
+            <article>
+                <h4>13.5 Capture Effect</h4>
+                <p>The <strong>capture effect</strong> refers to the scenario where one host (e.g., H1) consistently wins the medium due to the exponential backoff favoring previously successful hosts. If H1 wins initially, it has a higher probability of winning subsequent attempts, potentially starving other hosts.</p>
+
+                <pre class="mermaid text-center">
+graph LR
+    A[H1 Wins] --> B[Increased Probability for H1]
+    B --> C[Repeated Wins by H1]
+    C --> D[Starvation of H2]
+</pre>
+
+                <p>The capture effect can skew the fairness of the network.</p>
+            </article>
+
+            <article>
+                <h4>13.6 Mitigating the Capture Effect</h4>
+                <p>To address the capture effect, networks can employ collision-free algorithms like <strong>Token Passing</strong>. In token passing, only the host with the token can transmit, eliminating the possibility of collisions and ensuring fair access to the medium.</p>
+
+                <p>However, token passing has its own limitations, including potential delays and token loss, which can affect efficiency.</p>
+            </article>
+
+            <article>
+                <h4>13.7 Conclusion</h4>
+                <ul>
+                    <li>The exponential backoff algorithm is effective in reducing repeated collisions in CSMA/CD networks.</li>
+                    <li>It introduces a randomized waiting time that increases exponentially with each collision attempt.</li>
+                    <li>Despite its advantages, the algorithm may suffer from the capture effect, where a single host repeatedly wins access to the medium.</li>
+                    <li>Collision-free algorithms, such as token passing, provide an alternative to CSMA/CD in networks requiring strict fairness.</li>
+                </ul>
+            </article>
+            <article>
+                <h3>14. Error Handling in the MAC Layer</h3>
+                <p>Error handling at the MAC layer ensures that transmitted data packets arrive intact, with any corruption detected. The primary focus is on <strong>error detection</strong> rather than correction, as ARQ (Automatic Repeat Request) strategies allow retransmission of corrupted packets.</p>
+            </article>
+
+            <article>
+                <h4>14.1 Error Detection vs. Error Correction</h4>
+                <ul>
+                    <li><strong>Error Detection</strong>: Identifies if there is an error in the received data packet.</li>
+                    <li><strong>Error Correction</strong>: Attempts to correct errors without requesting retransmission. Examples include <em>Hamming Code</em> and <em>Convolutional Code</em>.</li>
+                </ul>
+                <p>In the MAC layer, detection strategies are preferred since ARQ protocols can manage retransmission.</p>
+            </article>
+
+            <article>
+                <h4>14.2 Error Detection Methods</h4>
+                <ul>
+                    <li><strong>Parity Check</strong>: Adds a bit to ensure even or odd parity. However, it is limited in detecting multiple-bit errors.</li>
+                    <li><strong>Checksum</strong>: Divides data into chunks and performs arithmetic operations to generate error-detection bits.</li>
+                    <li><strong>Cyclic Redundancy Check (CRC)</strong>: Uses polynomial division to detect errors, offering more robust protection than parity or checksum methods.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h4>14.3 Parity Check</h4>
+                <p>In parity-based error detection, the sender and receiver agree on a parity scheme (even or odd). If the parity at the receiver does not match the expected value, the packet is considered corrupted.</p>
+                <pre><code class="">
+Data: 1101 (3 zeros, odd parity)
+Add 1 bit to make it even: 11010
+</code></pre>
+                <p>Limitations: It fails to detect errors when multiple bits are altered.</p>
+            </article>
+
+            <article>
+                <h4>14.4 Checksum Algorithm</h4>
+                <p>The checksum algorithm breaks data into smaller chunks and computes a sum to generate error detection bits. The receiver recalculates the checksum to verify the data's integrity.</p>
+
+                <pre><code class="">
+D1 = 1011, D2 = 1100
+Checksum = D1 + D2 (ignoring carry bits)
+</code></pre>
+                <p>If the checksum at the receiver matches, the data is accepted. Otherwise, it is discarded.</p>
+            </article>
+
+            <article>
+                <h4>14.5 Cyclic Redundancy Check (CRC)</h4>
+                <p>CRC is a more reliable error detection method that uses polynomial division over the Galois field. It identifies even subtle errors by adding a set of CRC bits to the transmitted data.</p>
+
+                <h5>14.5.1 How CRC Works</h5>
+                <ul>
+                    <li>Both sender and receiver agree on a generator polynomial (e.g., \(x^3 + x + 1\)).</li>
+                    <li>The polynomial is converted into a bit string (e.g., \(1011\)).</li>
+                    <li>The sender appends zeros equal to the degree of the polynomial to the data and divides using XOR logic.</li>
+                </ul>
+
+                <pre class="mermaid text-center">
+graph TD
+    A[Data + CRC Bits] --> B[Division with Generator Polynomial]
+    B --> C[Compute Remainder using XOR]
+    C --> D[Attach Remainder as CRC]
+</code></pre>
+
+                <h5>14.5.2 CRC Example</h5>
+                <p>Given Data: 101101, Generator Polynomial: \(x^3 + x + 1\)</p>
+
+                <pre><code class="">
+Data + Zeros: 101101000
+Divisor (Generator Polynomial): 1011
+Perform XOR and continue until the data part becomes 0.
+CRC Bits: 101
+</code></pre>
+                <p>The transmitted message becomes 101101101. The receiver performs the same division. If the remainder is zero, the data is accepted; otherwise, it is discarded.</p>
+            </article>
+
+            <article>
+                <h4>14.6 Key Points</h4>
+                <ul>
+                    <li><strong>Parity</strong> is a simple technique but insufficient for multiple-bit errors.</li>
+                    <li><strong>Checksum</strong> offers better protection by summarizing data through addition but has limitations for complex errors.</li>
+                    <li><strong>CRC</strong> provides high reliability using polynomial division and is widely used in real-world networks.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h4>14.7 Summary</h4>
+                <p>Error handling at the MAC layer is crucial to maintaining data integrity in computer networks. While parity checks and checksums are simpler, CRC stands out as the most reliable technique due to its ability to detect subtle errors with mathematical precision.</p>
+            </article>
+
+            <article>
+                <h3>15. Framing in Data Link Layer</h3>
+                <p>Framing is the process of encapsulating data from the network layer into a frame at the data link layer, which is then transmitted to the physical layer. Each frame has a specific structure that helps with synchronization, error handling, and data identification.</p>
+            </article>
+
+            <article>
+                <h4>15.1 Frame Structure</h4>
+                <p>A frame generally consists of three parts:</p>
+                <ul>
+                    <li><strong>Header</strong>: Contains information like the frame number, size, MAC addresses, and start delimiters.</li>
+                    <li><strong>Data</strong>: Encapsulates the packet received from the network layer.</li>
+                    <li><strong>Tail</strong>: Includes error detection bits (like CRC or checksum) and end delimiters.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h4>15.2 Header and Tail Components</h4>
+                <p>The components in the header and tail vary depending on the protocol:</p>
+                <ul>
+                    <li><strong>Header</strong>: Contains the frame number, protocol information, source/destination MAC addresses, and start delimiters.</li>
+                    <li><strong>Tail</strong>: Contains CRC or checksum for error detection and end delimiters to mark the end of the frame.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h4>15.3 Fixed vs. Variable Frame Size</h4>
+                <ul>
+                    <li><strong>Fixed Size Frames</strong>: All frames are of the same size, which can result in padding if the data is smaller than the frame size.</li>
+                    <li><strong>Variable Size Frames</strong>: The frame size adapts to the size of the data, but requires delimiters or length fields to indicate the start and end of the frame.</li>
+                </ul>
+                <p>In fixed-size frames, padding is used to fill unused space. In variable-size frames, the length or delimiter bits are used to mark the end.</p>
+            </article>
+
+            <article>
+                <h4>15.4 Delimiters</h4>
+                <p>Delimiters help identify the beginning and end of a frame:</p>
+                <ul>
+                    <li><strong>Start Delimiters</strong>: Mark the beginning of the frame.</li>
+                    <li><strong>End Delimiters</strong>: Mark the end of the frame.</li>
+                </ul>
+                <p>Issues arise when the delimiter pattern appears within the data. In such cases, <strong>bit stuffing</strong> is used.</p>
+            </article>
+
+            <article>
+                <h4>15.5 Bit Stuffing</h4>
+                <p><strong>Bit Stuffing</strong> ensures that the delimiter pattern does not occur within the data. A bit is inserted at a specific location within the data to avoid confusion with delimiters.</p>
+
+                <h5>Example:</h5>
+                <pre><code class="">
+End Delimiter: 01111110
+Data: 0111110
+Bit Stuffed Data: 011111010
+</code></pre>
+
+                <p>The receiver removes the stuffed bit upon detection to recover the original data.</p>
+            </article>
+
+            <article>
+                <h4>15.6 Practical Example with Wireshark</h4>
+                <p>Using tools like Wireshark, we can observe real frames transmitted over a network. A typical Ethernet frame might contain:</p>
+                <ul>
+                    <li>Source and Destination MAC Addresses</li>
+                    <li>Protocol Details (e.g., Ethernet, IP, TCP)</li>
+                    <li>Frame Check Sequence (CRC)</li>
+                    <li>Frame Length</li>
+                </ul>
+                <p>Example: A frame with 74 bytes is transmitted, containing protocol information and CRC for error checking.</p>
+            </article>
+
+            <article>
+                <h4>15.7 Bit Stuffing in Action: Example Question</h4>
+                <p>Given an end delimiter <code>01111110</code> and an output bit string after stuffing <code>011111010</code>, the question is to determine the original data:</p>
+
+                <pre><code class="">
+End Delimiter: 01111110
+Stuffed Output: 011111010
+</code></pre>
+
+                <p>The original data was <code>0111110</code> before the bit stuffing. The receiver will remove the stuffed bit upon detection.</p>
+            </article>
+
+            <article>
+                <h4>15.8 Key Takeaways</h4>
+                <ul>
+                    <li>Framing helps encapsulate data for efficient transmission and error handling.</li>
+                    <li>Variable-size frames increase efficiency but require delimiters or length fields for synchronization.</li>
+                    <li>Bit stuffing prevents confusion between data and delimiter patterns.</li>
+                    <li>Tools like Wireshark help observe real-time frame structures and understand protocol behavior.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h2 class="text-center">Conclusion</h2>
+                <p>This documentation systematically examines key networking protocols, error handling mechanisms, and access control methods within the Data Link Layer, offering a structured foundation for understanding their theoretical constructs and practical implementations. Through detailed protocol analysis—including Stop-and-Wait ARQ, Sliding Window, ALOHA, and CSMA variants—this paper highlights the importance of balancing efficiency, fairness, and reliability in network communication.</p>
+
+                <p>The integration of mathematical models, such as throughput calculations and efficiency metrics, enables precise evaluation of protocol performance under varying conditions. Controlled access methods like Polling, Reservation, and Token Passing are explored to demonstrate their role in maintaining orderly communication across shared networks. Additionally, error detection strategies, including parity, CRC, and bit-stuffing, are discussed to underline their significance in preserving data integrity.</p>
+
+                <p>The insights drawn from this documentation underline the necessity of tailoring protocol selection to network environments, as demonstrated by the trade-offs between CSMA/CD and CSMA/CA in wired and wireless networks, respectively. Advanced techniques, such as Exponential Backoff, further showcase the value of congestion management strategies for ensuring fair access and mitigating collision risks. Collectively, this study contributes to a deeper understanding of the operational challenges and optimization strategies in network communication, equipping researchers and practitioners to make informed decisions in network design and deployment.</p>
+            </article>
+
+
+
+
+        </main>
+
+        <script> copyright("all"); </script>
+
+    </body>
+
+</html>
