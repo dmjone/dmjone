@@ -35,9 +35,16 @@ function get_menu_list(datetogen) {
                 codetype: "Prerequisite",
                 readtime: 45,
                 date: "Tue August 5, 2024",
-                link: "computer-networks-introduction",
-                
+                link: "computer-networks-introduction",                
             },
+            {
+                title: "Scaler Module 1 - Why do we need Computer Networks?",
+                desc: "Explore the reasons why computer networks are essential in today's digital world. Learn how networks enable communication, data sharing, and resource access across devices and locations.",
+                codetype: "Scaler Course Summary",
+                readtime: 45,
+                date: "Mon October 28, 2024",
+                link: "scaler-why-do-we-need-computer-networks",
+            },           
             {
                 title: "Components of a Computer Network",
                 desc: "Explore the components of a computer network, including devices, protocols, and services. Learn how network components work together to enable communication and data transfer.",
@@ -55,7 +62,15 @@ function get_menu_list(datetogen) {
                 date: "Tue August 5, 2024",
                 link: "types-of-computer-networks",
                 
-            },       
+            },
+            {
+                title: "Scaler Module 2 - Data Link Layer and LAN Protocols",
+                desc: "Learn about the data link layer and LAN protocols used in computer networks. Explore the functions of the data link layer and common LAN protocols such as Ethernet and Wi-Fi.",
+                codetype: "Scaler Course Summary",
+                readtime: 45,
+                date: "Mon October 28, 2024",
+                link: "scaler-data-link-layer-and-lan-protocols",
+            },
             {
                 title: "Network Topologies",
                 desc: "Learn about network topologies, including bus, star, ring, mesh, and hybrid topologies. Understand the advantages and disadvantages of each topology and their applications in network design.",
@@ -73,6 +88,14 @@ function get_menu_list(datetogen) {
                 date: "Tue August 5, 2024",
                 link: "network-protocols",
                 
+            },
+            {
+                title: "Scaler Module 3 - LAN Protocols and Network Devices",
+                desc: "Discover LAN protocols and network devices used in computer networks. Learn about common LAN protocols such as Ethernet and network devices such as switches and routers.",
+                codetype: "Scaler Course Summary",
+                readtime: 45,
+                date: "Mon October 28, 2024",
+                link: "scaler-lan-protocols-and-network-devices",
             },
             {
                 title: "Network Devices",
@@ -116,7 +139,7 @@ function get_menu_list(datetogen) {
                 date: "Tue August 6, 2024",
                 link: "network-security",
                 
-            },
+            },            
             {
                 title: "Network Architecture",
                 desc: "Learn about network architecture, including the client-server and P2P architecture models. Understand how network architecture is designed and implemented to support network communication.",
