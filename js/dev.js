@@ -16,6 +16,7 @@ const cdnjs_cryptoJS = "https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/c
 const google_login_js = "https://accounts.google.com/gsi/client";
 const cdnjs_DOMPurify = "https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.5/purify.min.js";
 const cdnjs_markdown = "https://cdnjs.cloudflare.com/ajax/libs/marked/14.1.2/marked.min.js";
+const cdnjs_mermaid = "https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.3.0/mermaid.min.js";
 const GLOBAL_login_page_path = window.location.hostname === 'localhost' ? '/login.html' : '/login';
 
 const GLOBAL_SERVICEWORKER_REINSTALL = 0;
@@ -564,7 +565,7 @@ const body_pomodoro_helptext = `
     if (GLOBAL_crawler_mode) {
         allScripts = [cdnjs_jquery, cdnjs_bootstrap, cdnjs_DOMPurify];
     } else {
-        allScripts = [google_login_js, cdnjs_jquery, cdnjs_bootstrap, cdnjs_DOMPurify, cdnjs_highlightjs, cdnjs_font_awesome, cdnjs_cryptoJS, cdnjs_highlightjs_asm, cdnjs_markdown];
+        allScripts = [google_login_js, cdnjs_jquery, cdnjs_bootstrap, cdnjs_DOMPurify, cdnjs_highlightjs, cdnjs_font_awesome, cdnjs_cryptoJS, cdnjs_highlightjs_asm, cdnjs_markdown, cdnjs_mermaid];
     }
 
     var loadScript = function (src) {
@@ -599,6 +600,7 @@ const body_pomodoro_helptext = `
             throwOnError: false,
             ignoredClasses: ['no-katex'] // Ignore the class no-math-render
         }); // Once all scripts are loaded, run the KaTeX rendering function
+        mermaid.initialize({ startOnLoad: true, theme: 'light' });
     });
 })();
 
