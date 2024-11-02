@@ -1,6 +1,6 @@
 (function () {    
     const DisplaySkills = true;    
-    const indevmode = true;    
+    const indevmode = location.host === "dmj.one" ? false : true;  // Set to false when deploying to production
 
     let linkarray = [];
     let certificate_code_downloader = [];
