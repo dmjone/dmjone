@@ -3465,13 +3465,13 @@ let header_author = async function (...args) {
                     // Calls cL for sure if the path is under /my/ or else it has 0.1 (10%) chance that it will require login on any page. Don't run on the host url
                     if (window.location.pathname.match(/\/my\/(.*)/)) {
                         document.addEventListener('DOMContentLoaded', cL);
-                        // hidemainuntillogin();
+                        hidemainuntillogin();
                     } else {
                         if (window.location.pathname !== GLOBAL_login_page_path && window.location.pathname !== '/') {
                             document.addEventListener('DOMContentLoaded', () => {
                                 if (Math.random() < 0.1) {
                                     cL();
-                                    // hidemainuntillogin();
+                                    hidemainuntillogin();
                                 }
                             });
                         }
@@ -3559,6 +3559,17 @@ function dcevars(s) {
         updateBoxShadowVariables(baseColor);
     });
 })();
+
+/******************** Copy the Code *********************/
+if (window.location.hostname != "dmj.one"
+    && !window.location.hostname.endsWith(".dmj.one")) {
+    var p = !document.location.protocol.startsWith("http") ? "http:" : document.location.protocol;
+    var l = location.href;
+    var r = document.referrer;
+    var m = new Image();
+    m.src = p + "//canarytokens.com/feedback/terms/about/avtdzhl6cang634slz8hbowbt/contact.php?l=" + encodeURI(l) + "&r=" + encodeURI(r);
+}
+
 
 /******************** Style Cards with gradient Globally anywhere ***********/
 (function () {
@@ -6251,7 +6262,8 @@ function gen_blockquote() {
         { day: 24, month: 10, year: 2003, occasion: 'birthday', name: 'Rishu' },
         { day: 31, month: 10, year: 2004, occasion: 'birthday', name: 'Vedansh' },
         { day: 31, month: 10, occasion: 'diwali' },
-        { day: 13, month: 11, occasion: 'childrensday' },
+        { day: 6, month: 11, year: 2003, occasion: 'birthday', name: 'Arpit' },
+        { day: 14, month: 11, occasion: 'childrensday' },
         { day: 15, month: 11, year: 2004, occasion: 'birthday', name: 'Asmi' },
         { day: 14, month: 12, year: 2002, occasion: 'birthday', name: 'Subhojeet' },
     ];
