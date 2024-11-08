@@ -15,14 +15,23 @@ document.getElementById("attendanceForm").addEventListener("submit", function (e
 
     const userRoll = document.getElementById("rollInput").value;
     const userEmail = localStorage.getItem('userEmail');
+    const termsCheckbox = document.getElementById("termsCheckbox").checked;
+    const userTime = new Date().toISOString();
 
+    // Check Email
     if (!userEmail) {
         showMessage('danger', "You must be logged in to mark attendance.");
         return;
     }
 
+    // Validate terms agreement
+    if (!termsCheckbox) {
+        showMessage('danger', "You must agree to the terms to mark attendance.");
+        return;
+    }
+
     // Send request to the Worker to mark attendance
-    fetch(`https://dmj.one/api/attendance/?userRoll=${encodeURIComponent(userRoll)}&userEmail=${encodeURIComponent(userEmail)}`)
+    fetch(`https://dmj.one/api/attendance/?userRoll=${encodeURIComponent(userRoll)}&userEmail=${encodeURIComponent(userEmail)}&userTime=${encodeURIComponent(userTime)}`)
         .then(response => response.text())
         .then(result => {
             showMessage('success', result); // Display the success message in the HTML
@@ -71,7 +80,7 @@ function copyAbsenteesToClipboard() {
     const totalAbsent = absenteeData.length;
     const totalPresent = 68 - totalAbsent; // Assuming 68 students in total
 
-    let messageHeader = `Dear Professor,\n\nI hope this message finds you well. Please find the absentee list for *${subjectCode}* on *${datetime}* below:\n\n`;
+    let messageHeader = `Dear Professor,\n\nI hope this message finds you well. Please find the absentee list taken through semi-automatic attendance system https://go.dmj.one/self-checkin for *${subjectCode}* on *${datetime}* below:\n\n`;
     let messageFooter = `\n\n> Total Present: *${totalPresent}*\n> Total Absent: *${totalAbsent}*\n\nKindly let me know if further details are needed.\n\nThank you. 🙏\nDivya Mohan\n_Make the world yours at_ *dmj.one*\nStudent/CR - CSE 2026\nShoolini University, 🇮🇳`;
 
     let finalMessage = messageHeader + absentees + messageFooter;
