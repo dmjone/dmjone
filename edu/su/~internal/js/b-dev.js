@@ -9,6 +9,17 @@ function showMessage(type, message) {
     messageBox.innerHTML = `<div class="alert alert-${type}" role="alert">${message}</div>`;
 }
 
+document.getElementById("termsCheckbox").addEventListener("change", function () {
+    const label = this.parentElement; // Get the parent label of the checkbox
+    if (this.checked) {
+        label.classList.add("bg-success", "bg-opacity-25");
+        label.classList.remove("bg-auto");
+    } else {
+        label.classList.remove("bg-success", "bg-opacity-25");
+        label.classList.add("bg-auto");
+    }
+});
+
 // Function to mark attendance
 document.getElementById("attendanceForm").addEventListener("submit", function (event) {
     event.preventDefault();
