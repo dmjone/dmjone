@@ -71,7 +71,7 @@ function loadAbsentees() {
                     absenteesList.appendChild(listItem);
                 });
             } else {
-                absenteesList.innerHTML = '<li class="list-group-item">No absentees found!</li>';
+                absenteesList.innerHTML = '<li class="list-group-item text-danger fw-bold fs-4"><i class="bi bi-lock"></i> Portal Locked!</li>';
             }
         })
         .catch(error => {
@@ -141,6 +141,7 @@ function checkUserEmail() {
     const userEmail = localStorage.getItem('userEmail')?.toLowerCase();
     const allowedEmail = atob('ZGl2eWFtb2hhbjE5OTNAZ21haWwuY29t');
     const buttons = ['copyAbsenteesButton', 'takeattendance', 'simulate', 'allabsent', 'allpresent'];
+    const accordion = document.getElementById('attendanceAccordion');
 
     buttons.forEach(id => {
         const button = document.getElementById(id);
@@ -149,6 +150,8 @@ function checkUserEmail() {
 
     if (userEmail === allowedEmail) {
         document.getElementById('attendanceoptions').classList.toggle('d-none');
+        document.getElementById('attendanceAccordion').classList.toggle('d-none');
+        
         function getURLparams(params) {
             const url = new URL('https://dmj.one/api/attendance/');
             Object.entries(params).forEach(([key, value]) => url.searchParams.append(key, value));
