@@ -78,10 +78,10 @@ function loadAbsentees() {
                 absenteesList.innerHTML = '<li class="list-group-item text-danger fw-bold fs-4"><i class="bi bi-lock"></i> Portal Locked!</li>';
                 document.getElementById("attendanceFormBlock").innerHTML = `
                     <div class="d-flex justify-content-center align-items-center my-3">
-                      <div class="text-center p-4 rounded shadow-lg bg-auto">
+                      <div class="text-center p-4">
                         <i class="bi bi-lock-fill display-1 text-danger"></i>
                         <h1 class="mt-3 fw-bold text-primary">Portal Locked!</h1>
-                        <p class="text-muted mt-2">Please come back and refresh in 2 minutes.</p>                        
+                        <p class="text-muted mt-2 d-none">Please come back and refresh in 2 minutes.</p>                        
                       </div>
                     </div>
                 `;
