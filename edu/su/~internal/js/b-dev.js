@@ -60,25 +60,39 @@ function loadAbsentees() {
         .then(response => response.json())
         .then(data => {
             const absenteesList = document.getElementById("absentees");
+
             absenteeData = data.results || []; // Save data to be used in the clipboard function
             absenteesList.innerHTML = ''; // Clear current list
 
             if (absenteeData.length > 0) {
-                absenteeData.forEach(item => {
+                document.getElementById('absenteeblock').classList.toggle('d-none');
+                absenteeData.forEach(item => {                
                     const listItem = document.createElement('li');
                     listItem.textContent = `${item.name} (${item.roll})`;
                     listItem.classList.add('list-group-item');
                     absenteesList.appendChild(listItem);
                 });
-            } else {
+            } else {                
                 absenteesList.innerHTML = '<li class="list-group-item text-danger fw-bold fs-4"><i class="bi bi-lock"></i> Portal Locked!</li>';
-                document.getElementById("attendanceForm").innerHTML = `<div class="text-center"><i class="bi bi-lock"></i> Portal Locked!</div>`;
+                document.getElementById("attendanceFormBlock").innerHTML = `
+                    <div class="d-flex justify-content-center align-items-center my-3">
+                      <div class="text-center p-4 rounded shadow-lg bg-auto">
+                        <i class="bi bi-lock-fill display-1 text-danger"></i>
+                        <h1 class="mt-3 fw-bold text-primary">Portal Locked!</h1>
+                        <p class="text-muted mt-2">Access to this portal is currently restricted. Please check back later.</p>
+                        <button class="btn btn-danger mt-3 signOutButton">
+                          <i class="bi bi-arrow-clockwise"></i> Signout
+                        </button>
+                      </div>
+                    </div>
+                `;                
             }
         })
         .catch(error => {
             showMessage('danger', 'Error loading absentees list: ' + error);
             console.error('Error:', error);
         });
+        
 }
 
 // Copy absentees to clipboard function
