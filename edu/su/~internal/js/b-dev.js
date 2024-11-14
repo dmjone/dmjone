@@ -70,9 +70,12 @@ function loadAbsentees() {
                 document.getElementById('attendanceFormBlock').classList.toggle('d-none');
                 document.getElementById('helpnote').classList.toggle('d-none');
                 
-                namecontainer.classList.remove('page-center', 'flex-column');
-                document.getElementById('customcontent-kajdio479eaugd371u2').innerHTML = null;
+                try {
+                    namecontainer.classList.remove('page-center', 'flex-column');
+                    document.getElementById('customcontent-kajdio479eaugd371u2').innerHTML = ''; // Use '' instead of null for clearing innerHTML
+                } catch (e) {}
 
+                
                 absenteeData.forEach(item => {                
                     const listItem = document.createElement('li');
                     listItem.textContent = `${item.name} (${item.roll})`;
