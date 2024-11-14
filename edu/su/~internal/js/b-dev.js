@@ -69,6 +69,10 @@ function loadAbsentees() {
                 document.getElementById('absenteeblock').classList.toggle('d-none');
                 document.getElementById('attendanceFormBlock').classList.toggle('d-none');
                 document.getElementById('helpnote').classList.toggle('d-none');
+                
+                namecontainer.classList.remove('page-center', 'flex-column');
+                document.getElementById('customcontent-kajdio479eaugd371u2').innerHTML = null;
+
                 absenteeData.forEach(item => {                
                     const listItem = document.createElement('li');
                     listItem.textContent = `${item.name} (${item.roll})`;
@@ -80,6 +84,7 @@ function loadAbsentees() {
                 namecontainer.classList.add('page-center', 'flex-column');
                 
                 namecontainer.innerHTML += `
+                <div id="customcontent-kajdio479eaugd371u2">
                     <div class="d-flex justify-content-center align-items-center my-3">
                       <div class="text-center p-4">
                         <i class="bi bi-lock-fill display-1 text-danger"></i>
@@ -87,6 +92,7 @@ function loadAbsentees() {
                         <p class="text-muted mt-2 d-none">Please come back and refresh in 2 minutes.</p>                        
                       </div>
                     </div>
+                </div>
                 `;                
             }
         })
