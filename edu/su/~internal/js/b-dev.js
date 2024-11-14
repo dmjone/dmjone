@@ -72,7 +72,7 @@ function loadAbsentees() {
                 });
             } else {
                 absenteesList.innerHTML = '<li class="list-group-item text-danger fw-bold fs-4"><i class="bi bi-lock"></i> Portal Locked!</li>';
-                document.getElementById("attendanceForm").innerHTML(`<div class="text-center"><i class="bi bi-lock"></i> Portal Locked!</div>`);
+                document.getElementById("attendanceForm").innerHTML = `<div class="text-center"><i class="bi bi-lock"></i> Portal Locked!</div>`;
             }
         })
         .catch(error => {
