@@ -72,6 +72,7 @@ function loadAbsentees() {
                 });
             } else {
                 absenteesList.innerHTML = '<li class="list-group-item text-danger fw-bold fs-4"><i class="bi bi-lock"></i> Portal Locked!</li>';
+                document.getElementById("attendanceForm").innerHTML(`<div class="text-center"><i class="bi bi-lock"></i> Portal Locked!</div>`);
             }
         })
         .catch(error => {
@@ -140,7 +141,7 @@ document.getElementById("copyAbsenteesButton").addEventListener("click", copyAbs
 function checkUserEmail() {
     const userEmail = localStorage.getItem('userEmail')?.toLowerCase();
     const allowedEmail = atob('ZGl2eWFtb2hhbjE5OTNAZ21haWwuY29t');
-    const buttons = ['copyAbsenteesButton', 'takeattendance', 'simulate', 'allabsent', 'allpresent'];    
+    const buttons = ['copyAbsenteesButton', 'takeattendance', 'simulate', 'allabsent', 'allpresent', 'lockportal'];    
 
     buttons.forEach(id => {
         const button = document.getElementById(id);
@@ -171,7 +172,8 @@ function checkUserEmail() {
             takeattendance: { take_attendance: 'true' },
             simulate: { simulate: 'true' },
             allabsent: { all_absent: 'true' },
-            allpresent: { all_present: 'true' }
+            allpresent: { all_present: 'true' },
+            lockportal: { lock_portal: 'true' }
         };
 
         Object.keys(paramMap).forEach(id => {
