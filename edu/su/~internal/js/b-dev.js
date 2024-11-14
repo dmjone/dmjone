@@ -66,7 +66,7 @@ function loadAbsentees() {
             absenteesList.innerHTML = ''; // Clear current list
 
             if (absenteeData.length > 0) {
-                document.getElementById('absenteeblock').classList.toggle('d-none');
+                document.getElementById('absenteeblock').classList.remove('d-none');
                 document.getElementById('attendanceFormBlock').classList.toggle('d-none');
                 document.getElementById('helpnote').classList.toggle('d-none');
                 
