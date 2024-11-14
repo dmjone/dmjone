@@ -66,6 +66,7 @@ function loadAbsentees() {
 
             if (absenteeData.length > 0) {
                 document.getElementById('absenteeblock').classList.toggle('d-none');
+                document.getElementById('attendanceFormBlock').classList.toggle('d-none');
                 absenteeData.forEach(item => {                
                     const listItem = document.createElement('li');
                     listItem.textContent = `${item.name} (${item.roll})`;
@@ -79,10 +80,7 @@ function loadAbsentees() {
                       <div class="text-center p-4 rounded shadow-lg bg-auto">
                         <i class="bi bi-lock-fill display-1 text-danger"></i>
                         <h1 class="mt-3 fw-bold text-primary">Portal Locked!</h1>
-                        <p class="text-muted mt-2">Access to this portal is currently restricted. Please check back later.</p>
-                        <button class="btn btn-danger mt-3 signOutButton">
-                          <i class="bi bi-arrow-clockwise"></i> Signout
-                        </button>
+                        <p class="text-muted mt-2">Please come back and refresh in 2 minutes.</p>                        
                       </div>
                     </div>
                 `;                
