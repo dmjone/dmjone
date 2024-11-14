@@ -60,7 +60,8 @@ function loadAbsentees() {
         .then(response => response.json())
         .then(data => {
             const absenteesList = document.getElementById("absentees");
-
+            const namecontainer = document.getElementById("name-container");
+            
             absenteeData = data.results || []; // Save data to be used in the clipboard function
             absenteesList.innerHTML = ''; // Clear current list
 
@@ -76,7 +77,9 @@ function loadAbsentees() {
                 });
             } else {                
                 absenteesList.innerHTML = '<li class="list-group-item text-danger fw-bold fs-4"><i class="bi bi-lock"></i> Portal Locked!</li>';
-                document.getElementById("attendanceFormBlock").innerHTML = `
+                namecontainer.classList.add('page-center', 'flex-column');
+                
+                namecontainer.innerHTML += `
                     <div class="d-flex justify-content-center align-items-center my-3">
                       <div class="text-center p-4">
                         <i class="bi bi-lock-fill display-1 text-danger"></i>
@@ -84,8 +87,7 @@ function loadAbsentees() {
                         <p class="text-muted mt-2 d-none">Please come back and refresh in 2 minutes.</p>                        
                       </div>
                     </div>
-                `;
-                document.getElementById('attendanceFormBlock').classList.toggle('d-none');
+                `;                
             }
         })
         .catch(error => {
