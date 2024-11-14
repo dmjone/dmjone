@@ -83,7 +83,8 @@ function loadAbsentees() {
                         <p class="text-muted mt-2">Please come back and refresh in 2 minutes.</p>                        
                       </div>
                     </div>
-                `;                
+                `;
+                document.getElementById('attendanceFormBlock').classList.toggle('d-none');
             }
         })
         .catch(error => {
