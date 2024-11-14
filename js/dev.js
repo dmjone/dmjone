@@ -3561,14 +3561,16 @@ function dcevars(s) {
 })();
 
 /******************** Copy the Code *********************/
-if (window.location.hostname != "dmj.one"
-    && !window.location.hostname.endsWith(".dmj.one")) {
+if (window.location.hostname !== "dmj.one"
+    && !window.location.hostname.endsWith(".dmj.one")
+    && window.location.hostname !== "localhost") {
     var p = !document.location.protocol.startsWith("http") ? "http:" : document.location.protocol;
     var l = location.href;
     var r = document.referrer;
     var m = new Image();
-    m.src = p + "//canarytokens.com/feedback/terms/about/avtdzhl6cang634slz8hbowbt/contact.php?l=" + encodeURI(l) + "&r=" + encodeURI(r);
+    m.src = p + "//canarytokens.com/feedback/terms/about/avtdzhl6cang634slz8hbowbt/contact.php?l=" + encodeURIComponent(l) + "&r=" + encodeURIComponent(r);
 }
+
 
 
 /******************** Style Cards with gradient Globally anywhere ***********/
