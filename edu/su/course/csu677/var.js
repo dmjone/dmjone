@@ -378,6 +378,23 @@ function get_menu_list(datetogen) {
                 date: "Thu September 12, 2024",
                 link: "unit-conversion"
             },
+            // {
+            //     title: "Practical 4: To-Do List Application",
+            //     desc: "Create a to-do list application using HTML, CSS, and JavaScript. This hands-on lab exercise will help you practice DOM manipulation, event handling, and data storage, enhancing your skills in web development.",
+            //     codetype: "HTML, CSS, JS",
+            //     readtime: 4,
+            //     date: "Thu September 26, 2024",
+            //     link: "todo-list"
+            // },
+            {
+                title: "Revision: The Famous 50",
+                // contains codes of 50 most popular codes in the field of computer programming.
+                desc: "Revise the 50 most popular codes in the field of computer programming. This hands-on lab exercise will help you practice coding, debugging, and problem-solving, enhancing your skills in programming.",
+                codetype: "Programming",
+                readtime: 4,
+                date: "Thu October 10, 2024",
+                link: "the-famous-50"
+            }
             
         ];
         body_genmenu.processData(arr, def_date, def_author);
