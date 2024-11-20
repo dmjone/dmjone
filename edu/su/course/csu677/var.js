@@ -387,8 +387,7 @@ function get_menu_list(datetogen) {
             //     link: "todo-list"
             // },
             {
-                title: "Revision: The Famous 50",
-                // contains codes of 50 most popular codes in the field of computer programming.
+                title: "Revision: The Famous 50",                
                 desc: "Revise the 50 most popular codes in the field of computer programming. This hands-on lab exercise will help you practice coding, debugging, and problem-solving, enhancing your skills in programming.",
                 codetype: "Programming",
                 readtime: 4,

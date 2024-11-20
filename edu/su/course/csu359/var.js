@@ -64,6 +64,14 @@ function get_menu_list(datetogen) {
                 
             },
             {
+                title: "Fiber Optic Cables",
+                desc: "Learn about fiber optic cables used in computer networks to transmit data over long distances. Explore the advantages of fiber optic cables over copper cables and their applications in network infrastructure.",
+                codetype: "Prerequisite",
+                readtime: 45,
+                date: "Tue August 5, 2024",
+                link: "fiber-optic-cables",
+            },
+            {
                 title: "Scaler Module 2 - Data Link Layer and LAN Protocols",
                 desc: "Learn about the data link layer and LAN protocols used in computer networks. Explore the functions of the data link layer and common LAN protocols such as Ethernet and Wi-Fi.",
                 codetype: "Scaler Course Summary",
@@ -81,13 +89,52 @@ function get_menu_list(datetogen) {
                 
             },
             {
+                title: "Network Interface Cards",
+                desc: "Discover network interface cards (NICs) used in computer networks to connect devices to a network. Learn the functions of NICs and how they enable data transfer between devices.",
+                codetype: "Prerequisite",
+                readtime: 5,
+                date: "Tue August 5, 2024",
+                link: "network-interface-cards",
+            },
+            {
                 title: "Network Protocols",
                 desc: "Explore network protocols used in computer networks to enable communication between devices. Learn about common protocols such as TCP/IP, UDP, HTTP, and FTP.",
                 codetype: "Prerequisite",
                 readtime: 45,
                 date: "Tue August 5, 2024",
-                link: "network-protocols",
-                
+                link: "network-protocols",                
+            },
+            {
+                title: "Sliding Window Protocol",
+                desc: "Learn about the sliding window protocol used in computer networks to improve data transfer efficiency. Understand how the sliding window protocol manages data flow and error recovery in network communication.",
+                codetype: "Prerequisite",
+                readtime: 10,
+                date: "Tue August 6, 2024",
+                link: "sliding-window-protocol",
+            },
+            {
+                title: "SSL/TLS",
+                desc: "Explore SSL/TLS protocols used to secure network communication over the internet. Learn how SSL/TLS protocols encrypt data and establish secure connections between clients and servers.",
+                codetype: "Prerequisite",
+                readtime: 10,
+                date: "Tue August 6, 2024",
+                link: "ssl-tls",
+            },
+            {
+                title: "Multiple Access Protocols",
+                desc: "Learn about multiple access protocols used in computer networks to enable multiple devices to share a common communication channel. Explore CSMA/CD, CSMA/CA, and TDMA protocols and their applications.",
+                codetype: "Prerequisite",
+                readtime: 10,
+                date: "Tue August 6, 2024",
+                link: "multiple-access-protocols",
+            },
+            {
+                title: "Address Resolution Protocol",
+                desc: "Explore the Address Resolution Protocol (ARP) used in computer networks to map IP addresses to MAC addresses. Learn how ARP resolves network addresses and enables communication between devices.",
+                codetype: "Prerequisite",
+                readtime: 10,
+                date: "Tue August 6, 2024",
+                link: "address-resolution-protocol",
             },
             {
                 title: "Scaler Module 3 - LAN Protocols and Network Devices",
@@ -113,6 +160,14 @@ function get_menu_list(datetogen) {
                 readtime: 30,
                 date: "Tue August 6, 2024",
                 link: "osi-model",                
+            },
+            {
+                title: "Data Link Layer",
+                desc: "Explore the data link layer in the OSI model, responsible for error detection and correction in network communication. Learn the functions of the data link layer and its protocols.",
+                codetype: "Prerequisite",
+                readtime: 10,
+                date: "Tue August 6, 2024",
+                link: "data-link-layer",
             },
             {
                 title: "TCP/IP Model",
