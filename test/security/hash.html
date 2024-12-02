@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Hash and AES Key Generator</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                margin: 20px;
+            }
+
+            textarea {
+                width: 100%;
+                height: 100px;
+            }
+
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 20px;
+            }
+
+            th,
+            td {
+                border: 1px solid #ccc;
+                padding: 10px;
+                text-align: left;
+            }
+
+            th {
+                background-color: #f4f4f4;
+            }
+        </style>
+    </head>
+
+    <body>
+        <h1>Real-Time Hash and AES Key Generator</h1>
+        <p>Type in the textbox below to see the hash values and AES keys:</p>
+        <textarea id="inputText" placeholder="Start typing..."></textarea>
+        <table>
+            <thead>
+                <tr>
+                    <th>Hash Variant</th>
+                    <th>Hash Value (Hex)</th>
+                    <th>AES Key (Base64)</th>
+                </tr>
+            </thead>
+            <tbody id="results">
+                <tr>
+                    <td colspan="3">Start typing to see results...</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <script>
+            async function generateHashAndKey(algorithm, text) {
+                const encoder = new TextEncoder();
+                const data = encoder.encode(text);
+                const hashBuffer = await crypto.subtle.digest(algorithm, data);
+                const hashArray = Array.from(new Uint8Array(hashBuffer));
+                const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+                // Ensure AES key generation handles arbitrary hash length
+                const keyBuffer = new Uint8Array(hashBuffer);
+                while (keyBuffer.length < 16) keyBuffer.push(0); // Pad if less than 16 bytes
+                const truncatedKey = keyBuffer.slice(0, 16);
+                const aesKey = await crypto.subtle.importKey(
+                    'raw',
+                    truncatedKey,
+                    { name: 'AES-CBC' },
+                    true, // Set extractable to true
+                    ['encrypt', 'decrypt']
+                );
+                const exportedKey = await crypto.subtle.exportKey('raw', aesKey);
+                const keyBase64 = btoa(String.fromCharCode(...new Uint8Array(exportedKey)));
+
+                return { hashHex, keyBase64 };
+            }
+
+            async function updateResults() {
+                const text = document.getElementById('inputText').value;
+                const hashVariants = ['SHA-1', 'SHA-256', 'SHA-384', 'SHA-512'];
+                const resultsElement = document.getElementById('results');
+                resultsElement.innerHTML = ''; // Clear previous results
+
+                if (!text) {
+                    resultsElement.innerHTML = '<tr><td colspan="3">Start typing to see results...</td></tr>';
+                    return;
+                }
+
+                for (const variant of hashVariants) {
+                    try {
+                        const { hashHex, keyBase64 } = await generateHashAndKey(variant, text);
+                        const row = `
+                        <tr>
+                            <td>${variant}</td>
+                            <td>${hashHex}</td>
+                            <td>${keyBase64}</td>
+                        </tr>
+                    `;
+                        resultsElement.innerHTML += row;
+                    } catch (err) {
+                        console.error(`Error with ${variant}:`, err);
+                    }
+                }
+            }
+
+            document.getElementById('inputText').addEventListener('input', updateResults);
+        </script>
+    </body>
+
+</html>
