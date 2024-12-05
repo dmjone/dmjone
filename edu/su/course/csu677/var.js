@@ -387,6 +387,30 @@ function get_menu_list(datetogen) {
             //     link: "todo-list"
             // },
             {
+                title: "Practical 4: Node.js Calculator",
+                desc: "Build a calculator application using Node.js and Express.js. This hands-on lab exercise will help you practice server-side programming, routing, and request handling, enhancing your skills in web development.",
+                codetype: "Node.js, Express.js",
+                readtime: 4,
+                date: "Thu September 26, 2024",
+                link: "calculator"
+            },
+            {
+                title: "Practical 5: String Operations in js",
+                desc: "Develop a string operations tool using js. This hands-on lab exercise will help you practice string manipulation, validation, and formatting, enhancing your skills in web development.",
+                codetype: "Node.js, Express.js",
+                readtime: 4,
+                date: "Thu October 3, 2024",
+                link: "string-operations"
+            },
+            {
+                title: "Profile Generation from form data",
+                desc: "Generate a profile from form data using js. This hands-on lab exercise will help you practice form data manipulation, validation, and output display, enhancing your skills in web development.",
+                codetype: "JavaScript",
+                readtime: 4,
+                date: "Thu October 10, 2024",
+                link: "profile-generation"
+            },
+            {
                 title: "Revision: The Famous 50",                
                 desc: "Revise the 50 most popular codes in the field of computer programming. This hands-on lab exercise will help you practice coding, debugging, and problem-solving, enhancing your skills in programming.",
                 codetype: "Programming",
