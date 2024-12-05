@@ -417,6 +417,14 @@ function get_menu_list(datetogen) {
                 readtime: 4,
                 date: "Thu October 10, 2024",
                 link: "the-famous-50"
+            },
+            {
+                title: "Node.js Practice Questions",
+                desc: "Test your knowledge of Node.js with practice questions and quizzes. This hands-on lab exercise will help you assess your understanding of Node.js concepts, features, and best practices, enhancing your skills in server-side programming.",
+                codetype: "Node.js",
+                readtime: 4,
+                date: "Thu October 17, 2024",
+                link: "nodejs-practice-questions"
             }
             
         ];
