@@ -615,7 +615,7 @@ const courseDetailsMap = {
     // Semester 5
     'cs103': { 'default': ["Dr. Sonia", "CS103", "Getting Started with Competitive Programming"] },
     'csu2029': { 'default': ["Prof. Narinder Verma", "CSU2029", "Thinking Unboxed: Strategies for Critical Analysis"]},
-    'csu359': { 'default': ["Abhishek Tomar", "CSU2029", "Computer Networks"]},
+    'csu359': { 'default': ["Abhishek Tomar", "CSU359", "Computer Networks"]},
     'csu1530': { 'default': ["Dr. Sonia", "CSU1530", "Biometric Security"]},
     'seaap005': { 'default': ["Anandita", "SEA-AP005", "Aptitude Development 005"]},    
     'projects': { 'default': ["", "List of Projects", "Academic"]},    

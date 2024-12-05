@@ -12,7 +12,7 @@ function get_menu_list(datetogen) {
                 // continuereading: " Click here to reach out to Faculty directly through email"
             },
             {
-                link: "#",
+                link: "lab/",
                 title: "Lab: Hands-On Practice and Exercises [WIP]",
                 desc: "Hands-on practice and exercises related to Ethical Hacking. Click to explore practical applications and case studies, including real-world scenarios and challenges.",
                 codetype: "CSU1899P | Ethical Hacking",
@@ -127,13 +127,33 @@ function get_menu_list(datetogen) {
             //     // cardimage: "_url_"
             // },
             {
-                title: "Practical 1: Procedure for VirtualBox Installation and Configuration",
-                desc: "Learn to set up your operating system lab environment with VirtualBox, a powerful virtualization tool for creating and managing virtual machines. This practical exercise will guide you through the installation and configuration of VirtualBox, enabling you to create a virtualized environment for hands-on learning and experimentation.",
-                codetype: "Installation",
-                readtime: 2,
-                date: "Wed February 07, 2024",
-                link: "installing-virtualbox"              
+                title: "Practical 1: Write the step-by-step procedure to install the Kali Linux and VM Ware.",
+                desc: "Learn how to install Kali Linux and VM Ware on your system. This practical exercise provides a detailed guide on setting up the necessary tools and environments for Ethical Hacking, enabling you to practice and experiment with hacking techniques and tools.",
+                codetype: "Practical Exercise",
+                readtime: 5,
+                link: "vmware-kali-setup"
             },            
+            {
+                title: "Practical 2: Write 30 important Linux commands useful in hacking with their name, syntax, purpose and relevant screenshot of output.",
+                desc: "Explore 30 important Linux commands used in hacking and cybersecurity. This practical exercise provides a comprehensive list of commands, along with their syntax, purpose, and output, enabling you to familiarize yourself with the Linux environment and command-line interface.",
+                codetype: "Practical Exercise",
+                readtime: 5,
+                link: "commands-in-linux"                
+            },
+            {
+                title: "Practical 3: Write the step-by-step procedure to change the MAC address using Kali Linux.",
+                desc: "Learn how to change the MAC address using Kali Linux. This practical exercise provides a detailed guide on modifying the MAC address of your network interface, enabling you to enhance your privacy and security while browsing the internet.",
+                codetype: "Practical Exercise",
+                readtime: 5,
+                link: "change-mac-address"
+            },
+            {
+                title: "Practical 4: Write the procedure/ways to hack the website.",
+                desc: "Explore different methods and techniques on the website hacking. This practical exercise provides an overview of the strategies and tools used by hackers to compromise websites, highlighting the vulnerabilities and security risks associated with web applications.",
+                codetype: "Practical Exercise",
+                readtime: 5,
+                link: "procedure-to-hack-website"
+            }
         ];
         body_genmenu.processData(arr, def_date, def_author);
     }
