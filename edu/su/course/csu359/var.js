@@ -675,6 +675,14 @@ function get_menu_list(datetogen) {
                 // link: "#",
                 // continuereading: false
             },
+            {
+                title: "Practice Questions and their Solutions",
+                desc: "Test your knowledge of computer networks with these practice questions and their solutions. Explore a range of topics and concepts to enhance your understanding of networking principles.",
+                codetype: "Assignment",
+                readtime: 60,
+                date: "Tue December 6, 2024",
+                link: "assignment",
+            }
 
 
 
