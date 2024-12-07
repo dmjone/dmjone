@@ -17,6 +17,8 @@ const google_login_js = "https://accounts.google.com/gsi/client";
 const cdnjs_DOMPurify = "https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.5/purify.min.js";
 const cdnjs_markdown = "https://cdnjs.cloudflare.com/ajax/libs/marked/14.1.2/marked.min.js";
 const cdnjs_mermaid = "https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.3.0/mermaid.min.js";
+const cdnjs_3js = "https://cdnjs.cloudflare.com/ajax/libs/three.js/110/three.min.js";
+const jsdelivr_snowfall = "https://cdn.jsdelivr.net/gh/motyar/snowfall/snowfall.js";
 const GLOBAL_login_page_path = window.location.hostname === 'localhost' ? '/login.html' : '/login';
 
 const GLOBAL_SERVICEWORKER_REINSTALL = 0;
@@ -565,7 +567,7 @@ const body_pomodoro_helptext = `
     if (GLOBAL_crawler_mode) {
         allScripts = [cdnjs_jquery, cdnjs_bootstrap, cdnjs_DOMPurify];
     } else {
-        allScripts = [google_login_js, cdnjs_jquery, cdnjs_bootstrap, cdnjs_DOMPurify, cdnjs_highlightjs, cdnjs_font_awesome, cdnjs_cryptoJS, cdnjs_highlightjs_asm, cdnjs_markdown, cdnjs_mermaid];
+        allScripts = [google_login_js, cdnjs_jquery, cdnjs_bootstrap, cdnjs_DOMPurify, cdnjs_highlightjs, cdnjs_font_awesome, cdnjs_cryptoJS, cdnjs_highlightjs_asm, cdnjs_markdown, cdnjs_mermaid, cdnjs_3js, jsdelivr_snowfall];
     }
 
     var loadScript = function (src) {
@@ -1870,7 +1872,7 @@ let header_author = async function (...args) {
         const IS_STUDENT_MODE = window.GLOBAL_get_isstudentmode_ || 0;
         const SITE_URL = 'https://dmj.one';
         // const CURRENT_LOCATION = `https://dmj.one/${urlpart1}/${urlpart2}/${urlpart3}/${urlpart4}/` || null || SITE_URL + window.location.pathname.replace(/\.html$/, '') || window.location.href;
-        const CURRENT_LOCATION = SITE_URL + window.location.pathname.replace(/\.html$/, '') || window.location.href;
+        const CURRENT_LOCATION = IS_STUDENT_MODE ? `https://dmj.one/` : SITE_URL + window.location.pathname.replace(/\.html$/, '') || window.location.href;
         const QR_CODE_MODE = 4;
         const QR_CODE_MAX_WIDTH = '1.25in';
         const QR_CODE_MAX_HEIGHT = '1.25in';
@@ -2948,7 +2950,7 @@ let header_author = async function (...args) {
         }
 
         if (window.ReviewSubjectQuestions) {
-            (function () {                
+            (function () {
                 const reviewcss = document.createElement('link');
                 reviewcss.setAttribute('rel', 'stylesheet');
                 reviewcss.setAttribute('href', '/css/reviewaiken.css');
@@ -5957,37 +5959,497 @@ function gen_blockquote() {
     };
 
     if (isWinter()) {
-        function createSnowflake() {
-            const snowflake = document.createElement("div");
-            snowflake.classList.add("snowflake");
-            snowflake.style.left = Math.random() * window.innerWidth + "px";
-            snowflake.style.top = "-50px";
-            snowflake.style.width = (Math.random() * 10 + 5) + "px";
-            snowflake.style.height = snowflake.style.width;
-            snowflake.speed = Math.random() * 2 + 1;
-            document.body.appendChild(snowflake);
-            return snowflake;
-        }
+        // (function () {
+        //     // Create a canvas and append it to the body
+        //     const canvas = document.createElement("canvas");
+        //     canvas.id = "snowfall-canvas";
+        //     canvas.style.position = "fixed";
+        //     canvas.style.top = "0";
+        //     canvas.style.left = "0";
+        //     canvas.style.pointerEvents = "none";
+        //     canvas.style.zIndex = "9999";
 
-        function moveSnowflake(snowflake) {
-            const top = parseFloat(snowflake.style.top);
-            const newTop = top + snowflake.speed;
-            snowflake.style.top = newTop + "px";
-            if (newTop > window.innerHeight) {
-                snowflake.remove();
+        //     const ctx = canvas.getContext("2d");
+
+        //     let snowflakes = [];
+        //     const numFlakes = 100;
+        //     let snowing = true;
+
+        //     let wind = 0; // Smooth wind speed
+        //     let targetWind = 0;
+
+        //     // Resize canvas to window
+        //     function resizeCanvas() {
+        //         canvas.width = window.innerWidth;
+        //         canvas.height = window.innerHeight;
+        //     }
+        //     window.addEventListener("resize", resizeCanvas);
+        //     resizeCanvas();
+
+        //     // Smoothly update wind
+        //     function updateWind() {
+        //         targetWind = (Math.random() - 0.5) * 2; // Random target wind (-1 to 1)
+        //         setTimeout(updateWind, Math.random() * 2000 + 1000); // Change wind every 1-3 seconds
+        //     }
+        //     updateWind();
+
+        //     // Create a snowflake
+        //     function createSnowflake() {
+        //         const depth = Math.random(); // Simulates Z-axis (depth)
+        //         return {
+        //             x: Math.random() * canvas.width,
+        //             y: Math.random() * -canvas.height,
+        //             radius: (Math.random() * 3 + 2) * (1 + depth),
+        //             speedY: (Math.random() * 2 + 0.5) * (1 + depth),
+        //             opacity: Math.min(1, depth + 0.3),
+        //             rotation: Math.random() * Math.PI * 2,
+        //             rotationSpeed: (Math.random() - 0.5) * 0.01,
+        //             depth,
+        //             melting: Math.random() < 0.3, // 30% chance to melt
+        //             meltOpacitySpeed: Math.random() * 0.005 + 0.002, // Speed of melting
+        //         };
+        //     }
+
+        //     for (let i = 0; i < numFlakes; i++) {
+        //         snowflakes.push(createSnowflake());
+        //     }
+        //     // Draw a dynamic snowflake-like structure
+        //     function drawSnowflake(x, y, radius, rotation, opacity) {
+        //         ctx.save();
+        //         ctx.translate(x, y);
+        //         ctx.rotate(rotation);
+        //         ctx.globalAlpha = opacity;
+
+        //         ctx.beginPath();
+        //         for (let i = 0; i < 6; i++) { // 6 points for hexagonal symmetry
+        //             const angle = (Math.PI / 3) * i;
+        //             const x1 = radius * Math.cos(angle);
+        //             const y1 = radius * Math.sin(angle);
+        //             const x2 = radius / 2 * Math.cos(angle + Math.PI / 6);
+        //             const y2 = radius / 2 * Math.sin(angle + Math.PI / 6);
+
+        //             ctx.moveTo(0, 0);
+        //             ctx.lineTo(x1, y1);
+        //             ctx.lineTo(x2, y2);
+        //         }
+        //         ctx.closePath();
+
+        //         ctx.strokeStyle = "rgba(255, 255, 255, 0.8)";
+        //         ctx.lineWidth = 1.2;
+        //         ctx.stroke();
+
+        //         ctx.restore();
+        //     }
+
+        //     let animationFrameId;
+
+        //     function renderSnowfall() {
+        //         ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        //         wind += (targetWind - wind) * 0.01; // Smooth wind transition
+
+        //         snowflakes.forEach((flake) => {
+        //             // Apply drift and rotation
+        //             flake.x += wind + Math.sin(flake.y / 50) * 0.5 * flake.depth;
+        //             flake.y += flake.speedY;
+        //             flake.rotation += flake.rotationSpeed;
+
+        //             // Simulate melting
+        //             if (flake.melting) {
+        //                 flake.opacity -= flake.meltOpacitySpeed;
+        //             }
+
+        //             // Fading effect near the bottom
+        //             if (flake.y > canvas.height * 0.7) {
+        //                 flake.opacity -= 0.005;
+        //             }
+
+        //             // Draw snowflake
+        //             if (flake.opacity > 0) {
+        //                 drawSnowflake(flake.x, flake.y, flake.radius, flake.rotation, flake.opacity);
+        //             }
+        //         });
+
+        //         // Remove flakes that fade out or melt completely
+        //         snowflakes = snowflakes.filter((flake) => flake.opacity > 0);
+
+        //         // Add new flakes during snowfall
+        //         if (snowing && snowflakes.length < numFlakes) {
+        //             snowflakes.push(createSnowflake());
+        //         }
+
+        //         // Stop when all flakes settle
+        //         if (!snowing && snowflakes.length === 0) {
+        //             cancelAnimationFrame(animationFrameId);
+        //             document.body.removeChild(canvas);
+        //         } else {
+        //             animationFrameId = requestAnimationFrame(renderSnowfall);
+        //         }
+        //     }
+
+        //     // Start snowfall on load
+        //     window.addEventListener("load", () => {
+        //         document.body.appendChild(canvas);
+        //         renderSnowfall();
+
+        //         // Stop generating new snowflakes after 7-10 seconds
+        //         const stopTime = Math.random() * 3 + 7;
+        //         setTimeout(() => {
+        //             snowing = false;
+        //         }, stopTime * 1000);
+        //     });
+        // })();
+
+        // (function () {
+        //     const canvas = document.createElement("canvas");
+        //     canvas.id = "snowfall-canvas";
+        //     canvas.style.position = "fixed";
+        //     canvas.style.top = "0";
+        //     canvas.style.left = "0";
+        //     canvas.style.pointerEvents = "none";
+        //     canvas.style.zIndex = "9999";
+
+
+        //     const ctx = canvas.getContext("2d");
+        //     const devicePerformanceFactor = window.innerWidth < 768 ? 0.5 : 1; // Scale for small devices
+
+        //     let snowflakes = [];
+        //     const baseNumFlakes = Math.round(100 * devicePerformanceFactor);
+        //     let snowing = true;
+
+        //     let wind = 0;
+        //     // Smooth wind update with gusts and powerful blizzards
+        //     let targetWind = 0;
+        //     let currentWind = 0;
+        //     let windGustStrength = 0;
+        //     let isBlizzard = false;
+        //     let blizzardStrength = 0;
+
+        //     // Resize canvas and scale for performance
+        //     function resizeCanvas() {
+        //         canvas.width = Math.floor(window.innerWidth * devicePerformanceFactor);
+        //         canvas.height = Math.floor(window.innerHeight * devicePerformanceFactor);
+        //     }
+        //     window.addEventListener("resize", resizeCanvas);
+        //     resizeCanvas();
+
+        //     // Smooth wind update
+        //     // function updateWind() {
+        //     //     targetWind = (Math.random() - 0.5) * 5;
+        //     //     setTimeout(updateWind, 2000); // Change wind direction every 3 seconds
+        //     // }
+        //     // updateWind();
+
+
+        //     function updateWind() {
+        //         targetWind = (Math.random() - 0.5) * 5;
+        //         windGustStrength = Math.random() < 0.1 ? (Math.random() - 0.5) * 10 : 0;  // 10% chance of gust
+        //         isBlizzard = Math.random() < 0.05; // 5% chance for a blizzard
+
+        //         if (isBlizzard) {
+        //             blizzardStrength = (Math.random() - 0.5) * 30; // Blizzard strength range between -15 and 15
+        //             targetWind += blizzardStrength;  // Apply blizzard to wind direction and speed                   
+        //         } else {
+        //             blizzardStrength = 0;  // No blizzard, reset strength
+        //         }
+        //         currentWind = targetWind + windGustStrength;
+        //         currentWind = currentWind * 0.9 + targetWind * 0.1;
+        //         setTimeout(updateWind, 2000); // Update every 2 seconds
+        //     }
+        //     updateWind();
+
+
+
+        //     // Create a snowflake
+        //     function createSnowflake() {
+        //         const depth = Math.random();
+        //         return {
+        //             x: Math.random() * canvas.width,
+        //             y: Math.random() * -canvas.height,
+        //             radius: (Math.random() * 2 + 1) * (1 + depth),
+        //             speedY: (Math.random() * 2 + 0.5) * (1 + depth),
+        //             opacity: Math.min(1, depth + 0.3),
+        //             drift: Math.sin(Math.random() * Math.PI),
+        //             melting: Math.random() < 0.9, // 20% chance to melt
+        //             meltRate: Math.random() * 0.01 + 0.002, // Melting rate
+        //         };
+        //     }
+
+        //     function populateSnowflakes() {
+        //         snowflakes = [];
+        //         for (let i = 0; i < baseNumFlakes; i++) {
+        //             snowflakes.push(createSnowflake());
+        //         }
+        //     }
+        //     populateSnowflakes();
+
+        //     // Render the snowflakes efficiently
+        //     function renderSnowfall() {
+        //         ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        //         // Smooth wind transition
+        //         wind += (targetWind - wind) * 0.01;
+
+        //         for (let i = snowflakes.length - 1; i >= 0; i--) {
+        //             const flake = snowflakes[i];
+
+        //             // Update positions
+        //             flake.x += wind * 0.5 + flake.drift * 0.5;
+        //             flake.y += flake.speedY;
+
+        //             // Simulate melting
+        //             if (flake.melting) flake.opacity -= flake.meltRate;
+
+        //             // Remove snowflakes that fade or leave the screen
+        //             if (flake.y > canvas.height || flake.opacity <= 0) {
+        //                 snowflakes.splice(i, 1);
+        //                 if (snowing) snowflakes.push(createSnowflake());
+        //                 continue;
+        //             }
+
+        //             // Draw snowflake
+        //             ctx.globalAlpha = flake.opacity;
+        //             ctx.beginPath();
+        //             ctx.arc(flake.x, flake.y, flake.radius, 0, Math.PI * 2);
+        //             ctx.fillStyle = "white";
+        //             ctx.fill();
+        //         }
+
+
+        //         if (snowflakes.length > 0 || snowing) {
+        //             requestAnimationFrame(renderSnowfall);
+        //         } else {
+        //             document.body.removeChild(canvas);
+        //         }
+        //     }
+
+        //     // Start snowfall and stop it after a duration
+        //     window.addEventListener("load", () => {
+        //         document.body.appendChild(canvas);
+        //         renderSnowfall();
+
+        //         // Stop generating new snowflakes after 7-10 seconds
+        //         const stopTime = Math.random() * 3 + 7;
+        //         setTimeout(() => {
+        //             snowing = false;
+        //         }, stopTime * 1000);
+        //     });
+        // })();
+
+
+        (function () {
+            const canvas = document.createElement("canvas");
+            canvas.id = "snowfall-canvas";
+            canvas.style.position = "fixed";
+            canvas.style.top = "0";
+            canvas.style.left = "0";
+            canvas.style.pointerEvents = "none";
+            canvas.style.zIndex = "9999";
+
+            const ctx = canvas.getContext("2d");
+            const devicePerformanceFactor = window.innerWidth < 768 ? 0.5 : 0.8; // Further scaled for older devices
+
+            let snowflakes = [];
+            const baseNumFlakes = Math.round(80 * devicePerformanceFactor); // Reduced number for better performance
+            let snowing = true;
+
+            let targetWind = 0;
+            let currentWind = 0;
+            let windGustStrength = 0;
+            let isBlizzard = false;
+            let blizzardStrength = 0;
+
+            // Snowflake pool for object reuse
+            const snowflakePool = [];
+
+            // Layers for parallax effect
+            const layers = [
+                { speedMultiplier: 1.0, sizeMultiplier: 1.0, opacity: 1.0 },
+                { speedMultiplier: 0.6, sizeMultiplier: 0.7, opacity: 0.7 },
+                { speedMultiplier: 0.3, sizeMultiplier: 0.5, opacity: 0.5 }
+            ];
+
+            // Resize canvas and scale for performance and device pixel ratio
+            function resizeCanvas() {
+                const dpr = window.devicePixelRatio || 1;
+                canvas.width = Math.floor(window.innerWidth * devicePerformanceFactor * dpr);
+                canvas.height = Math.floor(window.innerHeight * devicePerformanceFactor * dpr);
+                ctx.scale(dpr, dpr);
+                canvas.style.width = `${window.innerWidth}px`;
+                canvas.style.height = `${window.innerHeight}px`;
             }
-        }
+            window.addEventListener("resize", resizeCanvas);
+            resizeCanvas();
 
-        let snowflakeInterval = setInterval(() => {
-            const snowflake = createSnowflake();
-            setInterval(() => {
-                moveSnowflake(snowflake);
-            }, Math.floor(Math.random() * 100) + 20);
-        }, Math.floor(Math.random() * 300) + 100);
+            // Smooth wind update using LERP
+            function updateWind() {
+                targetWind = (Math.random() - 0.5) * 2; // Balanced wind between -1 and +1
+                windGustStrength = Math.random() < 0.1 ? (Math.random() - 0.5) * 3 : 0;  // 10% chance of gust
+                isBlizzard = Math.random() < 0.05; // 5% chance for a blizzard
 
-        setTimeout(() => {
-            clearInterval(snowflakeInterval);
-        }, Math.floor(Math.random() * 3000) + 2000);
+                if (isBlizzard) {
+                    blizzardStrength = (Math.random() - 0.5) * 10; // Blizzard strength range between -5 and 5
+                    targetWind += blizzardStrength;  // Apply blizzard to wind direction and speed                   
+                } else {
+                    blizzardStrength = 0;  // No blizzard, reset strength
+                }
+
+                setTimeout(updateWind, 4000); // Update every 4 seconds for smoother transitions
+            }
+            updateWind();
+
+            // Create a snowflake
+            function createSnowflake() {
+                const depth = Math.random();
+                const layer = Math.floor(Math.random() * layers.length);
+                return {
+                    x: Math.random() * (canvas.width / (window.devicePixelRatio || 1)),
+                    y: Math.random() * -canvas.height / (window.devicePixelRatio || 1),
+                    radius: (Math.random() * 2 + 1) * layers[layer].sizeMultiplier * (1 + depth),
+                    speedY: (Math.random() * 1.5 + 0.5) * layers[layer].speedMultiplier * (1 + depth),
+                    opacity: Math.min(1, depth + 0.3) * layers[layer].opacity,
+                    drift: (Math.random() - 0.5) * 1.5, // Drift between -0.75 and +0.75 for multi-directional movement
+                    melting: Math.random() < 0.5, // 50% chance to melt
+                    meltRate: Math.random() * 0.005 + 0.001 // Slightly adjusted melting rate
+                };
+            }
+
+            // Retrieve a snowflake from the pool or create a new one
+            function getSnowflake() {
+                return snowflakePool.length > 0 ? snowflakePool.pop() : createSnowflake();
+            }
+
+            // Recycle a snowflake back to the pool
+            function recycleSnowflake(flake) {
+                snowflakePool.push(flake);
+            }
+
+            // Initialize snowflakes
+            function populateSnowflakes() {
+                snowflakes = [];
+                for (let i = 0; i < baseNumFlakes; i++) {
+                    snowflakes.push(getSnowflake());
+                }
+            }
+            populateSnowflakes();
+
+            // Interaction parameters
+            const interactionRadius = 100; // Pixels
+            const interactionStrength = 0.5; // Adjust for repulsion intensity
+
+            // Initialize mouse position
+            let mouseX = null;
+            let mouseY = null;
+
+            // Update mouse position on mouse move
+            window.addEventListener('mousemove', (event) => {
+                const rect = canvas.getBoundingClientRect();
+                mouseX = (event.clientX - rect.left) * (canvas.width / rect.width) / (window.devicePixelRatio || 1);
+                mouseY = (event.clientY - rect.top) * (canvas.height / rect.height) / (window.devicePixelRatio || 1);
+            });
+
+            // Reset mouse position when the mouse leaves the window
+            window.addEventListener('mouseout', () => {
+                mouseX = null;
+                mouseY = null;
+            });
+
+            // Gust parameters
+            let gustWind = 0;
+            let gustDuration = 0;
+
+            // Add event listener for mouse clicks to create gusts
+            window.addEventListener('click', () => {
+                gustWind = (Math.random() - 0.5) * 5; // Random wind direction and strength
+                gustDuration = 50; // Duration in milliseconds
+            });
+
+            // Render the snowflakes efficiently
+            function renderSnowfall() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // Smooth wind transition using LERP
+                currentWind += (targetWind - currentWind) * 0.01; // Adjust factor for smoother transitions
+
+                // Apply gust wind
+                if (gustDuration > 0) {
+                    currentWind += gustWind;
+                    gustDuration -= 16; // Approximate frame duration (~60fps)
+                } else {
+                    gustWind = 0;
+                }
+
+                ctx.fillStyle = "white";
+
+                // Iterate through snowflakes in reverse for efficient removal
+                for (let i = snowflakes.length - 1; i >= 0; i--) {
+                    const flake = snowflakes[i];
+
+                    // Update positions
+                    flake.x += currentWind + flake.drift;
+                    flake.y += flake.speedY;
+
+                    // Interaction: Repel snowflakes from mouse cursor
+                    // Interaction: Attract snowflakes towards mouse cursor
+                    if (mouseX !== null && mouseY !== null) {
+                        const dx = mouseX - flake.x;
+                        const dy = mouseY - flake.y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        if (distance < interactionRadius) {
+                            const normalizedDistance = distance === 0 ? 1 : distance;
+                            const force = (interactionRadius - distance) / interactionRadius * interactionStrength;
+                            flake.x += (dx / normalizedDistance) * force;
+                            flake.y += (dy / normalizedDistance) * force;
+                        }
+                    }
+
+
+                    // Simulate melting
+                    if (flake.melting) flake.opacity -= flake.meltRate;
+
+                    // Remove snowflakes that fade or leave the screen
+                    if (flake.y > (canvas.height / (window.devicePixelRatio || 1)) || flake.opacity <= 0 || flake.x < -flake.radius || flake.x > window.innerWidth + flake.radius) {
+                        snowflakes.splice(i, 1);
+                        recycleSnowflake(flake);
+                        if (snowing && snowflakes.length < baseNumFlakes) {
+                            snowflakes.push(getSnowflake());
+                        }
+                        continue;
+                    }
+
+                    // Draw snowflake
+                    ctx.globalAlpha = flake.opacity;
+                    ctx.beginPath();
+                    ctx.arc(flake.x, flake.y, flake.radius, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                ctx.globalAlpha = 1; // Reset alpha for any other drawings
+
+                if (snowflakes.length > 0 || snowing) {
+                    requestAnimationFrame(renderSnowfall);
+                } else {
+                    document.body.removeChild(canvas);
+                }
+            }
+
+            // Start snowfall and stop it after a duration
+            window.addEventListener("load", () => {
+                document.body.appendChild(canvas);
+                renderSnowfall();
+
+                // Stop generating new snowflakes after 10-15 seconds
+                const stopTime = Math.random() * 5 + 10;
+                setTimeout(() => {
+                    snowing = false;
+                }, stopTime * 1000);
+            });
+        })();
+
+
+
+
+
     }
 })();
 
