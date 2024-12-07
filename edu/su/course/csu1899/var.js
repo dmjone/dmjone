@@ -13,7 +13,7 @@ function get_menu_list(datetogen) {
             },
             {
                 link: "lab/",
-                title: "Lab: Hands-On Practice and Exercises [WIP]",
+                title: "Lab: Hands-On Practice and Exercises",
                 desc: "Hands-on practice and exercises related to Ethical Hacking. Click to explore practical applications and case studies, including real-world scenarios and challenges.",
                 codetype: "CSU1899P | Ethical Hacking",
             },
