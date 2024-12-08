@@ -113,6 +113,55 @@ function get_menu_list(datetogen) {
                 readtime: 5,
                 link: "proxy-servers-vpns"
             },         
+            {
+                title: "Assignment",
+                desc: "Assignment for the course CSU1899 | Ethical Hacking",
+                codetype: "Assignment",
+                readtime: 5,
+                link: "assignment"
+            },
+            {
+                title: "Lecture 12: Types of attack and attackers in the context of the vulnerabilities associated with computer and information systems",
+                desc: "Explore the different types of attacks and attackers in the context of vulnerabilities associated with computer and information systems. This module provides an overview of common attack vectors, threat actors, and security risks, highlighting the importance of cybersecurity awareness and best practices.",
+                codetype: "Faculty Lecture",
+                readtime: 5,
+                link: "types-attack-attackers-vulnerabilities"
+            },
+            {
+                title: "Lecture 13: Types of Attack and Attackers in the Context of Network Vulnerabilities",
+                desc: "Understand the different types of attacks and attackers in the context of network vulnerabilities. This module explores the methods and techniques used by hackers to exploit network weaknesses, highlighting the risks and threats associated with insecure network configurations and protocols.",
+                codetype: "Faculty Lecture",
+                readtime: 5,
+                link: "types-attack-attackers-network-vulnerabilities"
+            },
+            {
+                title: "Lecture 14: Stenography",
+                desc: "Learn about steganography and its applications in Ethical Hacking. This module explores the techniques and methods used to hide information within digital media, enabling secure and covert communication channels for sensitive data and messages.",
+                codetype: "Faculty Lecture",
+                readtime: 5,
+                link: "stenography"
+            },
+            {
+                title: "Wireless Hacking",
+                desc: "Explore the concepts and techniques of wireless hacking in Ethical Hacking. This module covers the vulnerabilities and security risks associated with wireless networks, highlighting the importance of securing wireless communications and devices.",
+                codetype: "Faculty Lecture",
+                readtime: 5,
+                link: "wireless-hacking"                
+            },
+            {
+                title: "Firewalls and Honeypots",
+                desc: "Understand the concepts of firewalls and honeypots in Ethical Hacking. This module provides an overview of the technologies and methods used to protect networks and systems from cyber threats, ensuring data security and integrity in digital communications.",
+                codetype: "Faculty Lecture",
+                readtime: 5,
+                link: "firewalls-honeypots"
+            },
+            {
+                title: "IDS and IPS",
+                desc: "Learn about intrusion detection systems (IDS) and intrusion prevention systems (IPS) in Ethical Hacking. This module explores the technologies and methods used to monitor and protect networks from cyber threats, ensuring real-time threat detection and response.",
+                codetype: "Faculty Lecture",
+                readtime: 5,
+                link: "ids-ips"
+            }
             
         ];
         body_genmenu.processData(arr, def_date, def_author);

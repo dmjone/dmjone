@@ -17,8 +17,7 @@ const google_login_js = "https://accounts.google.com/gsi/client";
 const cdnjs_DOMPurify = "https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.5/purify.min.js";
 const cdnjs_markdown = "https://cdnjs.cloudflare.com/ajax/libs/marked/14.1.2/marked.min.js";
 const cdnjs_mermaid = "https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.3.0/mermaid.min.js";
-const cdnjs_3js = "https://cdnjs.cloudflare.com/ajax/libs/three.js/110/three.min.js";
-const jsdelivr_snowfall = "https://cdn.jsdelivr.net/gh/motyar/snowfall/snowfall.js";
+const cdnjs_3js = "https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js";
 const GLOBAL_login_page_path = window.location.hostname === 'localhost' ? '/login.html' : '/login';
 
 const GLOBAL_SERVICEWORKER_REINSTALL = 0;
@@ -567,7 +566,7 @@ const body_pomodoro_helptext = `
     if (GLOBAL_crawler_mode) {
         allScripts = [cdnjs_jquery, cdnjs_bootstrap, cdnjs_DOMPurify];
     } else {
-        allScripts = [google_login_js, cdnjs_jquery, cdnjs_bootstrap, cdnjs_DOMPurify, cdnjs_highlightjs, cdnjs_font_awesome, cdnjs_cryptoJS, cdnjs_highlightjs_asm, cdnjs_markdown, cdnjs_mermaid, cdnjs_3js, jsdelivr_snowfall];
+        allScripts = [google_login_js, cdnjs_jquery, cdnjs_bootstrap, cdnjs_DOMPurify, cdnjs_highlightjs, cdnjs_font_awesome, cdnjs_cryptoJS, cdnjs_highlightjs_asm, cdnjs_markdown, cdnjs_mermaid, cdnjs_3js];
     }
 
     var loadScript = function (src) {
@@ -3576,53 +3575,92 @@ if (window.location.hostname !== "dmj.one"
 
 
 /******************** Style Cards with gradient Globally anywhere ***********/
+// (function () {
+//     function getRandomLightColor() {
+//         var letters = 'BCDEF'.split('');
+//         var color = '#';
+//         for (var i = 0; i < 6; i++) {
+//             color += letters[Math.floor(Math.random() * letters.length)];
+//         }
+//         return color;
+//     }
+
+//     function getRandomDarkColor() {
+//         var letters = '012345'.split('');
+//         var color = '#';
+//         for (var i = 0; i < 6; i++) {
+//             color += letters[Math.floor(Math.random() * letters.length)];
+//         }
+//         return color;
+//     }
+
+//     function styleCards() {
+//         var prefersDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+//         var cards = document.querySelectorAll('.card');
+//         for (var i = 0; i < cards.length; i++) {
+//             var randomColor1, randomColor2;
+
+//             if (prefersDarkMode) {
+//                 randomColor1 = getRandomDarkColor();
+//                 randomColor2 = getRandomDarkColor();
+//             } else {
+//                 randomColor1 = getRandomLightColor();
+//                 randomColor2 = getRandomLightColor();
+//             }
+
+//             cards[i].style.background = `linear-gradient(270deg, ${randomColor1}, ${randomColor2})`;
+//         }
+//     }
+
+//     // Expose the styleCards function to the global window object
+//     window.applyCardStyles = styleCards;
+
+//     // Call styleCards to apply the styles
+//     // styleCards();
+
+//     // Listen for changes in the color scheme preference to re-apply styles
+//     window.matchMedia('(prefers-color-scheme: dark)').addListener(styleCards);
+//     window.matchMedia('(prefers-color-scheme: light)').addListener(styleCards);
+// })();
+
 (function () {
+    // Generate random light colors
     function getRandomLightColor() {
-        var letters = 'BCDEF'.split('');
-        var color = '#';
-        for (var i = 0; i < 6; i++) {
-            color += letters[Math.floor(Math.random() * letters.length)];
-        }
-        return color;
+        const letters = 'BCDEF'.split('');
+        return '#' + Array.from({ length: 6 }, () => letters[Math.floor(Math.random() * letters.length)]).join('');
     }
 
+    // Generate random dark colors
     function getRandomDarkColor() {
-        var letters = '012345'.split('');
-        var color = '#';
-        for (var i = 0; i < 6; i++) {
-            color += letters[Math.floor(Math.random() * letters.length)];
-        }
-        return color;
+        const letters = '012345'.split('');
+        return '#' + Array.from({ length: 6 }, () => letters[Math.floor(Math.random() * letters.length)]).join('');
     }
 
-    function styleCards() {
-        var prefersDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-        var cards = document.querySelectorAll('.card');
-        for (var i = 0; i < cards.length; i++) {
-            var randomColor1, randomColor2;
-
-            if (prefersDarkMode) {
-                randomColor1 = getRandomDarkColor();
-                randomColor2 = getRandomDarkColor();
-            } else {
-                randomColor1 = getRandomLightColor();
-                randomColor2 = getRandomLightColor();
-            }
-
-            cards[i].style.background = `linear-gradient(270deg, ${randomColor1}, ${randomColor2})`;
-        }
+    // Function to apply backgrounds to all elements with 'bg-random'
+    function applyRandomBackgrounds() {
+        const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.querySelectorAll('.bg-random').forEach((element) => {
+            let randomColor1 = prefersDarkMode ? getRandomDarkColor() : getRandomLightColor();
+            let randomColor2 = prefersDarkMode ? getRandomDarkColor() : getRandomLightColor();
+            element.style.background = `linear-gradient(270deg, ${randomColor1}, ${randomColor2})`;
+        });
     }
 
-    // Expose the styleCards function to the global window object
-    window.applyCardStyles = styleCards;
+    // Initial application of background styles
+    document.addEventListener("DOMContentLoaded", () => {
+        setTimeout(() => {
+            applyRandomBackgrounds();
+        }, 1000); // Small delay ensures all dynamic content is loaded
+    });
 
-    // Call styleCards to apply the styles
-    // styleCards();
-
-    // Listen for changes in the color scheme preference to re-apply styles
-    window.matchMedia('(prefers-color-scheme: dark)').addListener(styleCards);
-    window.matchMedia('(prefers-color-scheme: light)').addListener(styleCards);
+    // Apply styles on theme change (dark to light or light to dark)
+    const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    darkModeMediaQuery.addEventListener('change', (event) => {
+        // Trigger when theme switches between dark and light
+        applyRandomBackgrounds();
+    });
 })();
+
 
 
 /******************** Hide / Show on scroll **********************/
