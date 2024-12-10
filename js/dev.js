@@ -6767,6 +6767,7 @@ function gen_blockquote() {
         { day: 6, month: 11, year: 2003, occasion: 'birthday', name: 'Arpit' },
         { day: 14, month: 11, occasion: 'childrensday' },
         { day: 15, month: 11, year: 2004, occasion: 'birthday', name: 'Asmi' },
+        { day: 5, month: 12, year: 2003, occasion: 'birthday', name: 'Lakshika' },
         { day: 14, month: 12, year: 2002, occasion: 'birthday', name: 'Subhojeet' },
     ];
 
