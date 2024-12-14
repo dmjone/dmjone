@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Realistic Snowstorm Simulation</title>
+        <style>
+            body,
+            html {
+                margin: 0;
+                padding: 0;
+                overflow: hidden;
+                background-color: #0b0e17;
+                /* Night sky */
+                height: 100%;
+            }
+
+            canvas {
+                display: block;
+            }
+        </style>
+    </head>
+
+    <body>
+        <!-- Include Three.js -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+        <script>
+            let scene, camera, renderer, snowParticles, snowGeo, windForce = 0;
+
+            const snowflakeCount = 5000; // Total snow particles
+
+            function init() {
+                // Scene setup
+                scene = new THREE.Scene();
+                camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
+                camera.position.z = 5;
+
+                renderer = new THREE.WebGLRenderer({ alpha: true });
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                document.body.appendChild(renderer.domElement);
+
+                // Snow geometry
+                snowGeo = new THREE.BufferGeometry();
+                const positions = [];
+                const velocities = [];
+
+                for (let i = 0; i < snowflakeCount; i++) {
+                    positions.push(
+                        Math.random() * 200 - 100, // X
+                        Math.random() * 200 - 100, // Y
+                        Math.random() * 200 - 100  // Z
+                    );
+                    velocities.push(
+                        Math.random() * 0.2 + 0.1, // Downward speed (Y)
+                        Math.random() * 0.05       // Horizontal swaying factor
+                    );
+                }
+
+                snowGeo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+                snowGeo.setAttribute('velocity', new THREE.Float32BufferAttribute(velocities, 2));
+
+                // Snow material: simple white points
+                const snowMaterial = new THREE.PointsMaterial({
+                    color: 0xffffff,
+                    size: 0.2,
+                    transparent: true,
+                    opacity: 0.8
+                });
+
+                // Create the particle system
+                snowParticles = new THREE.Points(snowGeo, snowMaterial);
+                scene.add(snowParticles);
+
+                animate();
+                window.addEventListener('resize', onWindowResize, false);
+            }
+
+            function animate() {
+                requestAnimationFrame(animate);
+
+                const positions = snowGeo.attributes.position.array;
+                const velocities = snowGeo.attributes.velocity.array;
+
+                // Gradually adjust wind force (smooth gusts)
+                windForce += (Math.random() - 0.5) * 0.005;
+                windForce = Math.max(-0.2, Math.min(0.2, windForce)); // Clamp wind force
+
+                for (let i = 0; i < positions.length; i += 3) {
+                    // Vertical falling
+                    positions[i + 1] -= velocities[i / 3 * 2];
+
+                    // Smooth horizontal swaying with wind gusts
+                    positions[i] += Math.sin(Date.now() * 0.001 + i) * velocities[i / 3 * 2 + 1] + windForce;
+
+                    // Reset when snowflake falls out of view
+                    if (positions[i + 1] < -100) {
+                        positions[i + 1] = 100; // Reset to top
+                        positions[i] = Math.random() * 200 - 100; // Random X position
+                        positions[i + 2] = Math.random() * 200 - 100; // Random Z position
+                    }
+                }
+
+                snowGeo.attributes.position.needsUpdate = true;
+
+                renderer.render(scene, camera);
+            }
+
+            function onWindowResize() {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            }
+
+            init();
+        </script>
+    </body>
+
+</html>
