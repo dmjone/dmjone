@@ -6745,6 +6745,7 @@ function gen_blockquote() {
         { day: 3, month: 6, year: 2004, occasion: 'birthday', name: 'Adarsh' },
         { day: 4, month: 6, year: 2004, occasion: 'birthday', name: 'Aarushi' },
         { day: 13, month: 6, year: 2004, occasion: 'birthday', name: 'Anshuman' },
+        { day: 14, month: 6, year: 2002, occasion: 'birthday', name: 'Subhojeet' },
         { day: 16, month: 6, year: 2000, occasion: 'birthday', name: 'Yuvraj' },
         { day: 10, month: 7, year: 2004, occasion: 'birthday', name: 'Riyant' },
         { day: 2, month: 8, year: 2004, occasion: 'birthday', name: 'Aryan' },
@@ -6768,7 +6769,6 @@ function gen_blockquote() {
         { day: 14, month: 11, occasion: 'childrensday' },
         { day: 15, month: 11, year: 2004, occasion: 'birthday', name: 'Asmi' },
         { day: 5, month: 12, year: 2003, occasion: 'birthday', name: 'Lakshika' },
-        { day: 14, month: 12, year: 2002, occasion: 'birthday', name: 'Subhojeet' },
     ];
 
     const birthdayEmojis = [
