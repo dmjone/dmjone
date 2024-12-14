@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <title>Biometric Login</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- Include Bootstrap CSS -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+        <style>
+            body {
+                background: radial-gradient(circle, #141e30, #243b55);
+                color: #fff;
+                font-family: 'Arial', sans-serif;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                margin: 0;
+            }
+
+            .login-container {
+                text-align: center;
+                max-width: 400px;
+                padding: 20px;
+                background: rgba(0, 0, 0, 0.7);
+                border-radius: 15px;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            }
+
+            #video {
+                width: 150px;
+                height: 150px;
+                border: 2px solid #00d4ff;
+                border-radius: 50%;
+                object-fit: cover;
+                margin: 20px auto;
+                display: block;
+                box-shadow: 0 0 15px #00d4ff;
+            }
+
+            .btn-primary {
+                background: linear-gradient(to right, #00d4ff, #0084ff);
+                border: none;
+                color: #fff;
+                font-size: 1.2rem;
+                padding: 10px 20px;
+                border-radius: 50px;
+                transition: transform 0.3s ease, background 0.3s ease;
+            }
+
+            .btn-primary:hover {
+                transform: scale(1.1);
+                background: linear-gradient(to right, #0084ff, #00d4ff);
+            }
+
+            .modal-content {
+                background: rgba(0, 0, 0, 0.85);
+                color: #fff;
+                border: 2px solid #00d4ff;
+                border-radius: 10px;
+            }
+
+            @media (max-width: 576px) {
+                .login-container {
+                    padding: 15px;
+                    max-width: 95%;
+                }
+
+                #video {
+                    width: 120px;
+                    height: 120px;
+                }
+
+                .btn-primary {
+                    font-size: 1rem;
+                    padding: 8px 16px;
+                }
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="login-container">
+            <h1 class="mb-4">Biometric Login</h1>
+            <video id="video" autoplay muted loading="lazy"></video>
+            <button id="verify" class="btn btn-primary mt-4 w-100" aria-label="Scan face and login">Scan & Login</button>
+        </div>
+
+        <!-- Bootstrap Modal -->
+        <div class="modal fade" id="recordingModal" tabindex="-1" aria-labelledby="recordingModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content text-center">
+                    <div class="modal-header border-0">
+                        <h5 class="modal-title mx-auto display-5 text-warning" id="recordingModalLabel">Speak Now</h5>
+                        <!-- <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button> -->
+                    </div>
+                    <div class="modal-body">                        
+                        <p>Please speak clearly. Stay in the camera frame.</p>
+                        <p>Recording your voice for biometric authentication.</p>
+                        <div class="d-flex justify-content-center align-items-center mb-3">
+                            <span class="me-2 text-danger fw-bold">●</span>
+                            <span>Recording</span>
+                        </div>
+                        <div class="spinner-border text-primary mx-auto" role="status">
+                            <span class="visually-hidden">Recording...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Include Bootstrap JS -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+            let video = document.getElementById('video');
+            let canvas = document.createElement('canvas'); // Hidden canvas for capturing the face image
+            let faceData = '';
+            let voiceData = '';
+            let mediaRecorder;
+            let audioChunks = [];
+            const audioDuration = 5000; // Record for 5 seconds
+
+            // Access the user's webcam and microphone
+            navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+                .then(stream => {
+                    video.srcObject = stream;
+
+                    // Prepare for audio recording
+                    mediaRecorder = new MediaRecorder(stream);
+                    mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+
+                    mediaRecorder.onstop = () => {
+                        let blob = new Blob(audioChunks, { type: 'audio/webm' });
+                        let reader = new FileReader();
+                        reader.readAsDataURL(blob);
+                        reader.onloadend = () => {
+                            voiceData = reader.result; // Save voice data
+                            submitVerification(); // Submit both face and voice data
+                        };
+                    };
+                })
+                .catch(error => {
+                    console.error('Error accessing media devices:', error);
+                    alert('Could not access camera and microphone. Please allow access.');
+                });
+
+            document.getElementById('verify').addEventListener('click', (event) => {
+                // Disable the button
+                event.target.disabled = true;
+
+                // Capture face image
+                canvas.width = 320;
+                canvas.height = 240;
+                let context = canvas.getContext('2d');
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                faceData = canvas.toDataURL('image/png'); // Save face data
+
+                // Start audio recording
+                audioChunks = []; // Clear previous recordings
+                mediaRecorder.start();
+
+                // Show the recording modal
+                const recordingModal = new bootstrap.Modal(document.getElementById('recordingModal'));
+                recordingModal.show();
+
+                setTimeout(() => {
+                    mediaRecorder.stop();
+                    recordingModal.hide();
+                }, audioDuration); // Stop recording after 5 seconds
+            });
+
+            function submitVerification() {
+                if (!faceData || !voiceData) {
+                    alert('Error capturing data. Please try again.');
+                    return;
+                }
+
+                // Submit data to the server
+                fetch('/verify', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `face_data=${encodeURIComponent(faceData)}&voice_data=${encodeURIComponent(voiceData)}`
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.json().then(errData => {
+                                throw new Error(errData.message || 'Server error');
+                            });
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        alert(data.message); // Show success message
+                    })
+                    .catch(error => {
+                        alert(error.message);
+                    })
+                    .finally(() => {
+                        // Optionally keep the button disabled after completion or re-enable it
+                        // document.getElementById('verify').disabled = false;
+                    });
+            }
+        </script>
+
+    </body>
+
+</html>
