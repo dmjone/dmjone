@@ -6288,7 +6288,7 @@ function gen_blockquote() {
             const devicePerformanceFactor = window.innerWidth < 768 ? 0.5 : 0.8; // Further scaled for older devices
 
             let snowflakes = [];
-            const baseNumFlakes = Math.round(80 * devicePerformanceFactor); // Reduced number for better performance
+            const baseNumFlakes = Math.round(500 * devicePerformanceFactor); // Reduced number for better performance
             let snowing = true;
 
             let targetWind = 0;
@@ -6372,8 +6372,8 @@ function gen_blockquote() {
             populateSnowflakes();
 
             // Interaction parameters
-            const interactionRadius = 100; // Pixels
-            const interactionStrength = 0.5; // Adjust for repulsion intensity
+            const interactionRadius = 150; // Pixels
+            const interactionStrength = 0.9; // Adjust for repulsion intensity
 
             // Initialize mouse position
             let mouseX = null;
@@ -6476,8 +6476,8 @@ function gen_blockquote() {
                 document.body.appendChild(canvas);
                 renderSnowfall();
 
-                // Stop generating new snowflakes after 10-15 seconds
-                const stopTime = Math.random() * 54 + 5;
+                // Stop generating new snowflakes after 5-15 seconds
+                const stopTime = Math.random() * 5 + 10;
                 setTimeout(() => {
                     snowing = false;
                 }, stopTime * 1000);
