@@ -2,16 +2,15 @@
 function get_menu_list(datetogen) {
     function get_main(def_date, def_author) {
         const arr = [
-            {
-                link: "#",
-                title: "Concepts and Principles of English Communication Seminar",
-                desc: "Explore the fundamental concepts and principles of English Communication in this section. Learn about the importance of effective communication, the elements of language, and the role of communication in various contexts. Click to delve into the basics of English Communication and enhance your language skills.",
-                codetype: "LSE005 | English Communication",
-                cardimage: "https://cdn.dmj.one/edu/su/course/cs/img/logo.webp",                
-                // cardimage_dark: "//cdn.dmj.one/img/needhelp.webp",               
-                // continuereading: " Click here to reach out to Faculty directly through email"
-            },
-            
+            // {
+            //     link: "#",
+            //     title: "Concepts and Principles of English Communication Seminar",
+            //     desc: "Explore the fundamental concepts and principles of English Communication in this section. Learn about the importance of effective communication, the elements of language, and the role of communication in various contexts. Click to delve into the basics of English Communication and enhance your language skills.",
+            //     codetype: "LSE005 | English Communication",
+            //     cardimage: "https://cdn.dmj.one/edu/su/course/cs/img/logo.webp",                
+            //     // cardimage_dark: "//cdn.dmj.one/img/needhelp.webp",               
+            //     // continuereading: " Click here to reach out to Faculty directly through email"
+            // },            
             {
                 link: "practice/",
                 title: "Practice English Communication Skills: Strengthen Your Knowledge",
@@ -40,7 +39,6 @@ function get_menu_list(datetogen) {
     let title, link, date, desc, codetype, readtime, author = 1, semester, cardimage, continuereading;
     const functions = {
         theory: get_class,
-        lab: get_lab,
         default: get_main
     };
     (functions[window.urlpart5] || functions.default)(datetogen, author);

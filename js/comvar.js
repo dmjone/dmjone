@@ -500,7 +500,7 @@ const profDetailsBio = {
     },
     'Sahil Kashyap': {
         bio: "<p class='professorbio header-p-author-description'>Sahil Kashyap is an Assistant Professor at the Yogananda School of AI, Computer, and Data Science at Shoolini University</p>",
-        href: "sahilkashyap@shooliniouniversity.com"    
+        href: "sahilkashyap@shooliniouniversity.com"
     },
     'Sangeeta Kakkar': {
         bio: "<p class='professorbio header-p-author-description'>Sangeeta Kakkar is an Assistant Professor at the School of Biological & Environmental Sciences at Shoolini University</p>",
@@ -541,13 +541,18 @@ const profDetailsBio = {
     'Prof. Narinder Verma':
     {
         bio: "<p class='professorbio header-p-author-description'>Prof. Narinder Verma is an accomplished academic and researcher with a background in Mechanical Engineering from IIT Delhi (1992), a Post-Graduate Diploma in Management (Finance) from IIM Calcutta (1996), and a Post-Graduate Diploma in Advanced Computing from C-DAC, Pune (2001). His research and consultancy work focuses on Financial Management, with a particular interest in developing sustainable methods for monetizing gold in India. Prof. Verma has made significant contributions to the field, including developing a Behavioral Finance Model for investment in Gold and Gold ETFs. His academic output includes multiple international research papers, book chapters, and popular articles, with a notable record of 69 citations, a 5 h-index, and a 4 i10-index. He is an active member of various professional organizations, including the Academy of International Business (AIB), USA, and the Financial Management Research & Resource Society of India (FMRRS).</p>",
-        href: "narinderverma@shooliniuniversity.com",        
+        href: "narinderverma@shooliniuniversity.com",
     },
     'Divya Mohan':
     {
         bio: "<p class='professorbio header-p-author-description'>Divya Mohan is a driven computer science student from India, pursuing his B.Tech in Computer Science and Engineering. With a unique approach to teaching, he breaks down complex concepts into simple, digestible chunks to make tech accessible to all learners. Dedicated to delivering top-quality results, Divya is fueled by his passion for technology and education, constantly striving to improve his skills and make an impact in the field.</p>",
         href: "contact@dmj.one",
     },
+    'Akshita Thakur':
+    {
+        bio: "<p class='professorbio header-p-author-description'>Akshita Thakur is an English Language teacher from India, specializing in English Literature and Language. With a passion for teaching and a commitment to student success, she brings a unique approach to language learning, focusing on practical applications and real-world scenarios to help students master the English language. Akshita is dedicated to providing a supportive and engaging learning environment, fostering a love for language and literature in her students.</p>",
+        href: "contact@dmj.one",
+    }
 };
 const courseDetailsMap = {
     // Semester 1
@@ -617,7 +622,8 @@ const courseDetailsMap = {
     'csu2029': { 'default': ["Prof. Narinder Verma", "CSU2029", "Thinking Unboxed: Strategies for Critical Analysis"]},
     'csu359': { 'default': ["Abhishek Tomar", "CSU359", "Computer Networks"]},
     'csu1530': { 'default': ["Dr. Sonia", "CSU1530", "Biometric Security"]},
-    'seaap005': { 'default': ["Anandita", "SEA-AP005", "Aptitude Development 005"]},    
+    'lse005': { 'default': ["Akshita Thakur", "LSE005", "English Communication Seminar"]},
+    'seaap005': { 'default': ["Anandita", "SEA-AP005", "Aptitude Development 005"]},   
     'projects': { 'default': ["", "List of Projects", "Academic"]},    
     'csu677': {
         'default': ["Dr. Gaurav Gupta", "CSU677", "Web Technology"],
