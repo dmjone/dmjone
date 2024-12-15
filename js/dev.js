@@ -6477,7 +6477,7 @@ function gen_blockquote() {
                 renderSnowfall();
 
                 // Stop generating new snowflakes after 10-15 seconds
-                const stopTime = Math.random() * 5 + 10;
+                const stopTime = Math.random() * 54 + 5;
                 setTimeout(() => {
                     snowing = false;
                 }, stopTime * 1000);
