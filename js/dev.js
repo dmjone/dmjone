@@ -6278,6 +6278,7 @@ function gen_blockquote() {
         (function () {
             const canvas = document.createElement("canvas");
             canvas.id = "snowfall-canvas";
+            canvas.classList.add("d-print-none");
             canvas.style.position = "fixed";
             canvas.style.top = "0";
             canvas.style.left = "0";
