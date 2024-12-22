@@ -4799,12 +4799,28 @@ function maintenance_mode() {
         document.body.classList.remove('indian-flag-background', 'default-background');
 
         if (!isDarkMode) {
-            if ((month === 1 && day === 26) || (month === 8 && day === 15)) {
-                document.body.classList.add('indian-flag-background');
-            } else {
-                document.body.classList.add('default-background');
-            }
+            // Map dates (MM-DD) to corresponding background classes
+            const backgroundClassMap = {
+                "01-26": "indian-flag-background",
+                "08-15": "indian-flag-background",                
+                "12-25": "christmas-background",
+                "01-07": "christmas-background",                
+                "01-01": "new-year-background",                
+            };
+
+            // Get current date
+            const today = new Date();
+            const month = String(today.getMonth() + 1).padStart(2, "0"); // Ensure 2-digit format
+            const day = String(today.getDate()).padStart(2, "0");
+            const formattedDate = `${month}-${day}`;
+
+            // Determine the background class or fallback to default
+            const backgroundClass = backgroundClassMap[formattedDate] || "default-background";
+
+            // Apply the background class to the body
+            document.body.classList.add(backgroundClass);
         }
+
     }
 
     document.addEventListener('DOMContentLoaded', applyBackground);
@@ -6275,7 +6291,255 @@ function gen_blockquote() {
         // })();
 
 
+        // (function () {
+        //     const canvas = document.createElement("canvas");
+        //     canvas.id = "snowfall-canvas";
+        //     canvas.classList.add("d-print-none");
+        //     canvas.style.position = "fixed";
+        //     canvas.style.top = "0";
+        //     canvas.style.left = "0";
+        //     canvas.style.pointerEvents = "none";
+        //     canvas.style.zIndex = "9999";
+
+        //     const ctx = canvas.getContext("2d");
+        //     const devicePerformanceFactor = window.innerWidth < 768 ? 0.5 : 0.8; // Further scaled for older devices
+
+        //     let snowflakes = [];
+        //     const baseNumFlakes = Math.round(500 * devicePerformanceFactor); // Reduced number for better performance
+        //     let snowing = true;
+
+        //     let targetWind = 0;
+        //     let currentWind = 0;
+        //     let windGustStrength = 0;
+        //     let isBlizzard = false;
+        //     let blizzardStrength = 0;
+
+        //     // Snowflake pool for object reuse
+        //     const snowflakePool = [];
+
+        //     // Layers for parallax effect
+        //     const layers = [
+        //         { speedMultiplier: 2.0, sizeMultiplier: 1.0, opacity: 1.0 },
+        //         { speedMultiplier: 1.6, sizeMultiplier: 0.7, opacity: 0.7 },
+        //         { speedMultiplier: 1.3, sizeMultiplier: 0.5, opacity: 0.5 }
+        //     ];
+
+        //     // Resize canvas and scale for performance and device pixel ratio
+        //     function resizeCanvas() {
+        //         const dpr = window.devicePixelRatio || 1;
+        //         canvas.width = Math.floor(window.innerWidth * devicePerformanceFactor * dpr);
+        //         canvas.height = Math.floor(window.innerHeight * devicePerformanceFactor * dpr);
+        //         ctx.scale(dpr, dpr);
+        //         canvas.style.width = `${window.innerWidth}px`;
+        //         canvas.style.height = `${window.innerHeight}px`;
+        //     }
+        //     window.addEventListener("resize", resizeCanvas);
+        //     resizeCanvas();
+
+        //     // Smooth wind update using LERP
+        //     function updateWind() {
+        //         targetWind = (Math.random() - 0.5) * 2; // Balanced wind between -1 and +1
+        //         windGustStrength = Math.random() < 0.1 ? (Math.random() - 0.5) * 3 : 0;  // 10% chance of gust
+        //         isBlizzard = Math.random() < 0.05; // 5% chance for a blizzard
+
+        //         if (isBlizzard) {
+        //             blizzardStrength = (Math.random() - 0.5) * 10; // Blizzard strength range between -5 and 5
+        //             targetWind += blizzardStrength;  // Apply blizzard to wind direction and speed                   
+        //         } else {
+        //             blizzardStrength = 0;  // No blizzard, reset strength
+        //         }
+
+        //         setTimeout(updateWind, 4000); // Update every 4 seconds for smoother transitions
+        //     }
+        //     updateWind();
+
+        //     // Create a snowflake
+        //     function createSnowflake() {
+        //         const depth = Math.random();
+        //         const layer = Math.floor(Math.random() * layers.length);
+        //         return {
+        //             x: Math.random() * (canvas.width / (window.devicePixelRatio || 1)),
+        //             y: Math.random() * -canvas.height / (window.devicePixelRatio || 1),
+        //             radius: (Math.random() * 2 + 1) * layers[layer].sizeMultiplier * (1 + depth),
+        //             speedY: (Math.random() * 1.5 + 0.5) * layers[layer].speedMultiplier * (1 + depth),
+        //             opacity: Math.min(1, depth + 0.3) * layers[layer].opacity,
+        //             drift: (Math.random() - 0.5) * 1.5, // Drift between -0.75 and +0.75 for multi-directional movement
+        //             melting: Math.random() < 0.5, // 50% chance to melt
+        //             meltRate: Math.random() * 0.005 + 0.001 // Slightly adjusted melting rate
+        //         };
+        //     }
+
+        //     // Retrieve a snowflake from the pool or create a new one
+        //     function getSnowflake() {
+        //         return snowflakePool.length > 0 ? snowflakePool.pop() : createSnowflake();
+        //     }
+
+        //     // Recycle a snowflake back to the pool
+        //     function recycleSnowflake(flake) {
+        //         snowflakePool.push(flake);
+        //     }
+
+        //     // Initialize snowflakes
+        //     function populateSnowflakes() {
+        //         snowflakes = [];
+        //         for (let i = 0; i < baseNumFlakes; i++) {
+        //             snowflakes.push(getSnowflake());
+        //         }
+        //     }
+        //     populateSnowflakes();
+
+        //     // Interaction parameters
+        //     const interactionRadius = 150; // Pixels
+        //     const interactionStrength = 0.9; // Adjust for repulsion intensity
+
+        //     // Initialize mouse position
+        //     let mouseX = null;
+        //     let mouseY = null;
+
+        //     // Update mouse position on mouse move
+        //     window.addEventListener('mousemove', (event) => {
+        //         const rect = canvas.getBoundingClientRect();
+        //         mouseX = (event.clientX - rect.left) * (canvas.width / rect.width) / (window.devicePixelRatio || 1);
+        //         mouseY = (event.clientY - rect.top) * (canvas.height / rect.height) / (window.devicePixelRatio || 1);
+        //     });
+
+        //     // Reset mouse position when the mouse leaves the window
+        //     window.addEventListener('mouseout', () => {
+        //         mouseX = null;
+        //         mouseY = null;
+        //     });
+
+        //     // Gust parameters
+        //     let gustWind = 0;
+        //     let gustDuration = 0;
+
+        //     // Add event listener for mouse clicks to create gusts
+        //     window.addEventListener('click', () => {
+        //         gustWind = (Math.random() - 0.5) * 5; // Random wind direction and strength
+        //         gustDuration = 50; // Duration in milliseconds
+        //     });
+
+        //     // Render the snowflakes efficiently
+        //     function renderSnowfall() {
+        //         ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        //         // Smooth wind transition using LERP
+        //         currentWind += (targetWind - currentWind) * 0.01; // Adjust factor for smoother transitions
+
+        //         // Apply gust wind
+        //         if (gustDuration > 0) {
+        //             currentWind += gustWind;
+        //             gustDuration -= 16; // Approximate frame duration (~60fps)
+        //         } else {
+        //             gustWind = 0;
+        //         }
+
+        //         ctx.fillStyle = "white";
+
+        //         // Iterate through snowflakes in reverse for efficient removal
+        //         for (let i = snowflakes.length - 1; i >= 0; i--) {
+        //             const flake = snowflakes[i];
+
+        //             // Update positions
+        //             flake.x += currentWind + flake.drift;
+        //             flake.y += flake.speedY;
+
+        //             // Interaction: Repel snowflakes from mouse cursor
+        //             // Interaction: Attract snowflakes towards mouse cursor
+        //             if (mouseX !== null && mouseY !== null) {
+        //                 const dx = mouseX - flake.x;
+        //                 const dy = mouseY - flake.y;
+        //                 const distance = Math.sqrt(dx * dx + dy * dy);
+        //                 if (distance < interactionRadius) {
+        //                     const normalizedDistance = distance === 0 ? 1 : distance;
+        //                     const force = (interactionRadius - distance) / interactionRadius * interactionStrength;
+        //                     flake.x += (dx / normalizedDistance) * force;
+        //                     flake.y += (dy / normalizedDistance) * force;
+        //                 }
+        //             }
+
+
+        //             // Simulate melting
+        //             if (flake.melting) flake.opacity -= flake.meltRate;
+
+        //             // Remove snowflakes that fade or leave the screen
+        //             if (flake.y > (canvas.height / (window.devicePixelRatio || 1)) || flake.opacity <= 0 || flake.x < -flake.radius || flake.x > window.innerWidth + flake.radius) {
+        //                 snowflakes.splice(i, 1);
+        //                 recycleSnowflake(flake);
+        //                 if (snowing && snowflakes.length < baseNumFlakes) {
+        //                     snowflakes.push(getSnowflake());
+        //                 }
+        //                 continue;
+        //             }
+
+        //             // Draw snowflake
+        //             ctx.globalAlpha = flake.opacity;
+        //             ctx.beginPath();
+        //             ctx.arc(flake.x, flake.y, flake.radius, 0, Math.PI * 2);
+        //             ctx.fill();
+        //         }
+
+        //         ctx.globalAlpha = 1; // Reset alpha for any other drawings
+
+        //         if (snowflakes.length > 0 || snowing) {
+        //             requestAnimationFrame(renderSnowfall);
+        //         } else {
+        //             document.body.removeChild(canvas);
+        //         }
+        //     }
+
+        //     // Start snowfall and stop it after a duration
+        //     window.addEventListener("load", () => {
+        //         document.body.appendChild(canvas);
+        //         renderSnowfall();
+
+        //         // Stop generating new snowflakes after 5-15 seconds
+        //         const stopTime = Math.random() * 10 + 5;
+        //         setTimeout(() => {
+        //             snowing = false;
+        //         }, stopTime * 1000);
+        //     });
+        // })();
+
+
+
+
         (function () {
+            // ─────────────────────────────────────────────────────────────────────
+            //  HOLIDAY LOGIC
+            // ─────────────────────────────────────────────────────────────────────
+            const holidays = [
+                "12-25", // Christmas (US)
+                "01-07", // Christmas (Russian Orthodox)
+                "12-31", // New Year's Eve
+                "01-01", // New Year's Day
+            ];
+
+            function isHoliday() {
+                const today = new Date();
+                const month = String(today.getMonth() + 1).padStart(2, "0"); // Months are zero-indexed
+                const day = String(today.getDate()).padStart(2, "0");
+                const todayDate = `${month}-${day}`;
+                return holidays.includes(todayDate);
+            }
+
+            // Automatically set holidayMode. To set manually, just set to true or false
+            const holidayMode = isHoliday();
+
+            function getsnownumber() {
+                const width = window.innerWidth;
+                if (!holidayMode) {
+                    return width < 768 ? 100 : 200;
+                } else {
+                    return width < 768 ? 200 : 500;
+                }
+            }
+
+            const snownumber = getsnownumber();
+
+            // ─────────────────────────────────────────────────────────────────────
+            //  CANVAS SETUP
+            // ─────────────────────────────────────────────────────────────────────
             const canvas = document.createElement("canvas");
             canvas.id = "snowfall-canvas";
             canvas.classList.add("d-print-none");
@@ -6286,29 +6550,8 @@ function gen_blockquote() {
             canvas.style.zIndex = "9999";
 
             const ctx = canvas.getContext("2d");
-            const devicePerformanceFactor = window.innerWidth < 768 ? 0.5 : 0.8; // Further scaled for older devices
+            const devicePerformanceFactor = window.innerWidth < 768 ? 0.8 : 1.0;
 
-            let snowflakes = [];
-            const baseNumFlakes = Math.round(500 * devicePerformanceFactor); // Reduced number for better performance
-            let snowing = true;
-
-            let targetWind = 0;
-            let currentWind = 0;
-            let windGustStrength = 0;
-            let isBlizzard = false;
-            let blizzardStrength = 0;
-
-            // Snowflake pool for object reuse
-            const snowflakePool = [];
-
-            // Layers for parallax effect
-            const layers = [
-                { speedMultiplier: 1.0, sizeMultiplier: 1.0, opacity: 1.0 },
-                { speedMultiplier: 0.6, sizeMultiplier: 0.7, opacity: 0.7 },
-                { speedMultiplier: 0.3, sizeMultiplier: 0.5, opacity: 0.5 }
-            ];
-
-            // Resize canvas and scale for performance and device pixel ratio
             function resizeCanvas() {
                 const dpr = window.devicePixelRatio || 1;
                 canvas.width = Math.floor(window.innerWidth * devicePerformanceFactor * dpr);
@@ -6320,170 +6563,272 @@ function gen_blockquote() {
             window.addEventListener("resize", resizeCanvas);
             resizeCanvas();
 
-            // Smooth wind update using LERP
-            function updateWind() {
-                targetWind = (Math.random() - 0.5) * 2; // Balanced wind between -1 and +1
-                windGustStrength = Math.random() < 0.1 ? (Math.random() - 0.5) * 3 : 0;  // 10% chance of gust
-                isBlizzard = Math.random() < 0.05; // 5% chance for a blizzard
+            // ─────────────────────────────────────────────────────────────────────
+            //  SNOWFLAKE DATA & POOL
+            // ─────────────────────────────────────────────────────────────────────
+            let snowflakes = [];
+            const baseNumFlakes = Math.round(snownumber * devicePerformanceFactor);
+            let snowing = true;
 
-                if (isBlizzard) {
-                    blizzardStrength = (Math.random() - 0.5) * 10; // Blizzard strength range between -5 and 5
-                    targetWind += blizzardStrength;  // Apply blizzard to wind direction and speed                   
-                } else {
-                    blizzardStrength = 0;  // No blizzard, reset strength
+            // Pool to recycle snowflake objects for memory efficiency
+            const snowflakePool = [];
+
+            // ─────────────────────────────────────────────────────────────────────
+            //  LAYER SETUP (DYNAMIC)
+            // ─────────────────────────────────────────────────────────────────────
+            const layers = [
+                { speedMultiplier: 2.0, sizeMultiplier: 1.0, opacity: 1.0 },                
+                { speedMultiplier: 1.6, sizeMultiplier: 0.7, opacity: 0.7 },                                
+                { speedMultiplier: 1.3, sizeMultiplier: 0.5, opacity: 0.5 }
+            ];
+
+            // Randomize layers every 4 seconds
+            setInterval(randomizeLayers, 4000);
+
+            function randomizeLayers() {
+                layers.length = 0;
+
+                // Choose between 1–3 layers randomly (example)
+                const layerCount = 1 + Math.floor(Math.random() * 10);
+                for (let i = 0; i < layerCount; i++) {
+                    layers.push({
+                        speedMultiplier: 1.0 + Math.random() * 3.0,  // [1, 3)
+                        sizeMultiplier: 0.2 + Math.random() * 0.9,   // [0.5, 1)
+                        opacity: 0.1 + Math.random() * 0.9          // [0.3, 1)
+                    });
                 }
 
-                setTimeout(updateWind, 4000); // Update every 4 seconds for smoother transitions
+                // IMPORTANT:
+                // We DO NOT repopulate all flakes.
+                // Existing flakes continue to fall with their old layer properties.
+                // Only future new flakes will adopt the updated layers.
+            }            
+
+            // ─────────────────────────────────────────────────────────────────────
+            //  WIND & BLIZZARD
+            // ─────────────────────────────────────────────────────────────────────
+            let targetWind = 0;
+            let currentWind = 0;
+            let windGustStrength = 0;
+            let isBlizzard = false;
+            let blizzardStrength = 0;
+
+            function updateWind() {
+                targetWind = (Math.random() - 0.5) * 2; // Balanced wind between -1 and +1
+                windGustStrength = Math.random() < 0.3 ? (Math.random() - 0.5) * 3 : 0; // 30% chance of gust
+                isBlizzard = Math.random() < 0.3; // 30% chance for a blizzard
+
+                if (isBlizzard) {
+                    blizzardStrength = (Math.random() - 0.5) * 10; // Blizzard strength between -10 and +10
+                    targetWind += blizzardStrength;
+                } else {
+                    blizzardStrength = 0;
+                }
+
+                // Update wind every 4 seconds
+                setTimeout(updateWind, 4000);
             }
             updateWind();
 
-            // Create a snowflake
+            // ─────────────────────────────────────────────────────────────────────
+            //  CREATE / RECYCLE FLAKES
+            // ─────────────────────────────────────────────────────────────────────
             function createSnowflake() {
                 const depth = Math.random();
-                const layer = Math.floor(Math.random() * layers.length);
+                // Pick a random layer for this flake
+                const layerIndex = Math.floor(Math.random() * layers.length);
+                const layer = layers[layerIndex];
+
+                // In holiday mode, disable melting; otherwise random chance to melt
+                const shouldMelt = holidayMode ? false : Math.random() < 0.5;
+
                 return {
+                    // Position
                     x: Math.random() * (canvas.width / (window.devicePixelRatio || 1)),
                     y: Math.random() * -canvas.height / (window.devicePixelRatio || 1),
-                    radius: (Math.random() * 2 + 1) * layers[layer].sizeMultiplier * (1 + depth),
-                    speedY: (Math.random() * 1.5 + 0.5) * layers[layer].speedMultiplier * (1 + depth),
-                    opacity: Math.min(1, depth + 0.3) * layers[layer].opacity,
-                    drift: (Math.random() - 0.5) * 1.5, // Drift between -0.75 and +0.75 for multi-directional movement
-                    melting: Math.random() < 0.5, // 50% chance to melt
-                    meltRate: Math.random() * 0.005 + 0.001 // Slightly adjusted melting rate
+
+                    // Size / Speed
+                    radius: (Math.random() * 2 + 1) * layer.sizeMultiplier * (1 + depth),
+                    speedY: (Math.random() * 1.5 + 0.5) * layer.speedMultiplier * (1 + depth),
+                    drift: (Math.random() - 0.5) * 1.5,
+
+                    // Visual
+                    opacity: Math.min(1, depth + 0.3) * layer.opacity,
+
+                    // Melting properties
+                    melting: shouldMelt,
+                    meltRate: Math.random() * 0.005 + 0.001 // fade speed
                 };
             }
 
-            // Retrieve a snowflake from the pool or create a new one
             function getSnowflake() {
-                return snowflakePool.length > 0 ? snowflakePool.pop() : createSnowflake();
+                if (snowflakePool.length > 0) {
+                    const flake = snowflakePool.pop();
+                    Object.assign(flake, createSnowflake());
+                    return flake;
+                } else {
+                    return createSnowflake();
+                }
             }
 
-            // Recycle a snowflake back to the pool
             function recycleSnowflake(flake) {
                 snowflakePool.push(flake);
             }
 
-            // Initialize snowflakes
+            // ─────────────────────────────────────────────────────────────────────
+            //  INITIAL POPULATION
+            // ─────────────────────────────────────────────────────────────────────
             function populateSnowflakes() {
-                snowflakes = [];
+                snowflakes.length = 0;
                 for (let i = 0; i < baseNumFlakes; i++) {
                     snowflakes.push(getSnowflake());
                 }
             }
             populateSnowflakes();
 
-            // Interaction parameters
-            const interactionRadius = 150; // Pixels
-            const interactionStrength = 0.9; // Adjust for repulsion intensity
-
-            // Initialize mouse position
+            // ─────────────────────────────────────────────────────────────────────
+            //  MOUSE INTERACTION
+            // ─────────────────────────────────────────────────────────────────────
+            const interactionRadius = 250;
+            const interactionStrength = 0.9;
             let mouseX = null;
             let mouseY = null;
 
-            // Update mouse position on mouse move
-            window.addEventListener('mousemove', (event) => {
+            window.addEventListener("mousemove", (event) => {
                 const rect = canvas.getBoundingClientRect();
                 mouseX = (event.clientX - rect.left) * (canvas.width / rect.width) / (window.devicePixelRatio || 1);
                 mouseY = (event.clientY - rect.top) * (canvas.height / rect.height) / (window.devicePixelRatio || 1);
             });
 
-            // Reset mouse position when the mouse leaves the window
-            window.addEventListener('mouseout', () => {
+            window.addEventListener("mouseout", () => {
                 mouseX = null;
                 mouseY = null;
             });
 
-            // Gust parameters
+            // ─────────────────────────────────────────────────────────────────────
+            //  GUST ON CLICK
+            // ─────────────────────────────────────────────────────────────────────
             let gustWind = 0;
             let gustDuration = 0;
 
-            // Add event listener for mouse clicks to create gusts
-            window.addEventListener('click', () => {
-                gustWind = (Math.random() - 0.5) * 5; // Random wind direction and strength
-                gustDuration = 50; // Duration in milliseconds
+            window.addEventListener("click", () => {
+                gustWind = (Math.random() - 0.5) * 2;
+                gustDuration = 750; // ~750 frames
             });
 
-            // Render the snowflakes efficiently
+            // ─────────────────────────────────────────────────────────────────────
+            //  STOP LOGIC (IF NOT HOLIDAY MODE)
+            // ─────────────────────────────────────────────────────────────────────
+            if (!holidayMode) {
+                const stopTime = Math.random() * 7 + 2; // 5-15 seconds
+                setTimeout(() => {
+                    snowing = false;
+                }, stopTime * 1000);
+            }
+
+            // ─────────────────────────────────────────────────────────────────────
+            //  RENDER LOOP
+            // ─────────────────────────────────────────────────────────────────────
             function renderSnowfall() {
+                // If we're no longer snowing, let's see if we should remove the canvas
+                if (!snowing && snowflakes.length === 0) {
+                    // Remove the canvas from DOM if no flakes left
+                    if (canvas.parentNode) {
+                        canvas.parentNode.removeChild(canvas);
+                    }
+                    return;
+                }
+
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-                // Smooth wind transition using LERP
-                currentWind += (targetWind - currentWind) * 0.01; // Adjust factor for smoother transitions
+                // Smoothly move currentWind to targetWind
+                currentWind += (targetWind - currentWind) * 0.01;
 
                 // Apply gust wind
                 if (gustDuration > 0) {
                     currentWind += gustWind;
-                    gustDuration -= 16; // Approximate frame duration (~60fps)
+                    gustDuration -= 16; // ~16ms per frame @ ~60fps
                 } else {
                     gustWind = 0;
                 }
 
                 ctx.fillStyle = "white";
 
-                // Iterate through snowflakes in reverse for efficient removal
+                // Traverse from the end for efficient removal
                 for (let i = snowflakes.length - 1; i >= 0; i--) {
                     const flake = snowflakes[i];
 
-                    // Update positions
+                    // Move the flake
                     flake.x += currentWind + flake.drift;
                     flake.y += flake.speedY;
 
-                    // Interaction: Repel snowflakes from mouse cursor
-                    // Interaction: Attract snowflakes towards mouse cursor
+                    // Melting (if holidayMode=false and flake is set to melt)
+                    if (!holidayMode && flake.melting) {
+                        flake.opacity -= flake.meltRate;
+                    }
+
+                    // Mouse interaction
                     if (mouseX !== null && mouseY !== null) {
                         const dx = mouseX - flake.x;
                         const dy = mouseY - flake.y;
                         const distance = Math.sqrt(dx * dx + dy * dy);
                         if (distance < interactionRadius) {
-                            const normalizedDistance = distance === 0 ? 1 : distance;
                             const force = (interactionRadius - distance) / interactionRadius * interactionStrength;
-                            flake.x += (dx / normalizedDistance) * force;
-                            flake.y += (dy / normalizedDistance) * force;
+                            if (distance !== 0) {
+                                flake.x += (dx / distance) * force;
+                                flake.y += (dy / distance) * force;
+                            }
                         }
                     }
 
+                    // Off-screen checks
+                    const offScreen = flake.y > (canvas.height / (window.devicePixelRatio || 1));
+                    const invisible = flake.opacity <= 0;
+                    const outOfBoundsLeft = flake.x < -flake.radius;
+                    const outOfBoundsRight = flake.x > (window.innerWidth + flake.radius);
 
-                    // Simulate melting
-                    if (flake.melting) flake.opacity -= flake.meltRate;
-
-                    // Remove snowflakes that fade or leave the screen
-                    if (flake.y > (canvas.height / (window.devicePixelRatio || 1)) || flake.opacity <= 0 || flake.x < -flake.radius || flake.x > window.innerWidth + flake.radius) {
+                    if (offScreen || invisible || outOfBoundsLeft || outOfBoundsRight) {
                         snowflakes.splice(i, 1);
                         recycleSnowflake(flake);
-                        if (snowing && snowflakes.length < baseNumFlakes) {
+
+                        // If still snowing (or holidayMode), maintain flake count
+                        if ((snowing || holidayMode) && snowflakes.length < baseNumFlakes) {
                             snowflakes.push(getSnowflake());
                         }
                         continue;
                     }
 
-                    // Draw snowflake
+                    // Draw flake
                     ctx.globalAlpha = flake.opacity;
                     ctx.beginPath();
                     ctx.arc(flake.x, flake.y, flake.radius, 0, Math.PI * 2);
                     ctx.fill();
                 }
 
-                ctx.globalAlpha = 1; // Reset alpha for any other drawings
+                ctx.globalAlpha = 1;
 
-                if (snowflakes.length > 0 || snowing) {
+                // Continue animating if holidayMode or if still snowing or if flakes remain
+                if (holidayMode || snowing || snowflakes.length > 0) {
                     requestAnimationFrame(renderSnowfall);
                 } else {
-                    document.body.removeChild(canvas);
+                    // Stop if ended and no flakes left
+                    if (canvas.parentNode) {
+                        canvas.parentNode.removeChild(canvas);
+                    }
                 }
             }
 
-            // Start snowfall and stop it after a duration
+            // ─────────────────────────────────────────────────────────────────────
+            //  START SNOWFALL
+            // ─────────────────────────────────────────────────────────────────────
             window.addEventListener("load", () => {
                 document.body.appendChild(canvas);
                 renderSnowfall();
-
-                // Stop generating new snowflakes after 5-15 seconds
-                const stopTime = Math.random() * 5 + 10;
-                setTimeout(() => {
-                    snowing = false;
-                }, stopTime * 1000);
             });
         })();
+
+
+
 
 
 
