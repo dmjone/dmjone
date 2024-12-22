@@ -417,3 +417,38 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
+
+/********* Apply seasonal Greetings **********/
+document.addEventListener("DOMContentLoaded", () => {
+    const greetingsDiv = document.getElementById("seasonal-greetings");
+
+    // Map of dates to image sources (format: 'MM-DD': 'image-path')
+    const dateToImageMap = {
+        "01-01": { src: "//cdn.dmj.one/img/hny.webp", alt: "Happy New Year" },                                
+        "12-25": { src: "//cdn.dmj.one/img/xmas.webp", alt: "Merry Christmas" },        
+        "01-07": { src: "//cdn.dmj.one/img/xmas.webp", alt: "Merry Christmas" },
+        // Add more dates and image data as needed
+    };
+
+    // Get today's date in 'MM-DD' format
+    const today = new Date();
+    const formattedDate = today.toISOString().slice(5, 10);
+
+    // Check if today's date has a mapped image
+    if (dateToImageMap[formattedDate]) {
+        const { src, alt } = dateToImageMap[formattedDate];
+
+        // Create the <img> tag
+        const imgTag = document.createElement("img");
+        imgTag.className = "img-fluid";
+        imgTag.src = src;
+        imgTag.alt = alt;
+        imgTag.style = "width: 100%; height: auto; margin-top: -10vh;";
+
+        // Insert the <img> tag into the div
+        greetingsDiv.appendChild(imgTag);
+
+        // Remove the d-none class to make the div visible
+        greetingsDiv.classList.remove("d-none");
+    }
+});
