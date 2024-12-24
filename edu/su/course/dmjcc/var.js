@@ -76,8 +76,64 @@ function get_menu_list(datetogen) {
                 link: "homework-assignment-1"
             },            
             {
-                 
-             }
+                title: "Gossip Protocol",
+                desc: "Learn about the Gossip Protocol, a communication algorithm used in distributed systems to disseminate information efficiently. This section explores the key features and benefits of the Gossip Protocol, including scalability, fault tolerance, and eventual consistency. Click to access the theory section and deepen your understanding of the Gossip Protocol and its applications in distributed systems.",
+                codetype: "Concepts",
+                readtime: 5,
+                link: "gossip-protocol"
+            },
+            {
+                title: "Membership Protocol",
+                desc: "Explore the Membership Protocol, a distributed systems algorithm used to maintain group membership and detect failures. This section examines the key features and benefits of the Membership Protocol, including scalability, fault tolerance, and dynamic membership management. Click to access the theory section and enhance your understanding of the Membership Protocol and its applications in distributed systems.",
+                codetype: "Concepts",
+                readtime: 5,
+                link: "membership-protocol"
+            },
+            {
+                title: "Grids",
+                desc: "Learn about Grid Computing, a distributed computing model that enables the sharing and aggregation of computational resources. This section explores the key features and benefits of Grid Computing, including resource pooling, workload balancing, and virtualization. Click to access the theory section and deepen your understanding of Grid Computing and its applications in distributed systems.",
+                codetype: "Concepts",
+                readtime: 5,
+                link: "grids"
+            },
+            {
+                title: "Challenging Brainstorming Homework: Multidisciplinary Grid and Gossip-Based Distributed Systems Design",
+                desc: "Engage in a challenging brainstorming exercise to design multidisciplinary grid and gossip-based distributed systems. This homework assignment will test your creativity and problem-solving skills as you explore innovative solutions to real-world challenges. Click to access the assignment and demonstrate your ability to design complex distributed systems using grid and gossip-based algorithms.",
+                codetype: "Assignment",
+                readtime: 1,
+                link: "homework-assignment-2"
+            }
+            // {
+            //     title: "Distributed Hash Table (DHT)",
+            //     desc: "Learn about the Distributed Hash Table (DHT), a distributed systems data structure used to store and retrieve key-value pairs. This section explores the key features and benefits of DHTs, including decentralized storage, fault tolerance, and efficient key lookup. Click to access the theory section and deepen your understanding of DHTs and their applications in distributed systems.",
+            //     codetype: "Concepts",
+            //     readtime: 5,
+            //     link: "distributed-hash-table"
+            // },
+            // {
+            //     title: "Distributed File Systems",
+            //     desc: "Explore Distributed File Systems, a distributed systems architecture that enables the storage and retrieval of files across multiple nodes. This section examines the key features and benefits of Distributed File Systems, including fault tolerance, scalability, and data redundancy. Click to access the theory section and enhance your understanding of Distributed File Systems and their applications in distributed computing.",
+            //     codetype: "Concepts",
+            //     readtime: 5,
+            //     link: "distributed-file-systems"
+            // },
+            // {
+            //     title: "Consistent Hashing",
+            //     desc: "Learn about Consistent Hashing, a distributed systems algorithm used to map keys to nodes in a consistent and efficient manner. This section explores the key features and benefits of Consistent Hashing, including load balancing, fault tolerance, and data replication. Click to access the theory section and deepen your understanding of Consistent Hashing and its applications in distributed systems.",
+            //     codetype: "Concepts",
+            //     readtime: 5,
+            //     link: "consistent-hashing"
+            // },
+            // {
+            //     title: "Paxos Algorithm",
+            //     desc: "Explore the Paxos Algorithm, a distributed systems consensus protocol used to achieve agreement among a group of nodes. This section examines the key features and benefits of the Paxos Algorithm, including fault tolerance, safety, and liveness properties. Click to access the theory section and enhance your understanding of the Paxos Algorithm and its applications in distributed systems.",
+            //     codetype: "Concepts",
+            //     readtime: 5,
+            //     link: "paxos-algorithm"
+            // },
+            // {
+            //     title: "Raft Consensus Algorithm",
+            //     desc: "Learn about the Raft Consensus Algorithm, a distributed systems consensus protocol designed for ease of understanding and implementation. This section explores the key features and benefits of the Raft Algorithm, including leader election, log replication,
         ];
         body_genmenu.processData(arr, def_date, def_author);
     }
