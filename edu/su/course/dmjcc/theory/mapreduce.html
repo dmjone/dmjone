@@ -1,0 +1,191 @@
+<!-------------------------- © 2007 - present, dmj.one and contributors. ----------------------------------
+   Part of the dmjone project. Licensed under the GNU AGPL. Provided as-is, without warranty of any kind. 
+-------------------- Redistribution and modifications must retain this notice. --------------------------->
+
+
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+    <!--<![endif]-->
+
+    <head>
+        <script src="/js/edu_su_common.js"></script>
+        <noscript>
+            <style>
+                html,
+                body {
+                    margin: 0;
+                    overflow: hidden;
+                }
+            </style>
+            <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+        </noscript>
+
+        <title>MapReduce - DMJCC - dmj.one</title>
+        <meta name="description" content="Know what is MapReduce and how it works.">
+
+        <meta property="og:image" content="/logo.png">
+        <meta property="og:type" content="article">
+
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:site" content="@divyamohan1993">
+        <meta name="twitter:creator" content="@divyamohan1993">
+        <meta name="twitter:image" content="/logo.png">
+
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+        <meta name="author" content="Divya Mohan">
+        <meta name="robots" content="index, follow">
+
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js" integrity="sha512-sHSNLECRJSK+BFs7E8DiFc6pf6n90bLI85Emiw1jhreduZhK3VXgq9l4kAt9eTIHYAcuQBKHL01QKs4/3Xgl8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js" integrity="sha512-iWiuBS5nt6r60fCz26Nd0Zqe0nbk1ZTIQbl3Kv7kYsX+yKMUFHzjaH2+AnM6vp2Xs+gNmaBAVWJjSmuPw76Efg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                renderMathInElement(document.body, {
+                    // customised options
+                    // • auto-render specific keys, e.g.:
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false },
+                        { left: '\\(', right: '\\)', display: false },
+                        { left: '\\[', right: '\\]', display: true }
+                    ],
+                    // • rendering keys, e.g.:
+                    throwOnError: false
+                });
+            });
+        </script> -->
+
+        <!-- <style>
+            main ul {
+                list-style-type: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            main ul li {
+                margin: 0;
+                padding: 0;
+            }
+        </style> -->
+
+    </head>
+
+    <body>
+
+        <script> header_author("lakshika"); </script>
+
+        <main>
+            <article class="agen-tableofcontents">
+                <h2 class="text-center">
+                    MapReduce
+                </h2>
+                <div class="d-none contentdate">2024, December 24</div>
+            </article>
+
+            <article>
+                <h3>1. What is MapReduce?</h3>
+                <p>MapReduce is a programming model and a scalable processing technique designed for handling large datasets. It is used primarily in distributed systems, such as Hadoop, to process and generate massive amounts of data in parallel across clusters of computers.</p>
+
+                <h4>1.1 Key Concepts</h4>
+                <ul>
+                    <li><strong>Map</strong>: Divides input data into smaller, manageable sub-tasks, processes them, and produces intermediate key-value pairs.</li>
+                    <li><strong>Reduce</strong>: Aggregates the intermediate key-value pairs produced by the Map phase to generate final results.</li>
+                    <li><strong>Parallelism</strong>: The process executes tasks in parallel on multiple nodes for faster computation.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>2. How is MapReduce Used?</h3>
+
+                <h4>2.1 Workflow</h4>
+                <p>The execution of a MapReduce program involves the following steps:</p>
+                <ol>
+                    <li><strong>Input Splitting</strong>: The input dataset is divided into chunks, each of which is processed independently.</li>
+                    <li><strong>Mapping</strong>: The <code>Mapper</code> function processes each input split and emits intermediate key-value pairs.</li>
+                    <li><strong>Shuffling and Sorting</strong>: The intermediate key-value pairs are grouped by key. This step is managed by the system.</li>
+                    <li><strong>Reducing</strong>: The <code>Reducer</code> function processes grouped data to produce the final output.</li>
+                    <li><strong>Output</strong>: The results are stored in a specified format, typically in distributed storage systems like HDFS.</li>
+                </ol>
+
+                <h4>2.2 Implementation</h4>
+                <p>Here is an example of a simple MapReduce implementation for counting word occurrences:</p>
+                <pre><code class="language-java">// Mapper Class
+public static class MapClass extends MapReduceBase 
+  implements Mapper<LongWritable, Text, Text, IntWritable> {
+  private final static IntWritable one = new IntWritable(1);
+  private Text word = new Text();
+
+  public void map(LongWritable key, Text value, 
+      OutputCollector<Text, IntWritable> output, Reporter reporter) 
+      throws IOException {
+    String line = value.toString();
+    StringTokenizer itr = new StringTokenizer(line);
+    while (itr.hasMoreTokens()) {
+      word.set(itr.nextToken());
+      output.collect(word, one);
+    }
+  }
+}
+
+// Reducer Class
+public static class ReduceClass extends MapReduceBase 
+  implements Reducer<Text, IntWritable, Text, IntWritable> {
+  public void reduce(Text key, Iterator<IntWritable> values, 
+      OutputCollector<Text, IntWritable> output, Reporter reporter) 
+      throws IOException {
+    int sum = 0;
+    while (values.hasNext()) {
+      sum += values.next().get();
+    }
+    output.collect(key, new IntWritable(sum));
+  }
+}
+
+// Driver Code
+public void run(String inputPath, String outputPath) throws Exception {
+  JobConf conf = new JobConf(WordCount.class);
+  conf.setJobName("wordcount");
+
+  conf.setOutputKeyClass(Text.class);
+  conf.setOutputValueClass(IntWritable.class);
+
+  conf.setMapperClass(MapClass.class);
+  conf.setReducerClass(ReduceClass.class);
+
+  FileInputFormat.addInputPath(conf, new Path(inputPath));
+  FileOutputFormat.setOutputPath(conf, new Path(outputPath));
+  JobClient.runJob(conf);
+}
+</code></pre>
+            </article>
+
+            <article>
+                <h3>3. Why is MapReduce Used?</h3>
+
+                <h4>3.1 Advantages</h4>
+                <ul>
+                    <li><strong>Scalability</strong>: Processes petabytes of data across a distributed cluster.</li>
+                    <li><strong>Fault Tolerance</strong>: Handles node failures by reassigning failed tasks to other nodes.</li>
+                    <li><strong>Simplicity</strong>: Allows developers to focus on logic while the system manages underlying complexity.</li>
+                    <li><strong>Cost-Effective</strong>: Leverages commodity hardware for large-scale data processing.</li>
+                </ul>
+
+                <h4>3.2 Use Cases</h4>
+                <ul>
+                    <li><strong>Data Analytics</strong>: Processes logs, customer data, and social media trends.</li>
+                    <li><strong>Search Engine Indexing</strong>: Builds and updates indexes for web search engines.</li>
+                    <li><strong>Machine Learning</strong>: Performs distributed training and analysis of datasets.</li>
+                    <li><strong>ETL Processes</strong>: Extract, transform, and load large datasets for data warehousing.</li>
+                </ul>
+            </article>
+
+        </main>
+
+        <script> copyright("all"); </script>
+
+    </body>
+
+</html>

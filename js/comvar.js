@@ -50,6 +50,11 @@ const arr_author = {
         bio: "<p class='studentauthorbio header-p-author-description'>Rijul Chaudhary is a dedicated student from India, currently studying for his Bachelor's degree in Computer Science and Engineering at Shoolini University. Rijul has a keen interest in software development and is passionate about using his programming skills to create innovative solutions that address real-world challenges.</p>",
         href: "contact@dmj.one"
     },
+    lakshika: {
+        name: "Lakshika Tanwar",
+        bio: "<p class='studentauthorbio header-p-author-description'>Lakshika Tanwar is a B.Tech Computer Science (Cloud Computing) student at Shoolini University, India and an exchange student at NQU, Taiwan. As a contributor to dmj.one, she helps advance the platform's mission of accessible education. Skilled in Python, Java, Google Cloud, and AWS, she aspires to become a successful businesswoman while embracing challenges as opportunities.</p>",
+        href: "lakshikatanwar99@gmail.com"
+    }
 
 };
 
@@ -633,6 +638,7 @@ const courseDetailsMap = {
         'default': ["Dr. Piyush Sewal", "CSU1899", "Ethical Hacking"],
         'lab': ["Dr. Piyush Sewal", "CSU1899P", "Ethical Hacking Lab"]
     },
+    'dmjcc': { 'default': ["Divya Mohan", "DMJCC", "Cloud Computing Concepts"]},
     
 };
 
