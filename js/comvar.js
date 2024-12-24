@@ -638,7 +638,7 @@ const courseDetailsMap = {
         'default': ["Dr. Piyush Sewal", "CSU1899", "Ethical Hacking"],
         'lab': ["Dr. Piyush Sewal", "CSU1899P", "Ethical Hacking Lab"]
     },
-    'dmjcc': { 'default': ["Divya Mohan", "DMJCC", "Cloud Computing Concepts"]},
+    'dmjcclt': { 'default': ["Divya Mohan", "DMJCCLT", "Cloud Computing Concepts by Lakshika Tanwar"] },
     
 };
 

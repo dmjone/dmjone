@@ -6,7 +6,7 @@ function get_menu_list(datetogen) {
                 link: "theory/",
                 title: "Theory: Cloud Computing Concepts",
                 desc: "Explore the fundamental concepts of cloud computing, including cloud service models, deployment models, and key characteristics. This section provides an in-depth overview of cloud computing principles, enabling you to understand the benefits, challenges, and applications of cloud technology. Click to access the theory section and enhance your knowledge of cloud computing concepts.",
-                codetype: "DMJCC | Cloud Computing",                                
+                codetype: "DMJCCLT | Cloud Computing",
             },
             // {
             //     link: "lab/",
@@ -32,7 +32,7 @@ function get_menu_list(datetogen) {
                 codetype: "Concepts",
                 readtime: 5,
                 link: "what-is-cloud-computing"
-            },              
+            },
             {
                 title: "Cloud Service Models",
                 desc: "Learn about the different cloud service models, including Infrastructure as a Service (IaaS), Platform as a Service (PaaS), and Software as a Service (SaaS). This section explores the key features and use cases of each service model, helping you understand how cloud services are delivered and consumed. Click to access the theory section and deepen your knowledge of cloud service models.",
@@ -74,7 +74,7 @@ function get_menu_list(datetogen) {
                 codetype: "Assignment",
                 readtime: 1,
                 link: "homework-assignment-1"
-            },            
+            },
             {
                 title: "Gossip Protocol",
                 desc: "Learn about the Gossip Protocol, a communication algorithm used in distributed systems to disseminate information efficiently. This section explores the key features and benefits of the Gossip Protocol, including scalability, fault tolerance, and eventual consistency. Click to access the theory section and deepen your understanding of the Gossip Protocol and its applications in distributed systems.",
@@ -152,8 +152,8 @@ function get_menu_list(datetogen) {
                 codetype: "Installation",
                 readtime: 2,
                 date: "Wed February 07, 2024",
-                link: "installing-virtualbox"              
-            },                    
+                link: "installing-virtualbox"
+            },
         ];
         body_genmenu.processData(arr, def_date, def_author);
     }
