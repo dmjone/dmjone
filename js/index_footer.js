@@ -419,7 +419,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 /********* Apply seasonal Greetings **********/
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", function() {
     const greetingsDiv = document.getElementById("seasonal-greetings");
 
     // Map of dates to image sources (format: 'MM-DD': 'image-path')
@@ -432,7 +432,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Get today's date in 'MM-DD' format
     const today = new Date();
-    const formattedDate = today.toISOString().slice(5, 10);
+    //const formattedDate = today.toISOString().slice(5, 10);
+    const formattedDate = `${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 
     // Check if today's date has a mapped image
     if (dateToImageMap[formattedDate]) {
