@@ -55,6 +55,13 @@ function get_menu_list(datetogen) {
                 link: "mapreduce"
             },
             {
+                title: "Case Study: Integration of Cloud Computing Paradigms in Modern Distributed Systems",
+                desc: "Explore a case study on the integration of cloud computing paradigms in modern distributed systems. This section examines real-world examples of cloud computing applications and their impact on distributed systems architecture. Click to access the case study and learn how cloud computing is transforming the way we design and deploy distributed systems.",
+                codetype: "Case Study",
+                readtime: 5,
+                link: "case-study-integration-cloud-computing-paradigms"
+            },
+            {
                 title: "Homework Assignment 1: Real-World Cloud Computing and Distributed Systems Challenge",
                 desc: "Apply your knowledge of cloud computing and distributed systems to solve a real-world challenge. This homework assignment will test your understanding of key concepts, including cloud service models, MapReduce, and distributed computing principles. Click to access the assignment and demonstrate your proficiency in cloud computing and distributed systems.",
                 codetype: "Assignment",
