@@ -55,6 +55,13 @@ function get_menu_list(datetogen) {
                 link: "mapreduce"
             },
             {
+                title: "MapReduce - What, How and Why",
+                desc: "Explore the MapReduce programming model and its applications in distributed computing environments with questions like What, How and Why.",
+                codetype: "Concepts",
+                readtime: 5,
+                link: "mapreduce-what-how-why"
+            },
+            {
                 title: "Case Study: Integration of Cloud Computing Paradigms in Modern Distributed Systems",
                 desc: "Explore a case study on the integration of cloud computing paradigms in modern distributed systems. This section examines real-world examples of cloud computing applications and their impact on distributed systems architecture. Click to access the case study and learn how cloud computing is transforming the way we design and deploy distributed systems.",
                 codetype: "Case Study",

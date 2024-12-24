@@ -86,40 +86,22 @@
             </article>
 
             <article>
-                <h3>1. What is MapReduce?</h3>
-                <p>MapReduce is a programming model and a scalable processing technique designed for handling large datasets. It is used primarily in distributed systems, such as Hadoop, to process and generate massive amounts of data in parallel across clusters of computers.</p>
-
-                <h4>1.1 Key Concepts</h4>
-                <ul>
-                    <li><strong>Map</strong>: Divides input data into smaller, manageable sub-tasks, processes them, and produces intermediate key-value pairs.</li>
-                    <li><strong>Reduce</strong>: Aggregates the intermediate key-value pairs produced by the Map phase to generate final results.</li>
-                    <li><strong>Parallelism</strong>: The process executes tasks in parallel on multiple nodes for faster computation.</li>
-                </ul>
+                <h3>1. Introduction to MapReduce</h3>
+                <p>MapReduce is a programming model used to process and generate large datasets across a distributed system. It simplifies parallel computation by abstracting the processing into two primary functions: <strong>Map</strong> and <strong>Reduce</strong>.</p>
             </article>
 
             <article>
-                <h3>2. How is MapReduce Used?</h3>
+                <h3>2. Core Components of MapReduce</h3>
 
-                <h4>2.1 Workflow</h4>
-                <p>The execution of a MapReduce program involves the following steps:</p>
-                <ol>
-                    <li><strong>Input Splitting</strong>: The input dataset is divided into chunks, each of which is processed independently.</li>
-                    <li><strong>Mapping</strong>: The <code>Mapper</code> function processes each input split and emits intermediate key-value pairs.</li>
-                    <li><strong>Shuffling and Sorting</strong>: The intermediate key-value pairs are grouped by key. This step is managed by the system.</li>
-                    <li><strong>Reducing</strong>: The <code>Reducer</code> function processes grouped data to produce the final output.</li>
-                    <li><strong>Output</strong>: The results are stored in a specified format, typically in distributed storage systems like HDFS.</li>
-                </ol>
-
-                <h4>2.2 Implementation</h4>
-                <p>Here is an example of a simple MapReduce implementation for counting word occurrences:</p>
-                <pre><code class="language-java">// Mapper Class
+                <h4>2.1 Map Function</h4>
+                <p>The Map function processes input data, line by line, and outputs key-value pairs. Each line of input data is parsed, and meaningful keys and values are generated for further processing.</p>
+                <pre><code class="language-java">
 public static class MapClass extends MapReduceBase 
-  implements Mapper<LongWritable, Text, Text, IntWritable> {
+ implements Mapper<LongWritable, Text, Text, IntWritable> {
   private final static IntWritable one = new IntWritable(1);
   private Text word = new Text();
 
-  public void map(LongWritable key, Text value, 
-      OutputCollector<Text, IntWritable> output, Reporter reporter) 
+  public void map(LongWritable key, Text value, OutputCollector<Text, IntWritable> output, Reporter reporter) 
       throws IOException {
     String line = value.toString();
     StringTokenizer itr = new StringTokenizer(line);
@@ -129,12 +111,14 @@ public static class MapClass extends MapReduceBase
     }
   }
 }
+</code></pre>
 
-// Reducer Class
+                <h4>2.2 Reduce Function</h4>
+                <p>The Reduce function aggregates values associated with a common key. It takes the intermediate key-value pairs from the Map phase and combines the values for each key to produce the final result.</p>
+                <pre><code class="language-java">
 public static class ReduceClass extends MapReduceBase 
-  implements Reducer<Text, IntWritable, Text, IntWritable> {
-  public void reduce(Text key, Iterator<IntWritable> values, 
-      OutputCollector<Text, IntWritable> output, Reporter reporter) 
+ implements Reducer<Text, IntWritable, Text, IntWritable> {
+  public void reduce(Text key, Iterator<IntWritable> values, OutputCollector<Text, IntWritable> output, Reporter reporter) 
       throws IOException {
     int sum = 0;
     while (values.hasNext()) {
@@ -143,42 +127,76 @@ public static class ReduceClass extends MapReduceBase
     output.collect(key, new IntWritable(sum));
   }
 }
+</code></pre>
+            </article>
 
-// Driver Code
-public void run(String inputPath, String outputPath) throws Exception {
-  JobConf conf = new JobConf(WordCount.class);
-  conf.setJobName("wordcount");
+            <article>
+                <h3>3. MapReduce Workflow</h3>
+                <h4>3.1 Input Data</h4>
+                <p>Data is stored in the form of key-value pairs, which are processed line by line during the Map phase.</p>
 
-  conf.setOutputKeyClass(Text.class);
-  conf.setOutputValueClass(IntWritable.class);
+                <h4>3.2 Execution Phases</h4>
+                <ul>
+                    <li><strong>Map Phase:</strong> Transforms input data into intermediate key-value pairs.</li>
+                    <li><strong>Shuffle and Sort:</strong> Groups intermediate pairs by key.</li>
+                    <li><strong>Reduce Phase:</strong> Aggregates values of each grouped key to produce the output.</li>
+                </ul>
 
-  conf.setMapperClass(MapClass.class);
-  conf.setReducerClass(ReduceClass.class);
+                <h4>3.3 Example</h4>
+                <p>For a word count problem, the Map function outputs <code>(word, 1)</code> for each word, and the Reduce function sums up counts for each unique word.</p>
+            </article>
 
-  FileInputFormat.addInputPath(conf, new Path(inputPath));
-  FileOutputFormat.setOutputPath(conf, new Path(outputPath));
-  JobClient.runJob(conf);
+            <article>
+                <h3>4. Practical Applications of MapReduce</h3>
+                <ul>
+                    <li><strong>Web Indexing:</strong> Search engines use MapReduce for indexing web pages.</li>
+                    <li><strong>Log Analysis:</strong> Processing large-scale server logs to identify patterns.</li>
+                    <li><strong>Data Mining:</strong> Analyzing massive datasets for trends and insights.</li>
+                    <li><strong>Social Network Analysis:</strong> Identifying mutual connections in networks like Twitter or Facebook.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>5. Sample Use Case: Mutual Followers</h3>
+                <h4>5.1 Problem Statement</h4>
+                <p>Given a dataset of user relationships <code>(a, b)</code>, where <code>a</code> follows <code>b</code>, find all pairs of users who mutually follow each other.</p>
+
+                <h4>5.2 Map Function</h4>
+                <pre><code class="language-java">
+public void map(LongWritable key, Text value, OutputCollector<Text, IntWritable> output, Reporter reporter) 
+    throws IOException {
+  String line = value.toString();
+  String[] users = line.split(",");
+  if (users[0].compareTo(users[1]) < 0) {
+    output.collect(new Text("(" + users[0] + "," + users[1] + ")"), new IntWritable(1));
+  } else {
+    output.collect(new Text("(" + users[1] + "," + users[0] + ")"), new IntWritable(1));
+  }
+}
+</code></pre>
+
+                <h4>5.3 Reduce Function</h4>
+                <pre><code class="language-java">
+public void reduce(Text key, Iterator<IntWritable> values, OutputCollector<Text, IntWritable> output, Reporter reporter) 
+    throws IOException {
+  int count = 0;
+  while (values.hasNext()) {
+    count += values.next().get();
+  }
+  if (count == 2) {
+    output.collect(key, new IntWritable(count));
+  }
 }
 </code></pre>
             </article>
 
             <article>
-                <h3>3. Why is MapReduce Used?</h3>
-
-                <h4>3.1 Advantages</h4>
+                <h3>6. Key Features of MapReduce</h3>
                 <ul>
-                    <li><strong>Scalability</strong>: Processes petabytes of data across a distributed cluster.</li>
-                    <li><strong>Fault Tolerance</strong>: Handles node failures by reassigning failed tasks to other nodes.</li>
-                    <li><strong>Simplicity</strong>: Allows developers to focus on logic while the system manages underlying complexity.</li>
-                    <li><strong>Cost-Effective</strong>: Leverages commodity hardware for large-scale data processing.</li>
-                </ul>
-
-                <h4>3.2 Use Cases</h4>
-                <ul>
-                    <li><strong>Data Analytics</strong>: Processes logs, customer data, and social media trends.</li>
-                    <li><strong>Search Engine Indexing</strong>: Builds and updates indexes for web search engines.</li>
-                    <li><strong>Machine Learning</strong>: Performs distributed training and analysis of datasets.</li>
-                    <li><strong>ETL Processes</strong>: Extract, transform, and load large datasets for data warehousing.</li>
+                    <li><strong>Scalability:</strong> Processes large datasets using distributed computing.</li>
+                    <li><strong>Fault Tolerance:</strong> Automatically handles failures during computation.</li>
+                    <li><strong>Data Locality:</strong> Processes data close to its storage location, reducing I/O.</li>
+                    <li><strong>Simplicity:</strong> Abstracts parallel programming complexities for developers.</li>
                 </ul>
             </article>
 
