@@ -1,0 +1,1107 @@
+<!-------------------------- © 2007 - present, dmj.one and contributors. ----------------------------------
+   Part of the dmjone project. Licensed under the GNU AGPL. Provided as-is, without warranty of any kind. 
+-------------------- Redistribution and modifications must retain this notice. --------------------------->
+
+
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+    <!--<![endif]-->
+
+    <head>
+        <script src="/js/edu_su_common.js"></script>
+        <noscript>
+            <style>
+                html,
+                body {
+                    margin: 0;
+                    overflow: hidden;
+                }
+            </style>
+            <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+        </noscript>
+
+        <title>Review of Concepts - DMJCCLT - dmj.one</title>
+        <meta name="description" content="Review of Concepts of Key Value Stores and Time and Ordering in Distributed Systems - DMJCCLT - Provided by dmj.one">
+
+        <meta property="og:image" content="/logo.png">
+        <meta property="og:type" content="article">
+
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:site" content="@divyamohan1993">
+        <meta name="twitter:creator" content="@divyamohan1993">
+        <meta name="twitter:image" content="/logo.png">
+
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+        <meta name="author" content="Divya Mohan">
+        <meta name="robots" content="index, follow">
+
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js" integrity="sha512-sHSNLECRJSK+BFs7E8DiFc6pf6n90bLI85Emiw1jhreduZhK3VXgq9l4kAt9eTIHYAcuQBKHL01QKs4/3Xgl8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js" integrity="sha512-iWiuBS5nt6r60fCz26Nd0Zqe0nbk1ZTIQbl3Kv7kYsX+yKMUFHzjaH2+AnM6vp2Xs+gNmaBAVWJjSmuPw76Efg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                renderMathInElement(document.body, {
+                    // customised options
+                    // • auto-render specific keys, e.g.:
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false },
+                        { left: '\\(', right: '\\)', display: false },
+                        { left: '\\[', right: '\\]', display: true }
+                    ],
+                    // • rendering keys, e.g.:
+                    throwOnError: false
+                });
+            });
+        </script> -->
+
+        <!-- <style>
+            main ul {
+                list-style-type: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            main ul li {
+                margin: 0;
+                padding: 0;
+            }
+        </style> -->
+
+    </head>
+
+    <body>
+
+        <script> header_author("lakshika"); </script>
+
+        <main>
+            <article class="agen-tableofcontents">
+                <h2 class="text-center">
+                    Review of Concepts of Key Value Stores and Time and Ordering in Distributed Systems
+                </h2>
+                <div class="d-none contentdate">2024, December 26</div>
+            </article>
+
+            <article>
+                <h3>1. Why Are Key-Value/NoSQL Systems Popular Today?</h3>
+                <p>Key-value/NoSQL systems are increasingly popular due to their ability to handle the demands of modern applications. They provide a scalable, flexible, and high-performance data storage solution tailored to the unstructured and semi-structured data of today's workloads.</p>
+
+                <article>
+                    <h4>1.1 Key Characteristics of Key-Value Stores</h4>
+                    <ul>
+                        <li><strong>Data Structure:</strong> Maps unique keys to values, similar to dictionaries or hash tables, but on a distributed scale.</li>
+                        <li><strong>Scalability:</strong> Employ distributed systems to handle vast data volumes by spreading data across multiple servers or clusters.</li>
+                        <li><strong>Flexibility:</strong> Allow storage of unstructured or semi-structured data without requiring predefined schemas.</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>1.2 Advantages Over Relational Databases</h4>
+                    <p>Relational databases (RDBMS) like MySQL traditionally store data in structured tables with fixed schemas. However, the evolving needs of applications such as Twitter and Amazon have led to certain challenges:</p>
+                    <ul>
+                        <li><strong>Handling Unstructured Data:</strong> Many modern applications generate large amounts of unstructured data (e.g., user tweets or shopping cart details) that don’t fit into rigid schemas.</li>
+                        <li><strong>Write-Heavy Workloads:</strong> Modern applications, especially real-time systems, often involve high write frequencies. Key-value stores are optimized for such workloads.</li>
+                        <li><strong>Performance Needs:</strong> Key-value stores support fast operations through techniques like distributed hash tables and caching.</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>1.3 Key Applications and Use Cases</h4>
+                    <ul>
+                        <li><strong>Social Media:</strong> Storing tweets with tweet IDs as keys and tweet content as values (e.g., Twitter).</li>
+                        <li><strong>E-commerce:</strong> Managing product inventories with item numbers as keys and details as values (e.g., Amazon).</li>
+                        <li><strong>Video Streaming:</strong> Tracking user progress in videos using key-value pairs (e.g., Netflix).</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>1.4 NoSQL vs. RDBMS: A Paradigm Shift</h4>
+                    <p>Key-value stores have emerged due to the CAP theorem, which highlights trade-offs between consistency, availability, and partition tolerance:</p>
+                    <ul>
+                        <li><strong>Eventual Consistency:</strong> Systems like Cassandra prioritize availability and partition tolerance over immediate consistency.</li>
+                        <li><strong>Scaling Out:</strong> Utilize commodity hardware to add capacity incrementally, unlike traditional "scale-up" approaches.</li>
+                        <li><strong>BASE Properties:</strong> Key-value stores provide Basically Available, Soft state, and Eventual consistency instead of the rigid ACID guarantees of RDBMS.</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>1.5 Conclusion</h4>
+                    <p>Key-value/NoSQL systems address the limitations of traditional databases by offering scalable, flexible, and high-performance solutions for modern, dynamic workloads. They are essential for powering the data-intensive applications of the internet age.</p>
+                </article>
+            </article>
+
+
+            <article>
+                <h3>2. How Does Cassandra Make Writes Fast?</h3>
+                <p>Cassandra, a distributed key-value store, is designed to handle write-heavy workloads with low latency. It employs a combination of architectural choices and mechanisms to optimize write performance.</p>
+
+                <article>
+                    <h4>2.1 Log-Structured Storage Mechanism</h4>
+                    <ul>
+                        <li><strong>Write-Back Caching:</strong> Writes are initially stored in memory (in a structure called a <em>memtable</em>) instead of being written directly to disk. This minimizes disk I/O during the write path.</li>
+                        <li><strong>Commit Logs:</strong> Before updating the memtable, Cassandra appends the write operation to a commit log on disk. This ensures durability by allowing recovery in case of failures.</li>
+                        <li><strong>Flushing to Disk:</strong> When the memtable fills up or becomes old, it is flushed to disk as an SSTable (Sorted String Table). SSTables are immutable and store data in a sorted format for efficient lookups.</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>2.2 Write Path Details</h4>
+                    <p>The write path in Cassandra ensures speed and fault tolerance:</p>
+                    <ol>
+                        <li>The client sends the write to a <strong>coordinator node</strong>.</li>
+                        <li>The coordinator determines the replicas for the data using a <strong>partitioner</strong> (e.g., hash-based partitioning).</li>
+                        <li>The write is logged in the <strong>commit log</strong> for durability.</li>
+                        <li>The data is stored in the <strong>memtable</strong> for fast, in-memory access.</li>
+                        <li>When the memtable is full, it is flushed to disk as an SSTable.</li>
+                        <li>Indexes and Bloom filters are maintained for efficient read operations from disk.</li>
+                    </ol>
+                </article>
+
+                <article>
+                    <h4>2.3 Hinted Handoff for Availability</h4>
+                    <ul>
+                        <li><strong>Temporary Storage:</strong> If a replica is down, the coordinator temporarily stores the write as a "hint" and forwards it to the replica when it comes back online.</li>
+                        <li><strong>Ensures Liveness:</strong> This mechanism ensures that writes succeed even in the presence of temporary node failures.</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>2.4 Optimizations for Disk Access</h4>
+                    <ul>
+                        <li><strong>SSTables:</strong> Immutable SSTables are stored on disk, eliminating the need for locks and enabling efficient compaction of updates.</li>
+                        <li><strong>Bloom Filters:</strong> Used to minimize disk seeks by quickly determining whether a key exists in a particular SSTable.</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>2.5 Distributed Nature and Tunable Consistency</h4>
+                    <ul>
+                        <li><strong>Replication:</strong> Writes are distributed across multiple replicas, ensuring durability and fault tolerance.</li>
+                        <li><strong>Consistency Levels:</strong> Clients can specify consistency levels (e.g., ONE, QUORUM, ALL), balancing speed and consistency according to application needs.</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>2.6 Conclusion</h4>
+                    <p>By using in-memory caching, log-structured storage, and distributed replication, Cassandra achieves high write throughput. These mechanisms ensure durability, fault tolerance, and low-latency performance, making Cassandra suitable for write-intensive applications.</p>
+                </article>
+            </article>
+
+            <article>
+                <h3>3. How Does Cassandra Handle Failures?</h3>
+                <p>Cassandra is designed to provide high availability and fault tolerance in distributed systems. It employs multiple mechanisms to ensure data reliability and consistent operations even in the presence of node or network failures.</p>
+
+                <article>
+                    <h4>3.1 Replication for Fault Tolerance</h4>
+                    <ul>
+                        <li><strong>Replication Factor:</strong> Data is replicated across multiple nodes based on a configurable replication factor. This ensures data redundancy and availability during node failures.</li>
+                        <li><strong>Replication Strategies:</strong>
+                            <ul>
+                                <li><strong>SimpleStrategy:</strong> Replicates data in a single data center.</li>
+                                <li><strong>NetworkTopologyStrategy:</strong> Designed for multi-data-center deployments, it replicates data intelligently across racks and regions to ensure fault tolerance.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>3.2 Hinted Handoff</h4>
+                    <ul>
+                        <li><strong>Temporary Storage:</strong> If a replica is unavailable, the coordinator temporarily stores the write as a "hint."</li>
+                        <li><strong>Recovery:</strong> Once the replica comes back online, the coordinator forwards the hinted write to ensure data consistency.</li>
+                        <li><strong>Benefits:</strong> Prevents write failures during temporary outages and reduces the need for complex recovery processes.</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>3.3 Tunable Consistency Levels</h4>
+                    <p>Clients can choose a consistency level for each operation, enabling a trade-off between consistency and availability:</p>
+                    <ul>
+                        <li><strong>ANY:</strong> Ensures availability by allowing writes to any node, even if no replicas are available.</li>
+                        <li><strong>ONE:</strong> Requires acknowledgment from one replica.</li>
+                        <li><strong>QUORUM:</strong> Requires a majority of replicas to acknowledge the operation.</li>
+                        <li><strong>ALL:</strong> Ensures strong consistency but requires all replicas to acknowledge.</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>3.4 Read Repair</h4>
+                    <ul>
+                        <li><strong>Consistency Repair:</strong> During reads, if replicas return inconsistent data, Cassandra initiates a read repair to synchronize the replicas.</li>
+                        <li><strong>Background Repair:</strong> Ensures eventual consistency by updating replicas in the background.</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>3.5 Anti-Entropy Repair</h4>
+                    <ul>
+                        <li><strong>Merkle Trees:</strong> Used to compare data across replicas and identify inconsistencies.</li>
+                        <li><strong>Repair Process:</strong> Synchronizes inconsistent replicas using efficient data transfer.</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>3.6 Gossip Protocol for Node Discovery</h4>
+                    <ul>
+                        <li><strong>Cluster Membership:</strong> Nodes share information about other nodes' status (e.g., up, down, or joining) using a gossip-based protocol.</li>
+                        <li><strong>Failure Detection:</strong> Periodic heartbeats and suspicion scores help detect node failures efficiently.</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>3.7 Hinted Reads and Repairs</h4>
+                    <ul>
+                        <li><strong>Downtime Recovery:</strong> Cassandra uses hints and repairs to address stale data and ensure replicas converge over time.</li>
+                        <li><strong>Consistency Enforcement:</strong> Stronger consistency levels and quorum reads reduce the risk of stale reads.</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>3.8 Conclusion</h4>
+                    <p>Cassandra's robust mechanisms for replication, hinted handoff, tunable consistency, and repair processes ensure high availability and fault tolerance. Its distributed architecture minimizes downtime and allows seamless operation in failure scenarios, making it a reliable choice for modern applications.</p>
+                </article>
+            </article>
+
+            <article>
+                <h3>4. What is the CAP Theorem?</h3>
+                <p>The CAP theorem, formulated by Eric Brewer in 2000 and later proven by Gilbert and Lynch, addresses the trade-offs in distributed systems. It states that a distributed data store can achieve at most two out of three properties: Consistency, Availability, and Partition Tolerance.</p>
+
+                <article>
+                    <h4>4.1 Key Components of the CAP Theorem</h4>
+                    <ul>
+                        <li><strong>Consistency (C):</strong> Every read receives the most recent write or an error. This ensures all nodes in the system return the same data at any given time.</li>
+                        <li><strong>Availability (A):</strong> Every request (read or write) receives a response, even if some nodes are unavailable. This emphasizes the system's readiness to respond at all times.</li>
+                        <li><strong>Partition Tolerance (P):</strong> The system continues to function despite network partitions, where some nodes cannot communicate with others due to a failure or disconnection.</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>4.2 Implications of the CAP Theorem</h4>
+                    <p>The CAP theorem states that in the presence of a network partition, a distributed system must choose between:</p>
+                    <ul>
+                        <li><strong>Consistency:</strong> Ensure all nodes return the latest data, even if some nodes are unreachable, potentially sacrificing availability.</li>
+                        <li><strong>Availability:</strong> Allow operations to proceed, potentially sacrificing consistency by returning stale or incomplete data.</li>
+                    </ul>
+                    <p>Since partitions are inevitable in distributed systems, the CAP theorem effectively reduces the choice to a trade-off between consistency and availability.</p>
+                </article>
+
+                <article>
+                    <h4>4.3 System Classifications Based on CAP</h4>
+                    <p>Distributed systems are designed with different CAP trade-offs:</p>
+                    <ul>
+                        <li><strong>CP Systems:</strong> Prioritize Consistency and Partition Tolerance. Availability may be sacrificed during partitions (e.g., HBase, Spanner).</li>
+                        <li><strong>AP Systems:</strong> Prioritize Availability and Partition Tolerance. Consistency may be relaxed (e.g., Cassandra, DynamoDB).</li>
+                        <li><strong>CA Systems:</strong> Prioritize Consistency and Availability but cannot handle partitions. Typically, these systems operate in single-node or tightly-coupled environments.</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>4.4 Practical Observations</h4>
+                    <ul>
+                        <li><strong>Eventual Consistency:</strong> Many AP systems use eventual consistency to ensure replicas converge over time, balancing availability with delayed consistency.</li>
+                        <li><strong>Application-Specific Needs:</strong> Different applications require different trade-offs. Financial systems often prioritize consistency (CP), while social media platforms may prioritize availability (AP).</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>4.5 Conclusion</h4>
+                    <p>The CAP theorem provides a framework for understanding trade-offs in distributed systems. By clarifying the limitations and possibilities, it helps designers make informed choices based on their application requirements.</p>
+                </article>
+            </article>
+
+            <article>
+                <h3>5. What is Eventual Consistency?</h3>
+                <p>Eventual consistency is a consistency model used in distributed systems to ensure that all copies of a replicated piece of data will converge to the same state, provided no further updates are made to that data. It is a key feature of systems prioritizing availability and partition tolerance over immediate consistency.</p>
+
+                <article>
+                    <h4>5.1 Key Characteristics</h4>
+                    <ul>
+                        <li><strong>Convergence:</strong> Over time, all replicas in the system will become consistent, assuming no new updates occur.</li>
+                        <li><strong>Stale Reads:</strong> During the convergence process, some replicas may return outdated or inconsistent data.</li>
+                        <li><strong>Asynchronous Propagation:</strong> Updates are propagated asynchronously across replicas, enabling the system to handle high write and read loads.</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>5.2 How It Works</h4>
+                    <ol>
+                        <li>An update is applied to one or more replicas.</li>
+                        <li>The update is propagated to other replicas over time through background synchronization mechanisms.</li>
+                        <li>Once all replicas have received the update, they reach a consistent state.</li>
+                    </ol>
+                </article>
+
+                <article>
+                    <h4>5.3 Advantages</h4>
+                    <ul>
+                        <li><strong>High Availability:</strong> The system remains available for read and write operations, even during network partitions or node failures.</li>
+                        <li><strong>Scalability:</strong> Supports distributed architectures with large numbers of nodes by reducing synchronization overhead.</li>
+                        <li><strong>Performance:</strong> Allows faster writes by avoiding immediate synchronization across replicas.</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>5.4 Trade-Offs</h4>
+                    <ul>
+                        <li><strong>Temporary Inconsistency:</strong> Data may appear inconsistent during the propagation process.</li>
+                        <li><strong>Application Complexity:</strong> Applications need to handle the possibility of stale or conflicting data during the convergence period.</li>
+                        <li><strong>Conflict Resolution:</strong> The system or application must implement strategies (e.g., "last write wins") to resolve conflicts arising from concurrent updates.</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>5.5 Use Cases</h4>
+                    <ul>
+                        <li><strong>Social Media:</strong> Systems like Twitter or Facebook prioritize availability and responsiveness, tolerating temporary inconsistencies.</li>
+                        <li><strong>Content Delivery Networks:</strong> Distributed caching systems ensure updates propagate across nodes over time while serving content to users.</li>
+                        <li><strong>E-commerce:</strong> Inventory systems allow updates to propagate eventually to handle high traffic scenarios.</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>5.6 Conclusion</h4>
+                    <p>Eventual consistency is a practical choice for distributed systems where high availability and scalability are more critical than immediate consistency. It is especially useful for systems operating under the constraints of the CAP theorem.</p>
+                </article>
+            </article>
+
+            <article>
+                <h3>6. What is a Quorum?</h3>
+                <p>In distributed systems, a quorum is a subset of nodes or replicas required to agree on an operation (read or write) to ensure a consistent outcome. It is used to strike a balance between consistency, availability, and fault tolerance in systems with replicated data.</p>
+
+                <article>
+                    <h4>6.1 Key Concepts</h4>
+                    <ul>
+                        <li><strong>Majority Agreement:</strong> A quorum typically requires a majority of replicas (more than 50%) to participate in or acknowledge an operation.</li>
+                        <li><strong>Intersection Property:</strong> Any two quorums for the same operation must overlap, ensuring at least one replica shares the most recent update.</li>
+                        <li><strong>Read/Write Quorums:</strong>
+                            <ul>
+                                <li><strong>Read Quorum (R):</strong> The minimum number of replicas required to acknowledge a read request.</li>
+                                <li><strong>Write Quorum (W):</strong> The minimum number of replicas required to acknowledge a write request.</li>
+                                <li><strong>Total Replicas (N):</strong> The total number of replicas in the system.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>6.2 Quorum Formula</h4>
+                    <p>For consistency, the following condition must hold:</p>
+                    <p>$$R + W > N$$</p>
+                    <p>This ensures that at least one replica involved in a read operation overlaps with those involved in a write operation, preserving the latest written data.</p>
+
+                    <article>
+                        <h5>Example:</h5>
+                        <p>Suppose \(N = 5\):</p>
+                        <ul>
+                            <li>If \(W = 3\) (write quorum requires 3 replicas), then \(R\) must be at least \(3\) to ensure \(R + W > N\).</li>
+                            <li>This guarantees at least one replica in the read quorum reflects the latest write.</li>
+                        </ul>
+                    </article>
+
+                </article>
+
+                <article>
+                    <h4>6.3 Benefits</h4>
+                    <ul>
+                        <li><strong>Consistency:</strong> Quorums help ensure that a sufficient number of replicas agree on data before it is considered valid.</li>
+                        <li><strong>Fault Tolerance:</strong> By involving multiple replicas, the system remains resilient to individual node failures.</li>
+                        <li><strong>Flexibility:</strong> Quorums allow tunable consistency, enabling trade-offs between read and write performance.</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>6.4 Use Cases</h4>
+                    <ul>
+                        <li><strong>Distributed Databases:</strong> Systems like Cassandra and DynamoDB use quorum-based mechanisms to maintain consistency across replicas.</li>
+                        <li><strong>Consensus Protocols:</strong> Algorithms like Paxos and Raft rely on quorums to achieve agreement in distributed environments.</li>
+                        <li><strong>Cloud Storage:</strong> Systems like Amazon S3 use quorum-based replication to ensure durability and consistency.</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>6.5 Conclusion</h4>
+                    <p>A quorum is a fundamental concept in distributed systems that enables consistency and fault tolerance. By requiring overlapping subsets of nodes for operations, quorums ensure that the most recent data is preserved across replicas.</p>
+                </article>
+            </article>
+
+            <article>
+                <h3>7. Consistency Levels in Cassandra</h3>
+                <p>Cassandra offers tunable consistency levels, allowing users to balance consistency, availability, and latency according to application requirements. These levels determine how many replicas must acknowledge a read or write operation before it is considered successful.</p>
+
+                <article>
+                    <h4>7.1 Consistency Level Types</h4>
+                    <ul>
+                        <li><strong>ANY:</strong> Ensures the highest availability by allowing the write to succeed as long as at least one replica (including hinted handoff) acknowledges the operation. No guarantee that the data has been written to the required replicas.</li>
+                        <li><strong>ONE:</strong> The operation succeeds when at least one replica responds. Provides fast reads and writes but risks returning stale data during network partitions.</li>
+                        <li><strong>TWO:</strong> Requires acknowledgment from at least two replicas, offering a moderate level of consistency.</li>
+                        <li><strong>THREE:</strong> Requires acknowledgment from at least three replicas, enhancing consistency compared to ONE and TWO.</li>
+                        <li><strong>QUORUM:</strong> Ensures that the majority of replicas (\(\lceil \frac{N}{2} + 1 \rceil\)) acknowledge the operation. Provides strong consistency while balancing availability.</li>
+                        <li><strong>LOCAL_QUORUM:</strong> Similar to QUORUM but restricted to replicas within the local data center. Optimized for multi-data-center setups to reduce inter-region latency.</li>
+                        <li><strong>EACH_QUORUM:</strong> Ensures a QUORUM in each data center, providing strong consistency across all data centers.</li>
+                        <li><strong>ALL:</strong> Requires acknowledgment from all replicas. Provides the strongest consistency but at the cost of high latency and reduced availability during failures.</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>7.2 Read and Write Consistency</h4>
+                    <p>Consistency levels apply to both reads and writes:</p>
+                    <ul>
+                        <li><strong>Write Consistency:</strong> Specifies how many replicas must acknowledge a write for it to be considered successful.</li>
+                        <li><strong>Read Consistency:</strong> Specifies how many replicas must respond with the latest data for a read to be considered successful.</li>
+                    </ul>
+                    <p>When the sum of read (\(R\)) and write (\(W\)) consistency levels is greater than the total number of replicas (\(N\)) (\(R + W > N\)), strong consistency is ensured.</p>
+                </article>
+
+                <article>
+                    <h4>7.3 Practical Use Cases</h4>
+                    <ul>
+                        <li><strong>ANY:</strong> Use for applications prioritizing availability over immediate consistency, such as logging systems.</li>
+                        <li><strong>QUORUM:</strong> Use for applications requiring a balance between consistency and performance, such as e-commerce systems.</li>
+                        <li><strong>LOCAL_QUORUM:</strong> Ideal for multi-region applications where low-latency reads and writes within a region are essential.</li>
+                        <li><strong>ALL:</strong> Use sparingly for critical data requiring the highest consistency, such as financial transactions.</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>7.4 Conclusion</h4>
+                    <p>Cassandra's tunable consistency levels offer flexibility to adapt to various application needs. By allowing developers to choose the desired level of consistency, Cassandra balances trade-offs between consistency, availability, and latency effectively.</p>
+                </article>
+            </article>
+
+            <article>
+                <h3>8. How Do Snitches Work in Cassandra?</h3>
+                <p>Snitches in Cassandra are mechanisms used to determine the topology of the data center, including racks and regions, to ensure optimal data replication and request routing. They help Cassandra understand the physical layout of the cluster to improve fault tolerance and performance.</p>
+
+                <article>
+                    <h4>8.1 Purpose of Snitches</h4>
+                    <ul>
+                        <li><strong>Data Locality:</strong> Snitches enable Cassandra to route read and write requests to replicas closest to the client to minimize latency.</li>
+                        <li><strong>Fault Tolerance:</strong> By understanding the topology, snitches prevent data from being replicated across nodes in the same rack, avoiding single points of failure.</li>
+                        <li><strong>Replication Strategies:</strong> Snitches provide the information necessary for replication strategies like <em>NetworkTopologyStrategy</em>.</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>8.2 Types of Snitches</h4>
+                    <ul>
+                        <li><strong>SimpleSnitch:</strong>
+                            <ul>
+                                <li>Does not consider topology information.</li>
+                                <li>Primarily used for single-node clusters or non-production environments.</li>
+                            </ul>
+                        </li>
+                        <li><strong>RackInferringSnitch:</strong>
+                            <ul>
+                                <li>Infers rack and data center information based on the second and third octets of the IP address.</li>
+                                <li>Useful when IP addresses are allocated in a way that reflects the network topology.</li>
+                            </ul>
+                        </li>
+                        <li><strong>GossipingPropertyFileSnitch:</strong>
+                            <ul>
+                                <li>Uses a property file (`cassandra-rackdc.properties`) to configure data center and rack information.</li>
+                                <li>Shares topology information via gossip, dynamically updating the cluster.</li>
+                                <li>Recommended for production environments, especially multi-data-center setups.</li>
+                            </ul>
+                        </li>
+                        <li><strong>EC2Snitch:</strong>
+                            <ul>
+                                <li>Designed for Amazon EC2 environments.</li>
+                                <li>Uses EC2 regions as data centers and availability zones as racks.</li>
+                                <li>Automatically detects the topology from the EC2 instance metadata.</li>
+                            </ul>
+                        </li>
+                        <li><strong>EC2MultiRegionSnitch:</strong>
+                            <ul>
+                                <li>Similar to EC2Snitch but optimized for multi-region clusters in EC2.</li>
+                                <li>Ensures inter-region replication and efficient data access.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Custom Snitches:</strong>
+                            <ul>
+                                <li>Allows users to define their own snitch logic for specialized environments.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>8.3 How Snitches Work</h4>
+                    <ol>
+                        <li>The snitch determines the data center and rack for each node in the cluster.</li>
+                        <li>Replication strategies use this information to place replicas on nodes across different racks and data centers.</li>
+                        <li>During reads, the snitch helps choose the closest replica based on topology and latency.</li>
+                        <li>Snitches work with dynamic replication strategies like `NetworkTopologyStrategy` to optimize fault tolerance and reduce latency.</li>
+                    </ol>
+                </article>
+
+                <article>
+                    <h4>8.4 Choosing the Right Snitch</h4>
+                    <ul>
+                        <li><strong>SimpleSnitch:</strong> Best for testing and small-scale clusters.</li>
+                        <li><strong>GossipingPropertyFileSnitch:</strong> Ideal for most production environments, offering flexibility and adaptability.</li>
+                        <li><strong>EC2Snitch:</strong> Recommended for single-region EC2 deployments.</li>
+                        <li><strong>EC2MultiRegionSnitch:</strong> Use for multi-region deployments in EC2.</li>
+                        <li><strong>Custom Snitch:</strong> Use when specialized network configurations or topologies are required.</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>8.5 Conclusion</h4>
+                    <p>Snitches play a critical role in Cassandra's architecture by enabling efficient replication, fault tolerance, and latency optimization. By selecting the appropriate snitch based on the deployment environment, administrators can ensure optimal cluster performance.</p>
+                </article>
+            </article>
+
+            <article>
+                <h3>9. Why Is Time Synchronization Hard in Asynchronous Systems?</h3>
+                <p>Time synchronization in asynchronous systems is challenging due to the absence of a shared clock among distributed nodes and the unpredictability of communication delays and processing times. These limitations create difficulties in maintaining a consistent view of time across all nodes.</p>
+
+                <article>
+                    <h4>9.1 Characteristics of Asynchronous Systems</h4>
+                    <ul>
+                        <li><strong>Independent Clocks:</strong> Each node maintains its own local clock, which may drift from other clocks due to hardware and environmental differences.</li>
+                        <li><strong>Unbounded Communication Delays:</strong> Messages between nodes may take unpredictable amounts of time to arrive, leading to inconsistencies in timestamp-based ordering.</li>
+                        <li><strong>Unpredictable Processing Times:</strong> Nodes process events and messages at varying speeds, making synchronization unreliable.</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>9.2 Challenges in Synchronization</h4>
+                    <ul>
+                        <li><strong>Clock Skew:</strong> The difference in time values between clocks at two nodes. Over time, this skew can grow due to clock drift.</li>
+                        <li><strong>Clock Drift:</strong> The relative difference in clock speeds, caused by hardware imperfections, leads to gradual divergence in clock values.</li>
+                        <li><strong>Network Variability:</strong> Latencies in message delivery vary due to network congestion, routing differences, and hardware variability.</li>
+                        <li><strong>No Global Time:</strong> Asynchronous systems lack a single, universally accurate clock, making it impossible to rely on a global time standard.</li>
+                        <li><strong>Partial Order of Events:</strong> Without synchronized clocks, determining the absolute sequence of events across nodes is complex.</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>9.3 Key Problems in Synchronization</h4>
+                    <p>Asynchronous systems encounter the following core problems:</p>
+                    <ul>
+                        <li><strong>Inaccuracy:</strong> A node's local time is often out of sync with real-time or other nodes' clocks.</li>
+                        <li><strong>Non-Determinism:</strong> Message delays and variable processing times lead to inconsistent time interpretations.</li>
+                        <li><strong>Infeasibility of Perfect Synchronization:</strong> Due to unbounded delays, achieving perfect synchronization is theoretically impossible.</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>9.4 Mitigation Strategies</h4>
+                    <ul>
+                        <li><strong>Logical Time:</strong> Use logical clocks, such as Lamport timestamps or vector clocks, to order events based on causality rather than absolute time.</li>
+                        <li><strong>Clock Synchronization Protocols:</strong> Algorithms like Network Time Protocol (NTP) or Cristian's Algorithm attempt to synchronize clocks to an external time source, though with bounded error.</li>
+                        <li><strong>Eventual Consistency:</strong> Systems often rely on eventual synchronization, ensuring that clocks align within acceptable bounds over time.</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>9.5 Conclusion</h4>
+                    <p>Time synchronization in asynchronous systems is inherently challenging due to the absence of shared clocks, unpredictable communication delays, and clock drift. While perfect synchronization is unattainable, practical approaches like logical clocks and synchronization protocols help mitigate the impact of these challenges.</p>
+                </article>
+            </article>
+
+            <article>
+                <h3>10. How Can You Reduce the Error While Synchronizing Time Across Two Machines Over a Network?</h3>
+                <p>Synchronizing time across machines in a network involves addressing factors like communication delays, clock drift, and processing variability. Techniques and algorithms are employed to minimize the error in synchronized time values.</p>
+
+                <article>
+                    <h4>10.1 Key Techniques to Reduce Error</h4>
+                    <ul>
+                        <li><strong>Measure Round-Trip Time (RTT):</strong>
+                            <ul>
+                                <li>Compute the RTT for a message exchange between the two machines.</li>
+                                <li>Estimate one-way delay as half the RTT, assuming symmetric delays.</li>
+                                <li>Use this to adjust the synchronized time more accurately.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Use Multiple Synchronization Samples:</strong>
+                            <ul>
+                                <li>Take several measurements of RTT to account for variability in network delays.</li>
+                                <li>Average the results to reduce the impact of outliers and transient congestion.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Filter Noise in Network Delays:</strong>
+                            <ul>
+                                <li>Discard RTT samples significantly higher than the median to eliminate outliers caused by network congestion.</li>
+                                <li>Use statistical techniques like median or weighted averages for better delay estimates.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Estimate and Adjust Clock Drift:</strong>
+                            <ul>
+                                <li>Monitor the drift between clocks and adjust synchronization intervals accordingly.</li>
+                                <li>If drift rates are known, incorporate them into clock adjustments to maintain better alignment over time.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Apply Cristian’s Algorithm:</strong>
+                            <ul>
+                                <li>Use the minimum RTT observed as a basis to reduce error, assuming the actual delay cannot be shorter than this.</li>
+                                <li>Set the time to the midpoint of the earliest possible time window during synchronization.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Use Network Time Protocol (NTP):</strong>
+                            <ul>
+                                <li>Employ NTP, which uses hierarchical clock synchronization across multiple levels (stratum levels).</li>
+                                <li>Synchronize with lower-latency, higher-accuracy servers within the NTP hierarchy.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>10.2 Practical Steps to Minimize Error</h4>
+                    <ol>
+                        <li>Ensure both machines use reliable clocks with minimal drift.</li>
+                        <li>Connect the machines through low-latency, stable network paths.</li>
+                        <li>Prefer local time servers or synchronization sources to reduce latency.</li>
+                        <li>Set up periodic synchronization to adjust for ongoing drift.</li>
+                        <li>Implement clock skew correction mechanisms to smooth discrepancies.</li>
+                    </ol>
+                </article>
+
+                <article>
+                    <h4>10.3 Advanced Methods</h4>
+                    <ul>
+                        <li><strong>Use Precision Time Protocol (PTP):</strong>
+                            <ul>
+                                <li>PTP provides higher accuracy by timestamping messages at the hardware level, reducing software-induced delays.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Deploy GPS-Based Synchronization:</strong>
+                            <ul>
+                                <li>Synchronize clocks using GPS, which provides high-precision time signals, bypassing network delay variability.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Implement Stratum-Specific Configuration:</strong>
+                            <ul>
+                                <li>In NTP setups, configure clients to synchronize with high-precision, low-stratum servers for reduced errors.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>10.4 Conclusion</h4>
+                    <p>Reducing synchronization error between machines involves careful measurement of delays, statistical filtering, and the use of advanced protocols like NTP and PTP. Combining these methods ensures improved precision and reliability for time-sensitive applications.</p>
+                </article>
+            </article>
+
+            <article>
+                <h3>11. How Does HBase Ensure Consistency?</h3>
+                <p>HBase ensures strong consistency by carefully managing data writes, replication, and recovery mechanisms. Its architecture and operational design prioritize consistent reads and writes, making it suitable for applications requiring accurate, up-to-date data.</p>
+
+                <article>
+                    <h4>11.1 Key Mechanisms for Consistency</h4>
+                    <ul>
+                        <li><strong>Write-Ahead Log (WAL):</strong>
+                            <ul>
+                                <li>All updates are written to the WAL before being applied to in-memory structures (MemStores).</li>
+                                <li>This ensures durability and allows recovery in case of node failure.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Atomic Writes:</strong>
+                            <ul>
+                                <li>All updates to a single row are atomic. Multiple columns in the same row can be updated in a single operation without risking partial updates.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Region-Based Data Management:</strong>
+                            <ul>
+                                <li>HBase tables are divided into regions, each managed by a single region server.</li>
+                                <li>This eliminates the need for distributed consensus for a single row, simplifying consistency management.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>11.2 Data Replication and Strong Consistency</h4>
+                    <ul>
+                        <li><strong>Region Ownership:</strong>
+                            <ul>
+                                <li>Each region is served by one active region server, ensuring a single authoritative source for reads and writes.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Replication Across Data Centers:</strong>
+                            <ul>
+                                <li>For multi-data-center setups, asynchronous replication is used to propagate updates, ensuring eventual consistency across data centers while maintaining strong consistency locally.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Zookeeper Coordination:</strong>
+                            <ul>
+                                <li>Zookeeper ensures that only one region server is active for a given region, preventing split-brain scenarios.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>11.3 Recovery and Failover</h4>
+                    <ul>
+                        <li><strong>Automatic Failover:</strong>
+                            <ul>
+                                <li>If a region server fails, Zookeeper reassigns its regions to other servers.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Log Replay:</strong>
+                            <ul>
+                                <li>When a new region server takes over, it replays the WAL entries to ensure no data is lost.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>11.4 Client-Side Consistency Guarantees</h4>
+                    <ul>
+                        <li><strong>Strictly Consistent Reads:</strong>
+                            <ul>
+                                <li>Clients always read from the latest version of data in HBase, ensuring that they see the most recent updates.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Read Isolation:</strong>
+                            <ul>
+                                <li>Reads are isolated from ongoing writes, ensuring that partial or inconsistent states are never exposed.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>11.5 Advantages and Trade-offs</h4>
+                    <ul>
+                        <li><strong>Advantages:</strong>
+                            <ul>
+                                <li>Strong row-level consistency.</li>
+                                <li>Reliable recovery from failures.</li>
+                                <li>Durability through WAL.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Trade-offs:</strong>
+                            <ul>
+                                <li>Higher write latency due to WAL and atomicity guarantees.</li>
+                                <li>Reduced flexibility in write operations compared to eventual consistency systems.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>11.6 Conclusion</h4>
+                    <p>HBase achieves consistency through mechanisms like the Write-Ahead Log, atomic updates, and strict region management. Its design ensures reliable, up-to-date data access, making it ideal for systems requiring strong consistency guarantees.</p>
+                </article>
+            </article>
+
+            <article>
+                <h3>12. What Is Lamport Causality?</h3>
+                <p>Lamport causality, proposed by Leslie Lamport in 1978, defines a logical relationship between events in a distributed system based on their causal dependencies. It is a foundational concept in distributed systems, enabling the ordering of events without relying on synchronized clocks.</p>
+
+                <article>
+                    <h4>12.1 Core Idea of Lamport Causality</h4>
+                    <ul>
+                        <li><strong>Causal Dependency:</strong> If an event \(A\) influences event \(B\), then \(A\) causally precedes \(B\).</li>
+                        <li><strong>Logical Timestamps:</strong> Lamport introduces logical clocks to assign timestamps to events, ensuring that causally related events are properly ordered.</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>12.2 Happens-Before Relation</h4>
+                    <p>The "Happens-Before" relation (\(\rightarrow\)) is a partial ordering of events that defines causality:</p>
+                    <ul>
+                        <li>\(A \rightarrow B\): Event \(A\) happens before \(B\) if:
+                            <ul>
+                                <li>Both occur in the same process, and \(A\) happens earlier in the process timeline.</li>
+                                <li>Process \(A\) sends a message that is received by process \(B\).</li>
+                                <li>\(A \rightarrow B\) and \(B \rightarrow C\) imply \(A \rightarrow C\) (transitivity).</li>
+                            </ul>
+                        </li>
+                        <li>If no causal relationship exists between two events, they are considered concurrent.</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>12.3 Logical Clock Mechanism</h4>
+                    <ul>
+                        <li>Each process maintains a counter (logical clock).</li>
+                        <li>The clock is incremented whenever an event occurs.</li>
+                        <li>When a process sends a message, it includes its current clock value in the message.</li>
+                        <li>Upon receiving a message, the recipient updates its clock to the maximum of its current clock and the received timestamp, then increments it.</li>
+                    </ul>
+                    <p>This ensures that causally dependent events have consistent timestamps.</p>
+                </article>
+
+                <article>
+                    <h4>12.4 Practical Uses</h4>
+                    <ul>
+                        <li><strong>Event Ordering:</strong> Ensures events are processed in a causally consistent manner in distributed systems.</li>
+                        <li><strong>Debugging:</strong> Helps trace the sequence of events to identify issues in distributed applications.</li>
+                        <li><strong>Concurrency Control:</strong> Used in distributed databases to manage transaction dependencies.</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>12.5 Advantages and Limitations</h4>
+                    <ul>
+                        <li><strong>Advantages:</strong>
+                            <ul>
+                                <li>Enables causally consistent event ordering without synchronized clocks.</li>
+                                <li>Simple to implement with minimal computational overhead.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Limitations:</strong>
+                            <ul>
+                                <li>Does not capture the total order of events; only a partial order is established.</li>
+                                <li>Concurrent events cannot be distinguished causally.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>12.6 Conclusion</h4>
+                    <p>Lamport causality provides a logical framework for ordering events in distributed systems based on their causal relationships. It is a critical building block for understanding and designing systems that require consistency and coordination across distributed processes.</p>
+                </article>
+            </article>
+
+            <article>
+                <h3>13. Assigning Lamport Timestamps to a Run</h3>
+                <p>To assign Lamport timestamps to a sequence of events in a distributed system, follow the rules of the Lamport logical clock mechanism. The goal is to ensure that causally related events are timestamped in a manner that reflects their causality.</p>
+
+                <article>
+                    <h4>13.1 Steps to Assign Lamport Timestamps</h4>
+                    <ol>
+                        <li><strong>Initialize Logical Clocks:</strong>
+                            <ul>
+                                <li>Each process starts with a logical clock set to \(0\).</li>
+                            </ul>
+                        </li>
+                        <li><strong>Local Events:</strong>
+                            <ul>
+                                <li>When a process executes an event, it increments its logical clock by \(1\).</li>
+                            </ul>
+                        </li>
+                        <li><strong>Message Sending:</strong>
+                            <ul>
+                                <li>When a process sends a message, it increments its logical clock by \(1\) and attaches the updated clock value to the message.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Message Receiving:</strong>
+                            <ul>
+                                <li>Upon receiving a message, a process updates its logical clock to the maximum of its current clock and the received timestamp, then increments it by \(1\).</li>
+                            </ul>
+                        </li>
+                    </ol>
+                </article>
+
+                <article>
+                    <h4>13.2 Example</h4>
+                    <p>Consider three processes \(P_1\), \(P_2\), and \(P_3\) with the following events:</p>
+                    <ul>
+                        <li>\(P_1\): \(A \rightarrow C \rightarrow E\)</li>
+                        <li>\(P_2\): \(B \rightarrow D \rightarrow G\)</li>
+                        <li>\(P_3\): \(F \rightarrow H\)</li>
+                    </ul>
+                    <p>Messages:</p>
+                    <ul>
+                        <li>\(C\) at \(P_1\) sends a message to \(D\) at \(P_2\).</li>
+                        <li>\(E\) at \(P_1\) sends a message to \(F\) at \(P_3\).</li>
+                    </ul>
+
+                    <article>
+                        <h5>Steps:</h5>
+                        <ol>
+                            <li>Initialize clocks for all processes:
+                                \[
+                                \text{Clocks: } P_1 = 0, P_2 = 0, P_3 = 0
+                                \]</li>
+                            <li>Assign timestamps to local events:</li>
+                            <ul>
+                                <li>\(A\) at \(P_1\): \(P_1 = 1\)</li>
+                                <li>\(B\) at \(P_2\): \(P_2 = 1\)</li>
+                                <li>\(F\) at \(P_3\): \(P_3 = 1\)</li>
+                            </ul>
+                            <li>Handle message from \(C\) (\(P_1 = 2\)) to \(D\) (\(P_2 = 2\)):
+                                <ul>
+                                    <li>Send event \(C\) at \(P_1\): Increment \(P_1\) to \(3\), attach \(3\) to the message.</li>
+                                    <li>Receive event \(D\) at \(P_2\): Update \(P_2\) to \( \max(P_2, 3) + 1 = 4\).</li>
+                                </ul>
+                            </li>
+                            <li>Handle message from \(E\) (\(P_1 = 4\)) to \(F\) (\(P_3 = 2\)):
+                                <ul>
+                                    <li>Send event \(E\) at \(P_1\): Increment \(P_1\) to \(5\), attach \(5\) to the message.</li>
+                                    <li>Receive event \(F\) at \(P_3\): Update \(P_3\) to \( \max(P_3, 5) + 1 = 6\).</li>
+                                </ul>
+                            </li>
+                            <li>Continue assigning timestamps to remaining events:</li>
+                            <ul>
+                                <li>\(G\) at \(P_2\): \(P_2 = 5\)</li>
+                                <li>\(H\) at \(P_3\): \(P_3 = 7\)</li>
+                            </ul>
+                        </ol>
+                    </article>
+
+                    <article>
+                        <h4>13.3 Final Timestamps</h4>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Process</th>
+                                    <th>Event</th>
+                                    <th>Timestamp</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>\(P_1\)</td>
+                                    <td>\(A, C, E\)</td>
+                                    <td>\(1, 3, 5\)</td>
+                                </tr>
+                                <tr>
+                                    <td>\(P_2\)</td>
+                                    <td>\(B, D, G\)</td>
+                                    <td>\(1, 4, 5\)</td>
+                                </tr>
+                                <tr>
+                                    <td>\(P_3\)</td>
+                                    <td>\(F, H\)</td>
+                                    <td>\(6, 7\)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </article>
+
+                    <article>
+                        <h4>13.4 Conclusion</h4>
+                        <p>Lamport timestamps are a straightforward way to order events in a distributed system based on causality. By following the defined rules, logical timestamps ensure that causally related events are properly sequenced.</p>
+                    </article>
+                </article>
+            </article>
+            
+            <article>
+                <h3>14. Assigning Vector Timestamps to a Run</h3>
+                <p>Vector timestamps extend Lamport timestamps by capturing causal relationships between events across processes explicitly. They are used to determine both causality and concurrency in distributed systems.</p>
+
+                <article>
+                    <h4>14.1 Steps to Assign Vector Timestamps</h4>
+                    <ol>
+                        <li><strong>Initialize Vector Clocks:</strong>
+                            <ul>
+                                <li>Each process maintains a vector of size \(N\) (number of processes), initialized to all zeros.</li>
+                                <li>The \(i\)-th element of a process’s vector clock reflects the progress of process \(i\).</li>
+                            </ul>
+                        </li>
+                        <li><strong>Update Local Clock:</strong>
+                            <ul>
+                                <li>When a process performs an internal event, it increments its own entry in the vector clock.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Send a Message:</strong>
+                            <ul>
+                                <li>When a process sends a message, it attaches its current vector clock to the message.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Receive a Message:</strong>
+                            <ul>
+                                <li>When a process receives a message, it updates its vector clock by taking the element-wise maximum of its own clock and the received clock, then increments its own entry.</li>
+                            </ul>
+                        </li>
+                    </ol>
+                </article>
+
+                <article>
+                    <h4>14.2 Example</h4>
+                    <p>Consider three processes \(P_1\), \(P_2\), and \(P_3\) with the following events:</p>
+                    <ul>
+                        <li>\(P_1\): \(A \rightarrow C \rightarrow E\)</li>
+                        <li>\(P_2\): \(B \rightarrow D \rightarrow G\)</li>
+                        <li>\(P_3\): \(F \rightarrow H\)</li>
+                    </ul>
+                    <p>Messages:</p>
+                    <ul>
+                        <li>\(C\) at \(P_1\) sends a message to \(D\) at \(P_2\).</li>
+                        <li>\(E\) at \(P_1\) sends a message to \(F\) at \(P_3\).</li>
+                    </ul>
+
+                    <article>
+                        <h5>Steps:</h5>
+                        <ol>
+                            <li>Initialize vector clocks:
+                                \[
+                                P_1 = [0, 0, 0], \quad P_2 = [0, 0, 0], \quad P_3 = [0, 0, 0]
+                                \]</li>
+                            <li>Assign timestamps to events:</li>
+                            <ul>
+                                <li>Event \(A\) at \(P_1\): Increment \(P_1[1]\): \(P_1 = [1, 0, 0]\)</li>
+                                <li>Event \(B\) at \(P_2\): Increment \(P_2[2]\): \(P_2 = [0, 1, 0]\)</li>
+                                <li>Event \(F\) at \(P_3\): Increment \(P_3[3]\): \(P_3 = [0, 0, 1]\)</li>
+                            </ul>
+                            <li>Handle message from \(C\) (\(P_1 = [2, 0, 0]\)) to \(D\) (\(P_2 = [0, 1, 0]\)):</li>
+                            <ul>
+                                <li>Send event \(C\) at \(P_1\): Increment \(P_1[1]\): \(P_1 = [2, 0, 0]\), attach this clock to the message.</li>
+                                <li>Receive event \(D\) at \(P_2\): Update \(P_2\) to the element-wise maximum of \(P_2\) and the received clock, then increment \(P_2[2]\):
+                                    \[
+                                    P_2 = \max([0, 1, 0], [2, 0, 0]) + 1 = [2, 2, 0]
+                                    \]
+                                </li>
+                            </ul>
+                            <li>Handle message from \(E\) (\(P_1 = [3, 0, 0]\)) to \(F\) (\(P_3 = [0, 0, 1]\)):</li>
+                            <ul>
+                                <li>Send event \(E\) at \(P_1\): Increment \(P_1[1]\): \(P_1 = [3, 0, 0]\), attach this clock to the message.</li>
+                                <li>Receive event \(F\) at \(P_3\): Update \(P_3\) to the element-wise maximum of \(P_3\) and the received clock, then increment \(P_3[3]\):
+                                    \[
+                                    P_3 = \max([0, 0, 1], [3, 0, 0]) + 1 = [3, 0, 2]
+                                    \]
+                                </li>
+                            </ul>
+                            <li>Continue assigning timestamps to remaining events:</li>
+                            <ul>
+                                <li>Event \(G\) at \(P_2\): Increment \(P_2[2]\): \(P_2 = [2, 3, 0]\)</li>
+                                <li>Event \(H\) at \(P_3\): Increment \(P_3[3]\): \(P_3 = [3, 0, 3]\)</li>
+                            </ul>
+                        </ol>
+                    </article>
+
+                    <article>
+                        <h4>14.3 Final Timestamps</h4>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Process</th>
+                                    <th>Event</th>
+                                    <th>Vector Timestamp</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>\(P_1\)</td>
+                                    <td>\(A, C, E\)</td>
+                                    <td>\([1, 0, 0], [2, 0, 0], [3, 0, 0]\)</td>
+                                </tr>
+                                <tr>
+                                    <td>\(P_2\)</td>
+                                    <td>\(B, D, G\)</td>
+                                    <td>\([0, 1, 0], [2, 2, 0], [2, 3, 0]\)</td>
+                                </tr>
+                                <tr>
+                                    <td>\(P_3\)</td>
+                                    <td>\(F, H\)</td>
+                                    <td>\([0, 0, 1], [3, 0, 2], [3, 0, 3]\)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </article>
+
+                    <article>
+                        <h4>14.4 Conclusion</h4>
+                        <p>Vector timestamps provide a way to track causality explicitly in distributed systems. By following the rules for maintaining and updating vector clocks, we can assign timestamps that reflect both causal and concurrent relationships between events.</p>
+                    </article>
+                </article>
+
+        </main>
+
+        <script> copyright("all"); </script>
+
+    </body>
+
+</html>

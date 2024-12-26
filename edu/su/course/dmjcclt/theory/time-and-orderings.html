@@ -1,0 +1,308 @@
+<!-------------------------- © 2007 - present, dmj.one and contributors. ----------------------------------
+   Part of the dmjone project. Licensed under the GNU AGPL. Provided as-is, without warranty of any kind. 
+-------------------- Redistribution and modifications must retain this notice. --------------------------->
+
+
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+    <!--<![endif]-->
+
+    <head>
+        <script src="/js/edu_su_common.js"></script>
+        <noscript>
+            <style>
+                html,
+                body {
+                    margin: 0;
+                    overflow: hidden;
+                }
+            </style>
+            <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+        </noscript>
+
+        <title>Time and Ordering - DMJCCLT - dmj.one</title>
+        <meta name="description" content="Know about Time and Ordering in Distributed Systems - DMJCCLT - Provided by dmj.one">
+
+        <meta property="og:image" content="/logo.png">
+        <meta property="og:type" content="article">
+
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:site" content="@divyamohan1993">
+        <meta name="twitter:creator" content="@divyamohan1993">
+        <meta name="twitter:image" content="/logo.png">
+
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+        <meta name="author" content="Divya Mohan">
+        <meta name="robots" content="index, follow">
+
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js" integrity="sha512-sHSNLECRJSK+BFs7E8DiFc6pf6n90bLI85Emiw1jhreduZhK3VXgq9l4kAt9eTIHYAcuQBKHL01QKs4/3Xgl8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js" integrity="sha512-iWiuBS5nt6r60fCz26Nd0Zqe0nbk1ZTIQbl3Kv7kYsX+yKMUFHzjaH2+AnM6vp2Xs+gNmaBAVWJjSmuPw76Efg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                renderMathInElement(document.body, {
+                    // customised options
+                    // • auto-render specific keys, e.g.:
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false },
+                        { left: '\\(', right: '\\)', display: false },
+                        { left: '\\[', right: '\\]', display: true }
+                    ],
+                    // • rendering keys, e.g.:
+                    throwOnError: false
+                });
+            });
+        </script> -->
+
+        <!-- <style>
+            main ul {
+                list-style-type: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            main ul li {
+                margin: 0;
+                padding: 0;
+            }
+        </style> -->
+
+    </head>
+
+    <body>
+
+        <script> header_author("lakshika"); </script>
+
+        <main>
+            <article class="agen-tableofcontents">
+                <h2 class="text-center">
+                    Time and Orderings
+                </h2>
+                <div class="d-none contentdate">2024, December 26</div>
+            </article>
+
+            <article>
+                <h3>1. Introduction to Time and Ordering</h3>
+                <p>In distributed systems, each process operates independently, often running on separate physical machines. Unlike synchronous systems, which rely on a shared clock to maintain order, asynchronous distributed systems depend on their local clocks. This independence introduces discrepancies in how time is perceived across processes. Such discrepancies create challenges in ensuring that events occur in a coherent and consistent sequence across the system.</p>
+
+                <p>Why does this matter? Consider a situation where multiple servers handle reservations for the last seat on a flight. Without synchronized time, two servers may both record successful bookings for the same seat. These conflicts arise because the lack of a shared time reference makes it hard to determine the true order of events.</p>
+
+                <p>How can this be addressed? Distributed systems must either synchronize clocks or develop logical mechanisms to order events. Synchronization minimizes discrepancies between clocks, while logical methods ensure causality in event sequences, even if physical time is not aligned. Understanding this duality is the foundation of managing time and ordering in distributed systems.</p>
+            </article>
+
+
+            <article>
+                <h4>1.1 Importance of Synchronization</h4>
+                <p>Synchronization is a cornerstone of distributed systems, ensuring that processes coordinate their actions effectively. Without it, systems risk inconsistencies and inefficiencies. Let’s break down its importance:</p>
+
+                <ul>
+                    <li><strong>Correctness</strong>: Imagine a scenario where two servers process requests for the same resource, like the last available flight seat. If their clocks are out of sync, both servers may confirm the booking, leading to a double booking. Synchronization helps prevent such logical errors by providing a consistent timeline across processes.</li>
+
+                    <li><strong>Fairness</strong>: Consider a user attempting to access a shared service. If their request is timestamped later than another due to clock misalignment, even when it was sent earlier, they may face an unfair delay. Synchronization ensures that users’ actions are treated equitably, based on when they truly occur.</li>
+                </ul>
+
+                <p>How is this achieved? Synchronization can involve aligning clocks to a universal standard, such as Coordinated Universal Time (UTC), or using logical mechanisms to define a consistent order of events, ensuring both correctness and fairness in distributed operations.</p>
+            </article>
+
+
+            <article>
+                <h3>2. Challenges in Distributed Systems</h3>
+
+                <article>
+                    <h4>2.1 Clock Skew and Drift</h4>
+                    <p>In distributed systems, maintaining a consistent understanding of time is inherently challenging due to two key phenomena:</p>
+
+                    <ul>
+                        <li><strong>Clock Skew</strong>: This refers to the difference in clock readings across processes. Imagine two servers managing bank transactions. If one server's clock is ahead by a few seconds, it might process a withdrawal request before a deposit, even though the deposit occurred first. This could lead to an incorrect insufficient balance error.</li>
+
+                        <li><strong>Clock Drift</strong>: This arises when the clocks of different processes run at slightly different speeds, causing the skew to increase over time. For instance, if one server's clock is faster by 1 millisecond per second, over an hour, it will be 3.6 seconds ahead. Such discrepancies can accumulate and disrupt the system’s coherence.</li>
+                    </ul>
+                </article>
+                <article>
+
+                    <h4>2.2 Maximum Drift Rate (MDR)</h4>
+                    <p>To manage these challenges, we use the concept of Maximum Drift Rate (MDR), which quantifies how fast clocks can drift apart. This helps determine how often synchronization is required. For example:</p>
+
+                    <p>$$t_{sync} = \frac{M}{2 \times MDR}$$</p>
+
+                    <p>Here, $M$ represents the maximum allowable skew for the system. Consider a distributed video streaming service like Netflix, where synchronized timestamps ensure seamless playback across devices. If the MDR is known to be 1 microsecond per second and the system tolerates up to 1 millisecond skew, synchronization must occur at least every:</p>
+
+                    <p>$$t_{sync} = \frac{0.001}{2 \times 0.000001} = 500 \text{ seconds (or ~8 minutes).}$$</p>
+
+                    <p>By scheduling synchronization at this interval, the system prevents errors caused by skew or drift, ensuring consistency and fairness in operations.</p>
+                </article>
+            </article>
+
+            <article>
+                <h3>3. Time Synchronization Methods</h3>
+
+                <article>
+                    <h4>3.1 External Synchronization</h4>
+                    <p>External synchronization ensures that processes align their clocks with an external reference, typically UTC. Two key algorithms are:</p>
+
+                    <h5>3.1.1 Cristian's Algorithm</h5>
+                    <p>Cristian's Algorithm helps a process synchronize its clock with an external time server by estimating the offset caused by message delays. The steps are:</p>
+                    <ul>
+                        <li><strong>Step 1: Request Time</strong>: A process sends a "What is the time?" request to the time server and records the request's send time $t_0$ using its local clock.</li>
+                        <li><strong>Step 2: Receive Reply</strong>: The server responds with the current time $t_s$ according to its clock. The process receives the reply at time $t_1$ (local clock).</li>
+                        <li><strong>Step 3: Adjust Clock</strong>: The process calculates the adjusted time as:
+                            $$t_{adjusted} = t_s + \frac{t_1 - t_0}{2}$$
+                            Here, $\frac{t_1 - t_0}{2}$ approximates the one-way network delay.</li>
+                    </ul>
+                    <p><strong>Practical Example</strong>: In online gaming, Cristian's Algorithm can synchronize players' devices to ensure events like firing or jumping are consistent. While simple, its accuracy is affected by variable network latency, making it suitable for scenarios where bounded but small errors are acceptable.</p>
+
+                    <h5>3.1.2 Network Time Protocol (NTP)</h5>
+                    <p>NTP synchronizes clocks hierarchically, minimizing error by considering asymmetric delays and network hierarchies. It operates as follows:</p>
+                    <ul>
+                        <li><strong>Step 1: Multilevel Hierarchy</strong>: Servers are organized in a tree. Primary servers at the root synchronize directly with atomic clocks or GPS. Secondary servers synchronize with primary servers, and tertiary servers synchronize with secondary servers. Clients synchronize with their immediate parent node.</li>
+                        <li><strong>Step 2: Exchange Messages</strong>: A client exchanges four timestamps with its parent:
+                            <ul>
+                                <li>Request send time: $t_1$ (client's clock).</li>
+                                <li>Request receive time: $t_2$ (server's clock).</li>
+                                <li>Response send time: $t_3$ (server's clock).</li>
+                                <li>Response receive time: $t_4$ (client's clock).</li>
+                            </ul>
+                        <li><strong>Step 3: Compute Offset</strong>: The client calculates its clock offset as:
+                            $$o = \frac{(t_2 - t_1) + (t_3 - t_4)}{2}$$
+                        <li><strong>Step 4: Adjust Clock</strong>: The client adjusts its clock by the calculated offset.</li>
+                    </ul>
+                    <p><strong>Practical Example</strong>: Email systems use NTP to ensure timestamp accuracy across global servers. For instance, an email sent from New York and received in Tokyo appears with consistent timestamps, enhancing reliability and user trust.</p>
+
+                </article>
+                <article>
+                    <h4>3.2 Internal Synchronization</h4>
+                    <p>Internal synchronization focuses on aligning clocks within a distributed group without external references. A widely used algorithm is:</p>
+
+                    <h5>3.2.1 Berkeley Algorithm</h5>
+                    <p>Berkeley's Algorithm relies on averaging to synchronize clocks in distributed systems. The steps are:</p>
+                    <ul>
+                        <li><strong>Step 1: Collect Times</strong>: A central master process polls all other processes for their clock values, noting the message round-trip time (RTT) for each.</li>
+                        <li><strong>Step 2: Calculate Average</strong>: The master computes the average clock time across all processes, adjusting for RTT by halving it:
+                            $$t_{average} = \frac{\sum (t_{i} + RTT_{i}/2)}{N}$$
+                            Where $t_{i}$ is the clock value of process $i$.</li>
+                        <li><strong>Step 3: Send Adjustments</strong>: The master sends each process the amount to adjust its clock (positive or negative).</li>
+                    </ul>
+                    <p><strong>Practical Example</strong>: Distributed weather sensors monitoring temperature in a region use the Berkeley Algorithm to align their timestamps. This ensures the collected data is temporally consistent for further analysis.</p>
+                </article>
+            </article>
+
+            <article>
+                <h3>4. Logical Timestamps</h3>
+
+                <article>
+                    <h4>4.1 Lamport Timestamps</h4>
+                    <p>Lamport timestamps establish a logical ordering of events in distributed systems by assigning each event an integer timestamp. The algorithm ensures causality, meaning that if one event influences another, the first event will always have a smaller timestamp.</p>
+                    <p><strong>How it works:</strong></p>
+                    <ul>
+                        <li><strong>Event Execution:</strong> Each process maintains a local integer clock. When a process executes an event (e.g., a computation or message send), it increments its local clock by 1.</li>
+                        <li><strong>Message Exchange:</strong> When a process sends a message, it includes the current value of its clock in the message.</li>
+                        <li><strong>Message Receipt:</strong> Upon receiving a message with timestamp $T_{msg}$, the receiving process updates its clock to:
+                            $$T_{recv} = \max(T_{local}, T_{msg}) + 1$$</li>
+                    </ul>
+                    <p>This ensures that if an event $A$ causally precedes an event $B$, their timestamps will satisfy $T(A) < T(B)$.</p>
+                            <p><strong>Limitation:</strong> Lamport timestamps cannot distinguish concurrent events (i.e., events with no causal relationship).</p>
+
+                            <p><strong>Practical Example:</strong></p>
+                            <p>Consider a chat application where messages must be displayed in the order they were sent. Lamport timestamps ensure that if a user replies to a message, the reply will always appear after the original message, regardless of network delays.</p>
+                </article>
+                <article>
+                    <h4>4.2 Vector Timestamps</h4>
+                    <p>Vector timestamps extend Lamport's approach to distinguish causally related events from concurrent events. Each process maintains a vector of clocks, where each element tracks its knowledge of other processes' clocks.</p>
+                    <p><strong>How it works:</strong></p>
+                    <ul>
+                        <li><strong>Event Execution:</strong> When a process executes an event, it increments its own clock element in the vector.</li>
+                        <li><strong>Message Exchange:</strong> A process includes its vector timestamp in any message it sends.</li>
+                        <li><strong>Message Receipt:</strong> Upon receiving a message with vector timestamp $V_{msg}$, the receiving process updates its vector as follows:
+                            <ul>
+                                <li>Increment its own clock: $V[i] = V[i] + 1$</li>
+                                <li>Update other elements: $V[j] = \max(V_{msg}[j], V_{local}[j])$ for $j \neq i$</li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <p>This mechanism allows detecting concurrent events ($V_1 ||| V_2$) and causally related events ($V_1 < V_2$).</p>
+
+                            <p><strong>Practical Example:</strong></p>
+                            <p>In collaborative document editing, vector timestamps help maintain consistency. For example, if two users edit the same section concurrently, vector timestamps ensure both changes are tracked, and conflicts are resolved intelligently.</p>
+                </article>
+            </article>
+
+            <article>
+                <h3>5. Eventual Consistency Models</h3>
+
+                <article>
+                    <h4>5.1 CAP Theorem</h4>
+                    <p>The CAP theorem, proposed by Eric Brewer, states that a distributed system can satisfy at most two of the following three properties simultaneously:</p>
+
+                    <ul>
+                        <li><strong>Consistency</strong>: Ensures that all nodes return the latest written value for any data. For example, in a banking application, if one user transfers money, all subsequent queries across nodes must reflect the updated balance.</li>
+
+                        <li><strong>Availability</strong>: Guarantees that every request receives a response, even if some nodes fail. For instance, an e-commerce website must always allow users to browse and place orders, even during server downtime.</li>
+
+                        <li><strong>Partition Tolerance</strong>: Allows the system to continue functioning despite network partitions. For example, during a data center outage, a globally distributed database should still allow operations on unaffected nodes.</li>
+                    </ul>
+                    <p><strong>Real-World Trade-Off:</strong> Modern systems prioritize partition tolerance (essential due to the internet’s inherent unreliability) and balance between consistency and availability based on use case:</p>
+                    <ul>
+                        <li><strong>Consistency over Availability</strong>: Financial systems prioritize consistency to avoid incorrect account balances.</li>
+                        <li><strong>Availability over Consistency</strong>: Social media platforms prioritize availability to ensure posts and comments can be accessed at all times.</li>
+                    </ul>
+                </article>
+                <article>
+                    <h4>5.2 Models of Consistency</h4>
+                    <p>Distributed systems adopt various consistency models to balance user requirements and system constraints:</p>
+
+                    <ul>
+                        <li><strong>Eventual Consistency</strong>: Over time, all replicas of a data item converge to the same value, provided no new updates occur. For example, DNS systems propagate updates to domain records globally, ensuring eventual alignment despite initial discrepancies.</li>
+
+                        <li><strong>Causal Consistency</strong>: Preserves the causality between writes. If operation A causes operation B, any client reading B must see A. In collaborative editing tools, causal consistency ensures that changes made by one user appear in the correct order for others.</li>
+
+                        <li><strong>Strong Consistency</strong>: Ensures all clients view the same data simultaneously. For example, in stock trading platforms, the same stock price must be displayed to all traders at any given moment to ensure fairness and accuracy.</li>
+                    </ul>
+
+                    <p><strong>Practical Design:</strong> Distributed systems often choose models based on their workload. For example:</p>
+                    <ul>
+                        <li>Systems like Cassandra and DynamoDB use eventual consistency to prioritize availability.</li>
+                        <li>Google Spanner employs strong consistency for mission-critical applications.</li>
+                        <li>Causal consistency is often used in real-time collaboration tools like Google Docs.</li>
+                    </ul>
+                </article>
+            </article>
+
+            <article>
+                <h3>6. Applications in Distributed Systems</h3>
+
+                <article>
+                    <h4>6.1 Airline Reservation Systems</h4>
+                    <p>In airline reservation systems, distributed servers manage seat availability across multiple locations. Without synchronized clocks or proper event ordering, inconsistencies can arise, such as double-booking the same seat. For example:</p>
+                    <ul>
+                        <li><strong>Scenario:</strong> Two customers simultaneously book the last available seat on a flight. Server A processes Customer 1's request, while Server B processes Customer 2's request.</li>
+                        <li><strong>Issue:</strong> Without synchronized timestamps, both servers might independently record the seat as available, leading to conflicting bookings.</li>
+                        <li><strong>Solution:</strong> Synchronizing clocks using protocols like NTP or implementing logical timestamps ensures consistent event ordering. Server B would recognize that Customer 1's booking was processed first and correctly reject Customer 2's request.</li>
+                    </ul>
+                    <p>This prevents errors, ensuring accurate seat allocation and enhancing customer trust.</p>
+                </article>
+                <article>
+                    <h4>6.2 Key-Value Stores</h4>
+                    <p>Key-value stores like Cassandra and Riak use event ordering to ensure data consistency across distributed replicas. These databases often operate in eventual consistency mode to maximize availability and performance.</p>
+                    <ul>
+                        <li><strong>Scenario:</strong> A shopping cart service uses a distributed database to store cart items. A customer adds an item to their cart on Server X, while another operation removes an item on Server Y.</li>
+                        <li><strong>Issue:</strong> Without proper event ordering, these updates might conflict, leading to inconsistent cart states.</li>
+                        <li><strong>Solution:</strong> Logical or vector timestamps help track the causality of updates. For instance, Server Y identifies that the addition on Server X occurred earlier and merges the updates correctly.</li>
+                    </ul>
+                    <p>By maintaining correct replication and convergence, key-value stores provide reliable and high-performance data services in large-scale distributed systems.</p>
+                </article>
+            </article>
+
+
+
+
+        </main>
+
+        <script> copyright("all"); </script>
+
+    </body>
+
+</html>

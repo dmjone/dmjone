@@ -102,6 +102,42 @@ function get_menu_list(datetogen) {
                 codetype: "Assignment",
                 readtime: 1,
                 link: "homework-assignment-2"
+            },
+            {
+                title: "Peer-to-Peer (P2P) Networks",
+                desc: "Explore Peer-to-Peer (P2P) Networks, a distributed systems architecture that enables direct communication and resource sharing between nodes. This section examines the key features and benefits of P2P Networks, including decentralized communication, fault tolerance, and scalability. Click to access the theory section and enhance your understanding of P2P Networks and their applications in distributed systems.",
+                codetype: "Concepts",
+                readtime: 5,
+                link: "peer-to-peer-networks"
+            },
+            {
+                title: "Key Value Stores",
+                desc: "Learn about Key-Value Stores, a distributed systems data storage model that stores data as key-value pairs. This section explores the key features and benefits of Key-Value Stores, including high availability, fault tolerance, and scalability. Click to access the theory section and deepen your understanding of Key-Value Stores and their applications in distributed systems.",
+                codetype: "Concepts",
+                readtime: 5,
+                link: "key-value-stores"
+            },
+            {
+                title: "Time and Orderings in Distributed Systems",
+                desc: "Explore the concepts of time and orderings in distributed systems, including logical clocks, vector clocks, and Lamport timestamps. This section examines the key features and benefits of time and orderings, including causality, consistency, and synchronization. Click to access the theory section and enhance your understanding of time and orderings in distributed systems.",
+                codetype: "Concepts",
+                readtime: 5,
+                link: "time-and-orderings"
+            },
+            {
+                title: "Reviewing Concepts of Key Value Stores and Time and Orderings in Distributed Systems",
+                desc: "Review the concepts of Key Value Stores and Time and Orderings in Distributed Systems with questions like What, How and Why.",
+                codetype: "Concepts",
+                readtime: 5,
+                link: "review-key-value-stores-time-orderings"
+
+            },
+            {
+                title: "Homework 3: Novel Approach to Conflict-Free Distributed Scheduling for Urban Ride-Sharing Platforms",
+                desc: "Engage in a novel approach to conflict-free distributed scheduling for urban ride-sharing platforms. This homework assignment will challenge you to design an innovative solution to optimize scheduling and resource allocation in a distributed environment. Click to access the assignment and demonstrate your ability to apply distributed systems concepts to real-world problems.",
+                codetype: "Assignment",
+                readtime: 1,
+                link: "homework-assignment-3"
             }
             // {
             //     title: "Distributed Hash Table (DHT)",
