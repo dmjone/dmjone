@@ -138,6 +138,27 @@ function get_menu_list(datetogen) {
                 codetype: "Assignment",
                 readtime: 1,
                 link: "homework-assignment-3"
+            },
+            {
+                title: "Snapshots in Distributed Systems",
+                desc: "Learn about Snapshots in Distributed Systems, a technique used to capture the global state of a distributed system at a specific point in time. This section explores the key features and benefits of snapshots, including consistency, causality, and fault tolerance. Click to access the theory section and deepen your understanding of snapshots in distributed systems.",
+                codetype: "Concepts",
+                readtime: 5,
+                link: "snapshots"
+            },
+            {
+                title: "Multicast Communication in Distributed Systems",
+                desc: "Explore Multicast Communication in Distributed Systems, a messaging pattern used to deliver messages to multiple recipients simultaneously. This section examines the key features and benefits of multicast communication, including efficiency, scalability, and fault tolerance. Click to access the theory section and enhance your understanding of multicast communication in distributed systems.",
+                codetype: "Concepts",
+                readtime: 5,
+                link: "multicast-communication"
+            },
+            {
+                title: "Paxos Algorithm",
+                desc: "Explore the Paxos Algorithm, a distributed systems consensus protocol used to achieve agreement among a group of nodes. This section examines the key features and benefits of the Paxos Algorithm, including fault tolerance, safety, and liveness properties. Click to access the theory section and enhance your understanding of the Paxos Algorithm and its applications in distributed systems.",
+                codetype: "Concepts",
+                readtime: 5,
+                link: "paxos-algorithm"
             }
             // {
             //     title: "Distributed Hash Table (DHT)",

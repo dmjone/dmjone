@@ -1,0 +1,263 @@
+<!-------------------------- © 2007 - present, dmj.one and contributors. ----------------------------------
+   Part of the dmjone project. Licensed under the GNU AGPL. Provided as-is, without warranty of any kind. 
+-------------------- Redistribution and modifications must retain this notice. --------------------------->
+
+
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+    <!--<![endif]-->
+
+    <head>
+        <script src="/js/edu_su_common.js"></script>
+        <noscript>
+            <style>
+                html,
+                body {
+                    margin: 0;
+                    overflow: hidden;
+                }
+            </style>
+            <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+        </noscript>
+
+        <title>Snapshots - DMJCCLT - dmj.one</title>
+        <meta name="description" content="Know about Snapshots in distributed systems - DMJCCLT - dmj.one">
+
+        <meta property="og:image" content="/logo.png">
+        <meta property="og:type" content="article">
+
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:site" content="@divyamohan1993">
+        <meta name="twitter:creator" content="@divyamohan1993">
+        <meta name="twitter:image" content="/logo.png">
+
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+        <meta name="author" content="Divya Mohan">
+        <meta name="robots" content="index, follow">
+
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js" integrity="sha512-sHSNLECRJSK+BFs7E8DiFc6pf6n90bLI85Emiw1jhreduZhK3VXgq9l4kAt9eTIHYAcuQBKHL01QKs4/3Xgl8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js" integrity="sha512-iWiuBS5nt6r60fCz26Nd0Zqe0nbk1ZTIQbl3Kv7kYsX+yKMUFHzjaH2+AnM6vp2Xs+gNmaBAVWJjSmuPw76Efg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                renderMathInElement(document.body, {
+                    // customised options
+                    // • auto-render specific keys, e.g.:
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false },
+                        { left: '\\(', right: '\\)', display: false },
+                        { left: '\\[', right: '\\]', display: true }
+                    ],
+                    // • rendering keys, e.g.:
+                    throwOnError: false
+                });
+            });
+        </script> -->
+
+        <!-- <style>
+            main ul {
+                list-style-type: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            main ul li {
+                margin: 0;
+                padding: 0;
+            }
+        </style> -->
+
+    </head>
+
+    <body>
+
+        <script> header_author("dm", "lakshika"); </script>
+
+        <main>
+            <article class="agen-tableofcontents">
+                <h2 class="text-center">
+                    Snapshots in Distributed Systems
+                </h2>
+                <div class="d-none contentdate">2024, December 25</div>
+            </article>
+
+            <article>
+                <h3>1. Understanding Snapshots in Distributed Systems</h3>
+                <p>Imagine trying to understand the state of a system where multiple components are working independently and exchanging information. Capturing this state across all components, including what they are doing and the messages they are exchanging, is like taking a detailed photograph of the system at a moment in time. This "photograph" is vital for understanding how the system behaves, ensuring it can recover from issues, and maintaining its reliability.</p>
+            </article>
+
+            <article>
+                <h4>1.1 What Constitutes a Snapshot?</h4>
+                <p>A snapshot provides a detailed picture of the system by capturing:</p>
+                <ul>
+                    <li><strong>State of Each Component</strong>: Each system component (or process) has data it works with—think of this as its memory, tasks in progress, or other internal variables. These need to be recorded to understand what each part was doing at the time.</li>
+                    <li><strong>Messages in Transit</strong>: The communication channels between components often carry messages. Knowing what messages are mid-transit helps understand what actions were expected or in progress across components.</li>
+                </ul>
+                <p>Both the individual states and messages in transit form a complete snapshot of the system.</p>
+            </article>
+
+            <article>
+                <h4>1.2 Why Snapshots Matter</h4>
+                <p>In a complex system, snapshots serve specific, practical purposes:</p>
+                <ul>
+                    <li><strong>Recovering from Failures</strong>: If a system crashes, a snapshot can act as a "restore point" to resume operations without starting from scratch.</li>
+                    <li><strong>Identifying System Stalls</strong>: When parts of the system wait indefinitely for resources, a snapshot helps identify the exact conditions causing the wait, making it possible to resolve the problem.</li>
+                    <li><strong>Recognizing Task Completion</strong>: In distributed systems, tasks often depend on several components finishing their work. A snapshot can confirm whether everything required for a task has been completed.</li>
+                    <li><strong>Cleaning Up Unused Resources</strong>: Over time, unused data or processes might remain, wasting resources. Snapshots help detect these so they can be removed safely.</li>
+                </ul>
+                <p>Snapshots are essentially the key to understanding, troubleshooting, and optimizing a distributed system.</p>
+            </article>
+
+            <article>
+                <h3>2. Challenges in Capturing Snapshots</h3>
+                <p>In distributed systems, capturing the exact state at a single moment is inherently difficult. Each part of the system operates independently, often without shared knowledge of what other parts are doing at that instant. Unlike a single system with a unified clock, distributed systems do not have a global clock, so components may disagree on what "now" means. Additionally, components communicate by sending and receiving messages, which are often in transit and not yet delivered at the time a snapshot is initiated. Recording these in-transit messages without disrupting the system's operations adds another layer of complexity.</p>
+            </article>
+
+            <article>
+                <h4>2.1 Key Constraints</h4>
+                <p>To effectively capture snapshots, certain constraints must be managed:</p>
+                <ul>
+                    <li><strong>Minimal Disruption</strong>: The system must continue functioning while the snapshot is taken. Stopping all processes or halting communication just to record the state is not feasible because it disrupts normal operations.</li>
+                    <li><strong>Decentralized Coordination</strong>: Each process in the system must independently decide and record its own state. A centralized controller attempting to gather all data in one place is not practical, as it creates bottlenecks and single points of failure.</li>
+                    <li><strong>Accurate Representation of Message Flow</strong>: Messages exchanged between components are crucial for understanding the state. A message sent but not yet received represents an incomplete operation. Snapshots must correctly capture such in-transit messages to ensure the recorded state reflects the system's reality.</li>
+                    <li><strong>Preservation of Causality</strong>: Actions in distributed systems often depend on the order of previous actions. If a snapshot does not respect the natural sequence of events (e.g., message sent before message received), it will lead to inconsistencies, making the snapshot unreliable.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>3. Chandy-Lamport Snapshot Algorithm</h3>
+                <p>In distributed systems, capturing an accurate global state is critical but challenging due to independent and concurrent operations. The Chandy-Lamport algorithm is a widely used method that ensures a consistent global snapshot by leveraging causality instead of relying on synchronized clocks. It works by coordinating processes to record their states and the states of communication channels systematically.</p>
+            </article>
+
+            <article>
+                <h4>3.1 Algorithm Workflow</h4>
+                <p>The Chandy-Lamport algorithm proceeds in the following detailed steps:</p>
+                <ol>
+                    <li><strong>Initiation</strong>:
+                        <p>A designated process, called the initiator, begins the snapshot process:
+                        <ul>
+                            <li>The initiator records its own current state, including local variables, task progress, and any other relevant information.</li>
+                            <li>It then sends a special control message called a <em>marker</em> along all its outgoing communication channels. The marker is not an application message but a signal that indicates the beginning of a snapshot process.</li>
+                        </ul>
+                        </p>
+                    </li>
+
+                    <li><strong>Receiving the Marker</strong>:
+                        <p>When a process receives a marker, it reacts based on whether it is the first marker or a subsequent one:</p>
+                        <ul>
+                            <li><strong>First Marker Received</strong>:
+                                <p>If this is the first marker the process has seen:</p>
+                                <ul>
+                                    <li>The process immediately records its own current state, capturing all relevant information at that moment.</li>
+                                    <li>The channel through which the marker arrived is marked as "empty," signifying that no messages were in transit when the marker was received.</li>
+                                    <li>The process sends markers along all its outgoing communication channels to notify other processes of the snapshot process.</li>
+                                    <li>The process begins recording all incoming messages on the remaining channels until it receives a marker on each channel.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Subsequent Marker Received</strong>:
+                                <p>If the process receives another marker on a different channel:</p>
+                                <ul>
+                                    <li>It stops recording messages on that channel.</li>
+                                    <li>The recorded messages on that channel since the first marker are saved as the channel’s state. These messages represent the in-transit messages during the snapshot.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <li><strong>Completion</strong>:
+                        <p>The algorithm terminates when:</p>
+                        <ul>
+                            <li>Each process in the system has recorded its state.</li>
+                            <li>The state of every communication channel has been recorded, either as "empty" or containing messages that were in transit.</li>
+                        </ul>
+                        <p>At this point, the snapshot is complete, and the global state is compiled from the individual process and channel states.</p>
+                    </li>
+                </ol>
+            </article>
+
+            <article>
+                <h4>3.2 Properties of the Algorithm</h4>
+                <p>The Chandy-Lamport algorithm ensures the following essential properties:</p>
+                <ul>
+                    <li><strong>Causally Consistent Snapshots</strong>: The algorithm respects the natural order of events, ensuring that no events are captured out of sequence.</li>
+                    <li><strong>Consistent Cut Representation</strong>: The snapshot represents a consistent cut of the distributed system, maintaining causality and avoiding partial or incomplete states.</li>
+                    <li><strong>Non-Disruptive Execution</strong>: Processes continue their normal operations while the snapshot is being recorded, ensuring minimal impact on system performance.</li>
+                    <li><strong>Scalability</strong>: The algorithm works efficiently for any number of processes and channels, provided the system adheres to FIFO (First-In-First-Out) communication between processes.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>4. Applications of Snapshots</h3>
+                <p>Snapshots play a pivotal role in managing, maintaining, and debugging distributed systems. They provide a comprehensive view of the system's state, enabling several key functionalities:</p>
+                <ul>
+                    <li><strong>Fault Tolerance</strong>:
+                        <p>In distributed systems, failures are inevitable. Snapshots act as checkpoints, allowing the system to restart from a known consistent state rather than beginning from scratch. For example, in a cloud-based database, a snapshot can restore the system after a crash without data loss, ensuring uninterrupted service.</p>
+                    </li>
+                    <li><strong>System Monitoring</strong>:
+                        <p>Snapshots help administrators identify and resolve anomalies like unresponsive processes or deadlocks. By examining the snapshot, one can trace the origin of issues such as a circular dependency that causes a deadlock or a task that has stalled unexpectedly.</p>
+                    </li>
+                    <li><strong>State Debugging</strong>:
+                        <p>Snapshots are invaluable during debugging. They allow developers to analyze the exact state of each component and communication at a given moment. For example, if a computation yields incorrect results, a snapshot can reveal whether the problem lies in a misconfigured process or an overlooked message.</p>
+                    </li>
+                    <li><strong>Global Property Verification</strong>:
+                        <p>Certain properties in distributed systems, such as whether all computations have terminated or whether deadlocks exist, require a global view of the system. Snapshots provide this view, making it possible to verify these properties efficiently and accurately. For instance, in a batch processing system, a snapshot can confirm that all tasks are complete and resources have been released.</p>
+                    </li>
+                </ul>
+                
+            </article>
+
+            <article>
+                <h3>5. Limitations and Extensions</h3>
+                <p>The Chandy-Lamport algorithm is an elegant solution for capturing global snapshots in distributed systems, but it operates under certain constraints. These limitations highlight its dependencies and the need for enhancements in more complex scenarios:</p>
+            
+                <ul>
+                    <li><strong>FIFO Channels</strong>:
+                        <p>The algorithm assumes that communication channels deliver messages in the order they were sent (First-In-First-Out). This simplifies tracking messages in transit but may not hold in systems where communication channels are non-deterministic or unreliable.</p>
+                    </li>
+            
+                    <li><strong>Reliable Communication</strong>:
+                        <p>The algorithm relies on the guarantee that messages are neither lost nor duplicated during transmission. In real-world networks with potential packet loss or duplication, this assumption might not hold, limiting the algorithm's applicability without additional mechanisms.</p>
+                    </li>
+            
+                    <li><strong>No Process Failures</strong>:
+                        <p>The algorithm assumes that all processes remain functional during the snapshot process. If a process crashes or becomes unreachable, the snapshot may be incomplete or invalid, requiring fault-tolerant extensions to handle such scenarios.</p>
+                    </li>
+            
+                    <li><strong>Static Topology</strong>:
+                        <p>The algorithm presumes a fixed network topology during execution. Systems with dynamic changes, such as nodes joining or leaving, require modifications to maintain correctness.</p>
+                    </li>
+                </ul>
+            
+                <h4>Extensions to Address Limitations</h4>
+                <p>Advanced variants of the Chandy-Lamport algorithm have been developed to address these challenges:</p>
+                <ul>
+                    <li><strong>Relaxing FIFO Assumptions</strong>:
+                        <p>Protocols that add sequence numbers or use acknowledgments to order messages can handle non-FIFO communication channels.</p>
+                    </li>
+            
+                    <li><strong>Handling Message Loss and Duplication</strong>:
+                        <p>Reliability layers, such as retransmission and deduplication mechanisms, ensure that all relevant messages are delivered and counted correctly, even in unreliable networks.</p>
+                    </li>
+            
+                    <li><strong>Fault Tolerance</strong>:
+                        <p>Extensions like checkpoints with logging and recovery techniques can handle process crashes. These mechanisms allow the system to recover partial snapshots or retry the snapshot process.</p>
+                    </li>
+            
+                    <li><strong>Dynamic Systems</strong>:
+                        <p>Dynamic snapshot algorithms adapt to changes in the network topology by continuously updating the snapshot process to include new nodes or exclude failed ones.</p>
+                    </li>
+                </ul>                            
+            </article>
+
+
+        </main>
+
+        <script> copyright("all"); </script>
+
+    </body>
+
+</html>
