@@ -159,6 +159,20 @@ function get_menu_list(datetogen) {
                 codetype: "Concepts",
                 readtime: 5,
                 link: "paxos-algorithm"
+            },
+            {
+                title: "Leader Election in Distributed Systems",
+                desc: "Learn about Leader Election in Distributed Systems, a process used to select a leader node in a distributed environment. This section explores the key features and benefits of leader election, including fault tolerance, scalability, and consensus. Click to access the theory section and deepen your understanding of leader election in distributed systems.",
+                codetype: "Concepts",
+                readtime: 5,
+                link: "leader-election"
+            },
+            {
+                title: "Mutual Exclusion",
+                desc: "Explore Mutual Exclusion in Distributed Systems, a synchronization technique used to prevent concurrent access to shared resources. This section examines the key features and benefits of mutual exclusion, including deadlock prevention, fairness, and efficiency. Click to access the theory section and enhance your understanding of mutual exclusion in distributed systems.",
+                codetype: "Concepts",
+                readtime: 5,
+                link: "mutual-exclusion"
             }
             // {
             //     title: "Distributed Hash Table (DHT)",

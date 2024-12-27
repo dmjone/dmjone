@@ -1,0 +1,466 @@
+<!-------------------------- © 2007 - present, dmj.one and contributors. ----------------------------------
+   Part of the dmjone project. Licensed under the GNU AGPL. Provided as-is, without warranty of any kind. 
+-------------------- Redistribution and modifications must retain this notice. --------------------------->
+
+
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+    <!--<![endif]-->
+
+    <head>
+        <script src="/js/edu_su_common.js"></script>
+        <noscript>
+            <style>
+                html,
+                body {
+                    margin: 0;
+                    overflow: hidden;
+                }
+            </style>
+            <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+        </noscript>
+
+        <title>Mutual Exclusion - DMJCCLT - dmj.one</title>
+        <meta name="description" content="Know about Mutual Exclusion in distributed systems - DMJCCLT - dmj.one">
+
+        <meta property="og:image" content="/logo.png">
+        <meta property="og:type" content="article">
+
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:site" content="@divyamohan1993">
+        <meta name="twitter:creator" content="@divyamohan1993">
+        <meta name="twitter:image" content="/logo.png">
+
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+        <meta name="author" content="Divya Mohan">
+        <meta name="robots" content="index, follow">
+
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js" integrity="sha512-sHSNLECRJSK+BFs7E8DiFc6pf6n90bLI85Emiw1jhreduZhK3VXgq9l4kAt9eTIHYAcuQBKHL01QKs4/3Xgl8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js" integrity="sha512-iWiuBS5nt6r60fCz26Nd0Zqe0nbk1ZTIQbl3Kv7kYsX+yKMUFHzjaH2+AnM6vp2Xs+gNmaBAVWJjSmuPw76Efg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                renderMathInElement(document.body, {
+                    // customised options
+                    // • auto-render specific keys, e.g.:
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false },
+                        { left: '\\(', right: '\\)', display: false },
+                        { left: '\\[', right: '\\]', display: true }
+                    ],
+                    // • rendering keys, e.g.:
+                    throwOnError: false
+                });
+            });
+        </script> -->
+
+        <!-- <style>
+            main ul {
+                list-style-type: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            main ul li {
+                margin: 0;
+                padding: 0;
+            }
+        </style> -->
+
+    </head>
+
+    <body>
+
+        <script> header_author("dm", "lakshika"); </script>
+
+        <main>
+            <article class="agen-tableofcontents">
+                <h2 class="text-center">
+                    Mutual Exclusion in Distributed Systems
+                </h2>
+                <div class="d-none contentdate">2024, December 27</div>
+            </article>
+
+            <article>
+                <h3>1. Introduction and Basics</h3>
+                <p>Mutual exclusion is a fundamental concept in distributed systems, ensuring that multiple processes do not simultaneously access shared resources or critical sections (CS). This guarantees data consistency and correctness by avoiding race conditions.</p>
+            
+                <h4>1.1 Why Mutual Exclusion?</h4>
+                <ul>
+                    <li>
+                        <strong>Bank Example:</strong>
+                        <p><strong>What:</strong> Consider a scenario where two ATMs attempt to update the same bank account balance simultaneously.</p>
+                        <p><strong>Why:</strong> Without mutual exclusion, both ATMs might read the same initial balance and write conflicting updates, leading to incorrect totals (e.g., overwriting $21,000 with $11,000).</p>
+                        <p><strong>How:</strong> By ensuring mutual exclusion, only one ATM updates the balance at a time, preserving the correct final value.</p>
+                    </li>
+                    <li>
+                        <strong>Distributed File Systems:</strong>
+                        <p><strong>What:</strong> File systems shared across multiple machines must lock files to prevent simultaneous modifications.</p>
+                        <p><strong>Why:</strong> Concurrent writes to the same file can corrupt its integrity, making it unreadable or incorrect.</p>
+                        <p><strong>How:</strong> Mutual exclusion mechanisms ensure that only one process accesses a file at a time, maintaining its consistency.</p>
+                    </li>
+                    <li>
+                        <strong>Critical Section Problem:</strong>
+                        <p><strong>What:</strong> A critical section is a part of code that modifies shared resources and must not be accessed by multiple processes simultaneously.</p>
+                        <p><strong>Why:</strong> Without control, multiple processes may execute conflicting operations, leading to unpredictable results.</p>
+                        <p><strong>How:</strong> Mutual exclusion protocols manage entry and exit to/from the critical section, ensuring controlled access.</p>
+                    </li>
+                </ul>
+            
+                <h4>1.2 Requirements</h4>
+                <ul>
+                    <li>
+                        <strong>Safety:</strong>
+                        <p><strong>What:</strong> Ensures that at most one process is in the critical section at any time.</p>
+                        <p><strong>Why:</strong> This prevents data corruption caused by simultaneous access.</p>
+                        <p><strong>How:</strong> Mutual exclusion algorithms guarantee a single process's access by using mechanisms like locks or tokens.</p>
+                    </li>
+                    <li>
+                        <strong>Liveness:</strong>
+                        <p><strong>What:</strong> Guarantees that every request to access the critical section will eventually be granted.</p>
+                        <p><strong>Why:</strong> Prevents starvation, where some processes are indefinitely denied access.</p>
+                        <p><strong>How:</strong> Algorithms ensure fairness and maintain a queue or logical ordering for requests.</p>
+                    </li>
+                    <li>
+                        <strong>Ordering:</strong>
+                        <p><strong>What:</strong> Ensures that requests are granted access in the order they are made.</p>
+                        <p><strong>Why:</strong> This optional property prevents newer requests from bypassing older ones, which can violate logical consistency.</p>
+                        <p><strong>How:</strong> Mechanisms like timestamps or causal ordering prioritize requests sequentially.</p>
+                    </li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>2. Distributed Mutual Exclusion</h3>
+                <p>Distributed systems, unlike single operating systems, cannot rely on shared memory or global variables. They implement mutual exclusion using message passing across interconnected processes.</p>
+            
+                <h4>2.1 Centralized Algorithm</h4>
+                <ul>
+                    <li>
+                        <strong>Master Process:</strong>
+                        <p><strong>What:</strong> A central coordinator, called the master process, manages access to the critical section (CS) using a token system.</p>
+                        <p><strong>Why:</strong> This simplifies coordination as only the master process needs to handle requests and responses.</p>
+                        <p><strong>How:</strong>
+                        <ul>
+                            <li>Processes send a request to the master when they want to enter the CS.</li>
+                            <li>The master grants access by sending the token to the requesting process, following a First-In-First-Out (FIFO) order.</li>
+                            <li>Upon exiting the CS, the process returns the token to the master.</li>
+                        </ul>
+                        </p>
+                    </li>
+                    <li>
+                        <strong>Analysis:</strong>
+                        <ul>
+                            <li>
+                                <strong>Bandwidth:</strong>
+                                <p><strong>What:</strong> Measures the number of messages exchanged per operation.</p>
+                                <p><strong>Why:</strong> Helps evaluate the communication cost of the algorithm.</p>
+                                <p><strong>How:</strong>
+                                <ul>
+                                    <li><code>enter()</code>: 1 message to the master (request) + 1 message from the master (token) = 2 messages.</li>
+                                    <li><code>exit()</code>: 1 message to the master (returning the token).</li>
+                                </ul>
+                                </p>
+                            </li>
+                            <li>
+                                <strong>Issues:</strong>
+                                <p><strong>Single Point of Failure (SPoF):</strong> If the master fails, the entire system halts.</p>
+                                <p><strong>Bottleneck:</strong> The master process can become overwhelmed with requests, degrading performance.</p>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            
+                <h4>2.2 Ring-Based Algorithm</h4>
+                <ul>
+                    <li>
+                        <strong>Token Ring:</strong>
+                        <p><strong>What:</strong> Processes are arranged in a logical ring, and a single token circulates among them.</p>
+                        <p><strong>Why:</strong> Eliminates the need for a central coordinator, distributing the load evenly.</p>
+                        <p><strong>How:</strong>
+                        <ul>
+                            <li>Each process can only enter the CS if it holds the token.</li>
+                            <li>When done, it passes the token to its successor in the ring.</li>
+                            <li>If a process receives the token but does not need the CS, it immediately forwards the token.</li>
+                        </ul>
+                        </p>
+                    </li>
+                    <li>
+                        <strong>Analysis:</strong>
+                        <ul>
+                            <li>
+                                <strong>Client Delay:</strong>
+                                <p><strong>What:</strong> Time taken for a requesting process to acquire the token when no other process is in the CS.</p>
+                                <p><strong>How:</strong>
+                                <ul>
+                                    <li>Best case: The requesting process already holds the token, so delay is 0.</li>
+                                    <li>Worst case: The token must traverse N hops to return to the requesting process.</li>
+                                </ul>
+                                </p>
+                            </li>
+                            <li>
+                                <strong>Synchronization Delay:</strong>
+                                <p><strong>What:</strong> Time between one process exiting the CS and the next process entering.</p>
+                                <p><strong>How:</strong>
+                                <ul>
+                                    <li>Best case: Token passes to the immediate successor, requiring 1 hop.</li>
+                                    <li>Worst case: Token traverses N-1 hops to reach the next requesting process.</li>
+                                </ul>
+                                </p>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </article>
+
+            
+            <article>
+                <h3>3. Ricart-Agrawala's Algorithm</h3>
+                <p>The Ricart-Agrawala algorithm is a token-less approach to mutual exclusion in distributed systems. It leverages the concepts of causality and Lamport timestamps to ensure correctness, safety, and fairness without relying on a centralized master or token passing.</p>
+            
+                <h4>3.1 Steps</h4>
+                <ul>
+                    <li>
+                        <strong>Step 1: Multicasting a Request</strong>
+                        <p><strong>What:</strong> When a process, Pi, wants to enter the critical section (CS), it generates a request message.</p>
+                        <p><strong>Why:</strong> To inform all other processes about its intention to enter the CS.</p>
+                        <p><strong>How:</strong>
+                        <ul>
+                            <li>Attach the current Lamport timestamp (Ti) and the process ID (Pi) to the request message: <code>&lt;Ti, Pi&gt;</code>.</li>
+                            <li>Multicast this request to all other N-1 processes in the system.</li>
+                        </ul>
+                        </p>
+                    </li>
+                    <li>
+                        <strong>Step 2: Waiting for Replies</strong>
+                        <p><strong>What:</strong> After sending the request, Pi waits to receive <code>Reply</code> messages from all N-1 other processes.</p>
+                        <p><strong>Why:</strong> The replies indicate that no other process has a higher-priority request for the CS.</p>
+                        <p><strong>How:</strong>
+                        <ul>
+                            <li>Each process receiving a request checks its state:</li>
+                            <li>If it is in the CS or has a higher-priority request (based on timestamp and process ID), it delays sending the reply and queues Pi’s request.</li>
+                            <li>If neither condition applies, it immediately sends a reply to Pi.</li>
+                        </ul>
+                        </p>
+                    </li>
+                    <li>
+                        <strong>Step 3: Entering the Critical Section</strong>
+                        <p><strong>What:</strong> Once Pi has received replies from all N-1 processes, it can safely enter the CS.</p>
+                        <p><strong>Why:</strong> This ensures that no other process with higher priority is waiting for the CS.</p>
+                        <p><strong>How:</strong> Pi transitions to the critical section state and executes its critical code.</p>
+                    </li>
+                    <li>
+                        <strong>Step 4: Exiting the Critical Section</strong>
+                        <p><strong>What:</strong> When Pi finishes its work in the CS, it must allow other processes to proceed.</p>
+                        <p><strong>Why:</strong> To ensure fairness and prevent starvation.</p>
+                        <p><strong>How:</strong>
+                        <ul>
+                            <li>Pi sends <code>Reply</code> messages to all queued requests that it had deferred earlier.</li>
+                            <li>It transitions to the <code>Released</code> state.</li>
+                        </ul>
+                        </p>
+                    </li>
+                </ul>
+            
+                <h4>3.2 Safety Proof</h4>
+                <p><strong>What:</strong> The algorithm ensures that at most one process is in the CS at a time.</p>
+                <p><strong>Why:</strong> It avoids conflicting access to shared resources by leveraging Lamport timestamps and reply acknowledgments.</p>
+                <p><strong>How:</strong>
+                <ul>
+                    <li>If two processes, Pi and Pj, simultaneously attempt to access the CS, they exchange requests.</li>
+                    <li>The process with the earlier timestamp (or lower process ID in case of a tie) receives replies first and enters the CS.</li>
+                    <li>The other process waits until it receives a reply from the first, ensuring mutual exclusion.</li>
+                    <li>If Pi were to access the CS simultaneously with Pj, it would imply contradictory timestamp ordering (e.g., Ti < Tj and Tj < Ti), which is impossible under Lamport timestamp rules.</li>
+                </ul>
+                </p>
+            
+                <h4>3.3 Performance</h4>
+                <ul>
+                    <li>
+                        <strong>Bandwidth:</strong>
+                        <p><strong>What:</strong> Number of messages exchanged during an <code>enter()</code> or <code>exit()</code> operation.</p>
+                        <p><strong>How:</strong>
+                        <ul>
+                            <li><code>enter()</code>: N-1 request messages + N-1 reply messages = 2(N-1) messages.</li>
+                            <li><code>exit()</code>: Deferred replies sent to queued processes = N-1 messages in the worst case.</li>
+                        </ul>
+                        </p>
+                    </li>
+                    <li>
+                        <strong>Client Delay:</strong>
+                        <p><strong>What:</strong> Time taken for a process to enter the CS when no other process is using it.</p>
+                        <p><strong>How:</strong>
+                        <ul>
+                            <li>One round-trip time: Request multicast to all processes and their replies received.</li>
+                        </ul>
+                        </p>
+                    </li>
+                    <li>
+                        <strong>Synchronization Delay:</strong>
+                        <p><strong>What:</strong> Time between one process exiting the CS and the next process entering.</p>
+                        <p><strong>How:</strong>
+                        <ul>
+                            <li>One message transmission: Reply sent to the waiting process.</li>
+                        </ul>
+                        </p>
+                    </li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>4. Maekawa's Algorithm</h3>
+                <p>Maekawa's algorithm refines Ricart-Agrawala by reducing the number of processes involved in granting access to the critical section (CS). Instead of requiring responses from all processes, it uses subsets called voting sets to optimize bandwidth and delay.</p>
+            
+                <h4>4.1 Key Concepts</h4>
+                <ul>
+                    <li>
+                        <strong>Voting Sets:</strong>
+                        <p><strong>What:</strong> Each process, Pi, is associated with a voting set, Vi, containing √N processes.</p>
+                        <p><strong>Why:</strong> This limits the number of responses required, reducing overhead while ensuring intersection with other voting sets.</p>
+                        <p><strong>How:</strong>
+                        <ul>
+                            <li>The intersection of any two voting sets, Vi and Vj, is non-empty. This guarantees that no two processes can simultaneously access the CS.</li>
+                            <li>Voting sets are typically organized by placing processes in a √N × √N matrix, where rows and columns represent voting sets.</li>
+                        </ul>
+                        </p>
+                    </li>
+                    <li>
+                        <strong>Voting Requirement:</strong>
+                        <p><strong>What:</strong> Only votes from a process's voting set are required to enter the CS.</p>
+                        <p><strong>Why:</strong> This reduces the total number of messages compared to Ricart-Agrawala, where N-1 processes must reply.</p>
+                        <p><strong>How:</strong> Each process manages its voting set and responds only to requests from its own set.</p>
+                    </li>
+                </ul>
+            
+                <h4>4.2 Steps</h4>
+                <ul>
+                    <li>
+                        <strong>Request Phase:</strong>
+                        <p><strong>What:</strong> A process Pi sends a <code>Request</code> message to all members of its voting set Vi.</p>
+                        <p><strong>How:</strong>
+                        <ul>
+                            <li>Pi's state changes to <code>Wanted</code>.</li>
+                            <li>Each recipient in Vi evaluates the request:</li>
+                            <ul>
+                                <li>If it has not already voted, it sends a <code>Vote</code> to Pi and marks itself as having voted.</li>
+                                <li>If it has already voted, it queues Pi's request until its current vote is released.</li>
+                            </ul>
+                        </ul>
+                        </p>
+                    </li>
+                    <li>
+                        <strong>Execution Phase:</strong>
+                        <p><strong>What:</strong> Pi enters the CS after receiving votes from all members of Vi.</p>
+                        <p><strong>Why:</strong> This ensures that no overlapping voting set can grant simultaneous access.</p>
+                        <p><strong>How:</strong> Pi's state changes to <code>Held</code>, and it executes its critical section code.</p>
+                    </li>
+                    <li>
+                        <strong>Release Phase:</strong>
+                        <p><strong>What:</strong> After finishing the CS, Pi sends a <code>Release</code> message to all members of Vi.</p>
+                        <p><strong>How:</strong>
+                        <ul>
+                            <li>Recipients update their states to allow pending requests to proceed.</li>
+                            <li>Queued requests are processed in FIFO order, and votes are sent accordingly.</li>
+                        </ul>
+                        </p>
+                    </li>
+                </ul>
+            
+                <h4>4.3 Analysis</h4>
+                <ul>
+                    <li>
+                        <strong>Bandwidth:</strong>
+                        <p><strong>What:</strong> Measures the number of messages exchanged during <code>enter()</code> and <code>exit()</code> operations.</p>
+                        <p><strong>How:</strong>
+                        <ul>
+                            <li><code>enter()</code>: Pi sends √N requests to its voting set and receives √N votes, totaling 2√N messages.</li>
+                            <li><code>exit()</code>: Pi sends √N release messages to its voting set.</li>
+                        </ul>
+                        </p>
+                    </li>
+                    <li>
+                        <strong>Issues:</strong>
+                        <p><strong>What:</strong> While reducing bandwidth, Maekawa's algorithm introduces the risk of deadlocks.</p>
+                        <p><strong>Why:</strong> Circular wait conditions can occur when processes block each other while waiting for votes.</p>
+                        <p><strong>How:</strong> Deadlock prevention or detection mechanisms, such as timeouts or priority schemes, are required to resolve this issue.</p>
+                    </li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>5. Wrap-Up</h3>
+                <p>Mutual exclusion is a cornerstone of distributed system design, ensuring consistency and correctness in accessing shared resources. The choice of algorithm depends on the system’s requirements for safety, liveness, bandwidth, and delay.</p>
+            
+                <ul>
+                    <li>
+                        <strong>Centralized Algorithm:</strong>
+                        <p><strong>What:</strong> Relies on a single master process to coordinate access using a token.</p>
+                        <p><strong>Why:</strong> It is simple to implement and guarantees safety and liveness under normal operation.</p>
+                        <p><strong>How:</strong>
+                        <ul>
+                            <li>Master queues requests and grants the token in FIFO order.</li>
+                            <li><strong>Drawback:</strong> The master is a single point of failure (SPoF) and a performance bottleneck.</li>
+                        </ul>
+                        </p>
+                    </li>
+                    <li>
+                        <strong>Ring-Based Algorithm:</strong>
+                        <p><strong>What:</strong> Decentralizes control by arranging processes in a logical ring and passing a token.</p>
+                        <p><strong>Why:</strong> Eliminates the need for a central coordinator and distributes responsibility.</p>
+                        <p><strong>How:</strong>
+                        <ul>
+                            <li>Each process passes the token to its successor after using or declining it.</li>
+                            <li><strong>Drawback:</strong> High client and synchronization delays, especially in large systems.</li>
+                        </ul>
+                        </p>
+                    </li>
+                    <li>
+                        <strong>Ricart-Agrawala Algorithm:</strong>
+                        <p><strong>What:</strong> A token-less approach leveraging causality and Lamport timestamps.</p>
+                        <p><strong>Why:</strong> Avoids the need for a token or central authority, ensuring fairness.</p>
+                        <p><strong>How:</strong>
+                        <ul>
+                            <li>Processes multicast requests and await replies from all others before entering the CS.</li>
+                            <li><strong>Drawback:</strong> High bandwidth usage due to N-1 request and reply messages.</li>
+                        </ul>
+                        </p>
+                    </li>
+                    <li>
+                        <strong>Maekawa's Algorithm:</strong>
+                        <p><strong>What:</strong> Optimizes Ricart-Agrawala by requiring votes from a subset of processes (voting sets).</p>
+                        <p><strong>Why:</strong> Reduces bandwidth compared to Ricart-Agrawala.</p>
+                        <p><strong>How:</strong>
+                        <ul>
+                            <li>Processes request votes from their voting sets and enter the CS upon receiving all votes.</li>
+                            <li><strong>Drawback:</strong> Prone to deadlocks, which require additional mechanisms to resolve.</li>
+                        </ul>
+                        </p>
+                    </li>
+                </ul>
+            
+                <p>In real-world distributed systems, more advanced protocols are used to handle failures and ensure robust mutual exclusion:</p>
+                <ul>
+                    <li>
+                        <strong>Google Chubby:</strong> A locking service using Paxos consensus for fault tolerance. Chubby enables consistent locking and configuration management in Google's internal systems like BigTable and Megastore.
+                    </li>
+                    <li>
+                        <strong>Apache Zookeeper:</strong> A distributed coordination service using Zab (Zookeeper Atomic Broadcast) for leader election and mutual exclusion. Widely used in open-source distributed systems.
+                    </li>
+                </ul>
+                <p>These systems demonstrate how consensus protocols like Paxos ensure safety and eventual liveness in complex distributed environments.</p>
+            </article>
+
+
+
+
+        </main>
+
+        <script> copyright("all"); </script>
+
+    </body>
+
+</html>
