@@ -4801,12 +4801,14 @@ function maintenance_mode() {
         if (!isDarkMode) {
             // Map dates (MM-DD) to corresponding background classes
             const backgroundClassMap = {
+                "01-01": "new-year-background",
+                "01-07": "christmas-background",
                 "01-26": "indian-flag-background",
-                "08-15": "indian-flag-background",                
+                "03-13": "holi-background",
+                "03-14": "holi-background",
+                "08-15": "indian-flag-background",
                 "12-25": "christmas-background",
-                "01-07": "christmas-background",                
                 "12-31": "new-year-background",                
-                "01-01": "new-year-background",                
             };
 
             // Get current date
@@ -4816,7 +4818,8 @@ function maintenance_mode() {
             const formattedDate = `${month}-${day}`;
 
             // Determine the background class or fallback to default
-            const backgroundClass = backgroundClassMap[formattedDate] || "default-background";
+            const backgroundClass = backgroundClassMap[formattedDate] || "default-background";        
+
 
             // Apply the background class to the body
             document.body.classList.add(backgroundClass);
@@ -9352,14 +9355,14 @@ const certifications = {
             const isSmallScreen = window.matchMedia('(max-width: 768px)').matches;
 
             if (isSmallScreen) {
-                return `<div class="container p-4 m-4 rounded-3 border shadow-lg" style="background-color: var(--background-color) !important;">
+                return `<div class="container p-4 m-4 rounded-3 border shadow-lg animation-fade-in" style="background-color: var(--background-color) !important;">
   <h4 class="text-center">Quick Break Time!</h4>
   <p class="p-2">Let's take a moment to stand up, stretch, and take a few deep breaths. A quick pause can significantly boost your focus and productivity!</p>
   <div id="${timerId}" class="fs-1 text-center text-danger">⏳</div>
   <p class="text-muted text-center">Cannot wait? Refresh the page to remove the timer.</p>
 </div>`;
             } else {
-                return `<div class="container p-4 m-4 rounded-3 shadow-lg border border-1 border-warning-subtle" style="background-color: var(--background-color) !important;">
+                return `<div class="container p-4 m-4 rounded-3 shadow-lg border border-1 border-warning-subtle animation-fade-in" style="background-color: var(--background-color) !important;">
   <h3 class="mb-3 text-center">Time to Refresh & Recharge!</h3>
   <p class="">You've been pushing the limits, and it's nothing short of incredible! Now, let's take a strategic pause to supercharge. Ever wonder why the Pomodoro Technique is so effective? It's because these short breaks enhance cognitive function, allowing for better retention, creativity, and problem-solving skills. You're not just resting; you're setting the stage for even greater achievements.</p>
   <h5 class="">Let us make this technique work for you. Here are the things you should do now:</h5>
@@ -9399,7 +9402,7 @@ const certifications = {
             let toastContainer = document.querySelector('.toast-container');
             if (!toastContainer) {
                 toastContainer = document.createElement('div');
-                toastContainer.classList.add('toast-container', 'position-fixed', 'bottom-0', 'end-0', 'p-3');
+                toastContainer.classList.add('toast-container', 'position-fixed', 'bottom-0', 'end-0', 'p-3', 'animation-fade-in');
                 document.body.appendChild(toastContainer);
             }
 
@@ -9711,7 +9714,7 @@ const certifications = {
                         const collapseId = Math.random().toString(36).substr(2, 9);
 
                         const tocHTML = `
-                            <div class="container mt-4 w-100 w-xl-75 d-print-none">
+                            <div class="container mt-4 w-100 w-xl-75 d-print-none animation-fade-in">
                                 <div class="accordion" id="${accordionId}">
                                     <div class="accordion-item">
                                         <h2 class="accordion-header" id="h1">
@@ -9987,6 +9990,37 @@ window.onload = function () {
     }
     // console.log("Total time to read the webpage: " + totalTime + " minutes");
 };
+
+/************** Animate only when the content comes to view *************/
+(function () { 
+    // document.addEventListener("DOMContentLoaded", function () {
+    //     const paragraphs = document.querySelectorAll("header, article, footer");
+    //     const headings = document.querySelectorAll("h1, h2, h3");
+    //     const styleSheet = document.createElement("style");
+    //     let cssRules = "";
+
+    //     // Add classes and animation delay for paragraphs
+    //     paragraphs.forEach((p, index) => {
+    //         const waitTime = (index + 1) * 0.1; // Increment by 0.2s
+    //         const waitClass = `animation-wait-${index + 1}`;
+    //         cssRules += `.${waitClass} { animation-delay: ${waitTime}s; }\n`;
+    //         p.classList.add(waitClass, "animation-dissolve-in");
+    //     });
+
+    //     // Add classes and animation delay for headings
+    //     headings.forEach((h, index) => {
+    //         const waitTime = (index + 1) * 0.5; // Increment by 0.2s
+    //         const waitClass = `animation-wait-head-${index + 1}`;
+    //         cssRules += `.${waitClass} { animation-delay: ${waitTime}s; }\n`;
+    //         h.classList.add(waitClass, "animation-slide-in");
+    //     });
+
+    //     // Append styles to the document
+    //     styleSheet.type = "text/css";
+    //     styleSheet.textContent = cssRules;
+    //     document.head.appendChild(styleSheet);
+    // });
+})();
 
 
 /****************** Get the name from the user using bootstrap modal ***********************/
