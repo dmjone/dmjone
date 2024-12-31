@@ -39,7 +39,7 @@ const randomidgenerator = (i = 10) => [...Array(i)].map(() => 'abcdefghijkmnpqrs
 })();
 
 
-const notification_maintainence_mode = 0;
+const notification_maintainence_mode = 1;
 const GLOBAL_maintainence_message = "Some links, images, and features may not work as expected. Thank you for your patience.";
 
 const notification_feature_update = 0;
@@ -4805,6 +4805,7 @@ function maintenance_mode() {
                 "08-15": "indian-flag-background",                
                 "12-25": "christmas-background",
                 "01-07": "christmas-background",                
+                "12-31": "new-year-background",                
                 "01-01": "new-year-background",                
             };
 
@@ -6833,9 +6834,9 @@ function gen_blockquote() {
             // ─────────────────────────────────────────────────────────────────────
             const holidays = [
                 "12-25", // Christmas (US)
-                "01-07", // Christmas (Russian Orthodox)
                 "12-31", // New Year's Eve
                 "01-01", // New Year's Day
+                "01-07", // Christmas (Russian Orthodox)
             ];
 
             function isHoliday() {
@@ -7179,13 +7180,6 @@ function gen_blockquote() {
                 renderSnowfall();
             });
         })();
-
-
-
-
-
-
-
 
     }
 })();
