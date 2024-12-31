@@ -1,0 +1,432 @@
+<!-------------------------- © 2007 - present, dmj.one and contributors. ----------------------------------
+   Part of the dmjone project. Licensed under the GNU AGPL. Provided as-is, without warranty of any kind. 
+-------------------- Redistribution and modifications must retain this notice. --------------------------->
+
+
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+    <!--<![endif]-->
+
+    <head>
+        <script src="/js/edu_su_common.js"></script>
+        <noscript>
+            <style>
+                html,
+                body {
+                    margin: 0;
+                    overflow: hidden;
+                }
+            </style>
+            <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+        </noscript>
+
+        <title>Distributed Shared Memory - DMJCCLT - dmj.one</title>
+        <meta name="description" content="Know about Distributed Shared Memory and their applications in Distributed Systems.">
+
+        <meta property="og:image" content="/logo.png">
+        <meta property="og:type" content="article">
+
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:site" content="@divyamohan1993">
+        <meta name="twitter:creator" content="@divyamohan1993">
+        <meta name="twitter:image" content="/logo.png">
+
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+        <meta name="author" content="Divya Mohan">
+        <meta name="robots" content="index, follow">
+
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js" integrity="sha512-sHSNLECRJSK+BFs7E8DiFc6pf6n90bLI85Emiw1jhreduZhK3VXgq9l4kAt9eTIHYAcuQBKHL01QKs4/3Xgl8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js" integrity="sha512-iWiuBS5nt6r60fCz26Nd0Zqe0nbk1ZTIQbl3Kv7kYsX+yKMUFHzjaH2+AnM6vp2Xs+gNmaBAVWJjSmuPw76Efg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                renderMathInElement(document.body, {
+                    // customised options
+                    // • auto-render specific keys, e.g.:
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false },
+                        { left: '\\(', right: '\\)', display: false },
+                        { left: '\\[', right: '\\]', display: true }
+                    ],
+                    // • rendering keys, e.g.:
+                    throwOnError: false
+                });
+            });
+        </script> -->
+
+        <!-- <style>
+            main ul {
+                list-style-type: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            main ul li {
+                margin: 0;
+                padding: 0;
+            }
+        </style> -->
+
+    </head>
+
+    <body>
+
+        <script> header_author("dm", "lakshika"); </script>
+
+        <main>
+            <article class="agen-tableofcontents">
+                <h2 class="text-center">
+                    Distributed Shared Memory
+                </h2>
+                <div class="d-none contentdate">2024, December 31</div>
+            </article>
+
+
+
+            <article>
+                <h3>1. Introduction to Distributed Shared Memory (DSM)</h3>
+                <p><strong>What is DSM?</strong> Distributed Shared Memory (DSM) is a conceptual model implemented in software to enable processes across a distributed system to access shared memory as if they were part of a single system. It abstracts the complexity of inter-process communication over a network into simple memory operations like reading and writing.</p>
+                <p><strong>Why DSM?</strong> Traditional distributed systems require message-passing mechanisms for communication, which can be tedious to manage and prone to programming errors. DSM simplifies this by providing a shared memory abstraction. It allows developers to reuse code written for shared-memory systems, improving code portability and reducing development effort.</p>
+                <p><strong>How does DSM work?</strong> DSM simulates shared memory by:
+                <ul>
+                    <li>Mapping memory pages across different processes running on separate machines.</li>
+                    <li>Synchronizing data access using protocols to maintain consistency and coherence.</li>
+                    <li>Leveraging existing message-passing networks to fetch or update memory pages as required.</li>
+                </ul>
+                <p>This enables processes to appear as if they are sharing a physical memory space, while in reality, data is being communicated across the network.</p>
+                </p>
+            </article>
+
+            <article>
+                <article>
+                    <h4>1.1 Key Features of DSM</h4>
+                    <ul>
+                        <li>
+                            <strong>Virtual Memory Sharing:</strong>
+                            <p><strong>What:</strong> DSM creates an illusion of shared memory among processes across different machines.</p>
+                            <p><strong>Why:</strong> To streamline communication between distributed processes by eliminating the need for explicit message-passing mechanisms.</p>
+                            <p><strong>How:</strong> Memory pages are virtually shared by mapping them across processes. The DSM software intercepts read and write operations, fetching or updating pages over the network when required.</p>
+                        </li>
+                        <li>
+                            <strong>Abstraction:</strong>
+                            <p><strong>What:</strong> DSM transforms the explicit complexity of message passing into intuitive memory access operations.</p>
+                            <p><strong>Why:</strong> Reduces programming effort by enabling developers to focus on logic rather than low-level communication protocols.</p>
+                            <p><strong>How:</strong> By handling synchronization, consistency, and data transfer in the background, DSM provides processes with a unified memory interface.</p>
+                        </li>
+                        <li>
+                            <strong>Reusability:</strong>
+                            <p><strong>What:</strong> Programs developed for shared-memory systems can be executed on distributed systems using DSM.</p>
+                            <p><strong>Why:</strong> Reduces the need for rewriting or adapting code when transitioning from a multiprocessor system to a distributed environment.</p>
+                            <p><strong>How:</strong> DSM mirrors the memory-sharing behavior of multiprocessor systems by mimicking shared-memory interactions through networked memory management.</p>
+                        </li>
+                    </ul>
+                </article>
+            </article>
+            <article>
+                <h3>2. Implementation of DSM</h3>
+                <p><strong>What:</strong> DSM implementation involves simulating shared memory across distributed systems using a message-passing network. Processes interact with a virtual memory abstraction, with the underlying system ensuring coherence and consistency of data.</p>
+                <p><strong>Why:</strong> To provide a seamless memory-sharing experience, reduce communication complexity, and enable existing shared-memory programs to run on distributed systems without modifications.</p>
+                <p><strong>How:</strong> The implementation involves key components and mechanisms:</p>
+                <ul>
+                    <li>
+                        <strong>Message-Passing Network:</strong>
+                        <p>The underlying communication framework used to transfer data (memory pages) between processes on different machines. DSM software utilizes the network for fetching, updating, and synchronizing memory pages.</p>
+                    </li>
+                    <li>
+                        <strong>Caching:</strong>
+                        <p>Each process maintains a local cache of recently accessed memory pages. This reduces latency by avoiding repeated network calls for frequently used data.</p>
+                    </li>
+                    <li>
+                        <strong>Page Management:</strong>
+                        <p>The DSM system tracks the state (read or write) and ownership of memory pages to ensure consistency. It manages operations such as page faults, synchronization, and invalidation of outdated pages.</p>
+                    </li>
+                </ul>
+                <p>By combining these elements, DSM achieves a functional, virtual shared memory system on top of a distributed network infrastructure.</p>
+
+
+
+                <article>
+                    <h4>2.1 Caching in DSM</h4>
+                    <ul>
+                        <li>
+                            <strong>Local Cache:</strong>
+                            <p><strong>What:</strong> A temporary storage mechanism in each process for holding recently accessed memory pages.</p>
+                            <p><strong>Why:</strong> To reduce network latency and improve performance by minimizing the number of remote memory accesses.</p>
+                            <p><strong>How:</strong> DSM software maintains this cache in the local memory of each process, storing pages fetched from remote processes or created locally. The cache allows processes to operate on memory pages without frequent network calls.</p>
+                        </li>
+                        <li>
+                            <strong>Page Hit:</strong>
+                            <p><strong>What:</strong> A condition where the required memory page is already present in the local cache.</p>
+                            <p><strong>Why:</strong> Ensures quick access to data, bypassing the overhead of remote memory operations.</p>
+                            <p><strong>How:</strong> When a page hit occurs, the process directly reads or writes the data from the cache without involving the DSM network layer.</p>
+                        </li>
+                        <li>
+                            <strong>Page Miss:</strong>
+                            <p><strong>What:</strong> A condition where the requested memory page is not present in the local cache.</p>
+                            <p><strong>Why:</strong> Indicates that the required data is either on another process or has not been accessed recently.</p>
+                            <p><strong>How:</strong> The DSM software triggers a page fault handler, which locates the page on the network, fetches it to the local cache, and updates the page's state as needed. This operation involves network communication, which can increase latency.</p>
+                        </li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>2.2 Ownership and Page States</h4>
+                    <ul>
+                        <li>
+                            <strong>Owner:</strong>
+                            <p><strong>What:</strong> The process designated to hold and manage the most up-to-date version of a memory page.</p>
+                            <p><strong>Why:</strong> To centralize control over updates to ensure consistency and manage synchronization among processes.</p>
+                            <p><strong>How:</strong> DSM software assigns ownership dynamically. Ownership can change when a process needs to modify a page or when a page's state transitions from read to write.</p>
+                        </li>
+                        <li>
+                            <strong>Page States:</strong>
+                            <p><strong>What:</strong> Each memory page has a state indicating whether it is being read or written.</p>
+                            <ul>
+                                <li>
+                                    <strong>Read (R) State:</strong>
+                                    <p><strong>What:</strong> Pages are in the read state when multiple processes are permitted to read them.</p>
+                                    <p><strong>Why:</strong> To allow concurrent access without conflicts when no modifications are being made.</p>
+                                    <p><strong>How:</strong> The owner ensures no write copies exist, enabling multiple processes to access the page from their caches or via the network.</p>
+                                </li>
+                                <li>
+                                    <strong>Write (W) State:</strong>
+                                    <p><strong>What:</strong> A page is in the write state when a single process (the owner) has exclusive write access.</p>
+                                    <p><strong>Why:</strong> To prevent data inconsistencies that can occur from simultaneous writes by multiple processes.</p>
+                                    <p><strong>How:</strong> When a process needs to write to a page, it requests other processes to invalidate their read copies, ensuring that only the owner holds a modifiable version.</p>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>2.3 Page Fault Handling</h4>
+                    <p><strong>What:</strong> Page faults occur when a process accesses a memory page that is not present in its local cache.</p>
+                    <p><strong>Why:</strong> To fetch the required page from the network and update the cache to enable the process to read or write the data.</p>
+                    <p><strong>How:</strong> The DSM system employs a page fault handler to manage these situations:</p>
+                    <ul>
+                        <li>
+                            <strong>Process Request:</strong>
+                            <p>When a process encounters a page fault, it sends a request to the owner of the page or the DSM system to fetch the missing page.</p>
+                        </li>
+                        <li>
+                            <strong>Page Retrieval:</strong>
+                            <p>The owner or the DSM system locates the requested page, transfers it over the network, and updates the local cache of the requesting process.</p>
+                        </li>
+                        <li>
+                            <strong>State Update:</strong>
+                            <p>The page's state is updated based on the access type (read or write) and the ownership status to maintain consistency.</p>
+                        </li>
+                    </ul>
+                    <p>Page fault handling ensures that processes can access shared memory seamlessly, even when the required data is not present locally.</p>
+                </article>
+            </article>
+
+            <article>
+                <h3>3. Protocols in DSM</h3>
+                <p>Two main protocols manage consistency in DSM:</p>
+
+
+                <article>
+                    <h4>3.1 Invalidate Protocol</h4>
+                    <ul>
+                        <li>
+                            <strong>Invalidate Process:</strong>
+                            <p><strong>What:</strong> Before a process writes to a page, it ensures exclusivity by requesting other processes to invalidate their cached copies of the page.</p>
+                            <p><strong>Why:</strong> To maintain consistency by ensuring that only one writable copy of the page exists across all processes.</p>
+                            <p><strong>How:</strong> The writer process sends an invalidation message via multicast to all processes holding a copy of the page. Once these copies are invalidated, the writer updates its copy, marking it as the sole valid version.</p>
+                        </li>
+                        <li>
+                            <strong>Advantages:</strong>
+                            <p><strong>What:</strong> Benefits of the invalidate protocol.</p>
+                            <ul>
+                                <li><strong>Reduces Redundant Updates:</strong> Since only one writable copy exists, unnecessary propagation of updates to multiple processes is avoided.</li>
+                                <li><strong>Minimizes Overhead:</strong> Reduces the complexity of managing multiple writable copies and synchronizing their states.</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <strong>Challenges:</strong>
+                            <p><strong>What:</strong> Issues that can arise with the invalidate protocol.</p>
+                            <ul>
+                                <li><strong>False Sharing:</strong> When unrelated variables located on the same memory page are accessed by different processes, frequent invalidation requests can cause unnecessary network traffic and reduced efficiency.</li>
+                                <li><strong>Network Overhead:</strong> Multicasting invalidation requests introduces additional communication costs, especially in systems with high contention for shared pages.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>3.2 Update Protocol</h4>
+                    <ul>
+                        <li>
+                            <strong>Update Process:</strong>
+                            <p><strong>What:</strong> Multiple processes are allowed to hold writable copies of the same memory page simultaneously.</p>
+                            <p><strong>Why:</strong> To avoid the cost of invalidating and re-fetching pages in scenarios where frequent small updates are made.</p>
+                            <p><strong>How:</strong> When a process writes to a page, it sends an update message via multicast to all processes holding a copy. These processes update their local versions accordingly, ensuring consistency.</p>
+                        </li>
+                        <li>
+                            <strong>Advantages:</strong>
+                            <p><strong>What:</strong> Benefits of the update protocol.</p>
+                            <ul>
+                                <li><strong>Efficient for Frequent Small Updates:</strong> Minimizes the latency of frequent writes by updating existing copies instead of invalidating and fetching new ones.</li>
+                                <li><strong>Reduces False Sharing Issues:</strong> Variables on the same page can be updated without causing repeated invalidations.</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <strong>Challenges:</strong>
+                            <p><strong>What:</strong> Issues associated with the update protocol.</p>
+                            <ul>
+                                <li><strong>Higher Network Overhead:</strong> Each write operation generates multicast update messages, increasing bandwidth consumption, particularly with large page sizes or frequent writes.</li>
+                                <li><strong>Complex Synchronization:</strong> Keeping all copies of a page consistent across processes can be computationally expensive and error-prone in highly dynamic systems.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </article>
+
+            </article>
+
+
+
+            <article>
+                <h3>4. Consistency Models</h3>
+                <p><strong>What:</strong> Consistency models define the rules for how updates to shared memory are propagated and perceived by processes in a distributed system. They determine the guarantees provided for the order and visibility of updates across processes.</p>
+                <p><strong>Why:</strong> In DSM, consistency is critical to ensure predictable and correct behavior in distributed applications. Different models balance the trade-off between performance and the level of synchronization required.</p>
+                <ul>
+                    <li>
+                        <strong>Linearizability:</strong>
+                        <p><strong>What:</strong> The strongest consistency model, ensuring that all operations are globally ordered based on real-time.</p>
+                        <p><strong>Why:</strong> Provides the highest level of predictability by making operations appear as if executed atomically.</p>
+                        <p><strong>How:</strong> Each operation is visible instantaneously to all processes. This is achieved by synchronizing updates through mechanisms such as global clocks or transactional protocols.</p>
+                    </li>
+                    <li>
+                        <strong>Sequential Consistency:</strong>
+                        <p><strong>What:</strong> Ensures that operations appear in a consistent sequence, but the sequence may vary across processes as long as it respects the order of operations within each individual process.</p>
+                        <p><strong>Why:</strong> Simplifies implementation compared to linearizability while maintaining a logical ordering of events.</p>
+                        <p><strong>How:</strong> Processes apply updates in a sequence that respects the program order of each process but does not guarantee real-time order.</p>
+                    </li>
+                    <li>
+                        <strong>Eventual Consistency:</strong>
+                        <p><strong>What:</strong> The weakest model, ensuring that all updates will eventually be visible to all processes, but there is no guarantee about the timing or order of updates.</p>
+                        <p><strong>Why:</strong> Optimized for performance and scalability in systems where immediate consistency is not critical, such as caching or background synchronization tasks.</p>
+                        <p><strong>How:</strong> Processes operate on their local copies and synchronize updates asynchronously. Conflicts may be resolved using timestamps or conflict resolution policies.</p>
+                    </li>
+                </ul>
+                <p><strong>Trade-offs:</strong> Stronger consistency models like linearizability provide more reliability and intuitive behavior but impose higher synchronization costs and latency. Weaker models like eventual consistency prioritize performance and scalability, making them suitable for applications with less stringent consistency requirements.</p>
+            </article>
+
+
+            <article>
+                <h3>5. Challenges and Trade-offs</h3>
+                <ul>
+                    <li>
+                        <strong>False Sharing:</strong>
+                        <p><strong>What:</strong> Occurs when unrelated variables that reside on the same memory page are accessed or modified by different processes.</p>
+                        <p><strong>Why:</strong> Leads to unnecessary invalidations or updates, resulting in excessive network communication and reduced performance.</p>
+                        <p><strong>How:</strong> Mitigated by careful design of memory allocation and page boundaries to align variables with process-specific access patterns.</p>
+                    </li>
+                    <li>
+                        <strong>Page Size:</strong>
+                        <p><strong>What:</strong> The size of memory pages impacts both locality of interest (data access patterns) and network efficiency.</p>
+                        <p><strong>Why:</strong> Larger pages reduce the frequency of page transfers but increase the risk of false sharing. Smaller pages improve granularity but can lead to higher overhead from frequent transfers.</p>
+                        <p><strong>How:</strong> Optimal page size is determined based on application access patterns and system characteristics, often requiring profiling and tuning.</p>
+                    </li>
+                    <li>
+                        <strong>Network Latency:</strong>
+                        <p><strong>What:</strong> Delays caused by transferring memory pages or synchronization messages across the network.</p>
+                        <p><strong>Why:</strong> High latency can degrade system performance, especially in scenarios with frequent page faults or synchronization requirements.</p>
+                        <p><strong>How:</strong> Efficient protocols, caching strategies, and high-speed network technologies (e.g., Infiniband or RDMA) are employed to minimize latency.</p>
+                    </li>
+                </ul>
+                <p><strong>Trade-offs:</strong> Addressing these challenges involves balancing performance, consistency, and resource utilization. For example, reducing false sharing may require larger page sizes or complex data layout strategies, which could introduce other inefficiencies. Each trade-off must be evaluated in the context of the specific application and system constraints.</p>
+            </article>
+
+
+
+            <article>
+                <h3>6. Current and Future Trends</h3>
+                <p><strong>What:</strong> While DSM has seen reduced adoption in recent years, emerging technologies and advancements in network infrastructure suggest potential for renewed interest.</p>
+                <p><strong>Why:</strong> Modern applications demand higher performance and scalability, which can benefit from DSM’s abstraction when coupled with advancements in memory access and network speed.</p>
+                <ul>
+                    <li>
+                        <strong>Remote Direct Memory Access (RDMA):</strong>
+                        <p><strong>What:</strong> RDMA allows one machine to access the memory of another directly, bypassing the CPU and operating system involvement.</p>
+                        <p><strong>Why:</strong> Reduces latency and increases throughput for DSM operations, making memory access over the network nearly as fast as local memory operations.</p>
+                        <p><strong>How:</strong> RDMA-enabled hardware facilitates direct memory-to-memory data transfers, eliminating intermediate steps and reducing bottlenecks.</p>
+                    </li>
+                    <li>
+                        <strong>High-Speed Networks:</strong>
+                        <p><strong>What:</strong> Technologies such as Infiniband and next-generation Ethernet provide significantly higher data transfer speeds and lower latencies.</p>
+                        <p><strong>Why:</strong> Enhances the performance of DSM by accelerating page transfers and synchronization messages, mitigating traditional network-related drawbacks.</p>
+                        <p><strong>How:</strong> By leveraging these networks, DSM can achieve near-real-time synchronization and better support high-performance distributed applications.</p>
+                    </li>
+                </ul>
+                <p><strong>Future Outlook:</strong> With advancements like solid-state storage, RDMA, and ultra-fast networking, DSM could re-emerge as a viable solution for certain distributed computing challenges, particularly in cloud and edge computing environments where low-latency data sharing is critical.</p>
+            </article>
+
+            <article>
+                <h3>7. Practical Scenarios of DSM</h3>
+                <h4>7.1 Read Scenarios</h4>
+                <p><strong>What:</strong> Reading scenarios involve processes accessing data from memory pages, either locally or from remote processes.</p>
+                <p><strong>How:</strong>
+                <ul>
+                    <li>If a process owns the page (R or W state), it reads directly from its cache, ensuring low latency.</li>
+                    <li>If the page is not in the process's cache, a page fault occurs. The process retrieves the page from the owner process over the network, updates its cache, and marks the page in the R state.</li>
+                </ul>
+                </p>
+                <p><strong>Example:</strong> A distributed database system where a node retrieves a record from another node, caching the record locally for future reads.</p>
+
+                <h4>7.2 Write Scenarios</h4>
+                <p><strong>What:</strong> Writing scenarios involve modifying data on memory pages, requiring synchronization to maintain consistency across processes.</p>
+                <p><strong>How:</strong>
+                <ul>
+                    <li>In the invalidate protocol, the writing process sends invalidation messages to other processes holding copies of the page, ensuring exclusive access before writing.</li>
+                    <li>In the update protocol, the writing process multicasts the changes to all processes holding the page, updating their copies.</li>
+                </ul>
+                </p>
+                <p><strong>Example:</strong> A collaborative editing application where one user modifies a document, and the changes are propagated to others using either invalidation or update protocols.</p>
+            </article>
+
+            <article>
+                <h3>8. Code Snippet: Page Fault Handling in DSM</h3>
+                <p><strong>What:</strong> This code snippet demonstrates how a page fault is handled in a DSM system when a requested memory page is not found in the local cache of a process.</p>
+                <p><strong>Why:</strong> Page faults are critical events in DSM, triggering the system to retrieve the required page from the owner process to ensure seamless access and maintain consistency.</p>
+                <p><strong>How:</strong> The function follows these steps:</p>
+                <ul>
+                    <li>
+                        <strong>Cache Check:</strong> It first checks if the requested page (`page_id`) exists in the process's local cache.
+                    </li>
+                    <li>
+                        <strong>Page Owner Identification:</strong> If the page is not found, it identifies the owner process that holds the latest version of the page using `find_page_owner(page_id)`.
+                    </li>
+                    <li>
+                        <strong>Page Retrieval:</strong> The identified owner process sends the page data to the requesting process via `send_page(page_id)`.
+                    </li>
+                    <li>
+                        <strong>Cache Update:</strong> The retrieved page is added to the local cache of the requesting process for future access.
+                    </li>
+                    <li>
+                        <strong>Return Page:</strong> Finally, the function returns the requested page from the local cache.
+                    </li>
+                </ul>
+                <pre><code class="language-python">
+def page_fault_handler(process, page_id):
+    if page_id not in process.cache:  # Check for the page in local cache
+        owner = find_page_owner(page_id)  # Identify the owner process
+        page_data = owner.send_page(page_id)  # Retrieve the page from the owner
+        process.cache[page_id] = page_data  # Update the local cache
+    return process.cache[page_id]  # Return the page data
+    </code></pre>
+                <p><strong>Key Use Case:</strong> This mechanism is commonly used in distributed applications where memory consistency and data availability are critical, such as distributed file systems or virtualized environments.</p>
+            </article>
+
+        </main>
+
+        <script> copyright("all"); </script>
+
+    </body>
+
+</html>

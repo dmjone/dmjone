@@ -1,0 +1,317 @@
+<!-------------------------- © 2007 - present, dmj.one and contributors. ----------------------------------
+   Part of the dmjone project. Licensed under the GNU AGPL. Provided as-is, without warranty of any kind. 
+-------------------- Redistribution and modifications must retain this notice. --------------------------->
+
+
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+    <!--<![endif]-->
+
+    <head>
+        <script src="/js/edu_su_common.js"></script>
+        <noscript>
+            <style>
+                html,
+                body {
+                    margin: 0;
+                    overflow: hidden;
+                }
+            </style>
+            <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+        </noscript>
+
+        <title>Concurrency Control - DMJCCLT - dmj.one</title>
+        <meta name="description" content="Know about Concurrency Control in distributed systems - DMJCCLT - dmj.one">
+
+        <meta property="og:image" content="/logo.png">
+        <meta property="og:type" content="article">
+
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:site" content="@divyamohan1993">
+        <meta name="twitter:creator" content="@divyamohan1993">
+        <meta name="twitter:image" content="/logo.png">
+
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+        <meta name="author" content="Divya Mohan">
+        <meta name="robots" content="index, follow">
+
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js" integrity="sha512-sHSNLECRJSK+BFs7E8DiFc6pf6n90bLI85Emiw1jhreduZhK3VXgq9l4kAt9eTIHYAcuQBKHL01QKs4/3Xgl8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js" integrity="sha512-iWiuBS5nt6r60fCz26Nd0Zqe0nbk1ZTIQbl3Kv7kYsX+yKMUFHzjaH2+AnM6vp2Xs+gNmaBAVWJjSmuPw76Efg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                renderMathInElement(document.body, {
+                    // customised options
+                    // • auto-render specific keys, e.g.:
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false },
+                        { left: '\\(', right: '\\)', display: false },
+                        { left: '\\[', right: '\\]', display: true }
+                    ],
+                    // • rendering keys, e.g.:
+                    throwOnError: false
+                });
+            });
+        </script> -->
+
+        <!-- <style>
+            main ul {
+                list-style-type: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            main ul li {
+                margin: 0;
+                padding: 0;
+            }
+        </style> -->
+
+    </head>
+
+    <body>
+
+        <script> header_author("dm", "lakshika"); </script>
+
+        <main>
+            <article class="agen-tableofcontents">
+                <h2 class="text-center">
+                    Concurrency Control in Distributed Systems
+                </h2>
+                <div class="d-none contentdate">2024, December 31</div>
+            </article>
+
+            <article>
+                <h3>1. Concurrency Control</h3>
+                <p><strong>What:</strong> Concurrency control is a critical mechanism in database management systems that ensures multiple transactions execute reliably and correctly, even when processed concurrently. It prevents data inconsistencies and conflicts.</p>
+
+                <p><strong>Why:</strong> In multi-user environments, concurrent execution is common to maximize system throughput and minimize latency. Without concurrency control, simultaneous transactions can lead to issues such as data corruption, lost updates, or inconsistent states, violating the ACID properties.</p>
+
+                <p><strong>How:</strong> Concurrency control achieves its goals by using techniques and protocols designed to maintain the ACID properties:
+                </p>
+                <ul>
+                    <li><strong>Atomicity:</strong> Ensures that a transaction's operations either complete entirely or have no effect, preventing partial updates.</li>
+                    <li><strong>Consistency:</strong> Guarantees that the database remains in a valid state before and after transactions, adhering to defined rules and constraints.</li>
+                    <li><strong>Isolation:</strong> Ensures that transactions do not interfere with each other, appearing as though they execute sequentially.</li>
+                    <li><strong>Durability:</strong> Ensures that once a transaction is committed, its changes persist, even in the event of system crashes.</li>
+                </ul>
+                <p>Techniques such as locking (pessimistic), timestamp ordering, and multi-version concurrency control (optimistic) are commonly used to implement concurrency control while balancing correctness and performance.</p>
+            </article>
+
+            <article>
+                <h4>1.1 Remote Procedure Calls (RPCs)</h4>
+                <p><strong>What:</strong> RPCs enable one process to invoke functions in another process as if it were calling a local function. This abstraction hides the complexity of inter-process communication and makes distributed system design more intuitive.</p>
+
+                <p><strong>Why:</strong> Distributed systems require interaction between processes running on different nodes. RPCs provide a seamless interface for this, reducing the need for developers to manage low-level communication protocols. It supports modularity and code reuse by allowing processes to share functionality across boundaries.</p>
+
+                <p><strong>How:</strong> An RPC framework involves the following components:</p>
+                <ul>
+                    <li><strong>Client Stub:</strong> Represents the called function locally, marshalls parameters into a format suitable for network transmission.</li>
+                    <li><strong>Server Stub:</strong> Receives the call, unmarshalls parameters, and invokes the actual server-side function.</li>
+                    <li><strong>Communication Module:</strong> Facilitates message exchange between the client and server processes.</li>
+                    <li><strong>Dispatcher:</strong> Routes incoming calls to the correct server-side functions.</li>
+                </ul>
+
+                <h5>Key Characteristics:</h5>
+                <ul>
+                    <li><strong>Local vs. Remote Procedure Calls:</strong>
+                        <ul>
+                            <li><strong>LPCs:</strong> Operate within the same memory space, allowing direct data sharing (e.g., via pointers or references).</li>
+                            <li><strong>RPCs:</strong> Operate across distinct address spaces, requiring message passing and serialization.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Semantics:</strong>
+                        <ul>
+                            <li><strong>At most once:</strong> Ensures reliability by avoiding duplicate executions.</li>
+                            <li><strong>At least once:</strong> Suitable for idempotent operations, where repeated execution has no adverse effects.</li>
+                            <li><strong>Maybe:</strong> Provides a best-effort delivery without guarantees.</li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <h5>Challenges:</h5>
+                <p>RPCs face challenges such as ensuring fault tolerance, handling network latencies, and distinguishing between failures (e.g., network drops vs. server crashes). These are mitigated through retransmissions, filtering duplicates, and using idempotent operations wherever possible.</p>
+            </article>
+            <article>
+                <h4>1.2 Transactions</h4>
+                <p><strong>What:</strong> A transaction is a sequence of operations performed on a database or system that acts as a single logical unit. It guarantees a consistent and reliable outcome by adhering to the ACID properties.</p>
+
+                <p><strong>Why:</strong> Transactions are essential in environments with concurrent users or processes, ensuring data integrity and correctness even under failures, interruptions, or high contention. They provide a framework to handle complex operations safely and predictably.</p>
+
+                <p><strong>How:</strong> Transactions enforce ACID properties:</p>
+                <ul>
+                    <li><strong>Atomicity:</strong> Ensures all operations within a transaction are completed successfully; otherwise, no changes are made. This prevents partial updates from leaving the system in an inconsistent state.</li>
+                    <li><strong>Consistency:</strong> Maintains the database's validity by ensuring rules and constraints are always met before and after a transaction.</li>
+                    <li><strong>Isolation:</strong> Prevents interference among concurrent transactions by ensuring their operations are independent and their effects are as if executed sequentially.</li>
+                    <li><strong>Durability:</strong> Guarantees that the results of committed transactions are permanently recorded, surviving system crashes or hardware failures.</li>
+                </ul>
+
+                <h5>Transaction Lifecycle:</h5>
+                <ol>
+                    <li><strong>Begin:</strong> The transaction starts, reserving resources as needed.</li>
+                    <li><strong>Execute:</strong> Operations are performed, including reads and writes.</li>
+                    <li><strong>Validate:</strong> Checks are made to ensure the transaction meets all constraints and does not conflict with others.</li>
+                    <li><strong>Commit:</strong> If all conditions are met, changes are made permanent.</li>
+                    <li><strong>Rollback:</strong> If any issue arises, all changes are undone, leaving the system unaffected by the transaction.</li>
+                </ol>
+
+                <h5>Practical Example:</h5>
+                <pre><code class="language-java">
+// Example: Airline Booking Transaction
+int transactionId = openTransaction();
+int availability = server.getFlightAvailability("ABC", 123, "2024-12-31");
+if (availability > 0) {
+    int seat = server.bookTicket("ABC", 123, "2024-12-31");
+    server.putSeatPreference(seat, "aisle");
+}
+closeTransaction(transactionId);
+</code></pre>
+                <p>This ensures the ticket booking occurs atomically. If any step fails (e.g., no seats available), the transaction rolls back, leaving the database unaffected.</p>
+            </article>
+
+            <article>
+                <h4>1.3 Serial Equivalence</h4>
+                <p><strong>What:</strong> Serial equivalence ensures that the outcome of executing multiple concurrent transactions is equivalent to executing the same transactions in some sequential (serial) order.</p>
+
+                <p><strong>Why:</strong> Concurrent execution of transactions is crucial for system performance. However, it introduces the risk of conflicts. Serial equivalence provides a framework to validate that concurrency does not compromise the correctness or consistency of the database.</p>
+
+                <p><strong>How:</strong> The concept involves checking whether the interleaving of operations (actual execution order) can be transformed into a valid serial order. If such an order exists, the interleaving is deemed serially equivalent.</p>
+
+                <h5>1.3.1 Conflicting Operations</h5>
+                <p>Conflicts arise when the order of operations affects the outcome. These operations include:</p>
+                <ul>
+                    <li><strong>Read-Write:</strong> A read operation followed by a write operation (or vice versa) on the same object.</li>
+                    <li><strong>Write-Write:</strong> Two write operations on the same object.</li>
+                </ul>
+                <p>Swapping the order of these operations can lead to different results, hence they are considered conflicting.</p>
+
+                <h5>Example: Checking for Serial Equivalence</h5>
+                <pre><code class="language-auto">
+// Example: Serial Equivalence
+Transaction T1: write(x)
+Transaction T2: read(x)
+
+// Scenario 1 (Order: T1 -> T2):
+// T1 writes x, T2 reads the updated value of x.
+// Serial equivalence is maintained as (T1, T2).
+
+// Scenario 2 (Order: T2 -> T1):
+// T2 reads x, T1 writes to x afterward.
+// If the system must behave as though T1 executed first,
+// this order violates serial equivalence.
+</code></pre>
+
+                <h5>Validation Mechanism:</h5>
+                <ul>
+                    <li><strong>Conflict Graph:</strong> Represent transactions as nodes and conflicts as directed edges. If the graph is acyclic, the interleaving is serially equivalent.</li>
+                    <li><strong>Conflict Pair Analysis:</strong> For each pair of conflicting operations between transactions, determine the order (e.g., (T1, T2)). Consistency in ordering across all pairs implies serial equivalence.</li>
+                </ul>
+            </article>
+            <article>
+                <h4>1.4 Pessimistic Concurrency Control</h4>
+                <p><strong>What:</strong> Pessimistic concurrency control assumes conflicts are likely and proactively prevents them by restricting access to data objects using locks. It ensures correctness at the cost of potential delays due to waiting for locks.</p>
+
+                <p><strong>Why:</strong> In systems where transaction conflicts are frequent (e.g., high contention scenarios), pessimistic approaches provide a reliable way to maintain data integrity by avoiding conflicting operations entirely.</p>
+
+                <p><strong>How:</strong> Pessimistic control uses locking mechanisms to serialize conflicting operations.</p>
+
+                <h5>1.4.1 Exclusive Locking</h5>
+                <p><strong>What:</strong> Each object has a lock, and only one transaction can hold the lock at a time, ensuring exclusive access.</p>
+                <p><strong>Why:</strong> Prevents all conflicts (read-write, write-write) by allowing only one transaction to operate on the object at a time.</p>
+                <p><strong>How:</strong> Transactions call `lock(O)` to acquire a lock on object `O`. If another transaction holds the lock, the current transaction waits until the lock is released by calling `unlock(O)`. Locks are typically held until the transaction commits or aborts.</p>
+
+                <h5>1.4.2 Read-Write Locks</h5>
+                <p><strong>What:</strong> Implements a two-mode locking mechanism, allowing either shared access (read) or exclusive access (write).</p>
+                <p><strong>Why:</strong> Improves concurrency by allowing multiple transactions to read the same object simultaneously while ensuring exclusivity for writes.</p>
+                <p><strong>How:</strong></p>
+                <ul>
+                    <li><strong>Read Lock:</strong> Allows multiple transactions to read an object concurrently. No transaction can hold a write lock simultaneously.</li>
+                    <li><strong>Write Lock:</strong> Provides exclusive access to an object, blocking all read and write operations by other transactions.</li>
+                    <li>Locks are upgraded or downgraded as needed (e.g., read lock promoted to write lock).</li>
+                </ul>
+
+                <h5>1.4.3 Two-Phase Locking</h5>
+                <p><strong>What:</strong> A protocol to enforce serial equivalence by managing the order of lock acquisition and release.</p>
+                <p><strong>Why:</strong> Prevents cyclic dependencies and ensures that no new locks are acquired once a transaction starts releasing locks.</p>
+                <p><strong>How:</strong></p>
+                <ol>
+                    <li><strong>Growing Phase:</strong> A transaction acquires all the locks it needs but cannot release any lock.</li>
+                    <li><strong>Shrinking Phase:</strong> Once a transaction releases its first lock, it cannot acquire new locks.</li>
+                </ol>
+                <p><strong>Variant:</strong> Strict two-phase locking ensures all locks are released only at the commit point, providing stricter isolation.</p>
+
+                <h5>Challenges: Deadlocks</h5>
+                <p>Deadlocks occur when two or more transactions wait indefinitely for each other to release locks.</p>
+                <pre><code class="language-auto">
+// Deadlock Example
+Transaction T1: lock(A) -> lock(B)
+Transaction T2: lock(B) -> lock(A)
+// Both wait for each other indefinitely.
+</code></pre>
+                <p><strong>Handling Deadlocks:</strong></p>
+                <ul>
+                    <li><strong>Timeouts:</strong> Transactions abort if they wait too long for a lock.</li>
+                    <li><strong>Deadlock Detection:</strong> Use a wait-for graph to detect cycles and abort transactions to break the cycle.</li>
+                    <li><strong>Deadlock Prevention:</strong> Ensure transactions acquire all required locks upfront or impose an ordering on lock acquisition.</li>
+                </ul>
+            </article>
+            
+            <article>
+                <h4>1.5 Optimistic Concurrency Control</h4>
+                <p><strong>What:</strong> Optimistic concurrency control (OCC) allows transactions to execute without restrictions on access to shared resources. Validation occurs at the commit stage to ensure serial equivalence and conflict resolution.</p>
+
+                <p><strong>Why:</strong> OCC is ideal in environments with low conflict rates. It maximizes concurrency by reducing the overhead of locks and improves system throughput.</p>
+
+                <p><strong>How:</strong> OCC operates in three phases:</p>
+                <ol>
+                    <li><strong>Read Phase:</strong> Transactions read data and perform local computations without locking any resources.</li>
+                    <li><strong>Validation Phase:</strong> At commit time, the transaction checks if its operations conflict with others. If conflicts exist, the transaction aborts.</li>
+                    <li><strong>Write Phase:</strong> If validation succeeds, changes are written to the database.</li>
+                </ol>
+
+                <h5>1.5.1 Timestamp Ordering</h5>
+                <p><strong>What:</strong> Each transaction is assigned a unique timestamp that determines its position in the serialization order.</p>
+                <p><strong>Why:</strong> Timestamp ordering ensures that the sequence of transaction operations adheres to a global order, maintaining consistency.</p>
+                <p><strong>How:</strong></p>
+                <ul>
+                    <li><strong>Reads:</strong> A transaction can read an object only if it was last written by a transaction with a lower timestamp.</li>
+                    <li><strong>Writes:</strong> A transaction can write an object only if no transactions with higher timestamps have read or written the object.</li>
+                </ul>
+                <p>Transactions violating these conditions are aborted to preserve serial equivalence.</p>
+
+                <h5>1.5.2 Multi-Version Concurrency Control (MVCC)</h5>
+                <p><strong>What:</strong> MVCC maintains multiple versions of each data object, allowing transactions to access a version corresponding to their timestamp.</p>
+                <p><strong>Why:</strong> It eliminates the need for locks, providing higher concurrency and avoiding delays caused by conflicts.</p>
+                <p><strong>How:</strong></p>
+                <ul>
+                    <li><strong>Reads:</strong> Transactions read the version of an object that was last committed before their timestamp.</li>
+                    <li><strong>Writes:</strong> New versions are created with timestamps corresponding to the transaction that made the update.</li>
+                    <li><strong>Garbage Collection:</strong> Older versions no longer needed are removed to save storage.</li>
+                </ul>
+
+                <h5>1.5.3 Eventual Consistency</h5>
+                <p><strong>What:</strong> A consistency model ensuring that, over time, all copies of data in a distributed system converge to the same value.</p>
+                <p><strong>Why:</strong> Common in distributed systems like Cassandra and DynamoDB, eventual consistency prioritizes availability and scalability over strict consistency.</p>
+                <p><strong>How:</strong></p>
+                <ul>
+                    <li><strong>Last-Write-Wins (LWW):</strong> Conflicts are resolved by keeping the value with the latest timestamp.</li>
+                    <li><strong>Vector Clocks:</strong> Tracks causal relationships between operations to detect and resolve conflicts. Conflicting versions are resolved manually or by application logic.</li>
+                    <li><strong>Pruning:</strong> Limits the size of vector clocks by removing outdated entries based on time or size thresholds.</li>
+                </ul>
+            </article>
+
+
+
+
+
+        </main>
+
+        <script> copyright("all"); </script>
+
+    </body>
+
+</html>

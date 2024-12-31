@@ -1,0 +1,569 @@
+<!-------------------------- © 2007 - present, dmj.one and contributors. ----------------------------------
+   Part of the dmjone project. Licensed under the GNU AGPL. Provided as-is, without warranty of any kind. 
+-------------------- Redistribution and modifications must retain this notice. --------------------------->
+
+
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+    <!--<![endif]-->
+
+    <head>
+        <script src="/js/edu_su_common.js"></script>
+        <noscript>
+            <style>
+                html,
+                body {
+                    margin: 0;
+                    overflow: hidden;
+                }
+            </style>
+            <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+        </noscript>
+
+        <title>Scheduling Algorithm - DMJCCLT - dmj.one</title>
+        <meta name="description" content="Know about Scheduling Algorithm and their applications in Distributed Systems.">
+
+        <meta property="og:image" content="/logo.png">
+        <meta property="og:type" content="article">
+
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:site" content="@divyamohan1993">
+        <meta name="twitter:creator" content="@divyamohan1993">
+        <meta name="twitter:image" content="/logo.png">
+
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+        <meta name="author" content="Divya Mohan">
+        <meta name="robots" content="index, follow">
+
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js" integrity="sha512-sHSNLECRJSK+BFs7E8DiFc6pf6n90bLI85Emiw1jhreduZhK3VXgq9l4kAt9eTIHYAcuQBKHL01QKs4/3Xgl8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js" integrity="sha512-iWiuBS5nt6r60fCz26Nd0Zqe0nbk1ZTIQbl3Kv7kYsX+yKMUFHzjaH2+AnM6vp2Xs+gNmaBAVWJjSmuPw76Efg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                renderMathInElement(document.body, {
+                    // customised options
+                    // • auto-render specific keys, e.g.:
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false },
+                        { left: '\\(', right: '\\)', display: false },
+                        { left: '\\[', right: '\\]', display: true }
+                    ],
+                    // • rendering keys, e.g.:
+                    throwOnError: false
+                });
+            });
+        </script> -->
+
+        <!-- <style>
+            main ul {
+                list-style-type: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            main ul li {
+                margin: 0;
+                padding: 0;
+            }
+        </style> -->
+
+    </head>
+
+    <body>
+
+        <script> header_author("dm", "lakshika"); </script>
+
+        <main>
+            <article class="agen-tableofcontents">
+                <h2 class="text-center">
+                    Scheduling Algorithm
+                </h2>
+                <div class="d-none contentdate">2024, December 31</div>
+            </article>
+
+            <article>
+                <h3>Scheduling</h3>
+                <p><strong>What</strong>: Scheduling is the process of organizing, managing, and allocating tasks to available resources in a system. It determines the sequence and execution time of tasks competing for limited resources like processors, memory, and storage.</p>
+                <p><strong>Why</strong>: The need for scheduling arises from resource scarcity and the diversity of tasks demanding attention in systems. Without scheduling, resource conflicts can lead to inefficiency, unbalanced workloads, and unmet system objectives such as throughput, fairness, and response time.</p>
+                <p><strong>How</strong>: Scheduling uses algorithms and techniques to decide which task gets allocated to a resource at any given time. These techniques consider factors such as task priorities, arrival times, and resource requirements. Different scheduling algorithms optimize for specific goals, such as minimizing average completion time or ensuring fairness among competing tasks.</p>
+                <p><strong>Objectives</strong>:</p>
+                <ul>
+                    <li><strong>Maximizing resource utilization</strong>: Ensures that resources like CPU and memory are efficiently used without idle time.</li>
+                    <li><strong>Improving task throughput</strong>: Increases the number of tasks completed within a given time frame.</li>
+                    <li><strong>Optimizing response time</strong>: Reduces the waiting time for tasks, making systems more responsive.</li>
+                    <li><strong>Ensuring fairness</strong>: Balances resource allocation among competing tasks or users, preventing resource monopolization.</li>
+                </ul>
+                <p><strong>Context</strong>: Scheduling is applied in various domains:</p>
+                <ul>
+                    <li><strong>Single-Processor Systems</strong>: Deciding the order of task execution on a single CPU.</li>
+                    <li><strong>Distributed Systems</strong>: Allocating tasks across multiple nodes in a cluster (e.g., Hadoop).</li>
+                    <li><strong>Multi-Resource Environments</strong>: Managing tasks with diverse requirements like CPU, memory, and network bandwidth (e.g., DRF).</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>1. Single-Processor Scheduling</h3>
+                <p><strong>What</strong>: Single-processor scheduling involves managing the execution of multiple tasks on a system with only one processor. The objective is to determine the optimal sequence for task execution to achieve specific performance goals.</p>
+                <p><strong>Why</strong>: In a single-processor system, only one task can execute at a time. Without an efficient scheduling mechanism, longer tasks can delay shorter ones, leading to increased waiting times and reduced overall system performance. Scheduling ensures efficient processor utilization and fair task management.</p>
+                <p><strong>How</strong>: Various algorithms are employed to decide the order of task execution based on their characteristics, such as arrival time, execution time, or priority. Each algorithm has its strengths and trade-offs:</p>
+
+
+                <article>
+                    <h4>1.1 FIFO/FCFS (First-In First-Out/First-Come First-Serve)</h4>
+                    <p><strong>What</strong>: The FIFO/FCFS scheduling algorithm executes tasks in the order they arrive. It is straightforward and ensures no task skips the queue.</p>
+                    <p><strong>Why</strong>: Simplicity and predictability make it a foundational algorithm for scheduling, especially in systems where task arrival order aligns with the order of processing.</p>
+                    <p><strong>How</strong>: Tasks are maintained in a queue, with earlier-arriving tasks at the front. When the processor is free, the task at the head of the queue is executed. This continues until all tasks are processed.</p>
+
+                    <h5>Key Components</h5>
+                    <ul>
+                        <li><strong>Mechanism</strong>: Each task is processed sequentially based on its arrival time.</li>
+                        <li><strong>Queue</strong>: Tasks are stored in a queue sorted by their arrival times.</li>
+                        <li><strong>Execution</strong>: The first task is executed fully before moving to the next.</li>
+                        <li><strong>Drawback</strong>: Longer tasks block subsequent tasks, leading to higher average completion time (convoy effect).</li>
+                    </ul>
+
+                    <h5>Illustrative Example</h5>
+                    <p>Consider tasks with the following properties:</p>
+                    <ul>
+                        <li><strong>Task 1</strong>: Arrival at time 0, runtime 10.</li>
+                        <li><strong>Task 2</strong>: Arrival at time 6, runtime 5.</li>
+                        <li><strong>Task 3</strong>: Arrival at time 8, runtime 3.</li>
+                    </ul>
+                    <p>The processing order will follow the task arrival times: Task 1 → Task 2 → Task 3. Below is the Python implementation:</p>
+
+                    <pre><code class="language-python">
+# Example: FIFO/FCFS
+tasks = [(0, 10), (6, 5), (8, 3)]  # (arrival_time, run_time)
+queue = sorted(tasks, key=lambda x: x[0])  # Sort by arrival time
+completion_times = []
+current_time = 0
+
+for arrival, run_time in queue:
+    if current_time < arrival:
+        current_time = arrival  # Adjust for idle time
+    current_time += run_time
+    completion_times.append(current_time)
+
+average_completion_time = sum(completion_times) / len(tasks)
+print(f"Average Completion Time: {average_completion_time}")
+</code></pre>
+
+                    <h5>Analysis</h5>
+                    <ul>
+                        <li><strong>Completion Times</strong>: Task 1 finishes at 10, Task 2 at 15, and Task 3 at 18.</li>
+                        <li><strong>Average Completion Time</strong>: $$\frac{10 + 15 + 18}{3} = 14.33$$</li>
+                    </ul>
+
+                    <h5>Advantages</h5>
+                    <ul>
+                        <li>Simplicity: Easy to implement and understand.</li>
+                        <li>Fairness: No task skips the queue.</li>
+                    </ul>
+
+                    <h5>Drawbacks</h5>
+                    <ul>
+                        <li>Convoy Effect: A long task at the front delays shorter tasks, increasing overall completion time.</li>
+                        <li>Not Suitable for Interactive Systems: Poor responsiveness for shorter, time-sensitive tasks.</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>1.2 Shortest Task First (STF)</h4>
+                    <p><strong>What</strong>: The Shortest Task First (STF) scheduling algorithm prioritizes tasks with the shortest execution times. It is also referred to as Shortest Job First (SJF) in some contexts.</p>
+                    <p><strong>Why</strong>: STF is designed to minimize the average completion time, making it optimal for batch processing systems where task lengths are known in advance. By reducing the completion time for shorter tasks, it increases system throughput and responsiveness.</p>
+                    <p><strong>How</strong>: Tasks are maintained in a queue sorted by their execution times in ascending order. The task with the shortest run time is selected for execution whenever the processor is free.</p>
+
+                    <h5>Key Components</h5>
+                    <ul>
+                        <li><strong>Mechanism</strong>: Tasks are prioritized based on their execution time, ensuring shorter tasks are completed first.</li>
+                        <li><strong>Optimality</strong>: Minimizes the average completion time for a set of tasks.</li>
+                        <li><strong>Queue</strong>: Tasks are arranged in ascending order of their execution times.</li>
+                    </ul>
+
+                    <h5>Illustrative Example</h5>
+                    <p>Consider tasks with the following properties:</p>
+                    <ul>
+                        <li><strong>Task 1</strong>: Runtime 10.</li>
+                        <li><strong>Task 2</strong>: Runtime 5.</li>
+                        <li><strong>Task 3</strong>: Runtime 3.</li>
+                    </ul>
+                    <p>The processing order will be Task 3 → Task 2 → Task 1. Below is a Python implementation:</p>
+
+                    <pre><code class="language-python">
+# Example: Shortest Task First (STF)
+tasks = [(0, 10), (6, 5), (8, 3)]  # (arrival_time, run_time)
+queue = sorted(tasks, key=lambda x: x[1])  # Sort by runtime
+completion_times = []
+current_time = 0
+
+for arrival, run_time in queue:
+    if current_time < arrival:
+        current_time = arrival  # Adjust for idle time
+    current_time += run_time
+    completion_times.append(current_time)
+
+average_completion_time = sum(completion_times) / len(tasks)
+print(f"Average Completion Time: {average_completion_time}")
+</code></pre>
+
+                    <h5>Analysis</h5>
+                    <ul>
+                        <li><strong>Completion Times</strong>: Task 3 finishes at 3, Task 2 at 8, and Task 1 at 18.</li>
+                        <li><strong>Average Completion Time</strong>: $$\frac{3 + 8 + 18}{3} = 9.66$$</li>
+                    </ul>
+
+                    <h5>Advantages</h5>
+                    <ul>
+                        <li><strong>Efficiency</strong>: Optimal for minimizing average completion time.</li>
+                        <li><strong>System Throughput</strong>: Ensures quicker processing of shorter tasks, improving system responsiveness.</li>
+                    </ul>
+
+                    <h5>Drawbacks</h5>
+                    <ul>
+                        <li><strong>Task Starvation</strong>: Longer tasks may be delayed indefinitely if shorter tasks continuously arrive.</li>
+                        <li><strong>Predictive Requirement</strong>: Requires prior knowledge of task run times, which is not always feasible in dynamic systems.</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>1.3 Round-Robin (RR)</h4>
+                    <p><strong>What</strong>: Round-Robin (RR) is a preemptive scheduling algorithm where tasks are executed in a cyclic order, each receiving a fixed time slice (quantum) for execution. If a task does not complete within its allocated time slice, it is preempted and moved to the end of the queue.</p>
+                    <p><strong>Why</strong>: The algorithm is designed for fairness, ensuring all tasks get an equal share of CPU time. This makes it highly suitable for interactive systems where responsiveness and equitable processing are priorities.</p>
+                    <p><strong>How</strong>: Tasks are maintained in a circular queue. The processor executes the task at the head of the queue for one quantum, then preempts it and moves to the next task in the queue. This cycle repeats until all tasks are completed.</p>
+
+                    <h5>Key Components</h5>
+                    <ul>
+                        <li><strong>Mechanism</strong>: Tasks are executed in fixed time slices, and their states are saved if preempted for later continuation.</li>
+                        <li><strong>Fairness</strong>: Ensures no task monopolizes the processor, distributing CPU time equitably.</li>
+                        <li><strong>Applications</strong>: Ideal for interactive systems requiring quick responsiveness, such as user interfaces or time-sharing operating systems.</li>
+                    </ul>
+
+                    <h5>Illustrative Example</h5>
+                    <p>Consider tasks with the following properties:</p>
+                    <ul>
+                        <li><strong>Task 1</strong>: Runtime 10.</li>
+                        <li><strong>Task 2</strong>: Runtime 5.</li>
+                        <li><strong>Task 3</strong>: Runtime 3.</li>
+                    </ul>
+                    <p>Assume a quantum of 2 time units. The execution order will involve rotating through the tasks in the queue. Below is a Python implementation:</p>
+
+                    <pre><code class="language-python">
+# Example: Round-Robin (RR)
+tasks = [(0, 10), (6, 5), (8, 3)]  # (arrival_time, run_time)
+quantum = 2
+queue = tasks[:]  # Create a copy of tasks
+completion_times = [0] * len(tasks)
+remaining_times = [task[1] for task in tasks]
+current_time = 0
+
+while any(rt > 0 for rt in remaining_times):  # While tasks are incomplete
+    for i, (arrival, _) in enumerate(tasks):
+        if remaining_times[i] > 0 and current_time >= arrival:
+            execution_time = min(quantum, remaining_times[i])
+            current_time += execution_time
+            remaining_times[i] -= execution_time
+            if remaining_times[i] == 0:
+                completion_times[i] = current_time
+
+average_completion_time = sum(completion_times) / len(tasks)
+print(f"Average Completion Time: {average_completion_time}")
+</code></pre>
+
+                    <h5>Analysis</h5>
+                    <ul>
+                        <li><strong>Execution Order</strong>: Tasks are processed in a rotating fashion until all are completed.</li>
+                        <li><strong>Completion Times</strong>: Computed based on when tasks fully complete after multiple rounds.</li>
+                    </ul>
+
+                    <h5>Advantages</h5>
+                    <ul>
+                        <li><strong>Fairness</strong>: Prevents starvation by ensuring all tasks receive CPU time.</li>
+                        <li><strong>Responsiveness</strong>: Suitable for systems requiring regular updates, such as user interfaces.</li>
+                    </ul>
+
+                    <h5>Drawbacks</h5>
+                    <ul>
+                        <li><strong>Overhead</strong>: Frequent context switching can increase computational overhead.</li>
+                        <li><strong>Quantum Selection</strong>: Choosing an appropriate quantum size is critical. Too small increases overhead; too large reduces responsiveness.</li>
+                    </ul>
+                </article>
+            </article>
+
+            <article>
+                <article>
+                    <h3>2. Hadoop Scheduling</h3>
+                    <p><strong>What</strong>: Hadoop scheduling involves allocating computational and storage resources in a distributed Hadoop cluster. The aim is to manage tasks effectively while ensuring fair and efficient resource usage among multiple tenants (users or jobs).</p>
+                    <p><strong>Why</strong>: In a distributed environment, resources like CPU, memory, and storage are shared by multiple jobs. Without proper scheduling, resource conflicts can lead to inefficiencies, unfair allocation, and job starvation. Hadoop scheduling ensures that all jobs get adequate resources and that the cluster operates efficiently.</p>
+                    <p><strong>How</strong>: Hadoop uses scheduling algorithms to allocate cluster resources dynamically. These algorithms consider factors such as job priorities, user quotas, and task requirements to optimize resource utilization and fairness. Hadoop's scheduling mechanisms are built on its YARN (Yet Another Resource Negotiator) framework.</p>
+
+                    <h5>Key Objectives of Hadoop Scheduling</h5>
+                    <ul>
+                        <li><strong>Fair Resource Allocation</strong>: Distribute resources equitably among jobs or tenants to avoid resource monopolization.</li>
+                        <li><strong>High Utilization</strong>: Maximize the use of cluster resources, minimizing idle times.</li>
+                        <li><strong>Scalability</strong>: Handle a growing number of jobs and users without degrading performance.</li>
+                        <li><strong>Elasticity</strong>: Dynamically adjust resource allocation based on workload changes.</li>
+                    </ul>
+
+                    <h5>Challenges</h5>
+                    <ul>
+                        <li><strong>Multi-Tenancy</strong>: Multiple users (tenants) submit jobs, requiring the scheduler to balance competing demands.</li>
+                        <li><strong>Dynamic Resource Needs</strong>: Jobs may have varying and unpredictable resource requirements.</li>
+                        <li><strong>Fairness vs. Efficiency</strong>: Balancing equitable resource allocation with optimal cluster utilization.</li>
+                    </ul>
+
+                    <h5>Hadoop Scheduling Framework</h5>
+                    <p>Hadoop uses two primary schedulers for resource allocation:</p>
+                    <ul>
+                        <li><strong>Capacity Scheduler</strong>: Focuses on dividing cluster resources into queues, each with a guaranteed portion of the cluster's capacity.</li>
+                        <li><strong>Fair Scheduler</strong>: Ensures equitable resource distribution by allocating equal shares of the cluster to each user or job.</li>
+                    </ul>
+
+                    <h5>Applications</h5>
+                    <ul>
+                        <li>Large-scale data processing with multiple jobs (e.g., MapReduce tasks).</li>
+                        <li>Multi-tenant environments where multiple organizations or users share a single cluster.</li>
+                        <li>Dynamic workloads requiring real-time adjustment of resource allocation.</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>2.1 Hadoop Capacity Scheduler</h4>
+                    <p><strong>What</strong>: The Hadoop Capacity Scheduler is a resource management mechanism in Hadoop that divides cluster resources into queues. Each queue is assigned a specific percentage of the cluster's resources, ensuring predictable resource allocation for different tenants or jobs.</p>
+                    <p><strong>Why</strong>: This scheduler is designed for environments with multi-tenant workloads where guaranteed resource allocation and predictability are critical. It ensures fairness while allowing resource elasticity to maximize utilization.</p>
+                    <p><strong>How</strong>: Resources are divided into queues, and jobs within each queue are managed based on arrival order (typically FIFO). Administrators configure queues with soft and hard resource limits, which govern resource allocation dynamically.</p>
+
+                    <h5>Key Features</h5>
+                    <ul>
+                        <li><strong>Queues</strong>: Each queue is allocated a guaranteed percentage of cluster resources. For example:
+                            <ul>
+                                <li><strong>Queue 1</strong>: 80% of resources, for high-priority jobs.</li>
+                                <li><strong>Queue 2</strong>: 20% of resources, for lower-priority jobs.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Elasticity</strong>: Unused resources from one queue can be temporarily reallocated to other queues with higher demand. For instance, if Queue 2 has no active jobs, its resources may be allocated to jobs in Queue 1.</li>
+                        <li><strong>Preemption</strong>: Not supported to avoid task disruptions. Instead, resource reallocation occurs gradually as running tasks complete, ensuring tasks are not interrupted mid-execution.</li>
+                    </ul>
+
+                    <h5>Mechanism</h5>
+                    <ul>
+                        <li><strong>Soft Limit</strong>: Specifies the guaranteed percentage of cluster resources for a queue. Resources beyond the soft limit can be allocated to other queues if idle.</li>
+                        <li><strong>Hard Limit</strong>: Defines the maximum percentage of resources a queue can occupy, ensuring no queue monopolizes the cluster.</li>
+                        <li><strong>Hierarchical Queues</strong>: Queues can have sub-queues, each inheriting and sharing resources from the parent queue, enabling fine-grained control of resource allocation.</li>
+                    </ul>
+
+                    <h5>Advantages</h5>
+                    <ul>
+                        <li><strong>Predictability</strong>: Guarantees a minimum resource allocation for each queue, ensuring critical jobs receive necessary resources.</li>
+                        <li><strong>Elastic Resource Allocation</strong>: Dynamically reallocates unused resources, improving overall utilization.</li>
+                        <li><strong>Avoids Disruption</strong>: Preemption-free reallocation prevents task termination and wasted work.</li>
+                    </ul>
+
+                    <h5>Drawbacks</h5>
+                    <ul>
+                        <li><strong>Delayed Reallocation</strong>: Resource reallocation relies on task completion, which may be slow in high-load scenarios.</li>
+                        <li><strong>Queue Configuration Complexity</strong>: Requires careful configuration of queue limits to balance fairness and efficiency.</li>
+                    </ul>
+
+                    <h5>Use Case</h5>
+                    <p>Ideal for multi-tenant Hadoop environments where resource guarantees and workload isolation are crucial, such as organizations with distinct departments sharing a single cluster for batch and analytical processing.</p>
+                </article>
+
+                <article>
+                    <h4>2.2 Hadoop Fair Scheduler</h4>
+                    <p><strong>What</strong>: The Hadoop Fair Scheduler allocates resources dynamically in a Hadoop cluster, ensuring each user or job gets a fair share of resources. It focuses on equitable distribution and supports preemption to free resources for underutilized pools.</p>
+                    <p><strong>Why</strong>: This scheduler is designed for environments requiring fairness among competing jobs or users. By dynamically adjusting resource allocation, it ensures that all jobs make progress, preventing resource hogging and starvation.</p>
+                    <p><strong>How</strong>: Resources are divided into pools, typically one per user or job. Jobs within each pool share resources either equally (fair-share scheduling) or based on arrival order (FIFO). When resource utilization drops in underutilized pools, the scheduler preempts tasks in other pools to rebalance resource distribution.</p>
+
+                    <h5>Key Features</h5>
+                    <ul>
+                        <li><strong>Pools</strong>: Resources are divided among pools, ensuring fair allocation. For instance:
+                            <ul>
+                                <li><strong>Pool A</strong>: Allocated 50% of cluster resources.</li>
+                                <li><strong>Pool B</strong>: Allocated 50% of cluster resources.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Preemption</strong>: The scheduler terminates low-priority tasks in overutilized pools to reallocate resources to underutilized pools. This ensures minimum guarantees for all pools are met.</li>
+                        <li><strong>Configurable Scheduling</strong>: Within pools, tasks can follow:
+                            <ul>
+                                <li><strong>FIFO</strong>: Tasks are executed in the order they arrive.</li>
+                                <li><strong>Fair-Share</strong>: Resources are distributed equally among tasks within a pool.</li>
+                            </ul>
+                        </li>
+                    </ul>
+
+                    <h5>Mechanism</h5>
+                    <ul>
+                        <li><strong>Minimum Shares</strong>: Pools can have minimum resource guarantees. If these are not met, resources are taken from other pools through preemption.</li>
+                        <li><strong>Task Selection for Preemption</strong>: Recently started tasks are preempted first to minimize wasted computation.</li>
+                        <li><strong>Idempotent Tasks</strong>: Killed tasks can restart without side effects, as they process the same inputs and generate consistent outputs.</li>
+                    </ul>
+
+                    <h5>Advantages</h5>
+                    <ul>
+                        <li><strong>Fairness</strong>: Ensures resources are equitably distributed among all users or jobs.</li>
+                        <li><strong>Resource Reallocation</strong>: Dynamic adjustment of resource allocation prevents stagnation in underutilized pools.</li>
+                        <li><strong>Flexibility</strong>: Configurable scheduling policies within pools accommodate diverse workload requirements.</li>
+                    </ul>
+
+                    <h5>Drawbacks</h5>
+                    <ul>
+                        <li><strong>Wasted Computation</strong>: Preemption can lead to lost work, especially for long-running tasks.</li>
+                        <li><strong>Complexity</strong>: Managing multiple pools and scheduling configurations can be challenging in large-scale clusters.</li>
+                    </ul>
+
+                    <h5>Use Case</h5>
+                    <p>The Hadoop Fair Scheduler is ideal for clusters with diverse, competing workloads where fairness and adaptability are crucial, such as shared research environments or public cloud-based data processing clusters.</p>
+                </article>
+            </article>
+
+            <article>
+                <article>
+                    <h3>3. Dominant-Resource Fair Scheduling (DRF)</h3>
+                    <p><strong>What</strong>: Dominant-Resource Fair Scheduling (DRF) is a resource allocation strategy designed for environments where tasks or jobs have diverse multi-resource requirements, such as CPU, memory (RAM), disk, or network bandwidth. DRF ensures fairness by focusing on the dominant resource usage of each task.</p>
+                    <p><strong>Why</strong>: Traditional scheduling strategies may fail to ensure fairness in multi-resource environments, as they often optimize for a single resource (e.g., CPU). DRF addresses this by accounting for the varying needs of tasks, ensuring that no job disproportionately consumes its most critical resource (dominant resource).</p>
+                    <p><strong>How</strong>: DRF allocates resources by equalizing the dominant resource usage percentages across all tasks or jobs. This ensures that each job gets a fair share of the resource it depends on most, leading to balanced and equitable cluster utilization.</p>
+
+                    <h4>3.1 Concept</h4>
+
+                    <h5>Key Components</h5>
+                    <ul>
+                        <li><strong>Dominant Resource</strong>: The resource a task consumes the highest percentage of compared to the total cluster capacity. For instance:
+                            <ul>
+                                <li><strong>Job 1</strong>: Requires 2 CPUs and 8 GB RAM in a cluster with 18 CPUs and 36 GB RAM. Dominant resource = RAM (8/36 = 2/9).</li>
+                                <li><strong>Job 2</strong>: Requires 6 CPUs and 2 GB RAM. Dominant resource = CPU (6/18 = 1/3).</li>
+                            </ul>
+                        </li>
+                        <li><strong>Fairness Rule</strong>: DRF equalizes the usage percentage of the dominant resource across all jobs. In the example above, both Job 1 and Job 2 will get an equal share of their respective dominant resources.</li>
+                        <li><strong>Applications</strong>: DRF is used in distributed systems like Mesos and Hadoop clusters where multi-resource fairness is critical.</li>
+                    </ul>
+
+                    <h5>Mechanism</h5>
+                    <ol>
+                        <li>Determine the dominant resource for each job by calculating the highest percentage of total cluster capacity consumed by any resource.</li>
+                        <li>Allocate tasks to jobs so that the usage percentage of the dominant resource remains equal across all jobs.</li>
+                        <li>Repeat allocation until all jobs are either complete or cluster resources are exhausted.</li>
+                    </ol>
+
+                    <h5>Illustrative Example</h5>
+                    <p>Consider a cluster with 18 CPUs and 36 GB RAM:</p>
+                    <ul>
+                        <li><strong>Job 1</strong>: Tasks require 2 CPUs and 8 GB RAM (dominant resource = RAM).</li>
+                        <li><strong>Job 2</strong>: Tasks require 6 CPUs and 2 GB RAM (dominant resource = CPU).</li>
+                    </ul>
+
+                    <p>DRF allocates:</p>
+                    <ul>
+                        <li><strong>Job 1</strong>: 3 tasks, consuming 6 CPUs and 24 GB RAM.</li>
+                        <li><strong>Job 2</strong>: 2 tasks, consuming 12 CPUs and 4 GB RAM.</li>
+                    </ul>
+                    <p>Both jobs use 2/3 of their dominant resource, satisfying the fairness rule.</p>
+
+                    <h5>Advantages</h5>
+                    <ul>
+                        <li><strong>Fairness</strong>: Ensures equitable allocation of dominant resources, preventing resource monopolization.</li>
+                        <li><strong>Multi-Resource Support</strong>: Handles diverse resource requirements effectively.</li>
+                        <li><strong>Strategy-Proof</strong>: Prevents tenants from gaming the system by misreporting resource requirements.</li>
+                    </ul>
+
+                    <h5>Drawbacks</h5>
+                    <ul>
+                        <li><strong>Complexity</strong>: Requires accurate computation of dominant resources and careful allocation to maintain fairness.</li>
+                        <li><strong>Underutilization</strong>: May leave some non-dominant resources underutilized in the interest of fairness.</li>
+                    </ul>
+
+                    <h5>Applications</h5>
+                    <ul>
+                        <li><strong>Mesos</strong>: A distributed operating system for cloud environments.</li>
+                        <li><strong>Hadoop</strong>: Managing diverse workloads with varying resource requirements.</li>
+                        <li><strong>Cloud Systems</strong>: Fair scheduling in multi-tenant cloud infrastructures.</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>3.2 Example</h4>
+                    <p><strong>Scenario</strong>: A cluster with 18 CPUs and 36 GB RAM is shared by two jobs with distinct resource requirements:</p>
+                    <ul>
+                        <li><strong>Job 1</strong>: Each task requires 2 CPUs and 8 GB RAM.</li>
+                        <li><strong>Job 2</strong>: Each task requires 6 CPUs and 2 GB RAM.</li>
+                    </ul>
+
+                    <h5>Step 1: Identify Dominant Resources</h5>
+                    <p>The dominant resource for each job is the resource that consumes the highest percentage of the cluster's total capacity:</p>
+                    <ul>
+                        <li><strong>Job 1</strong>:
+                            <ul>
+                                <li>CPU usage per task = $$\frac{2}{18} = \frac{1}{9}$$</li>
+                                <li>RAM usage per task = $$\frac{8}{36} = \frac{2}{9}$$</li>
+                                <li><strong>Dominant Resource</strong>: RAM (2/9).</li>
+                            </ul>
+                        </li>
+                        <li><strong>Job 2</strong>:
+                            <ul>
+                                <li>CPU usage per task = $$\frac{6}{18} = \frac{1}{3}$$</li>
+                                <li>RAM usage per task = $$\frac{2}{36} = \frac{1}{18}$$</li>
+                                <li><strong>Dominant Resource</strong>: CPU (1/3).</li>
+                            </ul>
+                        </li>
+                    </ul>
+
+                    <h5>Step 2: Equalize Dominant Resource Usage</h5>
+                    <p>DRF ensures that each job gets the same percentage of its dominant resource:</p>
+                    <ul>
+                        <li><strong>Job 1</strong>: Dominant resource usage = $$\frac{\text{Number of tasks} \times 8}{36}$$.</li>
+                        <li><strong>Job 2</strong>: Dominant resource usage = $$\frac{\text{Number of tasks} \times 6}{18}$$.</li>
+                    </ul>
+                    <p>Set the dominant resource usage to be equal:</p>
+                    <p>$$\frac{\text{Number of tasks for Job 1} \times 8}{36} = \frac{\text{Number of tasks for Job 2} \times 6}{18}$$.</p>
+
+                    <h5>Step 3: Allocate Tasks</h5>
+                    <p>Solving for the task allocation:</p>
+                    <ul>
+                        <li><strong>Job 1</strong>: Allocates 3 tasks, consuming:
+                            <ul>
+                                <li>CPU = $$3 \times 2 = 6$$</li>
+                                <li>RAM = $$3 \times 8 = 24$$</li>
+                            </ul>
+                        </li>
+                        <li><strong>Job 2</strong>: Allocates 2 tasks, consuming:
+                            <ul>
+                                <li>CPU = $$2 \times 6 = 12$$</li>
+                                <li>RAM = $$2 \times 2 = 4$$</li>
+                            </ul>
+                        </li>
+                    </ul>
+
+                    <h5>Step 4: Verify Fairness</h5>
+                    <p>Each job uses 2/3 of its dominant resource:</p>
+                    <ul>
+                        <li><strong>Job 1</strong>: RAM usage = $$\frac{24}{36} = \frac{2}{3}$$.</li>
+                        <li><strong>Job 2</strong>: CPU usage = $$\frac{12}{18} = \frac{2}{3}$$.</li>
+                    </ul>
+                    <p>This ensures fairness as both jobs consume equal shares of their respective dominant resources.</p>
+
+                    <h5>Step 5: Check Cluster Utilization</h5>
+                    <p>Total resource consumption:</p>
+                    <ul>
+                        <li>CPU: $$6 + 12 = 18$$ (fully utilized).</li>
+                        <li>RAM: $$24 + 4 = 28$$ (underutilized, as fairness prioritizes dominant resource).</li>
+                    </ul>
+
+                    <h5>Conclusion</h5>
+                    <p>This allocation satisfies DRF's fairness rule, ensuring both jobs receive an equitable share of their critical resources while efficiently using the cluster's capabilities.</p>
+                </article>
+            </article>
+
+
+
+
+
+        </main>
+
+        <script> copyright("all"); </script>
+
+    </body>
+
+</html>

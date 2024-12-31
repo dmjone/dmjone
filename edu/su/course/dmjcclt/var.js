@@ -173,6 +173,76 @@ function get_menu_list(datetogen) {
                 codetype: "Concepts",
                 readtime: 5,
                 link: "mutual-exclusion"
+            },
+            {
+                title: "Concurrency Control in Distributed Systems",
+                desc: "Learn about Concurrency Control in Distributed Systems, a mechanism used to manage access to shared resources in a concurrent environment. This section explores the key features and benefits of concurrency control, including isolation, consistency, and scalability. Click to access the theory section and deepen your understanding of concurrency control in distributed systems.",
+                codetype: "Concepts",
+                readtime: 5,
+                link: "concurrency-control"
+            },
+            {
+                title: "Replication Control in Distributed Systems",
+                desc: "Explore Replication Control in Distributed Systems, a technique used to manage data replication across multiple nodes. This section examines the key features and benefits of replication control, including fault tolerance, consistency, and availability. Click to access the theory section and enhance your understanding of replication control in distributed systems.",
+                codetype: "Concepts",
+                readtime: 5,
+                link: "replication-control"
+            },
+            {
+                title: "Stream Processing in Distributed Systems",
+                desc: "Learn about Stream Processing in Distributed Systems, a data processing technique used to analyze real-time data streams. This section explores the key features and benefits of stream processing, including low latency, scalability, and fault tolerance. Click to access the theory section and deepen your understanding of stream processing in distributed systems.",
+                codetype: "Concepts",
+                readtime: 5,
+                link: "stream-processing"
+            },
+            {
+                title: "Distributed Graph Processing",
+                desc: "Explore Distributed Graph Processing, a data processing technique used to analyze and traverse graph data structures across multiple nodes. This section examines the key features and benefits of distributed graph processing, including parallelism, fault tolerance, and scalability. Click to access the theory section and enhance your understanding of distributed graph processing in distributed systems.",
+                codetype: "Concepts",
+                readtime: 5,
+                link: "distributed-graph-processing"
+            },
+            {
+                title: "Structure of Networks",
+                desc: "Learn about the Structure of Networks in Distributed Systems, including the physical and logical organization of network nodes. This section explores the key features and benefits of network structures, including scalability, fault tolerance, and performance. Click to access the theory section and deepen your understanding of network structures in distributed systems.",
+                codetype: "Concepts",
+                readtime: 5,
+                link: "structure-of-networks"
+            },
+            {
+                title: "Scheduling Algorithms in Distributed Systems",
+                desc: "Explore Scheduling Algorithms in Distributed Systems, a technique used to allocate resources and tasks across multiple nodes. This section examines the key features and benefits of scheduling algorithms, including fairness, efficiency, and load balancing. Click to access the theory section and enhance your understanding of scheduling algorithms in distributed systems.",
+                codetype: "Concepts",
+                readtime: 5,
+                link: "scheduling-algorithms"
+            },
+            {
+                title: "Distributed File Systems",
+                desc: "Explore Distributed File Systems, a distributed systems architecture that enables the storage and retrieval of files across multiple nodes. This section examines the key features and benefits of Distributed File Systems, including fault tolerance, scalability, and data redundancy. Click to access the theory section and enhance your understanding of Distributed File Systems and their applications in distributed computing.",
+                codetype: "Concepts",
+                readtime: 5,
+                link: "distributed-file-systems"
+            },
+            {
+                title: "Distributed Shared Memory",
+                desc: "Learn about Distributed Shared Memory, a memory model used in distributed systems to share memory across multiple nodes. This section explores the key features and benefits of Distributed Shared Memory, including data consistency, fault tolerance, and scalability. Click to access the theory section and deepen your understanding of Distributed Shared Memory and its applications in distributed systems.",
+                codetype: "Concepts",
+                readtime: 5,
+                link: "distributed-shared-memory"
+            },
+            {
+                title: "Sensor Networks",
+                desc: "Explore Sensor Networks, a distributed systems architecture that enables the collection and processing of sensor data. This section examines the key features and benefits of Sensor Networks, including energy efficiency, scalability, and data aggregation. Click to access the theory section and enhance your understanding of Sensor Networks and their applications in distributed systems.",
+                codetype: "Concepts",
+                readtime: 5,
+                link: "sensor-networks"
+            },
+            {
+                title: "Security in Distributed Systems",
+                desc: "Learn about Security in Distributed Systems, including encryption, authentication, and access control mechanisms. This section explores the key features and benefits of security measures, including confidentiality, integrity, and availability. Click to access the theory section and deepen your understanding of security in distributed systems.",
+                codetype: "Concepts",
+                readtime: 5,
+                link: "security-in-distributed-systems"
             }
             // {
             //     title: "Distributed Hash Table (DHT)",
