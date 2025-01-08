@@ -10,7 +10,13 @@ function get_menu_list(datetogen) {
             //     cardimage: "https://cdn.dmj.one/edu/su/course/cs/img/logo.webp",                
             //     // cardimage_dark: "//cdn.dmj.one/img/needhelp.webp",               
             //     // continuereading: " Click here to reach out to Faculty directly through email"
-            // },            
+            // },     
+            {
+                link: "theory/rising-again",
+                title: "Rising Again: A Tale of Resilience and Redemption",
+                desc: "Dive into an inspiring narrative of resilience, betrayal, and redemption. Follow the journey of overcoming immense challenges, reclaiming strength, and standing for one's values. This story, written by Divya Mohan, is part of the Story Writing Series published on dmj.one. Be inspired to rise against all odds.",
+                codetype: "Story | Inspirational"
+            },       
             {
                 link: "practice/",
                 title: "Practice English Communication Skills: Strengthen Your Knowledge",
