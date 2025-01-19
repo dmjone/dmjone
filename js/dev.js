@@ -7654,7 +7654,7 @@ function gen_blockquote() {
                 requestAnimationFrame(loop);
             }
 
-            const timeouttimer = forcedisplay ? Math.floor(Math.random() * 2000) + 3000 : Math.floor(Math.random() * 6000) + 6000;
+            const timeouttimer = forcedisplay ? Math.floor(Math.random() * 2000) + 3000 : Math.floor(Math.random() * 2000) + 9000;
 
             loop();
             setTimeout(function () {
@@ -7675,7 +7675,7 @@ function gen_blockquote() {
         (function () {
             document.addEventListener("DOMContentLoaded", () => {
                 const audio = document.createElement('audio');
-                audio.src = '/media/music/happy_bday.mp3';
+                audio.src = '/media/music/happy_bday_9s.mp3';
                 audio.preload = 'auto';
 
                 let audioPlayed = false;
