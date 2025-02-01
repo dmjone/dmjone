@@ -1,0 +1,774 @@
+<!-------------------------- © 2007 - present, dmj.one and contributors. ----------------------------------
+   Part of the dmjone project. Licensed under the GNU AGPL. Provided as-is, without warranty of any kind. 
+-------------------- Redistribution and modifications must retain this notice. --------------------------->
+
+
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+    <!--<![endif]-->
+
+    <head>
+        <script src="/js/edu_su_common.js"></script>
+        <noscript>
+            <style>
+                html,
+                body {
+                    margin: 0;
+                    overflow: hidden;
+                }
+            </style>
+            <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+        </noscript>
+
+        <title>Priority Queues in Data Structures - CSU083 | Shoolini University</title>
+        
+        <meta name="description" content="Learn Priority Queues in Data Structures, covering concepts, implementations, optimizations, and real-world applications. Part of the CSU083 course at Shoolini University.">
+        <meta name="keywords" content="Priority Queue, Data Structures, Min-Heap, Max-Heap, Heap, Heapify, DSA, Algorithms, Competitive Programming">
+        <meta name="author" content="Divya Mohan">
+        <meta name="robots" content="index, follow">
+        
+        <!-- Open Graph for Social Media -->
+        <meta property="og:image" content="/logo.png">
+        <meta property="og:type" content="article">
+        
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:site" content="@divyamohan1993">
+        <meta name="twitter:creator" content="@divyamohan1993">
+        <meta name="twitter:image" content="/logo.png">
+        
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        
+        <meta name="author" content="Divya Mohan">
+        <meta name="robots" content="index, follow">
+        
+        <!-- JSON-LD Structured Data for SEO -->
+        <script type="application/ld+json">
+            {
+              "@context": "https://schema.org",
+              "@type": "Course",
+              "name": "Priority Queues in Data Structures",
+              "description": "Learn Priority Queues in Data Structures with practical implementations, optimizations, and real-world applications in DSA.",
+              "provider": {
+                "@type": "EducationalOrganization",
+                "name": "Shoolini University",
+                "url": "https://shooliniuniversity.com"
+              }
+            }
+        </script>
+
+
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js" integrity="sha512-sHSNLECRJSK+BFs7E8DiFc6pf6n90bLI85Emiw1jhreduZhK3VXgq9l4kAt9eTIHYAcuQBKHL01QKs4/3Xgl8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js" integrity="sha512-iWiuBS5nt6r60fCz26Nd0Zqe0nbk1ZTIQbl3Kv7kYsX+yKMUFHzjaH2+AnM6vp2Xs+gNmaBAVWJjSmuPw76Efg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                renderMathInElement(document.body, {
+                    // customised options
+                    // • auto-render specific keys, e.g.:
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false },
+                        { left: '\\(', right: '\\)', display: false },
+                        { left: '\\[', right: '\\]', display: true }
+                    ],
+                    // • rendering keys, e.g.:
+                    throwOnError: false
+                });
+            });
+        </script> -->
+
+        <!-- <style>
+            main ul {
+                list-style-type: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            main ul li {
+                margin: 0;
+                padding: 0;
+            }
+        </style> -->
+
+
+
+    </head>
+
+    <body>
+
+        <script> header_author("dm"); </script>
+
+        <main>
+            <article class="agen-tableofcontents">
+                <h2 class="text-center">
+                    Priority Queues in Data Structures
+                </h2>
+                <div class="d-none contentdate">2024, August 5</div>
+            </article>
+
+            <article>
+                <h4>1. Prerequisites</h4>
+                <p>Before understanding priority queues, you should be familiar with:</p>
+                <ul>
+                    <li><strong>Queues</strong>: A data structure that follows FIFO (First In, First Out) ordering.</li>
+                    <li><strong>Heaps</strong>: A specialized tree-based structure used for efficiently managing priority elements.</li>
+                    <li><strong>Sorting</strong>: Understanding comparison-based sorting techniques helps in grasping how elements are ordered.</li>
+                    <li><strong>Big-O Complexity</strong>: To analyze time complexities of insertion, deletion, and retrieval operations.</li>
+                </ul>
+
+                <h4>2. What is a Priority Queue?</h4>
+                <p>A priority queue is a special type of queue where elements are dequeued based on their priority rather than the order they were enqueued.</p>
+                <ul>
+                    <li><strong>Ordering</strong>: Elements are assigned a priority, and higher-priority elements are served before lower-priority ones.</li>
+                    <li><strong>Implementation</strong>: Typically implemented using heaps (Binary Heap, Fibonacci Heap) for efficient operations.</li>
+                    <li><strong>Operations</strong>:
+                        <ul>
+                            <li><code>insert(element, priority)</code> → Adds an element with a given priority.</li>
+                            <li><code>extract_max()</code> / <code>extract_min()</code> → Removes and returns the highest/lowest priority element.</li>
+                            <li><code>peek()</code> → Retrieves but does not remove the highest/lowest priority element.</li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <h4>3. Why Does This Algorithm Exist?</h4>
+                <p>Priority queues exist because real-world systems often require prioritization rather than simple FIFO order. Key applications include:</p>
+                <ul>
+                    <li><strong>CPU Scheduling</strong>: The OS scheduler assigns tasks based on priority.</li>
+                    <li><strong>Graph Algorithms</strong>: Used in Dijkstra’s algorithm for shortest path calculation.</li>
+                    <li><strong>Network Routing</strong>: Manages packet transmission by prioritizing data.</li>
+                    <li><strong>Event-driven Simulations</strong>: Events are processed in order of their scheduled time.</li>
+                    <li><strong>Task Scheduling</strong>: Job queues in multi-threading environments use priority queues.</li>
+                </ul>
+
+                <h4>4. When Should You Use It?</h4>
+                <p>Use a priority queue when:</p>
+                <ul>
+                    <li>Elements must be processed based on priority rather than arrival order.</li>
+                    <li>Efficient retrieval of the highest or lowest priority element is required.</li>
+                    <li>Sorting elements dynamically as they are inserted is beneficial.</li>
+                    <li>Time-sensitive operations, such as real-time scheduling, are needed.</li>
+                </ul>
+
+                <h4>5. How Does It Compare to Alternatives?</h4>
+
+                <h5>Strengths:</h5>
+                <ul>
+                    <li><strong>Efficient Prioritization</strong>: Direct access to the highest/lowest priority element.</li>
+                    <li><strong>Faster Than Sorting</strong>: Maintaining a sorted list takes <code>O(n log n)</code>, but a heap-based priority queue allows insertion/deletion in <code>O(log n)</code>.</li>
+                    <li><strong>Dynamic Updates</strong>: Elements can be inserted with different priorities on the fly.</li>
+                </ul>
+
+                <h5>Weaknesses:</h5>
+                <ul>
+                    <li><strong>No Random Access</strong>: Unlike arrays, accessing arbitrary elements isn’t straightforward.</li>
+                    <li><strong>Not Always Optimal for Small Data</strong>: For a small number of elements, a simple sorted array may be faster.</li>
+                    <li><strong>Heap Implementation Complexity</strong>: Implementing an efficient priority queue requires understanding of heap structures.</li>
+                </ul>
+
+            </article>
+
+            <article>
+                <h4>6. Python Code Implementation</h4>
+                <pre><code class="language-python">
+import heapq
+
+class PriorityQueue:
+    def __init__(self):
+        self.queue = []
+
+    def insert(self, element, priority):
+        heapq.heappush(self.queue, (priority, element))
+
+    def extract_min(self):
+        if self.is_empty():
+            return None
+        return heapq.heappop(self.queue)[1]
+
+    def peek(self):
+        if self.is_empty():
+            return None
+        return self.queue[0][1]
+
+    def is_empty(self):
+        return len(self.queue) == 0
+
+    def display(self):
+        print("Priority Queue:", self.queue)
+
+# Example usage
+pq = PriorityQueue()
+pq.insert("Task A", 3)
+pq.insert("Task B", 1)
+pq.insert("Task C", 2)
+
+pq.display()  # Shows the internal heap structure
+
+print("Extract Min:", pq.extract_min())  # Should return "Task B" (priority 1)
+pq.display()
+
+print("Extract Min:", pq.extract_min())  # Should return "Task C" (priority 2)
+pq.display()
+
+print("Extract Min:", pq.extract_min())  # Should return "Task A" (priority 3)
+pq.display()
+</code></pre>
+
+                <h4>7. Dry Run - Step-by-Step Execution</h4>
+
+                <h5>Step 1: Insert "Task A" (Priority = 3)</h5>
+                <ul>
+                    <li>Heap: <code>[(3, "Task A")]</code></li>
+                </ul>
+
+                <h5>Step 2: Insert "Task B" (Priority = 1)</h5>
+                <ul>
+                    <li>Heap (before heapify): <code>[(3, "Task A"), (1, "Task B")]</code></li>
+                    <li>Heap (after heapify): <code>[(1, "Task B"), (3, "Task A")]</code> → <strong>Heap property maintained</strong></li>
+                </ul>
+
+                <h5>Step 3: Insert "Task C" (Priority = 2)</h5>
+                <ul>
+                    <li>Heap (before heapify): <code>[(1, "Task B"), (3, "Task A"), (2, "Task C")]</code></li>
+                    <li>Heap (after heapify): <code>[(1, "Task B"), (3, "Task A"), (2, "Task C")]</code></li>
+                </ul>
+
+                <h4>8. Extracting Elements (Min Priority First)</h4>
+
+                <h5>Step 4: Extract Min</h5>
+                <ul>
+                    <li>Heap before extraction: <code>[(1, "Task B"), (3, "Task A"), (2, "Task C")]</code></li>
+                    <li>Remove <code>"Task B"</code> (Priority = 1)</li>
+                    <li>Heap after extraction & reheapify: <code>[(2, "Task C"), (3, "Task A")]</code></li>
+                </ul>
+
+                <h5>Step 5: Extract Min</h5>
+                <ul>
+                    <li>Heap before extraction: <code>[(2, "Task C"), (3, "Task A")]</code></li>
+                    <li>Remove <code>"Task C"</code> (Priority = 2)</li>
+                    <li>Heap after extraction: <code>[(3, "Task A")]</code></li>
+                </ul>
+
+                <h5>Step 6: Extract Min</h5>
+                <ul>
+                    <li>Heap before extraction: <code>[(3, "Task A")]</code></li>
+                    <li>Remove <code>"Task A"</code> (Priority = 3)</li>
+                    <li>Heap after extraction: <code>[]</code> (Empty)</li>
+                </ul>
+
+                <h4>9. Final Output (Stepwise Execution)</h4>
+                <pre><code class="language-plaintext">
+Priority Queue: [(1, 'Task B'), (3, 'Task A'), (2, 'Task C')]
+Extract Min: Task B
+Priority Queue: [(2, 'Task C'), (3, 'Task A')]
+Extract Min: Task C
+Priority Queue: [(3, 'Task A')]
+Extract Min: Task A
+Priority Queue: []
+</code></pre>
+
+                <h4>10. Key Observations</h4>
+                <ul>
+                    <li>The <strong>Min Heap</strong> always maintains the smallest priority at the root.</li>
+                    <li>Each insertion takes <code>O(log n)</code> time due to heapification.</li>
+                    <li>Extraction is also <code>O(log n)</code> since it restructures the heap.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h4>11. Time Complexity Analysis</h4>
+                <p>The time complexity of a priority queue depends on its underlying data structure. Typically, heaps (binary, Fibonacci) are used for efficient operations.</p>
+
+                <h5>11.1 Worst-Case, Best-Case, and Average-Case Complexity</h5>
+                <table class="table table-bordered">
+                    <tr>
+                        <th>Operation</th>
+                        <th>Binary Heap Complexity</th>
+                        <th>Sorted Array Complexity</th>
+                        <th>Unsorted Array Complexity</th>
+                    </tr>
+                    <tr>
+                        <td>Insertion</td>
+                        <td><strong>O(log n)</strong> (heapify up)</td>
+                        <td><strong>O(n)</strong> (maintain sorted order)</td>
+                        <td><strong>O(1)</strong> (append at end)</td>
+                    </tr>
+                    <tr>
+                        <td>Extract Min/Max</td>
+                        <td><strong>O(log n)</strong> (heapify down)</td>
+                        <td><strong>O(1)</strong> (direct access)</td>
+                        <td><strong>O(n)</strong> (linear search for min/max)</td>
+                    </tr>
+                    <tr>
+                        <td>Peek (Get Min/Max)</td>
+                        <td><strong>O(1)</strong> (root access)</td>
+                        <td><strong>O(1)</strong> (first element)</td>
+                        <td><strong>O(n)</strong> (search for min/max)</td>
+                    </tr>
+                    <tr>
+                        <td>Search for an element</td>
+                        <td><strong>O(n)</strong> (linear search)</td>
+                        <td><strong>O(log n)</strong> (binary search)</td>
+                        <td><strong>O(n)</strong> (linear search)</td>
+                    </tr>
+                </table>
+
+                <h4>12. Space Complexity Analysis</h4>
+                <p>The space complexity of a priority queue is determined by the data structure used.</p>
+                <ul>
+                    <li><strong>Binary Heap:</strong> <code>O(n)</code> (stores all elements in an array representation).</li>
+                    <li><strong>Fibonacci Heap:</strong> <code>O(n)</code> (maintains additional structural information).</li>
+                    <li><strong>Sorted Array:</strong> <code>O(n)</code> (requires extra space if copying).</li>
+                    <li><strong>Unsorted Array:</strong> <code>O(n)</code> (simple storage, no overhead).</li>
+                </ul>
+
+                <h5>12.1 Space Consumption vs Input Size</h5>
+                <p>For a priority queue storing <code>n</code> elements:</p>
+                <ul>
+                    <li>A binary heap requires an array of size <code>n</code>, making it <strong>O(n)</strong>.</li>
+                    <li>Extra space may be required for bookkeeping in Fibonacci heaps, but it remains <strong>O(n)</strong>.</li>
+                    <li>Dynamic allocations (like linked structures) introduce extra overhead.</li>
+                </ul>
+
+                <h4>13. Trade-offs and Considerations</h4>
+
+                <h5>13.1 When to Use Heaps vs Other Implementations</h5>
+                <ul>
+                    <li><strong>Use a Binary Heap</strong> when frequent insertions and deletions are required (<code>O(log n)</code>).</li>
+                    <li><strong>Use a Sorted Array</strong> if you only need fast retrieval (<code>O(1)</code> for extract).</li>
+                    <li><strong>Use an Unsorted Array</strong> when insertions are frequent, but deletions are rare.</li>
+                </ul>
+
+                <h5>13.2 Trade-offs Between Time and Space</h5>
+                <ul>
+                    <li><strong>Heap-based priority queues</strong> balance insertions and deletions efficiently but require <code>O(n)</code> storage.</li>
+                    <li><strong>Sorting upon insertion</strong> reduces retrieval time but increases insertion cost.</li>
+                    <li><strong>Unsorted structures</strong> reduce insertion time but make retrieval expensive.</li>
+                </ul>
+
+            </article>
+
+
+            <article>
+                <h4>14. Common Optimizations</h4>
+                <p>Optimizing a priority queue involves improving insertion, deletion, and retrieval efficiency. Key optimizations include:</p>
+                <ul>
+                    <li><strong>Use of Fibonacci Heap:</strong> Reduces <code>extract_min()</code> to <code>O(log n)</code> and <code>decrease_key()</code> to <code>O(1)</code>, improving Dijkstra's algorithm.</li>
+                    <li><strong>Lazy Deletion:</strong> Instead of removing an element immediately, mark it as deleted and clean up periodically, reducing overhead.</li>
+                    <li><strong>Bucket-Based Prioritization:</strong> Group elements into priority buckets for faster access (used in network packet scheduling).</li>
+                    <li><strong>Pairing Heap:</strong> Provides better amortized complexity for decrease-key operations, improving dynamic graph applications.</li>
+                </ul>
+
+                <h4>15. Different Versions of the Algorithm</h4>
+
+                <h5>15.1 Min Heap vs Max Heap</h5>
+                <ul>
+                    <li><strong>Min Heap:</strong> Retrieves the smallest priority element first (useful in Dijkstra’s algorithm).</li>
+                    <li><strong>Max Heap:</strong> Retrieves the highest priority element first (used in scheduling and process management).</li>
+                </ul>
+
+                <h5>15.2 Binary Heap vs Fibonacci Heap</h5>
+                <table class="table table-bordered">
+                    <tr>
+                        <th>Feature</th>
+                        <th>Binary Heap</th>
+                        <th>Fibonacci Heap</th>
+                    </tr>
+                    <tr>
+                        <td>Insertion</td>
+                        <td><code>O(log n)</code></td>
+                        <td><code>O(1)</code></td>
+                    </tr>
+                    <tr>
+                        <td>Extract Min</td>
+                        <td><code>O(log n)</code></td>
+                        <td><code>O(log n)</code></td>
+                    </tr>
+                    <tr>
+                        <td>Decrease Key</td>
+                        <td><code>O(log n)</code></td>
+                        <td><code>O(1)</code></td>
+                    </tr>
+                    <tr>
+                        <td>Merge</td>
+                        <td><code>O(n)</code></td>
+                        <td><code>O(1)</code></td>
+                    </tr>
+                </table>
+
+                <h5>15.3 Iterative vs Recursive Implementations</h5>
+
+                <h6>Iterative Insert (Binary Heap)</h6>
+                <pre><code class="language-python">
+def insert(heap, element):
+    heap.append(element)
+    i = len(heap) - 1
+    while i > 0 and heap[i] < heap[(i-1)//2]:  # Heapify up
+        heap[i], heap[(i-1)//2] = heap[(i-1)//2], heap[i]
+        i = (i-1)//2
+</code></pre>
+
+                <h6>Recursive Insert (Binary Heap)</h6>
+                <pre><code class="language-python">
+def heapify_up(heap, i):
+    if i == 0:
+        return
+    parent = (i - 1) // 2
+    if heap[i] < heap[parent]:
+        heap[i], heap[parent] = heap[parent], heap[i]
+        heapify_up(heap, parent)
+</code></pre>
+
+                <h5>15.4 Comparison: Iterative vs Recursive</h5>
+                <ul>
+                    <li><strong>Iterative Approach:</strong> More memory efficient as it avoids function call overhead.</li>
+                    <li><strong>Recursive Approach:</strong> More elegant and easy to implement but has stack overhead.</li>
+                </ul>
+
+                <h4>16. Selecting the Best Priority Queue Variant</h4>
+                <ul>
+                    <li><strong>For simple tasks:</strong> Use a binary heap for an optimal balance of speed and memory.</li>
+                    <li><strong>For algorithms needing frequent decrease-key:</strong> Use Fibonacci heaps.</li>
+                    <li><strong>For real-time scheduling:</strong> Use bucket-based priority queues.</li>
+                </ul>
+
+            </article>
+
+            <article>
+                <h4>17. Common Pitfalls and Edge Cases</h4>
+                <p>Priority queues can fail or behave unexpectedly in specific scenarios. Understanding these cases is crucial for robust implementations.</p>
+
+                <h5>17.1 Edge Cases</h5>
+                <ul>
+                    <li><strong>Empty Queue Operations:</strong> Calling <code>extract_min()</code> or <code>peek()</code> on an empty queue should not cause an error.</li>
+                    <li><strong>Duplicate Priorities:</strong> Ensuring stable ordering when multiple elements have the same priority.</li>
+                    <li><strong>Very Large Inputs:</strong> Handling priority queues with millions of elements without memory overflow.</li>
+                    <li><strong>Negative Priorities:</strong> Ensuring the heap handles negative values correctly.</li>
+                    <li><strong>Dynamic Priority Changes:</strong> Decreasing or increasing priority dynamically without breaking heap properties.</li>
+                </ul>
+
+                <h5>17.2 Failure Scenarios</h5>
+                <ul>
+                    <li><strong>Heap Corruption:</strong> Incorrect insertion or extraction might break heap properties.</li>
+                    <li><strong>Memory Overflow:</strong> Continuous insertions without extractions may exhaust memory.</li>
+                    <li><strong>Non-comparable Elements:</strong> Trying to compare objects without a defined comparison operator.</li>
+                </ul>
+
+                <h4>18. Test Cases to Verify Correctness</h4>
+                <p>Test cases ensure the priority queue functions correctly under all conditions.</p>
+
+                <h5>18.1 Test Case: Basic Insert & Extract</h5>
+                <pre><code class="language-python">
+def test_basic_operations():
+    pq = PriorityQueue()
+    pq.insert("Task A", 3)
+    pq.insert("Task B", 1)
+    pq.insert("Task C", 2)
+    
+    assert pq.extract_min() == "Task B"
+    assert pq.extract_min() == "Task C"
+    assert pq.extract_min() == "Task A"
+</code></pre>
+
+                <h5>18.2 Test Case: Handling an Empty Queue</h5>
+                <pre><code class="language-python">
+def test_empty_queue():
+    pq = PriorityQueue()
+    assert pq.extract_min() is None
+    assert pq.peek() is None
+</code></pre>
+
+                <h5>18.3 Test Case: Duplicate Priorities</h5>
+                <pre><code class="language-python">
+def test_duplicate_priorities():
+    pq = PriorityQueue()
+    pq.insert("Task A", 2)
+    pq.insert("Task B", 2)
+    pq.insert("Task C", 2)
+    
+    assert pq.extract_min() in ["Task A", "Task B", "Task C"]
+</code></pre>
+
+                <h5>18.4 Test Case: Large Input Handling</h5>
+                <pre><code class="language-python">
+def test_large_input():
+    pq = PriorityQueue()
+    for i in range(1000000):
+        pq.insert(f"Task {i}", i)
+    
+    assert pq.extract_min() == "Task 0"  # Smallest priority should be first
+</code></pre>
+
+                <h4>19. Real-World Failure Scenarios</h4>
+
+                <h5>19.1 Handling Non-Comparable Elements</h5>
+                <p>Some priority queue implementations allow objects as elements, but without a comparator, they fail.</p>
+                <pre><code class="language-python">
+class CustomTask:
+    def __init__(self, name, priority):
+        self.name = name
+        self.priority = priority  # Missing comparison operator
+
+pq = PriorityQueue()
+pq.insert(CustomTask("Task X", 1), 1)  # May raise a TypeError
+</code></pre>
+                <p><strong>Fix:</strong> Implement a comparison method in the class.</p>
+
+                <h5>19.2 Memory Management in Continuous Insertions</h5>
+                <p>Repeated insertions without deletions can cause memory exhaustion.</p>
+                <pre><code class="language-python">
+def memory_leak_scenario():
+    pq = PriorityQueue()
+    for i in range(10**9):  # Excessive insertions
+        pq.insert(f"Task {i}", i)
+</code></pre>
+                <p><strong>Fix:</strong> Limit queue size or implement periodic cleanup.</p>
+
+                <h4>20. Best Practices for Failure Handling</h4>
+                <ul>
+                    <li><strong>Check for Empty Queue:</strong> Always verify before extracting an element.</li>
+                    <li><strong>Handle Duplicates:</strong> Ensure consistent ordering for equal-priority elements.</li>
+                    <li><strong>Use Exception Handling:</strong> Prevent crashes due to invalid operations.</li>
+                    <li><strong>Monitor Memory Usage:</strong> Implement auto-cleanup for unused elements.</li>
+                </ul>
+
+            </article>
+
+            <article>
+                <h4>21. Real-World Applications</h4>
+                <p>Priority Queues are widely used in real-world systems where prioritization is crucial.</p>
+
+                <h5>21.1 Operating Systems</h5>
+                <ul>
+                    <li><strong>Process Scheduling:</strong> The CPU scheduler selects the highest-priority process for execution.</li>
+                    <li><strong>Memory Management:</strong> Paging algorithms prioritize which pages should remain in RAM.</li>
+                </ul>
+
+                <h5>21.2 Networking & Communication</h5>
+                <ul>
+                    <li><strong>Packet Routing:</strong> Network routers prioritize packets based on Quality of Service (QoS).</li>
+                    <li><strong>Load Balancing:</strong> Requests are assigned to servers based on priority.</li>
+                </ul>
+
+                <h5>21.3 AI & Machine Learning</h5>
+                <ul>
+                    <li><strong>Pathfinding Algorithms:</strong> Used in Dijkstra’s and A* algorithms for shortest path calculations.</li>
+                    <li><strong>Task Scheduling in AI:</strong> Prioritizing deep learning model training jobs in cloud environments.</li>
+                </ul>
+
+                <h5>21.4 Finance & Stock Markets</h5>
+                <ul>
+                    <li><strong>Order Book Matching:</strong> Stock exchanges match buy/sell orders based on priority.</li>
+                    <li><strong>Fraud Detection:</strong> High-risk transactions are prioritized for review.</li>
+                </ul>
+
+                <h4>22. Open-Source Implementations</h4>
+                <p>Many open-source libraries provide optimized implementations of Priority Queues:</p>
+                <ul>
+                    <li><strong>Python:</strong> <a href="https://docs.python.org/3/library/heapq.html">heapq</a> (built-in module for heap-based priority queue).</li>
+                    <li><strong>C++:</strong> <a href="https://cplusplus.com/reference/queue/priority_queue/">std::priority_queue</a> (STL-based implementation).</li>
+                    <li><strong>Java:</strong> <a href="https://docs.oracle.com/javase/8/docs/api/java/util/PriorityQueue.html">java.util.PriorityQueue</a> (part of Java Collections).</li>
+                    <li><strong>Go:</strong> <a href="https://golang.org/pkg/container/heap/">container/heap</a> (standard heap-based priority queue).</li>
+                </ul>
+
+                <h4>23. Practical Project: Task Scheduler Using Priority Queue</h4>
+                <p>A real-world application of a priority queue is a Task Scheduler, where higher-priority tasks are executed first.</p>
+
+                <h5>23.1 Project Description</h5>
+                <p>We will implement a task scheduler where tasks with higher priority are executed first.</p>
+
+                <h5>23.2 Python Implementation</h5>
+                <pre><code class="language-python">
+import heapq
+import time
+
+class TaskScheduler:
+    def __init__(self):
+        self.queue = []
+    
+    def add_task(self, task_name, priority, execution_time):
+        heapq.heappush(self.queue, (priority, execution_time, task_name))
+    
+    def run_tasks(self):
+        while self.queue:
+            priority, execution_time, task_name = heapq.heappop(self.queue)
+            print(f"Executing Task: {task_name} (Priority: {priority})")
+            time.sleep(execution_time)  # Simulating task execution
+
+# Example Usage
+scheduler = TaskScheduler()
+scheduler.add_task("Low Priority Task", 3, 2)
+scheduler.add_task("High Priority Task", 1, 1)
+scheduler.add_task("Medium Priority Task", 2, 1.5)
+
+print("Starting Task Execution...")
+scheduler.run_tasks()
+</code></pre>
+
+                <h5>23.3 Expected Output</h5>
+                <pre><code class="language-plaintext">
+Starting Task Execution...
+Executing Task: High Priority Task (Priority: 1)
+Executing Task: Medium Priority Task (Priority: 2)
+Executing Task: Low Priority Task (Priority: 3)
+</code></pre>
+
+                <h4>24. Quick Recap</h4>
+                <ul>
+                    <li>Priority queues are essential for managing tasks efficiently in various industries.</li>
+                    <li>They enable optimized performance in OS scheduling, networking, and AI applications.</li>
+                    <li>Libraries like <code>heapq</code> in Python or <code>std::priority_queue</code> in C++ make implementation efficient.</li>
+                </ul>
+
+            </article>
+
+            <article>               
+                <h4>25. Assignments: Solve 10 Competitive Programming Problems</h4>
+                <p>Practice priority queue implementation by solving the following problems on platforms like <a href="https://leetcode.com/">LeetCode</a>, <a href="https://www.codeforces.com/">Codeforces</a>, and <a href="https://www.hackerrank.com/">HackerRank</a>.</p>
+
+                <ol>
+                    <li><strong>Kth Largest Element in an Array</strong> (LeetCode 215) - Use a min-heap of size K.</li>
+                    <li><strong>Top K Frequent Elements</strong> (LeetCode 347) - Use a max-heap or bucket sort.</li>
+                    <li><strong>Find Median from Data Stream</strong> (LeetCode 295) - Use two heaps to maintain median dynamically.</li>
+                    <li><strong>Merge K Sorted Lists</strong> (LeetCode 23) - Use a min-heap for efficient merging.</li>
+                    <li><strong>Task Scheduler</strong> (LeetCode 621) - Use a max-heap to schedule tasks efficiently.</li>
+                    <li><strong>Dijkstra’s Algorithm</strong> (Shortest Path) - Use a priority queue for efficient graph traversal.</li>
+                    <li><strong>Prim’s Algorithm</strong> (Minimum Spanning Tree) - Use a min-heap to find the minimum-cost edges.</li>
+                    <li><strong>Rearrange String K Distance Apart</strong> (LeetCode 358) - Use a max-heap to maintain order constraints.</li>
+                    <li><strong>Minimum Cost to Connect Ropes</strong> (LeetCode 1167) - Use a min-heap for greedy merging.</li>
+                    <li><strong>IPO (Investment in Projects)</strong> (LeetCode 502) - Use a priority queue to maximize capital.</li>
+                </ol>
+
+                <h4>26. System Design Problem: Job Scheduling System</h4>
+                <p>Design a job scheduling system where jobs are executed based on priority.</p>
+
+                <h5>26.1 Requirements</h5>
+                <ul>
+                    <li>Each job has a unique ID, execution time, and priority.</li>
+                    <li>Jobs should execute in the order of highest priority first.</li>
+                    <li>Use a priority queue to manage job execution.</li>
+                </ul>
+
+                <h5>26.2 System Architecture</h5>
+                <ul>
+                    <li><strong>Frontend:</strong> Displays job queue status.</li>
+                    <li><strong>Backend:</strong> API to add, remove, and execute jobs.</li>
+                    <li><strong>Database:</strong> Stores pending jobs and execution logs.</li>
+                </ul>
+
+                <h5>26.3 Python Implementation</h5>
+                <pre><code class="language-python">
+import heapq
+import time
+from threading import Thread
+
+class JobScheduler:
+    def __init__(self):
+        self.job_queue = []
+    
+    def add_job(self, job_id, priority, execution_time):
+        heapq.heappush(self.job_queue, (priority, job_id, execution_time))
+    
+    def execute_jobs(self):
+        while self.job_queue:
+            priority, job_id, execution_time = heapq.heappop(self.job_queue)
+            print(f"Executing Job {job_id} with Priority {priority}")
+            time.sleep(execution_time)  # Simulating execution time
+
+# Example usage
+scheduler = JobScheduler()
+scheduler.add_job("Job1", 2, 2)
+scheduler.add_job("Job2", 1, 1)
+scheduler.add_job("Job3", 3, 1.5)
+
+print("Starting Job Execution...")
+Thread(target=scheduler.execute_jobs).start()
+</code></pre>
+
+                <h5>26.4 Expected Output</h5>
+                <pre><code class="language-plaintext">
+Starting Job Execution...
+Executing Job Job2 with Priority 1
+Executing Job Job1 with Priority 2
+Executing Job Job3 with Priority 3
+</code></pre>
+
+                <h4>27. Time-Constrained Implementation Practice</h4>
+                <p>To simulate real-world coding interviews, implement a priority queue from scratch in <strong>15 minutes</strong> without using built-in heap functions.</p>
+
+                <h5>27.1 Challenge: Implement a Min-Heap Based Priority Queue</h5>
+                <p>Implement a custom priority queue using an array-based binary heap.</p>
+
+                <pre><code class="language-python">
+class MinHeap:
+    def __init__(self):
+        self.heap = []
+
+    def insert(self, element):
+        self.heap.append(element)
+        self._heapify_up(len(self.heap) - 1)
+
+    def extract_min(self):
+        if len(self.heap) == 0:
+            return None
+        if len(self.heap) == 1:
+            return self.heap.pop()
+        
+        min_val = self.heap[0]
+        self.heap[0] = self.heap.pop()
+        self._heapify_down(0)
+        return min_val
+
+    def _heapify_up(self, index):
+        parent = (index - 1) // 2
+        while index > 0 and self.heap[index] < self.heap[parent]:
+            self.heap[index], self.heap[parent] = self.heap[parent], self.heap[index]
+            index = parent
+            parent = (index - 1) // 2
+
+    def _heapify_down(self, index):
+        left = 2 * index + 1
+        right = 2 * index + 2
+        smallest = index
+        
+        if left < len(self.heap) and self.heap[left] < self.heap[smallest]:
+            smallest = left
+        if right < len(self.heap) and self.heap[right] < self.heap[smallest]:
+            smallest = right
+        
+        if smallest != index:
+            self.heap[index], self.heap[smallest] = self.heap[smallest], self.heap[index]
+            self._heapify_down(smallest)
+
+# Testing
+pq = MinHeap()
+pq.insert(3)
+pq.insert(1)
+pq.insert(2)
+print(pq.extract_min())  # Output: 1
+print(pq.extract_min())  # Output: 2
+print(pq.extract_min())  # Output: 3
+</code></pre>
+
+                <h4>28. Quick Recap</h4>
+                <ul>
+                    <li>Practicing priority queue problems strengthens problem-solving skills in competitive programming.</li>
+                    <li>Using priority queues in system design ensures efficient task scheduling.</li>
+                    <li>Time-constrained implementation prepares for real-world coding challenges.</li>
+                </ul>
+
+            </article>
+
+
+
+
+
+
+        </main>
+
+        <script> copyright("all"); </script>
+
+    </body>
+
+</html>

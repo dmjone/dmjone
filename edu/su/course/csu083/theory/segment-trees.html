@@ -1,0 +1,779 @@
+<!-------------------------- © 2007 - present, dmj.one and contributors. ----------------------------------
+   Part of the dmjone project. Licensed under the GNU AGPL. Provided as-is, without warranty of any kind. 
+-------------------- Redistribution and modifications must retain this notice. --------------------------->
+
+
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+    <!--<![endif]-->
+
+    <head>
+        <script src="/js/edu_su_common.js"></script>
+        <noscript>
+            <style>
+                html,
+                body {
+                    margin: 0;
+                    overflow: hidden;
+                }
+            </style>
+            <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+        </noscript>
+
+        <title>Segment Trees in Data Structures - CSU083 | Shoolini University</title>
+
+        <meta name="description" content="Learn Segment Trees in Data Structures, covering concepts, implementations, optimizations, real-world applications, and competitive programming use cases. Part of the CSU083 course at Shoolini University.">
+        <meta name="keywords" content="Segment Tree, Range Queries, Data Structures, Lazy Propagation, Competitive Programming, Fenwick Tree, Range Sum Query, Range Minimum Query, Persistent Segment Tree, System Design">
+        <meta name="author" content="Divya Mohan">
+        <meta name="robots" content="index, follow">
+
+        <!-- Open Graph for Social Media -->
+        <meta property="og:image" content="/logo.png">
+        <meta property="og:type" content="article">
+
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:site" content="@divyamohan1993">
+        <meta name="twitter:creator" content="@divyamohan1993">
+        <meta name="twitter:image" content="/logo.png">
+
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+        <meta name="author" content="Divya Mohan">
+        <meta name="robots" content="index, follow">
+
+        <!-- JSON-LD Structured Data for SEO -->
+        <script type="application/ld+json">
+            {
+              "@context": "https://schema.org",
+              "@type": "Course",
+              "name": "Segment Trees in Data Structures",
+              "description": "Master Segment Trees in Data Structures, covering range queries, updates, optimizations, and real-world applications in DSA and system design.",
+              "provider": {
+                "@type": "EducationalOrganization",
+                "name": "Shoolini University",
+                "url": "https://shooliniuniversity.com"
+              }
+            }
+        </script>
+
+
+
+
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js" integrity="sha512-sHSNLECRJSK+BFs7E8DiFc6pf6n90bLI85Emiw1jhreduZhK3VXgq9l4kAt9eTIHYAcuQBKHL01QKs4/3Xgl8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js" integrity="sha512-iWiuBS5nt6r60fCz26Nd0Zqe0nbk1ZTIQbl3Kv7kYsX+yKMUFHzjaH2+AnM6vp2Xs+gNmaBAVWJjSmuPw76Efg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                renderMathInElement(document.body, {
+                    // customised options
+                    // • auto-render specific keys, e.g.:
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false },
+                        { left: '\\(', right: '\\)', display: false },
+                        { left: '\\[', right: '\\]', display: true }
+                    ],
+                    // • rendering keys, e.g.:
+                    throwOnError: false
+                });
+            });
+        </script> -->
+
+        <!-- <style>
+            main ul {
+                list-style-type: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            main ul li {
+                margin: 0;
+                padding: 0;
+            }
+        </style> -->
+
+
+
+    </head>
+
+    <body>
+
+        <script> header_author("dm"); </script>
+
+        <main>
+            <article class="agen-tableofcontents">
+                <h2 class="text-center">
+                    Segment Trees in Data Structures
+                </h2>
+                <div class="d-none contentdate">2024, August 6</div>
+            </article>
+
+
+            <article>
+                <h3>1. Prerequisites</h3>
+                <p>Before diving into segment trees, you should have a solid understanding of:</p>
+                <ul>
+                    <li><strong>Arrays</strong>: Understanding basic operations like updates and queries.</li>
+                    <li><strong>Recursion</strong>: Segment trees use recursive functions for efficient construction and querying.</li>
+                    <li><strong>Binary Trees</strong>: The segment tree is a binary tree where each node stores information about a segment of the array.</li>
+                    <li><strong>Divide and Conquer</strong>: The tree divides the array into smaller segments, solving problems in parts.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>2. What is a Segment Tree?</h3>
+                <p>A <strong>segment tree</strong> is a binary tree used for efficiently answering range-based queries and performing point updates in an array. Each node in the segment tree represents a segment (or subarray) of the original array.</p>
+
+                <h4>2.1 Structure</h4>
+                <ul>
+                    <li>The root represents the entire array.</li>
+                    <li>Each internal node represents a segment of the array.</li>
+                    <li>Leaf nodes represent individual elements of the array.</li>
+                </ul>
+
+                <h4>2.2 Operations</h4>
+                <ul>
+                    <li><strong>Build</strong>: Construct the tree in <code>O(N)</code> time.</li>
+                    <li><strong>Query</strong>: Retrieve information for a given range in <code>O(log N)</code> time.</li>
+                    <li><strong>Update</strong>: Modify an element and update the tree in <code>O(log N)</code> time.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>3. Why Does This Algorithm Exist?</h3>
+                <p>Segment trees exist to solve range query problems efficiently when updates are frequent.</p>
+
+                <h4>3.1 Real-World Applications</h4>
+                <ul>
+                    <li><strong>Range Sum Queries</strong>: Quickly retrieve the sum of elements in a subarray.</li>
+                    <li><strong>Minimum/Maximum Queries</strong>: Find the minimum or maximum value in a given range.</li>
+                    <li><strong>Lazy Propagation</strong>: Used in interval updates where multiple updates need to be efficiently handled.</li>
+                    <li><strong>Computational Geometry</strong>: Used for problems like the skyline problem and range intersections.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>4. When Should You Use a Segment Tree?</h3>
+                <p>Use segment trees when:</p>
+                <ul>
+                    <li>Frequent <strong>updates</strong> are required on an array.</li>
+                    <li>Frequent <strong>range queries</strong> need to be answered efficiently.</li>
+                    <li>There is a need to perform operations like <strong>sum, min, max, GCD</strong> over a segment.</li>
+                </ul>
+                <p><strong>Avoid segment trees</strong> when:</p>
+                <ul>
+                    <li>Only a few queries exist, making a <code>O(N)</code> brute-force solution acceptable.</li>
+                    <li>Updates are rare, making other data structures like a <strong>Fenwick Tree</strong> a better alternative.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>5. How Does It Compare to Alternatives?</h3>
+
+                <h4>5.1 Strengths</h4>
+                <ul>
+                    <li><strong>Faster Queries</strong>: Provides <code>O(log N)</code> query time, which is much better than a naive <code>O(N)</code> scan.</li>
+                    <li><strong>Efficient Updates</strong>: Unlike prefix sum arrays, segment trees allow dynamic updates in <code>O(log N)</code>.</li>
+                    <li><strong>Supports Multiple Operations</strong>: Works for sum, min, max, GCD, and even advanced operations.</li>
+                </ul>
+
+                <h4>5.2 Weaknesses</h4>
+                <ul>
+                    <li><strong>High Space Complexity</strong>: Requires <code>4N</code> memory in worst-case scenarios.</li>
+                    <li><strong>Complex Implementation</strong>: Requires recursive tree construction and management.</li>
+                    <li><strong>Not Always Optimal</strong>: For simple use cases, a Fenwick Tree (Binary Indexed Tree) may be easier and sufficient.</li>
+                </ul>
+            </article>
+
+
+
+            <article>
+                <h3>6. Basic Implementation</h3>
+                <p>Below is the basic implementation of a segment tree in Python. The implementation includes:</p>
+                <ul>
+                    <li>Building the segment tree.</li>
+                    <li>Querying for a range sum.</li>
+                    <li>Updating an element and propagating changes.</li>
+                </ul>
+
+                <h4>6.1 Implementation in Python</h4>
+                <pre><code class="language-python">
+class SegmentTree:
+    def __init__(self, arr):
+        self.n = len(arr)
+        self.tree = [0] * (4 * self.n)
+        self.build(arr, 0, 0, self.n - 1)
+
+    def build(self, arr, node, start, end):
+        if start == end:
+            self.tree[node] = arr[start]
+        else:
+            mid = (start + end) // 2
+            left_child = 2 * node + 1
+            right_child = 2 * node + 2
+            self.build(arr, left_child, start, mid)
+            self.build(arr, right_child, mid + 1, end)
+            self.tree[node] = self.tree[left_child] + self.tree[right_child]
+
+    def query(self, node, start, end, l, r):
+        if r < start or l > end:
+            return 0  # Out of range
+        if l <= start and end <= r:
+            return self.tree[node]  # Completely inside range
+        mid = (start + end) // 2
+        left_sum = self.query(2 * node + 1, start, mid, l, r)
+        right_sum = self.query(2 * node + 2, mid + 1, end, l, r)
+        return left_sum + right_sum
+
+    def update(self, node, start, end, idx, value):
+        if start == end:
+            self.tree[node] = value
+        else:
+            mid = (start + end) // 2
+            if idx <= mid:
+                self.update(2 * node + 1, start, mid, idx, value)
+            else:
+                self.update(2 * node + 2, mid + 1, end, idx, value)
+            self.tree[node] = self.tree[2 * node + 1] + self.tree[2 * node + 2]
+
+# Example Usage
+arr = [1, 3, 5, 7, 9, 11]
+st = SegmentTree(arr)
+
+# Query sum from index 1 to 3
+print("Sum from index 1 to 3:", st.query(0, 0, len(arr) - 1, 1, 3)) # Output: 15
+
+# Update index 2 to 6
+st.update(0, 0, len(arr) - 1, 2, 6)
+print("Sum from index 1 to 3 after update:", st.query(0, 0, len(arr) - 1, 1, 3)) # Output: 16
+</code></pre>
+            </article>
+
+            <article>
+                <h4>6.2 Dry Run of the Algorithm</h4>
+
+                <p><strong>Step 1: Build the Tree for arr = [1, 3, 5, 7, 9, 11]</strong></p>
+                <table class="table table-bordered">
+                    <tr>
+                        <th>Node</th>
+                        <th>Range</th>
+                        <th>Value</th>
+                    </tr>
+                    <tr>
+                        <td>0</td>
+                        <td>[0,5]</td>
+                        <td>36</td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>[0,2]</td>
+                        <td>9</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>[3,5]</td>
+                        <td>27</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>[0,1]</td>
+                        <td>4</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>[2,2]</td>
+                        <td>5</td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td>[3,4]</td>
+                        <td>16</td>
+                    </tr>
+                    <tr>
+                        <td>6</td>
+                        <td>[5,5]</td>
+                        <td>11</td>
+                    </tr>
+                    <tr>
+                        <td>7</td>
+                        <td>[0,0]</td>
+                        <td>1</td>
+                    </tr>
+                    <tr>
+                        <td>8</td>
+                        <td>[1,1]</td>
+                        <td>3</td>
+                    </tr>
+                    <tr>
+                        <td>9</td>
+                        <td>[3,3]</td>
+                        <td>7</td>
+                    </tr>
+                    <tr>
+                        <td>10</td>
+                        <td>[4,4]</td>
+                        <td>9</td>
+                    </tr>
+                </table>
+
+                <p><strong>Step 2: Query Sum(1,3)</strong></p>
+                <ul>
+                    <li>Traverse the tree to compute the sum of indices 1 to 3.</li>
+                    <li>Sum = (tree[8] + tree[4] + tree[9]) = (3 + 5 + 7) = 15</li>
+                </ul>
+
+                <p><strong>Step 3: Update index 2 to 6</strong></p>
+                <ul>
+                    <li>Update value in tree and propagate changes upwards.</li>
+                    <li>New value at index 2 → 6.</li>
+                    <li>Tree updates: tree[4] = 6, tree[1] = 10, tree[0] = 37.</li>
+                    <li>New sum(1,3) = (tree[8] + tree[4] + tree[9]) = (3 + 6 + 7) = 16</li>
+                </ul>
+
+            </article>
+
+            <article>
+                <h3>7. Time & Space Complexity Analysis</h3>
+                <p>Segment trees offer efficient solutions for range-based queries, but they also have trade-offs in terms of time and space complexity.</p>
+
+                <h4>7.1 Time Complexity Analysis</h4>
+                <table class="table table-bordered">
+                    <tr>
+                        <th>Operation</th>
+                        <th>Best Case</th>
+                        <th>Worst Case</th>
+                        <th>Average Case</th>
+                    </tr>
+                    <tr>
+                        <td>Build</td>
+                        <td>O(N)</td>
+                        <td>O(N)</td>
+                        <td>O(N)</td>
+                    </tr>
+                    <tr>
+                        <td>Query</td>
+                        <td>O(1) (trivial case)</td>
+                        <td>O(log N)</td>
+                        <td>O(log N)</td>
+                    </tr>
+                    <tr>
+                        <td>Update</td>
+                        <td>O(1) (if no update needed)</td>
+                        <td>O(log N)</td>
+                        <td>O(log N)</td>
+                    </tr>
+                </table>
+
+                <p><strong>Explanation:</strong></p>
+                <ul>
+                    <li><strong>Build Time:</strong> Constructing the tree requires merging values from child nodes recursively. Each level takes O(N), and since there are O(log N) levels, the total is O(N).</li>
+                    <li><strong>Query Time:</strong> A range query requires visiting at most O(log N) nodes due to binary division.</li>
+                    <li><strong>Update Time:</strong> Updating a value requires modifying O(log N) parent nodes as changes propagate.</li>
+                </ul>
+
+                <h4>7.2 Space Complexity Analysis</h4>
+                <p>The segment tree stores nodes redundantly to allow fast queries.</p>
+                <ul>
+                    <li>The tree has approximately <code>2N - 1</code> nodes.</li>
+                    <li>Since each node stores a value, total space is <code>O(4N)</code> in the worst case.</li>
+                </ul>
+
+                <h4>7.3 Trade-offs</h4>
+                <ul>
+                    <li><strong>Efficiency vs. Space:</strong> Segment trees allow fast updates and queries but require extra space.</li>
+                    <li><strong>Alternatives:</strong> A <strong>Fenwick Tree</strong> (Binary Indexed Tree) is more space-efficient (<code>O(N)</code>) but does not support range updates efficiently.</li>
+                    <li><strong>Precomputed Prefix Sum:</strong> Uses only <code>O(N)</code> space but takes <code>O(N)</code> for updates.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>8. Optimizations & Variants (Making It Efficient)</h3>
+                <p>Segment trees can be optimized for efficiency and adapted to various problem requirements. Below are key optimizations, different versions, and a comparison of iterative vs. recursive implementations.</p>
+
+                <h4>8.1 Common Optimizations</h4>
+                <ul>
+                    <li><strong>Lazy Propagation</strong>: Optimizes range updates by deferring unnecessary updates until needed.</li>
+                    <li><strong>Iterative Segment Tree</strong>: Reduces recursion overhead by using an array-based representation.</li>
+                    <li><strong>Compressed Segment Tree</strong>: Uses hashing to reduce space in cases of sparse updates.</li>
+                    <li><strong>Persistent Segment Tree</strong>: Stores previous versions of the tree to allow rollback operations.</li>
+                </ul>
+
+                <h4>8.2 Different Versions of the Algorithm</h4>
+                <ul>
+                    <li><strong>Standard Segment Tree</strong>: Supports range queries and updates.</li>
+                    <li><strong>Lazy Segment Tree</strong>: Efficiently handles range updates.</li>
+                    <li><strong>Persistent Segment Tree</strong>: Maintains historical states of the array.</li>
+                    <li><strong>Dynamic Segment Tree</strong>: Allocates nodes dynamically for large, sparse input ranges.</li>
+                </ul>
+
+                <h4>8.3 Iterative vs. Recursive Implementations</h4>
+
+                <p>While segment trees are traditionally implemented recursively, an iterative approach can be more efficient in some cases.</p>
+
+                <table class="table table-bordered">
+                    <tr>
+                        <th>Aspect</th>
+                        <th>Recursive Implementation</th>
+                        <th>Iterative Implementation</th>
+                    </tr>
+                    <tr>
+                        <td>Memory Usage</td>
+                        <td>O(4N)</td>
+                        <td>O(2N)</td>
+                    </tr>
+                    <tr>
+                        <td>Function Call Overhead</td>
+                        <td>High due to recursion</td>
+                        <td>Lower, no stack usage</td>
+                    </tr>
+                    <tr>
+                        <td>Implementation Complexity</td>
+                        <td>Easier to understand</td>
+                        <td>Harder to implement</td>
+                    </tr>
+                    <tr>
+                        <td>Performance</td>
+                        <td>Slower due to recursion</td>
+                        <td>Faster due to iterative updates</td>
+                    </tr>
+                </table>
+
+                <h4>8.4 Iterative Implementation in Python</h4>
+                <pre><code class="language-python">
+class IterativeSegmentTree:
+    def __init__(self, arr):
+        self.n = len(arr)
+        self.tree = [0] * (2 * self.n)
+        
+        # Build tree
+        for i in range(self.n):
+            self.tree[self.n + i] = arr[i]
+        for i in range(self.n - 1, 0, -1):
+            self.tree[i] = self.tree[2 * i] + self.tree[2 * i + 1]
+
+    def query(self, l, r):
+        res = 0
+        l += self.n
+        r += self.n
+        while l <= r:
+            if l % 2 == 1:  # Right child
+                res += self.tree[l]
+                l += 1
+            if r % 2 == 0:  # Left child
+                res += self.tree[r]
+                r -= 1
+            l //= 2
+            r //= 2
+        return res
+
+    def update(self, idx, value):
+        idx += self.n
+        self.tree[idx] = value
+        while idx > 1:
+            idx //= 2
+            self.tree[idx] = self.tree[2 * idx] + self.tree[2 * idx + 1]
+
+# Example Usage
+arr = [1, 3, 5, 7, 9, 11]
+st = IterativeSegmentTree(arr)
+print("Sum from index 1 to 3:", st.query(1, 3))  # Output: 15
+st.update(2, 6)
+print("Sum from index 1 to 3 after update:", st.query(1, 3))  # Output: 16
+</code></pre>
+
+                <p><strong>Key Takeaways:</strong></p>
+                <ul>
+                    <li>Iterative implementation is faster but harder to understand.</li>
+                    <li>Lazy propagation is crucial for efficient range updates.</li>
+                    <li>Persistent segment trees enable rollback and history tracking.</li>
+                    <li>Compressed segment trees reduce memory for sparse datasets.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>9. Edge Cases & Failure Handling</h3>
+                <p>While segment trees provide efficient solutions for range queries and updates, they are prone to edge cases that can cause incorrect results or performance issues. Below, we identify common pitfalls, test cases, and real-world failure scenarios.</p>
+
+                <h4>9.1 Common Edge Cases & Pitfalls</h4>
+                <ul>
+                    <li><strong>Single Element Array</strong>: Ensure the segment tree correctly handles an array with only one element.</li>
+                    <li><strong>Empty Array</strong>: Handle cases where the input array is empty (may require special initialization).</li>
+                    <li><strong>Queries Out of Bounds</strong>: Queries should be validated to prevent accessing invalid indices.</li>
+                    <li><strong>Updates at the Boundaries</strong>: Edge indices (first and last) must be correctly updated and propagated.</li>
+                    <li><strong>Non-Power of Two Lengths</strong>: Segment trees usually work best with power-of-two lengths. Arrays with arbitrary lengths require additional logic for correct tree construction.</li>
+                    <li><strong>Handling Large Inputs</strong>: Large arrays can lead to high memory usage, making compressed segment trees a better option.</li>
+                </ul>
+
+                <h4>9.2 Test Cases to Verify Correctness</h4>
+                <p>To ensure reliability, test cases should cover all possible edge cases.</p>
+
+                <pre><code class="language-python">
+def test_segment_tree():
+    # Test case 1: Small array
+    arr = [1, 2, 3, 4, 5]
+    st = SegmentTree(arr)
+    assert st.query(0, 0, len(arr) - 1, 0, 4) == 15  # Full range sum
+    assert st.query(0, 0, len(arr) - 1, 1, 3) == 9    # Partial sum
+
+    # Test case 2: Single element array
+    arr = [10]
+    st = SegmentTree(arr)
+    assert st.query(0, 0, 0, 0, 0) == 10  # Single element sum
+
+    # Test case 3: Large array
+    arr = [i for i in range(1000)]
+    st = SegmentTree(arr)
+    assert st.query(0, 0, len(arr) - 1, 100, 200) == sum(arr[100:201])
+
+    # Test case 4: Out-of-bounds queries
+    try:
+        st.query(0, 0, len(arr) - 1, -1, 100)  # Negative index
+        assert False, "Out-of-bounds check failed"
+    except:
+        pass
+
+    try:
+        st.query(0, 0, len(arr) - 1, 500, 2000)  # Query exceeds range
+        assert False, "Out-of-bounds check failed"
+    except:
+        pass
+
+    # Test case 5: Updates at boundaries
+    arr = [1, 3, 5, 7, 9]
+    st = SegmentTree(arr)
+    st.update(0, 0, len(arr) - 1, 0, 10)  # Update first element
+    assert st.query(0, 0, len(arr) - 1, 0, 0) == 10
+    st.update(0, 0, len(arr) - 1, 4, 20)  # Update last element
+    assert st.query(0, 0, len(arr) - 1, 4, 4) == 20
+
+test_segment_tree()
+print("All test cases passed!")
+</code></pre>
+
+                <h4>9.3 Real-World Failure Scenarios</h4>
+                <p>Segment trees can fail in real-world applications due to improper handling of special cases.</p>
+
+                <ul>
+                    <li><strong>Incorrect Query Bounds:</strong> If a query range is outside valid indices, the function should return a neutral value (e.g., 0 for sum, infinity for min, etc.).</li>
+                    <li><strong>Memory Overflow:</strong> Large datasets (millions of elements) require O(4N) space, which may cause memory failures.</li>
+                    <li><strong>Unoptimized Updates:</strong> If updates occur frequently, lazy propagation must be implemented to avoid unnecessary recomputation.</li>
+                    <li><strong>Handling Floating Point Precision:</strong> If working with floating point numbers, precision errors might lead to incorrect results in sum-based queries.</li>
+                </ul>
+
+                <h4>9.4 Best Practices to Avoid Failures</h4>
+                <ul>
+                    <li>Always check query and update boundaries.</li>
+                    <li>Use lazy propagation for large datasets with frequent updates.</li>
+                    <li>Optimize space with compressed segment trees if the dataset is sparse.</li>
+                    <li>Ensure correct base cases in recursive implementations.</li>
+                </ul>
+
+            </article>
+
+            <article>
+                <h3>10. Real-World Applications & Industry Use Cases</h3>
+                <p>Segment trees are widely used in competitive programming and real-world applications requiring efficient range queries and updates. Below, we explore practical applications, open-source implementations, and a sample project demonstrating their use.</p>
+
+                <h4>10.1 Real-World Applications</h4>
+                <ul>
+                    <li><strong>Databases & Indexing</strong>: Used in database engines for fast range queries and aggregation (e.g., PostgreSQL query optimizations).</li>
+                    <li><strong>Computational Geometry</strong>: Employed in problems like the skyline problem, point location queries, and range searching.</li>
+                    <li><strong>Text Editors (Undo/Redo)</strong>: Persistent segment trees allow efficient undo/redo functionality by storing multiple versions of text states.</li>
+                    <li><strong>Network Routing & Traffic Analysis</strong>: Used in network packet analysis to maintain and query dynamic statistics on large datasets.</li>
+                    <li><strong>Stock Market Analysis</strong>: Segment trees help calculate moving averages, min/max price within a range, and trend analysis.</li>
+                    <li><strong>Game Development</strong>: Used in physics engines for collision detection, interval-based events, and updating large game state data efficiently.</li>
+                </ul>
+
+                <h4>10.2 Open-Source Implementations</h4>
+                <p>Many libraries and frameworks use segment trees for efficient range queries:</p>
+                <ul>
+                    <li><a href="https://github.com/mission-peace/interview/wiki">Mission-Peace Interview Guide</a>: Popular for algorithmic problems in competitive programming.</li>
+                    <li><a href="https://codeforces.com/">Codeforces</a>: A major competitive programming platform where segment trees are frequently used in contests.</li>
+                    <li><a href="https://github.com/TheAlgorithms">TheAlgorithms GitHub</a>: Contains segment tree implementations in multiple languages.</li>
+                </ul>
+
+                <h4>10.3 A Practical Python Project: Real-Time Stock Analysis</h4>
+                <p>This script simulates a stock market tracker where users can update stock prices and query the minimum, maximum, and sum of prices in a given time range.</p>
+
+                <pre><code class="language-python">
+class StockMarket:
+    def __init__(self, prices):
+        self.n = len(prices)
+        self.tree = [0] * (4 * self.n)
+        self.build(prices, 0, 0, self.n - 1)
+
+    def build(self, prices, node, start, end):
+        if start == end:
+            self.tree[node] = prices[start]
+        else:
+            mid = (start + end) // 2
+            left_child, right_child = 2 * node + 1, 2 * node + 2
+            self.build(prices, left_child, start, mid)
+            self.build(prices, right_child, mid + 1, end)
+            self.tree[node] = min(self.tree[left_child], self.tree[right_child])
+
+    def query_min(self, node, start, end, l, r):
+        if r < start or l > end:
+            return float('inf')  # Return max possible value
+        if l <= start and end <= r:
+            return self.tree[node]
+        mid = (start + end) // 2
+        left_min = self.query_min(2 * node + 1, start, mid, l, r)
+        right_min = self.query_min(2 * node + 2, mid + 1, end, l, r)
+        return min(left_min, right_min)
+
+    def update(self, node, start, end, idx, value):
+        if start == end:
+            self.tree[node] = value
+        else:
+            mid = (start + end) // 2
+            if idx <= mid:
+                self.update(2 * node + 1, start, mid, idx, value)
+            else:
+                self.update(2 * node + 2, mid + 1, end, idx, value)
+            self.tree[node] = min(self.tree[2 * node + 1], self.tree[2 * node + 2])
+
+# Example Usage
+stock_prices = [100, 102, 98, 95, 110, 115, 120]
+market = StockMarket(stock_prices)
+
+# Query the minimum price between day 1 and day 5
+print("Min stock price between day 1 and 5:", market.query_min(0, 0, len(stock_prices) - 1, 1, 5)) # Output: 95
+
+# Update stock price on day 3 to 90
+market.update(0, 0, len(stock_prices) - 1, 3, 90)
+print("Min stock price between day 1 and 5 after update:", market.query_min(0, 0, len(stock_prices) - 1, 1, 5)) # Output: 90
+</code></pre>
+
+                <h4>10.4 Key Takeaways</h4>
+                <ul>
+                    <li>Segment trees are widely used in databases, game engines, and real-time analytics.</li>
+                    <li>Open-source projects implement them for competitive programming and indexing.</li>
+                    <li>They provide efficient solutions for tracking dynamic datasets, such as stock prices.</li>
+                    <li>Optimized implementations (e.g., lazy propagation, iterative updates) help in real-world applications where performance matters.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>11. Segment Trees - Competitive Programming & System Design Integration</h3>
+                <p>Segment trees are a crucial tool in competitive programming and system design. They allow for efficient range queries and updates, making them essential for real-world applications.</p>
+
+                <h4>11.1 Competitive Programming Assignments</h4>
+                <p>To master segment trees, solve the following problems:</p>
+                <ol>
+                    <li><strong>Basic Range Sum Query</strong> (Update & Query) - <a href="https://www.spoj.com/problems/RMQSQ/">SPOJ RMQSQ</a></li>
+                    <li><strong>Range Minimum Query</strong> - <a href="https://codeforces.com/problemset/problem/380/C">Codeforces 380C</a></li>
+                    <li><strong>Frequent Values in a Range</strong> - <a href="https://onlinejudge.org/external/112/11235.pdf">UVa 11235</a></li>
+                    <li><strong>Lazy Propagation (Range Updates)</strong> - <a href="https://www.spoj.com/problems/HORRIBLE/">SPOJ HORRIBLE</a></li>
+                    <li><strong>Range XOR Query</strong> - <a href="https://www.hackerearth.com/problem/algorithm/xor-query/">HackerEarth XOR Query</a></li>
+                    <li><strong>Persistent Segment Tree (Versioned Queries)</strong> - <a href="https://codeforces.com/problemset/problem/375/D">Codeforces 375D</a></li>
+                    <li><strong>Dynamic Segment Tree (Large Inputs)</strong> - <a href="https://atcoder.jp/contests/dp/tasks/dp_r">AtCoder DP Contest (Task R)</a></li>
+                    <li><strong>Multiset Queries (Insert/Delete/Get Median)</strong> - <a href="https://codeforces.com/problemset/problem/846/F">Codeforces 846F</a></li>
+                    <li><strong>Max Subarray Sum Query</strong> - <a href="https://codeforces.com/problemset/problem/920/F">Codeforces 920F</a></li>
+                    <li><strong>Range GCD Query</strong> - <a href="https://codeforces.com/problemset/problem/448/D">Codeforces 448D</a></li>
+                </ol>
+
+                <h4>11.2 Using Segment Trees in a System Design Problem</h4>
+                <p>Segment trees can be used to efficiently process time-series data in real-world system design. Consider designing an <strong>analytics dashboard for real-time user interactions.</strong></p>
+
+                <h5>System Requirements</h5>
+                <ul>
+                    <li>Support <strong>millions of concurrent users</strong>.</li>
+                    <li>Provide <strong>real-time query responses</strong> for analytics.</li>
+                    <li>Handle <strong>frequent updates</strong> without performance degradation.</li>
+                </ul>
+
+                <h5>How Segment Trees Help</h5>
+                <ul>
+                    <li>Use a <strong>segment tree</strong> to track user engagement (clicks, active time) over time.</li>
+                    <li>Optimize data updates using <strong>lazy propagation</strong> to batch process interactions.</li>
+                    <li>Use a <strong>persistent segment tree</strong> to store previous states, allowing historical analysis.</li>
+                </ul>
+
+                <h5>High-Level System Design</h5>
+                <div class="mx-auto">
+                    <img class="img-fluid dynamicimg imgblacktowhite" loading="lazy" src="https://mermaid.ink/img/pako:eNplkctOwzAQRX_FmnVa2U6bpK6EBCo7kKCPDcpmSIbEUhIX20GUtv-Oa8oC4dXYc8_1PI5QmZpAQWNx37LtalkOLJydI7um95Gcd2wyuTndf9Dg2YNp3InF-Mmaipwz9kr8fYzMHfqqZbt9jZ4CtqGmD5qtJdp4Y7GhK_o_EfE1YTfxuif2PJLVF4vbAbuD15VboWtfDdp6CQn0ZHvUdejieDEswbfUUwkqhJ1uWl9COZyDEEdvNoehAuXtSAlYMzYtqDfsXLiNsdCVxjCL_leyxwHUET5BZWIqFvN0znORpZynswQOoITkUyHmM7nIMy55URTnBL6MCQZ8mkuRZ4XMOOdSpJmMdi8xef2Tah06fvzZQVzF-RvvvoLk?type=png" alt="Segment Tree System Design">
+                </div>
+                <h5>Implementation Snippet for Live Analytics</h5>
+                <pre><code class="language-python">
+class AnalyticsSegmentTree:
+    def __init__(self, events):
+        self.n = len(events)
+        self.tree = [0] * (4 * self.n)
+        self.build(events, 0, 0, self.n - 1)
+
+    def build(self, events, node, start, end):
+        if start == end:
+            self.tree[node] = events[start]
+        else:
+            mid = (start + end) // 2
+            left_child, right_child = 2 * node + 1, 2 * node + 2
+            self.build(events, left_child, start, mid)
+            self.build(events, right_child, mid + 1, end)
+            self.tree[node] = self.tree[left_child] + self.tree[right_child]
+
+    def query_sum(self, node, start, end, l, r):
+        if r < start or l > end:
+            return 0  # No contribution
+        if l <= start and end <= r:
+            return self.tree[node]
+        mid = (start + end) // 2
+        left_sum = self.query_sum(2 * node + 1, start, mid, l, r)
+        right_sum = self.query_sum(2 * node + 2, mid + 1, end, l, r)
+        return left_sum + right_sum
+
+    def update(self, node, start, end, idx, value):
+        if start == end:
+            self.tree[node] = value
+        else:
+            mid = (start + end) // 2
+            if idx <= mid:
+                self.update(2 * node + 1, start, mid, idx, value)
+            else:
+                self.update(2 * node + 2, mid + 1, end, idx, value)
+            self.tree[node] = self.tree[2 * node + 1] + self.tree[2 * node + 2]
+
+# Example Usage
+event_counts = [50, 20, 30, 40, 100, 80, 90]
+analytics = AnalyticsSegmentTree(event_counts)
+
+# Query total events from time 1 to 5
+print("User engagement from 1 to 5:", analytics.query_sum(0, 0, len(event_counts) - 1, 1, 5))
+
+# Update events at time 3 to 60
+analytics.update(0, 0, len(event_counts) - 1, 3, 60)
+print("User engagement from 1 to 5 after update:", analytics.query_sum(0, 0, len(event_counts) - 1, 1, 5))
+</code></pre>
+
+                <h4>11.3 Practicing Segment Trees Under Time Constraints</h4>
+                <p>To improve speed and accuracy, practice implementing segment trees within <strong>30 minutes</strong> under a competitive setting.</p>
+
+                <h5>Tips for Faster Implementation</h5>
+                <ul>
+                    <li>Use an <strong>iterative segment tree</strong> for faster updates.</li>
+                    <li>Memorize <strong>common base templates</strong> for fast implementation.</li>
+                    <li>Practice problems with <strong>lazy propagation</strong> to avoid unnecessary recomputation.</li>
+                    <li>Use <strong>Python/PyPy</strong> for faster execution in coding contests.</li>
+                </ul>
+
+                <h4>11.4 Conclusion</h4>
+                <ul>
+                    <li>Solving at least 10 competitive problems ensures mastery.</li>
+                    <li>System design integration shows real-world relevance.</li>
+                    <li>Practicing under time constraints enhances implementation speed.</li>
+                </ul>
+
+            </article>
+
+
+
+
+        </main>
+
+        <script> copyright("all"); </script>
+
+    </body>
+
+</html>

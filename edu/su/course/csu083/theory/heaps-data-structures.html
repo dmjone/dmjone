@@ -1,0 +1,1170 @@
+<!-------------------------- © 2007 - present, dmj.one and contributors. ----------------------------------
+   Part of the dmjone project. Licensed under the GNU AGPL. Provided as-is, without warranty of any kind. 
+-------------------- Redistribution and modifications must retain this notice. --------------------------->
+
+
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+    <!--<![endif]-->
+
+    <head>
+        <script src="/js/edu_su_common.js"></script>
+        <noscript>
+            <style>
+                html,
+                body {
+                    margin: 0;
+                    overflow: hidden;
+                }
+            </style>
+            <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+        </noscript>
+
+        <title>Tries in Data Structures - CSU083 | Shoolini University</title>
+
+        <meta name="description" content="Learn Tries in Data Structures, covering trie properties, operations, optimizations, and real-world applications. Part of the CSU083 course at Shoolini University.">
+        <meta name="keywords" content="Tries, Data Structures, Prefix Tree, Ternary Search Trie, Radix Tree, Autocomplete, DSA, Algorithms, Competitive Programming">
+        <meta name="author" content="Divya Mohan">
+        <meta name="robots" content="index, follow">
+
+        <!-- Open Graph for Social Media -->
+        <meta property="og:image" content="/logo.png">
+        <meta property="og:type" content="article">
+
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:site" content="@divyamohan1993">
+        <meta name="twitter:creator" content="@divyamohan1993">
+        <meta name="twitter:image" content="/logo.png">
+
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+        <meta name="author" content="Divya Mohan">
+        <meta name="robots" content="index, follow">
+
+        <!-- JSON-LD Structured Data for SEO -->
+        <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "Course",
+          "name": "Tries in Data Structures",
+          "description": "Learn Trie Data Structures with practical implementations and real-world applications in DSA.",
+          "provider": {
+            "@type": "EducationalOrganization",
+            "name": "Shoolini University",
+            "url": "https://shooliniuniversity.com"
+          }
+        }
+    </script>
+
+
+
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js" integrity="sha512-sHSNLECRJSK+BFs7E8DiFc6pf6n90bLI85Emiw1jhreduZhK3VXgq9l4kAt9eTIHYAcuQBKHL01QKs4/3Xgl8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js" integrity="sha512-iWiuBS5nt6r60fCz26Nd0Zqe0nbk1ZTIQbl3Kv7kYsX+yKMUFHzjaH2+AnM6vp2Xs+gNmaBAVWJjSmuPw76Efg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                renderMathInElement(document.body, {
+                    // customised options
+                    // • auto-render specific keys, e.g.:
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false },
+                        { left: '\\(', right: '\\)', display: false },
+                        { left: '\\[', right: '\\]', display: true }
+                    ],
+                    // • rendering keys, e.g.:
+                    throwOnError: false
+                });
+            });
+        </script> -->
+
+        <!-- <style>
+            main ul {
+                list-style-type: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            main ul li {
+                margin: 0;
+                padding: 0;
+            }
+        </style> -->
+
+
+    </head>
+
+    <body>
+
+        <script> header_author("dm"); </script>
+
+        <main>
+            <article class="agen-tableofcontents">
+                <h2 class="text-center">
+                    Heaps in Data Structures
+                </h2>
+                <div class="d-none contentdate">2024, August 4</div>
+            </article>
+
+            <article>
+                <h3>1. Prerequisites</h3>
+                <p>Before learning Heaps, one should be familiar with:</p>
+                <ul>
+                    <li><strong>Arrays</strong>: Understanding index-based storage is crucial since heaps often use arrays for implementation.</li>
+                    <li><strong>Binary Trees</strong>: Conceptualize nodes in levels. A Heap is a form of a complete binary tree.</li>
+                    <li><strong>Comparison Operators</strong>: Know how to compare two elements to maintain ordering (min or max).</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>2. What Is a Heap?</h3>
+                <p>A Heap is a specialized tree-based data structure that satisfies the <strong>heap property</strong>:</p>
+                <ul>
+                    <li><strong>Max-Heap Property</strong>: Every node’s value is greater than or equal to its children’s values.</li>
+                    <li><strong>Min-Heap Property</strong>: Every node’s value is less than or equal to its children’s values.</li>
+                </ul>
+                <p>Heaps are always kept <strong>complete</strong>: all levels are fully filled except possibly the last level, which is filled from left to right.</p>
+
+                <article>
+                    <h4>2.1 Heap Representation Using Arrays</h4>
+                    <p>We often store a heap in a single array. For a node at index <em>i</em>:</p>
+                    <ul>
+                        <li>Left child: index <em>2i + 1</em></li>
+                        <li>Right child: index <em>2i + 2</em></li>
+                        <li>Parent: index <em>⌊(i - 1)/2⌋</em></li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>2.2 Core Operations</h4>
+                    <ul>
+                        <li><strong>Insert</strong>: Place the new element at the end, then “bubble up” until the heap property is restored.</li>
+                        <li><strong>Extract</strong> (Max or Min): Remove the root, replace it with the last element, then “sift down” to restore the property.</li>
+                    </ul>
+                    <pre><code class="">// Example: Insert into a Max-Heap (array-based)
+void heapInsert(vector&lt;int>& heap, int value) {
+    heap.push_back(value);
+    int i = heap.size() - 1;
+    // Bubble up
+    while (i > 0 && heap[(i - 1) / 2] < heap[i]) {
+        swap(heap[i], heap[(i - 1) / 2]);
+        i = (i - 1) / 2;
+    }
+}
+</code></pre>
+                </article>
+            </article>
+
+            <article>
+                <h3>3. Why Does This Data Structure Exist?</h3>
+                <p>A Heap excels at maintaining a priority element accessible in <strong>O(1)</strong> time, with insertion and removal in <strong>O(log n)</strong>. This provides:</p>
+                <ul>
+                    <li><strong>Scheduling and Priority Queues</strong>: Quickly pick the next most urgent job or smallest/largest element.</li>
+                    <li><strong>Dijkstra’s Algorithm</strong>: Fast retrieval of the minimum distance node.</li>
+                    <li><strong>Median Tracking</strong>: Two heaps can help track medians in streaming data.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>4. How Does It Compare to Alternatives? (Strengths & Weaknesses)</h3>
+
+                <article>
+                    <h4>4.1 Strengths</h4>
+                    <ul>
+                        <li><strong>Guaranteed Logarithmic Insertion/Extraction</strong>: Predictable performance.</li>
+                        <li><strong>Easy to Implement</strong>: A simple array can represent the structure.</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>4.2 Weaknesses</h4>
+                    <ul>
+                        <li><strong>Limited Search Efficiency</strong>: Finding an arbitrary value is O(n) because the heap only guarantees the min/max at the root.</li>
+                        <li><strong>Strict Partial Ordering</strong>: Only the root is guaranteed to be the extreme; siblings are not in sorted order.</li>
+                    </ul>
+                </article>
+            </article>
+
+            <article>
+                <h3>5. When Should You Use It?</h3>
+                <ul>
+                    <li><strong>Prioritizing tasks</strong>: When you need the highest or lowest priority task first.</li>
+                    <li><strong>Maintaining running extremes</strong>: In real-time applications that need quick max or min retrieval.</li>
+                    <li><strong>Heapsort</strong>: Builds a heap to sort in <em>O(n log n)</em>.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>6. Basic Max-Heap Implementation</h3>
+                <p>Below is a simple C++ example. We'll maintain a <em>vector</em> to store heap elements. A <code>heapifyUp</code> function ensures the max-heap property after insertion, and <code>heapifyDown</code> restores order after removing the root.</p>
+
+                <article>
+                    <h4>6.1 Core Functions</h4>
+                    <pre><code class="">
+#include &lt;iostream>
+#include &lt;vector>
+#include &lt;algorithm>
+using namespace std;
+
+class MaxHeap {
+private:
+    vector&lt;int> heap;
+
+    void heapifyUp(int index) {
+        // Move the element at 'index' up the tree as needed
+        while (index > 0) {
+            int parent = (index - 1) / 2;
+            if (heap[index] > heap[parent]) {
+                swap(heap[index], heap[parent]);
+                index = parent;
+            } else {
+                break;
+            }
+        }
+    }
+
+    void heapifyDown(int index) {
+        // Move the element at 'index' down the tree as needed
+        int size = heap.size();
+        while (true) {
+            int left = 2 * index + 1;
+            int right = 2 * index + 2;
+            int largest = index;
+
+            // Check left child
+            if (left < size && heap[left] > heap[largest]) {
+                largest = left;
+            }
+            // Check right child
+            if (right < size && heap[right] > heap[largest]) {
+                largest = right;
+            }
+            // If no swap needed, heap property is restored
+            if (largest == index) break;
+            // Swap and continue
+            swap(heap[index], heap[largest]);
+            index = largest;
+        }
+    }
+
+public:
+    void insert(int value) {
+        heap.push_back(value);
+        heapifyUp(heap.size() - 1);
+    }
+
+    int extractMax() {
+        if (heap.empty()) {
+            throw runtime_error("Heap is empty!");
+        }
+        int maxValue = heap[0];
+        heap[0] = heap.back();
+        heap.pop_back();
+        if (!heap.empty()) {
+            heapifyDown(0);
+        }
+        return maxValue;
+    }
+
+    void printHeap() {
+        for (int val : heap) {
+            cout << val << " ";
+        }
+        cout << endl;
+    }
+};
+
+int main() {
+    MaxHeap mh;
+    mh.insert(4);
+    mh.insert(7);
+    mh.insert(1);
+    mh.insert(3);
+
+    cout << "Heap after insertions: ";
+    mh.printHeap();
+
+    int maxElement = mh.extractMax();
+    cout << "Extracted max: " << maxElement << endl;
+    cout << "Heap after extracting max: ";
+    mh.printHeap();
+
+    return 0;
+}
+</code></pre>
+                </article>
+            </article>
+
+            <article>
+                <h3>7. Dry Run (Step-by-Step)</h3>
+                <p>Consider inserting the elements <strong>4, 7, 1, 3</strong> in that order.</p>
+
+                <article>
+                    <h4>7.1 Initial State</h4>
+                    <p><strong>heap</strong> = [] (empty)</p>
+                </article>
+
+                <article>
+                    <h4>7.2 Insert 4</h4>
+                    <ul>
+                        <li>Push <code>4</code> into <code>heap</code>: <strong>heap</strong> = [4]</li>
+                        <li><code>heapifyUp</code>:
+                            <ul>
+                                <li>Index = 0 → Parent index = (0 - 1) / 2 = -1 (invalid), stop.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <p><strong>heap</strong> = [4]</p>
+                </article>
+
+                <article>
+                    <h4>7.3 Insert 7</h4>
+                    <ul>
+                        <li>Push <code>7</code>: <strong>heap</strong> = [4, 7]</li>
+                        <li><code>heapifyUp(index = 1)</code>:
+                            <ul>
+                                <li>Parent of 1 = 0</li>
+                                <li><code>heap[1] = 7</code> > <code>heap[0] = 4</code>, swap ⇒ [7, 4]</li>
+                                <li>Now index = 0, no parent to check, stop.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <p><strong>heap</strong> = [7, 4]</p>
+                </article>
+
+                <article>
+                    <h4>7.4 Insert 1</h4>
+                    <ul>
+                        <li>Push <code>1</code>: <strong>heap</strong> = [7, 4, 1]</li>
+                        <li><code>heapifyUp(index = 2)</code>:
+                            <ul>
+                                <li>Parent of 2 = 0</li>
+                                <li><code>heap[2] = 1</code>
+                                    < <code>heap[0] = 7</code>, no swap, stop.
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <p><strong>heap</strong> = [7, 4, 1]</p>
+                </article>
+
+                <article>
+                    <h4>7.5 Insert 3</h4>
+                    <ul>
+                        <li>Push <code>3</code>: <strong>heap</strong> = [7, 4, 1, 3]</li>
+                        <li><code>heapifyUp(index = 3)</code>:
+                            <ul>
+                                <li>Parent of 3 = 1 (integer division)</li>
+                                <li><code>heap[3] = 3</code>
+                                    < <code>heap[1] = 4</code>, no swap needed, stop.
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <p><strong>heap</strong> = [7, 4, 1, 3]</p>
+                </article>
+
+                <article>
+                    <h4>7.6 Extract Max</h4>
+                    <ul>
+                        <li><strong>Max</strong> = <code>heap[0]</code> = 7</li>
+                        <li>Move last element <code>heap[3]</code> = 3 to root ⇒ <strong>heap</strong> = [3, 4, 1]</li>
+                        <li><code>heapifyDown(index = 0)</code>:
+                            <ul>
+                                <li>left = 1 → <code>heap[1] = 4</code>, right = 2 → <code>heap[2] = 1</code></li>
+                                <li>largest = 1 since <code>4</code> > <code>3</code></li>
+                                <li>Swap <code>heap[0]</code> and <code>heap[1]</code> ⇒ [4, 3, 1]</li>
+                                <li>Now index = 1, new children: left = 3, right = 4 (both invalid indices), stop.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <p>Extracted <strong>7</strong>. Now <strong>heap</strong> = [4, 3, 1].</p>
+                </article>
+            </article>
+
+            <article>
+                <h3>8. Time Complexity Analysis (Big-O Mastery)</h3>
+                <p>Let's analyze the time complexity for various heap operations.</p>
+
+                <article>
+                    <h4>8.1 Insertion (heapify-up)</h4>
+                    <ul>
+                        <li>Inserting a new element at the end takes <strong>O(1)</strong>.</li>
+                        <li>It may need to move up the tree (heapify-up).</li>
+                        <li>Since a heap is a complete binary tree, its height is <strong>O(log n)</strong>.</li>
+                        <li><strong>Worst-case:</strong> The new element bubbles up to the root, taking <strong>O(log n)</strong>.</li>
+                        <li><strong>Best-case:</strong> No swaps needed, takes <strong>O(1)</strong>.</li>
+                        <li><strong>Average-case:</strong> Element moves up halfway on average → <strong>O(log n)</strong>.</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>8.2 Extract Max/Min (heapify-down)</h4>
+                    <ul>
+                        <li>Removing the root and replacing it with the last element takes <strong>O(1)</strong>.</li>
+                        <li>Heapify-down process moves the root to its correct position.</li>
+                        <li><strong>Worst-case:</strong> Swaps down to the last level → <strong>O(log n)</strong>.</li>
+                        <li><strong>Best-case:</strong> No swaps needed, already in place → <strong>O(1)</strong>.</li>
+                        <li><strong>Average-case:</strong> Moves halfway down on average → <strong>O(log n)</strong>.</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>8.3 Heap Construction (Building a Heap)</h4>
+                    <ul>
+                        <li>Naïve approach: Insert one-by-one → O(n log n).</li>
+                        <li>Optimized approach: Heapify from bottom-up → O(n).</li>
+                    </ul>
+                    <p>The proof for O(n) comes from the summation:</p>
+                    <p>$$ \sum_{i=0}^{\log n} \frac{n}{2^i} O(i) = O(n) $$</p>
+                </article>
+
+                <article>
+                    <h4>8.4 Heap Sort</h4>
+                    <ul>
+                        <li>Building the heap: <strong>O(n)</strong> (optimized heapify).</li>
+                        <li>Extracting elements one-by-one: <strong>O(n log n)</strong>.</li>
+                        <li>Overall complexity: <strong>O(n log n)</strong>.</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>8.5 Searching for an Element</h4>
+                    <ul>
+                        <li>Since the heap is not sorted, searching requires scanning all elements.</li>
+                        <li><strong>Worst-case:</strong> O(n).</li>
+                        <li><strong>Best-case:</strong> O(1) if found at the root.</li>
+                    </ul>
+                </article>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Operation</th>
+                            <th>Best Case</th>
+                            <th>Average Case</th>
+                            <th>Worst Case</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Insert</td>
+                            <td>O(1)</td>
+                            <td>O(log n)</td>
+                            <td>O(log n)</td>
+                        </tr>
+                        <tr>
+                            <td>Extract Max/Min</td>
+                            <td>O(1)</td>
+                            <td>O(log n)</td>
+                            <td>O(log n)</td>
+                        </tr>
+                        <tr>
+                            <td>Build Heap</td>
+                            <td>O(n)</td>
+                            <td>O(n)</td>
+                            <td>O(n)</td>
+                        </tr>
+                        <tr>
+                            <td>Heap Sort</td>
+                            <td>O(n log n)</td>
+                            <td>O(n log n)</td>
+                            <td>O(n log n)</td>
+                        </tr>
+                        <tr>
+                            <td>Search</td>
+                            <td>O(1)</td>
+                            <td>O(n)</td>
+                            <td>O(n)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </article>
+
+            <article>
+                <h3>9. Space Complexity Analysis</h3>
+                <ul>
+                    <li>A binary heap is stored in an array, requiring <strong>O(n)</strong> space.</li>
+                    <li>No additional data structures are used apart from recursion (if implemented recursively).</li>
+                    <li>In-place sorting (Heap Sort) requires <strong>O(1)</strong> extra space.</li>
+                    <li>For dynamic heaps (priority queues), pointers may introduce <strong>O(n)</strong> extra space in linked implementations.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>10. Trade-offs & Efficiency</h3>
+                <ul>
+                    <li><strong>Time vs. Space</strong>: Heaps are memory-efficient (O(n) space), but not the fastest for sorting.</li>
+                    <li><strong>Fast Insertion & Deletion</strong>: Heaps provide quick access to the min/max, unlike sorted arrays.</li>
+                    <li><strong>Poor Search Efficiency</strong>: Unlike BSTs, heaps are not optimized for search operations.</li>
+                    <li><strong>Use Case Trade-offs</strong>:
+                        <ul>
+                            <li>Use heaps when frequent <strong>min/max retrieval</strong> is required.</li>
+                            <li>Avoid heaps when <strong>random access</strong> or search is needed.</li>
+                        </ul>
+                    </li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>11. Common Optimizations for Heaps</h3>
+                <p>Optimizing heaps can significantly enhance performance, particularly in large-scale applications.</p>
+
+                <article>
+                    <h4>11.1 Optimized Heap Construction (Bottom-Up Heapify)</h4>
+                    <p>The naive method inserts elements one by one, taking <strong>O(n log n)</strong>. The optimized method, known as Floyd’s heap construction, builds the heap in O(n) using bottom-up heapification.</p>
+
+                    <pre><code class="">
+void buildHeap(vector&lt;int>& heap) {
+    int n = heap.size();
+    for (int i = (n / 2) - 1; i >= 0; i--) {
+        heapifyDown(heap, i, n);
+    }
+}
+</code></pre>
+                    <p>Why O(n) instead of O(n log n)?
+                        Instead of inserting each element individually, we heapify non-leaf nodes from bottom-up, reducing redundant swaps.</p>
+                </article>
+
+                <article>
+                    <h4>11.2 Lazy Deletion for Faster Remove Operations</h4>
+                    <p>Instead of physically removing an element and restructuring the heap, we mark elements as deleted and rebuild only when necessary, reducing unnecessary swaps.</p>
+                </article>
+
+                <article>
+                    <h4>11.3 Using Binary Heap Variants for Faster Operations</h4>
+                    <p>Several optimized heap structures exist, each tailored for specific operations.</p>
+                    <ul>
+                        <li><strong>d-ary Heap</strong>: Generalizes binary heaps with d children per node, reducing depth and improving performance in priority queues.</li>
+                        <li><strong>Fibonacci Heap</strong>: Provides amortized O(1) insertion and O(log n) extract-min, improving Dijkstra’s algorithm.</li>
+                        <li><strong>Pairing Heap</strong>: A self-adjusting heap with amortized O(1) insert and O(log n) extract-min, often outperforming Fibonacci heaps in practice.</li>
+                    </ul>
+                </article>
+            </article>
+
+            <article>
+                <h3>12. Heap Variants (Different Versions of the Algorithm)</h3>
+                <p>Different types of heaps exist to optimize specific use cases:</p>
+
+                <article>
+                    <h4>12.1 Binomial Heap</h4>
+                    <p>A collection of binomial trees that supports fast union operations in O(log n), useful in dynamic priority queues.</p>
+                </article>
+
+                <article>
+                    <h4>12.2 Fibonacci Heap</h4>
+                    <p>Uses a more relaxed structure, allowing for O(1) insertion and amortized O(log n) extract-min. It’s widely used in Dijkstra’s algorithm.</p>
+                </article>
+
+                <article>
+                    <h4>12.3 Min-Max Heap</h4>
+                    <p>A double-ended heap that allows both minimum and maximum extraction in O(log n), useful for range-based priority queues.</p>
+                </article>
+
+                <article>
+                    <h4>12.4 Soft Heap</h4>
+                    <p>A heap with constant-time insertion but allows some elements to be corrupted, making it useful in approximation algorithms.</p>
+                </article>
+            </article>
+
+            <article>
+                <h3>13. Iterative vs. Recursive Implementations (Efficiency Comparison)</h3>
+
+                <article>
+                    <h4>13.1 Heapify-Up (Insertion) - Iterative vs. Recursive</h4>
+
+                    <article>
+                        <h5>13.1.1 Iterative Version</h5>
+                        <pre><code class="">
+void heapifyUp(vector&lt;int>& heap, int index) {
+    while (index > 0) {
+        int parent = (index - 1) / 2;
+        if (heap[parent] < heap[index]) {
+            swap(heap[parent], heap[index]);
+            index = parent;
+        } else break;
+    }
+}
+</code></pre>
+                        <p><strong>Advantages:</strong>
+                            ✅ No recursive overhead (stack usage).
+                            ✅ Better suited for large heaps (avoids recursion depth limits).</p>
+                    </article>
+
+                    <article>
+                        <h5>13.1.2 Recursive Version</h5>
+                        <pre><code class="">
+void heapifyUp(vector&lt;int>& heap, int index) {
+    if (index == 0) return;
+    int parent = (index - 1) / 2;
+    if (heap[parent] < heap[index]) {
+        swap(heap[parent], heap[index]);
+        heapifyUp(heap, parent);
+    }
+}
+</code></pre>
+                        <p><strong>Advantages:</strong>
+                            ✅ Code is more readable.
+                            🚫 Recursion may cause stack overflow in deep heaps.</p>
+                    </article>
+                </article>
+
+                <article>
+                    <h4>13.2 Heapify-Down (Extract Max) - Iterative vs. Recursive</h4>
+
+                    <article>
+                        <h5>13.2.1 Iterative Version</h5>
+                        <pre><code class="">
+void heapifyDown(vector&lt;int>& heap, int index, int size) {
+    while (true) {
+        int left = 2 * index + 1;
+        int right = 2 * index + 2;
+        int largest = index;
+
+        if (left < size && heap[left] > heap[largest]) largest = left;
+        if (right < size && heap[right] > heap[largest]) largest = right;
+
+        if (largest != index) {
+            swap(heap[index], heap[largest]);
+            index = largest;
+        } else break;
+    }
+}
+</code></pre>
+                    </article>
+
+                    <article>
+                        <h5>13.2.2 Recursive Version</h5>
+                        <pre><code class="">
+void heapifyDown(vector&lt;int>& heap, int index, int size) {
+    int left = 2 * index + 1;
+    int right = 2 * index + 2;
+    int largest = index;
+
+    if (left < size && heap[left] > heap[largest]) largest = left;
+    if (right < size && heap[right] > heap[largest]) largest = right;
+
+    if (largest != index) {
+        swap(heap[index], heap[largest]);
+        heapifyDown(heap, largest, size);
+    }
+}
+</code></pre>
+                        <p><strong>Comparison:</strong></p>
+                        <ul>
+                            <li><strong>Iterative</strong>: More efficient, avoids recursion overhead.</li>
+                            <li><strong>Recursive</strong>: More readable but limited by recursion depth.</li>
+                        </ul>
+                    </article>
+                </article>
+            </article>
+
+            <article>
+                <h3>14. Summary of Optimizations</h3>
+                <ul>
+                    <li>Use <strong>Bottom-Up Heapify</strong> instead of inserting elements one by one to build a heap in O(n).</li>
+                    <li>For priority queues, prefer <strong>Fibonacci heaps</strong> (better Dijkstra performance).</li>
+                    <li><strong>Lazy deletion</strong> improves efficiency by reducing unnecessary heap restructuring.</li>
+                    <li>For large-scale applications, iterative heapify-down is more efficient than recursion.</li>
+                    <li>Choose the appropriate <strong>heap variant</strong> (d-ary, pairing, Fibonacci) based on the problem constraints.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>15. Common Pitfalls & Edge Cases</h3>
+                <p>Understanding and handling edge cases ensures a robust heap implementation. Below are the most common pitfalls:</p>
+
+                <article>
+                    <h4>15.1 Handling an Empty Heap</h4>
+                    <ul>
+                        <li><strong>Edge Case</strong>: Extracting from an empty heap.</li>
+                        <li><strong>Issue</strong>: Accessing an empty array causes runtime errors.</li>
+                        <li><strong>Solution</strong>: Before extracting, check if the heap is empty.</li>
+                    </ul>
+                    <pre><code class="">
+int extractMax(vector&lt;int>& heap) {
+    if (heap.empty()) {
+        throw runtime_error("Heap is empty!");
+    }
+    int maxValue = heap[0];
+    heap[0] = heap.back();
+    heap.pop_back();
+    heapifyDown(heap, 0, heap.size());
+    return maxValue;
+}
+</code></pre>
+                </article>
+
+                <article>
+                    <h4>15.2 Handling Single Element Heap</h4>
+                    <ul>
+                        <li><strong>Edge Case</strong>: Inserting and then extracting when only one element exists.</li>
+                        <li><strong>Issue</strong>: The heapify-down operation should not run unnecessarily.</li>
+                        <li><strong>Solution</strong>: If size becomes 0 after extraction, return early.</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>15.3 Duplicates in the Heap</h4>
+                    <ul>
+                        <li><strong>Edge Case</strong>: Handling duplicate values in insertion and extraction.</li>
+                        <li><strong>Issue</strong>: While inserting, duplicates should not break the heap property.</li>
+                        <li><strong>Solution</strong>: Heap operations should work fine as long as comparisons are consistent.</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>15.4 Large Inputs (Stress Testing)</h4>
+                    <ul>
+                        <li><strong>Edge Case</strong>: Inserting and extracting millions of elements.</li>
+                        <li><strong>Issue</strong>: Inefficient heapify implementations might cause timeouts.</li>
+                        <li><strong>Solution</strong>: Use bottom-up heapify for construction in O(n).</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>15.5 Handling Negative Values</h4>
+                    <ul>
+                        <li><strong>Edge Case</strong>: Working with negative numbers.</li>
+                        <li><strong>Issue</strong>: Comparison operations must handle negative values correctly.</li>
+                        <li><strong>Solution</strong>: The heap property is maintained as long as comparison logic is intact.</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>15.6 Floating Point Values</h4>
+                    <ul>
+                        <li><strong>Edge Case</strong>: Using heaps with floating-point values.</li>
+                        <li><strong>Issue</strong>: Precision errors may cause incorrect ordering.</li>
+                        <li><strong>Solution</strong>: Consider rounding or using integer scaling for accuracy.</li>
+                    </ul>
+                </article>
+            </article>
+
+            <article>
+                <h3>16. Test Cases to Verify Correctness</h3>
+                <p>Below are various test cases to ensure correctness and robustness.</p>
+
+                <article>
+                    <h4>16.1 Insertion and Extraction</h4>
+                    <pre><code class="">
+void testInsertionAndExtraction() {
+    MaxHeap heap;
+    heap.insert(10);
+    heap.insert(5);
+    heap.insert(15);
+    heap.insert(20);
+
+    assert(heap.extractMax() == 20);
+    assert(heap.extractMax() == 15);
+    assert(heap.extractMax() == 10);
+    assert(heap.extractMax() == 5);
+}
+</code></pre>
+                </article>
+
+                <article>
+                    <h4>16.2 Extracting from an Empty Heap</h4>
+                    <pre><code class="">
+void testEmptyHeapExtraction() {
+    MaxHeap heap;
+    try {
+        heap.extractMax();
+        assert(false); // Should not reach this
+    } catch (runtime_error& e) {
+        assert(true); // Expected exception
+    }
+}
+</code></pre>
+                </article>
+
+                <article>
+                    <h4>16.3 Handling Duplicates</h4>
+                    <pre><code class="">
+void testDuplicateValues() {
+    MaxHeap heap;
+    heap.insert(10);
+    heap.insert(10);
+    heap.insert(10);
+
+    assert(heap.extractMax() == 10);
+    assert(heap.extractMax() == 10);
+    assert(heap.extractMax() == 10);
+}
+</code></pre>
+                </article>
+
+                <article>
+                    <h4>16.4 Large Input Performance</h4>
+                    <pre><code class="">
+void testLargeHeap() {
+    MaxHeap heap;
+    for (int i = 1; i <= 1000000; i++) {
+        heap.insert(i);
+    }
+
+    for (int i = 1000000; i >= 1; i--) {
+        assert(heap.extractMax() == i);
+    }
+}
+</code></pre>
+                </article>
+
+                <article>
+                    <h4>16.5 Handling Negative Numbers</h4>
+                    <pre><code class="">
+void testNegativeValues() {
+    MaxHeap heap;
+    heap.insert(-10);
+    heap.insert(-5);
+    heap.insert(-20);
+    heap.insert(-1);
+
+    assert(heap.extractMax() == -1);
+    assert(heap.extractMax() == -5);
+    assert(heap.extractMax() == -10);
+    assert(heap.extractMax() == -20);
+}
+</code></pre>
+                </article>
+            </article>
+
+            <article>
+                <h3>17. Real-World Failure Scenarios</h3>
+
+                <article>
+                    <h4>17.1 Memory Overflows</h4>
+                    <ul>
+                        <li>Inserting too many elements in a system with limited memory.</li>
+                        <li>Heap growth must be handled with memory-efficient implementations.</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>17.2 Corrupted Heap Order</h4>
+                    <ul>
+                        <li>Manual modifications of the heap array (e.g., unintended swaps).</li>
+                        <li>Debugging requires reapplying heapify to restore order.</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>17.3 Thread Safety Issues</h4>
+                    <ul>
+                        <li>Race conditions in concurrent priority queue implementations.</li>
+                        <li>Use locks or thread-safe priority queue implementations.</li>
+                    </ul>
+                </article>
+
+            </article>
+
+            <article>
+                <h3>18. Quick Recap</h3>
+                <ul>
+                    <li>Identify and handle empty heaps and single-element cases.</li>
+                    <li>Ensure correct handling of duplicates, negatives, and large inputs.</li>
+                    <li>Test different failure scenarios to avoid runtime crashes.</li>
+                    <li>Optimize heap operations to handle millions of insertions efficiently.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>19. Real-World Applications of Heaps</h3>
+                <p>Heaps play a crucial role in various domains due to their efficient <strong>priority retrieval</strong> capabilities. Below are key industry applications:</p>
+
+                <article>
+                    <h4>19.1 Priority Queues (Operating Systems & Task Scheduling)</h4>
+                    <ul>
+                        <li><strong>OS Process Scheduling</strong>: The CPU scheduler maintains a queue of tasks where higher-priority processes execute first.</li>
+                        <li><strong>Thread Scheduling</strong>: Multi-threaded applications prioritize execution using heaps.</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>19.2 Graph Algorithms (Dijkstra's & Prim's Algorithm)</h4>
+                    <ul>
+                        <li><strong>Shortest Path (Dijkstra’s Algorithm)</strong>: Uses a min-heap to efficiently retrieve the node with the smallest distance.</li>
+                        <li><strong>Minimum Spanning Tree (Prim’s Algorithm)</strong>: Uses heaps to find the minimum edge efficiently.</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>19.3 Data Compression (Huffman Coding)</h4>
+                    <ul>
+                        <li>Huffman coding, used in file compression formats like ZIP, PNG, and MP3, builds an optimal prefix tree using a min-heap.</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>19.4 Search Engines (Google & Bing Ranking Systems)</h4>
+                    <ul>
+                        <li>Search engines store the top-k search results using a max-heap, ensuring the most relevant results appear first.</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>19.5 Load Balancing in Web Servers</h4>
+                    <ul>
+                        <li>Many web services (e.g., AWS Load Balancer) use heaps to efficiently assign tasks to the least-loaded server.</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>19.6 Real-Time Median Finding (Finance & Stock Markets)</h4>
+                    <ul>
+                        <li>Maintaining a real-time median for stock price fluctuations requires two heaps (min-heap and max-heap).</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>19.7 AI & Machine Learning (A* Algorithm for Pathfinding)</h4>
+                    <ul>
+                        <li>Used in AI and robotics for shortest pathfinding in games, autonomous cars, and GPS navigation systems.</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>19.8 Social Media Feeds (Top-K Trending Topics)</h4>
+                    <ul>
+                        <li>Social networks like Twitter, Facebook, and Instagram use heaps to maintain a list of trending topics.</li>
+                    </ul>
+                </article>
+
+            </article>
+
+            <article>
+                <h3>20. Open-Source Implementations of Heaps</h3>
+                <p>Several open-source libraries provide efficient heap implementations:</p>
+                <ul>
+                    <li><strong>C++ STL Priority Queue</strong>: `std::priority_queue` in the Standard Template Library (STL).</li>
+                    <li><strong>Python heapq Module</strong>: Provides min-heaps for fast priority queue operations.</li>
+                    <li><strong>Boost Heap Library</strong>: Advanced heap variants in C++.</li>
+                    <li><strong>Java PriorityQueue</strong>: Uses a binary heap for priority queue operations.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>21. Practical Heap Implementation (Top-K Trending Words in a File)</h3>
+                <p>We’ll use a min-heap to efficiently find the top K most frequently occurring words in a file.</p>
+
+                <article>
+                    <h4>21.1 Python Implementation</h4>
+                    <pre><code class="language-python">
+import heapq
+from collections import Counter
+
+def top_k_words(filename, k):
+    # Read file and count word occurrences
+    with open(filename, 'r') as file:
+        words = file.read().split()
+    
+    word_count = Counter(words)  # Count word frequencies
+    
+    # Use a min-heap to store the top K words
+    min_heap = []
+    
+    for word, freq in word_count.items():
+        heapq.heappush(min_heap, (freq, word))
+        if len(min_heap) > k:
+            heapq.heappop(min_heap)  # Remove the least frequent word
+    
+    # Extract results from heap
+    top_words = sorted(min_heap, reverse=True)  # Sort in descending order
+    return top_words
+
+# Example usage
+filename = "sample.txt"
+k = 5
+print(top_k_words(filename, k))
+</code></pre>
+                </article>
+
+                <article>
+                    <h4>21.2 Sample Dry Run</h4>
+                    <p>Given an input file <code>sample.txt</code> containing:</p>
+                    <pre><code class="language-text">
+apple banana apple orange banana banana apple grape grape
+</code></pre>
+                    <p>The output for <code>top_k_words("sample.txt", 3)</code> would be:</p>
+                    <pre><code class="language-text">
+[(3, 'apple'), (3, 'banana'), (2, 'grape')]
+</code></pre>
+                </article>
+
+                <article>
+                    <h4>21.3 Explanation</h4>
+                    <ul>
+                        <li>Reads the file and counts occurrences of each word.</li>
+                        <li>Uses a min-heap to track the top K words.</li>
+                        <li>If heap size exceeds K, the least frequent word is removed.</li>
+                        <li>Final heap contains the most frequent K words, sorted in descending order.</li>
+                    </ul>
+                </article>
+
+            </article>
+
+            <article>
+                <h3>22. Quick Recap</h3>
+                <ul>
+                    <li>Heaps are widely used in operating systems, search engines, AI, and social media ranking.</li>
+                    <li>Open-source implementations include C++ STL, Python heapq, and Java PriorityQueue.</li>
+                    <li>A practical implementation was demonstrated for finding top-K frequent words in a file.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>23. Competitive Programming: Heap-Based Problems</h3>
+                <p>To master heaps in competitive programming, solve the following 10 problems. These problems are categorized by difficulty.</p>
+
+                <article>
+                    <h4>23.1 Beginner (Basic Heap Operations)</h4>
+                    <ul>
+                        <li>🟢 Find K largest elements
+                            *Given an array of size N, find the K largest elements using a heap.*
+                            (Hint: Use a min-heap of size K.)</li>
+
+                        <li>🟢 Kth smallest/largest element
+                            *Find the Kth smallest or largest element in an unsorted array.*
+                            (Hint: Use a heap with O(log K) insertion.)</li>
+
+                        <li>🟢 Merge K sorted lists
+                            *You are given K sorted linked lists. Merge them into a single sorted list.*
+                            (Hint: Use a min-heap to efficiently extract the smallest element from each list.)</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>23.2 Intermediate (Priority Queues & Optimization)</h4>
+                    <ul>
+                        <li>🟠 Find Median in a Running Stream
+                            *Given a stream of numbers, find the median after each insertion.*
+                            (Hint: Maintain two heaps: a max-heap for the left half and a min-heap for the right half.)</li>
+
+                        <li>🟠 Sort Nearly Sorted Array (K-Sorted Array)
+                            *Given an array where every element is at most K positions away from its sorted order, sort it efficiently.*
+                            (Hint: Use a min-heap of size K.)</li>
+
+                        <li>🟠 Task Scheduler (Leetcode 621)
+                            *Given a list of tasks and a cooldown period, schedule tasks with minimum idle time.*
+                            (Hint: Use a max-heap to always schedule the most frequent task first.)</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>23.3 Advanced (Graph Algorithms & Complex Heaps)</h4>
+                    <ul>
+                        <li>🔴 Dijkstra’s Algorithm
+                            *Find the shortest path from a source node to all other nodes in a weighted graph.*
+                            (Hint: Use a min-heap to extract the node with the smallest distance.)</li>
+
+                        <li>🔴 Prim’s Minimum Spanning Tree
+                            *Given a weighted graph, find the Minimum Spanning Tree using Prim’s algorithm.*
+                            (Hint: Use a priority queue (min-heap) to always select the minimum edge.)</li>
+
+                        <li>🔴 Top K Frequent Elements (Leetcode 347)
+                            *Find the K most frequent elements in an array.*
+                            (Hint: Use a min-heap to store frequency counts.)</li>
+
+                        <li>🔴 Maximum Capital (Investment Problem)
+                            *Given capital C and a set of projects (each with a profit & capital requirement), maximize profit by selecting up to K projects.*
+                            (Hint: Use two heaps: one to track available projects and another for profit maximization.)</li>
+                    </ul>
+                </article>
+            </article>
+
+            <article>
+                <h3>24. System Design Integration: Using Heaps in Real-World Architectures</h3>
+
+                <article>
+                    <h4>24.1 System Design Problem: Real-Time Leaderboard</h4>
+                    <p>Design a real-time leaderboard system where users' scores update frequently, and you need to retrieve the top K players efficiently.</p>
+
+                    <p><strong>Requirements:</strong></p>
+                    <ul>
+                        <li>Supports millions of players.</li>
+                        <li>Each player’s score updates frequently.</li>
+                        <li>Retrieving the top K players should be fast.</li>
+                    </ul>
+
+                    <p><strong>Heap-Based Solution:</strong></p>
+                    <ul>
+                        <li>Use a max-heap to maintain the top K scores.</li>
+                        <li>For each update, insert the new score into the heap.</li>
+                        <li>When the heap size exceeds K, remove the smallest score.</li>
+                    </ul>
+
+                    <pre><code class="language-python">
+import heapq
+
+class Leaderboard:
+    def __init__(self, k):
+        self.k = k
+        self.heap = []  # Min-heap to track top K scores
+
+    def add_score(self, player, score):
+        heapq.heappush(self.heap, (score, player))
+        if len(self.heap) > self.k:
+            heapq.heappop(self.heap)  # Remove lowest score
+
+    def get_top_players(self):
+        return sorted(self.heap, reverse=True)
+
+# Example Usage:
+lb = Leaderboard(3)
+lb.add_score("Alice", 50)
+lb.add_score("Bob", 70)
+lb.add_score("Charlie", 65)
+lb.add_score("David", 80)
+
+print(lb.get_top_players())  # Top 3 players
+</code></pre>
+
+                    <p><strong>Scalability Considerations:</strong></p>
+                    <ul>
+                        <li>For large-scale leaderboards, store scores in Redis Sorted Sets (`ZADD` & `ZRANGE`).</li>
+                        <li>For frequent updates, maintain a lazy deletion heap to reduce expensive operations.</li>
+                    </ul>
+                </article>
+            </article>
+
+            <article>
+                <h3>24. Practicing Heaps Under Time Constraints</h3>
+                <p>Competitive programmers must implement heaps quickly & efficiently during contests.</p>
+
+                <article>
+                    <h4>24.1 Time-Based Coding Challenges</h4>
+                    <ul>
+                        <li>🕒 Implement a Max-Heap in 10 minutes</li>
+                        <li>🕒 Solve Kth Largest Element in 5 minutes</li>
+                        <li>🕒 Write Heap Sort in 15 minutes</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>24.2 Speed Practice Techniques</h4>
+                    <ul>
+                        <li>Master STL (C++), heapq (Python), PriorityQueue (Java).</li>
+                        <li>Use template functions for quick heap initialization.</li>
+                        <li>Understand heap optimizations to reduce unnecessary swaps.</li>
+                    </ul>
+                </article>
+            </article>
+
+            <article>
+                <h3>25. Quick Recap</h3>
+                <ul>
+                    <li>🎯 Solve 10 competitive programming problems using heaps.</li>
+                    <li>⚙️ Design a real-time leaderboard using heaps.</li>
+                    <li>⏳ Practice heap-based problems under time constraints.</li>
+                </ul>
+            </article>
+
+        </main>
+
+        <script> copyright("all"); </script>
+
+    </body>
+
+</html>

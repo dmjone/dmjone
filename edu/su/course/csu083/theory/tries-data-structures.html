@@ -1,0 +1,1063 @@
+<!-------------------------- © 2007 - present, dmj.one and contributors. ----------------------------------
+   Part of the dmjone project. Licensed under the GNU AGPL. Provided as-is, without warranty of any kind. 
+-------------------- Redistribution and modifications must retain this notice. --------------------------->
+
+
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+    <!--<![endif]-->
+
+    <head>
+        <script src="/js/edu_su_common.js"></script>
+        <noscript>
+            <style>
+                html,
+                body {
+                    margin: 0;
+                    overflow: hidden;
+                }
+            </style>
+            <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+        </noscript>
+
+        <title>Heaps in Data Structures - CSU083 | Shoolini University</title>
+
+        <meta name="description" content="Learn Heaps in Data Structures, covering heap properties, operations, optimizations, and real-world applications. Part of the CSU083 course at Shoolini University.">
+        <meta name="keywords" content="Heaps, Data Structures, Binary Heap, Min-Heap, Max-Heap, Heapify, DSA, Algorithms, Competitive Programming">
+        <meta name="author" content="Divya Mohan">
+        <meta name="robots" content="index, follow">
+
+        <!-- Open Graph for Social Media -->
+        <meta property="og:image" content="/logo.png">
+        <meta property="og:type" content="article">
+
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:site" content="@divyamohan1993">
+        <meta name="twitter:creator" content="@divyamohan1993">
+        <meta name="twitter:image" content="/logo.png">
+
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+        <meta name="author" content="Divya Mohan">
+        <meta name="robots" content="index, follow">
+
+        <!-- JSON-LD Structured Data for SEO -->
+        <script type="application/ld+json">
+            {
+              "@context": "https://schema.org",
+              "@type": "Course",
+              "name": "Heaps in Data Structures",
+              "description": "Learn Heap Data Structures with practical implementations and real-world applications in DSA.",
+              "provider": {
+                "@type": "EducationalOrganization",
+                "name": "Shoolini University",
+                "url": "https://shooliniuniversity.com"
+              }
+            }
+        </script>
+
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js" integrity="sha512-sHSNLECRJSK+BFs7E8DiFc6pf6n90bLI85Emiw1jhreduZhK3VXgq9l4kAt9eTIHYAcuQBKHL01QKs4/3Xgl8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js" integrity="sha512-iWiuBS5nt6r60fCz26Nd0Zqe0nbk1ZTIQbl3Kv7kYsX+yKMUFHzjaH2+AnM6vp2Xs+gNmaBAVWJjSmuPw76Efg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                renderMathInElement(document.body, {
+                    // customised options
+                    // • auto-render specific keys, e.g.:
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false },
+                        { left: '\\(', right: '\\)', display: false },
+                        { left: '\\[', right: '\\]', display: true }
+                    ],
+                    // • rendering keys, e.g.:
+                    throwOnError: false
+                });
+            });
+        </script> -->
+
+        <!-- <style>
+            main ul {
+                list-style-type: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            main ul li {
+                margin: 0;
+                padding: 0;
+            }
+        </style> -->
+
+
+
+    </head>
+
+    <body>
+
+        <script> header_author("dm"); </script>
+
+        <main>
+            <article class="agen-tableofcontents">
+                <h2 class="text-center">
+                    Tries in Data Structures
+                </h2>
+                <div class="d-none contentdate">2024, August 8</div>
+            </article>
+
+            <article>                
+                <h4>1. Prerequisites</h4>
+                <p>Before understanding Tries, it is essential to be familiar with the following concepts:</p>
+                <ul>
+                    <li><strong>Strings & Character Encoding</strong>: Tries store and search words efficiently.</li>
+                    <li><strong>Tree Data Structure</strong>: Tries are a specialized type of tree.</li>
+                    <li><strong>Hash Maps / Arrays</strong>: Trie nodes use an array or hash map to store child references.</li>
+                    <li><strong>Recursion & Iteration</strong>: Trie operations often involve traversal using recursion or loops.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h4>2. What is a Trie?</h4>
+                <p>A <strong>Trie</strong> (also known as a <strong>prefix tree</strong>) is a tree-like data structure used for fast string searching and storage.</p>
+                <ul>
+                    <li>Each node represents a <strong>character</strong>.</li>
+                    <li>Each path from the root to a node represents a <strong>prefix</strong> of one or more words.</li>
+                    <li>Words are stored as paths, with nodes marking the <strong>end of a word</strong>.</li>
+                </ul>
+                <p>Example Trie for words: <code>"cat", "car", "bat"</code></p>
+                <pre><code class="">
+         (root)
+        /      \
+      c         b
+     / \        |
+    a   a       a
+   /     \      |
+  t       r     t
+</code></pre>
+            </article>
+
+            <article>
+                <h4>3. Why Does This Algorithm Exist?</h4>
+                <p>Tries are used where fast string lookups and prefix-based queries are needed:</p>
+                <ul>
+                    <li><strong>Autocomplete Systems</strong>: Suggest words based on user input (Google Search, IDE code completion).</li>
+                    <li><strong>Spell Checkers</strong>: Quickly validate words in a dictionary.</li>
+                    <li><strong>IP Routing</strong>: Used in networking to match IP addresses with prefixes.</li>
+                    <li><strong>DNA Sequencing</strong>: Efficiently store and search genetic sequences.</li>
+                    <li><strong>Compression Algorithms</strong>: Used in Lempel-Ziv compression (LZ78, LZW).</li>
+                </ul>
+            </article>
+
+            <article>
+                <h4>4. When Should You Use It?</h4>
+                <p>Tries are ideal for scenarios involving:</p>
+                <ul>
+                    <li><strong>Fast prefix searching</strong>: Retrieve all words starting with a given prefix.</li>
+                    <li><strong>Word dictionaries</strong>: Store large collections of words efficiently.</li>
+                    <li><strong>Autocomplete suggestions</strong>: Retrieve suggestions based on partial input.</li>
+                    <li><strong>IP address matching</strong>: Route packets based on prefix-based IP tables.</li>
+                    <li><strong>Genome pattern matching</strong>: Search for substrings in genetic sequences.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h4>5. How Does It Compare to Alternatives?</h4>
+
+                <h5>5.1 Strengths</h5>
+                <ul>
+                    <li><strong>Fast Lookups</strong>: Performs word searches in <code>O(L)</code> time (L = word length).</li>
+                    <li><strong>Prefix Matching</strong>: Ideal for retrieving words with a common prefix.</li>
+                    <li><strong>Memory Efficient for Similar Words</strong>: Common prefixes are shared, reducing redundancy.</li>
+                </ul>
+
+                <h5>5.2 Weaknesses</h5>
+                <ul>
+                    <li><strong>High Space Complexity</strong>: Uses more memory than hash maps when words have fewer shared prefixes.</li>
+                    <li><strong>Not Ideal for Small Data</strong>: Hash maps may be faster for a small set of keys.</li>
+                    <li><strong>Complex Implementation</strong>: More difficult to implement compared to hash tables.</li>
+                </ul>
+
+                <h5>5.3 Comparison with Other Structures</h5>
+                <table class="table table-bordered">
+                    <tr>
+                        <th>Data Structure</th>
+                        <th>Time Complexity (Search)</th>
+                        <th>Space Complexity</th>
+                        <th>Best Use Case</th>
+                    </tr>
+                    <tr>
+                        <td>Trie</td>
+                        <td><code>O(L)</code></td>
+                        <td>High</td>
+                        <td>Prefix searches, autocomplete</td>
+                    </tr>
+                    <tr>
+                        <td>Hash Map</td>
+                        <td><code>O(1)</code> (average), <code>O(L)</code> (worst)</td>
+                        <td>Moderate</td>
+                        <td>Fast exact matches</td>
+                    </tr>
+                    <tr>
+                        <td>Binary Search Tree</td>
+                        <td><code>O(log N)</code></td>
+                        <td>Low</td>
+                        <td>Sorted searches</td>
+                    </tr>
+                </table>
+            </article>
+
+            <article>
+                <h4>6. Basic Implementation in Python</h4>
+                <p>The following is a basic implementation of a Trie in Python. It supports insertion and search operations.</p>
+
+                <pre><code class="language-python">
+class TrieNode:
+    def __init__(self):
+        self.children = {}  # Dictionary to store children nodes
+        self.is_end_of_word = False  # Marks the end of a word
+
+class Trie:
+    def __init__(self):
+        self.root = TrieNode()  # Root node of the Trie
+
+    def insert(self, word):
+        node = self.root
+        for char in word:
+            if char not in node.children:
+                node.children[char] = TrieNode()  # Create a new node if char not found
+            node = node.children[char]  # Move to the next node
+        node.is_end_of_word = True  # Mark the end of the word
+
+    def search(self, word):
+        node = self.root
+        for char in word:
+            if char not in node.children:
+                return False  # Word not found
+            node = node.children[char]  # Move to the next node
+        return node.is_end_of_word  # Check if it's the end of a word
+</code></pre>
+            </article>
+
+            <article>
+                <h4>7. Dry Run on a Small Input Set</h4>
+                <p>Let's insert the words <code>"cat"</code> and <code>"car"</code> into the Trie and search for them.</p>
+
+                <h5>7.1 Step-by-Step Insertion of "cat"</h5>
+                <table class="table table-bordered">
+                    <tr>
+                        <th>Step</th>
+                        <th>Character</th>
+                        <th>Action</th>
+                        <th>Trie Structure</th>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>'c'</td>
+                        <td>Create new node for 'c'</td>
+                        <td>(root) → 'c'</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>'a'</td>
+                        <td>Create new node for 'a'</td>
+                        <td>(root) → 'c' → 'a'</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>'t'</td>
+                        <td>Create new node for 't', mark end</td>
+                        <td>(root) → 'c' → 'a' → 't' (end)</td>
+                    </tr>
+                </table>
+
+                <h5>7.2 Step-by-Step Insertion of "car"</h5>
+                <table class="table table-bordered">
+                    <tr>
+                        <th>Step</th>
+                        <th>Character</th>
+                        <th>Action</th>
+                        <th>Trie Structure</th>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>'c'</td>
+                        <td>Already exists, move to 'c'</td>
+                        <td>(root) → 'c'</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>'a'</td>
+                        <td>Already exists, move to 'a'</td>
+                        <td>(root) → 'c' → 'a'</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>'r'</td>
+                        <td>Create new node for 'r', mark end</td>
+                        <td>(root) → 'c' → 'a' → 't' (end)</br>(root) → 'c' → 'a' → 'r' (end)</td>
+                    </tr>
+                </table>
+
+                <h5>7.3 Searching for "cat"</h5>
+                <table class="table table-bordered">
+                    <tr>
+                        <th>Step</th>
+                        <th>Character</th>
+                        <th>Action</th>
+                        <th>Current Node</th>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>'c'</td>
+                        <td>Exists, move to 'c'</td>
+                        <td>(root) → 'c'</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>'a'</td>
+                        <td>Exists, move to 'a'</td>
+                        <td>(root) → 'c' → 'a'</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>'t'</td>
+                        <td>Exists, move to 't'</td>
+                        <td>(root) → 'c' → 'a' → 't' (end)</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>-</td>
+                        <td>Reached end, word found</td>
+                        <td>✔</td>
+                    </tr>
+                </table>
+
+                <h5>7.4 Searching for "car"</h5>
+                <table class="table table-bordered">
+                    <tr>
+                        <th>Step</th>
+                        <th>Character</th>
+                        <th>Action</th>
+                        <th>Current Node</th>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>'c'</td>
+                        <td>Exists, move to 'c'</td>
+                        <td>(root) → 'c'</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>'a'</td>
+                        <td>Exists, move to 'a'</td>
+                        <td>(root) → 'c' → 'a'</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>'r'</td>
+                        <td>Exists, move to 'r'</td>
+                        <td>(root) → 'c' → 'a' → 'r' (end)</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>-</td>
+                        <td>Reached end, word found</td>
+                        <td>✔</td>
+                    </tr>
+                </table>
+
+                <h5>7.5 Searching for "cab"</h5>
+                <table class="table table-bordered">
+                    <tr>
+                        <th>Step</th>
+                        <th>Character</th>
+                        <th>Action</th>
+                        <th>Current Node</th>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>'c'</td>
+                        <td>Exists, move to 'c'</td>
+                        <td>(root) → 'c'</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>'a'</td>
+                        <td>Exists, move to 'a'</td>
+                        <td>(root) → 'c' → 'a'</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>'b'</td>
+                        <td>Not found, return False</td>
+                        <td>❌</td>
+                    </tr>
+                </table>
+
+                <p>The Trie correctly identifies words "cat" and "car" as present, and "cab" as missing.</p>
+            </article>
+
+            <article>
+                <h4>8. Time Complexity Analysis</h4>
+                <p>Trie operations depend on the length of the word (<code>L</code>) rather than the number of words (<code>N</code>), making them efficient for searching and prefix-based queries.</p>
+
+                <h5>8.1 Worst-Case Time Complexity</h5>
+                <ul>
+                    <li><strong>Insertion:</strong> <code>O(L)</code> (Each character needs a new node)</li>
+                    <li><strong>Search:</strong> <code>O(L)</code> (Each character must be checked in the Trie)</li>
+                    <li><strong>Deletion:</strong> <code>O(L)</code> (Need to traverse to the end and remove unnecessary nodes)</li>
+                </ul>
+                <p><strong>Explanation:</strong> The worst case occurs when every character in a word requires a new node, making the number of operations proportional to the word length.</p>
+
+                <h5>8.2 Best-Case Time Complexity</h5>
+                <ul>
+                    <li><strong>Insertion:</strong> <code>O(1)</code> (If the word already exists in the Trie)</li>
+                    <li><strong>Search:</strong> <code>O(1)</code> (If the first character does not exist)</li>
+                    <li><strong>Deletion:</strong> <code>O(1)</code> (If the word is not present, we return immediately)</li>
+                </ul>
+                <p><strong>Explanation:</strong> The best case occurs when searching for a word that is missing early in the Trie or already exists without modifications.</p>
+
+                <h5>8.3 Average-Case Time Complexity</h5>
+                <ul>
+                    <li><strong>Insertion:</strong> <code>O(L)</code> (Part of the prefix may already exist)</li>
+                    <li><strong>Search:</strong> <code>O(L)</code> (May traverse an existing path)</li>
+                    <li><strong>Deletion:</strong> <code>O(L)</code> (Removing a partial path)</li>
+                </ul>
+                <p><strong>Explanation:</strong> On average, some characters of a word will share nodes with others, reducing the number of new nodes created.</p>
+            </article>
+
+            <article>
+                <h4>9. Space Complexity Analysis</h4>
+                <p>The space complexity of a Trie depends on the number of nodes created.</p>
+
+                <h5>9.1 Worst-Case Space Complexity</h5>
+                <ul>
+                    <li><strong>Trie with N words, all unique prefixes:</strong> <code>O(N * L)</code></li>
+                </ul>
+                <p><strong>Explanation:</strong> If no words share prefixes, each character needs a new node, leading to high space usage.</p>
+
+                <h5>9.2 Best-Case Space Complexity</h5>
+                <ul>
+                    <li><strong>Trie with N words, all sharing a common prefix:</strong> <code>O(N)</code></li>
+                </ul>
+                <p><strong>Explanation:</strong> If all words share the same prefix, the Trie is highly compressed, reducing memory usage.</p>
+
+                <h5>9.3 Average-Case Space Complexity</h5>
+                <ul>
+                    <li><strong>Depends on the number of shared prefixes:</strong> <code>O(N * P)</code> (P is the average prefix length)</li>
+                </ul>
+                <p><strong>Explanation:</strong> Some words share prefixes, so the space complexity is reduced compared to the worst case.</p>
+
+                <h5>9.4 Space Optimization Strategies</h5>
+                <ul>
+                    <li><strong>Compressed Tries (Radix Tree):</strong> Merge consecutive nodes when possible.</li>
+                    <li><strong>Ternary Search Tries:</strong> Reduce space by using binary search properties.</li>
+                    <li><strong>Hash Maps Instead of Arrays:</strong> Use hash maps to reduce unused child pointers.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h4>10. Trade-offs</h4>
+
+                <h5>10.1 Advantages</h5>
+                <ul>
+                    <li><strong>Fast Lookups:</strong> Searching is <code>O(L)</code>, independent of the number of words.</li>
+                    <li><strong>Prefix-Based Searches:</strong> Efficient for autocomplete and dictionary applications.</li>
+                    <li><strong>Memory Efficient for Similar Words:</strong> Shared prefixes save space.</li>
+                </ul>
+
+                <h5>10.2 Disadvantages</h5>
+                <ul>
+                    <li><strong>High Memory Usage:</strong> If words do not share prefixes, space usage increases.</li>
+                    <li><strong>Not Ideal for Small Datasets:</strong> Hash maps are often more efficient for small word sets.</li>
+                    <li><strong>Implementation Complexity:</strong> Requires managing child nodes and deletion carefully.</li>
+                </ul>
+
+                <h5>10.3 When to Use Tries vs Alternatives</h5>
+                <table class="table table-bordered">
+                    <tr>
+                        <th>Data Structure</th>
+                        <th>Time Complexity (Search)</th>
+                        <th>Space Complexity</th>
+                        <th>Best Use Case</th>
+                    </tr>
+                    <tr>
+                        <td>Trie</td>
+                        <td><code>O(L)</code></td>
+                        <td>High</td>
+                        <td>Prefix searches, autocomplete</td>
+                    </tr>
+                    <tr>
+                        <td>Hash Table</td>
+                        <td><code>O(1)</code> (average), <code>O(L)</code> (worst)</td>
+                        <td>Moderate</td>
+                        <td>Fast exact matches</td>
+                    </tr>
+                    <tr>
+                        <td>Binary Search Tree</td>
+                        <td><code>O(log N)</code></td>
+                        <td>Low</td>
+                        <td>Sorted searches</td>
+                    </tr>
+                </table>
+            </article>
+
+            <article>
+
+                <h4>10. Common Optimizations</h4>
+                <p>Tries can be optimized to reduce memory usage and improve search efficiency. Below are some of the most common optimizations:</p>
+
+                <h5>10.1 Compressed Trie (Radix Tree)</h5>
+                <ul>
+                    <li><strong>Optimization:</strong> Compress paths with a single child into one node.</li>
+                    <li><strong>Benefit:</strong> Reduces space complexity by eliminating redundant single-child nodes.</li>
+                    <li><strong>Use Case:</strong> Ideal for storing long strings with many common prefixes.</li>
+                </ul>
+
+                <pre><code class="">
+Before Compression:
+(root) → "c" → "a" → "t"
+         → "c" → "a" → "r"
+
+After Compression:
+(root) → "cat"
+         → "car"
+</code></pre>
+
+                <h5>10.2 Ternary Search Trie (TST)</h5>
+                <ul>
+                    <li><strong>Optimization:</strong> Stores characters in a binary-search manner.</li>
+                    <li><strong>Benefit:</strong> Uses less space than traditional Tries.</li>
+                    <li><strong>Use Case:</strong> Efficient for dictionary-based searching with reduced memory usage.</li>
+                </ul>
+
+                <h5>10.3 Using Hash Maps Instead of Arrays</h5>
+                <ul>
+                    <li><strong>Optimization:</strong> Use hash maps instead of fixed-size arrays for child nodes.</li>
+                    <li><strong>Benefit:</strong> Saves memory when dealing with sparse alphabets.</li>
+                    <li><strong>Use Case:</strong> Useful when storing large dictionaries with varying word lengths.</li>
+                </ul>
+
+                <h5>10.4 Bitwise Tries</h5>
+                <ul>
+                    <li><strong>Optimization:</strong> Store binary representations instead of characters.</li>
+                    <li><strong>Benefit:</strong> Used in IP routing tables for efficient lookups.</li>
+                    <li><strong>Use Case:</strong> Network routers and firewall rule matching.</li>
+                </ul>
+
+            </article>
+
+            <article>
+                <h4>11. Variants of Tries</h4>
+
+                <h5>11.1 Standard Trie</h5>
+                <ul>
+                    <li><strong>Each node has multiple children.</strong></li>
+                    <li><strong>Supports fast prefix-based searching.</strong></li>
+                    <li><strong>Downside:</strong> High memory consumption.</li>
+                </ul>
+
+                <h5>11.2 Compressed (Radix) Trie</h5>
+                <ul>
+                    <li><strong>Compresses single-child paths.</strong></li>
+                    <li><strong>Reduces space complexity.</strong></li>
+                    <li><strong>Downside:</strong> Slightly more complex to implement.</li>
+                </ul>
+
+                <h5>11.3 Ternary Search Trie (TST)</h5>
+                <ul>
+                    <li><strong>Uses a binary search approach for character storage.</strong></li>
+                    <li><strong>More space-efficient than a standard Trie.</strong></li>
+                    <li><strong>Downside:</strong> Slower than standard Trie in some cases.</li>
+                </ul>
+
+                <h5>11.4 Patricia Trie</h5>
+                <ul>
+                    <li><strong>Similar to Radix Tree but eliminates unnecessary nodes.</strong></li>
+                    <li><strong>Optimized for applications like IP routing.</strong></li>
+                </ul>
+
+            </article>
+
+            <article>
+                <h4>12. Iterative vs. Recursive Implementations</h4>
+
+                <h5>12.1 Iterative Implementation</h5>
+                <p>Uses loops instead of recursion. It is more memory-efficient because it avoids function call overhead.</p>
+
+                <pre><code class="language-python">
+class Trie:
+    def __init__(self):
+        self.root = {}
+
+    def insert(self, word):
+        node = self.root
+        for char in word:
+            if char not in node:
+                node[char] = {}
+            node = node[char]
+        node['#'] = True  # Mark end of word
+
+    def search(self, word):
+        node = self.root
+        for char in word:
+            if char not in node:
+                return False
+            node = node[char]
+        return '#' in node
+</code></pre>
+
+                <h5>12.2 Recursive Implementation</h5>
+                <p>Uses recursion to traverse the Trie. It is elegant but can cause stack overflow for deep recursion.</p>
+
+                <pre><code class="language-python">
+class TrieNode:
+    def __init__(self):
+        self.children = {}
+        self.is_end_of_word = False
+
+class Trie:
+    def __init__(self):
+        self.root = TrieNode()
+
+    def insert_recursive(self, node, word, index):
+        if index == len(word):
+            node.is_end_of_word = True
+            return
+        char = word[index]
+        if char not in node.children:
+            node.children[char] = TrieNode()
+        self.insert_recursive(node.children[char], word, index + 1)
+
+    def insert(self, word):
+        self.insert_recursive(self.root, word, 0)
+
+    def search_recursive(self, node, word, index):
+        if index == len(word):
+            return node.is_end_of_word
+        char = word[index]
+        if char not in node.children:
+            return False
+        return self.search_recursive(node.children[char], word, index + 1)
+
+    def search(self, word):
+        return self.search_recursive(self.root, word, 0)
+</code></pre>
+
+                <h5>12.3 Comparison</h5>
+                <table class="table table-bordered">
+                    <tr>
+                        <th>Implementation</th>
+                        <th>Memory Efficiency</th>
+                        <th>Ease of Understanding</th>
+                        <th>Performance</th>
+                    </tr>
+                    <tr>
+                        <td>Iterative</td>
+                        <td>High (No function call overhead)</td>
+                        <td>Moderate</td>
+                        <td>Fast for shallow Tries</td>
+                    </tr>
+                    <tr>
+                        <td>Recursive</td>
+                        <td>Low (Recursive calls take extra space)</td>
+                        <td>More intuitive</td>
+                        <td>Slow for deep recursion</td>
+                    </tr>
+                </table>
+
+            </article>
+
+            <article>
+                <h4>13. Common Pitfalls and Edge Cases</h4>
+                <p>Tries must handle various edge cases to ensure robustness and correctness. Below are some common issues:</p>
+
+                <h5>13.1 Empty String Insertion</h5>
+                <ul>
+                    <li><strong>Issue:</strong> Should the Trie allow an empty string?</li>
+                    <li><strong>Fix:</strong> Define behavior explicitly – either store it or return an error.</li>
+                </ul>
+
+                <h5>13.2 Searching for a Non-Existent Word</h5>
+                <ul>
+                    <li><strong>Issue:</strong> A search for a missing word should return <code>False</code>.</li>
+                    <li><strong>Fix:</strong> Ensure traversal stops early if a character is missing.</li>
+                </ul>
+
+                <h5>13.3 Prefix vs. Full Word Searches</h5>
+                <ul>
+                    <li><strong>Issue:</strong> Searching for a prefix may incorrectly return <code>True</code>.</li>
+                    <li><strong>Fix:</strong> Ensure only full words are marked as valid using an <code>is_end_of_word</code> flag.</li>
+                </ul>
+
+                <h5>13.4 Deleting a Word with Shared Prefix</h5>
+                <ul>
+                    <li><strong>Issue:</strong> Removing a word should not delete shared prefixes.</li>
+                    <li><strong>Fix:</strong> Only remove nodes if they are not part of another word.</li>
+                </ul>
+
+                <h5>13.5 Case Sensitivity</h5>
+                <ul>
+                    <li><strong>Issue:</strong> Should <code>"Cat"</code> and <code>"cat"</code> be different words?</li>
+                    <li><strong>Fix:</strong> Define clear policies (e.g., convert all to lowercase).</li>
+                </ul>
+
+                <h5>13.6 Handling Special Characters</h5>
+                <ul>
+                    <li><strong>Issue:</strong> Tries should handle numbers, punctuation, and spaces.</li>
+                    <li><strong>Fix:</strong> Expand node structure to support non-alphabetic characters.</li>
+                </ul>
+
+            </article>
+
+            <article>
+                <h4>14. Test Cases to Verify Correctness</h4>
+                <p>To ensure correctness, we define test cases for common operations.</p>
+
+                <pre><code class="language-python">
+def test_trie():
+    trie = Trie()
+
+    # Test 1: Insert and Search Basic Words
+    trie.insert("apple")
+    assert trie.search("apple") == True  # Word should be found
+    assert trie.search("app") == False   # Prefix should not be a word
+    print("Test 1 passed")
+
+    # Test 2: Prefix Handling
+    trie.insert("app")
+    assert trie.search("app") == True  # Now 'app' should be found
+    print("Test 2 passed")
+
+    # Test 3: Case Sensitivity
+    trie.insert("Cat")
+    assert trie.search("Cat") == True
+    assert trie.search("cat") == False  # Case-sensitive check
+    print("Test 3 passed")
+
+    # Test 4: Deletion of Word with Shared Prefix
+    trie.insert("car")
+    trie.insert("cart")
+    trie.delete("car")
+    assert trie.search("car") == False  # 'car' should be removed
+    assert trie.search("cart") == True  # 'cart' should remain
+    print("Test 4 passed")
+
+    # Test 5: Handling Special Characters
+    trie.insert("hello-world")
+    assert trie.search("hello-world") == True
+    assert trie.search("hello") == False  # Should not return true for a prefix
+    print("Test 5 passed")
+
+    # Test 6: Searching Non-Existent Words
+    assert trie.search("banana") == False
+    print("Test 6 passed")
+
+    # Test 7: Empty String Handling
+    trie.insert("")
+    assert trie.search("") == False  # Should not store empty strings
+    print("Test 7 passed")
+
+test_trie()
+</code></pre>
+
+            </article>
+
+            <article>
+                <h4>15. Real-World Failure Scenarios</h4>
+
+                <h5>15.1 Incomplete Data Storage</h5>
+                <ul>
+                    <li><strong>Problem:</strong> Storing a large dictionary may be interrupted due to memory constraints.</li>
+                    <li><strong>Solution:</strong> Use a disk-backed Trie (e.g., Patricia Trie).</li>
+                </ul>
+
+                <h5>15.2 Large-Scale Performance Bottlenecks</h5>
+                <ul>
+                    <li><strong>Problem:</strong> Tries consume excessive memory when storing millions of words.</li>
+                    <li><strong>Solution:</strong> Use a compressed Trie or hash-based approach.</li>
+                </ul>
+
+                <h5>15.3 Security Issues</h5>
+                <ul>
+                    <li><strong>Problem:</strong> An attacker can perform denial-of-service (DoS) by inserting an excessive number of words.</li>
+                    <li><strong>Solution:</strong> Limit input size and use memory-efficient variants like Ternary Search Trie.</li>
+                </ul>
+
+                <h5>15.4 Multithreading & Concurrency Issues</h5>
+                <ul>
+                    <li><strong>Problem:</strong> If multiple threads insert words simultaneously, race conditions may occur.</li>
+                    <li><strong>Solution:</strong> Use thread-safe implementations or read-write locks.</li>
+                </ul>
+
+            </article>
+
+            <article>
+
+                <h4>16. How is This Algorithm Used in Real-World Applications?</h4>
+                <p>Tries are widely used in applications requiring fast string retrieval, prefix searching, and dictionary operations. Below are some practical use cases:</p>
+
+                <h5>16.1 Autocomplete & Search Suggestions</h5>
+                <ul>
+                    <li><strong>Example:</strong> Google Search, IDEs (IntelliJ, VS Code) use Tries to suggest words as you type.</li>
+                    <li><strong>Why?</strong> Tries allow fast retrieval of words that share a common prefix.</li>
+                </ul>
+
+                <h5>16.2 Spell Checking</h5>
+                <ul>
+                    <li><strong>Example:</strong> Grammarly, Microsoft Word use Tries to check word validity.</li>
+                    <li><strong>Why?</strong> A dictionary stored in a Trie enables O(L) lookup for valid words.</li>
+                </ul>
+
+                <h5>16.3 IP Routing (Longest Prefix Match)</h5>
+                <ul>
+                    <li><strong>Example:</strong> Routers use Patricia Tries to store IP address prefixes.</li>
+                    <li><strong>Why?</strong> Searching for the longest matching prefix in O(L) is optimal for networking.</li>
+                </ul>
+
+                <h5>16.4 DNA Sequence Matching</h5>
+                <ul>
+                    <li><strong>Example:</strong> Bioinformatics tools use Tries to store and search genetic sequences.</li>
+                    <li><strong>Why?</strong> Genetic sequences are essentially long strings that need fast substring searching.</li>
+                </ul>
+
+                <h5>16.5 Text Compression (Lempel-Ziv Algorithms)</h5>
+                <ul>
+                    <li><strong>Example:</strong> GIF, PNG, ZIP file formats use Tries in dictionary-based compression.</li>
+                    <li><strong>Why?</strong> Tries help in efficiently storing and retrieving repeating patterns.</li>
+                </ul>
+
+                <h5>16.6 Auto-Correct & Keyboard Input Prediction</h5>
+                <ul>
+                    <li><strong>Example:</strong> SwiftKey, Gboard use Tries to correct and predict words.</li>
+                    <li><strong>Why?</strong> Tries quickly find words close to user input.</li>
+                </ul>
+
+                <h5>16.7 Database Indexing</h5>
+                <ul>
+                    <li><strong>Example:</strong> Search engines and key-value stores optimize lookups using Tries.</li>
+                    <li><strong>Why?</strong> Tries support fast range queries and prefix-based retrieval.</li>
+                </ul>
+
+            </article>
+
+            <article>
+                <h4>17. Open-Source Implementations of Tries</h4>
+                <p>Many open-source libraries implement Tries for various purposes:</p>
+
+                <h5>17.1 Python Libraries</h5>
+                <ul>
+                    <li><strong>Trie Package:</strong> <a href="https://pypi.org/project/pygtrie/">pygtrie</a> - A library for prefix trees.</li>
+                    <li><strong>DAWG:</strong> <a href="https://github.com/pytries/DAWG">Directed Acyclic Word Graph</a> - A space-efficient Trie variation.</li>
+                </ul>
+
+                <h5>17.2 Java Libraries</h5>
+                <ul>
+                    <li><strong>Apache Commons:</strong> <a href="https://commons.apache.org/">Apache Commons Collections</a> - Offers Trie-based implementations.</li>
+                </ul>
+
+                <h5>17.3 C++ Libraries</h5>
+                <ul>
+                    <li><strong>libtrie:</strong> <a href="https://github.com/kumpera/libtrie">Trie Data Structure</a> - An optimized C++ implementation.</li>
+                </ul>
+
+                <h5>17.4 Trie Implementations in Search Engines</h5>
+                <ul>
+                    <li><strong>Elasticsearch:</strong> Uses Tries for autocomplete and indexing.</li>
+                    <li><strong>Sphinx Search:</strong> Implements Tries for fast text searches.</li>
+                </ul>
+
+            </article>
+
+            <article>
+                <h4>18. Practical Project: Implementing a Trie-Based Autocomplete System</h4>
+                <p>Let's build a simple command-line autocomplete tool using Tries in Python.</p>
+
+                <h5>18.1 Python Implementation</h5>
+                <pre><code class="language-python">
+class TrieNode:
+    def __init__(self):
+        self.children = {}
+        self.is_end_of_word = False
+
+class Trie:
+    def __init__(self):
+        self.root = TrieNode()
+
+    def insert(self, word):
+        node = self.root
+        for char in word:
+            if char not in node.children:
+                node.children[char] = TrieNode()
+            node = node.children[char]
+        node.is_end_of_word = True
+
+    def autocomplete(self, prefix):
+        def dfs(node, prefix, results):
+            if node.is_end_of_word:
+                results.append(prefix)
+            for char, next_node in node.children.items():
+                dfs(next_node, prefix + char, results)
+        
+        node = self.root
+        for char in prefix:
+            if char not in node.children:
+                return []  # No matches
+            node = node.children[char]
+        
+        results = []
+        dfs(node, prefix, results)
+        return results
+
+# Sample Usage
+trie = Trie()
+words = ["cat", "car", "cart", "care", "dog", "dot"]
+for word in words:
+    trie.insert(word)
+
+prefix = input("Enter prefix: ").strip()
+suggestions = trie.autocomplete(prefix)
+print("Suggestions:", suggestions)
+</code></pre>
+
+                <h5>18.2 How It Works</h5>
+                <ul>
+                    <li>Inserts words into a Trie.</li>
+                    <li>Uses a DFS-based approach to find all words matching a prefix.</li>
+                    <li>Returns autocomplete suggestions efficiently.</li>
+                </ul>
+
+                <h5>18.3 Example Run</h5>
+                <pre><code class="">
+Input: "ca"
+Output: ['cat', 'car', 'cart', 'care']
+
+Input: "do"
+Output: ['dog', 'dot']
+
+Input: "x"
+Output: []
+</code></pre>
+
+                <h5>18.4 Possible Extensions</h5>
+                <ul>
+                    <li>Connect to a database for real-world applications.</li>
+                    <li>Integrate with a web UI for an interactive search bar.</li>
+                    <li>Implement frequency-based ranking for better suggestions.</li>
+                </ul>
+
+            </article>
+
+            <article>            
+                <h4>19. Competitive Programming Assignments</h4>
+                <p>To master Tries, solve at least 10 problems that cover different applications of the algorithm. Below are problem suggestions categorized by difficulty.</p>
+
+                <h5>19.1 Beginner Problems (Basic Insertion & Search)</h5>
+                <ol>
+                    <li><strong>Implement a Trie:</strong> Write a Trie with insert and search functions. (<a href="https://leetcode.com/problems/implement-trie-prefix-tree/">Leetcode 208</a>)</li>
+                    <li><strong>Prefix Search:</strong> Implement a function to check if a word starts with a given prefix. (<a href="https://leetcode.com/problems/implement-trie-prefix-tree/">Leetcode 208</a>)</li>
+                </ol>
+
+                <h5>19.2 Intermediate Problems (Prefix-Based Queries)</h5>
+                <ol start="3">
+                    <li><strong>Longest Common Prefix:</strong> Find the longest common prefix among a set of words. (<a href="https://leetcode.com/problems/longest-common-prefix/">Leetcode 14</a>)</li>
+                    <li><strong>Replace Words:</strong> Replace words in a sentence with their shortest root found in a dictionary. (<a href="https://leetcode.com/problems/replace-words/">Leetcode 648</a>)</li>
+                    <li><strong>Maximum XOR of Two Numbers in an Array:</strong> Use Tries to maximize the XOR of two numbers. (<a href="https://leetcode.com/problems/maximum-xor-of-two-numbers-in-an-array/">Leetcode 421</a>)</li>
+                </ol>
+
+                <h5>19.3 Advanced Problems (Optimization & Memory Constraints)</h5>
+                <ol start="6">
+                    <li><strong>Palindrome Pairs:</strong> Find all word pairs that form palindromes when concatenated. (<a href="https://leetcode.com/problems/palindrome-pairs/">Leetcode 336</a>)</li>
+                    <li><strong>Search Suggestions System:</strong> Build an autocomplete system that returns a sorted list of words matching the prefix. (<a href="https://leetcode.com/problems/search-suggestions-system/">Leetcode 1268</a>)</li>
+                    <li><strong>Word Search II:</strong> Use a Trie and backtracking to find words in a 2D grid. (<a href="https://leetcode.com/problems/word-search-ii/">Leetcode 212</a>)</li>
+                </ol>
+
+                <h5>19.4 Expert-Level Problems (System Optimization & Scalability)</h5>
+                <ol start="9">
+                    <li><strong>Add and Search Word:</strong> Implement a data structure that supports adding and searching words with wildcards. (<a href="https://leetcode.com/problems/design-add-and-search-words-data-structure/">Leetcode 211</a>)</li>
+                    <li><strong>Concatenated Words:</strong> Find words that can be formed by concatenating other words in a list. (<a href="https://leetcode.com/problems/concatenated-words/">Leetcode 472</a>)</li>
+                </ol>
+
+            </article>
+
+            <article>
+                <h4>20. System Design Integration - Using Tries in a Large-Scale System</h4>
+                <p>Tries can be used in system design to handle high-performance text-based queries. Below is a design problem to implement Tries in a scalable way.</p>
+
+                <h5>20.1 Design a Scalable Autocomplete System</h5>
+                <p><strong>Problem Statement:</strong> You are designing an autocomplete feature for a large-scale application. Millions of users search for words every second, and the system must provide relevant suggestions with low latency.</p>
+
+                <h5>20.2 Challenges</h5>
+                <ul>
+                    <li>Handling a large dataset (millions of words).</li>
+                    <li>Providing fast prefix-based search (<code>O(L)</code> lookup time).</li>
+                    <li>Ensuring scalability across multiple servers.</li>
+                    <li>Efficient storage to minimize memory usage.</li>
+                    <li>Ranking words based on popularity.</li>
+                </ul>
+
+                <h5>20.3 System Design Architecture</h5>
+                <ol>
+                    <li><strong>Data Storage:</strong> Store words in a distributed Trie, partitioned across servers.</li>
+                    <li><strong>Caching Layer:</strong> Use Redis to cache frequently searched prefixes.</li>
+                    <li><strong>Sharding Strategy:</strong> Distribute words by first character to different nodes.</li>
+                    <li><strong>Ranking Engine:</strong> Maintain frequency counts to rank autocomplete results.</li>
+                </ol>
+
+                <h5>20.4 Technologies to Use</h5>
+                <ul>
+                    <li>Trie Implementation: Python, Java, or C++</li>
+                    <li>Database: PostgreSQL or NoSQL (MongoDB for flexible storage)</li>
+                    <li>Caching: Redis</li>
+                    <li>Load Balancer: Nginx or AWS ELB</li>
+                    <li>Indexing: Elasticsearch for fast retrieval</li>
+                </ul>
+
+                <h5>20.5 Design Diagram</h5>
+                <p><em>High-level architecture for a Trie-based autocomplete system:</em></p>
+                <img class="img-fluid dynamicimg imgblacktowhite mx-auto" loading="lazy" src="https://mermaid.ink/img/pako:eNqFkbFuwjAQQH8lujlEtgNJcKUOLUOHsgBd2jBckyuxlMSR7VSlwL_XhFSiYqinO7_ns313gEKXBBJ2Brsq2Czu8jbw68WSCSaT--BZY_mANbYFmZFdbw3OIxYVva2oVPYSb0dzSM7K8Um5Y7Ai29fO3sClsvYYbIyiNZlPMvxfQ4zG1ZnhJQt0-I6WbrD4iyGEhkyDqvRfP5zlHFxFDeUgfVirXeVyyNuTF7F3er1vC5DO9BSC0f2uAvmBtfVZ35XoaKHQN7D5VTpsQR7gC2TCIz6fxTOW8iRmLJ6GsAfJBYs4n03FPE2YYFmWnUL41toXYFEqeJpkImGMCR4nYij3OsDxTt9op83yMrhhfqcf2rmMeQ?type=png" />
+                
+
+            </article>
+
+            <article>
+                <h4>21. Practicing Implementation Under Time Constraints</h4>
+                <p>To be effective in competitive programming, you must implement Tries quickly under time pressure. Follow this training plan:</p>
+
+                <h5>21.1 Time-Based Challenges</h5>
+                <ul>
+                    <li>Implement a Trie in <strong>15 minutes</strong>.</li>
+                    <li>Insert and search words in <strong>10 minutes</strong>.</li>
+                    <li>Implement autocomplete using DFS in <strong>20 minutes</strong>.</li>
+                    <li>Solve at least 3 Leetcode Trie problems in <strong>1 hour</strong>.</li>
+                </ul>
+
+                <h5>21.2 Resources for Time-Based Practice</h5>
+                <ul>
+                    <li><a href="https://leetcode.com/">Leetcode</a></li>
+                    <li><a href="https://www.codechef.com/">CodeChef</a></li>
+                    <li><a href="https://www.hackerrank.com/">HackerRank</a></li>
+                </ul>
+
+                <h5>21.3 Speed Optimization Tips</h5>
+                <ul>
+                    <li><strong>Use Iterative Over Recursive:</strong> Avoid deep recursion for large input sizes.</li>
+                    <li><strong>Hash Map for Storage:</strong> Use hash maps instead of fixed-size arrays.</li>
+                    <li><strong>Precompute Results:</strong> Cache frequent queries.</li>
+                </ul>
+
+            </article>
+
+
+
+
+
+        </main>
+
+        <script> copyright("all"); </script>
+
+    </body>
+
+</html>

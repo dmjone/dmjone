@@ -1,0 +1,867 @@
+<!-------------------------- © 2007 - present, dmj.one and contributors. ----------------------------------
+   Part of the dmjone project. Licensed under the GNU AGPL. Provided as-is, without warranty of any kind. 
+-------------------- Redistribution and modifications must retain this notice. --------------------------->
+
+
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+    <!--<![endif]-->
+
+    <head>
+        <script src="/js/edu_su_common.js"></script>
+        <noscript>
+            <style>
+                html,
+                body {
+                    margin: 0;
+                    overflow: hidden;
+                }
+            </style>
+            <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+        </noscript>
+
+        <title>Bloom Filters in Data Structures - CSU083 | Shoolini University</title>
+
+        <meta name="description" content="Learn Bloom Filters in Data Structures, covering concepts, implementations, optimizations, real-world applications, and competitive programming use cases. Part of the CSU083 course at Shoolini University.">
+        <meta name="keywords" content="Bloom Filters, Probabilistic Data Structures, Hash Functions, False Positives, Counting Bloom Filters, Scalable Bloom Filters, Competitive Programming, System Design, Set Membership">
+        <meta name="author" content="Divya Mohan">
+        <meta name="robots" content="index, follow">
+
+        <!-- Open Graph for Social Media -->
+        <meta property="og:title" content="Bloom Filters in Data Structures - CSU083 | Shoolini University">
+        <meta property="og:description" content="Comprehensive guide on Bloom Filters, covering theory, implementation, optimizations, and real-world applications in databases, security, and networking.">
+        <meta property="og:image" content="/logo.png">
+        <meta property="og:type" content="article">
+        <meta property="og:url" content="https://shooliniuniversity.com/csu083/bloom-filters">
+
+        <!-- Twitter Cards -->
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:title" content="Bloom Filters in Data Structures">
+        <meta name="twitter:description" content="Master Bloom Filters with a deep dive into implementations, use cases, and optimizations in system design and competitive programming.">
+        <meta name="twitter:site" content="@divyamohan1993">
+        <meta name="twitter:creator" content="@divyamohan1993">
+        <meta name="twitter:image" content="/logo.png">
+
+        <!-- Mobile Responsiveness -->
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <!-- JSON-LD Structured Data for SEO -->
+        <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "Course",
+          "name": "Bloom Filters in Data Structures",
+          "description": "Master Bloom Filters in Data Structures, covering fundamental concepts, hash functions, optimizations, applications in databases, security, and competitive programming.",
+          "provider": [
+            {
+              "@type": "EducationalOrganization",
+              "name": "dmj.one",
+              "url": "https://dmj.one"
+            },
+            {
+              "@type": "EducationalOrganization",
+              "name": "Shoolini University",
+              "url": "https://shooliniuniversity.com"
+            }
+          ]
+        }
+        </script>
+
+
+
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js" integrity="sha512-sHSNLECRJSK+BFs7E8DiFc6pf6n90bLI85Emiw1jhreduZhK3VXgq9l4kAt9eTIHYAcuQBKHL01QKs4/3Xgl8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js" integrity="sha512-iWiuBS5nt6r60fCz26Nd0Zqe0nbk1ZTIQbl3Kv7kYsX+yKMUFHzjaH2+AnM6vp2Xs+gNmaBAVWJjSmuPw76Efg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                renderMathInElement(document.body, {
+                    // customised options
+                    // • auto-render specific keys, e.g.:
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false },
+                        { left: '\\(', right: '\\)', display: false },
+                        { left: '\\[', right: '\\]', display: true }
+                    ],
+                    // • rendering keys, e.g.:
+                    throwOnError: false
+                });
+            });
+        </script> -->
+
+        <!-- <style>
+            main ul {
+                list-style-type: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            main ul li {
+                margin: 0;
+                padding: 0;
+            }
+        </style> -->
+
+
+
+    </head>
+
+    <body>
+
+        <script> header_author("dm"); </script>
+
+        <main>
+            <article class="agen-tableofcontents">
+                <h2 class="text-center">
+                    Bloom Filters
+                </h2>
+                <div class="d-none contentdate">2024, August 2</div>
+            </article>
+
+
+            <article>
+                <h3>1. Bloom Filters</h3>
+                <p>Bloom filters are a space-efficient probabilistic data structure used to test whether an element is a member of a set, with a possibility of false positives but no false negatives. They are widely used in scenarios where memory constraints exist, and an exact membership test is unnecessary.</p>
+            </article>
+
+            <article>
+                <h3>2. Prerequisites</h3>
+                <p>Before understanding Bloom Filters, you should be familiar with the following concepts:</p>
+                <ul>
+                    <li><strong>Hash Functions</strong>: A deterministic function that maps input data to a fixed-size output.</li>
+                    <li><strong>Bit Arrays</strong>: A sequence of bits where each bit can be set (1) or unset (0).</li>
+                    <li><strong>Set Theory</strong>: Understanding membership testing (i.e., checking if an element is in a set).</li>
+                    <li><strong>Probability & False Positives</strong>: The concept of probabilistic guarantees rather than absolute certainty.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>3. What is a Bloom Filter?</h3>
+                <p>A Bloom filter is a fixed-size bit array initialized with all bits set to 0. It uses multiple independent hash functions to determine positions in this bit array where an element should be recorded.</p>
+
+                <h4>3.1 How it Works</h4>
+                <ul>
+                    <li>To <strong>insert</strong> an element: Compute multiple hash values for the element and set the corresponding bit positions to 1 in the bit array.</li>
+                    <li>To <strong>query</strong> an element: Compute the hash values and check if all corresponding bits are set to 1.</li>
+                    <li>If all bits are 1, the element is <strong>probably present</strong>; if any bit is 0, the element is <strong>definitely absent</strong>.</li>
+                </ul>
+
+                <h4>3.2 Key Properties</h4>
+                <ul>
+                    <li><strong>False Positives:</strong> A Bloom filter may wrongly indicate presence due to hash collisions.</li>
+                    <li><strong>No False Negatives:</strong> If an element was inserted, it will always be found.</li>
+                    <li><strong>Fixed Size:</strong> Memory usage does not grow with the number of elements.</li>
+                    <li><strong>Irreversible:</strong> Cannot delete elements directly without using variants like Counting Bloom Filters.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>4. Why Does This Algorithm Exist?</h3>
+                <p>Bloom filters exist to provide fast and memory-efficient set membership testing in cases where exact results are unnecessary. They are used in:</p>
+
+                <h4>4.1 Real-world Use Cases</h4>
+                <ul>
+                    <li><strong>Database Query Optimization:</strong> Avoids unnecessary disk lookups by quickly checking if a key is present.</li>
+                    <li><strong>Network Security & Caching:</strong> Helps in detecting malicious URLs or filtering spam emails.</li>
+                    <li><strong>Distributed Systems:</strong> Used in distributed databases like Cassandra and Bigtable to check for the existence of keys before fetching data.</li>
+                    <li><strong>Blockchain & Cryptography:</strong> Used in Bitcoin to filter transactions.</li>
+                    <li><strong>Web Crawlers:</strong> Prevents visiting duplicate URLs.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>5. When Should You Use Bloom Filters?</h3>
+                <ul>
+                    <li>When memory is constrained and set membership testing is required.</li>
+                    <li>When false positives are acceptable but false negatives are not.</li>
+                    <li>When the set is large and constantly growing.</li>
+                    <li>When approximate answers are sufficient (e.g., web crawlers, DNS caching, fraud detection).</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>6. Comparison with Alternatives</h3>
+
+                <h4>6.1 Strengths</h4>
+                <ul>
+                    <li>Extremely memory-efficient compared to traditional hash sets.</li>
+                    <li>O(1) time complexity for insertions and queries.</li>
+                    <li>Does not require storing elements, reducing storage costs.</li>
+                </ul>
+
+                <h4>6.2 Weaknesses</h4>
+                <ul>
+                    <li>Cannot delete elements without specialized variants (e.g., Counting Bloom Filters).</li>
+                    <li>Introduces false positives, which may lead to unnecessary checks.</li>
+                    <li>Not suitable when exact set membership is required.</li>
+                </ul>
+
+                <h4>6.3 Alternatives</h4>
+                <table class="table table-bordered">
+                    <tr>
+                        <th>Alternative</th>
+                        <th>Memory Usage</th>
+                        <th>False Positives</th>
+                        <th>Deletions</th>
+                        <th>Best Use Case</th>
+                    </tr>
+                    <tr>
+                        <td>Hash Set</td>
+                        <td>High</td>
+                        <td>No</td>
+                        <td>Yes</td>
+                        <td>Exact membership testing</td>
+                    </tr>
+                    <tr>
+                        <td>Counting Bloom Filter</td>
+                        <td>Moderate</td>
+                        <td>Yes</td>
+                        <td>Yes</td>
+                        <td>When deletions are needed</td>
+                    </tr>
+                    <tr>
+                        <td>Cuckoo Filter</td>
+                        <td>Moderate</td>
+                        <td>Lower than Bloom Filter</td>
+                        <td>Yes</td>
+                        <td>Exact deletions with low memory overhead</td>
+                    </tr>
+                </table>
+            </article>
+
+
+            <article>
+                <h3>7. Python Implementation</h3>
+                <p>The implementation uses:</p>
+                <ul>
+                    <li>A bit array initialized with all bits set to 0.</li>
+                    <li>Multiple hash functions for mapping elements.</li>
+                    <li>Insertion that sets bits at computed positions.</li>
+                    <li>Querying that checks if all bits at computed positions are set.</li>
+                </ul>
+
+                <pre><code class="language-python">import hashlib
+import bitarray
+
+class BloomFilter:
+    def __init__(self, size, hash_count):
+        self.size = size  # Number of bits in the bit array
+        self.hash_count = hash_count  # Number of hash functions
+        self.bit_array = bitarray.bitarray(size)  # Bit array
+        self.bit_array.setall(0)  # Initialize all bits to 0
+
+    def _hashes(self, item):
+        """Generate multiple hash values for an item."""
+        return [int(hashlib.md5((item + str(i)).encode()).hexdigest(), 16) % self.size for i in range(self.hash_count)]
+
+    def add(self, item):
+        """Insert an item into the Bloom Filter."""
+        for hash_val in self._hashes(item):
+            self.bit_array[hash_val] = 1
+
+    def check(self, item):
+        """Check if an item is probably present."""
+        return all(self.bit_array[hash_val] for hash_val in self._hashes(item))
+
+# Example Usage
+bf = BloomFilter(10, 2)  # Bit array size = 10, 2 hash functions
+bf.add("hello")          # Insert "hello"
+print(bf.check("hello")) # True (Probably present)
+print(bf.check("world")) # False (Definitely not present)
+</code></pre>
+            </article>
+
+            <article>
+                <h3>8. Dry Run (Step-by-Step Execution)</h3>
+
+                <h4>8.1 Initial State</h4>
+                <p>Bit array before insertion:</p>
+                <pre><code class="language-auto">[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]</code></pre>
+
+                <h4>8.2 Inserting "hello"</h4>
+                <p>Hash values computed using `_hashes("hello")`:</p>
+                <ul>
+                    <li>Hash 1: `hashlib.md5("hello0")` → Index `3`</li>
+                    <li>Hash 2: `hashlib.md5("hello1")` → Index `7`</li>
+                </ul>
+                <p>Bit array after inserting "hello":</p>
+                <pre><code class="language-auto">[0, 0, 0, 1, 0, 0, 0, 1, 0, 0]</code></pre>
+
+                <h4>8.3 Checking "hello"</h4>
+                <ul>
+                    <li>Hash 1: Index `3` → `bit_array[3] = 1`</li>
+                    <li>Hash 2: Index `7` → `bit_array[7] = 1`</li>
+                </ul>
+                <p>All bits are 1 → "hello" is probably present.</p>
+
+                <h4>8.4 Checking "world"</h4>
+                <ul>
+                    <li>Hash 1: `hashlib.md5("world0")` → Index `2`</li>
+                    <li>Hash 2: `hashlib.md5("world1")` → Index `9`</li>
+                </ul>
+                <p>Bit array check:</p>
+                <pre><code class="language-auto">[0, 0, <strong>0</strong>, 1, 0, 0, 0, 1, 0, <strong>0</strong>]</code></pre>
+                <ul>
+                    <li>`bit_array[2] = 0` → "world" is definitely NOT present.</li>
+                    <li>`bit_array[9] = 0` → Confirms non-membership.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>9. Quick Recap</h3>
+                <ul>
+                    <li>Insertion modifies the bit array at positions determined by hash functions.</li>
+                    <li>Checking involves verifying that all corresponding bits are set.</li>
+                    <li>A lookup can yield false positives but never false negatives.</li>
+                    <li>Memory usage remains low, making it suitable for large-scale applications.</li>
+                </ul>
+            </article>
+
+
+            <article>
+                <h3>10. Time Complexity Analysis</h3>
+
+                <h4>10.1 Insertion Complexity</h4>
+                <ul>
+                    <li>A Bloom filter inserts an element by computing <strong>k</strong> hash functions and setting <strong>k</strong> bits in the bit array.</li>
+                    <li>Each hash function runs in <strong>O(1)</strong>, so the total time complexity for insertion is:</li>
+                </ul>
+                <p><strong>O(k)</strong> (where <strong>k</strong> is the number of hash functions)</p>
+
+                <h4>10.2 Query (Lookup) Complexity</h4>
+                <ul>
+                    <li>To check if an element is in the set, the Bloom filter calculates <strong>k</strong> hash functions and verifies if all <strong>k</strong> corresponding bits are set.</li>
+                    <li>Each hash function runs in <strong>O(1)</strong>, so the total time complexity for a lookup is:</li>
+                </ul>
+                <p><strong>O(k)</strong></p>
+
+                <h4>10.3 Deletion Complexity</h4>
+                <ul>
+                    <li>Standard Bloom filters do not support deletion.</li>
+                    <li>In Counting Bloom Filters, deletions involve decrementing counters instead of flipping bits, which results in the same complexity as insertion:</li>
+                </ul>
+                <p><strong>O(k)</strong></p>
+
+                <h4>10.4 Worst, Best, and Average Case Complexity</h4>
+                <table class="table table-bordered">
+                    <tr>
+                        <th>Operation</th>
+                        <th>Best Case</th>
+                        <th>Average Case</th>
+                        <th>Worst Case</th>
+                    </tr>
+                    <tr>
+                        <td>Insertion</td>
+                        <td>O(k)</td>
+                        <td>O(k)</td>
+                        <td>O(k)</td>
+                    </tr>
+                    <tr>
+                        <td>Lookup</td>
+                        <td>O(k)</td>
+                        <td>O(k)</td>
+                        <td>O(k)</td>
+                    </tr>
+                    <tr>
+                        <td>Deletion (Counting Bloom Filter)</td>
+                        <td>O(k)</td>
+                        <td>O(k)</td>
+                        <td>O(k)</td>
+                    </tr>
+                </table>
+            </article>
+
+            <article>
+                <h3>11. Space Complexity Analysis</h3>
+
+                <h4>11.1 Space Complexity Formula</h4>
+                <p>Given a Bloom filter with:</p>
+                <ul>
+                    <li>n = expected number of elements</li>
+                    <li>m = number of bits in the bit array</li>
+                    <li>k = number of hash functions</li>
+                    <li>p = desired false positive probability</li>
+                </ul>
+                <p>The optimal bit array size m is given by:</p>
+                <p>$$ m = -\frac{n \ln p}{(\ln 2)^2} $$</p>
+                <p>The optimal number of hash functions k is:</p>
+                <p>$$ k = \frac{m}{n} \ln 2 $$</p>
+
+                <h4>11.2 Space Complexity Growth</h4>
+                <ul>
+                    <li>The space complexity of a Bloom filter grows linearly with the number of elements n.</li>
+                    <li>Unlike traditional hash tables that store full elements, Bloom filters only store bits, leading to significant space savings.</li>
+                    <li>For small false positive probabilities, the bit array grows larger.</li>
+                </ul>
+                <p>Overall, the space complexity is:</p>
+                <p><strong>O(n)</strong> (linear with respect to the number of elements)</p>
+            </article>
+
+            <article>
+                <h3>12. Trade-offs in Bloom Filters</h3>
+
+                <h4>12.1 Strengths</h4>
+                <ul>
+                    <li>Low memory usage compared to hash sets.</li>
+                    <li>Fast O(k) insertions and lookups.</li>
+                    <li>Scalable for large datasets.</li>
+                </ul>
+
+                <h4>12.2 Weaknesses</h4>
+                <ul>
+                    <li>False Positives: No guarantee of exact set membership.</li>
+                    <li>No Deletions: Standard Bloom filters do not support element removal.</li>
+                    <li>Fixed Size: Once created, size cannot be adjusted dynamically.</li>
+                </ul>
+
+                <h4>12.3 Comparison with Alternatives</h4>
+                <table class="table table-bordered">
+                    <tr>
+                        <th>Data Structure</th>
+                        <th>Time Complexity (Insert/Lookup)</th>
+                        <th>Space Complexity</th>
+                        <th>False Positives</th>
+                        <th>Deletions</th>
+                    </tr>
+                    <tr>
+                        <td>Bloom Filter</td>
+                        <td>O(k)</td>
+                        <td>O(n)</td>
+                        <td>Yes</td>
+                        <td>No</td>
+                    </tr>
+                    <tr>
+                        <td>Hash Set</td>
+                        <td>O(1)</td>
+                        <td>O(n log n)</td>
+                        <td>No</td>
+                        <td>Yes</td>
+                    </tr>
+                    <tr>
+                        <td>Counting Bloom Filter</td>
+                        <td>O(k)</td>
+                        <td>O(n)</td>
+                        <td>Yes (Lower)</td>
+                        <td>Yes</td>
+                    </tr>
+                    <tr>
+                        <td>Cuckoo Filter</td>
+                        <td>O(1)</td>
+                        <td>O(n)</td>
+                        <td>Lower</td>
+                        <td>Yes</td>
+                    </tr>
+                </table>
+            </article>
+
+            <article>
+                <h3>13. Quick Recap</h3>
+                <ul>
+                    <li>Bloom filters offer O(k) time complexity for insertions and lookups.</li>
+                    <li>They achieve O(n) space complexity, making them highly memory-efficient.</li>
+                    <li>Trade-offs include false positives and lack of deletions.</li>
+                    <li>They outperform hash sets when memory is constrained and false positives are tolerable.</li>
+                </ul>
+            </article>
+
+
+            <article>
+                <h3>14. Common Optimizations</h3>
+
+                <h4>14.1 Optimal Number of Hash Functions</h4>
+                <ul>
+                    <li>The number of hash functions k affects both efficiency and false positive probability.</li>
+                    <li>The optimal value of k is calculated as:</li>
+                    <p>$$ k = \frac{m}{n} \ln 2 $$</p>
+                    <li>Avoiding too many hash functions improves performance without significantly increasing false positives.</li>
+                </ul>
+
+                <h4>14.2 Hash Function Selection</h4>
+                <ul>
+                    <li>Using multiple independent hash functions can be costly.</li>
+                    <li>A common optimization is to derive multiple hash values from two base hash functions:</li>
+                    <p>$$ h_i(x) = h_1(x) + i \cdot h_2(x) $$</p>
+                    <li>This reduces computational overhead while maintaining efficiency.</li>
+                </ul>
+
+                <h4>14.3 Space-Efficient Storage</h4>
+                <ul>
+                    <li>Use compressed bit arrays to reduce memory usage.</li>
+                    <li>Partitioned Bloom Filters store bits in separate smaller arrays, improving cache locality.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>15. Variants of Bloom Filters</h3>
+
+                <h4>15.1 Counting Bloom Filter (CBF)</h4>
+                <ul>
+                    <li>Stores a counter instead of a bit, allowing deletions.</li>
+                    <li>Each bit position is replaced with a small integer counter.</li>
+                    <li>Use Case: Applications needing dynamic updates, such as network monitoring.</li>
+                </ul>
+
+                <h4>15.2 Scalable Bloom Filter (SBF)</h4>
+                <ul>
+                    <li>Handles dynamically growing datasets.</li>
+                    <li>Maintains multiple Bloom filters and adds new ones as required.</li>
+                    <li>Use Case: Databases and storage indexing.</li>
+                </ul>
+
+                <h4>15.3 Cuckoo Filter</h4>
+                <ul>
+                    <li>Uses Cuckoo hashing instead of a bit array.</li>
+                    <li>Supports deletions and has a lower false positive rate.</li>
+                    <li>Use Case: Cache replacement policies, fingerprint-based authentication.</li>
+                </ul>
+
+                <h4>15.4 Compressed Bloom Filter</h4>
+                <ul>
+                    <li>Reduces space usage by compressing the bit array.</li>
+                    <li>Balances memory efficiency with query performance.</li>
+                    <li>Use Case: Network traffic filtering and security applications.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>16. Iterative vs. Recursive Implementations</h3>
+                <h4>16.1 Iterative Implementation</h4>
+                <p>Involves a loop to compute multiple hash values for insertion and lookup.</p>
+                <pre><code class="language-python">def insert_iterative(bloom_filter, item, k):
+    for i in range(k):
+        index = hash(item + str(i)) % len(bloom_filter)
+        bloom_filter[index] = 1
+</code></pre>
+
+                <ul>
+                    <li><strong>Advantages:</strong> Efficient, avoids recursion overhead.</li>
+                    <li><strong>Disadvantages:</strong> Code might be less elegant for some cases.</li>
+                </ul>
+
+                <h4>16.2 Recursive Implementation</h4>
+                <p>Uses recursion to insert and check values.</p>
+                <pre><code class="language-python">def insert_recursive(bloom_filter, item, k, i=0):
+    if i == k:
+        return
+    index = hash(item + str(i)) % len(bloom_filter)
+    bloom_filter[index] = 1
+    insert_recursive(bloom_filter, item, k, i + 1)
+</code></pre>
+
+                <ul>
+                    <li><strong>Advantages:</strong> More readable in some cases.</li>
+                    <li><strong>Disadvantages:</strong> Higher stack usage; may cause stack overflow for large datasets.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>17. Quick Recap</h3>
+                <ul>
+                    <li>Optimizing hash function selection and bit storage improves efficiency.</li>
+                    <li>Variants like Counting Bloom Filters and Scalable Bloom Filters address deletions and dynamic growth.</li>
+                    <li>Iterative implementations are generally more efficient than recursive ones due to stack overhead.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>18. Common Pitfalls and Edge Cases</h3>
+
+                <h4>18.1 False Positives</h4>
+                <ul>
+                    <li>A Bloom filter may return `True` for an element that was never inserted.</li>
+                    <li>This occurs due to hash collisions.</li>
+                    <li>Mitigation: Adjusting the size of the bit array (m) and number of hash functions (k) reduces false positives.</li>
+                </ul>
+
+                <h4>18.2 No False Negatives</h4>
+                <ul>
+                    <li>If an element was inserted, it will always be found.</li>
+                    <li>False negatives are only possible in incorrect implementations.</li>
+                </ul>
+
+                <h4>18.3 Inability to Delete Elements</h4>
+                <ul>
+                    <li>Standard Bloom filters do not support deletions.</li>
+                    <li>Mitigation: Use a Counting Bloom Filter (CBF).</li>
+                </ul>
+
+                <h4>18.4 Hash Function Collisions</h4>
+                <ul>
+                    <li>Poor hash function choices may lead to excessive bit collisions.</li>
+                    <li>Mitigation: Use cryptographic hash functions like MurmurHash or SHA-256.</li>
+                </ul>
+
+                <h4>18.5 Oversized or Undersized Filters</h4>
+                <ul>
+                    <li>If the bit array is too small, false positives increase.</li>
+                    <li>If too large, memory usage becomes inefficient.</li>
+                    <li>Mitigation: Use the formula:</li>
+                    <p>$$ m = -\frac{n \ln p}{(\ln 2)^2} $$</p>
+                </ul>
+
+                <h4>18.6 Large Input Sets</h4>
+                <ul>
+                    <li>Bloom filters work best when n (number of elements) is known or bounded.</li>
+                    <li>When n grows beyond the planned size, false positives increase.</li>
+                    <li>Mitigation: Use Scalable Bloom Filters to dynamically expand.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>19. Test Cases for Verification</h3>
+
+                <h4>19.1 Basic Functionality Tests</h4>
+                <p>Verify that inserted elements are detected:</p>
+                <pre><code class="language-python">def test_basic_insertion():
+    bf = BloomFilter(100, 3)
+    bf.add("apple")
+    assert bf.check("apple") == True  # Expected: Present
+</code></pre>
+
+                <h4>19.2 False Positive Test</h4>
+                <p>Check if an uninserted element could return a false positive:</p>
+                <pre><code class="language-python">def test_false_positive():
+    bf = BloomFilter(100, 3)
+    bf.add("apple")
+    assert bf.check("banana") in [True, False]  # Could be a false positive
+</code></pre>
+
+                <h4>19.3 Edge Case: Empty Bloom Filter</h4>
+                <p>Ensure no elements are falsely detected in an empty filter:</p>
+                <pre><code class="language-python">def test_empty_filter():
+    bf = BloomFilter(100, 3)
+    assert bf.check("apple") == False  # Expected: Not present
+</code></pre>
+
+                <h4>19.4 Edge Case: High Collision</h4>
+                <p>Insert many elements and test false positive rates:</p>
+                <pre><code class="language-python">def test_high_collision():
+    bf = BloomFilter(10, 3)  # Small filter, high collision probability
+    for i in range(50):
+        bf.add(str(i))  # Insert multiple elements
+    assert bf.check("random") in [True, False]  # Likely false positive
+</code></pre>
+            </article>
+
+            <article>
+                <h3>20. Real-World Failure Scenarios</h3>
+
+                <h4>20.1 Security Threats</h4>
+                <ul>
+                    <li>Bloom filters used in network security (e.g., spam filtering) can fail due to adversarial attacks that trigger false positives.</li>
+                    <li>Mitigation: Use more secure hash functions and rate-limit queries.</li>
+                </ul>
+
+                <h4>20.2 Data Integrity Risks</h4>
+                <ul>
+                    <li>In distributed databases, false positives may lead to unnecessary disk reads.</li>
+                    <li>Mitigation: Use hybrid approaches combining Bloom filters with exact match structures.</li>
+                </ul>
+
+                <h4>20.3 Cache Efficiency Issues</h4>
+                <ul>
+                    <li>When used in caches, Bloom filters might evict necessary items due to high false positives.</li>
+                    <li>Mitigation: Use adaptive Bloom filters that adjust dynamically.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>21. Quick Recap</h3>
+                <ul>
+                    <li>False positives are a fundamental limitation.</li>
+                    <li>Optimal sizing of the bit array and hash functions is crucial.</li>
+                    <li>Variants like Counting and Scalable Bloom Filters address deletion and dynamic growth.</li>
+                    <li>Test cases help validate correctness and mitigate failures.</li>
+                </ul>
+            </article>
+
+
+            <article>
+                <h3>22. Real-World Applications</h3>
+
+                <h4>22.1 Databases & Indexing</h4>
+                <ul>
+                    <li><strong>Apache Cassandra, Google Bigtable, and LevelDB</strong>: Uses Bloom filters to avoid unnecessary disk lookups for non-existent keys.</li>
+                    <li><strong>PostgreSQL & MySQL</strong>: Reduces query execution time by filtering out non-matching rows before accessing disk storage.</li>
+                </ul>
+
+                <h4>22.2 Network Security & Caching</h4>
+                <ul>
+                    <li><strong>Spam Filters (Google Gmail, SpamAssassin)</strong>: Identifies spam emails quickly without storing entire blacklists.</li>
+                    <li><strong>DNS Caching (Google Public DNS, Cloudflare)</strong>: Prevents querying the root servers for already checked non-existent domains.</li>
+                    <li><strong>Web Crawlers (Googlebot, Bingbot)</strong>: Avoids crawling the same URLs multiple times.</li>
+                </ul>
+
+                <h4>22.3 Blockchain & Cryptography</h4>
+                <ul>
+                    <li><strong>Bitcoin (SPV Wallets)</strong>: Uses Bloom filters to request only relevant transactions instead of downloading the entire blockchain.</li>
+                    <li><strong>Tor Network</strong>: Detects malicious relays while keeping the system lightweight.</li>
+                </ul>
+
+                <h4>22.4 AI & Machine Learning</h4>
+                <ul>
+                    <li><strong>Recommendation Systems (Netflix, Amazon, Spotify)</strong>: Avoids recommending the same items multiple times.</li>
+                    <li><strong>Data Deduplication (Google Drive, Dropbox)</strong>: Detects duplicate files efficiently.</li>
+                </ul>
+
+                <h4>22.5 Fraud Detection & Security</h4>
+                <ul>
+                    <li><strong>Financial Systems (Visa, Mastercard)</strong>: Prevents duplicate transactions by detecting if a request has already been processed.</li>
+                    <li><strong>Login Security (Brute-force Prevention)</strong>: Blocks repeated login attempts for non-existent users.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>23. Open-Source Implementations</h3>
+                <ul>
+                    <li><strong>Python</strong>: <a href="https://github.com/jaybaird/python-bloomfilter">GitHub - python-bloomfilter</a></li>
+                    <li><strong>Java</strong>: <a href="https://github.com/google/guava">Google Guava</a> (contains a Bloom Filter implementation)</li>
+                    <li><strong>C++</strong>: <a href="https://github.com/ArashPartow/bloom">Arash Partow's Bloom Filter Library</a></li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>24. Practical Project: URL Blacklisting for Web Security</h3>
+                <p>This script implements a Bloom filter to efficiently check whether a given URL is blacklisted, preventing access to malicious websites.</p>
+
+                <pre><code class="language-python">import hashlib
+import bitarray
+
+class BloomFilter:
+    def __init__(self, size, hash_count):
+        self.size = size  # Bit array size
+        self.hash_count = hash_count  # Number of hash functions
+        self.bit_array = bitarray.bitarray(size)
+        self.bit_array.setall(0)
+
+    def _hashes(self, item):
+        """Generate multiple hash values for an item."""
+        return [int(hashlib.md5((item + str(i)).encode()).hexdigest(), 16) % self.size for i in range(self.hash_count)]
+
+    def add(self, item):
+        """Insert an item into the Bloom Filter."""
+        for hash_val in self._hashes(item):
+            self.bit_array[hash_val] = 1
+
+    def check(self, item):
+        """Check if an item is probably present."""
+        return all(self.bit_array[hash_val] for hash_val in self._hashes(item))
+
+# Initialize Bloom filter
+bf = BloomFilter(size=10000, hash_count=5)
+
+# Add blacklisted URLs
+blacklisted_urls = ["malicious.com", "phishing.net", "dangerous.org"]
+for url in blacklisted_urls:
+    bf.add(url)
+
+# Check if a given URL is blacklisted
+test_urls = ["malicious.com", "safe-site.com", "phishing.net"]
+
+for url in test_urls:
+    if bf.check(url):
+        print(f"Warning: {url} is potentially blacklisted!")
+    else:
+        print(f"{url} is safe.")
+</code></pre>
+            </article>
+
+            <article>
+                <h3>25. Quick Recap</h3>
+                <ul>
+                    <li>Bloom filters are used in databases, security, blockchain, AI, and networking.</li>
+                    <li>Popular open-source implementations exist in Python, Java, and C++.</li>
+                    <li>The provided URL Blacklist Project demonstrates real-world usage in web security.</li>
+                    <li>Despite limitations like false positives and no deletions, Bloom filters remain highly efficient.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>26. Competitive Programming Assignments</h3>
+                <p>Solve at least 10 problems using Bloom filters.</p>
+
+                <h4>26.1 Basic Problems</h4>
+                <ol>
+                    <li><strong>Simple Set Membership</strong>: Implement a Bloom filter to check the presence of numbers in a set.</li>
+                    <li><strong>Duplicate Detection</strong>: Use a Bloom filter to detect duplicates in a large dataset efficiently.</li>
+                </ol>
+
+                <h4>26.2 Medium-Level Problems</h4>
+                <ol start="3">
+                    <li><strong>Spam Email Filtering</strong>: Implement a Bloom filter that checks if an email is in a spam database.</li>
+                    <li><strong>Large Dataset Lookup</strong>: Process millions of queries for set membership efficiently.</li>
+                    <li><strong>Distributed Cache Management</strong>: Use Bloom filters to minimize unnecessary database lookups.</li>
+                </ol>
+
+                <h4>26.3 Advanced Problems</h4>
+                <ol start="6">
+                    <li><strong>Streaming Data Processing</strong>: Implement a Bloom filter for real-time membership testing on a continuous data stream.</li>
+                    <li><strong>Efficient Web Crawler</strong>: Ensure that a web crawler does not visit the same URL twice.</li>
+                    <li><strong>Fraud Detection System</strong>: Prevent repeated fraudulent transactions using a Bloom filter.</li>
+                    <li><strong>Phishing URL Detection</strong>: Implement a probabilistic security check against malicious URLs.</li>
+                    <li><strong>Dynamic Bloom Filter</strong>: Implement a scalable Bloom filter that can handle growing datasets.</li>
+                </ol>
+            </article>
+
+            <article>
+                <h3>27. System Design Integration Assignment</h3>
+                <p>Use Bloom filters in a large-scale system design problem.</p>
+
+                <h4>27.1 Problem Statement</h4>
+                <p>Design a distributed URL shortener (like Bit.ly) where:</p>
+                <ul>
+                    <li>Bloom filters prevent duplicate URL generation.</li>
+                    <li>The system handles billions of URLs efficiently.</li>
+                    <li>The database lookups are minimized to reduce load.</li>
+                </ul>
+
+                <h4>27.2 Integration Plan</h4>
+                <ul>
+                    <li>Use a Bloom filter to check if a URL has already been shortened before querying the database.</li>
+                    <li>If the Bloom filter returns False, the URL is definitely new.</li>
+                    <li>If the Bloom filter returns True, a database lookup is performed to confirm if it already exists.</li>
+                    <li>This reduces database load significantly.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>28. Time-Constrained Implementation Challenge</h3>
+                <p>Practice coding a Bloom filter under a strict 30-minute time limit.</p>
+
+                <h4>28.1 Challenge</h4>
+                <p>Implement a Bloom filter that can:</p>
+                <ul>
+                    <li>Insert elements efficiently.</li>
+                    <li>Check membership in O(k) time.</li>
+                    <li>Handle at least 1 million elements.</li>
+                </ul>
+
+                <h4>28.2 Evaluation Criteria</h4>
+                <ul>
+                    <li>Correctness: Does it work as expected?</li>
+                    <li>Efficiency: Does it use memory optimally?</li>
+                    <li>Optimization: Are hash functions implemented efficiently?</li>
+                    <li>Code Quality: Is the code readable and maintainable?</li>
+                </ul>
+
+                <p>Start a timer and challenge yourself to implement the Bloom filter from scratch!</p>
+            </article>
+
+            <article>
+                <h3>29. Final Thoughts</h3>
+                <ul>
+                    <li>Practice 10 problems covering different Bloom filter applications.</li>
+                    <li>Apply Bloom filters in system design for database optimization.</li>
+                    <li>Test your speed with a 30-minute competitive programming challenge.</li>
+                    <li>Mastering Bloom filters improves efficiency in large-scale systems and real-world applications.</li>
+                </ul>
+            </article>
+        </main>
+
+        <script> copyright("all"); </script>
+
+    </body>
+
+</html>

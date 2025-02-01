@@ -41,6 +41,69 @@ function get_menu_list(datetogen) {
                 link: "almost-complete-binary-tree"
             },
             {
+                title: "Heaps",
+                desc: "Delve into the intricate world of Heaps with our comprehensive guide. Explore the foundational principles and advanced applications of Heaps, unraveling the complexities of this data structure. From basic concepts to advanced strategies, this guide offers a holistic view of Heaps. Begin your journey into the realm of efficient data structures now!",
+                codetype: "Concepts",
+                readtime: 20,
+                link: "heaps-data-structures"
+            },
+            {
+                title: "Tries",
+                desc: "Uncover the intricate world of Tries with our comprehensive guide. Explore the foundational principles and advanced applications of Tries, unraveling the complexities of this data structure. From basic concepts to advanced strategies, this guide offers a holistic view of Tries. Begin your journey into the realm of efficient data structures now!",
+                codetype: "Concepts",
+                readtime: 20,
+                link: "tries-data-structures"
+            },
+            {
+                title: "Priority Queues",
+                desc: "Embark on an exploratory odyssey into the world of Priority Queues with our in-depth guide. Discover the delicate balance and optimized structure of Priority Queues, bridging theoretical principles with practical execution. From elemental concepts to complex applications, this guide encapsulates a comprehensive view of Priority Queues. Initiate your intellectual venture into the essence of data structural efficiency today!",
+                codetype: "Data Structures",
+                readtime: 20,
+                link: "priority-queues"
+            },
+            {
+                title: "Union-Find",
+                desc: "Uncover the intricate world of Union-Find with our comprehensive guide. Explore the foundational principles and advanced applications of Union-Find, unraveling the complexities of this data structure. From basic concepts to advanced strategies, this guide offers a holistic view of Union-Find. Begin your journey into the realm of efficient data structures now!",
+                codetype: "Concepts",
+                readtime: 20,
+                link: "union-find"
+            },
+            {
+                title: "Segment Trees",
+                desc: "Delve into the intricate world of Segment Trees with our comprehensive guide. Explore the foundational principles and advanced applications of Segment Trees, unraveling the complexities of this data structure. From basic concepts to advanced strategies, this guide offers a holistic view of Segment Trees. Begin your journey into the realm of efficient data structures now!",
+                codetype: "Concepts",
+                readtime: 20,
+                link: "segment-trees"                
+            },
+            {
+                title: "Fenwick Trees",
+                desc: "Embark on an exploratory odyssey into the world of Fenwick Trees with our in-depth guide. Discover the delicate balance and optimized structure of Fenwick Trees, bridging theoretical principles with practical execution. From elemental concepts to complex applications, this guide encapsulates a comprehensive view of Fenwick Trees. Initiate your intellectual venture into the essence of data structural efficiency today!",
+                codetype: "Data Structures",
+                readtime: 20,
+                link: "fenwick-trees"
+            },
+            {
+                title: "Self Balancing Trees",
+                desc: "Uncover the intricate world of Self Balancing Trees with our comprehensive guide. Explore the foundational principles and advanced applications of Self Balancing Trees, unraveling the complexities of this data structure. From basic concepts to advanced strategies, this guide offers a holistic view of Self Balancing Trees. Begin your journey into the realm of efficient data structures now!",
+                codetype: "Concepts",
+                readtime: 20,
+                link: "self-balancing-trees"                
+            },
+            {
+                title: "Bloom Filters",
+                desc: "Delve into the intricate world of Bloom Filters with our comprehensive guide. Explore the foundational principles and advanced applications of Bloom Filters, unraveling the complexities of this data structure. From basic concepts to advanced strategies, this guide offers a holistic view of Bloom Filters. Begin your journey into the realm of efficient data structures now!",
+                codetype: "Concepts",
+                readtime: 20,
+                link: "bloom-filters"
+            },
+            {
+                title: "Skip Lists",
+                desc: "Embark on an exploratory odyssey into the world of Skip Lists with our in-depth guide. Discover the delicate balance and optimized structure of Skip Lists, bridging theoretical principles with practical execution. From elemental concepts to complex applications, this guide encapsulates a comprehensive view of Skip Lists. Initiate your intellectual venture into the essence of data structural efficiency today!",
+                codetype: "Data Structures",
+                readtime: 20,
+                link: "skip-lists"
+            },
+            {
                 title: "Revision of Concepts",
                 desc: "Delve deep into the intricate world with our extensive revision of concepts. Unravel the complexities and strategic approaches of fundamental theories with advanced problem-solving techniques. This guide provides a overview of all the concepts, from basic recursion to advanced tabulation strategies. Embark on your journey to mastering efficient algorithms and optimal solutions in the realm of Design and Analysis of Algorithm!",
                 codetype: "Revision",
