@@ -36,7 +36,7 @@ function get_menu_list(datetogen) {
 
 
     /**********  AUTOMATION CONTROL **********/
-    let title, link, date, desc, codetype, readtime, author = 1, semester, cardimage, continuereading;
+    let title, link, date, desc, codetype, readtime, author = 1, semester, cardimage, continuereading;    
     const functions = {
         theory: get_class,        
         default: get_main

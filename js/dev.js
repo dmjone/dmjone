@@ -4636,10 +4636,13 @@ function body_blockcards(link, date, title, desc, codetype, readtime, author, se
     // `;
     // body_generated += `<div class="m-0 my-5 postcard light shadow-lg ${getcolor}">
 
-    function authorlink(author) {
+    function authorlink(author) {        
         switch (author) {
             case "Divya Mohan":
                 output = `<a href="/resume/"><li class="tag__item tag__item_author text-muted d-none d-sm-inline-block list-inline-item cursor-pointer"><i class="bi bi-pencil-square"></i>  ${author}</li></a>`;
+                break;
+            case "Lakshika Tanwar":
+                output = `<a href="/resume/lakshikatanwar"><li class="tag__item tag__item_author text-muted d-none d-sm-inline-block list-inline-item cursor-pointer"><i class="bi bi-pencil-square"></i>  ${author}</li></a>`;
                 break;
             case undefined:
             case null:
