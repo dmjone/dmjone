@@ -639,6 +639,8 @@ const courseDetailsMap = {
         'lab': ["Dr. Piyush Sewal", "CSU1899P", "Ethical Hacking Lab"]
     },
     'dmjcclt': { 'default': ["", "DMJCCLT", "Cloud Computing Concepts"] },
+
+    // Semester 6    
     'lse006': { 'default': ["Akshita Thakur", "LSE006", "English Communication Seminar 2"] },
     
 };

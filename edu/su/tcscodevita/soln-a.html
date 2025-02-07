@@ -1,0 +1,151 @@
+<!-------------------------- © 2007 - present, dmj.one and contributors. ----------------------------------
+   Part of the dmjone project. Licensed under the GNU AGPL. Provided as-is, without warranty of any kind. 
+-------------------- Redistribution and modifications must retain this notice. --------------------------->
+
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+    <!--<![endif]-->
+
+    <head>
+        <script src="/js/edu_su_common.js"></script>
+        <noscript>
+            <style>
+                html,
+                body {
+                    margin: 0;
+                    overflow: hidden;
+                }
+            </style>
+            <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+        </noscript>
+
+        <title>Solution A - Shoolini University</title>
+        <meta name="description" content="R2 Solution A - Shoolini University">
+
+        <meta property="og:image" content="/logo.png">
+        <meta property="og:type" content="article">
+
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:site" content="@divyamohan1993">
+        <meta name="twitter:creator" content="@divyamohan1993">
+        <meta name="twitter:image" content="/logo.png">
+
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+        <meta name="author" content="Divya Mohan">
+        <meta name="robots" content="noindex, nofollow">
+    </head>
+
+    <body>
+
+        <script>header_author("WriteManually", `<h1 class='text-center'>Solution A</h1><p class="text-center">Made in <img class="img-fluid" src="https://upload.wikimedia.org/wikipedia/commons/4/41/Flag_of_India.svg" alt="India" title="India" width=20> by <strong>Divya Mohan</strong> <a href="/resume/"><i class="text-white fas fa-person-booth" title="View Resume"></i></a></p>`)</script>
+
+        <main>
+            <article>
+                <h2 class="text-center">Solution A</h2>
+            </article>
+            <article>
+                <pre><code class="language-python">import sys
+import heapq
+
+def solve():
+    data = sys.stdin.read().strip().split()
+    index = 0
+    
+    grid_rows = int(data[index]); index+=1
+    grid_cols = int(data[index]); index+=1
+    
+    obstacle_intensity = [[0]*grid_cols for _ in range(grid_rows)]
+    start_row = start_col = -1
+    destination_row = destination_col = -1
+    
+    for row in range(grid_rows):
+        for col in range(grid_cols):
+            value = data[index]
+            index += 1
+            if value == 'A':
+                start_row, start_col = row, col
+                obstacle_intensity[row][col] = 0
+            elif value == 'B':
+                destination_row, destination_col = row, col
+                obstacle_intensity[row][col] = 0
+            else:
+                obstacle_intensity[row][col] = int(value)
+    
+    movement_cost = [[0]*grid_cols for _ in range(grid_rows)]
+    for row in range(grid_rows):
+        for col in range(grid_cols):
+            movement_cost[row][col] = int(data[index])
+            index += 1
+    
+    max_stamina = int(data[index])
+    index += 1
+    
+    if start_row < 0 or destination_row < 0:
+        print("Not Possible")
+        return
+    
+    if start_row == destination_row and start_col == destination_col:
+        print(movement_cost[start_row][start_col], max_stamina)
+        return
+    
+    priority_queue = []
+    initial_energy = movement_cost[start_row][start_col]
+    initial_burden = 0
+    heapq.heappush(priority_queue, (initial_energy, start_row, start_col, initial_burden))
+    
+    visited_cells = [[[] for _ in range(grid_cols)] for __ in range(grid_rows)]
+    visited_cells[start_row][start_col].append((initial_energy, initial_burden))
+    
+    movement_directions = [(-1,0),(1,0),(0,-1),(0,1)]
+    
+    while priority_queue:
+        current_energy, row, col, burden = heapq.heappop(priority_queue)
+        
+        if is_dominated(visited_cells[row][col], current_energy, burden):
+            continue
+        
+        if row == destination_row and col == destination_col:
+            remaining_stamina = max_stamina - burden
+            if remaining_stamina < 0:
+                print("Not Possible")
+            else:
+                print(current_energy, remaining_stamina)
+            return
+        
+        for row_offset, col_offset in movement_directions:
+            next_row, next_col = row + row_offset, col + col_offset
+            if 0 <= next_row < grid_rows and 0 <= next_col < grid_cols:
+                new_burden = burden + obstacle_intensity[next_row][next_col] + 1
+                if new_burden <= max_stamina:
+                    new_energy = current_energy + movement_cost[next_row][next_col]
+                    if not is_dominated(visited_cells[next_row][next_col], new_energy, new_burden):
+                        remove_dominated(visited_cells[next_row][next_col], new_energy, new_burden)
+                        visited_cells[next_row][next_col].append((new_energy, new_burden))
+                        heapq.heappush(priority_queue, (new_energy, next_row, next_col, new_burden))
+    
+    print("Not Possible")
+
+def is_dominated(states_list, new_energy, new_burden):
+    for (energy, burden) in states_list:
+        if energy <= new_energy and burden <= new_burden:
+            return True
+    return False
+
+def remove_dominated(states_list, new_energy, new_burden):
+    filtered_states = []
+    for (energy, burden) in states_list:
+        if not (new_energy <= energy and new_burden <= burden):
+            filtered_states.append((energy, burden))
+    states_list[:] = filtered_states
+</code></pre>
+        </main></article>
+
+        <script> copyright("all"); </script>
+
+    </body>
+
+</html>
