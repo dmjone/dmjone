@@ -10,7 +10,7 @@
     <body>
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
             <div class="container">
-                <a class="navbar-brand" href="/">Admin Panel</a>
+                <a class="navbar-brand" href="/admin">Admin Panel</a>
                 <div class="collapse navbar-collapse">
                     <ul class="navbar-nav ms-auto">
                         <li class="nav-item"><a id="logout" class="nav-link" href="#">Logout</a></li>
@@ -32,13 +32,24 @@
                 </thead>
                 <tbody id="users"></tbody>
             </table>
-            <h1>Pending Articles</h1>
+            <h2>Create New User</h2>
+            <form id="createUserForm">
+                <div class="mb-3"><label class="form-label">Email</label><input type="email" id="newUserEmail" class="form-control"></div>
+                <div class="mb-3"><label class="form-label">Password</label><input type="password" id="newUserPassword" class="form-control"></div>
+                <div class="mb-3"><label class="form-label">Role</label><select id="newUserRole" class="form-select">
+                        <option value="user">User</option>
+                        <option value="admin">Admin</option>
+                    </select></div>
+                <button type="submit" class="btn btn-success">Create User</button>
+            </form>
+            <div id="createUserMessage" class="mt-3"></div>
+            <h1 class="mt-5">Pending Articles</h1>
             <div id="pendingArticles" class="list-group"></div>
         </div>
         <script>
             document.getElementById('logout').addEventListener('click', e => {
                 fetch('api/logout', { method: 'POST' }).then(r => r.json()).then(data => {
-                    window.location.href = '../'
+                    window.location.href = '../project-1/'
                 })
             })
             fetch('api/admin/users').then(r => r.json()).then(data => {
@@ -48,14 +59,26 @@
                     document.getElementById('users').appendChild(row)
                 })
             })
-            fetch('api/articles').then(r => r.json()).then(data => {
+            document.getElementById('createUserForm').addEventListener('submit', e => {
+                e.preventDefault()
+                fetch('api/admin/users', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({
+                        email: document.getElementById('newUserEmail').value,
+                        password: document.getElementById('newUserPassword').value,
+                        role: document.getElementById('newUserRole').value
+                    })
+                }).then(r => r.json()).then(data => {
+                    document.getElementById('createUserMessage').textContent = data.success ? "User created." : data.error
+                })
+            })
+            fetch('api/admin/articles').then(r => r.json()).then(data => {
                 data.filter(a => a.status === 'pending').forEach(a => {
                     let item = document.createElement('a')
                     item.href = '#'
                     item.className = 'list-group-item list-group-item-action'
                     item.textContent = a.title
                     item.onclick = () => {
-                        fetch('api/admin/articles/' + a.id + 'approve', { method: 'POST' }).then(r => r.json()).then(data => {
+                        fetch('api/admin/articles/' + a.id + '/approve', { method: 'POST' }).then(r => r.json()).then(data => {
                             location.reload()
                         })
                     }
