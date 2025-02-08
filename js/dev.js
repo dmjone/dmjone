@@ -8519,14 +8519,14 @@ messageUsButtonCaller();
         // Scroll up/down when hovering on the buttons
         scrollUpBtn.addEventListener('mouseover', function () {
             scrollInterval = setInterval(() => {
-                window.scrollBy(0, -5); // Scroll up
-            }, 20);
+                window.scrollBy(0, -1); // Scroll up
+            }, 8);
         });
 
         scrollDownBtn.addEventListener('mouseover', function () {
             scrollInterval = setInterval(() => {
                 window.scrollBy(0, 1); // Scroll down
-            }, 20);
+            }, 40);
         });
 
         // Stop scrolling when hover ends

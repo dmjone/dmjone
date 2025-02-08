@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <title>Admin Panel</title>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    </head>
+
+    <body>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container">
+                <a class="navbar-brand" href="/">Admin Panel</a>
+                <div class="collapse navbar-collapse">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item"><a id="logout" class="nav-link" href="#">Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <div class="container mt-4">
+            <h1>Users</h1>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Active</th>
+                        <th>Created At</th>
+                    </tr>
+                </thead>
+                <tbody id="users"></tbody>
+            </table>
+            <h1>Pending Articles</h1>
+            <div id="pendingArticles" class="list-group"></div>
+        </div>
+        <script>
+            document.getElementById('logout').addEventListener('click', e => {
+                fetch('api/logout', { method: 'POST' }).then(r => r.json()).then(data => {
+                    window.location.href = '../'
+                })
+            })
+            fetch('api/admin/users').then(r => r.json()).then(data => {
+                data.forEach(u => {
+                    let row = document.createElement('tr')
+                    row.innerHTML = '<td>' + u.id + '</td><td>' + u.email + '</td><td>' + u.role + '</td><td>' + (u.is_active ? 'Yes' : 'No') + '</td><td>' + u.created_at + '</td>'
+                    document.getElementById('users').appendChild(row)
+                })
+            })
+            fetch('api/articles').then(r => r.json()).then(data => {
+                data.filter(a => a.status === 'pending').forEach(a => {
+                    let item = document.createElement('a')
+                    item.href = '#'
+                    item.className = 'list-group-item list-group-item-action'
+                    item.textContent = a.title
+                    item.onclick = () => {
+                        fetch('api/admin/articles/' + a.id + 'approve', { method: 'POST' }).then(r => r.json()).then(data => {
+                            location.reload()
+                        })
+                    }
+                    document.getElementById('pendingArticles').appendChild(item)
+                })
+            })
+        </script>
+    </body>
+
+</html>
