@@ -19,8 +19,9 @@
     <body>
         <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
             <div class="container">
-                <a class="navbar-brand" href="../project-1/">Project 1 - PhP MySQL</a>
+                <a class="navbar-brand" href="../project-1/">Project 1 - PhP and MySQL</a>
                 <div class="ms-auto">
+                    <button id="deactivate" class="btn btn-warning me-2">Deactivate Account</button>
                     <button id="logout" class="btn btn-danger">Logout</button>
                 </div>
             </div>
@@ -51,7 +52,15 @@
         </div>
         <script>
             document.getElementById('logout').addEventListener('click', () => {
-                fetch('api/logout', { method: 'POST' }).then(r => r.json()).then(() => window.location.href = '/')
+                fetch('api/logout', { method: 'POST' }).then(r => r.json()).then(() => window.location.href = '../project-1/')
+            })
+            document.getElementById('deactivate').addEventListener('click', () => {
+                if (confirm("Are you sure you want to deactivate your account?")) {
+                    fetch('api/deactivate', { method: 'POST' }).then(r => r.json()).then(data => {
+                        if (data.success) { alert("Account deactivated."); window.location.href = '/' }
+                        else alert(data.error)
+                    })
+                }
             })
             function loadMyArticles() {
                 fetch('api/myarticles')
@@ -88,11 +97,7 @@
             document.getElementById('articleForm').addEventListener('submit', e => {
                 e.preventDefault()
                 const id = document.getElementById('articleId').value
-                const payload = {
-                    title: document.getElementById('title').value,
-                    slug: document.getElementById('slug').value,
-                    content: document.getElementById('content').value
-                }
+                const payload = { title: document.getElementById('title').value, slug: document.getElementById('slug').value, content: document.getElementById('content').value }
                 if (id) {
                     fetch('api/articles/' + id, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
                         .then(r => r.json()).then(() => { loadMyArticles(); document.getElementById('articleForm').style.display = 'none' })

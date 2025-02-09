@@ -84,6 +84,11 @@
             </div>
             <div id="sectionArticles" class="section">
                 <h2>Articles</h2>
+                <div class="mb-3">
+                    <input type="number" id="searchUserId" class="form-control" placeholder="Search articles by user ID">
+                    <button id="searchBtn" class="btn btn-primary mt-2">Search</button>
+                    <button id="clearSearch" class="btn btn-secondary mt-2">Clear</button>
+                </div>
                 <table class="table table-striped" id="articlesTable">
                     <thead>
                         <tr>
@@ -140,6 +145,82 @@
                 <div id="createArticleMessage" class="mt-3"></div>
             </div>
         </div>
+
+        <!-- User Edit Modal -->
+        <div class="modal fade" id="userEditModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form id="userEditForm">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Edit User</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <input type="hidden" id="editUserId">
+                            <div class="mb-3">
+                                <label class="form-label">Role</label>
+                                <select id="editUserRole" class="form-select">
+                                    <option value="user">User</option>
+                                    <option value="admin">Admin</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Active</label>
+                                <select id="editUserActive" class="form-select">
+                                    <option value="1">Active</option>
+                                    <option value="0">Inactive/Banned</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Article Edit Modal -->
+        <div class="modal fade" id="articleEditModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <form id="articleEditForm">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Edit Article</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <input type="hidden" id="editArticleId">
+                            <div class="mb-3">
+                                <label class="form-label">Title</label>
+                                <input type="text" id="editArticleTitle" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Slug</label>
+                                <input type="text" id="editArticleSlug" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Content</label>
+                                <textarea id="editArticleContent" class="form-control" rows="5" required></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Status</label>
+                                <select id="editArticleStatus" class="form-select">
+                                    <option value="pending">Pending</option>
+                                    <option value="published">Published</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
         <script>
             document.querySelectorAll('#sidebarNav a').forEach(link => {
                 link.addEventListener('click', function (e) {
@@ -167,15 +248,37 @@
                             let row = document.createElement('tr')
                             row.innerHTML = `<td>${u.id}</td><td>${u.email}</td><td>${u.role}</td><td>${u.is_active ? 'Yes' : 'No'}</td><td>${u.created_at}</td>
           <td>
-            <button class="btn btn-sm btn-warning me-1" onclick="alert('Edit User ${u.id} functionality coming soon')">Edit</button>
+            <button class="btn btn-sm btn-warning me-1" onclick="openUserEdit(${u.id},'${u.role}',${u.is_active})">Edit</button>
             <button class="btn btn-sm btn-danger" onclick="alert('Delete User ${u.id} functionality coming soon')">Delete</button>
           </td>`
                             tbody.appendChild(row)
                         })
                     })
             }
+            function openUserEdit(id, role, active) {
+                document.getElementById('editUserId').value = id
+                document.getElementById('editUserRole').value = role
+                document.getElementById('editUserActive').value = active
+                new bootstrap.Modal(document.getElementById('userEditModal')).show()
+            }
+            document.getElementById('userEditForm').addEventListener('submit', e => {
+                e.preventDefault()
+                let id = document.getElementById('editUserId').value, role = document.getElementById('editUserRole').value, active = document.getElementById('editUserActive').value
+                fetch('api/admin/users/' + id, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ role: role, is_active: Number(active) })
+                })
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.success) { loadUsers(); bootstrap.Modal.getInstance(document.getElementById('userEditModal')).hide() }
+                        else alert(data.error)
+                    })
+            })
             function loadArticles() {
-                fetch('api/admin/articles')
+                let userId = document.getElementById('searchUserId').value
+                let url = 'api/admin/articles' + (userId ? '?userId=' + userId : '')
+                fetch(url)
                     .then(r => r.json())
                     .then(data => {
                         const tbody = document.getElementById('articlesTable').querySelector('tbody')
@@ -184,15 +287,52 @@
                             let row = document.createElement('tr')
                             row.innerHTML = `<td>${a.id}</td><td>${a.title}</td><td>${a.slug}</td><td>${a.status}</td><td>${a.author_id}</td><td>${a.created_at}</td>
           <td>
-            ${console.log(a)};
-            ${a.status === 'pending' ? `<button class="btn btn-sm btn-success" onclick="approveArticle(${a.id})">Approve</button>` : ''}
-            <button class="btn btn-sm btn-warning" onclick="alert('Edit Article ${a.id} functionality coming soon')">Edit</button>
-            <button class="btn btn-sm btn-danger" onclick="alert('Delete Article ${a.id} functionality coming soon')">Delete</button>
+            ${a.status === 'pending' ? `<button class="btn btn-sm btn-success me-1" onclick="approveArticle(${a.id})">Approve</button>` : ''}
+            <button class="btn btn-sm btn-warning me-1" onclick="openArticleEdit(${a.id},'${a.title}','${a.slug}','${a.content}','${a.status}')">Edit</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteArticle(${a.id})">Delete</button>
           </td>`
                             tbody.appendChild(row)
                         })
                     })
             }
+            document.getElementById('searchBtn').addEventListener('click', () => loadArticles())
+            document.getElementById('clearSearch').addEventListener('click', () => {
+                document.getElementById('searchUserId').value = ''
+                loadArticles()
+            })
+            function approveArticle(id) {
+                fetch('api/admin/articles/' + id + '/approve', { method: 'POST' })
+                    .then(r => r.json())
+                    .then(data => { if (data.success) loadArticles(); else alert(data.error) })
+            }
+            function deleteArticle(id) {
+                if (confirm("Delete article " + id + "?")) {
+                    fetch('api/admin/articles/' + id, { method: 'DELETE' })
+                        .then(r => r.json())
+                        .then(data => { if (data.success) loadArticles(); else alert(data.error) })
+                }
+            }
+            function openArticleEdit(id, title, slug, content, status) {
+                document.getElementById('editArticleId').value = id
+                document.getElementById('editArticleTitle').value = title
+                document.getElementById('editArticleSlug').value = slug
+                document.getElementById('editArticleContent').value = content
+                document.getElementById('editArticleStatus').value = status
+                new bootstrap.Modal(document.getElementById('articleEditModal')).show()
+            }
+            document.getElementById('articleEditForm').addEventListener('submit', e => {
+                e.preventDefault()
+                let id = document.getElementById('editArticleId').value
+                let payload = {
+                    title: document.getElementById('editArticleTitle').value,
+                    slug: document.getElementById('editArticleSlug').value,
+                    content: document.getElementById('editArticleContent').value,
+                    status: document.getElementById('editArticleStatus').value
+                }
+                fetch('api/admin/articles/' + id, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
+                    .then(r => r.json())
+                    .then(data => { if (data.success) { loadArticles(); bootstrap.Modal.getInstance(document.getElementById('articleEditModal')).hide() } else alert(data.error) })
+            })
             function loadLogs() {
                 fetch('api/admin/logs')
                     .then(r => r.json())
@@ -205,12 +345,6 @@
                             tbody.appendChild(row)
                         })
                     })
-            }
-            function approveArticle(id) {
-                console.log('Approving article', id);
-                fetch('api/admin/articles/' + id + '/approve', { method: 'POST' })
-                    .then(r => r.json())
-                    .then(data => { if (data.success) loadArticles(); else alert(data.error) })
             }
             document.getElementById('formCreateUser').addEventListener('submit', e => {
                 e.preventDefault()
