@@ -70,7 +70,7 @@
                 </div>
             </div>
         </nav>
-        
+
         <section class="hero py-5">
             <div class="container text-center">
                 <h1>Dynamic Blog Project</h1>
@@ -99,32 +99,41 @@
             </div>
         </footer>
 
+
+
+
         <script>
             // Check if user is logged in by calling the /api/profile endpoint.
             // The backend should return user info if authenticated.
-            /* fetch('api/profile')
-                .then(response => {
-                    if (response.ok) return response.json();
-                    else throw new Error('Not logged in');
-                })
-                .then(data => {
-                    // Clear the default links.
-                    const navLinks = document.getElementById('navbarNavUL');
-                    navLinks.innerHTML = "";
-                    let li = document.createElement('li');
-                    li.className = 'nav-item';
-                    // If the logged-in user is admin, show the Admin panel link.
-                    if (data.role === 'admin') {
-                        li.innerHTML = '<a class="nav-link" href="admin">Admin</a>';
-                    } else {
-                        li.innerHTML = '<a class="nav-link" href="dashboard">Dashboard</a>';
+            (async function loadProfile() {
+                try {
+                    const response = await fetch('api/profile');
+                    if (!response.ok) {
+                        throw new Error('Not logged in');
                     }
-                    navLinks.appendChild(li);
-                })
-                .catch(err => {
-                    // Not logged in—leave the default Login/Register links.
+                    const data = await response.json();
+
+                    const navLinks = document.getElementById('navbarNavUL');
+                    // Clear default links.
+                    navLinks.innerHTML = "";
+
+                    // Map each role to its corresponding link.
+                    const roleLinks = {
+                        admin: { href: 'admin', label: 'Admin' },
+                        user: { href: 'dashboard', label: 'Dashboard' }
+                    };
+
+                    const link = roleLinks[data.role];
+                    if (link) {
+                        navLinks.innerHTML = `<li class="nav-item">
+                                        <a class="nav-link" href="${link.href}">${link.label}</a>
+                                      </li>`;
+                    }
+                } catch (err) {
                     console.log("Not logged in:", err);
-                }); */
+                    // Optionally, you can leave the default Login/Register links in place.
+                }
+            })();
 
             fetch('api/articles')
                 .then(r => r.json())
