@@ -25,17 +25,17 @@
                 background-size: cover;
                 filter: blur(10px);
                 z-index: -1;
-                /* Place behind the content */
             }
 
             /* The register form container remains unblurred */
             .register-container {
                 position: relative;
-                margin-top: 10%;                
+                margin-top: 10%;
                 padding: 2rem;
                 border-radius: 8px;
                 z-index: 1;
             }
+
             .hero {
                 background: no-repeat center center;
                 background-size: cover;
@@ -46,10 +46,11 @@
                 justify-content: center;
                 text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
             }
+
             .card-img-top {
-              width: 100%;
-              height: 200px; /* Adjust this height as needed */
-              object-fit: cover;
+                width: 100%;
+                height: 200px;
+                object-fit: cover;
             }
         </style>
     </head>
@@ -62,7 +63,7 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ms-auto">
+                    <ul class="navbar-nav ms-auto" id="navLinks">
                         <li class="nav-item"><a class="nav-link" href="login">Login</a></li>
                         <li class="nav-item"><a class="nav-link" href="register">Register</a></li>
                     </ul>
@@ -87,25 +88,51 @@
             <div class="container">&copy; 2025 A PhP MySQL Evaluation Project by dmj.one</div>
         </footer>
         <script>
+            // Check if user is logged in by calling the /api/profile endpoint.
+            // The backend should return user info if authenticated.
+            fetch('api/profile')
+                .then(response => {
+                    if (response.ok) return response.json();
+                    else throw new Error('Not logged in');
+                })
+                .then(data => {
+                    // Clear the default links.
+                    const navLinks = document.getElementById('navLinks');
+                    navLinks.innerHTML = "";
+                    let li = document.createElement('li');
+                    li.className = 'nav-item';
+                    // If the logged-in user is admin, show the Admin panel link.
+                    if (data.role === 'admin') {
+                        li.innerHTML = '<a class="nav-link" href="admin">Admin</a>';
+                    } else {
+                        li.innerHTML = '<a class="nav-link" href="dashboard">Dashboard</a>';
+                    }
+                    navLinks.appendChild(li);
+                })
+                .catch(err => {
+                    // Not logged in—leave the default Login/Register links.
+                    console.log("Not logged in:", err);
+                });
+
             fetch('api/articles')
                 .then(r => r.json())
                 .then(data => {
-                    const container = document.getElementById('articlesContainer')
+                    const container = document.getElementById('articlesContainer');
                     data.forEach(article => {
-                        let col = document.createElement('div')
-                        col.className = 'col-md-4 mb-4'
+                        let col = document.createElement('div');
+                        col.className = 'col-md-4 mb-4';
                         col.innerHTML = `
-            <a href="article?id=${article.id}"><div class="card h-100">
-              <img src="https://agen-bgimg.dmj.one/?cb=${Math.random()}" class="card-img-top" alt="${article.title}">
-              <div class="card-body">
-                <h5 class="card-title">${article.title}</h5>
-                <p class="card-text">${article.content.substring(0, 100)}...</p>                
-              </div>
-            </div></a>
-          `
-                        container.appendChild(col)
-                    })
-                })
+              <a href="article?id=${article.id}"><div class="card h-100">
+                <img src="https://agen-bgimg.dmj.one/?cb=${Math.random()}" class="card-img-top" alt="${article.title}">
+                <div class="card-body">
+                  <h5 class="card-title">${article.title}</h5>
+                  <p class="card-text">${article.content.substring(0, 100)}...</p>
+                </div>
+              </div></a>
+            `;
+                        container.appendChild(col);
+                    });
+                });
         </script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     </body>
