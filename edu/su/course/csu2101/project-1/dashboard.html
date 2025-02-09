@@ -3,75 +3,107 @@
 
     <head>
         <meta charset="UTF-8">
-        <title>User Dashboard</title>
+        <title>User Dashboard - My Awesome Blog</title>
         <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+        <style>
+            body {
+                background: #f4f4f4;
+            }
+
+            .dashboard-container {
+                margin-top: 2rem;
+            }
+        </style>
     </head>
 
     <body>
-        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
             <div class="container">
-                <a class="navbar-brand" href="../dashboard">Blog</a>
-                <div class="collapse navbar-collapse">
-                    <ul class="navbar-nav ms-auto">
-                        <li class="nav-item"><a id="logout" class="nav-link" href="#">Logout</a></li>
-                    </ul>
+                <a class="navbar-brand" href="../project-1/">Project 1 - PhP MySQL</a>
+                <div class="ms-auto">
+                    <button id="logout" class="btn btn-danger">Logout</button>
                 </div>
             </div>
         </nav>
-        <div class="container mt-4">
-            <h1>Your Articles</h1>
-            <div id="articles" class="list-group"></div>
-            <button id="newArticle" class="btn btn-primary mt-3">New Article</button>
-            <div id="articleForm" class="mt-4" style="display:none;">
-                <h3 id="formTitle">New Article</h3>
-                <form id="form">
-                    <div class="mb-3"><input type="hidden" id="articleId"></div>
-                    <div class="mb-3"><label class="form-label">Title</label><input type="text" id="title" class="form-control"></div>
-                    <div class="mb-3"><label class="form-label">Slug</label><input type="text" id="slug" class="form-control"></div>
-                    <div class="mb-3"><label class="form-label">Content</label><textarea id="content" class="form-control"></textarea></div>
-                    <button type="submit" class="btn btn-success">Save</button>
-                </form>
-            </div>
+        <div class="container dashboard-container">
+            <h2>Your Articles</h2>
+            <button id="newArticleBtn" class="btn btn-success mb-3">New Article</button>
+            <div id="articlesList" class="list-group"></div>
+            <hr>
+            <h2>Create / Edit Article</h2>
+            <form id="articleForm" style="display: none;">
+                <input type="hidden" id="articleId">
+                <div class="mb-3">
+                    <label class="form-label">Title</label>
+                    <input type="text" id="title" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Slug</label>
+                    <input type="text" id="slug" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Content</label>
+                    <textarea id="content" class="form-control" rows="6" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Save Article</button>
+                <button type="button" id="cancelArticle" class="btn btn-secondary">Cancel</button>
+            </form>
         </div>
         <script>
-            document.getElementById('logout').addEventListener('click', e => {
-                fetch('api/logout', { method: 'POST' }).then(r => r.json()).then(data => {
-                    window.location.href = '/'
-                })
+            document.getElementById('logout').addEventListener('click', () => {
+                fetch('api/logout', { method: 'POST' }).then(r => r.json()).then(() => window.location.href = '/')
             })
-            document.getElementById('newArticle').addEventListener('click', () => {
+            function loadMyArticles() {
+                fetch('api/myarticles')
+                    .then(r => r.json())
+                    .then(data => {
+                        const list = document.getElementById('articlesList')
+                        list.innerHTML = ''
+                        data.forEach(article => {
+                            let item = document.createElement('a')
+                            item.href = "#"
+                            item.className = "list-group-item list-group-item-action"
+                            item.textContent = article.title + " (" + article.status + ")"
+                            item.addEventListener('click', () => {
+                                document.getElementById('articleId').value = article.id
+                                document.getElementById('title').value = article.title
+                                document.getElementById('slug').value = article.slug
+                                document.getElementById('content').value = article.content
+                                document.getElementById('articleForm').style.display = 'block'
+                            })
+                            list.appendChild(item)
+                        })
+                    })
+            }
+            document.getElementById('newArticleBtn').addEventListener('click', () => {
                 document.getElementById('articleForm').style.display = 'block'
+                document.getElementById('articleId').value = ''
+                document.getElementById('title').value = ''
+                document.getElementById('slug').value = ''
+                document.getElementById('content').value = ''
             })
-            fetch('api/myarticles').then(r => r.json()).then(data => {
-                data.forEach(a => {
-                    let item = document.createElement('a')
-                    item.href = '#'
-                    item.className = 'list-group-item list-group-item-action'
-                    item.textContent = a.title + ' (' + a.status + ')'
-                    item.onclick = () => {
-                        document.getElementById('articleId').value = a.id
-                        document.getElementById('title').value = a.title
-                        document.getElementById('slug').value = a.slug
-                        document.getElementById('content').value = a.content
-                        document.getElementById('articleForm').style.display = 'block'
-                    }
-                    document.getElementById('articles').appendChild(item)
-                })
+            document.getElementById('cancelArticle').addEventListener('click', () => {
+                document.getElementById('articleForm').style.display = 'none'
             })
-            document.getElementById('form').addEventListener('submit', e => {
+            document.getElementById('articleForm').addEventListener('submit', e => {
                 e.preventDefault()
-                let id = document.getElementById('articleId').value, payload = { title: document.getElementById('title').value, slug: document.getElementById('slug').value, content: document.getElementById('content').value }
+                const id = document.getElementById('articleId').value
+                const payload = {
+                    title: document.getElementById('title').value,
+                    slug: document.getElementById('slug').value,
+                    content: document.getElementById('content').value
+                }
                 if (id) {
-                    fetch('api/articles/' + id, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }).then(r => r.json()).then(data => {
-                        location.reload()
-                    })
+                    fetch('api/articles/' + id, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
+                        .then(r => r.json()).then(() => { loadMyArticles(); document.getElementById('articleForm').style.display = 'none' })
                 } else {
-                    fetch('api/articles', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }).then(r => r.json()).then(data => {
-                        location.reload()
-                    })
+                    fetch('api/articles', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
+                        .then(r => r.json()).then(() => { loadMyArticles(); document.getElementById('articleForm').style.display = 'none' })
                 }
             })
+            loadMyArticles()
         </script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     </body>
 
 </html>

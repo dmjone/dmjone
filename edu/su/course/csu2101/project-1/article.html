@@ -3,40 +3,65 @@
 
     <head>
         <meta charset="UTF-8">
-        <title>Article</title>
+        <title>Article - My Awesome Blog</title>
         <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+        <style>
+            .article-banner {
+                background: url('https://agen-bgimg.dmj.one/') no-repeat center center fixed;
+                background-size: cover;
+                filter: blur(10px);
+                height: 40vh;
+            }
+        </style>
     </head>
 
     <body>
-        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
             <div class="container">
-                <a class="navbar-brand" href="../dashboard">Blog</a>
+                <a class="navbar-brand" href="../project-1/">Project 1 - PhP MySQL</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
             </div>
         </nav>
-        <div class="container mt-4">
-            <div id="article"></div>
-            <div id="comments" class="mt-4"></div>
-            <div id="commentForm" class="mt-4">
-                <h3>Leave a Comment</h3>
-                <textarea id="commentContent" class="form-control"></textarea>
-                <button id="submitComment" class="btn btn-primary mt-2">Submit</button>
+        <div class="article-banner"></div>
+        <div class="container my-5">
+            <div id="articleContent"></div>
+            <hr>
+            <h4>Comments</h4>
+            <div id="commentsSection"></div>
+            <div class="mt-4">
+                <h5>Leave a Comment</h5>
+                <textarea id="commentText" class="form-control mb-2" rows="3"></textarea>
+                <button id="submitComment" class="btn btn-primary">Submit Comment</button>
             </div>
         </div>
         <script>
             const urlParams = new URLSearchParams(window.location.search)
-            const id = urlParams.get('id')
-            fetch('api/articles').then(r => r.json()).then(data => {
-                let article = data.find(a => a.id == id)
-                if (article) {
-                    document.getElementById('article').innerHTML = '<h1>' + article.title + '</h1><p>' + article.content + '</p>'
-                }
-            })
-            document.getElementById('submitComment').addEventListener('click', () => {
-                fetch('api/articles/' + id + 'comment', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ content: document.getElementById('commentContent').value }) }).then(r => r.json()).then(data => {
-                    location.reload()
+            const articleId = urlParams.get('id')
+            fetch('api/articles')
+                .then(r => r.json())
+                .then(data => {
+                    let article = data.find(a => a.id == articleId)
+                    if (article) {
+                        document.getElementById('articleContent').innerHTML = `
+            <h1>${article.title}</h1>
+            <p>${article.content}</p>
+            <p class="text-muted">Published on: ${article.created_at}</p>
+          `
+                    }
                 })
+            document.getElementById('submitComment').addEventListener('click', () => {
+                fetch('api/articles/' + articleId + '/comments', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ content: document.getElementById('commentText').value })
+                })
+                    .then(r => r.json())
+                    .then(data => location.reload())
             })
         </script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     </body>
 
 </html>
