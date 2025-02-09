@@ -31,6 +31,7 @@
         <link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700" rel="stylesheet">
 
         <style>
+            /* Global Styles */
             body {
                 font-family: 'Roboto', sans-serif;
             }
@@ -125,6 +126,12 @@
                 color: #777;
             }
 
+            /* Ensure images are responsive */
+            .article-content img {
+                max-width: 100%;
+                height: auto;
+            }
+
             /* Responsive adjustments */
             @media (max-width: 768px) {
                 .article-banner {
@@ -133,6 +140,49 @@
 
                 .banner-content h1 {
                     font-size: 2rem;
+                }
+            }
+
+            /* Print Styles for APA6 formatting */
+            @media print {
+                @page {
+                    margin: 1in;
+                }
+
+                /* Hide elements that are not needed in print */
+                nav,
+                .article-banner,
+                .share-buttons,
+                #comments,
+                .related-articles,
+                footer,
+                .btn,
+                .navbar,
+                .card,
+                .comment {
+                    display: none !important;
+                }
+
+                /* Expand main content to full width */
+                .main-content,
+                .col-lg-8 {
+                    margin: 0;
+                    padding: 0;
+                    width: 100%;
+                }
+
+                .article-content {
+                    padding: 0;
+                    border: none;
+                    box-shadow: none;
+                }
+
+                /* APA6 styling */
+                body {
+                    font-family: "Times New Roman", serif;
+                    font-size: 12pt;
+                    line-height: 1.5;
+                    color: #000;
                 }
             }
         </style>
@@ -238,7 +288,6 @@
         </footer>
 
         <!-- Scripts: FontAwesome, Bootstrap Bundle -->
-        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script> -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 
         <!-- JavaScript -->
@@ -255,7 +304,7 @@
 
             // Load the article content and related info
             function loadArticle() {
-                fetch('api/articles', {cache: 'no-store' })
+                fetch('api/articles', { cache: 'no-store' })
                     .then(response => response.json())
                     .then(data => {
                         let article = data.find(a => a.id == articleId);
@@ -268,22 +317,22 @@
                             // Load author info with improved layout if available
                             if (article.author) {
                                 document.getElementById('authorBio').innerHTML = `
-                                <div class="card border-0 mb-4">
-                                  <div class="card-body">
-                                    <div class="d-flex align-items-center">
-                                      <img src="${article.author.avatar || 'https://via.placeholder.com/60'}" 
-                                           class="rounded-circle me-3" alt="${article.author.name}" width="60" height="60">
-                                      <div>
-                                        <h5 class="mb-0">
-                                          <a href="${article.author.url}" class="text-decoration-none">${article.author.name}</a>
-                                        </h5>
-                                        <small class="text-muted">Author</small>
-                                      </div>
-                                    </div>
-                                    <p class="mt-3 mb-0">${article.author.bio || "No bio available."}</p>
-                                  </div>
-                                </div>
-              `;
+                  <div class="card border-0 mb-4">
+                    <div class="card-body">
+                      <div class="d-flex align-items-center">
+                        <img src="${article.author.avatar || 'https://via.placeholder.com/60'}" 
+                             class="rounded-circle me-3" alt="${article.author.name}" width="60" height="60">
+                        <div>
+                          <h5 class="mb-0">
+                            <a href="${article.author.url}" class="text-decoration-none">${article.author.name}</a>
+                          </h5>
+                          <small class="text-muted">Author</small>
+                        </div>
+                      </div>
+                      <p class="mt-3 mb-0">${article.author.bio || "No bio available."}</p>
+                    </div>
+                  </div>
+                `;
                             } else {
                                 document.getElementById('authorBio').textContent = "Author information not available.";
                             }
@@ -317,12 +366,12 @@
                         const card = document.createElement('div');
                         card.className = 'card mb-2';
                         card.innerHTML = `
-            <div class="card-body">
-              <h6 class="card-title">${article.title}</h6>
-              <p class="card-text"><small class="text-muted">Published on ${article.created_at}</small></p>
-              <a href="article?id=${article.id}" class="stretched-link"></a>
-            </div>
-          `;
+              <div class="card-body">
+                <h6 class="card-title">${article.title}</h6>
+                <p class="card-text"><small class="text-muted">Published on ${article.created_at}</small></p>
+                <a href="article?id=${article.id}" class="stretched-link"></a>
+              </div>
+            `;
                         container.appendChild(card);
                     });
                 }
@@ -340,11 +389,11 @@
                         } else {
                             comments.forEach(comment => {
                                 commentsSection.innerHTML += `
-                <div class="comment">
-                  <p>${marked.parse(comment.content)}</p>
-                  <small>Posted on ${comment.created_at}</small>
-                </div>
-              `;
+                  <div class="comment">
+                    <p>${marked.parse(comment.content)}</p>
+                    <small>Posted on ${comment.created_at}</small>
+                  </div>
+                `;
                             });
                         }
                     })
@@ -382,15 +431,7 @@
             // Social share buttons setup
             function setupShareButtons() {
                 const currentUrl = encodeURIComponent(window.location.href);
-                document.getElementById('shareTwitter').href = `https://twitter.com/intent/tweet?url=${currentUrl}`;
-                document.getElementById('shareFacebook').href = `https://www.facebook.com/sharer/sharer.php?u=${currentUrl}`;
-                document.getElementById('shareLinkedIn').href = `https://www.linkedin.com/shareArticle?mini=true&url=${currentUrl}`;
-            }
-
-            function setupShareButtons() {
-                const currentUrl = encodeURIComponent(window.location.href);
                 const shareText = encodeURIComponent("Check out CourseConnect Blog!");
-
                 document.getElementById('shareX').href = `https://x.com/intent/tweet?url=${currentUrl}&text=${shareText}`;
                 document.getElementById('shareFacebook').href = `https://www.facebook.com/sharer/sharer.php?u=${currentUrl}`;
                 document.getElementById('shareLinkedIn').href = `https://www.linkedin.com/shareArticle?mini=true&url=${currentUrl}&title=${shareText}`;
