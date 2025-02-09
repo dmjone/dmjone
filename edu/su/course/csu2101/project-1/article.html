@@ -3,7 +3,7 @@
 
     <head>
         <meta charset="UTF-8">
-        <title>Article - My Awesome Blog</title>
+        <title>Article - Dynamic PHP & MySQL Blog</title>
         <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
         <style>
             .article-banner {
@@ -12,13 +12,20 @@
                 filter: blur(5px);
                 height: 20vh;
             }
+
+            .comment {
+                padding: 0.75rem;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                background-color: #f8f9fa;
+            }
         </style>
     </head>
 
     <body>
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
             <div class="container">
-                <a class="navbar-brand" href="../project-1/">Project 1 - PhP MySQL</a>
+                <a class="navbar-brand" href="../project-1/">Dynamic PHP & MySQL Blog</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -43,28 +50,72 @@
             const urlParams = new URLSearchParams(window.location.search);
             const articleId = urlParams.get('id');
 
+            // Fetch and render the article content.
             fetch('api/articles')
                 .then(response => response.json())
                 .then(data => {
                     let article = data.find(a => a.id == articleId);
                     if (article) {
-                        // Convert markdown to HTML using marked.parse()
                         document.getElementById('articleContent').innerHTML = `
-                          <h1>${article.title}</h1>
-                          ${marked.parse(article.content)}
-                          <p class="text-muted">Published on: ${article.created_at}</p>
-                        `;
+            <h1>${article.title}</h1>
+            ${marked.parse(article.content)}
+            <p class="text-muted">Published on: ${article.created_at}</p>
+          `;
                     }
+                    // Load comments after the article is rendered.
+                    loadComments();
                 });
 
+            // Function to fetch and display comments.
+            function loadComments() {
+                fetch('api/articles/' + articleId + '/comments')
+                    .then(response => response.json())
+                    .then(comments => {
+                        const commentsSection = document.getElementById('commentsSection');
+                        commentsSection.innerHTML = '';
+                        if (comments.length === 0) {
+                            commentsSection.innerHTML = '<p>No comments yet.</p>';
+                        } else {
+                            comments.forEach(comment => {
+                                commentsSection.innerHTML += `
+                <div class="comment mb-3">
+                  <p>${marked.parse(comment.content)}</p>
+                  <small class="text-muted">Posted on ${comment.created_at}</small>
+                </div>
+              `;
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching comments:', error);
+                    });
+            }
+
+            // Submit comment handler.
             document.getElementById('submitComment').addEventListener('click', () => {
+                const commentContent = document.getElementById('commentText').value;
+                if (!commentContent.trim()) {
+                    alert("Please enter a comment before submitting.");
+                    return;
+                }
                 fetch('api/articles/' + articleId + '/comments', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ content: document.getElementById('commentText').value })
+                    body: JSON.stringify({ content: commentContent })
                 })
                     .then(response => response.json())
-                    .then(data => location.reload());
+                    .then(data => {
+                        if (data.success) {
+                            // Clear the textarea and reload comments without reloading the entire page.
+                            document.getElementById('commentText').value = '';
+                            loadComments();
+                        } else {
+                            alert(data.error);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error submitting comment:', error);
+                    });
             });
         </script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
