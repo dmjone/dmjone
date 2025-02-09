@@ -4,25 +4,124 @@
     <head>
         <meta charset="UTF-8">
         <title>Article - Dynamic Blog Project</title>
+        <!-- Bootstrap CSS -->
         <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+        <!-- FontAwesome for share icons -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-k6RqeWeciBc8kRz9XOR/XNp4fPuhB6jO65z1m2nD4Q/3QGx+AfGjE/tQPS/PZ7l1WPEPdzjs7ElUP6COY5i0TA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+        <!-- Google Fonts -->
+        <link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700" rel="stylesheet">
         <style>
-            .article-banner {
-                background: url('https://agen-bgimg.dmj.one/') no-repeat center center fixed;
-                background-size: cover;
-                filter: blur(5px);
-                height: 20vh;
+            body {
+                background: #f7f7f7;
+                font-family: 'Roboto', sans-serif;
             }
 
+            /* Navbar */
+            .navbar-brand {
+                font-weight: 500;
+            }
+
+            /* Article Banner */
+            .article-banner {
+                position: relative;
+                background: url('https://agen-bgimg.dmj.one/') no-repeat center center;
+                background-size: cover;
+                height: 40vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #fff;
+            }
+
+            .article-banner::before {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+            }
+
+            .banner-content {
+                position: relative;
+                z-index: 2;
+                text-align: center;
+            }
+
+            .banner-content h1 {
+                font-size: 3rem;
+                font-weight: 700;
+                margin-bottom: 0.5rem;
+            }
+
+            .banner-content p {
+                font-size: 1.2rem;
+            }
+
+            /* Main Content */
+            .main-content {
+                margin-top: 2rem;
+            }
+
+            .article-content {
+                background: #fff;
+                padding: 2rem;
+                border-radius: 8px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            }
+
+            .author-info,
+            .related-articles {
+                background: #fff;
+                padding: 1rem;
+                border-radius: 8px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+                margin-bottom: 2rem;
+            }
+
+            .share-buttons a {
+                margin-right: 10px;
+                font-size: 1.5rem;
+                color: #007bff;
+                transition: color 0.3s;
+            }
+
+            .share-buttons a:hover {
+                color: #0056b3;
+            }
+
+            /* Comment Section */
             .comment {
-                padding: 0.75rem;
+                padding: 1rem;
                 border: 1px solid #ddd;
-                border-radius: 4px;
-                background-color: #f8f9fa;
+                border-radius: 8px;
+                background-color: #fff;
+                margin-bottom: 1rem;
+                box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+            }
+
+            .comment small {
+                color: #777;
+            }
+
+            /* Responsive adjustments */
+            @media (max-width: 768px) {
+                .article-banner {
+                    height: 30vh;
+                }
+
+                .banner-content h1 {
+                    font-size: 2rem;
+                }
             }
         </style>
+        <!-- Include Marked.js for Markdown rendering -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.2.12/marked.min.js"></script>
     </head>
 
     <body>
+        <!-- Navigation Bar -->
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
             <div class="container">
                 <a class="navbar-brand" href="../project-1/">Dynamic Blog Project</a>
@@ -31,42 +130,125 @@
                 </button>
             </div>
         </nav>
-        <div class="article-banner"></div>
-        <div class="container my-5">
-            <div id="articleContent"></div>
-            <hr>
-            <h4>Comments</h4>
-            <div id="commentsSection"></div>
-            <div class="mt-4">
-                <h5>Leave a Comment</h5>
-                <textarea id="commentText" class="form-control mb-2" rows="3"></textarea>
-                <button id="submitComment" class="btn btn-primary">Submit Comment</button>
+
+        <!-- Article Banner -->
+        <div class="article-banner">
+            <div class="banner-content">
+                <h1 id="bannerTitle">Loading...</h1>
+                <p id="bannerDate"></p>
             </div>
         </div>
 
-        <!-- Include Marked.js from CDNJS to render Markdown -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.2.12/marked.min.js"></script>
+        <!-- Main Content -->
+        <div class="container main-content">
+            <div class="row">
+                <!-- Article Content Column -->
+                <div class="col-lg-8">
+                    <div class="article-content" id="articleContent">
+                        <!-- Article content will be loaded here -->
+                    </div>
+
+                    <!-- Social Share Buttons -->
+                    <div class="share-buttons my-4">
+                        <span>Share: </span>
+                        <a href="#" id="shareTwitter" title="Share on Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" id="shareFacebook" title="Share on Facebook"><i class="fab fa-facebook"></i></a>
+                        <a href="#" id="shareLinkedIn" title="Share on LinkedIn"><i class="fab fa-linkedin"></i></a>
+                    </div>
+
+                    <!-- Comments Section -->
+                    <section id="comments">
+                        <h4>Comments</h4>
+                        <div id="commentsSection">
+                            <!-- Comments will be loaded here -->
+                        </div>
+                        <div class="mt-4">
+                            <h5>Leave a Comment</h5>
+                            <textarea id="commentText" class="form-control mb-2" rows="3" placeholder="Your comment..."></textarea>
+                            <button id="submitComment" class="btn btn-primary">Submit Comment</button>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- Sidebar Column -->
+                <div class="col-lg-4">
+                    <!-- Author Info -->
+                    <div class="author-info">
+                        <h5>About the Author</h5>
+                        <p id="authorBio">Loading author info...</p>
+                    </div>
+
+                    <!-- Related Articles -->
+                    <div class="related-articles">
+                        <h5>Related Articles</h5>
+                        <div id="relatedArticles">
+                            <!-- Related articles will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- JavaScript -->
         <script>
             const urlParams = new URLSearchParams(window.location.search);
             const articleId = urlParams.get('id');
 
-            // Fetch and render the article content.
-            fetch('api/articles')
-                .then(response => response.json())
-                .then(data => {
-                    let article = data.find(a => a.id == articleId);
-                    if (article) {
-                        document.getElementById('articleContent').innerHTML = `
-            <h1>${article.title}</h1>
-            ${marked.parse(article.content)}
-            <p class="text-muted">Published on: ${article.created_at}</p>
-          `;
-                    }
-                    // Load comments after the article is rendered.
-                    loadComments();
-                });
+            // Load the article content and related info
+            function loadArticle() {
+                fetch('api/articles')
+                    .then(response => response.json())
+                    .then(data => {
+                        let article = data.find(a => a.id == articleId);
+                        if (article) {
+                            // Update banner with article title and date
+                            document.getElementById('bannerTitle').textContent = article.title;
+                            document.getElementById('bannerDate').textContent = "Published on: " + article.created_at;
 
-            // Function to fetch and display comments.
+                            // Render article content using marked.js
+                            document.getElementById('articleContent').innerHTML = marked.parse(article.content);
+
+                            // Load author info if available
+                            if (article.author) {
+                                document.getElementById('authorBio').innerHTML = `<strong>${article.author.name}</strong><br>${article.author.bio || "No bio available."}`;
+                            } else {
+                                document.getElementById('authorBio').textContent = "Author information not available.";
+                            }
+
+                            // Load related articles (example: filter by same category)
+                            loadRelatedArticles(data, article);
+                        }
+                        loadComments();
+                    })
+                    .catch(error => {
+                        console.error('Error loading article:', error);
+                    });
+            }
+
+            // Load related articles (up to 3)
+            function loadRelatedArticles(articles, currentArticle) {
+                const related = articles.filter(a => a.id != currentArticle.id && a.category === currentArticle.category).slice(0, 3);
+                const container = document.getElementById('relatedArticles');
+                container.innerHTML = '';
+                if (related.length === 0) {
+                    container.innerHTML = '<p>No related articles.</p>';
+                } else {
+                    related.forEach(article => {
+                        const card = document.createElement('div');
+                        card.className = 'card';
+                        card.innerHTML = `
+            <div class="card-body">
+              <h6 class="card-title">${article.title}</h6>
+              <p class="card-text"><small class="text-muted">Published on ${article.created_at}</small></p>
+              <a href="article.html?id=${article.id}" class="stretched-link"></a>
+            </div>
+          `;
+                        container.appendChild(card);
+                    });
+                }
+            }
+
+            // Load comments for the article
             function loadComments() {
                 fetch('api/articles/' + articleId + '/comments')
                     .then(response => response.json())
@@ -78,9 +260,9 @@
                         } else {
                             comments.forEach(comment => {
                                 commentsSection.innerHTML += `
-                <div class="comment mb-3">
+                <div class="comment">
                   <p>${marked.parse(comment.content)}</p>
-                  <small class="text-muted">Posted on ${comment.created_at}</small>
+                  <small>Posted on ${comment.created_at}</small>
                 </div>
               `;
                             });
@@ -91,7 +273,7 @@
                     });
             }
 
-            // Submit comment handler.
+            // Submit comment handler
             document.getElementById('submitComment').addEventListener('click', () => {
                 const commentContent = document.getElementById('commentText').value;
                 if (!commentContent.trim()) {
@@ -106,7 +288,6 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            // Clear the textarea and reload comments without reloading the entire page.
                             document.getElementById('commentText').value = '';
                             loadComments();
                         } else {
@@ -117,7 +298,20 @@
                         console.error('Error submitting comment:', error);
                     });
             });
+
+            // Social share buttons setup
+            function setupShareButtons() {
+                const currentUrl = encodeURIComponent(window.location.href);
+                document.getElementById('shareTwitter').href = `https://twitter.com/intent/tweet?url=${currentUrl}`;
+                document.getElementById('shareFacebook').href = `https://www.facebook.com/sharer/sharer.php?u=${currentUrl}`;
+                document.getElementById('shareLinkedIn').href = `https://www.linkedin.com/shareArticle?mini=true&url=${currentUrl}`;
+            }
+
+            // Initialize page content
+            setupShareButtons();
+            loadArticle();
         </script>
+        <!-- Bootstrap Bundle JS -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     </body>
 
