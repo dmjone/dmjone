@@ -5,19 +5,22 @@
         <meta charset="UTF-8">
         <title>Login - CourseConnect</title>
 
+        <!-- Open Graph / Twitter metadata -->
         <meta property="og:image" content="/logo.png">
         <meta property="og:type" content="article">
-        
         <meta name="twitter:card" content="summary">
         <meta name="twitter:site" content="@divyamohan1993">
         <meta name="twitter:creator" content="@divyamohan1993">
         <meta name="twitter:image" content="/logo.png">
-        
-        <meta charset="UTF-8" />
+
         <meta name="viewport" content="width=device-width,initial-scale=1" />
-        
         <meta name="author" content="Divya Mohan">
         <meta name="robots" content="noindex, nofollow">
+
+        <!-- Prevent caching -->
+        <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+        <meta http-equiv="Pragma" content="no-cache" />
+        <meta http-equiv="Expires" content="0" />
 
         <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
         <style>
@@ -39,22 +42,21 @@
                 background-size: cover;
                 filter: blur(10px);
                 z-index: -1;
-                /* Place behind the content */
             }
 
-            /* The register form container remains unblurred */
+            /* The login form container remains unblurred */
             .login-container {
                 position: relative;
                 margin-top: 10%;
                 padding: 2rem;
                 border-radius: 8px;
                 z-index: 1;
-                background-color: rgb(255, 255, 255, 0.85);
+                background-color: rgba(255, 255, 255, 0.85);
             }
         </style>
         <script>
             // Immediately check if a user session already exists.
-            fetch('api/profile', { credentials: 'include' })
+            fetch('api/profile', { credentials: 'include', cache: 'no-store' })
                 .then(response => {
                     if (!response.ok) {
                         // Not logged in, so no redirection.
@@ -75,7 +77,6 @@
                     console.log("User not logged in:", err.message);
                 });
         </script>
-
     </head>
 
     <body>
@@ -96,35 +97,50 @@
                     </form>
                     <div id="message" class="mt-3 text-danger text-center"></div>
                     <div class="text-center mt-2">
+                        <a href="forgot-password">Forgot Password?</a>
+                    </div>
+                    <div class="text-center mt-2">
                         <a href="register">Don't have an account? Register</a>
                     </div>
                 </div>
             </div>
         </div>
 
+
         <!-- Scripts: FontAwesome, Bootstrap Bundle -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 
-        
         <script>
             document.getElementById('loginForm').addEventListener('submit', e => {
-                e.preventDefault()
+                e.preventDefault();
                 fetch('api/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: document.getElementById('email').value, password: document.getElementById('password').value })
+                    body: JSON.stringify({
+                        email: document.getElementById('email').value,
+                        password: document.getElementById('password').value
+                    }),
+                    credentials: 'include',
+                    cache: 'no-store'
                 })
                     .then(r => r.json())
                     .then(data => {
                         if (data.success) {
-                            if (data.role === "admin") window.location.href = "admin"
-                            else window.location.href = "dashboard"
-                        } else document.getElementById('message').textContent = data.error
+                            if (data.role === "admin") {
+                                window.location.href = "admin";
+                            } else {
+                                window.location.href = "dashboard";
+                            }
+                        } else {
+                            document.getElementById('message').textContent = data.error;
+                        }
                     })
-            })
+                    .catch(err => {
+                        console.error("Login error:", err);
+                    });
+            });
         </script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     </body>
 
 </html>
