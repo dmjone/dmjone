@@ -277,29 +277,42 @@
 
             // Load related articles (up to 3)
             function loadRelatedArticles(articles, currentArticle) {
-                let related = articles.filter(a => a.id != currentArticle.id && a.category === currentArticle.category);
-                // Shuffle the related articles array randomly
-                related.sort(() => Math.random() - 0.5);
-                const selected = related.slice(0, 3);                
+                // Filter out the current article and keep only those with the same category.
+                let related = articles.filter(a => a.id !== currentArticle.id && a.category === currentArticle.category);
+
+                // Fisher-Yates shuffle algorithm for a proper random shuffle.
+                function shuffleArray(array) {
+                    for (let i = array.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [array[i], array[j]] = [array[j], array[i]];
+                    }
+                }
+                shuffleArray(related);
+
+                // Limit to 3 related articles.
+                const selected = related.slice(0, 3);
+
                 const container = document.getElementById('relatedArticles');
                 container.innerHTML = '';
-                if (related.length === 0) {
+
+                if (selected.length === 0) {
                     container.innerHTML = '<p>No related articles.</p>';
                 } else {
-                    related.forEach(article => {
+                    selected.forEach(article => {
                         const card = document.createElement('div');
-                        card.className = 'card';
+                        card.className = 'card mb-2';
                         card.innerHTML = `
-            <div class="card-body">
-              <h6 class="card-title">${article.title}</h6>
-              <p class="card-text"><small class="text-muted">Published on ${article.created_at}</small></p>
-              <a href="article?id=${article.id}" class="stretched-link"></a>
-            </div>
-          `;
+                          <div class="card-body">
+                            <h6 class="card-title">${article.title}</h6>
+                            <p class="card-text"><small class="text-muted">Published on ${article.created_at}</small></p>
+                            <a href="article?id=${article.id}" class="stretched-link"></a>
+                          </div>
+                        `;
                         container.appendChild(card);
                     });
                 }
             }
+
 
             // Load comments for the article
             function loadComments() {
