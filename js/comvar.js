@@ -557,6 +557,11 @@ const profDetailsBio = {
     {
         bio: "<p class='professorbio header-p-author-description'>Akshita Thakur is an English Language teacher from India, specializing in English Literature and Language. With a passion for teaching and a commitment to student success, she brings a unique approach to language learning, focusing on practical applications and real-world scenarios to help students master the English language. Akshita is dedicated to providing a supportive and engaging learning environment, fostering a love for language and literature in her students.</p>",
         href: "contact@dmj.one",
+    },
+    'Aman Rajak':
+    {
+        bio: "<p class='professorbio header-p-author-description'>Aman Rajak is a tech trainer with 7+ years of experience in Cybersecurity, IoT, Web Development, and MySQL. He has conducted 500+ corporate sessions and trained students at IITs and NITs on Blockchain, Big Data, and AI. A cybersecurity expert, he supports national forces with threat analysis and VAPT. During the pandemic, he worked on robotics projects and served as a COVID warrior.</p>",
+        href: "jazzk.p.s@gmail.com",
     }
 };
 const courseDetailsMap = {
@@ -642,6 +647,7 @@ const courseDetailsMap = {
 
     // Semester 6    
     'lse006': { 'default': ["Akshita Thakur", "LSE006", "English Communication Seminar 2"] },
+    'csu2101': { 'default': ["Aman Rajak", "CSU2101", "Programming in PHP & MySQL"] },
     
 };
 
