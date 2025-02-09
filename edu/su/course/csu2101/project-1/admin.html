@@ -85,19 +85,19 @@
                     window.location.href = "login";
                 });
 
-                (function () {
-                        'use strict';
-                        const defaultTheme = 'light';
-                        let storedTheme;
-                        try {
-                            storedTheme = localStorage.getItem('theme');
-                        } catch (err) { }
-                        if (storedTheme === 'dark' || (!storedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                            document.documentElement.setAttribute('data-bs-theme', 'dark');
-                        } else {
-                            document.documentElement.setAttribute('data-bs-theme', defaultTheme);
-                        }
-                    })();
+            (function () {
+                'use strict';
+                const defaultTheme = 'light';
+                let storedTheme;
+                try {
+                    storedTheme = localStorage.getItem('theme');
+                } catch (err) { }
+                if (storedTheme === 'dark' || (!storedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                    document.documentElement.setAttribute('data-bs-theme', 'dark');
+                } else {
+                    document.documentElement.setAttribute('data-bs-theme', defaultTheme);
+                }
+            })();
         </script>
     </head>
 
@@ -220,6 +220,18 @@
                         <div class="modal-body">
                             <input type="hidden" id="editUserId">
                             <div class="mb-3">
+                                <label class="form-label">Full Name</label>
+                                <input type="text" id="editUserName" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Author URL</label>
+                                <input type="url" id="editUserAuthorUrl" class="form-control">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Biography</label>
+                                <textarea id="editUserAuthorBio" class="form-control" rows="3"></textarea>
+                            </div>
+                            <div class="mb-3">
                                 <label class="form-label">Role</label>
                                 <select id="editUserRole" class="form-select">
                                     <option value="user">User</option>
@@ -242,6 +254,7 @@
                 </div>
             </div>
         </div>
+
 
         <!-- Article Edit Modal -->
         <div class="modal fade" id="articleEditModal" tabindex="-1">
@@ -312,12 +325,19 @@
                         const tbody = document.getElementById('usersTable').querySelector('tbody')
                         tbody.innerHTML = ''
                         data.forEach(u => {
-                            let row = document.createElement('tr')
-                            row.innerHTML = `<td>${u.id}</td><td>${u.email}</td><td>${u.role}</td><td>${u.is_active ? 'Yes' : 'No'}</td><td>${u.created_at}</td>
-                            <td>
-                              <button class="btn btn-sm btn-warning me-1" onclick="openUserEdit(${u.id},'${u.role}',${u.is_active})">Edit</button>            
-                              <button class="btn btn-sm btn-danger" onclick="deleteUser(${u.id})">Delete</button>
-                            </td>`
+                            let row = document.createElement('tr')                            
+                            row.innerHTML = `
+                                  <td>${u.id}</td>
+                                  <td>${u.email}</td>
+                                  <td>${u.name || ''}</td>
+                                  <td>${u.role}</td>
+                                  <td>${u.is_active ? 'Yes' : 'No'}</td>
+                                  <td>${u.created_at}</td>
+                                  <td>
+                                    <button class="btn btn-sm btn-warning me-1" onclick="openUserEdit(${u.id}, '${u.role}', ${u.is_active}, '${(u.name || "").replace(/'/g, "\\'")}', '${(u.author_url || "").replace(/'/g, "\\'")}', '${(u.author_bio || "").replace(/'/g, "\\'")}')">Edit</button>
+                                    <button class="btn btn-sm btn-danger" onclick="deleteUser(${u.id})">Delete</button>
+                                  </td>`;
+
                             tbody.appendChild(row)
                         })
                     })
@@ -336,26 +356,45 @@
                         });
                 }
             }
-            function openUserEdit(id, role, active) {
-                document.getElementById('editUserId').value = id
-                document.getElementById('editUserRole').value = role
-                document.getElementById('editUserActive').value = active
-                new bootstrap.Modal(document.getElementById('userEditModal')).show()
+            function openUserEdit(id, role, active, name, author_url, author_bio) {
+                document.getElementById('editUserId').value = id;
+                document.getElementById('editUserName').value = name || "";
+                document.getElementById('editUserAuthorUrl').value = author_url || "";
+                document.getElementById('editUserAuthorBio').value = author_bio || "";
+                document.getElementById('editUserRole').value = role;
+                document.getElementById('editUserActive').value = active;
+                new bootstrap.Modal(document.getElementById('userEditModal')).show();
             }
             document.getElementById('userEditForm').addEventListener('submit', e => {
-                e.preventDefault()
-                let id = document.getElementById('editUserId').value, role = document.getElementById('editUserRole').value, active = document.getElementById('editUserActive').value
-                fetch('api/admin/users/' + id, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ role: role, is_active: Number(active) })
-                })
-                    .then(r => r.json())
-                    .then(data => {
-                        if (data.success) { loadUsers(); bootstrap.Modal.getInstance(document.getElementById('userEditModal')).hide() }
-                        else alert(data.error)
+                    e.preventDefault();
+                    let id = document.getElementById('editUserId').value,
+                        role = document.getElementById('editUserRole').value,
+                        active = document.getElementById('editUserActive').value,
+                        name = document.getElementById('editUserName').value.trim(),
+                        author_url = document.getElementById('editUserAuthorUrl').value.trim(),
+                        author_bio = document.getElementById('editUserAuthorBio').value.trim();
+
+                    fetch('api/admin/users/' + id, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            role: role,
+                            is_active: Number(active),
+                            name: name,
+                            author_url: author_url,
+                            author_bio: author_bio
+                        })
                     })
-            })
+                        .then(r => r.json())
+                        .then(data => {
+                            if (data.success) {
+                                loadUsers();
+                                bootstrap.Modal.getInstance(document.getElementById('userEditModal')).hide();
+                            } else {
+                                alert(data.error);
+                            }
+                        });
+                });
             function loadArticles() {
                 let userId = document.getElementById('searchUserId').value
                 let url = 'api/admin/articles' + (userId ? '?userId=' + userId : '')
@@ -374,7 +413,7 @@
                                 </td>`
                             tbody.appendChild(row)
                         })
-                    })                
+                    })
             }
             document.getElementById('searchBtn').addEventListener('click', () => loadArticles())
             document.getElementById('clearSearch').addEventListener('click', () => {

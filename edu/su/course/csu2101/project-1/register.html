@@ -7,18 +7,13 @@
 
         <meta property="og:image" content="/logo.png">
         <meta property="og:type" content="article">
-
         <meta name="twitter:card" content="summary">
         <meta name="twitter:site" content="@divyamohan1993">
         <meta name="twitter:creator" content="@divyamohan1993">
         <meta name="twitter:image" content="/logo.png">
-
-        <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
-
         <meta name="author" content="Divya Mohan">
         <meta name="robots" content="noindex, nofollow">
-
         <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
         <meta http-equiv="Pragma" content="no-cache" />
         <meta http-equiv="Expires" content="0" />
@@ -44,7 +39,6 @@
                 background-size: cover;
                 filter: blur(10px);
                 z-index: -1;
-                /* Place behind the content */
             }
 
             /* The register form container remains unblurred */
@@ -54,7 +48,7 @@
                 padding: 2rem;
                 border-radius: 8px;
                 z-index: 1;
-                background-color: rgb(255, 255, 255, 0.85);
+                background-color: rgba(255, 255, 255, 0.85);
             }
         </style>
         <script>
@@ -62,13 +56,11 @@
             fetch('api/profile', { credentials: 'include', cache: 'no-store' })
                 .then(response => {
                     if (!response.ok) {
-                        // Not logged in, so no redirection.
                         throw new Error("Not logged in");
                     }
                     return response.json();
                 })
                 .then(user => {
-                    // If logged in, redirect based on user role.
                     if (user.role === 'admin') {
                         window.location.href = 'admin';
                     } else {
@@ -76,7 +68,6 @@
                     }
                 })
                 .catch(err => {
-                    // Error indicates not logged in; allow the page to load normally.
                     console.log("User not logged in:", err.message);
                 });
 
@@ -102,9 +93,24 @@
                 <div class="col-md-4 register-container bg-gradient shadow-lg">
                     <h3 class="text-center mb-4">Register</h3>
                     <form id="registerForm">
+                        <!-- New field: Full Name -->
+                        <div class="mb-3">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" id="name" class="form-control" placeholder="Your full name" required>
+                        </div>
+                        <!-- New field: Author URL -->
+                        <div class="mb-3">
+                            <label class="form-label">Author URL</label>
+                            <input type="url" id="author_url" class="form-control" placeholder="https://yourwebsite.com" required>
+                        </div>
+                        <!-- New field: Biography -->
+                        <div class="mb-3">
+                            <label class="form-label">Biography</label>
+                            <textarea id="author_bio" class="form-control" rows="3" placeholder="A short biography" required></textarea>
+                        </div>
                         <div class="mb-3">
                             <label class="form-label">Email</label>
-                            <input type="email" id="email" class="form-control" required>
+                            <input type="email" id="email" class="form-control" placeholder="you@example.com" required>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Password</label>
@@ -123,26 +129,34 @@
         <!-- Scripts: FontAwesome, Bootstrap Bundle -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-
         <script>
             document.getElementById('registerForm').addEventListener('submit', e => {
                 e.preventDefault();
+                // Capture all registration fields.
+                const name = document.getElementById('name').value.trim();
+                const author_url = document.getElementById('author_url').value.trim();
+                const author_bio = document.getElementById('author_bio').value.trim();
+                const email = document.getElementById('email').value.trim();
+                const password = document.getElementById('password').value;
+
                 fetch('api/register', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        email: document.getElementById('email').value,
-                        password: document.getElementById('password').value
-                    })
+                    body: JSON.stringify({ name, author_url, author_bio, email, password })
                 })
                     .then(r => r.json())
                     .then(data => {
-                        if (data.success) window.location.href = 'login';
-                        else document.getElementById('message').textContent = data.error;
+                        if (data.success) {
+                            window.location.href = 'login';
+                        } else {
+                            document.getElementById('message').textContent = data.error;
+                        }
+                    })
+                    .catch(err => {
+                        document.getElementById('message').textContent = "Error: " + err.message;
                     });
             });
         </script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     </body>
 
 </html>
