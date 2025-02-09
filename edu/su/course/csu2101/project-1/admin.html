@@ -104,7 +104,7 @@
     <body>
         <nav id="sidebar" class="d-flex flex-column">
             <div class="text-center mb-4">
-                <h4>CourseConnect Admin</h4>
+                <h4>Admin</h4>
             </div>
             <ul class="nav flex-column mb-auto" id="sidebarNav">
                 <li class="nav-item"><a href="#" class="nav-link active" data-section="Users"><i class="bi bi-people-fill"></i> Users</a></li>
@@ -114,6 +114,10 @@
                 <li class="nav-item"><a href="#" class="nav-link" data-section="CreateArticle"><i class="bi bi-file-plus"></i> Create Article</a></li>
             </ul>
             <div class="mt-auto p-3">
+                <ul class="nav flex-column mb-auto" id="sidebarNav">
+                    <li class="nav-item"><a href="../project-1/" class="nav-link"><i class="bi bi-house-door"></i> Home</a></li>
+                    <li class="nav-item"><a href="dashboard" class="nav-link"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+                </ul>
                 <button id="logout" class="btn btn-danger w-100">Logout</button>
             </div>
         </nav>
@@ -320,7 +324,7 @@
                 })
             })
             document.getElementById('logout').addEventListener('click', () => {
-                fetch('api/logout', { method: 'POST' }).then(r => r.json()).then(() => window.location.href = '../project-1/')
+                fetch('api/logout', { method: 'POST', cache: 'no-store' }).then(r => r.json()).then(() => window.location.href = '../project-1/')
             })
             function loadUsers() {
                 fetch('api/admin/users')
@@ -329,7 +333,7 @@
                         const tbody = document.getElementById('usersTable').querySelector('tbody')
                         tbody.innerHTML = ''
                         data.forEach(u => {
-                            let row = document.createElement('tr')                            
+                            let row = document.createElement('tr')
                             row.innerHTML = `
                                   <td>${u.id}</td>
                                   <td>${u.email}</td>
@@ -371,37 +375,37 @@
                 new bootstrap.Modal(document.getElementById('userEditModal')).show();
             }
             document.getElementById('userEditForm').addEventListener('submit', e => {
-                    e.preventDefault();
-                    let id = document.getElementById('editUserId').value,
-                        role = document.getElementById('editUserRole').value,
-                        active = document.getElementById('editUserActive').value,
-                        name = document.getElementById('editUserName').value.trim(),
-                        author_url = document.getElementById('editUserAuthorUrl').value.trim(),
-                        author_avatar = document.getElementById('editUserAvatarUrl').value.trim(),
-                        author_bio = document.getElementById('editUserAuthorBio').value.trim();
+                e.preventDefault();
+                let id = document.getElementById('editUserId').value,
+                    role = document.getElementById('editUserRole').value,
+                    active = document.getElementById('editUserActive').value,
+                    name = document.getElementById('editUserName').value.trim(),
+                    author_url = document.getElementById('editUserAuthorUrl').value.trim(),
+                    author_avatar = document.getElementById('editUserAvatarUrl').value.trim(),
+                    author_bio = document.getElementById('editUserAuthorBio').value.trim();
 
-                    fetch('api/admin/users/' + id, {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            role: role,
-                            is_active: Number(active),
-                            name: name,
-                            author_url: author_url,
-                            author_avatar: author_avatar,
-                            author_bio: author_bio
-                        })
+                fetch('api/admin/users/' + id, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        role: role,
+                        is_active: Number(active),
+                        name: name,
+                        author_url: author_url,
+                        author_avatar: author_avatar,
+                        author_bio: author_bio
                     })
-                        .then(r => r.json())
-                        .then(data => {
-                            if (data.success) {
-                                loadUsers();
-                                bootstrap.Modal.getInstance(document.getElementById('userEditModal')).hide();
-                            } else {
-                                alert(data.error);
-                            }
-                        });
-                });
+                })
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.success) {
+                            loadUsers();
+                            bootstrap.Modal.getInstance(document.getElementById('userEditModal')).hide();
+                        } else {
+                            alert(data.error);
+                        }
+                    });
+            });
             function loadArticles() {
                 let userId = document.getElementById('searchUserId').value
                 let url = 'api/admin/articles' + (userId ? '?userId=' + userId : '')
