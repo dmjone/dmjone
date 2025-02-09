@@ -247,13 +247,27 @@
                         data.forEach(u => {
                             let row = document.createElement('tr')
                             row.innerHTML = `<td>${u.id}</td><td>${u.email}</td><td>${u.role}</td><td>${u.is_active ? 'Yes' : 'No'}</td><td>${u.created_at}</td>
-          <td>
-            <button class="btn btn-sm btn-warning me-1" onclick="openUserEdit(${u.id},'${u.role}',${u.is_active})">Edit</button>
-            <button class="btn btn-sm btn-danger" onclick="alert('Delete User ${u.id} functionality coming soon')">Delete</button>
-          </td>`
+                            <td>
+                              <button class="btn btn-sm btn-warning me-1" onclick="openUserEdit(${u.id},'${u.role}',${u.is_active})">Edit</button>            
+                              <button class="btn btn-sm btn-danger" onclick="deleteUser(${u.id})">Delete</button>
+                            </td>`
                             tbody.appendChild(row)
                         })
                     })
+            }
+
+            function deleteUser(id) {
+                if (confirm("Are you sure you want to delete user " + id + "?")) {
+                    fetch("api/admin/users/" + id, { method: "DELETE" })
+                        .then(r => r.json())
+                        .then(data => {
+                            if (data.success) {
+                                loadUsers();
+                            } else {
+                                alert(data.error);
+                            }
+                        });
+                }
             }
             function openUserEdit(id, role, active) {
                 document.getElementById('editUserId').value = id
