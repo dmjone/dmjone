@@ -4,124 +4,254 @@
     <head>
         <meta charset="UTF-8">
         <title>User Dashboard - Dynamic Blog Project</title>
+        <!-- Bootstrap CSS -->
         <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+        <!-- Google Fonts -->
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500">
         <style>
+             /* Remove background and blur from the body itself */
             body {
-                background: #f4f4f4;
+                margin: 0;
+                padding: 0;
+                position: relative;
             }
 
-            .dashboard-container {
-                margin-top: 2rem;
+            /* Create a pseudo-element for the background image with a blur filter */
+            body::before {
+                content: "";
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: url('https://agen-bgimg.dmj.one/') no-repeat center center fixed;
+                background-size: cover;
+                filter: blur(10px);
+                z-index: -1;
+            }
+
+            body {                
+                font-family: 'Roboto', sans-serif;
+            }
+
+            /* Navbar styling */
+            .navbar-brand {
+                font-weight: 500;
+            }
+
+            .btn-custom {
+                border-radius: 20px;
+            }
+
+            /* Hero Section */
+            .hero {
+                background: url('https://source.unsplash.com/1600x400/?office') no-repeat center center;
+                background-size: cover;
+                padding: 3rem 0;
+                color: #fff;
+                text-align: center;
+                margin-bottom: 2rem;
+            }
+
+            .hero h1 {
+                font-size: 3rem;
+                text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+            }
+
+            .hero p {
+                font-size: 1.2rem;
+                text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+            }
+
+            /* Dashboard Cards */
+            .card {
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                margin-bottom: 2rem;
             }
         </style>
         <script>
+            // Check if the user is logged in; if not, redirect to login.
             fetch('api/profile')
                 .then(response => {
-                    if (!response.ok) throw new Error('Not logged in');                    
+                    if (!response.ok) throw new Error('Not logged in');
                     return response.json();
                 })
                 .catch(err => {
                     console.log("Not logged in:", err);
-                    window.location.href = "login";  // Redirect to login if not logged in.
+                    window.location.href = "login";
                 });
         </script>
-
     </head>
 
     <body>
+        <!-- Navigation Bar -->
         <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
             <div class="container">
                 <a class="navbar-brand" href="../project-1/">Dynamic Blog Project</a>
                 <div class="ms-auto">
-                    <button id="deactivate" class="btn btn-warning me-2">Deactivate Account</button>
-                    <button id="logout" class="btn btn-danger">Logout</button>
+                    <button id="deactivate" class="btn btn-danger me-2 btn-custom">Deactivate Account</button>
+                    <button id="logout" class="btn btn-warning btn-custom">Logout</button>
                 </div>
             </div>
         </nav>
-        <div class="container dashboard-container">
-            <h2>Your Articles</h2>
-            <button id="newArticleBtn" class="btn btn-success mb-3">New Article</button>
-            <div id="articlesList" class="list-group"></div>
-            <hr>
-            <h2>Create / Edit Article</h2>
-            <form id="articleForm" style="display: none;">
-                <input type="hidden" id="articleId">
-                <div class="mb-3">
-                    <label class="form-label">Title</label>
-                    <input type="text" id="title" class="form-control" required>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Slug</label>
-                    <input type="text" id="slug" class="form-control" required>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Content</label>
-                    <textarea id="content" class="form-control" rows="6" required></textarea>
-                </div>
-                <button type="submit" class="btn btn-primary">Save Article</button>
-                <button type="button" id="cancelArticle" class="btn btn-secondary">Cancel</button>
-            </form>
+
+        <!-- Hero Section -->
+        <div class="hero">
+            <div class="container">
+                <h1>Welcome to Your Dashboard</h1>
+                <p>Manage your articles and account settings easily.</p>
+            </div>
         </div>
+
+        <!-- Dashboard Container -->
+        <div class="container mb-5">
+            <div class="row">
+                <!-- Your Articles Section -->
+                <div class="col-lg-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title mb-0">Your Articles</h2>
+                        </div>
+                        <div class="card-body">
+                            <button id="newArticleBtn" class="btn btn-info mb-3 btn-custom">New Article</button>
+                            <div id="articlesList" class="list-group">
+                                <!-- Articles will be loaded here dynamically -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Create / Edit Article Section -->
+                <div class="col-lg-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title mb-0">Create / Edit Article</h2>
+                        </div>
+                        <div class="card-body">
+                            <form id="articleForm" style="display: none;">
+                                <input type="hidden" id="articleId">
+                                <div class="mb-3">
+                                    <label class="form-label">Title</label>
+                                    <input type="text" id="title" class="form-control" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Slug</label>
+                                    <input type="text" id="slug" class="form-control" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Content</label>
+                                    <textarea id="content" class="form-control" rows="6" required></textarea>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <button type="submit" class="btn btn-primary btn-custom">Save Article</button>
+                                    <button type="button" id="cancelArticle" class="btn btn-secondary btn-custom">Cancel</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- JavaScript -->
         <script>
+            // Logout and Deactivate Account
             document.getElementById('logout').addEventListener('click', () => {
-                fetch('api/logout', { method: 'POST' }).then(r => r.json()).then(() => window.location.href = '../project-1/')
-            })
+                fetch('api/logout', { method: 'POST' })
+                    .then(r => r.json())
+                    .then(() => window.location.href = '../project-1/');
+            });
+
             document.getElementById('deactivate').addEventListener('click', () => {
                 if (confirm("Are you sure you want to deactivate your account?")) {
-                    fetch('api/deactivate', { method: 'POST', credentials: 'include'}).then(r => r.json()).then(data => {
-                        if (data.success) { alert("Account deactivated."); window.location.href = '/' }
-                        else alert(data.error)
-                    })
+                    fetch('api/deactivate', { method: 'POST', credentials: 'include' })
+                        .then(r => r.json())
+                        .then(data => {
+                            if (data.success) {
+                                alert("Account deactivated.");
+                                window.location.href = '/';
+                            } else {
+                                alert(data.error);
+                            }
+                        });
                 }
-            })
+            });
+
+            // Load the user's articles
             function loadMyArticles() {
-                fetch('api/myarticles', {
-                    credentials: 'include'
-                })
+                fetch('api/myarticles', { credentials: 'include' })
                     .then(r => r.json())
                     .then(data => {
-                        const list = document.getElementById('articlesList')
-                        list.innerHTML = ''
+                        const list = document.getElementById('articlesList');
+                        list.innerHTML = '';
                         data.forEach(article => {
-                            let item = document.createElement('a')
-                            item.href = "#"
-                            item.className = "list-group-item list-group-item-action"
-                            item.textContent = article.title + " (" + article.status + ")"
+                            let item = document.createElement('a');
+                            item.href = "#";
+                            item.className = "list-group-item list-group-item-action";
+                            item.textContent = article.title + " (" + article.status + ")";
                             item.addEventListener('click', () => {
-                                document.getElementById('articleId').value = article.id
-                                document.getElementById('title').value = article.title
-                                document.getElementById('slug').value = article.slug
-                                document.getElementById('content').value = article.content
-                                document.getElementById('articleForm').style.display = 'block'
-                            })
-                            list.appendChild(item)
-                        })
-                    })
+                                document.getElementById('articleId').value = article.id;
+                                document.getElementById('title').value = article.title;
+                                document.getElementById('slug').value = article.slug;
+                                document.getElementById('content').value = article.content;
+                                document.getElementById('articleForm').style.display = 'block';
+                            });
+                            list.appendChild(item);
+                        });
+                    });
             }
+
+            // New Article Button: Show the form for a new article
             document.getElementById('newArticleBtn').addEventListener('click', () => {
-                document.getElementById('articleForm').style.display = 'block'
-                document.getElementById('articleId').value = ''
-                document.getElementById('title').value = ''
-                document.getElementById('slug').value = ''
-                document.getElementById('content').value = ''
-            })
+                document.getElementById('articleForm').style.display = 'block';
+                document.getElementById('articleId').value = '';
+                document.getElementById('title').value = '';
+                document.getElementById('slug').value = '';
+                document.getElementById('content').value = '';
+            });
+
+            // Cancel Article: Hide the form
             document.getElementById('cancelArticle').addEventListener('click', () => {
-                document.getElementById('articleForm').style.display = 'none'
-            })
+                document.getElementById('articleForm').style.display = 'none';
+            });
+
+            // Handle the Create / Edit Article form submission
             document.getElementById('articleForm').addEventListener('submit', e => {
-                e.preventDefault()
-                const id = document.getElementById('articleId').value
-                const payload = { title: document.getElementById('title').value, slug: document.getElementById('slug').value, content: document.getElementById('content').value }
+                e.preventDefault();
+                const id = document.getElementById('articleId').value;
+                const payload = {
+                    title: document.getElementById('title').value,
+                    slug: document.getElementById('slug').value,
+                    content: document.getElementById('content').value
+                };
                 if (id) {
-                    fetch('api/articles/' + id, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
-                        .then(r => r.json()).then(() => { loadMyArticles(); document.getElementById('articleForm').style.display = 'none' })
+                    fetch('api/articles/' + id, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    })
+                        .then(r => r.json())
+                        .then(() => {
+                            loadMyArticles();
+                            document.getElementById('articleForm').style.display = 'none';
+                        });
                 } else {
-                    fetch('api/articles', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
-                        .then(r => r.json()).then(() => { loadMyArticles(); document.getElementById('articleForm').style.display = 'none' })
+                    fetch('api/articles', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    })
+                        .then(r => r.json())
+                        .then(() => {
+                            loadMyArticles();
+                            document.getElementById('articleForm').style.display = 'none';
+                        });
                 }
-            })
-            loadMyArticles()
+            });
+
+            // Initially load the articles.
+            loadMyArticles();
         </script>
+        <!-- Bootstrap Bundle JS -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     </body>
 
