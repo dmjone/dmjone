@@ -25,8 +25,8 @@ function get_menu_list(datetogen) {
             // },
             {
                 "link": "project-1/",
-                "title": "CourseConnect - A Dynamic Blog System",
-                "desc": "<strong>Academic Project</strong><br />Explore our flagship project, CourseConnect - a dynamic blog system that utilizes modern, enterprise-grade SQL solutions while maintaining the classic PHP/MySQL spirit. Discover its innovative features, design decisions, and performance optimizations.",
+                "title": "ThryVexis - A Dynamic Blog System",
+                "desc": "<strong>Academic Project</strong><br />Explore our flagship project, ThryVexis - a dynamic blog system that utilizes modern, enterprise-grade SQL solutions while maintaining the classic PHP/MySQL spirit. Discover its innovative features, design decisions, and performance optimizations.",
                 "codetype": "Project | Dynamic Blog System"
             }
         ];
