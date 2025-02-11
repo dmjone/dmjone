@@ -295,9 +295,7 @@
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="ms-auto">
-                    <button id="logout" class="btn btn-warning btn-custom">Logout</button>
-                </div>
+                <div class="ms-auto" id="dynamicButton"></div>
             </div>
         </nav>
 
@@ -527,12 +525,32 @@
             loadArticle();
         </script> -->
         <script>
-            document.getElementById('logout').addEventListener('click', () => {
-                fetch('../api/logout', { method: 'POST', cache: 'no-store' })
-                    .then(r => r.json())
-                    .then(() => window.location.href = '../../project-1/');
-            });
+            (async function loadProfile() {
+                try {
+                    const response = await fetch('api/profile', { credentials: 'include', cache: 'no-store' });
+                    const navLinks = document.getElementById('dynamicButton');
+                    if (!response.ok) throw new Error('Not logged in');
+                    const data = await response.json();
+                    if (data.error) throw new Error(data.error);
+                    if (data.role) {
+                        navLinks.innerHTML = `<button id="logout" class="btn btn-warning btn-custom">Logout</button>`;
+                    } else {
+                        navLinks.innerHTML = `<button id="nextArticle" class="btn btn-info btn-custom">Read Random</button>`;
+                    }
+                } catch (err) {
+                    console.log("Not logged in:", err);
+                }
+            })();            
 
+            // let document load first
+            document.addEventListener('DOMContentLoaded', () => {
+                document.getElementById('logout').addEventListener('click', () => {
+                    fetch('../api/logout', { method: 'POST', cache: 'no-store' })
+                        .then(r => r.json())
+                        .then(() => window.location.href = '../../project-1/');
+                });
+            });
+            
             // Extract the slug from the URL path
             const urlSegments = window.location.pathname.split('/');
             const articleSlug = urlSegments[urlSegments.length - 1]; // Get the last part of the path as the slug
@@ -593,6 +611,18 @@
                     }
                 }
                 shuffleArray(related);
+
+                document.addEventListener('DOMContentLoaded', () => {
+                    document.getElementById('nextArticle').addEventListener('click', () => {
+                        const nextArticle = related.pop();
+                        try {
+                            if (nextArticle) window.location.href = nextArticle.slug;                            
+                        } catch (err) {
+                            console.error('Error loading next article:', err);
+                        }
+                    });
+                });                
+                
                 const selected = related.slice(0, 3);
                 const container = document.getElementById('relatedArticles');
                 container.innerHTML = '';
@@ -603,13 +633,13 @@
                         const card = document.createElement('div');
                         card.className = 'card mb-2';
                         card.innerHTML = `
-                <div class="card-body">
-                    <h6 class="card-title">${article.title}</h6>
-                    <p class="card-text"><small class="text-muted">Published on ${article.created_at}</small></p>
-                    <a href="${article.slug}" class="stretched-link"></a>
-                </div>
-            `;
-                        container.appendChild(card);
+                            <div class="card-body">
+                                <h6 class="card-title">${article.title}</h6>
+                                <p class="card-text"><small class="text-muted">Published on ${article.created_at}</small></p>
+                                <a href="${article.slug}" class="stretched-link"></a>
+                            </div>
+                        `;
+                        container.appendChild(card);                        
                     });
                 }
             }
