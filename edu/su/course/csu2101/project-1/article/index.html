@@ -536,6 +536,7 @@
             // Extract the slug from the URL path
             const urlSegments = window.location.pathname.split('/');
             const articleSlug = urlSegments[urlSegments.length - 1]; // Get the last part of the path as the slug
+            let articleID;
 
             // Load the article content and related info
             function loadArticle() {
@@ -544,6 +545,7 @@
                     .then(data => {
                         let article = data.find(a => a.slug === articleSlug);
                         if (article) {
+                            articleID = article.id;
                             document.getElementById('bannerTitle').textContent = article.title;
                             document.getElementById('bannerDate').textContent = "Published on " + article.created_at + " by " + article.author.name;
                             document.getElementById('articleContent').innerHTML = marked.parse(article.content);
@@ -614,7 +616,7 @@
 
             // Load comments for the article
             function loadComments() {
-                fetch('../api/articles/' + articleSlug + '/comments')
+                fetch('../api/articles/' + articleID + '/comments')
                     .then(response => response.json())
                     .then(comments => {
                         const commentsSection = document.getElementById('commentsSection');
@@ -643,7 +645,7 @@
                     alert("Please enter a comment before submitting.");
                     return;
                 }
-                fetch('../api/articles/' + articleSlug + '/comments', {
+                fetch('../api/articles/' + articleID + '/comments', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ content: commentContent })
