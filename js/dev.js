@@ -8063,7 +8063,7 @@ function gen_blockquote() {
         const date = new Date();
         const day = date.getDate();
         const month = date.getMonth() + 1;
-        return day === 5 && month === 6;
+        return day === 14 && month === 2 || day === 13 && month === 2;
     };
 
     if (isValentine()) {
