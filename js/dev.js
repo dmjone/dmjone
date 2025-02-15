@@ -2064,7 +2064,7 @@ let header_author = async function (...args) {
 
             var facultyDiv = document.createElement('div');
             facultyDiv.className = 'd-none d-print-block mx-auto';
-            facultyDiv.innerHTML = COURSE_DETAILS ? COURSE ? `<p class="text-center fst-italic">Under the guidance of <span class="text-capitalize">${FACULTY_NAME}</span> in the subject of <span class="text-capitalize">${COURSE_DETAILS} (${COURSE})</span></p>` : `<p class="text-center">${COURSE_DETAILS}</p>` : '';
+            facultyDiv.innerHTML = COURSE_DETAILS ? COURSE ? FACULTY_NAME ? `<p class="text-center fst-italic">Under the guidance of <span class="text-capitalize">${FACULTY_NAME}</span> in the subject of <span class="text-capitalize">${COURSE_DETAILS} (${COURSE})</span></p>` : `<p class="text-center fst-italic"><span class="text-capitalize">${COURSE_DETAILS} (${COURSE})</span></p>` : `<p class="text-center">${COURSE_DETAILS}</p>` : '';
             // facultyDiv.innerHTML = window.GLOBAL_get_course_detail_ ? window.GLOBAL_get_course_ ? `<p class="text-center fst-italic">Under the guidance of <span class="text-capitalize">Asst. Prof. Payal Khanna</span> in the subject of <span class="text-capitalize">Enhancing Leadership through Coaching Skills (CSU1806)</span></p>` : `<p class="text-center">${window.GLOBAL_get_course_detail_}</p>` : '';
             // facultyDiv.innerHTML += window.GLOBAL_get_Faculty_Name_ ? `<p class="text-center text-uppercase"><span class="fw-bold"></span> ${window.GLOBAL_get_Faculty_Name_}</p>` : '';
             facultyDiv.innerHTML += `<p class="text-center text-uppercase" style="font-size:8pt!important">${studentmode ? 'Submitted on' : 'Printed on'} ${RETRIEVED_DATE}</p>`;
