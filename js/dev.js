@@ -39,7 +39,7 @@ const randomidgenerator = (i = 10) => [...Array(i)].map(() => 'abcdefghijkmnpqrs
 })();
 
 
-const notification_maintainence_mode = 1;
+const notification_maintainence_mode = 0;
 const GLOBAL_maintainence_message = "Some links, images, and features may not work as expected. Thank you for your patience.";
 
 const notification_feature_update = 0;
@@ -52,10 +52,11 @@ const GLOBAL_NewArticle_message = `A new article has been published. <a href="/e
 const notification_article_update = 0;
 const GLOBAL_ArticleUpdate_message = `An article has been updated. <a href="/my/articles/2022/01/01/sample-article" class="alert-link">Read more</a>.`;
 
-const notification_new_course = 0;
-const GLOBAL_NewCourse_message = `A new course on <strong>Computer Networks</strong> has been added. <a href="/edu/su/course/csu359/" class="alert-link">Explore now</a>.`;
+const notification_new_course = 1;
+const GLOBAL_NewCourse_message = `A new course on <strong>Cloud Computing</strong> has been added. <a href="/edu/su/course/dmjcclt/" class="alert-link">Explore now</a>.`;
 
 const GLOBAL_crawler_mode = 0;
+const GLOBAL_404safe_sitemap_spider_mode = 1; // Change to 0 to give random login requests. Set to 1 to prevent 404 redirects. 
 
 // const body_pomodoro_helptext = "The Pomodoro Technique is a time management method developed by Francesco Cirillo in the late 1980s. The technique uses a timer to break down work into intervals, traditionally 25 minutes in length, separated by short breaks. These intervals are named pomodoros, the plural in English of the Italian word pomodoro (tomato), after the tomato-shaped kitchen timer that Cirillo used as a university student. The technique has been widely popularized by dozens of apps and websites providing timers and instructions. Closely related to concepts such as timeboxing and iterative and incremental development used in software design, the method has been adopted in pair programming contexts.";
 const body_pomodoro_helptext = `
@@ -3470,7 +3471,7 @@ let header_author = async function (...args) {
                     } else {
                         if (window.location.pathname !== GLOBAL_login_page_path && window.location.pathname !== '/') {
                             document.addEventListener('DOMContentLoaded', () => {
-                                if (Math.random() < 0.1) {
+                                if (!GLOBAL_404safe_sitemap_spider_mode && Math.random() < 0.3) {
                                     cL();
                                     hidemainuntillogin();
                                 }
