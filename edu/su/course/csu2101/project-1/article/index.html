@@ -2,6 +2,7 @@
 <html lang="en" data-bs-theme="auto">
 
     <head>
+
         <meta charset="UTF-8">
         <title>Article - ThryVexis</title>
 
@@ -32,23 +33,15 @@
         <!-- Google Fonts -->
         <link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700" rel="stylesheet">
 
-        <!-- KaTeX for math rendering -->
+
         <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js" integrity="sha512-sHSNLECRJSK+BFs7E8DiFc6pf6n90bLI85Emiw1jhreduZhK3VXgq9l4kAt9eTIHYAcuQBKHL01QKs4/3Xgl8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js" integrity="sha512-iWiuBS5nt6r60fCz26Nd0Zqe0nbk1ZTIQbl3Kv7kYsX+yKMUFHzjaH2+AnM6vp2Xs+gNmaBAVWJjSmuPw76Efg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
-        <!-- Our own CSS & head script -->
         <link rel="stylesheet" href="../asset/style.css" />
         <script src="../asset/script-head.js"></script>
 
         <!-- Include Marked.js for Markdown rendering -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.2.12/marked.min.js"></script>
-
-        <!-- Hide the page until content is loaded -->
-        <style>
-            body {
-                visibility: hidden;
-            }
-        </style>
     </head>
 
     <body>
@@ -87,6 +80,7 @@
 
                 <!-- Sidebar Column -->
                 <div class="col-lg-3">
+
                     <!-- Social Share Buttons -->
                     <div class="share-buttons my-4">
                         <span>Share: </span>
@@ -140,58 +134,33 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 
         <!-- JavaScript -->
-        <script>
-            // Wrap everything in an async IIFE so we can await our fetches
-            (async function initPage() {
-                try {
-                    // Load user profile (if any) before rendering the page
-                    await (async function loadProfile() {
-                        try {
-                            const response = await fetch('../api/profile', { credentials: 'include', cache: 'no-store' });
-                            const navLinks = document.getElementById('dynamicButton');
-                            if (!response.ok) throw new Error('Not logged in');
-                            const data = await response.json();
-                            if (data.error) throw new Error(data.error);
-                            if (data.role) {
-                                navLinks.innerHTML = `<button id="logout" class="btn btn-warning btn-custom">Logout</button>`;
-                                document.getElementById('logout').addEventListener('click', () => {
-                                    fetch('../api/logout', { method: 'POST', cache: 'no-store' })
-                                        .then(r => r.json())
-                                        .then(() => window.location.href = '../../project-1/');
-                                });
-                            }
-                        } catch (err) {
-                            console.log("Not logged in:", err);
-                        }
-                    })();
+        <!-- <script>
+            // Logout and Deactivate Account
+            document.getElementById('logout').addEventListener('click', () => {
+                fetch('api/logout', { method: 'POST', cache: 'no-store' })
+                    .then(r => r.json())
+                    .then(() => window.location.href = '../project-1/');
+            });
 
-                    // Extract the slug from the URL path
-                    const urlSegments = window.location.pathname.split('/');
-                    const articleSlug = urlSegments[urlSegments.length - 1]; // e.g. "time-management-tips"
-                    let articleID;
+            const urlParams = new URLSearchParams(window.location.search);
+            const articleId = urlParams.get('id');            
 
-                    // Fetch only the needed article (and related articles) from the new endpoint.
-                    await fetch('../api/article/' + articleSlug, { cache: 'no-store' })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.error) {
-                                document.getElementById('articleContent').innerHTML =
-                                    '<div class="text-danger display-4 text-center">404: Article not found.</div><div class="text-center"><a href="../../">Go Back</a></div>';
-                                return;
-                            }
-                            // Use the returned article object.
-                            const article = data.article;
-                            articleID = article.id;
-                            // Update the page title using the article title if available; otherwise, fallback to the slug.
-                            document.title = `${article.title || articleSlug} - ThryVexis`;
-
+            // Load the article content and related info
+            function loadArticle() {
+                fetch('api/articles', { cache: 'no-store' })
+                    .then(response => response.json())
+                    .then(data => {
+                        let article = data.find(a => a.id == articleId);
+                        if (article) {
+                            // Update banner with article title and date
                             document.getElementById('bannerTitle').textContent = article.title;
                             document.getElementById('bannerDate').textContent = "Published on " + article.created_at + " by " + article.author.name;
+                            // Render article content using marked.js
                             document.getElementById('articleContent').innerHTML = marked.parse(article.content);
-
+                            // Load author info with improved layout if available
                             if (article.author) {
                                 document.getElementById('authorBio').innerHTML = `
-                                  <div class="card border border-1 border-danger mb-4">
+                                  <div class="card border-0 mb-4">
                                     <div class="card-body">
                                       <div class="d-flex align-items-center">
                                         <img src="${article.author.avatar || 'https://dmj.one/logo.png'}" 
@@ -210,118 +179,472 @@
                             } else {
                                 document.getElementById('authorBio').textContent = "Author information not available.";
                             }
-
-                            // Load related articles using the related array from the API.
-                            loadRelatedArticles(data.related);
-                            loadComments();
-                        })
-                        .catch(error => {
-                            console.error('Error loading article:', error);
-                        });
-
-                    // Helper: Load related articles into the sidebar.
-                    function loadRelatedArticles(related) {
-                        try {
-                            document.getElementById('nextArticle').addEventListener('click', () => {
-                                const nextArticle = related.pop();
-                                if (nextArticle) {
-                                    window.location.href = nextArticle.slug;
-                                }
-                            });
-                        } catch (err) {
-                            console.log('Error setting next article button:', err);
+                            // Load related articles (filter by same category)
+                            loadRelatedArticles(data, article);
                         }
+                        loadComments();
+                    })
+                    .catch(error => {
+                        console.error('Error loading article:', error);
+                    });
+            }
 
-                        const container = document.getElementById('relatedArticles');
-                        container.innerHTML = '';
-                        if (related.length === 0) {
-                            container.innerHTML = '<p>No related articles.</p>';
+            // Load related articles (up to 3) using Fisher-Yates shuffle
+            function loadRelatedArticles(articles, currentArticle) {
+                let related = articles.filter(a => a.id !== currentArticle.id && a.category === currentArticle.category);
+                function shuffleArray(array) {
+                    for (let i = array.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [array[i], array[j]] = [array[j], array[i]];
+                    }
+                }
+                shuffleArray(related);
+                const selected = related.slice(0, 3);
+                const container = document.getElementById('relatedArticles');
+                container.innerHTML = '';
+                if (selected.length === 0) {
+                    container.innerHTML = '<p>No related articles.</p>';
+                } else {
+                    selected.forEach(article => {
+                        const card = document.createElement('div');
+                        card.className = 'card mb-2';
+                        card.innerHTML = `
+              <div class="card-body">
+                <h6 class="card-title">${article.title}</h6>
+                <p class="card-text"><small class="text-muted">Published on ${article.created_at}</small></p>
+                <a href="article?id=${article.id}" class="stretched-link"></a>
+              </div>
+            `;
+                        container.appendChild(card);
+                    });
+                }
+            }
+
+            // Load comments for the article
+            function loadComments() {
+                fetch('api/articles/' + articleId + '/comments')
+                    .then(response => response.json())
+                    .then(comments => {
+                        const commentsSection = document.getElementById('commentsSection');
+                        commentsSection.innerHTML = '';
+                        if (comments.length === 0) {
+                            commentsSection.innerHTML = '<p>No comments yet.</p>';
                         } else {
-                            related.forEach(article => {
-                                const card = document.createElement('div');
-                                card.className = 'card mb-2';
-                                card.innerHTML = `
-                  <div class="card-body">
-                    <h6 class="card-title">${article.title}</h6>
-                    <p class="card-text"><small class="text-muted">Published on ${article.created_at}</small></p>
-                    <a href="${article.slug}" class="stretched-link"></a>
+                            comments.forEach(comment => {
+                                commentsSection.innerHTML += `
+                  <div class="comment">
+                    <p>${marked.parse(comment.content)}</p>
+                    <small>Posted on ${comment.created_at}</small>
                   </div>
                 `;
-                                container.appendChild(card);
                             });
                         }
-                    }
-
-                    // Helper: Load comments for the article.
-                    function loadComments() {
-                        fetch('../api/articles/' + articleID + '/comments')
-                            .then(response => response.json())
-                            .then(comments => {
-                                const commentsSection = document.getElementById('commentsSection');
-                                commentsSection.innerHTML = '';
-                                if (comments.length === 0) {
-                                    commentsSection.innerHTML = '<p>No comments yet.</p>';
-                                } else {
-                                    comments.forEach(comment => {
-                                        commentsSection.innerHTML += `
-                      <div class="comment">
-                        <p>${marked.parse(comment.content)}</p>
-                        <small>Posted on ${comment.created_at}</small>
-                      </div>
-                    `;
-                                    });
-                                }
-                            })
-                            .catch(error => {
-                                console.error('Error fetching comments:', error);
-                            });
-                    }
-
-                    document.getElementById('submitComment').addEventListener('click', () => {
-                        const commentContent = document.getElementById('commentText').value;
-                        if (!commentContent.trim()) {
-                            alert("Please enter a comment before submitting.");
-                            return;
-                        }
-                        fetch('../api/articles/' + articleID + '/comments', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ content: commentContent })
-                        })
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.success) {
-                                    document.getElementById('commentText').value = '';
-                                    loadComments();
-                                } else {
-                                    alert(data.error);
-                                }
-                            })
-                            .catch(error => {
-                                console.error('Error submitting comment:', error);
-                            });
+                    })
+                    .catch(error => {
+                        console.error('Error fetching comments:', error);
                     });
+            }
 
-                    // Social share buttons setup.
-                    function setupShareButtons() {
-                        const currentUrl = encodeURIComponent(window.location.href);
-                        const shareText = encodeURIComponent("Check out ThryVexis Blog!");
-                        document.getElementById('shareX').href = `https://x.com/intent/tweet?url=${currentUrl}&text=${shareText}`;
-                        document.getElementById('shareFacebook').href = `https://www.facebook.com/sharer/sharer.php?u=${currentUrl}`;
-                        document.getElementById('shareLinkedIn').href = `https://www.linkedin.com/shareArticle?mini=true&url=${currentUrl}&title=${shareText}`;
-                        document.getElementById('shareInstagram').href = `https://www.instagram.com/dmj.one`;
+            // Submit comment handler
+            document.getElementById('submitComment').addEventListener('click', () => {
+                const commentContent = document.getElementById('commentText').value;
+                if (!commentContent.trim()) {
+                    alert("Please enter a comment before submitting.");
+                    return;
+                }
+                fetch('api/articles/' + articleId + '/comments', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ content: commentContent })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            document.getElementById('commentText').value = '';
+                            loadComments();
+                        } else {
+                            alert(data.error);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error submitting comment:', error);
+                    });
+            });
+
+            // Social share buttons setup
+            function setupShareButtons() {
+                const currentUrl = encodeURIComponent(window.location.href);
+                const shareText = encodeURIComponent("Check out ThryVexis Blog!");
+                document.getElementById('shareX').href = `https://x.com/intent/tweet?url=${currentUrl}&text=${shareText}`;
+                document.getElementById('shareFacebook').href = `https://www.facebook.com/sharer/sharer.php?u=${currentUrl}`;
+                document.getElementById('shareLinkedIn').href = `https://www.linkedin.com/shareArticle?mini=true&url=${currentUrl}&title=${shareText}`;
+                document.getElementById('shareInstagram').href = `https://www.instagram.com/dmj.one`;
+            }
+
+            // Initialize page content
+            setupShareButtons();
+            loadArticle();
+        </script> -->
+        <script>
+            // Fetches all articles content just like the index page.
+            (async function loadProfile() {
+                try {
+                    const response = await fetch('../api/profile', { credentials: 'include', cache: 'no-store' });
+                    const navLinks = document.getElementById('dynamicButton');
+                    if (!response.ok) throw new Error('Not logged in');
+                    const data = await response.json();
+                    if (data.error) throw new Error(data.error);
+                    if (data.role) {
+                        navLinks.innerHTML = `<button id="logout" class="btn btn-warning btn-custom">Logout</button>`;
+                        document.getElementById('logout').addEventListener('click', () => {
+                            fetch('../api/logout', { method: 'POST', cache: 'no-store' })
+                                .then(r => r.json())
+                                .then(() => window.location.href = '../../project-1/');
+                        });
                     }
-                    setupShareButtons();
-
-                    // Now that everything is loaded and rendered, show the page.
-                    document.body.style.visibility = 'visible';
                 } catch (err) {
-                    console.error("Error during initialization:", err);
-                    // In case of an error, still show the page (perhaps with an error message).
-                    document.body.style.visibility = 'visible';
+                    console.log("Not logged in:", err);
                 }
             })();
+
+            // Extract the slug from the URL path
+            const urlSegments = window.location.pathname.split('/');
+            const articleSlug = urlSegments[urlSegments.length - 1]; // Get the last part of the path as the slug
+            let articleID;
+
+            // Load the article content and related info
+            function loadArticle() {
+                fetch('../api/articlesCached', { cache: 'default' })
+                    .then(response => response.json())
+                    .then(data => {
+                        let article = data.find(a => a.slug === articleSlug);
+                        if (article) {
+                            articleID = article.id;
+
+                            // Update the page title using the article title if available; otherwise, fallback to the slug.
+                            document.title = `${article.title || articleSlug} - ThryVexis`;
+
+                            document.getElementById('bannerTitle').textContent = article.title;
+                            document.getElementById('bannerDate').textContent = "Published on " + article.created_at + " by " + article.author.name;
+                            document.getElementById('articleContent').innerHTML = marked.parse(article.content);
+
+                            if (article.author) {
+                                document.getElementById('authorBio').innerHTML = `
+                                    <div class="card border border-1 border-danger mb-4">
+                                        <div class="card-body">
+                                            <div class="d-flex align-items-center">
+                                                <img src="${article.author.avatar || 'https://dmj.one/logo.png'}" 
+                                                     class="rounded-circle me-3" alt="${article.author.name}" width="60" height="60">
+                                                <div>
+                                                    <h5 class="mb-0" id="author-name">
+                                                        <a href="${article.author.url}" class="text-decoration-none">${article.author.name}</a>
+                                                    </h5>
+                                                    <small class="text-muted">Author</small>
+                                                </div>
+                                            </div>
+                                            <p class="mt-3 mb-0">${article.author.bio || "No bio available."}</p>
+                                        </div>
+                                    </div>
+                                `;
+                            } else {
+                                document.getElementById('authorBio').textContent = "Author information not available.";
+                            }
+
+                            loadRelatedArticles(data, article);
+                        } else {
+                            document.getElementById('articleContent').innerHTML = '<div class="text-danger display-4 text-center">404: Article not found.</div><div class="text-center"><a href="../../">Go Back</a></div>';
+                        }
+                        loadComments();
+                    })
+                    .catch(error => {
+                        console.error('Error loading article:', error);
+                    });
+            }
+
+            // Load related articles (up to 3) using Fisher-Yates shuffle
+            function loadRelatedArticles(articles, currentArticle) {
+                let related = articles.filter(a => a.id !== currentArticle.id && a.category === currentArticle.category);
+                function shuffleArray(array) {
+                    for (let i = array.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [array[i], array[j]] = [array[j], array[i]];
+                    }
+                }
+                shuffleArray(related);
+
+                try {
+                    document.getElementById('nextArticle').addEventListener('click', () => {
+                        const nextArticle = related.pop();
+                        try {
+                            if (nextArticle) window.location.href = nextArticle.slug;
+                        } catch (err) {
+                            console.error('Error loading next article:', err);
+                        }
+                    });
+                } catch (err) { console.log('Error setting next article button:', err); };
+
+                const selected = related.slice(0, 3);
+                const container = document.getElementById('relatedArticles');
+                container.innerHTML = '';
+                if (selected.length === 0) {
+                    container.innerHTML = '<p>No related articles.</p>';
+                } else {
+                    selected.forEach(article => {
+                        const card = document.createElement('div');
+                        card.className = 'card mb-2';
+                        card.innerHTML = `
+                            <div class="card-body">
+                                <h6 class="card-title">${article.title}</h6>
+                                <p class="card-text"><small class="text-muted">Published on ${article.created_at}</small></p>
+                                <a href="${article.slug}" class="stretched-link"></a>
+                            </div>
+                        `;
+                        container.appendChild(card);
+                    });
+                }
+            }
+
+            // Load comments for the article
+            function loadComments() {
+                fetch('../api/articles/' + articleID + '/comments', { cache: 'no-store' })
+                    .then(response => response.json())
+                    .then(comments => {
+                        const commentsSection = document.getElementById('commentsSection');
+                        commentsSection.innerHTML = '';
+                        if (comments.length === 0) {
+                            commentsSection.innerHTML = '<p>No comments yet.</p>';
+                        } else {
+                            comments.forEach(comment => {
+                                commentsSection.innerHTML += `
+                        <div class="comment">
+                            <p>${marked.parse(comment.content)}</p>
+                            <small>Posted on ${comment.created_at}</small>
+                        </div>
+                    `;
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching comments:', error);
+                    });
+            }
+
+            document.getElementById('submitComment').addEventListener('click', () => {
+                const commentContent = document.getElementById('commentText').value;
+                if (!commentContent.trim()) {
+                    alert("Please enter a comment before submitting.");
+                    return;
+                }
+                fetch('../api/articles/' + articleID + '/comments', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ content: commentContent })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            document.getElementById('commentText').value = '';
+                            loadComments();
+                        } else {
+                            alert(data.error);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error submitting comment:', error);
+                    });
+            });
+
+            // Social share buttons setup
+            function setupShareButtons() {
+                const currentUrl = encodeURIComponent(window.location.href);
+                const shareText = encodeURIComponent("Check out ThryVexis Blog!");
+                document.getElementById('shareX').href = `https://x.com/intent/tweet?url=${currentUrl}&text=${shareText}`;
+                document.getElementById('shareFacebook').href = `https://www.facebook.com/sharer/sharer.php?u=${currentUrl}`;
+                document.getElementById('shareLinkedIn').href = `https://www.linkedin.com/shareArticle?mini=true&url=${currentUrl}&title=${shareText}`;
+                document.getElementById('shareInstagram').href = `https://www.instagram.com/dmj.one`;
+            }
+
+            setupShareButtons();
+            loadArticle();            
         </script>
+        <!-- <script>
+            // Fetches standalone article content from the slug in the URL
+            (async function loadProfile() {
+                try {
+                    const response = await fetch('../api/profile', { credentials: 'include', cache: 'no-store' });
+                    const navLinks = document.getElementById('dynamicButton');
+                    if (!response.ok) throw new Error('Not logged in');
+                    const data = await response.json();
+                    if (data.error) throw new Error(data.error);
+                    if (data.role) {
+                        navLinks.innerHTML = `<button id="logout" class="btn btn-warning btn-custom">Logout</button>`;
+                        document.getElementById('logout').addEventListener('click', () => {
+                            fetch('../api/logout', { method: 'POST', cache: 'no-store' })
+                                .then(r => r.json())
+                                .then(() => window.location.href = '../../project-1/');
+                        });
+                    }
+                } catch (err) {
+                    console.log("Not logged in:", err);
+                }
+            })();
+
+            // Extract the slug from the URL path
+            const urlSegments = window.location.pathname.split('/');
+            const articleSlug = urlSegments[urlSegments.length - 1]; // Get the last part of the path as the slug
+            let articleID;
+
+            function loadArticle() {
+                // Fetch only the needed article (and related articles) from the new endpoint.
+                fetch('../api/article/' + articleSlug, { cache: 'no-store' })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            document.getElementById('articleContent').innerHTML =
+                                '<div class="text-danger display-4 text-center">404: Article not found.</div><div class="text-center"><a href="../../">Go Back</a></div>';
+                            return;
+                        }
+                        // Use the returned article object.
+                        const article = data.article;
+                        articleID = article.id;
+
+
+                        // Update the page title using the article title if available; otherwise, fallback to the slug.
+                        document.title = `${article.title || articleSlug} - ThryVexis`;
+
+                        document.getElementById('bannerTitle').textContent = article.title;
+                        document.getElementById('bannerDate').textContent = "Published on " + article.created_at + " by " + article.author.name;
+                        document.getElementById('articleContent').innerHTML = marked.parse(article.content);
+
+                        if (article.author) {
+                            document.getElementById('authorBio').innerHTML = `
+                              <div class="card border border-1 border-danger mb-4">
+                                <div class="card-body">
+                                  <div class="d-flex align-items-center">
+                                    <img src="${article.author.avatar || 'https://dmj.one/logo.png'}" 
+                                         class="rounded-circle me-3" alt="${article.author.name}" width="60" height="60">
+                                    <div>
+                                      <h5 class="mb-0" id="author-name">
+                                        <a href="${article.author.url}" class="text-decoration-none">${article.author.name}</a>
+                                      </h5>
+                                      <small class="text-muted">Author</small>
+                                    </div>
+                                  </div>
+                                  <p class="mt-3 mb-0">${article.author.bio || "No bio available."}</p>
+                                </div>
+                              </div>
+                            `;
+                        } else {
+                            document.getElementById('authorBio').textContent = "Author information not available.";
+                        }
+
+                        // Load related articles using the related array from the API.
+                        loadRelatedArticles(data.related);
+                        loadComments();
+                    })
+                    .catch(error => {
+                        console.error('Error loading article:', error);
+                    });
+            }
+
+
+            function loadRelatedArticles(related) {
+                // Set up the "next article" button to load a random related article.
+                try {
+                    document.getElementById('nextArticle').addEventListener('click', () => {
+                        const nextArticle = related.pop();
+                        if (nextArticle) {
+                            window.location.href = nextArticle.slug;
+                        }
+                    });
+                } catch (err) {
+                    console.log('Error setting next article button:', err);
+                }
+
+                const container = document.getElementById('relatedArticles');
+                container.innerHTML = '';
+                if (related.length === 0) {
+                    container.innerHTML = '<p>No related articles.</p>';
+                } else {
+                    related.forEach(article => {
+                        const card = document.createElement('div');
+                        card.className = 'card mb-2';
+                        card.innerHTML = `
+                              <div class="card-body">
+                                <h6 class="card-title">${article.title}</h6>
+                                <p class="card-text"><small class="text-muted">Published on ${article.created_at}</small></p>
+                                <a href="${article.slug}" class="stretched-link"></a>
+                              </div>
+                            `;
+                        container.appendChild(card);
+                    });
+                }
+            }
+
+
+            // Load comments for the article
+            function loadComments() {
+                fetch('../api/articles/' + articleID + '/comments')
+                    .then(response => response.json())
+                    .then(comments => {
+                        const commentsSection = document.getElementById('commentsSection');
+                        commentsSection.innerHTML = '';
+                        if (comments.length === 0) {
+                            commentsSection.innerHTML = '<p>No comments yet.</p>';
+                        } else {
+                            comments.forEach(comment => {
+                                commentsSection.innerHTML += `
+                        <div class="comment">
+                            <p>${marked.parse(comment.content)}</p>
+                            <small>Posted on ${comment.created_at}</small>
+                        </div>
+                    `;
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching comments:', error);
+                    });
+            }
+
+            document.getElementById('submitComment').addEventListener('click', () => {
+                const commentContent = document.getElementById('commentText').value;
+                if (!commentContent.trim()) {
+                    alert("Please enter a comment before submitting.");
+                    return;
+                }
+                fetch('../api/articles/' + articleID + '/comments', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ content: commentContent })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            document.getElementById('commentText').value = '';
+                            loadComments();
+                        } else {
+                            alert(data.error);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error submitting comment:', error);
+                    });
+            });
+
+            // Social share buttons setup
+            function setupShareButtons() {
+                const currentUrl = encodeURIComponent(window.location.href);
+                const shareText = encodeURIComponent("Check out ThryVexis Blog!");
+                document.getElementById('shareX').href = `https://x.com/intent/tweet?url=${currentUrl}&text=${shareText}`;
+                document.getElementById('shareFacebook').href = `https://www.facebook.com/sharer/sharer.php?u=${currentUrl}`;
+                document.getElementById('shareLinkedIn').href = `https://www.linkedin.com/shareArticle?mini=true&url=${currentUrl}&title=${shareText}`;
+                document.getElementById('shareInstagram').href = `https://www.instagram.com/dmj.one`;
+            }
+
+            setupShareButtons();
+            loadArticle();            
+        </script> -->
         <!-- End JavaScript -->
     </body>
 
