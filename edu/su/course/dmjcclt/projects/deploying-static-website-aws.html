@@ -1,0 +1,205 @@
+<!-------------------------- © 2007 - present, dmj.one and contributors. ----------------------------------
+   Part of the dmjone project. Licensed under the GNU AGPL. Provided as-is, without warranty of any kind. 
+-------------------- Redistribution and modifications must retain this notice. --------------------------->
+
+
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+    <!--<![endif]-->
+
+    <head>
+        <script src="/js/edu_su_common.js"></script>
+        <noscript>
+            <style>
+                html,
+                body {
+                    margin: 0;
+                    overflow: hidden;
+                }
+            </style>
+            <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+        </noscript>
+
+        <title>Simple Static Website Deployment on AWS - DMJCCLT - dmj.one</title>
+        <meta name="description" content="Learn how to deploy a production-grade microservices - a web application on AWS using Terraform, Ansible, Docker, Kubernetes, and GitHub Actions.">
+        <meta property="og:image" content="/logo.png">
+        <meta property="og:type" content="article">
+
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:site" content="@divyamohan1993">
+        <meta name="twitter:creator" content="@divyamohan1993">
+        <meta name="twitter:image" content="/logo.png">
+
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+        <meta name="author" content="Divya Mohan">
+        <meta name="robots" content="index, follow">
+
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js" integrity="sha512-sHSNLECRJSK+BFs7E8DiFc6pf6n90bLI85Emiw1jhreduZhK3VXgq9l4kAt9eTIHYAcuQBKHL01QKs4/3Xgl8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js" integrity="sha512-iWiuBS5nt6r60fCz26Nd0Zqe0nbk1ZTIQbl3Kv7kYsX+yKMUFHzjaH2+AnM6vp2Xs+gNmaBAVWJjSmuPw76Efg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                renderMathInElement(document.body, {
+                    // customised options
+                    // • auto-render specific keys, e.g.:
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false },
+                        { left: '\\(', right: '\\)', display: false },
+                        { left: '\\[', right: '\\]', display: true }
+                    ],
+                    // • rendering keys, e.g.:
+                    throwOnError: false
+                });
+            });
+        </script> -->
+
+        <!-- <style>
+            main ul {
+                list-style-type: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            main ul li {
+                margin: 0;
+                padding: 0;
+            }
+        </style> -->
+
+    </head>
+
+    <body>
+
+        <script> header_author("dm", "lakshika"); </script>
+
+        <main>
+            <article class="agen-tableofcontents">
+                <h2 class="text-center">
+                    Deploying a Basic Static Website on AWS Using Terraform, Ansible, Docker, and GitHub Actions
+                </h2>
+                <div class="d-none contentdate">2024, February 14</div>
+                <div class="mt-3 d-flex flex-wrap align-items-center gap-3 text-center justify-content-center d-print-none">
+
+                    <!-- Difficulty Level -->
+                    <div class="d-flex align-items-center gap-2 p-2 rounded border border-success-subtle bg-success bg-opacity-10 shadow-sm">
+                        <i class="bi bi-lightning-charge-fill text-success fs-4"></i>
+                        <span class="fw-semibold text-success">Difficulty:</span>
+                        <span class="badge fs-6 bg-success">Easy</span>
+                    </div>
+                </div>
+            </article>
+
+            <article>
+                <h3>Overview</h3>
+                <p>This project introduces you to real-world cloud deployment through a simple, practical example. You will deploy a basic static website (using HTML, CSS, and JavaScript) on AWS. The project uses industry-standard tools in an easy-to-follow manner. You will learn how to automate infrastructure, configure servers, containerize your website, and set up continuous deployment.</p>
+                <div class="my-3 alert alert-warning alert-dismissible fade show text-center border-0 shadow-lg rounded-3" role="alert">
+                    <strong>Good luck!</strong> Enjoy your journey into cloud technologies! 🚀☁️
+                </div>
+            </article>
+            <article>
+                <h2>Objectives</h2>
+                <p>By completing this project, you will:</p>
+                <ul>
+                    <li><strong>Provision Infrastructure:</strong> Use Terraform to create a basic AWS EC2 instance.</li>
+                    <li><strong>Configure the Server:</strong> Use Ansible to install Docker and Nginx on your EC2 instance.</li>
+                    <li><strong>Containerize the Website:</strong> Package your static website into a Docker container.</li>
+                    <li><strong>Automate Deployment:</strong> Set up GitHub Actions to build your Docker image, push it to AWS ECR, and deploy it on the EC2 instance.</li>
+                    <li><strong>Manage Traffic:</strong> Configure Nginx to serve your website as a reverse proxy.</li>
+                    <li><strong>Monitor and Secure:</strong> Enable AWS CloudWatch for basic monitoring and set up simple IAM policies.</li>
+                </ul>
+            </article>
+            <article>
+                <h2>What You Will Learn</h2>
+                <p>This project will introduce you to essential cloud and DevOps concepts:</p>
+                <ul>
+                    <li><strong>Terraform:</strong> Write simple code to create and manage AWS resources.</li>
+                    <li><strong>Ansible:</strong> Automate server setup for consistency and speed.</li>
+                    <li><strong>Docker:</strong> Package your static website into a container for easy deployment.</li>
+                    <li><strong>GitHub Actions:</strong> Automate the build and deployment process.</li>
+                </ul>
+                <h4>AWS Services</h4>
+                <ul>
+                    <li><strong>EC2:</strong> Virtual server to host your application.</li>
+                    <li><strong>ECR:</strong> Repository to store your Docker image.</li>
+                    <li><strong>CloudWatch:</strong> Tool for monitoring logs and performance.</li>
+                    <li><strong>IAM:</strong> Manage access and security for AWS resources.</li>
+                </ul>
+            </article>
+            <article>
+                <h3>Project Architecture</h3>
+                <p>Your project will have the following components:</p>
+                <h4>Static Website</h4>
+                <p>A simple website made with HTML, CSS, and JavaScript.</p>
+                <h4>Containerization</h4>
+                <p>Your website will be packaged in a Docker container.</p>
+                <h4>Infrastructure</h4>
+                <ul>
+                    <li><strong>EC2 Instance:</strong> A basic virtual server on AWS.</li>
+                    <li><strong>ECR:</strong> Storage for your Docker image.</li>
+                    <li><strong>Nginx:</strong> Installed on EC2 to serve your website.</li>
+                    <li><strong>CloudWatch:</strong> Monitors logs and performance.</li>
+                    <li><strong>IAM:</strong> Provides basic security settings.</li>
+                </ul>
+            </article>
+            <article>
+                <h3>6. Steps Involved</h3>
+                <p>You will work on these main tasks:</p>
+                <ol>
+                    <li><strong>Create an EC2 Instance with Terraform:</strong> Write simple Terraform scripts to set up a virtual server on AWS.</li>
+                    <li><strong>Configure the EC2 Instance with Ansible:</strong> Use Ansible playbooks to install Docker and Nginx.</li>
+                    <li><strong>Build and Containerize the Website:</strong> Create a Dockerfile for your static website and build a Docker image.</li>
+                    <li><strong>Set Up GitHub Actions for CI/CD:</strong> Automate the process of building the Docker image, pushing it to ECR, and deploying it to your EC2 instance.</li>
+                    <li><strong>Configure Nginx as a Reverse Proxy:</strong> Set up Nginx to serve your static website from the Docker container.</li>
+                    <li><strong>Enable Monitoring with CloudWatch:</strong> Configure CloudWatch for basic log and performance monitoring.</li>
+                    <li><strong>Establish Basic Security with IAM:</strong> Create simple IAM policies to control access to your AWS resources.</li>
+                </ol>
+            </article>
+            <article>
+                <h3>7. Expected Outcomes</h3>
+                <p>After completing this project, you will be able to:</p>
+                <ul>
+                    <li>Create and manage a basic AWS EC2 instance using Terraform.</li>
+                    <li>Automate server configuration using Ansible.</li>
+                    <li>Package and deploy a static website in a Docker container.</li>
+                    <li>Set up an automated CI/CD pipeline with GitHub Actions.</li>
+                    <li>Serve your website securely with Nginx and monitor it using CloudWatch.</li>
+                    <li>Understand basic security practices with IAM.</li>
+                </ul>
+            </article>
+            <article>
+                <h3>8. Real-World Benefits</h3>
+                <p>This project simulates a practical deployment scenario:</p>
+                <ul>
+                    <li><strong>Automation:</strong> Learn how to automate infrastructure and deployment tasks.</li>
+                    <li><strong>Simplicity:</strong> Gain hands-on experience with tools that make managing web applications easier.</li>
+                    <li><strong>Scalability:</strong> Understand the basics of deploying applications on the cloud.</li>
+                    <li><strong>Career Readiness:</strong> Acquire skills that are in demand in everyday cloud operations.</li>
+                    <li><strong>Problem Solving:</strong> Build confidence in troubleshooting and monitoring deployed applications.</li>
+                </ul>
+            </article>
+            <article>
+                <h2>9. Additional Resources</h2>
+                <ul>
+                    <li><strong>AWS Documentation:</strong> Guides on EC2, ECR, CloudWatch, and IAM.</li>
+                    <li><strong>Terraform Documentation:</strong> <a href="https://www.terraform.io/docs">Terraform Docs</a></li>
+                    <li><strong>Ansible Documentation:</strong> <a href="https://docs.ansible.com">Ansible Docs</a></li>
+                    <li><strong>Docker Documentation:</strong> <a href="https://docs.docker.com">Docker Docs</a></li>
+                    <li><strong>GitHub Actions Documentation:</strong> <a href="https://docs.github.com/en/actions">GitHub Actions Docs</a></li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>Conclusion</h3>
+                <p>This project offers a simple yet practical introduction to cloud deployment. You will gain essential skills for automating infrastructure, managing server configurations, and deploying applications in the cloud. These skills are directly applicable to daily operations in real-world environments, setting a strong foundation for your future in cloud computing and DevOps.</p>                
+            </article>
+
+        </main>
+        <script> copyright("all"); </script>
+
+    </body>
+
+</html>

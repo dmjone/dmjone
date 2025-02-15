@@ -4477,7 +4477,8 @@ function body_blockcards(link, date, title, desc, codetype, readtime, author, se
 
     const authors = {
         "vp": "Vanshika Painuly",
-        "1": "Divya Mohan"
+        "1": "Divya Mohan",
+        "lakshika": "Lakshika Tanwar"
     };
     author = authors[author] || author;
 
