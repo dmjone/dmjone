@@ -77,8 +77,7 @@ function get_menu_list(datetogen) {
             {
                 title: "Homework Assignment 1: Real-World Cloud Computing and Distributed Systems Challenge",
                 desc: "Apply your knowledge of cloud computing and distributed systems to solve a real-world challenge. This homework assignment will test your understanding of key concepts, including cloud service models, MapReduce, and distributed computing principles. Click to access the assignment and demonstrate your proficiency in cloud computing and distributed systems.",
-                codetype: "Assignment",
-                author: "lakshika",
+                codetype: "Assignment",                
                 readtime: 1,
                 link: "homework-assignment-1"
             },
@@ -86,7 +85,6 @@ function get_menu_list(datetogen) {
                 title: "Gossip Protocol",
                 desc: "Learn about the Gossip Protocol, a communication algorithm used in distributed systems to disseminate information efficiently. This section explores the key features and benefits of the Gossip Protocol, including scalability, fault tolerance, and eventual consistency. Click to access the theory section and deepen your understanding of the Gossip Protocol and its applications in distributed systems.",
                 codetype: "Concepts",
-                author: "lakshika",
                 readtime: 5,
                 link: "gossip-protocol"
             },
@@ -94,7 +92,7 @@ function get_menu_list(datetogen) {
                 title: "Membership Protocol",
                 desc: "Explore the Membership Protocol, a distributed systems algorithm used to maintain group membership and detect failures. This section examines the key features and benefits of the Membership Protocol, including scalability, fault tolerance, and dynamic membership management. Click to access the theory section and enhance your understanding of the Membership Protocol and its applications in distributed systems.",
                 codetype: "Concepts",
-                author: "lakshika",
+                author: "Anshuman Mohanty",
                 readtime: 5,
                 link: "membership-protocol"
             },
@@ -110,7 +108,7 @@ function get_menu_list(datetogen) {
                 title: "Challenging Brainstorming Homework: Multidisciplinary Grid and Gossip-Based Distributed Systems Design",
                 desc: "Engage in a challenging brainstorming exercise to design multidisciplinary grid and gossip-based distributed systems. This homework assignment will test your creativity and problem-solving skills as you explore innovative solutions to real-world challenges. Click to access the assignment and demonstrate your ability to design complex distributed systems using grid and gossip-based algorithms.",
                 codetype: "Assignment",
-                author: "lakshika",
+                author: "Aarchit Joshi",
                 readtime: 1,
                 link: "homework-assignment-2"
             },
@@ -118,7 +116,6 @@ function get_menu_list(datetogen) {
                 title: "Peer-to-Peer (P2P) Networks",
                 desc: "Explore Peer-to-Peer (P2P) Networks, a distributed systems architecture that enables direct communication and resource sharing between nodes. This section examines the key features and benefits of P2P Networks, including decentralized communication, fault tolerance, and scalability. Click to access the theory section and enhance your understanding of P2P Networks and their applications in distributed systems.",
                 codetype: "Concepts",
-                author: "lakshika",
                 readtime: 5,
                 link: "peer-to-peer-networks"
             },
@@ -134,7 +131,7 @@ function get_menu_list(datetogen) {
                 title: "Time and Orderings in Distributed Systems",
                 desc: "Explore the concepts of time and orderings in distributed systems, including logical clocks, vector clocks, and Lamport timestamps. This section examines the key features and benefits of time and orderings, including causality, consistency, and synchronization. Click to access the theory section and enhance your understanding of time and orderings in distributed systems.",
                 codetype: "Concepts",
-                author: "lakshika",
+                author: "Rijul Chaudhary",
                 readtime: 5,
                 link: "time-and-orderings"
             },
@@ -151,7 +148,7 @@ function get_menu_list(datetogen) {
                 title: "Homework 3: Novel Approach to Conflict-Free Distributed Scheduling for Urban Ride-Sharing Platforms",
                 desc: "Engage in a novel approach to conflict-free distributed scheduling for urban ride-sharing platforms. This homework assignment will challenge you to design an innovative solution to optimize scheduling and resource allocation in a distributed environment. Click to access the assignment and demonstrate your ability to apply distributed systems concepts to real-world problems.",
                 codetype: "Assignment",
-                author: "lakshika",
+                author: "Ahmad Waleed Salehi",
                 readtime: 1,
                 link: "homework-assignment-3"
             },
@@ -175,15 +172,14 @@ function get_menu_list(datetogen) {
                 title: "Paxos Algorithm",
                 desc: "Explore the Paxos Algorithm, a distributed systems consensus protocol used to achieve agreement among a group of nodes. This section examines the key features and benefits of the Paxos Algorithm, including fault tolerance, safety, and liveness properties. Click to access the theory section and enhance your understanding of the Paxos Algorithm and its applications in distributed systems.",
                 codetype: "Concepts",
-                author: "lakshika",
+                author: "Manik",
                 readtime: 5,
                 link: "paxos-algorithm"
             },
             {
                 title: "Leader Election in Distributed Systems",
                 desc: "Learn about Leader Election in Distributed Systems, a process used to select a leader node in a distributed environment. This section explores the key features and benefits of leader election, including fault tolerance, scalability, and consensus. Click to access the theory section and deepen your understanding of leader election in distributed systems.",
-                codetype: "Concepts",
-                author: "lakshika",
+                codetype: "Concepts",                
                 readtime: 5,
                 link: "leader-election"
             },
@@ -199,7 +195,6 @@ function get_menu_list(datetogen) {
                 title: "Concurrency Control in Distributed Systems",
                 desc: "Learn about Concurrency Control in Distributed Systems, a mechanism used to manage access to shared resources in a concurrent environment. This section explores the key features and benefits of concurrency control, including isolation, consistency, and scalability. Click to access the theory section and deepen your understanding of concurrency control in distributed systems.",
                 codetype: "Concepts",
-                author: "lakshika",
                 readtime: 5,
                 link: "concurrency-control"
             },
@@ -239,7 +234,7 @@ function get_menu_list(datetogen) {
                 title: "Scheduling Algorithms in Distributed Systems",
                 desc: "Explore Scheduling Algorithms in Distributed Systems, a technique used to allocate resources and tasks across multiple nodes. This section examines the key features and benefits of scheduling algorithms, including fairness, efficiency, and load balancing. Click to access the theory section and enhance your understanding of scheduling algorithms in distributed systems.",
                 codetype: "Concepts",
-                author: "lakshika",
+                author: "Aarchit Joshi",
                 readtime: 5,
                 link: "scheduling-algorithms"
             },
@@ -270,8 +265,7 @@ function get_menu_list(datetogen) {
             {
                 title: "Security in Distributed Systems",
                 desc: "Learn about Security in Distributed Systems, including encryption, authentication, and access control mechanisms. This section explores the key features and benefits of security measures, including confidentiality, integrity, and availability. Click to access the theory section and deepen your understanding of security in distributed systems.",
-                codetype: "Concepts",
-                author: "lakshika",
+                codetype: "Concepts",                
                 readtime: 5,
                 link: "security-in-distributed-systems"
             }

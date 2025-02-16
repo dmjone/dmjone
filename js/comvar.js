@@ -54,6 +54,11 @@ const arr_author = {
         name: "Lakshika Tanwar",
         bio: "<p class='studentauthorbio header-p-author-description'>Lakshika Tanwar is a B.Tech Computer Science (Cloud Computing) student at Shoolini University, India and an exchange student at NQU, Taiwan. As a contributor to dmj.one, she helps advance the platform's mission of accessible education. Skilled in Python, Java, Google Cloud, and AWS, she aspires to become a successful businesswoman while embracing challenges as opportunities.</p>",
         href: "lakshikatanwar99@gmail.com"
+    },
+    anshuman: {
+        name: "Anshuman Mohanty",
+        bio: "<p class='studentauthorbio header-p-author-description'>Anshuman Mohanty is a B.Tech Computer Science student at Shoolini University, India. Passionate about technology and learning, he is a contributor to dmj.one, supporting the platform's goal of providing quality education for all. Anshuman is constantly expanding his skills and exploring new opportunities in the tech world.</p>",
+        href: "anshumanmohanty@shooliniuniversity.com"
     }
 
 };
