@@ -22,6 +22,14 @@ function get_menu_list(datetogen) {
                 title: "Practice Ethical Hacking Concepts: Strengthen Your Knowledge",
                 desc: "Reinforce your understanding of Ethical Hacking with practice exercises and interactive tools. This section offers a range of resources to help you master Ethical Hacking Concepts, including coding challenges, quizzes, and more.",
                 codetype: "Practice | Ethical Hacking",                
+            },
+            {
+                link: "theory/digicampus-localstorage-privilege-escalation",
+                title: "Privilege Escalation via 'localStorage' Manipulation",
+                desc: "Identified and analyzed a critical privilege escalation vulnerability in the Shoolini University DigiCampus platform. The issue allowed users to manipulate `localStorage` entries in the browser to gain unauthorized access to faculty-level privileges. This vulnerability posed a significant security risk, exposing sensitive student records, grading systems, and administrative tools.",
+                codetype: "Academic Project",
+                continuereading: "Click to Visit the Project Page",
+                cardimage: "https://cdn.dmj.one/edu/su/course/projects/img/logo.webp"
             }
         ];
 

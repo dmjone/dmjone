@@ -1,0 +1,303 @@
+<!-------------------------- © 2007 - present, dmj.one and contributors. ----------------------------------
+   Part of the dmjone project. Licensed under the GNU AGPL. Provided as-is, without warranty of any kind. 
+-------------------- Redistribution and modifications must retain this notice. --------------------------->
+
+
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+    <!--<![endif]-->
+
+    <head>
+        <script src="/js/edu_su_common.js"></script>
+        <noscript>
+            <style>
+                html,
+                body {
+                    margin: 0;
+                    overflow: hidden;
+                }
+            </style>
+            <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+        </noscript>
+
+        <title>Vulnerability Report - CSU1899 - Shoolini U</title>
+        <meta name="description" content="This report documents a privilege escalation vulnerability discovered in the Shoolini University DigiCampus platform, which allowed unauthorized users to manipulate localStorage entries and escalate privileges to faculty-level access. The vulnerability has been patched as of December 2024.">
+
+        <meta property="og:image" content="/logo.png">
+        <meta property="og:type" content="article">
+
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:site" content="@divyamohan1993">
+        <meta name="twitter:creator" content="@divyamohan1993">
+        <meta name="twitter:image" content="/logo.png">
+
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+        <meta name="author" content="Divya Mohan">
+        <meta name="robots" content="index, follow">
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/14.1.2/marked.min.js"></script>
+    </head>
+
+    <body>
+
+        <script> header_author("dm");</script>
+
+        <main>
+            <article class="agen-tableofcontents">
+                <h2 class="text-center">
+                    Privilege Escalation via 'localStorage' Manipulation
+                </h2>
+                <div class="d-none contentdate">2024, October 11</div>
+            </article>
+
+            <article>
+                <div class="text-justify">
+                    <div class="card shadow-lg border-0">
+                        <div class="card-header text-center">
+                            <h3 class="mb-0">Cybersecurity Vulnerability Report</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="my-3">
+                                <p class="text-center mx-auto fw-bold text-uppercase text-secondary">For Educational Purposes Only</p>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <p><strong>Prepared for:</strong> Shoolini University DigiCampus</p>
+                                    <p><strong>Prepared by:</strong> Divya Mohan (Cybersecurity Student)</p>
+                                    <p><strong>Report ID:</strong> CSU1899-DMJ-0001</p>
+                                    <p><strong>Date Reported:</strong> October 11, 2024</p>
+                                </div>
+                                <div class="col-md-6 text-md-end">
+                                    <p><strong>Severity:</strong> <span class="text-danger">Critical</span></p>
+                                    <p><strong>Status:</strong> <span class="text-success fw-bold">Patched (December 2024)</span></p>
+                                    <p><strong>Disclosure:</strong> Ethical, Post-Patch</p>
+                                    <p><strong>Report Type:</strong> Vulnerability Assessment</p>
+                                </div>
+                            </div>
+
+                            <hr>
+
+                            <div class="mb-3">
+                                <h5 class="text-primary">Report Summary</h5>
+                                <p>
+                                    This report documents a <strong>privilege escalation vulnerability</strong> discovered in the
+                                    <strong>Shoolini University DigiCampus</strong> platform, which allowed unauthorized users to
+                                    manipulate <code>localStorage</code> entries and escalate privileges to faculty-level access.
+                                    The vulnerability has been patched as of <strong>December 2024</strong>.
+                                </p>
+                            </div>
+
+                            <div class="mb-3">
+                                <h5 class="text-primary">Security Recommendations</h5>
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item">✅ Enforce server-side role validation to prevent client-side manipulation.</li>
+                                    <li class="list-group-item">✅ Implement token invalidation checks for modified session data.</li>
+                                    <li class="list-group-item">✅ Use secure, HTTP-only cookies for authentication instead of `localStorage`.</li>
+                                </ul>
+                            </div>
+
+                            <hr>
+
+                            <div class="mb-3">
+                                <h5 class="text-danger">Confidentiality & Legal Disclaimer</h5>
+                                <p class="text-muted">
+                                    This research was conducted ethically and disclosed only after the vulnerability was patched.
+                                    The researcher had no unauthorized access beyond the scope of ethical security testing.
+                                    No proprietary information or unauthorized data was accessed, modified, or exfiltrated.
+                                </p>
+                                <div class="alert alert-warning bg-opacity-50 text-center mx-auto">
+                                    This report is publicly disclosed as part of the <strong>Ethical Hacking Academic Project</strong>, conducted under responsible disclosure guidelines to enhance cybersecurity awareness and improve platform security.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </article>
+
+            <article class="page-center">
+                <h2 style="font-size:2rem !important; color: red !important" class="text-uppercase">Confidential Security Report</h2>
+                <h2 style="font-size:1.5rem !important; color: rgb(185, 0, 0) !important" class="text-uppercase">critical vulnerability</h2>
+            </article>
+
+            <article>
+                <h3><strong>1. Executive Summary</strong></h3>
+                <p>This report outlines the findings of a privilege escalation vulnerability discovered during a penetration test on the Shoolini University DigiCampus platform. The vulnerability allows unauthorized users to manipulate <code>localStorage</code> entries in their browser, leading to privilege escalation from student to faculty roles, thus granting unauthorized access to sensitive resources. This issue could lead to significant security breaches, including unauthorized access to confidential data such as student records, faculty resources, and grading systems.</p>
+                <p>The purpose of this report is to inform the organization of this security flaw and recommend actionable steps to mitigate the risk.</p>
+            </article>
+            <article>
+                <h3><strong>2. Scope</strong></h3>
+                <p>The scope of this penetration test was limited to the Shoolini University DigiCampus website. Testing was conducted with permission from the organization and focused on identifying security vulnerabilities, particularly those that could result in privilege escalation or unauthorized access to sensitive information.</p>
+            </article>
+            <article>
+                <h3><strong>3. Vulnerability Description</strong></h3>
+                <h4><strong>Vulnerability Type</strong>: Privilege Escalation</h4>
+                <h4><strong>Attack Vector</strong>: 'localStorage' Manipulation</h4>
+                <p>During testing, it was found that the platform stores critical user role information such as <code>faculty</code>, <code>student</code>, and <code>userType</code> in <code>localStorage</code>, a client-side storage mechanism. This allows users to directly manipulate these fields, resulting in unauthorized access to higher-privileged areas of the platform. This security flaw stems from the fact that the system trusts client-side data without sufficient server-side validation.</p>
+                <h4><strong>Steps to Reproduce</strong>:</h4>
+                <ol>
+                    <li><strong>Login as a student</strong>: Access the DigiCampus platform using valid student credentials.</li>
+                    <li><strong>Inspect <code>localStorage</code></strong>: Open the browser's developer tools and inspect the <code>localStorage</code> for fields like <code>faculty</code>, <code>student</code>, and <code>userType</code>.</li>
+                    <li><strong>Manipulate the values</strong>:<ul>
+                            <li>Set <code>faculty: true</code>, <code>student: false</code>, and <code>userType: 'faculty'</code>.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Refresh the page</strong>: After modifying the values, refresh the page to observe the escalation in privileges. The user is now recognized as a faculty member and has access to faculty-specific resources.</li>
+                </ol>
+                <h4><strong>Impact</strong>:</h4>
+                <ul>
+                    <li><strong>Unauthorized Access</strong>: A student can escalate their privileges to a faculty member, gaining access to confidential resources such as student records, grades, and administrative tools.</li>
+                    <li><strong>Data Breach</strong>: This could result in the exposure of sensitive information, violating privacy regulations such as GDPR, and could lead to reputational damage.</li>
+                    <li><strong>Privilege Misuse</strong>: With access to faculty features, an attacker could alter grades or perform administrative actions on behalf of faculty members.</li>
+                </ul>
+            </article>
+            <article>
+                <h3><strong>4. Timeline of Events</strong></h3>
+                <ol>
+                    <li><strong>October 10, 2024</strong>: Initial discovery of client-side data manipulation vulnerability in <code>localStorage</code>.</li>
+                    <li><strong>October 10, 2024</strong>: Successfully escalated privileges from student to faculty by modifying <code>localStorage</code> values.</li>
+                    <li><strong>October 11, 2024</strong>: Detailed analysis of the impact and potential exploitation scenarios.</li>
+                    <li><strong>October 11, 2024</strong>: Report prepared and shared with the organization.</li>
+                </ol>
+            </article>
+            <article>
+                <h3><strong>5. Vulnerability Analysis</strong></h3>
+                <h4><strong>Root Cause</strong>:</h4>
+                <ul>
+                    <li><strong>Client-Side Trust</strong>: The root cause of this vulnerability is the reliance on <code>localStorage</code> to store critical data related to user roles and access control. The server trusts the data sent from the client without verifying its authenticity or integrity.</li>
+                </ul>
+                <h4><strong>Potential Exploits</strong>:</h4>
+                <ol>
+                    <li><strong>Role Escalation</strong>: Users can modify their role to gain unauthorized access to higher-privileged functions.</li>
+                    <li><strong>Data Breach</strong>: By gaining faculty access, users could view or modify sensitive information, such as student records and grades.</li>
+                    <li><strong>Operational Disruption</strong>: Misuse of administrative tools by unauthorized users could lead to disruptions in the platform’s operations.</li>
+                </ol>
+                <h4><strong>Likelihood</strong>:</h4>
+                <p>Given that the data in <code>localStorage</code> is accessible through standard browser developer tools, the likelihood of exploitation is <strong>high</strong>.</p>
+                <h4><strong>Severity</strong>:</h4>
+                <p>This is a <strong>critical</strong> vulnerability, as it allows a non-privileged user to gain unauthorized access to sensitive and restricted resources.</p>
+            </article>
+            <article>
+                <h3><strong>6. Recommendations</strong></h3>
+                <h4><strong>Short-Term Fixes</strong>:</h4>
+                <ul>
+                    <li><strong>Server-Side Role Validation</strong>: Ensure that all role-based access control (RBAC) decisions are made server-side, that it, the server should never trust user-provided data, especially roles or permissions stored in <code>localStorage</code>.</li>
+                    <li><strong>Invalidate Modified Tokens</strong>: Implement checks that invalidate requests where critical data, such as roles or permissions, has been tampered with.</li>
+                    <li><strong>Session Handling</strong>: Use HTTP-only cookies to manage user sessions and roles, which are inaccessible to client-side scripts and prevent tampering.</li>
+                </ul>
+                <h4><strong>Long-Term Recommendations</strong>:</h4>
+                <ul>
+                    <li><strong>Use Secure Tokens (eg: JWT)</strong>: Implement secure, signed tokens like JSON Web Tokens (JWT) that encode user roles and other important data, and should be verified server-side to prevent tamperin-</li>
+                    <li><strong>Data Encryption in <code>localStorage</code></strong>: If <code>localStorage</code> must be used, ensure that sensitive data is encrypted and integrity-checked using digital signature-</li>
+                    <li><strong>Conduct Regular Security Audits</strong>: Perform regular security audits and penetration testing to identify and mitigate vulnerabilities earl-</li>
+                    <li><strong>Train Developers</strong>: Ensure that the development team is trained on secure coding practices, particularly with respect to client-server trust boundaries and proper handling of sensitive data.</li>
+                </ul>
+            </article>
+            <article>
+                <h3><strong>7. Conclusion</strong></h3>
+                <p>The privilege escalation vulnerability identified in the Shoolini University DigiCampus platform is a critical issue that could result in severe security breaches if left unaddressed. By allowing users to manipulate <code>localStorage</code> values, the platform inadvertently enables unauthorized access to sensitive areas reserved for faculty members. This vulnerability should be prioritized for immediate remediation, with emphasis on moving sensitive data handling from client-side storage to server-side validation.</p>
+                <p>I recommend that the organization implement the fixes and mitigations mentioned above as a priority to safeguard against exploitation and future attacks.</p>
+            </article>
+            <article>
+                <h3><strong>8. References</strong></h3>
+                <ul>
+                    <li>OWASP Top 10 (2023): <a href="https://owasp.org/www-project-top-ten/">https://owasp.org/www-project-top-ten/</a></li>
+                    <li>X-Force Threat Intelligence Index (2023): <a href="https://www.ibm.com/security/xforce">https://www.ibm.com/security/xforce</a></li>
+                    <li>JSON Web Tokens (JWT): <a href="https://jwt.io/">https://jwt.io/</a></li>
+                </ul>
+            </article>
+            <article>
+                <h2 class="text-center">———————————— End of Report ————————————</h2>
+            </article>
+
+
+            <div id="markdown-raws" class="d-none">
+### **1. Executive Summary**
+
+This report outlines the findings of a privilege escalation vulnerability discovered during a penetration test on the Shoolini University DigiCampus platform. The vulnerability allows unauthorized users to manipulate `localStorage` entries in their browser, leading to privilege escalation from student to faculty roles, thus granting unauthorized access to sensitive resources. This issue could lead to significant security breaches, including unauthorized access to confidential data such as student records, faculty resources, and grading systems.
+
+The purpose of this report is to inform the organization of this security flaw and recommend actionable steps to mitigate the risk.
+
+### **2. Scope**
+
+The scope of this penetration test was limited to the Shoolini University DigiCampus website. Testing was conducted with permission from the organization and focused on identifying security vulnerabilities, particularly those that could result in privilege escalation or unauthorized access to sensitive information.
+
+### **3. Vulnerability Description**
+
+#### **Vulnerability Type**: Privilege Escalation
+#### **Attack Vector**: 'localStorage' Manipulation
+
+During testing, it was found that the platform stores critical user role information such as `faculty`, `student`, and `userType` in `localStorage`, a client-side storage mechanism. This allows users to directly manipulate these fields, resulting in unauthorized access to higher-privileged areas of the platform. This security flaw stems from the fact that the system trusts client-side data without sufficient server-side validation.
+
+#### **Steps to Reproduce**:
+1. **Login as a student**: Access the DigiCampus platform using valid student credentials.
+2. **Inspect `localStorage`**: Open the browser's developer tools and inspect the `localStorage` for fields like `faculty`, `student`, and `userType`.
+3. **Manipulate the values**:
+    - Set `faculty: true`, `student: false`, and `userType: 'faculty'`.
+4. **Refresh the page**: After modifying the values, refresh the page to observe the escalation in privileges. The user is now recognized as a faculty member and has access to faculty-specific resources.
+
+#### **Impact**:
+- **Unauthorized Access**: A student can escalate their privileges to a faculty member, gaining access to confidential resources such as student records, grades, and administrative tools.
+- **Data Breach**: This could result in the exposure of sensitive information, violating privacy regulations such as GDPR, and could lead to reputational damage.
+- **Privilege Misuse**: With access to faculty features, an attacker could alter grades or perform administrative actions on behalf of faculty members.
+
+### **4. Timeline of Events**
+
+1. **October 10, 2024**: Initial discovery of client-side data manipulation vulnerability in `localStorage`.
+2. **October 10, 2024**: Successfully escalated privileges from student to faculty by modifying `localStorage` values.
+3. **October 11, 2024**: Detailed analysis of the impact and potential exploitation scenarios.
+4. **October 11, 2024**: Report prepared and shared with the organization.
+
+### **5. Vulnerability Analysis**
+
+#### **Root Cause**:
+- **Client-Side Trust**: The root cause of this vulnerability is the reliance on `localStorage` to store critical data related to user roles and access control. The server trusts the data sent from the client without verifying its authenticity or integrity.
+
+#### **Potential Exploits**:
+1. **Role Escalation**: Users can modify their role to gain unauthorized access to higher-privileged functions.
+2. **Data Breach**: By gaining faculty access, users could view or modify sensitive information, such as student records and grades.
+3. **Operational Disruption**: Misuse of administrative tools by unauthorized users could lead to disruptions in the platform’s operations.
+
+#### **Likelihood**:
+Given that the data in `localStorage` is accessible through standard browser developer tools, the likelihood of exploitation is **high**.
+
+#### **Severity**:
+This is a **critical** vulnerability, as it allows a non-privileged user to gain unauthorized access to sensitive and restricted resources.
+
+### **6. Recommendations**
+
+#### **Short-Term Fixes**:
+- **Server-Side Role Validation**: Ensure that all role-based access control (RBAC) decisions are made server-side, that it, the server should never trust user-provided data, especially roles or permissions stored in `localStorage`.
+- **Invalidate Modified Tokens**: Implement checks that invalidate requests where critical data, such as roles or permissions, has been tampered with.
+- **Session Handling**: Use HTTP-only cookies to manage user sessions and roles, which are inaccessible to client-side scripts and prevent tampering.
+
+#### **Long-Term Recommendations**:
+- **Use Secure Tokens (eg: JWT)**: Implement secure, signed tokens like JSON Web Tokens (JWT) that encode user roles and other important data, and should be verified server-side to prevent tamperin-
+- **Data Encryption in `localStorage`**: If `localStorage` must be used, ensure that sensitive data is encrypted and integrity-checked using digital signature-
+- **Conduct Regular Security Audits**: Perform regular security audits and penetration testing to identify and mitigate vulnerabilities earl-
+- **Train Developers**: Ensure that the development team is trained on secure coding practices, particularly with respect to client-server trust boundaries and proper handling of sensitive data.
+
+### **7. Conclusion**
+
+The privilege escalation vulnerability identified in the Shoolini University DigiCampus platform is a critical issue that could result in severe security breaches if left unaddressed. By allowing users to manipulate `localStorage` values, the platform inadvertently enables unauthorized access to sensitive areas reserved for faculty members. This vulnerability should be prioritized for immediate remediation, with emphasis on moving sensitive data handling from client-side storage to server-side validation.
+
+I recommend that the organization implement the fixes and mitigations mentioned above as a priority to safeguard against exploitation and future attacks.
+
+### **8. References**
+- OWASP Top 10 (2023): https://owasp.org/www-project-top-ten/
+- X-Force Threat Intelligence Index (2023): https://www.ibm.com/security/xforce
+- JSON Web Tokens (JWT): https://jwt.io/
+
+## ———————————— End of Report ————————————
+            </div>
+        </main>
+
+        <script> copyright("all"); cL()</script>
+
+    </body>
+
+</html>

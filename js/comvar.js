@@ -573,6 +573,11 @@ const profDetailsBio = {
         bio: "<p class='professorbio header-p-author-description'>Dr. Ahmad Waleed Salehi is a researcher and educator specializing in AI, deep learning, and medical imaging. His PhD research focused on Alzheimer's Disease analysis using MRI data, enhancing diagnostic accuracy through optimized deep learning techniques. As an Assistant Professor at Shoolini University, he mentors students, develops academic curricula, and actively contributes to AI research. He engages in global collaborations, reviews international journals, and participates in faculty development programs. Passionate about AI model optimization and data-driven solutions, Dr. Salehi remains committed to advancing AI and deep learning for real-world impact.</p>",
         href: "contact@dmj.one",
     },
+    'Anandita Garg':
+    {
+        bio: "<p class='professorbio header-p-author-description'>Anandita Garg is an Assistant Professor and researcher specializing in AI, machine learning, and electronics. A GATE 2023 qualifier and Stanford-certified in Machine Learning, she contributed to a Govt. of India-backed project on Automated Soil Nutrient Sensing and holds a patent for an anti-sleep alarm. With five years of experience in academia and research, she remains committed to AI-driven innovations in engineering and technology.</p>",
+        href: "contact@dmj.one"
+    },
         
 };
 const courseDetailsMap = {
@@ -634,7 +639,7 @@ const courseDetailsMap = {
     'csu1641': {
         'default': ["Dr. Arvind Sharma", "CSU1641", "Cyber Security"],        
     },
-    'seaap004': { 'default': ["Anandita", "SEA-AP004", "Aptitude Development 004"]},
+    'seaap004': { 'default': ["Anandita Garg", "SEA-AP004", "Aptitude Development 004"]},
     'seaws004': { 'default': ["Chen Chun", "SEA-WS004", "Writing Seminar 004"]},
     'csu1806': { 'default': ["Payal Khanna", "CSU1806", "Enhancing Leadership through Coaching Skills"]},
     
@@ -644,7 +649,7 @@ const courseDetailsMap = {
     'csu359': { 'default': ["Abhishek Tomar", "CSU359", "Computer Networks"]},
     'csu1530': { 'default': ["Dr. Sonia", "CSU1530", "Biometric Security"]},
     'lse005': { 'default': ["Akshita Thakur", "LSE005", "English Communication Seminar"]},
-    'seaap005': { 'default': ["Anandita", "SEA-AP005", "Aptitude Development 005"]},   
+    'seaap005': { 'default': ["Anandita Garg", "SEA-AP005", "Aptitude Development 005"]},   
     'projects': { 'default': ["", "List of Projects", "Academic"]},    
     'csu677': {
         'default': ["Dr. Gaurav Gupta", "CSU677", "Web Technology"],

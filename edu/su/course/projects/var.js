@@ -58,6 +58,15 @@ function get_menu_list(datetogen) {
                 continuereading: "Click to Visit the Project Page",
                 link: "view/student-management-system"
             },
+            {
+                title: "Privilege Escalation via 'localStorage' Manipulation",
+                desc: "Identified and analyzed a critical privilege escalation vulnerability in the Shoolini University DigiCampus platform. The issue allowed users to manipulate `localStorage` entries in the browser to gain unauthorized access to faculty-level privileges. This vulnerability posed a significant security risk, exposing sensitive student records, grading systems, and administrative tools.",
+                codetype: "Academic Project",
+                cardimage: "https://cdn.dmj.one/edu/su/course/projects/img/logo.webp",
+                continuereading: "Click to Visit the Project Page",
+                link: "view/localstorage-privilege-escalation"
+            },
+            
 
         ];
 
