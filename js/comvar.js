@@ -567,7 +567,13 @@ const profDetailsBio = {
     {
         bio: "<p class='professorbio header-p-author-description'>Aman Rajak is a tech trainer with 7+ years of experience in Cybersecurity, IoT, Web Development, and MySQL. He has conducted 500+ corporate sessions and trained students at IITs and NITs on Blockchain, Big Data, and AI. A cybersecurity expert, he supports national forces with threat analysis and VAPT. During the pandemic, he worked on robotics projects and served as a COVID warrior.</p>",
         href: "jazzk.p.s@gmail.com",
-    }
+    },
+    'Dr. Ahmad Waleed Salehi':
+    {
+        bio: "<p class='professorbio header-p-author-description'>Dr. Ahmad Waleed Salehi is a researcher and educator specializing in AI, deep learning, and medical imaging. His PhD research focused on Alzheimer's Disease analysis using MRI data, enhancing diagnostic accuracy through optimized deep learning techniques. As an Assistant Professor at Shoolini University, he mentors students, develops academic curricula, and actively contributes to AI research. He engages in global collaborations, reviews international journals, and participates in faculty development programs. Passionate about AI model optimization and data-driven solutions, Dr. Salehi remains committed to advancing AI and deep learning for real-world impact.</p>",
+        href: "contact@dmj.one",
+    },
+        
 };
 const courseDetailsMap = {
     // Semester 1
@@ -648,11 +654,11 @@ const courseDetailsMap = {
         'default': ["Dr. Piyush Sewal", "CSU1899", "Ethical Hacking"],
         'lab': ["Dr. Piyush Sewal", "CSU1899P", "Ethical Hacking Lab"]
     },
-    'dmjcclt': { 'default': ["", "DMJCCLT", "Cloud Computing Concepts"] },
-
+    
     // Semester 6    
+    'dmjcclt': { 'default': ["Dr. Ahmad Waleed Salehi", "DMJCCLT", "Cloud Computing Concepts"] },
     'lse006': { 'default': ["Akshita Thakur", "LSE006", "English Communication Seminar 2"] },
-    'csu2101': { 'default': ["Aman Rajak", "CSU2101", "Programming in PHP & MySQL"] },
+    'csu2101': { 'default': ["Aman Rajak", "CSU2101", "Programming in PHP & MySQL"] },    
     
 };
 
