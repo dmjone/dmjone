@@ -1,0 +1,824 @@
+<!-------------------------- © 2007 - present, dmj.one and contributors. ----------------------------------
+   Part of the dmjone project. Licensed under the GNU AGPL. Provided as-is, without warranty of any kind. 
+-------------------- Redistribution and modifications must retain this notice. --------------------------->
+
+
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+    <!--<![endif]-->
+
+    <head>
+        <script src="/js/edu_su_common.js"></script>
+        <noscript>
+            <style>
+                html,
+                body {
+                    margin: 0;
+                    overflow: hidden;
+                }
+            </style>
+            <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+        </noscript>
+
+        <title>Bipartite Graph Checking - CSU083 | Shoolini University</title>
+
+        <meta name="description" content="Learn Bipartite Graph Checking in Data Structures, covering theory, implementation, optimizations, real-world applications, and competitive programming use cases. Part of the CSU083 course at Shoolini University.">
+        <meta name="keywords" content="Bipartite Graph, Graph Theory, BFS, DFS, Graph Coloring, Maximum Matching, Competitive Programming, System Design, Network Flow, Recommendation Systems">
+        <meta name="author" content="Divya Mohan">
+        <meta name="robots" content="index, follow">
+
+        <!-- Open Graph for Social Media -->
+        <meta property="og:title" content="Bipartite Graph Checking - CSU083 | Shoolini University">
+        <meta property="og:description" content="Comprehensive guide on Bipartite Graph Checking, covering fundamental concepts, BFS & DFS implementations, optimizations, and real-world applications in networking, AI, and scheduling.">
+        <meta property="og:image" content="/logo.png">
+        <meta property="og:type" content="article">
+
+        <!-- Twitter Cards -->
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:title" content="Bipartite Graph Checking in Data Structures">
+        <meta name="twitter:description" content="Master Bipartite Graph Checking with a deep dive into implementations, use cases, and optimizations in system design and competitive programming.">
+        <meta name="twitter:site" content="@divyamohan1993">
+        <meta name="twitter:creator" content="@divyamohan1993">
+        <meta name="twitter:image" content="/logo.png">
+
+        <!-- Mobile Responsiveness -->
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <!-- JSON-LD Structured Data for SEO -->
+        <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "Course",
+            "name": "Bipartite Graph Checking in Data Structures",
+            "description": "Master Bipartite Graph Checking, covering fundamental concepts, BFS & DFS implementations, optimizations, applications in network flow, scheduling, AI, and competitive programming.",
+            "provider": [
+                {
+                    "@type": "EducationalOrganization",
+                    "name": "dmj.one",
+                    "url": "https://dmj.one"
+                },
+                {
+                    "@type": "EducationalOrganization",
+                    "name": "Shoolini University",
+                    "url": "https://shooliniuniversity.com"
+                }
+            ]
+        }
+        </script>
+
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js" integrity="sha512-sHSNLECRJSK+BFs7E8DiFc6pf6n90bLI85Emiw1jhreduZhK3VXgq9l4kAt9eTIHYAcuQBKHL01QKs4/3Xgl8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js" integrity="sha512-iWiuBS5nt6r60fCz26Nd0Zqe0nbk1ZTIQbl3Kv7kYsX+yKMUFHzjaH2+AnM6vp2Xs+gNmaBAVWJjSmuPw76Efg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                renderMathInElement(document.body, {
+                    // customised options
+                    // • auto-render specific keys, e.g.:
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false },
+                        { left: '\\(', right: '\\)', display: false },
+                        { left: '\\[', right: '\\]', display: true }
+                    ],
+                    // • rendering keys, e.g.:
+                    throwOnError: false
+                });
+            });
+        </script> -->
+
+        <!-- <style>
+            main ul {
+                list-style-type: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            main ul li {
+                margin: 0;
+                padding: 0;
+            }
+        </style> -->
+
+
+
+    </head>
+
+    <body>
+
+        <script> header_author("dm"); </script>
+
+        <main>
+            <article class="agen-tableofcontents">
+                <h2 class="text-center">
+                    Bipartite Graph Checking
+                </h2>
+                <div class="d-none contentdate">2025, February 6</div>
+            </article>
+
+            <article>
+                <h3>1. Prerequisites</h3>
+                <p>Before understanding bipartite graph checking, you need to be familiar with the following concepts:</p>
+                <ul>
+                    <li><strong>Graph Theory:</strong> Understanding nodes (vertices) and edges.</li>
+                    <li><strong>Graph Representations:</strong> Adjacency matrix and adjacency list.</li>
+                    <li><strong>Graph Traversal:</strong> Breadth-First Search (BFS) and Depth-First Search (DFS).</li>
+                    <li><strong>Graph Coloring:</strong> Assigning colors to nodes while ensuring constraints.</li>
+                    <li><strong>Cyclic and Acyclic Graphs:</strong> Recognizing cycles in a graph.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>2. What is a Bipartite Graph?</h3>
+                <p>A bipartite graph is a graph where its vertices can be divided into two disjoint sets, <code>U</code> and <code>V</code>, such that no two vertices within the same set are adjacent.</p>
+                <p>Formally, a graph <code>G = (V, E)</code> is bipartite if there exists a partition <code>(U, V)</code> where every edge <code>(u, v) ∈ E</code> satisfies <code>u ∈ U</code> and <code>v ∈ V</code>.</p>
+                <p>Key properties:</p>
+                <ul>
+                    <li>A graph is bipartite if and only if it is <strong>2-colorable</strong>.</li>
+                    <li>A graph with an <strong>odd-length cycle</strong> is never bipartite.</li>
+                    <li>Bipartite graphs have applications in <strong>matching problems</strong> (e.g., job assignment).</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>3. Why Does Bipartite Graph Checking Exist?</h3>
+                <p>Bipartite graph checking is essential because bipartite graphs have unique properties that make them useful in:</p>
+                <ul>
+                    <li><strong>Network Flow:</strong> Solving problems like maximum matching in a bipartite graph.</li>
+                    <li><strong>Scheduling Problems:</strong> Assigning tasks to workers efficiently.</li>
+                    <li><strong>Social Network Analysis:</strong> Dividing users into groups to detect potential conflicts.</li>
+                    <li><strong>Graph-Based Machine Learning:</strong> Representing relationships in datasets.</li>
+                    <li><strong>Biological Networks:</strong> Modeling protein-interaction networks.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>4. When Should You Use Bipartite Graph Checking?</h3>
+                <p>You should check whether a graph is bipartite in the following scenarios:</p>
+                <ul>
+                    <li><strong>When solving matching problems:</strong> In a bipartite graph, matching algorithms like the Hopcroft-Karp algorithm work efficiently.</li>
+                    <li><strong>When analyzing relationships:</strong> Social networks and conflict resolution often use bipartite models.</li>
+                    <li><strong>When designing algorithms:</strong> Some graph algorithms, such as network flow problems, require bipartite graphs for efficient solutions.</li>
+                    <li><strong>When avoiding odd-length cycles:</strong> If you need a conflict-free assignment of entities.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>5. How Does Bipartite Graph Checking Compare to Alternatives?</h3>
+                <p>Bipartite graph checking has its strengths and weaknesses when compared to other graph analysis methods:</p>
+
+                <h4>Strengths:</h4>
+                <ul>
+                    <li><strong>Efficient detection:</strong> Checking if a graph is bipartite using BFS or DFS runs in <code>O(V + E)</code> time.</li>
+                    <li><strong>Useful for optimization problems:</strong> Many optimization problems (e.g., job assignment) are easily solvable when the graph is bipartite.</li>
+                    <li><strong>Better algorithmic efficiency:</strong> Algorithms like the Hungarian algorithm work best on bipartite graphs.</li>
+                </ul>
+
+                <h4>Weaknesses:</h4>
+                <ul>
+                    <li><strong>Not applicable to general graphs:</strong> Many real-world graphs are not bipartite.</li>
+                    <li><strong>Limited expressiveness:</strong> Some networks (e.g., social interactions) may require more complex models.</li>
+                    <li><strong>Fails with odd-length cycles:</strong> A single odd-length cycle makes the entire graph non-bipartite.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>6. Basic Implementation</h3>
+                <p>The following is a Python implementation of bipartite graph checking using Breadth-First Search (BFS):</p>
+
+                <pre><code class="language-python">
+from collections import deque
+
+def is_bipartite(graph, start):
+    color = {}  # Dictionary to store colors (0 or 1)
+    queue = deque([start])
+    color[start] = 0  # Assign first color
+
+    while queue:
+        node = queue.popleft()
+        for neighbor in graph[node]:
+            if neighbor not in color:
+                color[neighbor] = 1 - color[node]  # Assign alternate color
+                queue.append(neighbor)
+            elif color[neighbor] == color[node]:
+                return False  # Same color adjacent nodes → Not bipartite
+    return True
+
+# Example Graph (Adjacency List Representation)
+graph = {
+    0: [1, 3],
+    1: [0, 2],
+    2: [1, 3],
+    3: [0, 2]
+}
+
+# Checking bipartiteness for all components
+print(is_bipartite(graph, 0))  # Output: True
+</code></pre>
+
+                <p><strong>Explanation:</strong></p>
+                <ul>
+                    <li>We use a queue to perform BFS and color the nodes.</li>
+                    <li>If a node’s neighbor already has the same color, the graph is not bipartite.</li>
+                    <li>Otherwise, we alternate colors as we traverse.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>7. Dry Run of the Algorithm</h3>
+                <p>Let's dry run the algorithm on the following input graph:</p>
+                <pre>
+  0 --- 1
+  |     |
+  3 --- 2
+</pre>
+
+                <h4>Step-by-Step Execution:</h4>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <tr class="table-dark">
+                            <th>Step</th>
+                            <th>Queue</th>
+                            <th>Current Node</th>
+                            <th>Neighbor</th>
+                            <th>Color Map</th>
+                            <th>Action</th>
+                        </tr>
+
+                        <tr>
+                            <td>1</td>
+                            <td>[0]</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>{0: 0}</td>
+                            <td>Start with node 0, color it 0</td>
+                        </tr>
+
+                        <tr>
+                            <td>2</td>
+                            <td>[]</td>
+                            <td>0</td>
+                            <td>1</td>
+                            <td>{0: 0, 1: 1}</td>
+                            <td>Color 1 as 1, add to queue</td>
+                        </tr>
+
+                        <tr>
+                            <td>3</td>
+                            <td>[1]</td>
+                            <td>0</td>
+                            <td>3</td>
+                            <td>{0: 0, 1: 1, 3: 1}</td>
+                            <td>Color 3 as 1, add to queue</td>
+                        </tr>
+
+                        <tr>
+                            <td>4</td>
+                            <td>[1, 3]</td>
+                            <td>1</td>
+                            <td>2</td>
+                            <td>{0: 0, 1: 1, 3: 1, 2: 0}</td>
+                            <td>Color 2 as 0, add to queue</td>
+                        </tr>
+
+                        <tr>
+                            <td>5</td>
+                            <td>[3, 2]</td>
+                            <td>3</td>
+                            <td>2</td>
+                            <td>{0: 0, 1: 1, 3: 1, 2: 0}</td>
+                            <td>2 is already colored correctly (no conflict)</td>
+                        </tr>
+
+                        <tr>
+                            <td>6</td>
+                            <td>[2]</td>
+                            <td>2</td>
+                            <td>1</td>
+                            <td>{0: 0, 1: 1, 3: 1, 2: 0}</td>
+                            <td>1 is already colored correctly (no conflict)</td>
+                        </tr>
+
+                        <tr>
+                            <td>7</td>
+                            <td>[]</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>{0: 0, 1: 1, 3: 1, 2: 0}</td>
+                            <td>Queue empty, return True</td>
+                        </tr>
+                    </table>
+
+                    <p><strong>Final Output:</strong> The graph is bipartite.</p>
+
+                    <p><strong>Key Observations:</strong></p>
+                    <ul>
+                        <li>The algorithm colors nodes as we traverse and ensures adjacent nodes have different colors.</li>
+                        <li>If at any point a node and its neighbor have the same color, the graph is not bipartite.</li>
+                        <li>The BFS ensures that all components of the graph are checked.</li>
+                    </ul>
+            </article>
+
+            <article>
+                <h3>8. Time & Space Complexity Analysis</h3>
+
+                <h4>8.1 Worst-Case Complexity (O(V + E))</h4>
+                <p>In the worst case, the graph is fully connected and the algorithm must traverse all nodes and edges:</p>
+                <ul>
+                    <li><strong>BFS Traversal:</strong> Each node is visited once → O(V)</li>
+                    <li><strong>Checking All Edges:</strong> Each edge is examined at most twice (once for each endpoint) → O(E)</li>
+                </ul>
+                <p><strong>Total Complexity:</strong> O(V + E) (Linear Time Complexity)</p>
+
+                <h4>8.2 Best-Case Complexity (O(1))</h4>
+                <p>If the graph is empty (contains no edges), we return True immediately in O(1) time.</p>
+
+                <h4>8.3 Average-Case Complexity (O(V + E))</h4>
+                <p>For most graphs, the algorithm performs a BFS traversal, leading to an average complexity of O(V + E).</p>
+
+            </article>
+
+            <article>
+                <h3>9. Space Complexity Analysis</h3>
+                <p>Space consumption depends on the graph representation and auxiliary structures:</p>
+
+                <ul>
+                    <li><strong>Graph Storage:</strong> If adjacency list is used, it takes O(V + E).</li>
+                    <li><strong>Queue for BFS:</strong> In the worst case, all nodes are stored → O(V).</li>
+                    <li><strong>Color Dictionary:</strong> Stores colors for all vertices → O(V).</li>
+                </ul>
+
+                <p><strong>Total Space Complexity:</strong> O(V + E)</p>
+
+            </article>
+
+            <article>
+                <h3>10. Trade-Offs Analysis</h3>
+
+                <h4>10.1 Strengths</h4>
+                <ul>
+                    <li><strong>Efficient:</strong> Runs in linear time, making it feasible for large graphs.</li>
+                    <li><strong>Memory Efficient:</strong> Uses O(V + E) space, optimal for sparse graphs.</li>
+                    <li><strong>Simple Implementation:</strong> Uses BFS or DFS with minimal modifications.</li>
+                </ul>
+
+                <h4>10.2 Weaknesses</h4>
+                <ul>
+                    <li><strong>Not Suitable for Dense Graphs:</strong> In a complete graph, E = O(V²), leading to higher space requirements.</li>
+                    <li><strong>Fails on Odd-Length Cycles:</strong> Even a single odd-length cycle makes the entire graph non-bipartite.</li>
+                    <li><strong>Graph Representation Matters:</strong> Using adjacency matrices increases space to O(V²), making it inefficient for large graphs.</li>
+                </ul>
+
+                <h4>10.3 Alternative Approaches</h4>
+                <ul>
+                    <li><strong>DFS-Based Checking:</strong> Uses recursion but has O(V) space overhead due to function calls.</li>
+                    <li><strong>Graph Reduction Techniques:</strong> Converting graphs to bipartite-friendly formats may help in some cases.</li>
+                    <li><strong>Advanced Matching Algorithms:</strong> For specific problems like job matching, algorithms like Hopcroft-Karp provide better efficiency.</li>
+                </ul>
+
+            </article>
+
+            <article>
+                <h3>11. Optimizations & Variants</h3>
+
+                <h4>11.1 Common Optimizations</h4>
+
+                <ul>
+                    <li><strong>Use Adjacency List Instead of Matrix:</strong> Reduces space complexity from O(V²) to O(V + E), making it feasible for large graphs.</li>
+                    <li><strong>Avoid Unnecessary Traversals:</strong> Maintain a visited set to prevent redundant BFS or DFS calls.</li>
+                    <li><strong>Early Termination:</strong> If an odd cycle is detected early, terminate immediately instead of checking the entire graph.</li>
+                    <li><strong>Use Union-Find (Disjoint Set):</strong> Allows efficient bipartiteness checking without explicit traversal (O(α(V)) per operation).</li>
+                    <li><strong>Parallel Processing for Large Graphs:</strong> Divide graph into smaller components and process them concurrently.</li>
+                </ul>
+
+                <h4>11.2 Variants of Bipartite Graph Checking</h4>
+
+                <ul>
+                    <li><strong>DFS-Based Approach:</strong> Uses recursion to traverse and check colors.</li>
+                    <li><strong>Union-Find Approach:</strong> Uses disjoint-set union-find structure to detect bipartiteness efficiently.</li>
+                    <li><strong>Maximum Bipartite Matching:</strong> Extends bipartite checking to find the largest possible matching (Hopcroft-Karp Algorithm in O(√V * E)).</li>
+                    <li><strong>K-Partite Graph Checking:</strong> A generalization where a graph is split into K disjoint sets instead of 2.</li>
+                </ul>
+
+            </article>
+
+            <article>
+                <h3>12. Iterative vs. Recursive Implementations</h3>
+
+                <h4>12.1 Iterative (BFS) Approach</h4>
+
+                <p>Using an explicit queue for traversal ensures O(V + E) time complexity without additional recursion overhead.</p>
+
+                <pre><code class="language-python">
+from collections import deque
+
+def is_bipartite_bfs(graph, start):
+    color = {}  
+    queue = deque([start])
+    color[start] = 0  
+
+    while queue:
+        node = queue.popleft()
+        for neighbor in graph[node]:
+            if neighbor not in color:
+                color[neighbor] = 1 - color[node]  
+                queue.append(neighbor)
+            elif color[neighbor] == color[node]:
+                return False  
+    return True
+</code></pre>
+
+                <h4>Pros of Iterative BFS:</h4>
+                <ul>
+                    <li><strong>Avoids Recursion Depth Issues:</strong> Works well for large graphs without hitting recursion limits.</li>
+                    <li><strong>More Memory Efficient:</strong> Uses a queue instead of function call stack, making it scalable.</li>
+                </ul>
+
+                <h4>12.2 Recursive (DFS) Approach</h4>
+
+                <p>The recursive DFS approach avoids using an explicit queue but may run into recursion depth issues on large graphs.</p>
+
+                <pre><code class="language-python">
+def is_bipartite_dfs(graph, node, color, current_color):
+    if node in color:
+        return color[node] == current_color  
+
+    color[node] = current_color  
+
+    for neighbor in graph[node]:
+        if not is_bipartite_dfs(graph, neighbor, color, 1 - current_color):
+            return False  
+
+    return True
+
+def check_bipartite(graph):
+    color = {}
+    for node in graph:
+        if node not in color:
+            if not is_bipartite_dfs(graph, node, color, 0):
+                return False
+    return True
+</code></pre>
+
+                <h4>Pros of Recursive DFS:</h4>
+                <ul>
+                    <li><strong>Simple & Elegant:</strong> Requires fewer lines of code and follows a natural recursive flow.</li>
+                    <li><strong>Works Well for Smaller Graphs:</strong> Efficient when dealing with relatively small input sizes.</li>
+                </ul>
+
+                <h4>Cons of Recursive DFS:</h4>
+                <ul>
+                    <li><strong>Stack Overflow Risk:</strong> Deep recursive calls may cause memory issues in large graphs.</li>
+                    <li><strong>Higher Implicit Space Complexity:</strong> Recursion uses O(V) stack space, making it inefficient for deep graphs.</li>
+                </ul>
+
+                <h4>12.3 Summary of Efficiency Comparison</h4>
+
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <tr class="table-dark">
+                            <th>Method</th>
+                            <th>Time Complexity</th>
+                            <th>Space Complexity</th>
+                            <th>Best Use Case</th>
+                        </tr>
+                        <tr>
+                            <td>Iterative BFS</td>
+                            <td>O(V + E)</td>
+                            <td>O(V)</td>
+                            <td>Large graphs, avoiding recursion depth issues</td>
+                        </tr>
+                        <tr>
+                            <td>Recursive DFS</td>
+                            <td>O(V + E)</td>
+                            <td>O(V) (function call stack)</td>
+                            <td>Smaller graphs, cleaner implementation</td>
+                        </tr>
+                    </table>
+
+                    <p><strong>Final Takeaway:</strong> Use BFS for large graphs to avoid recursion depth issues. DFS is more readable but less scalable.</p>
+
+            </article>
+
+            <article>
+                <h3>13. Edge Cases & Failure Handling</h3>
+
+                <p>When checking for bipartiteness, certain edge cases and pitfalls can cause incorrect results or inefficiencies.</p>
+
+                <h4>13.1 Common Edge Cases</h4>
+                <ul>
+                    <li><strong>Disconnected Graph:</strong> A graph with multiple components must be checked separately.</li>
+                    <li><strong>Single Node:</strong> A graph with a single vertex is trivially bipartite.</li>
+                    <li><strong>Graph with Self-Loops:</strong> If a node has an edge to itself, it is immediately non-bipartite.</li>
+                    <li><strong>Graph with Odd-Length Cycles:</strong> A cycle with an odd number of vertices makes the graph non-bipartite.</li>
+                    <li><strong>Empty Graph:</strong> A graph with no edges is trivially bipartite.</li>
+                    <li><strong>Graph with Multiple Components:</strong> If one component is bipartite but another isn’t, the entire graph is non-bipartite.</li>
+                    <li><strong>Large Graphs:</strong> Handling recursion depth in DFS for graphs with high node counts.</li>
+                </ul>
+
+                <h4>13.2 Handling Failures</h4>
+                <ul>
+                    <li><strong>Use a visited set:</strong> Prevent redundant checks in disconnected graphs.</li>
+                    <li><strong>Catch Stack Overflow Errors:</strong> Use an iterative approach for large graphs to avoid recursion limits.</li>
+                    <li><strong>Validate Input:</strong> Ensure the input graph representation is correct (e.g., no malformed adjacency lists).</li>
+                </ul>
+
+            </article>
+
+            <article>
+                <h3>14. Test Cases to Verify Correctness</h3>
+
+                <p>Below are Python test cases to verify the correctness of the bipartite checking algorithm.</p>
+
+                <pre><code class="language-python">
+def test_bipartite():
+    test_cases = [
+        {
+            "graph": {0: [1], 1: [0]},  # Simple bipartite graph
+            "expected": True
+        },
+        {
+            "graph": {0: [1, 2], 1: [0, 3], 2: [0, 3], 3: [1, 2]},  # Square (even cycle)
+            "expected": True
+        },
+        {
+            "graph": {0: [1, 2], 1: [0, 2], 2: [0, 1]},  # Triangle (odd cycle)
+            "expected": False
+        },
+        {
+            "graph": {0: []},  # Single node
+            "expected": True
+        },
+        {
+            "graph": {0: [0]},  # Self-loop
+            "expected": False
+        },
+        {
+            "graph": {0: [1], 1: [2], 2: [3], 3: [0], 4: [5], 5: [4]},  # Two components, both bipartite
+            "expected": True
+        },
+        {
+            "graph": {0: [1, 2], 1: [2, 3], 2: [0, 1, 3], 3: [1, 2]},  # Odd-length cycle in a component
+            "expected": False
+        }
+    ]
+
+    for i, test in enumerate(test_cases):
+        result = check_bipartite(test["graph"])
+        assert result == test["expected"], f"Test case {i} failed: expected {test['expected']}, got {result}"
+    
+    print("All test cases passed!")
+
+test_bipartite()
+</code></pre>
+
+                <h4>14.1 Test Coverage</h4>
+                <ul>
+                    <li><strong>Basic bipartite graph</strong> (passes)</li>
+                    <li><strong>Even cycle graph</strong> (passes)</li>
+                    <li><strong>Odd cycle graph</strong> (fails correctly)</li>
+                    <li><strong>Single node graph</strong> (passes)</li>
+                    <li><strong>Self-loop graph</strong> (fails correctly)</li>
+                    <li><strong>Multiple components</strong> (correctly handles multiple checks)</li>
+                    <li><strong>Odd-length cycle in a component</strong> (fails correctly)</li>
+                </ul>
+
+            </article>
+
+            <article>
+                <h3>15. Real-World Failure Scenarios</h3>
+
+                <h4>15.1 Network Partitioning Errors</h4>
+                <p>In distributed networks, incorrect bipartite checking can cause partitioning failures in network routing, leading to performance issues.</p>
+
+                <h4>15.2 Scheduling Conflicts</h4>
+                <p>Incorrectly assuming a bipartite structure in scheduling applications can lead to infeasible assignments (e.g., a conflict in job scheduling).</p>
+
+                <h4>15.3 Social Network Analysis Errors</h4>
+                <p>Many recommendation systems assume bipartite graphs for collaborative filtering. Misclassification can degrade recommendation quality.</p>
+
+                <h4>15.4 Incorrect Graph Processing in Machine Learning</h4>
+                <p>In graph-based ML, assuming bipartiteness can introduce data biases if the graph is actually non-bipartite.</p>
+
+            </article>
+
+            <article>
+                <h3>16. Real-World Applications & Industry Use Cases</h3>
+
+                <h4>16.1 Job Matching & Assignment Problems</h4>
+                <p>Bipartite graphs are widely used in matching problems where one set of entities must be paired with another.</p>
+                <ul>
+                    <li><strong>Job-Candidate Matching:</strong> Assigning candidates to available jobs based on skills and requirements.</li>
+                    <li><strong>College Admissions:</strong> Matching students to universities based on eligibility.</li>
+                    <li><strong>Task Scheduling:</strong> Assigning workers to tasks in an optimal way.</li>
+                </ul>
+
+                <h4>16.2 Network Flow & Optimization</h4>
+                <p>Many network problems can be modeled as bipartite graphs to optimize flow and routing.</p>
+                <ul>
+                    <li><strong>Packet Routing:</strong> Efficiently distributing network traffic.</li>
+                    <li><strong>Server-Client Load Balancing:</strong> Distributing requests optimally across servers.</li>
+                    <li><strong>Power Grid Optimization:</strong> Assigning power stations to cities efficiently.</li>
+                </ul>
+
+                <h4>16.3 Recommendation Systems</h4>
+                <p>Recommendation systems use bipartite graphs to model interactions between users and items.</p>
+                <ul>
+                    <li><strong>Netflix & Spotify:</strong> Recommending movies or songs based on user preferences.</li>
+                    <li><strong>E-commerce (Amazon, eBay):</strong> Product recommendations based on purchase history.</li>
+                    <li><strong>Social Networks:</strong> Friend and content recommendations.</li>
+                </ul>
+
+                <h4>16.4 Security & Fraud Detection</h4>
+                <p>Bipartite graphs can help detect fraud and anomalies in networks.</p>
+                <ul>
+                    <li><strong>Credit Card Fraud:</strong> Detecting unusual transaction patterns.</li>
+                    <li><strong>Identity Verification:</strong> Ensuring correct user-to-account linkages.</li>
+                    <li><strong>Cybersecurity Threat Modeling:</strong> Analyzing connections between users and activities.</li>
+                </ul>
+
+                <h4>16.5 Biological & Medical Research</h4>
+                <p>Bipartite graphs help analyze relationships in biological networks.</p>
+                <ul>
+                    <li><strong>Drug Discovery:</strong> Matching drugs to target diseases.</li>
+                    <li><strong>Protein-Protein Interactions:</strong> Studying complex biological interactions.</li>
+                    <li><strong>Genome Analysis:</strong> Mapping genes to traits or diseases.</li>
+                </ul>
+
+            </article>
+
+            <article>
+                <h3>17. Open-Source Implementations</h3>
+
+                <h4>17.1 NetworkX (Python)</h4>
+                <p><a href="https://networkx.github.io/documentation/stable/reference/algorithms/generated/networkx.algorithms.bipartite.is_bipartite.html">NetworkX is_bipartite()</a> provides a built-in way to check if a graph is bipartite.</p>
+
+                <pre><code class="language-python">
+import networkx as nx
+
+G = nx.Graph()
+G.add_edges_from([(0, 1), (1, 2), (2, 3), (3, 0)])
+print(nx.is_bipartite(G))  # Output: True
+</code></pre>
+
+                <h4>17.2 Boost Graph Library (C++)</h4>
+                <p><a href="https://www.boost.org/doc/libs/1_66_0/libs/graph/doc/index.html">Boost Graph Library (BGL)</a> provides efficient graph processing functions.</p>
+
+                <h4>17.3 igraph (R, Python, C)</h4>
+                <p><a href="https://igraph.org/python/">igraph</a> is a powerful tool for handling large-scale graphs.</p>
+
+            </article>
+
+            <article>
+                <h3>18. Practical Project: Matching Freelancers to Projects</h3>
+
+                <h4>18.1 Project Overview</h4>
+                <p>We will implement a real-world script that assigns freelancers to projects using bipartite graph matching.</p>
+
+                <h4>18.2 Problem Statement</h4>
+                <p>Given a list of freelancers with different skills and a list of projects requiring specific skills, we must determine if a perfect matching exists.</p>
+
+                <h4>18.3 Implementation</h4>
+
+                <pre><code class="language-python">
+from collections import deque
+
+def is_bipartite(graph):
+    color = {}
+    queue = deque()
+
+    for start in graph:
+        if start not in color:
+            queue.append(start)
+            color[start] = 0  
+
+            while queue:
+                node = queue.popleft()
+                for neighbor in graph[node]:
+                    if neighbor not in color:
+                        color[neighbor] = 1 - color[node]
+                        queue.append(neighbor)
+                    elif color[neighbor] == color[node]:
+                        return False
+    return True
+
+# Example Data
+freelancers = {"Alice": ["Python", "JavaScript"], "Bob": ["Java", "C++"], "Charlie": ["Python", "C++"]}
+projects = {"Project1": ["Python"], "Project2": ["Java"], "Project3": ["C++"]}
+
+# Creating a Bipartite Graph
+graph = {}
+for freelancer, skills in freelancers.items():
+    graph[freelancer] = []
+    for project, required_skills in projects.items():
+        if any(skill in skills for skill in required_skills):
+            graph[freelancer].append(project)
+            graph.setdefault(project, []).append(freelancer)
+
+# Checking if the Assignment is Possible
+print("Is bipartite (possible assignment)?", is_bipartite(graph))
+</code></pre>
+
+                <h4>18.4 How This Works:</h4>
+                <ul>
+                    <li>Freelancers and projects form two sets of the bipartite graph.</li>
+                    <li>Edges exist between freelancers and projects if skills match.</li>
+                    <li>If the graph is bipartite, it means all projects can be assigned efficiently.</li>
+                </ul>
+
+                <h4>18.5 Further Enhancements:</h4>
+                <ul>
+                    <li>Use <a href="https://en.wikipedia.org/wiki/Hopcroft%E2%80%93Karp_algorithm">Hopcroft-Karp Algorithm</a> for maximum matching.</li>
+                    <li>Apply weighted matching using <a href="https://en.wikipedia.org/wiki/Hungarian_algorithm">Hungarian Algorithm</a>.</li>
+                    <li>Extend to real-time freelancer-job allocation systems.</li>
+                </ul>
+
+            </article>
+
+            <article>
+                <h3>19. Competitive Programming & System Design Integration</h3>
+
+                <h4>19.1 Competitive Programming Use Cases</h4>
+                <p>Bipartite graph checking frequently appears in contests due to its applications in:</p>
+                <ul>
+                    <li><strong>Graph Coloring Problems:</strong> Checking if a graph is 2-colorable.</li>
+                    <li><strong>Matching Problems:</strong> Finding maximum matchings using bipartite properties.</li>
+                    <li><strong>Cycle Detection:</strong> Determining the presence of odd-length cycles.</li>
+                    <li><strong>Network Flow:</strong> Solving problems where two disjoint sets interact.</li>
+                </ul>
+
+                <h4>19.2 Competitive Programming Strategies</h4>
+                <ul>
+                    <li><strong>Optimize for Time:</strong> Use BFS instead of DFS for better iterative efficiency.</li>
+                    <li><strong>Optimize for Space:</strong> Use adjacency lists instead of matrices.</li>
+                    <li><strong>Handle Edge Cases:</strong> Disconnected graphs, single nodes, self-loops, etc.</li>
+                    <li><strong>Apply Bipartite Matching:</strong> Extend bipartiteness checking to solve matching problems.</li>
+                </ul>
+
+                <h4>19.3 System Design Integration</h4>
+                <p>Bipartite graphs play a key role in designing scalable applications:</p>
+
+                <ul>
+                    <li><strong>Load Balancing Systems:</strong> Matching servers to client requests.</li>
+                    <li><strong>Job Scheduling Algorithms:</strong> Assigning workers to jobs efficiently.</li>
+                    <li><strong>Distributed Computing:</strong> Matching computation tasks to processors.</li>
+                    <li><strong>Recommendation Engines:</strong> Mapping users to content in large-scale systems.</li>
+                </ul>
+
+                <p>Example: In a microservices architecture, bipartite graphs can be used to model service dependencies, ensuring that no cyclic dependencies exist in a dependency graph.</p>
+
+            </article>
+
+            <article>
+                <h3>20. Assignments</h3>
+
+                <h4>20.1 Solve 10 Competitive Programming Problems</h4>
+                <p>Practice solving at least 10 problems on platforms like Codeforces, LeetCode, AtCoder, or GeeksforGeeks:</p>
+
+                <ol>
+                    <li><strong>Check if a graph is bipartite</strong> – Basic implementation (LeetCode Medium).</li>
+                    <li><strong>Maximum Bipartite Matching</strong> – Hopcroft-Karp Algorithm (Codeforces).</li>
+                    <li><strong>Detect Odd-Length Cycle</strong> – Use BFS or DFS (AtCoder).</li>
+                    <li><strong>Graph Coloring</strong> – Check if a graph is 2-colorable (GeeksforGeeks).</li>
+                    <li><strong>Stable Matching Problem</strong> – Gale-Shapley Algorithm (ICPC Archives).</li>
+                    <li><strong>Minimum Vertex Cover</strong> – Reduce to bipartite matching (Hackerrank).</li>
+                    <li><strong>Graph Theory Problems in Networks</strong> – Apply bipartite properties to network routing (LeetCode).</li>
+                    <li><strong>Friend Recommendations</strong> – Use bipartite models for user-item recommendations (Codeforces).</li>
+                    <li><strong>Course Scheduling</strong> – Ensuring dependencies can be resolved (TopCoder).</li>
+                    <li><strong>Two-Sets Problem</strong> – Splitting elements into two valid groups (GeeksforGeeks).</li>
+                </ol>
+
+                <h4>20.2 Use Bipartite Graphs in a System Design Problem</h4>
+                <p>Design a <strong>real-world application</strong> where bipartite graphs help solve a critical problem.</p>
+
+                <p>Example: <strong>Ride-Sharing System</strong></p>
+                <ul>
+                    <li>Model drivers and riders as two sets of a bipartite graph.</li>
+                    <li>Edges exist between drivers and riders within a reasonable distance.</li>
+                    <li>Use a bipartite matching algorithm to assign riders to drivers efficiently.</li>
+                </ul>
+
+                <h4>20.3 Implement Under Time Constraints</h4>
+                <p>Time yourself and try solving a problem within strict time limits:</p>
+
+                <ul>
+                    <li><strong>5 minutes:</strong> Implement BFS-based bipartiteness checking.</li>
+                    <li><strong>10 minutes:</strong> Modify the BFS solution to handle disconnected components.</li>
+                    <li><strong>15 minutes:</strong> Solve a competitive programming problem with bipartite graphs.</li>
+                    <li><strong>30 minutes:</strong> Implement a real-world use case (e.g., freelancer-project matching).</li>
+                </ul>
+
+                <p>Practicing under constraints improves problem-solving speed for coding competitions.</p>
+
+            </article>
+
+
+
+        </main>
+
+        <script> copyright("all"); </script>
+
+    </body>
+
+</html>

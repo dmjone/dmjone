@@ -1,0 +1,910 @@
+<!-------------------------- © 2007 - present, dmj.one and contributors. ----------------------------------
+   Part of the dmjone project. Licensed under the GNU AGPL. Provided as-is, without warranty of any kind. 
+-------------------- Redistribution and modifications must retain this notice. --------------------------->
+
+
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+    <!--<![endif]-->
+
+    <head>
+        <script src="/js/edu_su_common.js"></script>
+        <noscript>
+            <style>
+                html,
+                body {
+                    margin: 0;
+                    overflow: hidden;
+                }
+            </style>
+            <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+        </noscript>
+
+        <title>Aho-Corasick Algorithm - CSU083 | Shoolini University</title>
+        
+        <meta name="description" content="Learn the Aho-Corasick Algorithm, covering concepts, implementations, optimizations, real-world applications, and competitive programming use cases. Part of the CSU083 course at Shoolini University.">
+        <meta name="keywords" content="Aho-Corasick Algorithm, String Matching, Trie, Automaton, Multi-Pattern Search, Competitive Programming, Intrusion Detection, Search Engines, System Design">
+        <meta name="author" content="Divya Mohan">
+        <meta name="robots" content="index, follow">
+        
+        <!-- Open Graph for Social Media -->
+        <meta property="og:title" content="Aho-Corasick Algorithm - CSU083 | Shoolini University">
+        <meta property="og:description" content="Comprehensive guide on the Aho-Corasick Algorithm, covering theory, implementation, optimizations, and real-world applications in security, search engines, and bioinformatics.">
+        <meta property="og:image" content="/logo.png">
+        <meta property="og:type" content="article">
+        
+        <!-- Twitter Cards -->
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:title" content="Aho-Corasick Algorithm - CSU083">
+        <meta name="twitter:description" content="Master the Aho-Corasick Algorithm with a deep dive into its implementation, optimizations, and real-world applications in cybersecurity and search engines.">
+        <meta name="twitter:site" content="@divyamohan1993">
+        <meta name="twitter:creator" content="@divyamohan1993">
+        <meta name="twitter:image" content="/logo.png">
+        
+        <!-- Mobile Responsiveness -->
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        
+        <!-- JSON-LD Structured Data for SEO -->
+        <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "Course",
+            "name": "Aho-Corasick Algorithm",
+            "description": "Master the Aho-Corasick Algorithm, covering fundamental concepts, Trie structures, failure links, real-world applications, and competitive programming scenarios.",
+            "provider": [
+                {
+                    "@type": "EducationalOrganization",
+                    "name": "dmj.one",
+                    "url": "https://dmj.one"
+                },
+                {
+                    "@type": "EducationalOrganization",
+                    "name": "Shoolini University",
+                    "url": "https://shooliniuniversity.com"
+                }
+            ]
+        }
+        </script>
+
+
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js" integrity="sha512-sHSNLECRJSK+BFs7E8DiFc6pf6n90bLI85Emiw1jhreduZhK3VXgq9l4kAt9eTIHYAcuQBKHL01QKs4/3Xgl8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js" integrity="sha512-iWiuBS5nt6r60fCz26Nd0Zqe0nbk1ZTIQbl3Kv7kYsX+yKMUFHzjaH2+AnM6vp2Xs+gNmaBAVWJjSmuPw76Efg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                renderMathInElement(document.body, {
+                    // customised options
+                    // • auto-render specific keys, e.g.:
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false },
+                        { left: '\\(', right: '\\)', display: false },
+                        { left: '\\[', right: '\\]', display: true }
+                    ],
+                    // • rendering keys, e.g.:
+                    throwOnError: false
+                });
+            });
+        </script> -->
+
+        <!-- <style>
+            main ul {
+                list-style-type: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            main ul li {
+                margin: 0;
+                padding: 0;
+            }
+        </style> -->
+
+
+
+    </head>
+
+    <body>
+
+        <script> header_author("dm"); </script>
+
+        <main>
+            <article class="agen-tableofcontents">
+                <h2 class="text-center">
+                    Aho-Corasick Algorithm
+                </h2>
+                <div class="d-none contentdate">2025, February 11</div>
+            </article>
+
+            <article>
+                <h3>1. Prerequisites</h3>
+                <p>Before understanding the Aho-Corasick algorithm, you need familiarity with:</p>
+                <ul>
+                    <li><strong>Trie (Prefix Tree)</strong>: A tree data structure for storing strings, where nodes represent prefixes.</li>
+                    <li><strong>Finite State Automata (FSA)</strong>: A computational model used for pattern matching in a sequence.</li>
+                    <li><strong>KMP (Knuth-Morris-Pratt) Algorithm</strong>: A string-matching algorithm that builds partial match tables.</li>
+                    <li><strong>Breadth-First Search (BFS)</strong>: Used in Aho-Corasick for constructing failure links efficiently.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>2. What is the Aho-Corasick Algorithm?</h3>
+                <p>The Aho-Corasick algorithm is an efficient string-searching algorithm that finds multiple patterns in a given text simultaneously.</p>
+                <ul>
+                    <li><strong>Constructs a Trie</strong>: Inserts all patterns into a prefix tree.</li>
+                    <li><strong>Builds Failure Links</strong>: Uses BFS to connect nodes when a mismatch occurs, allowing efficient transitions.</li>
+                    <li><strong>Performs Multi-Pattern Matching</strong>: Scans the text in linear time using the preprocessed Trie.</li>
+                </ul>
+                <p>The algorithm processes the text in <strong>O(N + M + Z)</strong> time complexity, where:</p>
+                <ul>
+                    <li><strong>N</strong> = length of the text.</li>
+                    <li><strong>M</strong> = total length of patterns.</li>
+                    <li><strong>Z</strong> = total occurrences of patterns in the text.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>3. Why Does This Algorithm Exist?</h3>
+                <p>The Aho-Corasick algorithm is designed to perform fast multi-pattern searching, useful in:</p>
+                <ul>
+                    <li><strong>Spam Filtering</strong>: Detecting blacklisted words in emails.</li>
+                    <li><strong>Intrusion Detection</strong>: Scanning network packets for malicious signatures.</li>
+                    <li><strong>Bioinformatics</strong>: DNA sequence analysis for identifying motifs.</li>
+                    <li><strong>Search Engines</strong>: Auto-suggestions and keyword highlighting.</li>
+                    <li><strong>Plagiarism Detection</strong>: Finding copied content from a set of known documents.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>4. When Should You Use It?</h3>
+                <p>The Aho-Corasick algorithm is best used when:</p>
+                <ul>
+                    <li>You need to search for multiple patterns at once.</li>
+                    <li>The patterns are known beforehand and can be preprocessed.</li>
+                    <li>Speed is crucial, and you need an <strong>O(N)</strong> search time.</li>
+                    <li>Efficient memory usage is required compared to naive multi-pattern searches.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>5. How Does It Compare to Alternatives?</h3>
+                <h4>5.1 Strengths</h4>
+                <ul>
+                    <li><strong>Faster than Naïve Search</strong>: Processes the text in a single pass.</li>
+                    <li><strong>Handles Multiple Patterns</strong>: Unlike KMP or Rabin-Karp, which typically handle single-pattern searches.</li>
+                    <li><strong>Linear Time Complexity</strong>: Efficient even for large texts.</li>
+                </ul>
+
+                <h4>5.2 Weaknesses</h4>
+                <ul>
+                    <li><strong>High Preprocessing Overhead</strong>: Trie construction and failure links take additional time.</li>
+                    <li><strong>Memory Intensive</strong>: Requires extra space to store the Trie and failure links.</li>
+                    <li><strong>Not Ideal for Single Pattern Searches</strong>: Simpler algorithms like KMP or Rabin-Karp may be more efficient in such cases.</li>
+                </ul>
+            </article>
+
+
+            <article>
+                <h3>6. Basic Implementation</h3>
+                <h4>6.1 Python Implementation</h4>
+                <p>The following Python implementation demonstrates the Aho-Corasick algorithm for multi-pattern searching.</p>
+
+                <pre><code class="language-python">
+from collections import deque
+
+class TrieNode:
+    def __init__(self):
+        self.children = {}
+        self.fail_link = None
+        self.output = []
+
+class AhoCorasick:
+    def __init__(self, patterns):
+        self.root = TrieNode()
+        self.build_trie(patterns)
+        self.build_failure_links()
+
+    def build_trie(self, patterns):
+        for pattern in patterns:
+            node = self.root
+            for char in pattern:
+                if char not in node.children:
+                    node.children[char] = TrieNode()
+                node = node.children[char]
+            node.output.append(pattern)
+
+    def build_failure_links(self):
+        queue = deque()
+        for key, node in self.root.children.items():
+            node.fail_link = self.root
+            queue.append(node)
+        
+        while queue:
+            current = queue.popleft()
+            for key, child in current.children.items():
+                fail = current.fail_link
+                while fail and key not in fail.children:
+                    fail = fail.fail_link
+                child.fail_link = fail.children[key] if fail else self.root
+                child.output += child.fail_link.output
+                queue.append(child)
+
+    def search(self, text):
+        node = self.root
+        results = []
+        for i, char in enumerate(text):
+            while node and char not in node.children:
+                node = node.fail_link
+            if not node:
+                node = self.root
+                continue
+            node = node.children[char]
+            for match in node.output:
+                results.append((i - len(match) + 1, match))
+        return results
+
+patterns = ["he", "she", "his", "hers"]
+aho = AhoCorasick(patterns)
+text = "ahishers"
+matches = aho.search(text)
+print("Matches found:", matches)
+</code></pre>
+
+                <p><strong>Explanation:</strong></p>
+                <ul>
+                    <li><strong>build_trie:</strong> Constructs a Trie from given patterns.</li>
+                    <li><strong>build_failure_links:</strong> Uses BFS to create failure links for mismatched transitions.</li>
+                    <li><strong>search:</strong> Uses failure links to match multiple patterns efficiently in <strong>O(N)</strong> time.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>7. Dry Run</h3>
+                <h4>7.1 Input:</h4>
+                <ul>
+                    <li>Patterns: ["he", "she", "his", "hers"]</li>
+                    <li>Text: "ahishers"</li>
+                </ul>
+
+                <h4>7.2 Step-by-Step Execution:</h4>
+                <table class="table table-bordered">"
+                    <tr>
+                        <th>Step</th>
+                        <th>Character</th>
+                        <th>Current Node</th>
+                        <th>Action</th>
+                        <th>Output</th>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>'a'</td>
+                        <td>Root</td>
+                        <td>No match, stay at root.</td>
+                        <td>[]</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>'h'</td>
+                        <td>h</td>
+                        <td>Move to node 'h'.</td>
+                        <td>[]</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>'i'</td>
+                        <td>hi</td>
+                        <td>Move to node 'i'.</td>
+                        <td>[]</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>'s'</td>
+                        <td>his</td>
+                        <td>Pattern "his" matched.</td>
+                        <td>[(1, "his")]</td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td>'h'</td>
+                        <td>h</td>
+                        <td>Move to node 'h'.</td>
+                        <td>[]</td>
+                    </tr>
+                    <tr>
+                        <td>6</td>
+                        <td>'e'</td>
+                        <td>he</td>
+                        <td>Pattern "he" matched.</td>
+                        <td>[(1, "his"), (4, "he")]</td>
+                    </tr>
+                    <tr>
+                        <td>7</td>
+                        <td>'r'</td>
+                        <td>her</td>
+                        <td>Move to node 'r'.</td>
+                        <td>[]</td>
+                    </tr>
+                    <tr>
+                        <td>8</td>
+                        <td>'s'</td>
+                        <td>hers</td>
+                        <td>Pattern "hers" matched.</td>
+                        <td>[(1, "his"), (4, "he"), (5, "hers")]</td>
+                    </tr>
+                </table>
+
+                <h4>7.3 Final Matches:</h4>
+                <p>Matches found: [(1, "his"), (4, "he"), (5, "hers")]</p>
+                <p>These matches indicate the starting index where each pattern occurs in the text.</p>
+
+            </article>
+
+            <article>
+                <h3>8. Time & Space Complexity Analysis</h3>
+
+                <h4>8.1 Time Complexity Analysis</h4>
+                <p>The Aho-Corasick algorithm operates in three main phases:</p>
+
+                <ul>
+                    <li><strong>Trie Construction:</strong> Inserting M patterns of average length L takes <strong>O(M × L)</strong>.</li>
+                    <li><strong>Failure Links Construction:</strong> Uses BFS to process all nodes in <strong>O(M × L)</strong>.</li>
+                    <li><strong>Text Searching:</strong> Each character in text T is processed at most once, taking <strong>O(T + Z)</strong>, where Z is the total matches found.</li>
+                </ul>
+
+                <h4>8.2 Worst-Case Complexity</h4>
+                <p>The worst-case complexity occurs when all characters mismatch and failure links traverse back to the root frequently.</p>
+                <ul>
+                    <li><strong>Trie Construction:</strong> <strong>O(M × L)</strong></li>
+                    <li><strong>Failure Links Construction:</strong> <strong>O(M × L)</strong></li>
+                    <li><strong>Search Phase:</strong> <strong>O(T + Z)</strong></li>
+                </ul>
+                <p><strong>Total Complexity (Worst-Case):</strong> <strong>O(M × L + T + Z)</strong></p>
+
+                <h4>8.3 Best-Case Complexity</h4>
+                <p>In the best case, failure links allow direct transitions, and patterns match early.</p>
+                <ul>
+                    <li><strong>Trie Construction:</strong> <strong>O(M × L)</strong></li>
+                    <li><strong>Failure Links Construction:</strong> <strong>O(M × L)</strong></li>
+                    <li><strong>Search Phase:</strong> <strong>O(T)</strong></li>
+                </ul>
+                <p><strong>Total Complexity (Best-Case):</strong> <strong>O(M × L + T)</strong></p>
+
+                <h4>8.4 Average-Case Complexity</h4>
+                <p>On average, failure links reduce unnecessary backtracking, and patterns are distributed evenly.</p>
+                <ul>
+                    <li><strong>Trie Construction:</strong> <strong>O(M × L)</strong></li>
+                    <li><strong>Failure Links Construction:</strong> <strong>O(M × L)</strong></li>
+                    <li><strong>Search Phase:</strong> <strong>O(T + Z)</strong></li>
+                </ul>
+                <p><strong>Total Complexity (Average-Case):</strong> <strong>O(M × L + T + Z)</strong></p>
+
+            </article>
+
+            <article>
+                <h3>9. Space Complexity Analysis</h3>
+                <p>The Aho-Corasick algorithm requires additional space for:</p>
+                <ul>
+                    <li><strong>Trie Storage:</strong> Each node contains pointers to child nodes, leading to <strong>O(M × L)</strong> space.</li>
+                    <li><strong>Failure Links:</strong> Each node has a failure link requiring <strong>O(M × L)</strong> additional space.</li>
+                    <li><strong>Output Storage:</strong> Each pattern is stored explicitly, contributing <strong>O(M × L)</strong> space.</li>
+                </ul>
+                <p><strong>Total Space Complexity:</strong> <strong>O(M × L)</strong></p>
+
+                <h4>9.1 How Space Consumption Changes With Input Size</h4>
+                <ul>
+                    <li>As the number of patterns (M) increases, the Trie grows linearly, consuming more space.</li>
+                    <li>As the length of patterns (L) increases, each node contains more children, increasing memory usage.</li>
+                    <li>Failure links introduce additional overhead but improve search efficiency.</li>
+                </ul>
+
+            </article>
+
+            <article>
+                <h3>10. Trade-Offs in Aho-Corasick Algorithm</h3>
+
+                <h4>10.1 Strengths</h4>
+                <ul>
+                    <li><strong>Efficient for Large Texts:</strong> Processes text in linear time <strong>O(T)</strong>.</li>
+                    <li><strong>Multi-Pattern Matching:</strong> Finds multiple patterns simultaneously, unlike KMP or Rabin-Karp.</li>
+                    <li><strong>Failure Links Reduce Backtracking:</strong> Avoids redundant computations.</li>
+                </ul>
+
+                <h4>10.2 Weaknesses</h4>
+                <ul>
+                    <li><strong>High Space Consumption:</strong> Large Tries consume significant memory.</li>
+                    <li><strong>Preprocessing Overhead:</strong> Trie and failure links take time to construct.</li>
+                    <li><strong>Not Ideal for Few Patterns:</strong> If searching for one pattern, simpler algorithms (like KMP) are preferable.</li>
+                </ul>
+
+                <h4>10.3 When to Use Aho-Corasick vs. Other Algorithms</h4>
+                <table class="table table-bordered">"
+                    <tr>
+                        <th>Algorithm</th>
+                        <th>Best Use Case</th>
+                        <th>Time Complexity</th>
+                        <th>Space Complexity</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Aho-Corasick</strong></td>
+                        <td>Multi-pattern searching in large text</td>
+                        <td>O(T + M × L + Z)</td>
+                        <td>O(M × L)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>KMP</strong></td>
+                        <td>Single pattern searching</td>
+                        <td>O(T + L)</td>
+                        <td>O(L)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Rabin-Karp</strong></td>
+                        <td>Multiple pattern searching (small set)</td>
+                        <td>O(T + M)</td>
+                        <td>O(1)</td>
+                    </tr>
+                </table>
+
+            </article>
+
+            <article>
+                <h3>11. Optimizations & Variants</h3>
+
+                <h4>11.1 Common Optimizations</h4>
+                <p>To improve the performance of the Aho-Corasick algorithm, several optimizations can be applied:</p>
+
+                <ul>
+                    <li><strong>Compressed Trie (DAWG - Directed Acyclic Word Graph):</strong> Reduces memory usage by merging common suffixes.</li>
+                    <li><strong>Bitwise Transition Table:</strong> Uses bitwise operations instead of hash tables for faster transitions.</li>
+                    <li><strong>Lazy Failure Link Computation:</strong> Computes failure links on-demand to reduce preprocessing time.</li>
+                    <li><strong>Parallel Processing:</strong> Distributes text searching across multiple threads for large datasets.</li>
+                    <li><strong>Cache-Aware Traversal:</strong> Orders nodes in a cache-friendly manner to minimize cache misses.</li>
+                </ul>
+
+                <h4>11.2 Variants of Aho-Corasick</h4>
+                <p>Different versions of the algorithm exist for specialized use cases:</p>
+
+                <ul>
+                    <li><strong>Dynamic Aho-Corasick:</strong> Allows pattern insertion and deletion after preprocessing.</li>
+                    <li><strong>AC Automaton with Output Compression:</strong> Merges identical output states to save space.</li>
+                    <li><strong>GPU-Optimized Aho-Corasick:</strong> Parallelizes the algorithm for large-scale text processing.</li>
+                    <li><strong>Streaming Aho-Corasick:</strong> Processes continuous text streams without storing the entire input.</li>
+                </ul>
+
+            </article>
+
+            <article>
+                <h3>12. Iterative vs. Recursive Implementations</h3>
+
+                <h4>12.1 Iterative Implementation</h4>
+                <p>The most common implementation of Aho-Corasick is iterative, using a queue for BFS in failure link construction:</p>
+
+                <pre><code class="language-python">
+from collections import deque
+
+def build_failure_links(root):
+    queue = deque()
+    for key, node in root.children.items():
+        node.fail_link = root
+        queue.append(node)
+    
+    while queue:
+        current = queue.popleft()
+        for key, child in current.children.items():
+            fail = current.fail_link
+            while fail and key not in fail.children:
+                fail = fail.fail_link
+            child.fail_link = fail.children[key] if fail else root
+            queue.append(child)
+</code></pre>
+
+                <ul>
+                    <li><strong>Advantages:</strong> Efficient, avoids deep recursion, better suited for large datasets.</li>
+                    <li><strong>Disadvantages:</strong> Requires additional memory for queue storage.</li>
+                </ul>
+
+                <h4>12.2 Recursive Implementation</h4>
+                <p>A recursive version can be used for failure link construction but suffers from stack depth issues:</p>
+
+                <pre><code class="language-python">
+def build_failure_links_recursive(node, root):
+    for key, child in node.children.items():
+        fail = node.fail_link
+        while fail and key not in fail.children:
+            fail = fail.fail_link
+        child.fail_link = fail.children[key] if fail else root
+        build_failure_links_recursive(child, root)
+</code></pre>
+
+                <ul>
+                    <li><strong>Advantages:</strong> Simplifies logic, avoids explicit queue.</li>
+                    <li><strong>Disadvantages:</strong> May cause stack overflow for deep tries, less cache-friendly.</li>
+                </ul>
+
+                <h4>12.3 Efficiency Comparison</h4>
+                <table class="table table-bordered">"
+                    <tr>
+                        <th>Implementation</th>
+                        <th>Time Complexity</th>
+                        <th>Space Complexity</th>
+                        <th>Best Use Case</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Iterative (BFS-based)</strong></td>
+                        <td>O(M × L)</td>
+                        <td>O(M × L)</td>
+                        <td>Large datasets, practical use</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Recursive (DFS-based)</strong></td>
+                        <td>O(M × L)</td>
+                        <td>O(M × L) + O(D) (stack depth D)</td>
+                        <td>Small datasets, theoretical use</td>
+                    </tr>
+                </table>
+
+            </article>
+
+            <article>
+                <h3>13. Edge Cases & Failure Handling</h3>
+
+                <h4>13.1 Common Pitfalls and Edge Cases</h4>
+                <p>While implementing Aho-Corasick, it's crucial to handle edge cases correctly:</p>
+
+                <ul>
+                    <li><strong>Empty Pattern Set:</strong> If no patterns are given, searching should return an empty result.</li>
+                    <li><strong>Pattern Larger than Text:</strong> If patterns are longer than the input text, they should never match.</li>
+                    <li><strong>Overlapping Patterns:</strong> Multiple patterns might match at the same position; all should be reported.</li>
+                    <li><strong>Failure Link Loop:</strong> Ensure that failure links do not enter infinite loops during traversal.</li>
+                    <li><strong>Case Sensitivity:</strong> If searching is case-insensitive, preprocess patterns and text accordingly.</li>
+                    <li><strong>Unicode & Special Characters:</strong> Handle different character encodings properly.</li>
+                    <li><strong>Large Pattern Set:</strong> If many patterns exist, optimize Trie construction to avoid memory overflows.</li>
+                    <li><strong>Streaming Input:</strong> When text is received in chunks, maintain state between searches.</li>
+                </ul>
+
+            </article>
+
+            <article>
+                <h3>14. Test Cases to Verify Correctness</h3>
+
+                <h4>14.1 Sample Test Cases</h4>
+
+                <table class="table table-bordered">"
+                    <tr>
+                        <th>Test Case</th>
+                        <th>Input Patterns</th>
+                        <th>Input Text</th>
+                        <th>Expected Output</th>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Basic Match</strong></td>
+                        <td>["he", "she", "his", "hers"]</td>
+                        <td>"ahishers"</td>
+                        <td>[(1, "his"), (4, "he"), (5, "hers")]</td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Empty Patterns</strong></td>
+                        <td>[]</td>
+                        <td>"some random text"</td>
+                        <td>[]</td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Pattern Larger than Text</strong></td>
+                        <td>["longpattern"]</td>
+                        <td>"short"</td>
+                        <td>[]</td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Overlapping Matches</strong></td>
+                        <td>["ab", "abc", "bc"]</td>
+                        <td>"abc"</td>
+                        <td>[(0, "ab"), (0, "abc"), (1, "bc")]</td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Case Sensitivity</strong></td>
+                        <td>["hello"]</td>
+                        <td>"Hello world"</td>
+                        <td>[] (if case-sensitive), [(0, "hello")] (if case-insensitive)</td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Special Characters</strong></td>
+                        <td>["$money$", "#tag"]</td>
+                        <td>"earn $money$ fast! Use #tag"</td>
+                        <td>[(5, "$money$"), (20, "#tag")]</td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Multiple Occurrences</strong></td>
+                        <td>["abc"]</td>
+                        <td>"abc abc abc"</td>
+                        <td>[(0, "abc"), (4, "abc"), (8, "abc")]</td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Streaming Input</strong></td>
+                        <td>["data"]</td>
+                        <td>"incoming datastream containing data"</td>
+                        <td>[(9, "data"), (28, "data")]</td>
+                    </tr>
+
+                </table>
+
+                <h4>14.2 Python Code for Testing</h4>
+                <p>To ensure correctness, write test functions:</p>
+
+                <pre><code class="language-python">
+def run_tests():
+    patterns = [
+        (["he", "she", "his", "hers"], "ahishers", [(1, "his"), (4, "he"), (5, "hers")]),
+        ([], "some random text", []),
+        (["longpattern"], "short", []),
+        (["ab", "abc", "bc"], "abc", [(0, "ab"), (0, "abc"), (1, "bc")]),
+        (["hello"], "Hello world", []),  # Case-sensitive check
+        (["$money$", "#tag"], "earn $money$ fast! Use #tag", [(5, "$money$"), (20, "#tag")]),
+        (["abc"], "abc abc abc", [(0, "abc"), (4, "abc"), (8, "abc")]),
+        (["data"], "incoming datastream containing data", [(9, "data"), (28, "data")])
+    ]
+
+    aho = AhoCorasick([])
+    for pattern_set, text, expected in patterns:
+        aho.__init__(pattern_set)
+        result = aho.search(text)
+        assert result == expected, f"Test failed for input: {text}"
+
+    print("All tests passed!")
+
+run_tests()
+</code></pre>
+
+            </article>
+
+            <article>
+                <h3>15. Real-World Failure Scenarios</h3>
+
+                <h4>15.1 Failure Scenarios in Practical Applications</h4>
+                <p>Even well-designed Aho-Corasick implementations can fail in certain real-world situations:</p>
+
+                <ul>
+                    <li><strong>Insufficient Memory:</strong> Large pattern sets may cause excessive memory usage.</li>
+                    <li><strong>High Processing Latency:</strong> If the failure links are not efficiently optimized, searches may take longer.</li>
+                    <li><strong>Unicode Encoding Issues:</strong> Some implementations fail to handle multi-byte characters correctly.</li>
+                    <li><strong>Ignoring Overlapping Matches:</strong> Some systems incorrectly assume only the longest match is needed.</li>
+                    <li><strong>File Scanning Limitations:</strong> In intrusion detection, scanning large files may be infeasible due to memory constraints.</li>
+                    <li><strong>Unwanted Substring Matches:</strong> If a partial word match is not desired, the algorithm must ensure whole-word boundaries.</li>
+                </ul>
+
+                <h4>15.2 Mitigation Strategies</h4>
+                <ul>
+                    <li><strong>Memory Optimization:</strong> Use compressed Trie representations to save space.</li>
+                    <li><strong>Parallel Processing:</strong> Distribute pattern searching across multiple threads.</li>
+                    <li><strong>Precompiled Automaton:</strong> Precompute and serialize the automaton to avoid rebuilding it repeatedly.</li>
+                    <li><strong>Chunk-Based Streaming:</strong> Process large data in chunks to avoid memory exhaustion.</li>
+                    <li><strong>Post-Processing Filters:</strong> Use regex or additional checks to refine matches.</li>
+                </ul>
+
+            </article>
+
+            <article>
+                <h3>16. Real-World Applications & Industry Use Cases</h3>
+
+                <h4>16.1 How is Aho-Corasick Used in Real-World Applications?</h4>
+                <p>The Aho-Corasick algorithm is widely used across industries due to its ability to efficiently search for multiple patterns. Some key applications include:</p>
+
+                <ul>
+                    <li><strong>Spam Detection:</strong> Identifies blacklisted words and phishing URLs in emails.</li>
+                    <li><strong>Intrusion Detection Systems (IDS):</strong> Detects malware signatures and suspicious network activity.</li>
+                    <li><strong>Plagiarism Detection:</strong> Compares documents for copied text using multi-pattern search.</li>
+                    <li><strong>Search Engines:</strong> Provides auto-suggestions and keyword highlighting.</li>
+                    <li><strong>DNA & Bioinformatics:</strong> Identifies DNA sequences and genetic markers in research.</li>
+                    <li><strong>Text Filtering:</strong> Used in chat moderation to filter inappropriate words.</li>
+                    <li><strong>Log Analysis:</strong> Scans log files for security breaches or error patterns.</li>
+                    <li><strong>Data Leak Prevention (DLP):</strong> Prevents sensitive data exposure by scanning text.</li>
+                </ul>
+
+            </article>
+
+            <article>
+                <h3>17. Open-Source Implementations</h3>
+                <p>Several open-source implementations of the Aho-Corasick algorithm are available for different programming languages:</p>
+
+                <ul>
+                    <li><strong>Python:</strong> <a href="https://github.com/ViDA-NYU/pyahocorasick" target="_blank">pyahocorasick</a> (Highly optimized Python implementation).</li>
+                    <li><strong>C++:</strong> <a href="https://github.com/ccsb-scripps/aho-corasick" target="_blank">Aho-Corasick in C++</a> (Performance-optimized for large-scale data).</li>
+                    <li><strong>Go:</strong> <a href="https://github.com/cloudflare/ahocorasick" target="_blank">Cloudflare’s Aho-Corasick</a> (Used in security applications).</li>
+                    <li><strong>Java:</strong> <a href="https://github.com/robert-bor/aho-corasick" target="_blank">Efficient Java implementation</a> (Used in search engines).</li>
+                </ul>
+
+                <p>These implementations allow developers to integrate Aho-Corasick into their applications efficiently.</p>
+
+            </article>
+
+            <article>
+                <h3>18. Practical Project: Implementing Aho-Corasick for Text Filtering</h3>
+
+                <h4>18.1 Project Overview</h4>
+                <p>We will create a script that uses the Aho-Corasick algorithm to scan text for prohibited words and replace them with asterisks (***) for chat moderation.</p>
+
+                <h4>18.2 Python Implementation</h4>
+
+                <pre><code class="language-python">
+from collections import deque
+
+class TrieNode:
+    def __init__(self):
+        self.children = {}
+        self.fail_link = None
+        self.output = []
+
+class AhoCorasickFilter:
+    def __init__(self, banned_words):
+        self.root = TrieNode()
+        self.build_trie(banned_words)
+        self.build_failure_links()
+
+    def build_trie(self, banned_words):
+        for word in banned_words:
+            node = self.root
+            for char in word:
+                if char not in node.children:
+                    node.children[char] = TrieNode()
+                node = node.children[char]
+            node.output.append(word)
+
+    def build_failure_links(self):
+        queue = deque()
+        for key, node in self.root.children.items():
+            node.fail_link = self.root
+            queue.append(node)
+        
+        while queue:
+            current = queue.popleft()
+            for key, child in current.children.items():
+                fail = current.fail_link
+                while fail and key not in fail.children:
+                    fail = fail.fail_link
+                child.fail_link = fail.children[key] if fail else self.root
+                child.output += child.fail_link.output
+                queue.append(child)
+
+    def censor_text(self, text):
+        node = self.root
+        output_text = list(text)
+
+        i = 0
+        while i < len(text):
+            char = text[i]
+            while node and char not in node.children:
+                node = node.fail_link
+            if not node:
+                node = self.root
+                i += 1
+                continue
+            node = node.children[char]
+            for match in node.output:
+                start = i - len(match) + 1
+                output_text[start:i+1] = '*' * len(match)
+            i += 1
+
+        return ''.join(output_text)
+
+# Example usage
+banned_words = ["bad", "ugly", "offensive"]
+filter_system = AhoCorasickFilter(banned_words)
+text = "This is a bad and ugly statement!"
+filtered_text = filter_system.censor_text(text)
+print("Filtered Output:", filtered_text)
+</code></pre>
+
+                <h4>18.3 Expected Output</h4>
+                <pre><code>
+Filtered Output: This is a *** and **** statement!
+</code></pre>
+
+                <h4>18.4 Key Features</h4>
+                <ul>
+                    <li>Uses Aho-Corasick for efficient multi-word detection.</li>
+                    <li>Replaces banned words with asterisks (***) for censorship.</li>
+                    <li>Runs in <strong>O(N)</strong> time complexity, making it ideal for large text inputs.</li>
+                </ul>
+
+            </article>
+
+            <article>
+                <h3>19. Competitive Programming & System Design Integration</h3>
+
+                <h4>19.1 Competitive Programming Use Cases</h4>
+                <p>The Aho-Corasick algorithm is frequently used in coding competitions due to its efficiency in handling multi-pattern searches. It is ideal for problems that involve:</p>
+
+                <ul>
+                    <li><strong>Finding multiple patterns in a large text.</strong></li>
+                    <li><strong>Detecting overlapping occurrences.</strong></li>
+                    <li><strong>Fast substring matching in large datasets.</strong></li>
+                    <li><strong>Efficient dictionary-based search.</strong></li>
+                </ul>
+
+                <p>Key platforms where Aho-Corasick problems appear:</p>
+                <ul>
+                    <li><strong>LeetCode:</strong> String pattern matching problems.</li>
+                    <li><strong>Codeforces:</strong> Text processing and dictionary-based search.</li>
+                    <li><strong>AtCoder:</strong> Competitive string matching.</li>
+                    <li><strong>Google Kick Start & Code Jam:</strong> Efficient text scanning.</li>
+                    <li><strong>ICPC & Topcoder:</strong> Advanced trie-based challenges.</li>
+                </ul>
+
+                <h4>19.2 System Design Integration</h4>
+                <p>In real-world systems, Aho-Corasick is used in:</p>
+
+                <ul>
+                    <li><strong>Search Engines:</strong> Efficient keyword-based search and autocomplete.</li>
+                    <li><strong>Security Systems:</strong> Intrusion detection (IDS/IPS) to scan network packets.</li>
+                    <li><strong>Content Moderation:</strong> Chat filters and spam detection.</li>
+                    <li><strong>Log Analysis:</strong> Detecting error patterns in large log files.</li>
+                    <li><strong>DNA Sequence Matching:</strong> Bioinformatics applications.</li>
+                </ul>
+
+                <h4>19.3 Scaling Aho-Corasick for Large Systems</h4>
+                <ul>
+                    <li><strong>Distributed Processing:</strong> Use MapReduce for large-scale text processing.</li>
+                    <li><strong>Parallelized Search:</strong> Implement multi-threaded Aho-Corasick for high-speed pattern matching.</li>
+                    <li><strong>Memory Optimization:</strong> Use compressed tries (Directed Acyclic Word Graphs - DAWG) to reduce space usage.</li>
+                    <li><strong>Streaming Processing:</strong> Implement Aho-Corasick in a streaming fashion for real-time applications.</li>
+                </ul>
+
+            </article>
+
+            <article>
+                <h3>20. Assignments & Practice Problems</h3>
+
+                <h4>20.1 Solve at Least 10 Problems Using Aho-Corasick</h4>
+                <p>Practice problems to master the algorithm:</p>
+
+                <ol>
+                    <li><strong>Multi-pattern search in text</strong> (Find multiple words in a given paragraph).</li>
+                    <li><strong>Spam word detection</strong> (Filter messages with banned words).</li>
+                    <li><strong>Plagiarism checker</strong> (Detect copied sentences in an essay).</li>
+                    <li><strong>DNA sequence search</strong> (Find patterns in genome data).</li>
+                    <li><strong>Autocomplete system</strong> (Suggest words while typing).</li>
+                    <li><strong>Intrusion detection system (IDS)</strong> (Find malicious keywords in network logs).</li>
+                    <li><strong>Keyword-based sentiment analysis</strong> (Detect positive/negative phrases in reviews).</li>
+                    <li><strong>Hashtag monitoring system</strong> (Track trending hashtags in tweets).</li>
+                    <li><strong>Log error detection</strong> (Find specific error codes in server logs).</li>
+                    <li><strong>Profanity filter</strong> (Censor inappropriate words in chat applications).</li>
+                </ol>
+
+                <h4>20.2 Implement Aho-Corasick in a System Design Problem</h4>
+                <p>Use Aho-Corasick in a large-scale application:</p>
+
+                <ul>
+                    <li><strong>Design a scalable spam detection system</strong> using Aho-Corasick for multi-pattern search.</li>
+                    <li><strong>Build a real-time log monitoring system</strong> that scans error messages using Aho-Corasick.</li>
+                    <li><strong>Implement an efficient search engine autocomplete feature</strong> with preprocessed keyword matching.</li>
+                    <li><strong>Develop a high-speed URL blacklist checker</strong> for cybersecurity applications.</li>
+                </ul>
+
+                <h4>20.3 Practice Implementing Aho-Corasick Under Time Constraints</h4>
+                <p>To improve coding speed, try:</p>
+
+                <ul>
+                    <li><strong>Solving a problem in under 20 minutes:</strong> Implement Aho-Corasick for a simple multi-pattern search.</li>
+                    <li><strong>Implementing a variant in under 30 minutes:</strong> Modify the algorithm to handle dynamic pattern insertion.</li>
+                    <li><strong>Optimizing memory usage in 45 minutes:</strong> Reduce space complexity using compressed data structures.</li>
+                    <li><strong>Debugging an Aho-Corasick implementation in 15 minutes:</strong> Identify errors in a provided incorrect implementation.</li>
+                </ul>
+
+            </article>
+
+
+        </main>
+
+        <script> copyright("all"); </script>
+
+    </body>
+
+</html>

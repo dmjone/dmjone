@@ -1,0 +1,853 @@
+<!-------------------------- © 2007 - present, dmj.one and contributors. ----------------------------------
+   Part of the dmjone project. Licensed under the GNU AGPL. Provided as-is, without warranty of any kind. 
+-------------------- Redistribution and modifications must retain this notice. --------------------------->
+
+
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+    <!--<![endif]-->
+
+    <head>
+        <script src="/js/edu_su_common.js"></script>
+        <noscript>
+            <style>
+                html,
+                body {
+                    margin: 0;
+                    overflow: hidden;
+                }
+            </style>
+            <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+        </noscript>
+
+        <title>Rabin-Karp Algorithm - CSU083 | Shoolini University</title>
+
+        <meta name="description" content="Learn the Rabin-Karp Algorithm, covering concepts, implementations, optimizations, real-world applications, and competitive programming use cases. Part of the CSU083 course at Shoolini University.">
+        <meta name="keywords" content="Rabin-Karp Algorithm, String Matching, Hashing, Rolling Hash, Pattern Searching, Competitive Programming, System Design, Text Search, Plagiarism Detection, Cybersecurity, DNA Sequence Matching">
+        <meta name="author" content="Divya Mohan">
+        <meta name="robots" content="index, follow">
+
+        <!-- Open Graph for Social Media -->
+        <meta property="og:title" content="Rabin-Karp Algorithm - CSU083 | Shoolini University">
+        <meta property="og:description" content="Comprehensive guide on the Rabin-Karp Algorithm, covering theory, implementation, optimizations, and real-world applications in search engines, security, and databases.">
+        <meta property="og:image" content="/logo.png">
+        <meta property="og:type" content="article">
+
+        <!-- Twitter Cards -->
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:title" content="Rabin-Karp Algorithm">
+        <meta name="twitter:description" content="Master the Rabin-Karp Algorithm with a deep dive into implementations, use cases, and optimizations in system design and competitive programming.">
+        <meta name="twitter:site" content="@divyamohan1993">
+        <meta name="twitter:creator" content="@divyamohan1993">
+        <meta name="twitter:image" content="/logo.png">
+
+        <!-- Mobile Responsiveness -->
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <!-- JSON-LD Structured Data for SEO -->
+        <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "Course",
+            "name": "Rabin-Karp Algorithm",
+            "description": "Master the Rabin-Karp Algorithm, covering fundamental concepts, rolling hash, optimizations, and applications in search engines, security, and competitive programming.",
+            "provider": [
+                {
+                    "@type": "EducationalOrganization",
+                    "name": "dmj.one",
+                    "url": "https://dmj.one"
+                },
+                {
+                    "@type": "EducationalOrganization",
+                    "name": "Shoolini University",
+                    "url": "https://shooliniuniversity.com"
+                }
+            ]
+        }
+        </script>
+
+
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js" integrity="sha512-sHSNLECRJSK+BFs7E8DiFc6pf6n90bLI85Emiw1jhreduZhK3VXgq9l4kAt9eTIHYAcuQBKHL01QKs4/3Xgl8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js" integrity="sha512-iWiuBS5nt6r60fCz26Nd0Zqe0nbk1ZTIQbl3Kv7kYsX+yKMUFHzjaH2+AnM6vp2Xs+gNmaBAVWJjSmuPw76Efg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                renderMathInElement(document.body, {
+                    // customised options
+                    // • auto-render specific keys, e.g.:
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false },
+                        { left: '\\(', right: '\\)', display: false },
+                        { left: '\\[', right: '\\]', display: true }
+                    ],
+                    // • rendering keys, e.g.:
+                    throwOnError: false
+                });
+            });
+        </script> -->
+
+        <!-- <style>
+            main ul {
+                list-style-type: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            main ul li {
+                margin: 0;
+                padding: 0;
+            }
+        </style> -->
+
+
+
+    </head>
+
+    <body>
+
+        <script> header_author("dm"); </script>
+
+        <main>
+            <article class="agen-tableofcontents">
+                <h2 class="text-center">
+                    Rabin-Karp Algorithm
+                </h2>
+                <div class="d-none contentdate">2025, February 9</div>
+            </article>
+
+            <article>
+                <h3>1. Prerequisites</h3>
+                <p>Before understanding the Rabin-Karp algorithm, you need to be familiar with:</p>
+                <ul>
+                    <li><strong>String Matching</strong>: Basic understanding of how to search a pattern within a larger text.</li>
+                    <li><strong>Hashing</strong>: A method to map data to a fixed-size value, crucial for efficient pattern matching.</li>
+                    <li><strong>Modular Arithmetic</strong>: Used in hashing to keep hash values within a manageable range.</li>
+                    <li><strong>Rolling Hash</strong>: A technique to update hash values efficiently when sliding over text.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>2. What is the Rabin-Karp Algorithm?</h3>
+                <p>The Rabin-Karp algorithm is a string searching algorithm that finds occurrences of a pattern within a text using hashing. Instead of directly comparing characters, it converts substrings into hash values and compares these values to detect matches efficiently.</p>
+                <p>Steps:</p>
+                <ol>
+                    <li>Compute the hash of the pattern.</li>
+                    <li>Compute the hash of the first substring in the text (same length as the pattern).</li>
+                    <li>Slide over the text, updating the hash using a rolling hash function.</li>
+                    <li>If the hash matches the pattern’s hash, do a character-by-character check to confirm.</li>
+                </ol>
+            </article>
+
+            <article>
+                <h3>3. Why Does This Algorithm Exist?</h3>
+                <p>The Rabin-Karp algorithm was developed to efficiently find patterns in large bodies of text. Its real-world applications include:</p>
+                <ul>
+                    <li><strong>Plagiarism Detection</strong>: Comparing text segments across large documents.</li>
+                    <li><strong>Spam Detection</strong>: Identifying patterns in email spam filters.</li>
+                    <li><strong>DNA Sequence Matching</strong>: Finding genetic sequences efficiently.</li>
+                    <li><strong>Network Security</strong>: Searching for malware signatures in network traffic.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>4. When Should You Use It?</h3>
+                <p>Rabin-Karp is ideal when:</p>
+                <ul>
+                    <li>Searching for multiple patterns in a text (e.g., plagiarism detection).</li>
+                    <li>Efficiency is needed in detecting exact and approximate matches.</li>
+                    <li>Preprocessing time is not a concern but fast lookup is required.</li>
+                </ul>
+                <p>It is less useful when:</p>
+                <ul>
+                    <li>Dealing with small patterns where direct comparison is efficient.</li>
+                    <li>Hash collisions occur frequently, leading to unnecessary character-by-character checks.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>5. How Does It Compare to Alternatives?</h3>
+
+                <h4>Strengths:</h4>
+                <ul>
+                    <li><strong>Fast for multiple pattern searches</strong> due to efficient hash-based lookups.</li>
+                    <li><strong>Good for approximate matching</strong> (useful in text similarity detection).</li>
+                    <li><strong>Rolling hash optimization</strong> reduces redundant computations.</li>
+                </ul>
+
+                <h4>Weaknesses:</h4>
+                <ul>
+                    <li><strong>High collision probability</strong>: Hash values may match even when strings do not, requiring extra character comparisons.</li>
+                    <li><strong>Slower in the worst case</strong>: If collisions are frequent, it degrades to \(O(nm)\) complexity.</li>
+                </ul>
+
+                <h4>Comparison with Other Algorithms:</h4>
+                <table class="table table-bordered">"
+                    <tr>
+                        <th>Algorithm</th>
+                        <th>Best Case</th>
+                        <th>Worst Case</th>
+                        <th>Use Case</th>
+                    </tr>
+                    <tr>
+                        <td>Rabin-Karp</td>
+                        <td>\(O(n)\)</td>
+                        <td>\(O(nm)\) (with collisions)</td>
+                        <td>Multiple pattern matching</td>
+                    </tr>
+                    <tr>
+                        <td>KMP (Knuth-Morris-Pratt)</td>
+                        <td>\(O(n)\)</td>
+                        <td>\(O(n)\)</td>
+                        <td>Single pattern, long text</td>
+                    </tr>
+                    <tr>
+                        <td>Boyer-Moore</td>
+                        <td>\(O(n/m)\)</td>
+                        <td>\(O(nm)\)</td>
+                        <td>Long text, short patterns</td>
+                    </tr>
+                </table>
+            </article>
+
+            <article>
+                <h3>6. Basic Implementation (Code & Dry Run)</h3>
+
+                <h4>6.1 Python Implementation</h4>
+                <p>Below is the basic implementation of the Rabin-Karp algorithm in Python:</p>
+
+                <pre><code class="language-python">def rabin_karp(text, pattern, prime=101):
+    d = 256  # Number of characters in the input alphabet
+    m = len(pattern)
+    n = len(text)
+    h = 1  # Hash multiplier
+    pattern_hash = 0
+    text_hash = 0
+    results = []
+    
+    # Compute the value of h = d^(m-1) % prime
+    for i in range(m - 1):
+        h = (h * d) % prime
+
+    # Compute initial hash values for the pattern and the first window of text
+    for i in range(m):
+        pattern_hash = (d * pattern_hash + ord(pattern[i])) % prime
+        text_hash = (d * text_hash + ord(text[i])) % prime
+
+    # Slide the pattern over the text
+    for i in range(n - m + 1):
+        # Check hash values
+        if pattern_hash == text_hash:
+            # Confirm match by checking characters
+            if text[i:i + m] == pattern:
+                results.append(i)
+
+        # Compute hash of next window by removing first character and adding next
+        if i < n - m:
+            text_hash = (d * (text_hash - ord(text[i]) * h) + ord(text[i + m])) % prime
+            if text_hash < 0:
+                text_hash += prime  # Ensure positive hash values
+
+    return results
+
+# Example usage
+text = "ABABDABACDABABCABAB"
+pattern = "ABAB"
+print(rabin_karp(text, pattern))  # Expected Output: [0, 10, 15]
+</code></pre>
+            </article>
+
+            <article>
+                <h3>7. Dry Run of Rabin-Karp Algorithm</h3>
+
+                <h4>7.1 Example Input</h4>
+                <ul>
+                    <li><strong>Text:</strong> "ABABDABACDABABCABAB"</li>
+                    <li><strong>Pattern:</strong> "ABAB"</li>
+                    <li><strong>Prime:</strong> 101 (used for hashing)</li>
+                </ul>
+
+                <h4>7.2 Step-by-Step Execution</h4>
+
+                <table class="table table-bordered">"
+                    <tr>
+                        <th>Step</th>
+                        <th>Action</th>
+                        <th>Pattern Hash</th>
+                        <th>Text Hash</th>
+                        <th>Match?</th>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>Compute pattern hash ("ABAB")</td>
+                        <td>88</td>
+                        <td>-</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>Compute initial text hash ("ABAB")</td>
+                        <td>-</td>
+                        <td>88</td>
+                        <td>✅ (Character check confirms match at index 0)</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>Slide window to "BABD"</td>
+                        <td>88</td>
+                        <td>31</td>
+                        <td>❌</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>Slide window to "ABDA"</td>
+                        <td>88</td>
+                        <td>54</td>
+                        <td>❌</td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td>Slide window to "BDAB"</td>
+                        <td>88</td>
+                        <td>79</td>
+                        <td>❌</td>
+                    </tr>
+                    <tr>
+                        <td>6</td>
+                        <td>Slide window to "DABA"</td>
+                        <td>88</td>
+                        <td>23</td>
+                        <td>❌</td>
+                    </tr>
+                    <tr>
+                        <td>7</td>
+                        <td>Slide window to "ABAC"</td>
+                        <td>88</td>
+                        <td>94</td>
+                        <td>❌</td>
+                    </tr>
+                    <tr>
+                        <td>8</td>
+                        <td>Slide window to "BACD"</td>
+                        <td>88</td>
+                        <td>78</td>
+                        <td>❌</td>
+                    </tr>
+                    <tr>
+                        <td>9</td>
+                        <td>Slide window to "ACDA"</td>
+                        <td>88</td>
+                        <td>3</td>
+                        <td>❌</td>
+                    </tr>
+                    <tr>
+                        <td>10</td>
+                        <td>Slide window to "CDAB"</td>
+                        <td>88</td>
+                        <td>41</td>
+                        <td>❌</td>
+                    </tr>
+                    <tr>
+                        <td>11</td>
+                        <td>Slide window to "DABA"</td>
+                        <td>88</td>
+                        <td>23</td>
+                        <td>❌</td>
+                    </tr>
+                    <tr>
+                        <td>12</td>
+                        <td>Slide window to "ABAB"</td>
+                        <td>88</td>
+                        <td>88</td>
+                        <td>✅ (Character check confirms match at index 10)</td>
+                    </tr>
+                    <tr>
+                        <td>13</td>
+                        <td>Slide window to "BABC"</td>
+                        <td>88</td>
+                        <td>36</td>
+                        <td>❌</td>
+                    </tr>
+                    <tr>
+                        <td>14</td>
+                        <td>Slide window to "ABCA"</td>
+                        <td>88</td>
+                        <td>25</td>
+                        <td>❌</td>
+                    </tr>
+                    <tr>
+                        <td>15</td>
+                        <td>Slide window to "BCAB"</td>
+                        <td>88</td>
+                        <td>46</td>
+                        <td>❌</td>
+                    </tr>
+                    <tr>
+                        <td>16</td>
+                        <td>Slide window to "CABA"</td>
+                        <td>88</td>
+                        <td>67</td>
+                        <td>❌</td>
+                    </tr>
+                    <tr>
+                        <td>17</td>
+                        <td>Slide window to "ABAB"</td>
+                        <td>88</td>
+                        <td>88</td>
+                        <td>✅ (Character check confirms match at index 15)</td>
+                    </tr>
+                </table>
+
+                <h4>7.3 Final Matches</h4>
+                <p>The pattern "ABAB" is found at indices: <strong>[0, 10, 15]</strong></p>
+            </article>
+
+            <article>
+                <h3>8. Time & Space Complexity Analysis</h3>
+
+                <h4>8.1 Best-Case Complexity</h4>
+                <p>When there are no hash collisions, the algorithm only computes hashes and slides the window:</p>
+                <ul>
+                    <li><strong>Hash computation:</strong> \(O(m)\) (for the pattern and first text window)</li>
+                    <li><strong>Sliding window:</strong> \(O(n - m + 1)\) (each step takes constant time \(O(1)\))</li>
+                    <li><strong>Overall:</strong> \(O(n)\) (since \(m \ll n\), it simplifies to \(O(n)\))</li>
+                </ul>
+
+                <h4>8.2 Worst-Case Complexity</h4>
+                <p>If hash collisions occur frequently, every match requires a character-by-character verification:</p>
+                <ul>
+                    <li><strong>Hash computation:</strong> \(O(m)\)</li>
+                    <li><strong>Sliding window:</strong> \(O(n - m + 1)\)</li>
+                    <li><strong>Worst-case character comparisons:</strong> \(O(m)\) (if each hash collision forces full verification)</li>
+                    <li><strong>Overall:</strong> \(O(nm)\) (similar to naive search)</li>
+                </ul>
+
+                <h4>8.3 Average-Case Complexity</h4>
+                <p>When hash collisions are rare, verification is not needed, leading to:</p>
+                <ul>
+                    <li><strong>Hash computation:</strong> \(O(m)\)</li>
+                    <li><strong>Sliding window:</strong> \(O(n - m + 1)\)</li>
+                    <li><strong>Rare character comparisons:</strong> \(O(1)\)</li>
+                    <li><strong>Overall:</strong> \(O(n)\)</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>9. Space Complexity Analysis</h3>
+
+                <h4>9.1 Space Consumption Breakdown</h4>
+                <ul>
+                    <li><strong>Pattern storage:</strong> \(O(m)\)</li>
+                    <li><strong>Text storage:</strong> \(O(n)\)</li>
+                    <li><strong>Hash values:</strong> \(O(1)\) (only a few integer variables for rolling hash calculations)</li>
+                    <li><strong>Overall:</strong> \(O(1)\) (No additional storage beyond input)</li>
+                </ul>
+
+                <h4>9.2 How Space Scales with Input</h4>
+                <ul>
+                    <li><strong>Constant space</strong> for small inputs.</li>
+                    <li><strong>Efficient memory usage</strong> even for large inputs since no auxiliary data structures are needed.</li>
+                    <li><strong>Low memory overhead</strong> makes it suitable for embedded systems.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>10. Understanding Trade-offs</h3>
+
+                <h4>10.1 Strengths</h4>
+                <ul>
+                    <li><strong>Fast for multiple pattern searches</strong>: Only one pass through the text.</li>
+                    <li><strong>Efficient on average</strong>: \(O(n)\) time complexity when hash collisions are minimal.</li>
+                    <li><strong>Ideal for approximate matching</strong>: Can detect similar patterns by modifying the hash function.</li>
+                    <li><strong>Space-efficient</strong>: Uses only a few integer variables.</li>
+                </ul>
+
+                <h4>10.2 Weaknesses</h4>
+                <ul>
+                    <li><strong>Hash collisions</strong>: Increases complexity to \(O(nm)\) in worst cases.</li>
+                    <li><strong>Not best for single pattern search</strong>: KMP or Boyer-Moore perform better.</li>
+                    <li><strong>Prime number dependency</strong>: A poorly chosen prime may lead to frequent collisions.</li>
+                </ul>
+
+                <h4>10.3 When to Choose Rabin-Karp</h4>
+                <ul>
+                    <li><strong>Large text, small pattern, multiple searches</strong>: Hashing reduces redundant comparisons.</li>
+                    <li><strong>Plagiarism detection, spam filtering, network security</strong>: Efficient multiple pattern matching.</li>
+                    <li><strong>Not ideal for single pattern search</strong>: Other algorithms like KMP or Boyer-Moore perform better.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>11. Optimizations & Variants</h3>
+
+                <h4>11.1 Common Optimizations</h4>
+                <ul>
+                    <li><strong>Better Hash Function:</strong> Choose a large prime number to reduce hash collisions.</li>
+                    <li><strong>Double Hashing:</strong> Use two different hash functions to further minimize false positives.</li>
+                    <li><strong>Bitwise Operations:</strong> Instead of multiplying and dividing, use bitwise shifts to compute hashes faster.</li>
+                    <li><strong>Sliding Window Optimization:</strong> Avoid redundant hash recalculations by efficiently updating the rolling hash.</li>
+                    <li><strong>Parallel Processing:</strong> Divide the text into chunks and process them concurrently for performance gains in large-scale applications.</li>
+                </ul>
+
+                <h4>11.2 Variants of Rabin-Karp</h4>
+                <ul>
+                    <li><strong>Multi-Pattern Rabin-Karp:</strong> Hash multiple patterns simultaneously, commonly used in plagiarism detection.</li>
+                    <li><strong>Approximate Matching:</strong> Instead of exact matches, allow small variations using hash similarity thresholds.</li>
+                    <li><strong>Rabin-Karp with Bloom Filters:</strong> Use a bloom filter for rapid exclusion of non-matching substrings before deeper verification.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>12. Iterative vs. Recursive Implementations</h3>
+
+                <h4>12.1 Iterative Implementation</h4>
+                <pre><code class="language-python">def rabin_karp_iterative(text, pattern, prime=101):
+    d = 256  
+    m, n = len(pattern), len(text)
+    h, pattern_hash, text_hash = 1, 0, 0
+    results = []
+
+    for i in range(m - 1):
+        h = (h * d) % prime
+
+    for i in range(m):
+        pattern_hash = (d * pattern_hash + ord(pattern[i])) % prime
+        text_hash = (d * text_hash + ord(text[i])) % prime
+
+    for i in range(n - m + 1):
+        if pattern_hash == text_hash and text[i:i + m] == pattern:
+            results.append(i)
+
+        if i < n - m:
+            text_hash = (d * (text_hash - ord(text[i]) * h) + ord(text[i + m])) % prime
+            if text_hash < 0:
+                text_hash += prime
+
+    return results
+</code></pre>
+
+                <h4>12.2 Recursive Implementation</h4>
+                <pre><code class="language-python">def rabin_karp_recursive(text, pattern, prime=101, i=0, text_hash=None, pattern_hash=None, h=None, results=None):
+    if results is None:
+        results = []
+        d = 256  
+        m, n = len(pattern), len(text)
+        h = 1  
+
+        for _ in range(m - 1):
+            h = (h * d) % prime
+
+        pattern_hash, text_hash = 0, 0
+        for j in range(m):
+            pattern_hash = (d * pattern_hash + ord(pattern[j])) % prime
+            text_hash = (d * text_hash + ord(text[j])) % prime
+
+    if i > len(text) - len(pattern):
+        return results
+
+    if pattern_hash == text_hash and text[i:i + len(pattern)] == pattern:
+        results.append(i)
+
+    if i < len(text) - len(pattern):
+        text_hash = (d * (text_hash - ord(text[i]) * h) + ord(text[i + len(pattern)])) % prime
+        if text_hash < 0:
+            text_hash += prime
+
+    return rabin_karp_recursive(text, pattern, prime, i + 1, text_hash, pattern_hash, h, results)
+</code></pre>
+
+                <h4>12.3 Efficiency Comparison</h4>
+
+                <table class="table table-bordered">"
+                    <tr>
+                        <th>Approach</th>
+                        <th>Time Complexity</th>
+                        <th>Space Complexity</th>
+                        <th>Best Use Case</th>
+                    </tr>
+                    <tr>
+                        <td>Iterative</td>
+                        <td>\(O(n)\) average, \(O(nm)\) worst</td>
+                        <td>\(O(1)\)</td>
+                        <td>Standard applications, better for large inputs</td>
+                    </tr>
+                    <tr>
+                        <td>Recursive</td>
+                        <td>\(O(n)\) average, \(O(nm)\) worst</td>
+                        <td>\(O(n)\) (due to recursion stack)</td>
+                        <td>Conceptual understanding, small input sizes</td>
+                    </tr>
+                </table>
+
+                <h4>12.4 Conclusion</h4>
+                <ul>
+                    <li>The <strong>iterative</strong> version is more memory-efficient and faster for large inputs.</li>
+                    <li>The <strong>recursive</strong> version adds unnecessary stack overhead and is not ideal for large-scale text searching.</li>
+                    <li>Recursive implementations are useful for conceptual understanding but are not practical for real-world Rabin-Karp applications.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>13. Edge Cases & Failure Handling</h3>
+
+                <h4>13.1 Common Pitfalls & Edge Cases</h4>
+                <ul>
+                    <li><strong>Hash Collisions:</strong> Two different substrings may have the same hash, requiring additional character comparisons.</li>
+                    <li><strong>Empty Pattern or Text:</strong> If the pattern or text is empty, the algorithm should handle it gracefully and return an empty result.</li>
+                    <li><strong>Pattern Longer than Text:</strong> If the pattern length exceeds the text length, no matches should be found.</li>
+                    <li><strong>Repeating Substrings:</strong> When the text contains many repeating sequences, rolling hash calculations might lead to excessive collisions.</li>
+                    <li><strong>Special Characters & Case Sensitivity:</strong> Hashing behavior may vary if the text contains special characters or if case sensitivity is ignored.</li>
+                    <li><strong>Large Text Inputs:</strong> Integer overflow may occur in languages without built-in large number handling (e.g., C, Java without `BigInteger`).</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>14. Test Cases to Verify Correctness</h3>
+
+                <h4>14.1 Basic Test Cases</h4>
+                <pre><code class="language-python">def test_rabin_karp():
+    text1 = "ABABDABACDABABCABAB"
+    pattern1 = "ABAB"
+    assert rabin_karp(text1, pattern1) == [0, 10, 15], "Test Case 1 Failed"
+
+    text2 = "HELLO WORLD"
+    pattern2 = "WORLD"
+    assert rabin_karp(text2, pattern2) == [6], "Test Case 2 Failed"
+
+    text3 = "AAAAAAAAAA"
+    pattern3 = "AAA"
+    assert rabin_karp(text3, pattern3) == [0, 1, 2, 3, 4, 5, 6, 7], "Test Case 3 Failed"
+
+    text4 = "abcdef"
+    pattern4 = "gh"
+    assert rabin_karp(text4, pattern4) == [], "Test Case 4 Failed"
+
+    text5 = ""
+    pattern5 = "A"
+    assert rabin_karp(text5, pattern5) == [], "Test Case 5 Failed"
+
+    text6 = "A"
+    pattern6 = ""
+    assert rabin_karp(text6, pattern6) == [], "Test Case 6 Failed"
+
+    text7 = "ABCD"
+    pattern7 = "ABCDEFG"
+    assert rabin_karp(text7, pattern7) == [], "Test Case 7 Failed"
+
+    print("All test cases passed!")
+
+# Run the tests
+test_rabin_karp()
+</code></pre>
+
+                <h4>14.2 Explanation of Test Cases</h4>
+                <ul>
+                    <li><strong>Test Case 1:</strong> Standard case with multiple occurrences.</li>
+                    <li><strong>Test Case 2:</strong> A pattern occurring at the end of the text.</li>
+                    <li><strong>Test Case 3:</strong> Highly repetitive text with overlapping matches.</li>
+                    <li><strong>Test Case 4:</strong> Pattern does not exist in the text.</li>
+                    <li><strong>Test Case 5:</strong> Empty text, non-empty pattern.</li>
+                    <li><strong>Test Case 6:</strong> Non-empty text, empty pattern.</li>
+                    <li><strong>Test Case 7:</strong> Pattern longer than text (impossible match).</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>15. Real-World Failure Scenarios</h3>
+
+                <h4>15.1 Hash Collisions in Large Text Data</h4>
+                <p>Scenario: In large text datasets (e.g., DNA sequencing), hash collisions can trigger many false positives, reducing efficiency.</p>
+                <p><strong>Solution:</strong> Use a stronger hash function or double hashing.</p>
+
+                <h4>15.2 Unicode & Multilingual Text Issues</h4>
+                <p>Scenario: In languages like Chinese, Arabic, or Japanese, character encoding variations can alter hash values.</p>
+                <p><strong>Solution:</strong> Normalize text encoding before hashing.</p>
+
+                <h4>15.3 Scaling for Massive Inputs</h4>
+                <p>Scenario: Searching for a pattern in terabytes of text (e.g., search engines) requires significant optimizations.</p>
+                <p><strong>Solution:</strong> Use distributed processing (e.g., MapReduce) to parallelize computation.</p>
+
+                <h4>15.4 Network Intrusion Detection</h4>
+                <p>Scenario: Detecting malicious patterns in network packets using Rabin-Karp.</p>
+                <p><strong>Problem:</strong> High hash collision rate leads to excessive verification.</p>
+                <p><strong>Solution:</strong> Implement rolling hash with adaptive filtering.</p>
+
+                <h4>15.5 Case Sensitivity & Special Characters</h4>
+                <p>Scenario: Searching for "hello" should match "HELLO" in case-insensitive searches.</p>
+                <p><strong>Solution:</strong> Convert all characters to lowercase before hashing.</p>
+
+            </article>
+
+            <article>
+                <h3>16. Real-World Applications & Industry Use Cases</h3>
+
+                <h4>16.1 Plagiarism Detection</h4>
+                <p><strong>Use Case:</strong> Many plagiarism detection tools use Rabin-Karp to quickly locate matching phrases across documents.</p>
+                <p><strong>How it works:</strong> Convert documents into hash fingerprints and compare them across a large database.</p>
+
+                <h4>16.2 Spam Filtering</h4>
+                <p><strong>Use Case:</strong> Email filtering systems use Rabin-Karp to detect patterns commonly found in spam emails.</p>
+                <p><strong>How it works:</strong> Predefined spam phrases are hashed and compared with incoming emails to flag spam messages.</p>
+
+                <h4>16.3 Digital Forensics & Cybersecurity</h4>
+                <p><strong>Use Case:</strong> Cybersecurity tools use Rabin-Karp to identify malware signatures in files and network packets.</p>
+                <p><strong>How it works:</strong> Hash known malicious patterns and scan system logs for matches.</p>
+
+                <h4>16.4 DNA Sequence Matching</h4>
+                <p><strong>Use Case:</strong> Bioinformatics applications use Rabin-Karp for fast pattern matching in genetic data.</p>
+                <p><strong>How it works:</strong> Convert DNA sequences into hash values and scan large datasets for known patterns.</p>
+
+                <h4>16.5 Search Engines & Text Indexing</h4>
+                <p><strong>Use Case:</strong> Search engines use Rabin-Karp to locate exact phrase matches efficiently.</p>
+                <p><strong>How it works:</strong> Hash indexed text segments and compare them against user queries.</p>
+
+            </article>
+
+            <article>
+                <h3>17. Open-Source Implementations</h3>
+                <p>Several open-source libraries implement Rabin-Karp in optimized ways:</p>
+
+                <h4>17.1 Python - Scikit-learn's String Matching</h4>
+                <p>Scikit-learn includes fast implementations for approximate string matching, using variations of Rabin-Karp.</p>
+                <p><strong>Repo:</strong> <a href="https://github.com/scikit-learn/scikit-learn" target="_blank">GitHub - scikit-learn</a></p>
+
+                <h4>17.2 Java - Apache Commons StringUtils</h4>
+                <p>The Apache Commons library provides efficient substring search implementations, including Rabin-Karp.</p>
+                <p><strong>Repo:</strong> <a href="https://github.com/apache/commons-lang" target="_blank">GitHub - Apache Commons</a></p>
+
+                <h4>17.3 C++ - GNU Grep (Pattern Matching in Linux)</h4>
+                <p>GNU Grep, a high-performance text search tool, uses Rabin-Karp for certain types of pattern searches.</p>
+                <p><strong>Repo:</strong> <a href="https://git.savannah.gnu.org/cgit/grep.git" target="_blank">GNU Grep Source Code</a></p>
+
+            </article>
+
+            <article>
+                <h3>18. Practical Project: File Similarity Detector</h3>
+
+                <h4>18.1 Objective</h4>
+                <p>We will create a Python script that checks the similarity between two text files using the Rabin-Karp algorithm.</p>
+
+                <h4>18.2 Implementation</h4>
+                <pre><code class="language-python">import os
+
+def compute_hash(text, prime=101):
+    """Computes hash for a given text"""
+    d = 256
+    hash_value = 0
+    for char in text:
+        hash_value = (d * hash_value + ord(char)) % prime
+    return hash_value
+
+def rabin_karp_similarity(file1, file2, window_size=10):
+    """Compares similarity between two text files using Rabin-Karp"""
+    with open(file1, "r", encoding="utf-8") as f1, open(file2, "r", encoding="utf-8") as f2:
+        text1, text2 = f1.read(), f2.read()
+
+    hashes1 = {compute_hash(text1[i:i+window_size]) for i in range(len(text1) - window_size + 1)}
+    hashes2 = {compute_hash(text2[i:i+window_size]) for i in range(len(text2) - window_size + 1)}
+
+    intersection = hashes1.intersection(hashes2)
+    similarity = len(intersection) / max(len(hashes1), len(hashes2))
+
+    return similarity
+
+# Example usage
+file1, file2 = "document1.txt", "document2.txt"
+if os.path.exists(file1) and os.path.exists(file2):
+    similarity_score = rabin_karp_similarity(file1, file2)
+    print(f"File Similarity Score: {similarity_score * 100:.2f}%")
+else:
+    print("Ensure both files exist before running the script.")
+</code></pre>
+
+                <h4>18.3 How It Works</h4>
+                <ul>
+                    <li>Reads two text files.</li>
+                    <li>Splits them into small overlapping chunks (sliding window).</li>
+                    <li>Computes Rabin-Karp hash values for each chunk.</li>
+                    <li>Compares hash sets to determine similarity.</li>
+                </ul>
+
+                <h4>18.4 Applications</h4>
+                <ul>
+                    <li>Detecting plagiarism between two documents.</li>
+                    <li>Finding duplicate text in large files.</li>
+                    <li>Comparing logs for similar patterns.</li>
+                </ul>
+
+                <h4>18.5 Future Enhancements</h4>
+                <ul>
+                    <li>Optimize with rolling hashes.</li>
+                    <li>Extend to support large datasets with parallel processing.</li>
+                    <li>Apply it to DNA sequence analysis.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>19. Competitive Programming & System Design Integration</h3>
+
+                <h4>19.1 Competitive Programming Use Cases</h4>
+                <p>Rabin-Karp is useful in competitive programming where pattern matching needs to be done efficiently.</p>
+
+                <h4>19.2 Types of Problems Where Rabin-Karp Excels</h4>
+                <ul>
+                    <li><strong>Finding a substring in a string:</strong> Standard pattern matching problem.</li>
+                    <li><strong>Finding multiple occurrences of a pattern:</strong> Useful when multiple matches need to be tracked.</li>
+                    <li><strong>Detecting plagiarism:</strong> Finding common substrings across texts.</li>
+                    <li><strong>Checking for anagrams:</strong> Finding if a substring is a permutation of another.</li>
+                    <li><strong>Fast dictionary lookups:</strong> Hash-based searching in large datasets.</li>
+                </ul>
+
+                <h4>19.3 System Design Integration</h4>
+                <p>Rabin-Karp can be integrated into large-scale systems for efficient pattern matching.</p>
+
+                <h4>19.4 Examples of System Design Use Cases</h4>
+                <ul>
+                    <li><strong>Log Monitoring Systems:</strong> Detect repeated error messages efficiently.</li>
+                    <li><strong>Intrusion Detection Systems:</strong> Search for known malware patterns in network packets.</li>
+                    <li><strong>Plagiarism Detection Services:</strong> Find similarities in academic papers.</li>
+                    <li><strong>Search Engines:</strong> Identify common search queries and autocomplete suggestions.</li>
+                    <li><strong>DNA Sequence Matching:</strong> Compare genetic sequences for mutations.</li>
+                </ul>
+
+            </article>
+
+            <article>
+                <h3>20. Assignments & Practice Problems</h3>
+
+                <h4>20.1 Solve at Least 10 Problems Using Rabin-Karp</h4>
+                <p>Try implementing Rabin-Karp for the following problems:</p>
+                <ol>
+                    <li>Find all occurrences of a pattern in a given text.</li>
+                    <li>Find repeated substrings of length \(k\) in a large text.</li>
+                    <li>Check if a given string contains a rotated version of another.</li>
+                    <li>Find the longest repeating substring in a given text.</li>
+                    <li>Detect anagrams in a text using Rabin-Karp hashing.</li>
+                    <li>Find the first unique substring of length \(k\) in a text.</li>
+                    <li>Detect plagiarism between two documents.</li>
+                    <li>Find common substrings between two texts.</li>
+                    <li>Search for DNA sequence patterns efficiently.</li>
+                    <li>Implement a spam filter to detect predefined phrases.</li>
+                </ol>
+
+                <h4>20.2 Use Rabin-Karp in a System Design Problem</h4>
+                <p>Design a system that efficiently searches for specific keywords in a large-scale database using Rabin-Karp.</p>
+
+                <h4>20.3 Practice Implementing Under Time Constraints</h4>
+                <p>Time yourself while implementing Rabin-Karp from scratch. Try optimizing:</p>
+                <ul>
+                    <li>Basic implementation within 15 minutes.</li>
+                    <li>Handling multiple pattern searches within 20 minutes.</li>
+                    <li>Handling large inputs with optimizations in 30 minutes.</li>
+                </ul>
+            </article>
+
+        </main>
+
+        <script> copyright("all"); </script>
+
+    </body>
+
+</html>

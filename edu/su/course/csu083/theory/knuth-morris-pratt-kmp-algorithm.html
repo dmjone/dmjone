@@ -1,0 +1,986 @@
+<!-------------------------- © 2007 - present, dmj.one and contributors. ----------------------------------
+   Part of the dmjone project. Licensed under the GNU AGPL. Provided as-is, without warranty of any kind. 
+-------------------- Redistribution and modifications must retain this notice. --------------------------->
+
+
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+    <!--<![endif]-->
+
+    <head>
+        <script src="/js/edu_su_common.js"></script>
+        <noscript>
+            <style>
+                html,
+                body {
+                    margin: 0;
+                    overflow: hidden;
+                }
+            </style>
+            <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+        </noscript>
+
+        <title>Knuth-Morris-Pratt Algorithm - CSU083 | Shoolini University</title>
+
+        <meta name="description" content="Learn the Knuth-Morris-Pratt Algorithm, covering theory, implementation, optimizations, real-world applications, and competitive programming use cases. Part of the CSU083 course at Shoolini University.">
+        <meta name="keywords" content="Knuth-Morris-Pratt Algorithm, KMP Algorithm, String Matching, LPS Array, Pattern Searching, Competitive Programming, System Design, Text Search Optimization">
+        <meta name="author" content="Divya Mohan">
+        <meta name="robots" content="index, follow">
+
+        <!-- Open Graph for Social Media -->
+        <meta property="og:title" content="Knuth-Morris-Pratt Algorithm - CSU083 | Shoolini University">
+        <meta property="og:description" content="Comprehensive guide on the Knuth-Morris-Pratt Algorithm, covering its theory, implementation, optimizations, and real-world applications in text searching, cybersecurity, and database indexing.">
+        <meta property="og:image" content="/logo.png">
+        <meta property="og:type" content="article">
+
+        <!-- Twitter Cards -->
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:title" content="Knuth-Morris-Pratt Algorithm - CSU083">
+        <meta name="twitter:description" content="Master the Knuth-Morris-Pratt Algorithm with an in-depth exploration of its concepts, applications in search engines, bioinformatics, and competitive programming challenges.">
+        <meta name="twitter:site" content="@divyamohan1993">
+        <meta name="twitter:creator" content="@divyamohan1993">
+        <meta name="twitter:image" content="/logo.png">
+
+        <!-- Mobile Responsiveness -->
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <!-- JSON-LD Structured Data for SEO -->
+        <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "Course",
+            "name": "Knuth-Morris-Pratt Algorithm",
+            "description": "Deep dive into the Knuth-Morris-Pratt Algorithm, covering foundational concepts, efficient pattern searching techniques, real-world applications, and competitive programming challenges.",
+            "provider": [
+                {
+                    "@type": "EducationalOrganization",
+                    "name": "dmj.one",
+                    "url": "https://dmj.one"
+                },
+                {
+                    "@type": "EducationalOrganization",
+                    "name": "Shoolini University",
+                    "url": "https://shooliniuniversity.com"
+                }
+            ]
+        }
+        </script>
+
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js" integrity="sha512-sHSNLECRJSK+BFs7E8DiFc6pf6n90bLI85Emiw1jhreduZhK3VXgq9l4kAt9eTIHYAcuQBKHL01QKs4/3Xgl8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js" integrity="sha512-iWiuBS5nt6r60fCz26Nd0Zqe0nbk1ZTIQbl3Kv7kYsX+yKMUFHzjaH2+AnM6vp2Xs+gNmaBAVWJjSmuPw76Efg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                renderMathInElement(document.body, {
+                    // customised options
+                    // • auto-render specific keys, e.g.:
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false },
+                        { left: '\\(', right: '\\)', display: false },
+                        { left: '\\[', right: '\\]', display: true }
+                    ],
+                    // • rendering keys, e.g.:
+                    throwOnError: false
+                });
+            });
+        </script> -->
+
+        <!-- <style>
+            main ul {
+                list-style-type: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            main ul li {
+                margin: 0;
+                padding: 0;
+            }
+        </style> -->
+
+
+
+    </head>
+
+    <body>
+
+        <script> header_author("dm"); </script>
+
+        <main>
+            <article class="agen-tableofcontents">
+                <h2 class="text-center">
+                    Knuth-Morris-Pratt Algorithm (KMP)
+                </h2>
+                <div class="d-none contentdate">2025, February 8</div>
+            </article>
+
+            <article>
+                <h3>1. Prerequisites: Foundational Concepts</h3>
+                <p>Before understanding the Knuth-Morris-Pratt (KMP) algorithm, you need to be familiar with the following:</p>
+
+                <h4>1.1 String Matching Basics</h4>
+                <p>Understanding how to find a substring within a larger string using brute-force comparison.</p>
+
+                <h4>1.2 Prefix and Suffix Concepts</h4>
+                <p>A prefix of a string is a substring starting from the first character, and a suffix is a substring ending at the last character.</p>
+
+                <h4>1.3 Time Complexity Analysis</h4>
+                <p>Concepts of Big-O notation, particularly understanding how $O(n)$, $O(mn)$, and $O(log n)$ affect algorithm performance.</p>
+
+                <h4>1.4 Data Structures</h4>
+                <p>Basic understanding of arrays and pattern tables (partial match tables).</p>
+            </article>
+
+            <article>
+                <h3>2. Core Concept: What is the Knuth-Morris-Pratt Algorithm?</h3>
+                <p>The Knuth-Morris-Pratt (KMP) algorithm is an efficient pattern matching algorithm that finds occurrences of a pattern in a text in $O(n + m)$ time, where:</p>
+                <ul>
+                    <li><strong>n</strong>: Length of the text</li>
+                    <li><strong>m</strong>: Length of the pattern</li>
+                </ul>
+                <p>Unlike the brute-force approach ($O(nm)$), KMP avoids redundant comparisons by using a preprocessing step to build a <strong>partial match table (LPS - Longest Prefix Suffix)</strong>.</p>
+
+                <h4>2.1 How Does KMP Work?</h4>
+                <p>KMP consists of two main phases:</p>
+                <ul>
+                    <li><strong>Preprocessing (Building the LPS Array)</strong>: Identifies repeating prefixes and suffixes within the pattern.</li>
+                    <li><strong>Pattern Matching</strong>: Uses the LPS array to avoid unnecessary re-evaluation of characters.</li>
+                </ul>
+
+                <h5>2.1.1 LPS Array Example</h5>
+                <p>For the pattern <code>ABABCABAB</code>, the LPS array is:</p>
+                <pre><code class="language-auto">A  B  A  B  C  A  B  A  B
+0  0  1  2  0  1  2  3  4</code></pre>
+                <p>The LPS array tells us the longest prefix that is also a suffix, helping us skip unnecessary comparisons.</p>
+            </article>
+
+            <article>
+                <h3>3. Why Does This Algorithm Exist?</h3>
+                <p>The KMP algorithm exists to solve the inefficiencies of brute-force string searching by reducing redundant comparisons. It is widely used in:</p>
+
+                <h4>3.1 Search Engines</h4>
+                <p>Efficient keyword searching in large documents.</p>
+
+                <h4>3.2 DNA Sequence Matching</h4>
+                <p>Finding genetic patterns in biological research.</p>
+
+                <h4>3.3 Spam Detection</h4>
+                <p>Identifying spam patterns in emails.</p>
+
+                <h4>3.4 Plagiarism Detection</h4>
+                <p>Finding exact matches of text across large datasets.</p>
+            </article>
+
+            <article>
+                <h3>4. When Should You Use It?</h3>
+                <p>KMP is most effective when:</p>
+                <ul>
+                    <li>The pattern is significantly smaller than the text.</li>
+                    <li>Repeated patterns exist in the text (allowing LPS to optimize skips).</li>
+                    <li>Searching in real-time applications (e.g., autocomplete, spell checkers).</li>
+                </ul>
+
+                <h4>4.1 When Not to Use KMP?</h4>
+                <ul>
+                    <li>If the pattern changes frequently, preprocessing (LPS calculation) may not be efficient.</li>
+                    <li>If the dataset is too small, brute-force methods may suffice.</li>
+                    <li>If you need approximate matching, algorithms like Rabin-Karp or Aho-Corasick may be better.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>5. How Does It Compare to Alternatives?</h3>
+
+                <h4>5.1 Strengths</h4>
+                <ul>
+                    <li><strong>Efficient:</strong> Runs in linear time $O(n + m)$.</li>
+                    <li><strong>Eliminates Redundant Comparisons:</strong> Uses LPS array for skipping unnecessary re-evaluations.</li>
+                    <li><strong>Works Well for Large Texts:</strong> Suitable for searching in long documents or DNA sequences.</li>
+                </ul>
+
+                <h4>5.2 Weaknesses</h4>
+                <ul>
+                    <li><strong>Preprocessing Overhead:</strong> Requires $O(m)$ time to compute the LPS array.</li>
+                    <li><strong>Not Suitable for Dynamic Patterns:</strong> If the pattern changes frequently, recomputing the LPS array can be expensive.</li>
+                    <li><strong>Limited to Exact Matching:</strong> Does not handle approximate string matching or multiple patterns efficiently.</li>
+                </ul>
+
+                <h4>5.3 Comparison with Other String Matching Algorithms</h4>
+                <table class="table table-bordered">"
+                    <tr>
+                        <th>Algorithm</th>
+                        <th>Time Complexity</th>
+                        <th>Best Use Case</th>
+                    </tr>
+                    <tr>
+                        <td>Brute Force</td>
+                        <td>$O(nm)$</td>
+                        <td>Small datasets</td>
+                    </tr>
+                    <tr>
+                        <td>KMP</td>
+                        <td>$O(n + m)$</td>
+                        <td>Long texts with repetitive patterns</td>
+                    </tr>
+                    <tr>
+                        <td>Rabin-Karp</td>
+                        <td>$O(n + m)$ (average), $O(nm)$ (worst)</td>
+                        <td>Multiple pattern searches</td>
+                    </tr>
+                    <tr>
+                        <td>Boyer-Moore</td>
+                        <td>$O(n/m)$ (best), $O(nm)$ (worst)</td>
+                        <td>Searching in large texts with distinct patterns</td>
+                    </tr>
+                </table>
+            </article>
+
+            <article>
+                <h3>6. Basic Implementation</h3>
+                <p>The following is the basic implementation of the Knuth-Morris-Pratt (KMP) algorithm in Python. The implementation consists of two parts:</p>
+                <ul>
+                    <li><strong>Building the LPS (Longest Prefix Suffix) array</strong></li>
+                    <li><strong>Using the LPS array for pattern matching</strong></li>
+                </ul>
+
+                <h4>6.1 Python Implementation</h4>
+                <pre><code class="language-python">def compute_lps(pattern):
+    m = len(pattern)
+    lps = [0] * m
+    length = 0  # Length of the previous longest prefix suffix
+    i = 1
+
+    while i < m:
+        if pattern[i] == pattern[length]:
+            length += 1
+            lps[i] = length
+            i += 1
+        else:
+            if length != 0:
+                length = lps[length - 1]
+            else:
+                lps[i] = 0
+                i += 1
+    return lps
+
+def kmp_search(text, pattern):
+    n, m = len(text), len(pattern)
+    lps = compute_lps(pattern)
+
+    i = j = 0  # i -> text index, j -> pattern index
+    while i < n:
+        if pattern[j] == text[i]:
+            i += 1
+            j += 1
+
+        if j == m:
+            print(f"Pattern found at index {i - j}")
+            j = lps[j - 1]  # Move j back to check for further occurrences
+        elif i < n and pattern[j] != text[i]:  
+            if j != 0:
+                j = lps[j - 1]
+            else:
+                i += 1  # Move to next character in text
+
+# Example usage:
+text = "ABABDABACDABABCABAB"
+pattern = "ABABCABAB"
+kmp_search(text, pattern)</code></pre>
+                <p>This implementation efficiently searches for the pattern in the text using the precomputed LPS array.</p>
+            </article>
+
+            <article>
+                <h3>7. Dry Run of the Algorithm</h3>
+                <p>Let’s dry run the algorithm step by step with the input:</p>
+                <ul>
+                    <li><strong>Text:</strong> <code>ABABDABACDABABCABAB</code></li>
+                    <li><strong>Pattern:</strong> <code>ABABCABAB</code></li>
+                </ul>
+
+                <h4>7.1 Step 1: Compute LPS Array for Pattern</h4>
+                <p>For <code>ABABCABAB</code>, the LPS array is computed as follows:</p>
+                <pre><code class="language-auto">A  B  A  B  C  A  B  A  B
+0  0  1  2  0  1  2  3  4</code></pre>
+                <p>This array helps us skip redundant comparisons.</p>
+
+                <h4>7.2 Step 2: Start Matching in Text</h4>
+                <p>We begin comparing the pattern with the text at each position:</p>
+                <table class="table table-bordered">"
+                    <tr>
+                        <th>Step</th>
+                        <th>i (Text Index)</th>
+                        <th>j (Pattern Index)</th>
+                        <th>Action</th>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>Match: A == A</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>Match: B == B</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>2</td>
+                        <td>2</td>
+                        <td>Match: A == A</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>3</td>
+                        <td>3</td>
+                        <td>Match: B == B</td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td>4</td>
+                        <td>4</td>
+                        <td>Mismatch: C != D, Use LPS to shift</td>
+                    </tr>
+                    <tr>
+                        <td>6</td>
+                        <td>10</td>
+                        <td>8</td>
+                        <td>Pattern found at index 10</td>
+                    </tr>
+                </table>
+
+                <h4>7.3 Explanation of Shifting Using LPS</h4>
+                <p>Whenever a mismatch occurs at a position <code>j</code>, instead of restarting, we use the LPS array to move the pattern to the next possible matching position.</p>
+
+                <h4>7.4 Final Output</h4>
+                <pre><code class="language-auto">Pattern found at index 10</code></pre>
+                <p>The pattern <code>ABABCABAB</code> is found in the text starting at index 10.</p>
+            </article>
+
+            <article>
+                <h3>8. Time & Space Complexity Analysis</h3>
+                <p>The Knuth-Morris-Pratt (KMP) algorithm operates efficiently by reducing redundant comparisons using the LPS (Longest Prefix Suffix) array. Below is a detailed complexity analysis.</p>
+
+                <h4>8.1 Time Complexity Breakdown</h4>
+                <p>The KMP algorithm consists of two major phases:</p>
+
+                <h5>8.1.1 Preprocessing the Pattern (Building LPS Array)</h5>
+                <ul>
+                    <li>We iterate over the pattern of length <code>m</code> to compute the LPS array.</li>
+                    <li>Each character is processed at most once, resulting in <strong>O(m)</strong> time complexity.</li>
+                </ul>
+
+                <h5>8.1.2 Searching the Pattern in Text</h5>
+                <ul>
+                    <li>Each character in the text is checked at most once.</li>
+                    <li>The use of LPS prevents unnecessary rechecking, leading to <strong>O(n)</strong> complexity.</li>
+                </ul>
+
+                <h4>8.2 Worst-Case Time Complexity</h4>
+                <p>Occurs when the pattern has a repetitive structure, causing frequent mismatches.</p>
+                <p><strong>Time Complexity:</strong> $$O(n + m)$$</p>
+
+                <h4>8.3 Best-Case Time Complexity</h4>
+                <p>Occurs when there are no mismatches or when the pattern doesn't appear in the text.</p>
+                <p><strong>Time Complexity:</strong> $$O(n)$$</p>
+
+                <h4>8.4 Average-Case Time Complexity</h4>
+                <p>Generally, the algorithm performs close to its best-case due to efficient skipping.</p>
+                <p><strong>Time Complexity:</strong> $$O(n + m)$$</p>
+            </article>
+
+            <article>
+                <h3>9. Space Complexity Analysis</h3>
+                <h4>9.1 Space Consumption</h4>
+                <p>The KMP algorithm mainly consumes space for the LPS array:</p>
+                <ul>
+                    <li><strong>LPS Array:</strong> Requires <code>O(m)</code> space, where <code>m</code> is the pattern length.</li>
+                    <li><strong>Auxiliary Variables:</strong> A few integer variables (<code>i, j, length</code>) take constant <code>O(1)</code> space.</li>
+                </ul>
+
+                <h4>9.2 Space Complexity Formula</h4>
+                <p><strong>Overall Space Complexity:</strong> $$O(m)$$</p>
+
+                <h4>9.3 How Space Grows with Input Size</h4>
+                <p>Since only the pattern length <code>m</code> affects memory usage, the space requirement remains minimal and grows linearly with the pattern size.</p>
+            </article>
+
+            <article>
+                <h3>10. Trade-offs in Using KMP</h3>
+                <h4>10.1 Strengths</h4>
+                <ul>
+                    <li><strong>Eliminates Redundant Comparisons:</strong> Uses LPS array to skip unnecessary checks.</li>
+                    <li><strong>Linear Time Complexity:</strong> Efficient for long texts ($O(n + m)$).</li>
+                    <li><strong>Works Well on Repetitive Texts:</strong> Handles cases where patterns have repetitive structures.</li>
+                </ul>
+
+                <h4>10.2 Weaknesses</h4>
+                <ul>
+                    <li><strong>Extra Preprocessing Overhead:</strong> Requires <code>O(m)</code> preprocessing time.</li>
+                    <li><strong>Not Suitable for Dynamic Patterns:</strong> If patterns change frequently, recomputing LPS becomes inefficient.</li>
+                    <li><strong>Limited to Exact Matching:</strong> Doesn't work well for approximate or fuzzy searches.</li>
+                </ul>
+
+                <h4>10.3 Comparison with Alternatives</h4>
+                <table class="table table-bordered">"
+                    <tr>
+                        <th>Algorithm</th>
+                        <th>Time Complexity</th>
+                        <th>Space Complexity</th>
+                        <th>Best Use Case</th>
+                    </tr>
+                    <tr>
+                        <td>Brute Force</td>
+                        <td>O(nm)</td>
+                        <td>O(1)</td>
+                        <td>Small datasets</td>
+                    </tr>
+                    <tr>
+                        <td>KMP</td>
+                        <td>O(n + m)</td>
+                        <td>O(m)</td>
+                        <td>Exact matching in large texts</td>
+                    </tr>
+                    <tr>
+                        <td>Rabin-Karp</td>
+                        <td>O(n + m) (avg), O(nm) (worst)</td>
+                        <td>O(1)</td>
+                        <td>Multiple pattern searches</td>
+                    </tr>
+                    <tr>
+                        <td>Boyer-Moore</td>
+                        <td>O(n/m) (best), O(nm) (worst)</td>
+                        <td>O(m)</td>
+                        <td>Fast search in distinct patterns</td>
+                    </tr>
+                </table>
+            </article>
+
+            <article>
+                <h3>11. Optimizations & Variants</h3>
+                <p>The Knuth-Morris-Pratt (KMP) algorithm is already optimized for linear-time pattern searching, but additional improvements can further enhance its efficiency in practical applications.</p>
+
+                <h4>11.1 Common Optimizations</h4>
+
+                <h5>11.1.1 Optimized LPS Computation</h5>
+                <p>The preprocessing step for the LPS array can be fine-tuned by minimizing unnecessary comparisons:</p>
+                <ul>
+                    <li>Instead of resetting <code>length</code> completely on mismatch, use <code>lps[length - 1]</code> to resume comparison.</li>
+                    <li>Use <strong>iterative LPS calculation</strong> instead of a naive double-loop approach.</li>
+                </ul>
+
+                <h5>11.1.2 Avoiding Unnecessary Comparisons</h5>
+                <ul>
+                    <li>Once a match is found, avoid rechecking characters already confirmed.</li>
+                    <li>Instead of backtracking the text pointer, use LPS to skip characters efficiently.</li>
+                </ul>
+
+                <h5>11.1.3 Early Termination</h5>
+                <p>If the remaining characters in the text are fewer than the unmatched part of the pattern, terminate early.</p>
+
+                <h4>11.2 Variants of KMP</h4>
+
+                <h5>11.2.1 KMP for Multiple Patterns</h5>
+                <p>Instead of using KMP separately for each pattern, preprocessing multiple patterns into a single LPS table is useful in:</p>
+                <ul>
+                    <li><strong>Aho-Corasick Algorithm</strong>: Builds an automaton for multi-pattern matching.</li>
+                    <li><strong>Trie-based KMP</strong>: Reduces redundant LPS computations across patterns.</li>
+                </ul>
+
+                <h5>11.2.2 Approximate Matching</h5>
+                <p>Traditional KMP works for exact matches, but can be extended using:</p>
+                <ul>
+                    <li><strong>Bitwise KMP</strong>: Uses bitwise operations to speed up searches in specific cases.</li>
+                    <li><strong>Modified LPS Computation</strong>: Allows for approximate matching with wildcards.</li>
+                </ul>
+
+                <h5>11.2.3 Parallelized KMP</h5>
+                <p>Modern hardware supports running different parts of the search on multiple cores, improving performance on large texts.</p>
+
+                <h5>11.2.4 KMP with Compressed LPS</h5>
+                <p>Instead of storing the entire LPS array, only necessary transition points can be stored to save memory.</p>
+            </article>
+
+            <article>
+                <h3>12. Iterative vs. Recursive Implementations</h3>
+
+                <h4>12.1 Iterative KMP Implementation</h4>
+                <p>The standard KMP implementation is iterative, using loops for LPS computation and pattern matching.</p>
+                <pre><code class="language-python">def kmp_search(text, pattern):
+    n, m = len(text), len(pattern)
+    lps = compute_lps(pattern)
+    
+    i = j = 0  # Pointers for text and pattern
+    while i < n:
+        if pattern[j] == text[i]:
+            i += 1
+            j += 1
+
+        if j == m:
+            print(f"Pattern found at index {i - j}")
+            j = lps[j - 1]  # Move j back using LPS
+        elif i < n and pattern[j] != text[i]:
+            if j != 0:
+                j = lps[j - 1]
+            else:
+                i += 1  # Move forward in text</code></pre>
+
+                <h4>12.2 Recursive KMP Implementation</h4>
+                <p>A recursive version eliminates loops by using function calls:</p>
+                <pre><code class="language-python">def recursive_kmp(text, pattern, i=0, j=0, lps=None):
+    if lps is None:
+        lps = compute_lps(pattern)
+    
+    if i >= len(text):
+        return
+    
+    if j == len(pattern):
+        print(f"Pattern found at index {i - j}")
+        return recursive_kmp(text, pattern, i, lps[j - 1], lps)
+    
+    if text[i] == pattern[j]:
+        return recursive_kmp(text, pattern, i + 1, j + 1, lps)
+    
+    if j != 0:
+        return recursive_kmp(text, pattern, i, lps[j - 1], lps)
+    else:
+        return recursive_kmp(text, pattern, i + 1, j, lps)</code></pre>
+
+                <h4>12.3 Efficiency Comparison</h4>
+                <table class="table table-bordered">"
+                    <tr>
+                        <th>Feature</th>
+                        <th>Iterative</th>
+                        <th>Recursive</th>
+                    </tr>
+                    <tr>
+                        <td>Time Complexity</td>
+                        <td>O(n + m)</td>
+                        <td>O(n + m)</td>
+                    </tr>
+                    <tr>
+                        <td>Space Complexity</td>
+                        <td>O(m) (only LPS stored)</td>
+                        <td>O(m + d) (LPS + recursion depth)</td>
+                    </tr>
+                    <tr>
+                        <td>Stack Usage</td>
+                        <td>Minimal</td>
+                        <td>May cause stack overflow for large inputs</td>
+                    </tr>
+                    <tr>
+                        <td>Performance</td>
+                        <td>Faster due to loop optimization</td>
+                        <td>Slower due to recursive calls</td>
+                    </tr>
+                </table>
+
+                <h4>12.4 When to Use Each</h4>
+                <ul>
+                    <li><strong>Iterative KMP</strong>: Preferable in most cases due to lower memory usage and better performance.</li>
+                    <li><strong>Recursive KMP</strong>: Useful when dealing with problems requiring recursive breakdown.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>13. Edge Cases & Failure Handling</h3>
+                <p>The Knuth-Morris-Pratt (KMP) algorithm generally performs efficiently, but certain edge cases can cause unexpected behavior. Below are some of the most critical pitfalls and how to handle them.</p>
+
+                <h4>13.1 Edge Cases</h4>
+
+                <h5>13.1.1 Pattern Longer than Text</h5>
+                <p>If the pattern length is greater than the text length, the search should terminate immediately.</p>
+                <pre><code class="language-python">if len(pattern) > len(text):
+    return "Pattern length exceeds text length. No match possible."
+</code></pre>
+
+                <h5>13.1.2 Pattern is Empty</h5>
+                <p>If the pattern is an empty string, it should match at every index of the text.</p>
+                <pre><code class="language-python">if len(pattern) == 0:
+    return "Empty pattern matches at all positions."
+</code></pre>
+
+                <h5>13.1.3 Text is Empty</h5>
+                <p>If the text is empty, no matches should be found.</p>
+                <pre><code class="language-python">if len(text) == 0:
+    return "No match in an empty text."
+</code></pre>
+
+                <h5>13.1.4 Repeating Characters in Pattern</h5>
+                <p>Patterns with many repeating characters (e.g., <code>"aaaaa"</code>) should not cause excessive LPS recalculations.</p>
+
+                <h5>13.1.5 No Match Exists</h5>
+                <p>If no part of the text matches the pattern, the algorithm should terminate gracefully.</p>
+
+                <h5>13.1.6 Multiple Matches</h5>
+                <p>The algorithm should handle multiple occurrences of the pattern within the text.</p>
+
+                <h5>13.1.7 Case Sensitivity</h5>
+                <p>By default, KMP is case-sensitive, meaning <code>"ABC"</code> and <code>"abc"</code> are treated as different. To handle case-insensitive searches, convert both text and pattern to lowercase.</p>
+                <pre><code class="language-python">text = text.lower()
+pattern = pattern.lower()
+</code></pre>
+            </article>
+
+            <article>
+                <h3>14. Test Cases to Verify Correctness</h3>
+                <p>To ensure the correctness of the KMP algorithm, we need to validate various scenarios using test cases.</p>
+
+                <h4>14.1 Basic Test Cases</h4>
+                <table class="table table-bordered">"
+                    <tr>
+                        <th>Test Case</th>
+                        <th>Text</th>
+                        <th>Pattern</th>
+                        <th>Expected Output</th>
+                    </tr>
+                    <tr>
+                        <td>Pattern found once</td>
+                        <td>"abcdeabcabc"</td>
+                        <td>"abc"</td>
+                        <td>Found at index 0, 5, 8</td>
+                    </tr>
+                    <tr>
+                        <td>Pattern not found</td>
+                        <td>"abcdefgh"</td>
+                        <td>"xyz"</td>
+                        <td>No match found</td>
+                    </tr>
+                    <tr>
+                        <td>Pattern longer than text</td>
+                        <td>"abc"</td>
+                        <td>"abcd"</td>
+                        <td>No match found</td>
+                    </tr>
+                    <tr>
+                        <td>Pattern is empty</td>
+                        <td>"abcdef"</td>
+                        <td>""</td>
+                        <td>Matches at all positions</td>
+                    </tr>
+                    <tr>
+                        <td>Text is empty</td>
+                        <td>""</td>
+                        <td>"abc"</td>
+                        <td>No match found</td>
+                    </tr>
+                    <tr>
+                        <td>Multiple occurrences</td>
+                        <td>"ababababc"</td>
+                        <td>"ab"</td>
+                        <td>Found at index 0, 2, 4, 6</td>
+                    </tr>
+                </table>
+
+                <h4>14.2 Python Unit Tests</h4>
+                <pre><code class="language-python">import unittest
+
+class TestKMP(unittest.TestCase):
+    def test_single_match(self):
+        self.assertEqual(kmp_search("abcdeabcabc", "abc"), [0, 5, 8])
+
+    def test_no_match(self):
+        self.assertEqual(kmp_search("abcdefgh", "xyz"), [])
+
+    def test_pattern_longer_than_text(self):
+        self.assertEqual(kmp_search("abc", "abcd"), [])
+
+    def test_empty_pattern(self):
+        self.assertEqual(kmp_search("abcdef", ""), list(range(len("abcdef"))))
+
+    def test_empty_text(self):
+        self.assertEqual(kmp_search("", "abc"), [])
+
+    def test_multiple_occurrences(self):
+        self.assertEqual(kmp_search("ababababc", "ab"), [0, 2, 4, 6])
+
+if __name__ == "__main__":
+    unittest.main()
+</code></pre>
+            </article>
+
+            <article>
+                <h3>15. Real-World Failure Scenarios</h3>
+
+                <h4>15.1 Handling Large Text Inputs</h4>
+                <p>When dealing with very large texts (e.g., genome sequences, logs, or books), KMP’s efficiency remains linear, but:</p>
+                <ul>
+                    <li>Precomputing LPS can be costly for extremely long patterns.</li>
+                    <li>Disk I/O or network latency may become the real bottleneck.</li>
+                </ul>
+
+                <h4>15.2 Handling Unicode & Special Characters</h4>
+                <p>KMP must handle non-ASCII characters properly, such as:</p>
+                <ul>
+                    <li>Multi-byte Unicode sequences (e.g., emojis, non-Latin scripts).</li>
+                    <li>Normalization issues (e.g., accented characters appearing differently).</li>
+                </ul>
+                <pre><code class="language-python">import unicodedata
+text = unicodedata.normalize('NFC', text)
+pattern = unicodedata.normalize('NFC', pattern)
+</code></pre>
+
+                <h4>15.3 Case-Insensitive Matching</h4>
+                <p>By default, "abc" ≠ "ABC". To perform case-insensitive matching:</p>
+                <pre><code class="language-python">text = text.lower()
+pattern = pattern.lower()
+</code></pre>
+
+                <h4>15.4 Real-Time Streaming Search</h4>
+                <p>For real-time applications (e.g., autocomplete, network packet inspection), KMP needs to work on streaming data:</p>
+                <ul>
+                    <li>Use a rolling buffer instead of storing the entire text.</li>
+                    <li>Incrementally compute LPS on incoming data.</li>
+                </ul>
+
+                <h4>15.5 Pattern Changing Dynamically</h4>
+                <p>If the pattern changes frequently, recomputing the LPS array can be expensive. Instead, a hybrid approach using:</p>
+                <ul>
+                    <li>Rabin-Karp for initial pattern detection.</li>
+                    <li>KMP for exact matching once a candidate substring is found.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>16. Real-World Applications & Industry Use Cases</h3>
+                <p>The Knuth-Morris-Pratt (KMP) algorithm is widely used in various real-world applications where efficient substring searching is required.</p>
+
+                <h4>16.1 Search Engines & Text Processing</h4>
+                <ul>
+                    <li><strong>Keyword Search:</strong> Search engines like Google use variations of KMP for exact keyword matching within web pages.</li>
+                    <li><strong>Plagiarism Detection:</strong> Tools like Turnitin scan large documents for duplicate content using optimized string matching.</li>
+                    <li><strong>Text Editors:</strong> Find-and-replace functions in editors like VS Code and Sublime Text use KMP for fast text searches.</li>
+                </ul>
+
+                <h4>16.2 Bioinformatics</h4>
+                <ul>
+                    <li><strong>DNA Sequence Matching:</strong> Genomics research involves searching for specific gene sequences in large DNA datasets.</li>
+                    <li><strong>Protein Structure Analysis:</strong> Searching for repeating patterns in protein sequences to detect genetic disorders.</li>
+                </ul>
+
+                <h4>16.3 Network Security & Cybersecurity</h4>
+                <ul>
+                    <li><strong>Intrusion Detection Systems (IDS):</strong> Firewalls and IDS scan network packets for known malicious signatures using KMP.</li>
+                    <li><strong>Spam Filters:</strong> Email filters use KMP to detect common spam patterns in subject lines or content.</li>
+                </ul>
+
+                <h4>16.4 E-Commerce & Digital Marketing</h4>
+                <ul>
+                    <li><strong>Product Search:</strong> Platforms like Amazon and eBay use substring matching to improve search accuracy.</li>
+                    <li><strong>Ad Targeting:</strong> Matching user input with stored keywords for better ad recommendations.</li>
+                </ul>
+
+                <h4>16.5 Software Development & Compilers</h4>
+                <ul>
+                    <li><strong>Syntax Highlighting:</strong> IDEs use pattern matching to highlight keywords in source code.</li>
+                    <li><strong>Lexical Analysis:</strong> Compilers use string matching techniques to tokenize code efficiently.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>17. Open-Source Implementations</h3>
+                <p>Several open-source projects implement KMP for different applications.</p>
+
+                <h4>17.1 Notable Repositories</h4>
+                <ul>
+                    <li><a href="https://github.com/TheAlgorithms/Python/blob/master/strings/knuth_morris_pratt.py">TheAlgorithms/Python - KMP Implementation</a></li>
+                    <li><a href="https://github.com/TheAlgorithms/C-Plus-Plus/blob/master/strings/knuth_morris_pratt.cpp">TheAlgorithms/C++ - KMP Implementation</a></li>
+                    <li><a href="https://github.com/egonSchiele/grokking_algorithms">Grokking Algorithms (Python, JavaScript, Go)</a></li>
+                </ul>
+
+                <h4>17.2 How to Contribute</h4>
+                <ul>
+                    <li>Optimize the LPS computation for better performance.</li>
+                    <li>Implement multi-pattern matching using Trie + KMP.</li>
+                    <li>Integrate KMP with streaming data handling for real-time applications.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>18. Practical Project: Log File Keyword Search</h3>
+                <p>This project implements a simple log file scanner that detects specific keywords in server logs using the KMP algorithm.</p>
+
+                <h4>18.1 Use Case</h4>
+                <p>Detect security incidents by scanning server logs for patterns like "unauthorized access", "SQL injection", or "error 500".</p>
+
+                <h4>18.2 Python Implementation</h4>
+                <pre><code class="language-python">import os
+
+def compute_lps(pattern):
+    m = len(pattern)
+    lps = [0] * m
+    length = 0  
+    i = 1
+
+    while i < m:
+        if pattern[i] == pattern[length]:
+            length += 1
+            lps[i] = length
+            i += 1
+        else:
+            if length != 0:
+                length = lps[length - 1]
+            else:
+                lps[i] = 0
+                i += 1
+    return lps
+
+def kmp_search(text, pattern):
+    n, m = len(text), len(pattern)
+    lps = compute_lps(pattern)
+
+    i = j = 0  
+    occurrences = []
+    while i < n:
+        if pattern[j] == text[i]:
+            i += 1
+            j += 1
+
+        if j == m:
+            occurrences.append(i - j)
+            j = lps[j - 1]  
+        elif i < n and pattern[j] != text[i]:  
+            if j != 0:
+                j = lps[j - 1]
+            else:
+                i += 1  
+    return occurrences
+
+def scan_log_file(log_file, keywords):
+    with open(log_file, "r", encoding="utf-8") as file:
+        lines = file.readlines()
+    
+    for i, line in enumerate(lines):
+        for keyword in keywords:
+            matches = kmp_search(line, keyword)
+            if matches:
+                print(f"Match for '{keyword}' found in line {i+1}: {line.strip()}")
+
+# Example usage:
+log_file_path = "server_logs.txt"
+search_patterns = ["unauthorized access", "error 500", "SQL injection"]
+scan_log_file(log_file_path, search_patterns)</code></pre>
+
+                <h4>18.3 How It Works</h4>
+                <ul>
+                    <li>Reads a server log file line by line.</li>
+                    <li>Uses KMP to search for predefined security-related keywords.</li>
+                    <li>Prints occurrences of those keywords along with the line number.</li>
+                </ul>
+
+                <h4>18.4 Future Enhancements</h4>
+                <ul>
+                    <li>Store results in a structured format (CSV, JSON).</li>
+                    <li>Monitor logs in real time using a streaming approach.</li>
+                    <li>Integrate with machine learning for anomaly detection.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>19. Competitive Programming & System Design Integration</h3>
+
+                <h4>19.1 KMP in Competitive Programming</h4>
+                <p>The Knuth-Morris-Pratt (KMP) algorithm is frequently used in competitive programming for string-matching problems. Given its efficiency ($O(n + m)$ complexity), it is ideal for handling large inputs.</p>
+
+                <h5>19.1.1 Common Problem Patterns</h5>
+                <ul>
+                    <li><strong>Finding the first occurrence of a substring</strong> – Used in problems where checking if a pattern exists is necessary.</li>
+                    <li><strong>Counting occurrences of a substring</strong> – Finding all positions where a pattern appears in the text.</li>
+                    <li><strong>Detecting cyclic shifts</strong> – Checking if one string is a rotation of another.</li>
+                    <li><strong>Longest border of a string</strong> – Finding the longest prefix which is also a suffix (directly obtained from the LPS array).</li>
+                    <li><strong>Pattern searching in DNA sequences</strong> – Often tested in bioinformatics-related problems.</li>
+                </ul>
+
+                <h5>19.1.2 Problem-Solving Strategy</h5>
+                <ol>
+                    <li>Identify if the problem requires substring searching.</li>
+                    <li>Precompute the LPS array if necessary.</li>
+                    <li>Apply KMP instead of naive or brute-force approaches.</li>
+                    <li>Optimize for edge cases (large inputs, multiple matches).</li>
+                </ol>
+
+                <h4>19.2 KMP in System Design</h4>
+                <p>In large-scale applications, KMP is used in various system design scenarios:</p>
+
+                <h5>19.2.1 Distributed Search Engines</h5>
+                <ul>
+                    <li>KMP is used in full-text search engines for efficient keyword lookups.</li>
+                    <li>Distributed databases use KMP to optimize text-based query execution.</li>
+                </ul>
+
+                <h5>19.2.2 Real-Time Log Analysis</h5>
+                <ul>
+                    <li>Streaming platforms like Kafka use pattern matching to flag anomalies in logs.</li>
+                    <li>Live security monitoring systems scan logs for suspicious patterns using KMP.</li>
+                </ul>
+
+                <h5>19.2.3 Bioinformatics Systems</h5>
+                <ul>
+                    <li>Genome sequencing applications use KMP to match DNA fragments against known sequences.</li>
+                    <li>Medical research databases optimize pattern searches using variations of KMP.</li>
+                </ul>
+
+                <h5>19.2.4 Spam Detection & Filtering</h5>
+                <ul>
+                    <li>Email servers use KMP to match spam keywords in incoming messages.</li>
+                    <li>Social media platforms scan posts for flagged words to moderate content.</li>
+                </ul>
+
+            </article>
+
+            <article>
+                <h3>20. Assignments</h3>
+                <h4>20.1 Solve at Least 10 Problems Using KMP</h4>
+                <p>Practice problems to reinforce your understanding of KMP:</p>
+                <ol>
+                    <li><a href="https://www.spoj.com/problems/NHAY/">NHAY - A Needle in the Haystack (SPOJ)</a></li>
+                    <li><a href="https://www.geeksforgeeks.org/problems/search-pattern-rabin-karp-algorithm--141631/1">Pattern Searching (GFG)</a></li>
+                    <li><a href="https://leetcode.com/problems/implement-strstr/">Implement strStr() (Leetcode 28)</a></li>
+                    <li><a href="https://www.codechef.com/problems/TASHIFT">TASHIFT - The Shift (CodeChef)</a></li>
+                    <li><a href="https://www.hackerrank.com/challenges/the-power-sum/problem">The Power Sum (HackerRank)</a></li>
+                    <li>Find all occurrences of a pattern in a string with overlapping matches.</li>
+                    <li>Find the longest border of a string using KMP’s LPS array.</li>
+                    <li>Check if one string is a rotation of another using KMP.</li>
+                    <li>Find the longest repeating substring in a given text using KMP.</li>
+                    <li>Count the number of times a pattern appears in a large document efficiently.</li>
+                </ol>
+
+                <h4>20.2 Use KMP in a System Design Problem</h4>
+                <p>Design a scalable log processing system where multiple servers generate logs, and a monitoring system scans for predefined error messages using KMP.</p>
+                <p>Steps:</p>
+                <ul>
+                    <li>Implement a distributed logging system where logs are continuously streamed.</li>
+                    <li>Use KMP to efficiently search error messages in real-time.</li>
+                    <li>Optimize the implementation for handling high-throughput logs.</li>
+                </ul>
+
+                <h4>20.3 Implement KMP Under Time Constraints</h4>
+                <p>To improve your ability to implement KMP efficiently in a competitive environment, follow these constraints:</p>
+                <ul>
+                    <li>Write a complete KMP implementation (including LPS computation) in <strong>10 minutes</strong>.</li>
+                    <li>Debug and test it within <strong>5 minutes</strong>.</li>
+                    <li>Optimize your implementation to handle large text and pattern inputs.</li>
+                </ul>
+
+                <p>Suggested platforms for timed practice:</p>
+                <ul>
+                    <li><a href="https://www.leetcode.com">Leetcode</a></li>
+                    <li><a href="https://www.codeforces.com">Codeforces</a></li>
+                    <li><a href="https://www.spoj.com">SPOJ</a></li>
+                    <li><a href="https://www.hackerrank.com">HackerRank</a></li>
+                </ul>
+
+                <p>By solving these assignments, you'll gain confidence in implementing KMP efficiently and applying it to real-world problems.</p>
+            </article>
+
+        </main>
+
+        <script> copyright("all"); </script>
+
+    </body>
+
+</html>

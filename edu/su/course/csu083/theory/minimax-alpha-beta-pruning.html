@@ -1,0 +1,1262 @@
+<!-------------------------- © 2007 - present, dmj.one and contributors. ----------------------------------
+   Part of the dmjone project. Licensed under the GNU AGPL. Provided as-is, without warranty of any kind. 
+-------------------- Redistribution and modifications must retain this notice. --------------------------->
+
+
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+    <!--<![endif]-->
+
+    <head>
+        <script src="/js/edu_su_common.js"></script>
+        <noscript>
+            <style>
+                html,
+                body {
+                    margin: 0;
+                    overflow: hidden;
+                }
+            </style>
+            <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+        </noscript>
+
+        <title>Minimax & Alpha-Beta Pruning - CSU083 | Shoolini University</title>
+        
+        <meta name="description" content="Learn Minimax & Alpha-Beta Pruning, covering concepts, implementations, optimizations, real-world applications, and competitive programming use cases. Part of the CSU083 course at Shoolini University.">
+        <meta name="keywords" content="Minimax, Alpha-Beta Pruning, Game Theory, Adversarial Search, AI Decision Making, Chess AI, Competitive Programming, System Design, Artificial Intelligence">
+        <meta name="author" content="Divya Mohan">
+        <meta name="robots" content="index, follow">
+        
+        <!-- Open Graph for Social Media -->
+        <meta property="og:title" content="Minimax & Alpha-Beta Pruning - CSU083 | Shoolini University">
+        <meta property="og:description" content="Comprehensive guide on Minimax & Alpha-Beta Pruning, covering theory, implementation, optimizations, and real-world applications in AI, games, and system design.">
+        <meta property="og:image" content="/logo.png">
+        <meta property="og:type" content="article">
+        
+        <!-- Twitter Cards -->
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:title" content="Minimax & Alpha-Beta Pruning in AI & Game Theory">
+        <meta name="twitter:description" content="Master Minimax & Alpha-Beta Pruning with in-depth coverage of implementations, use cases, and optimizations in AI, system design, and competitive programming.">
+        <meta name="twitter:site" content="@divyamohan1993">
+        <meta name="twitter:creator" content="@divyamohan1993">
+        <meta name="twitter:image" content="/logo.png">
+        
+        <!-- Mobile Responsiveness -->
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        
+        <!-- JSON-LD Structured Data for SEO -->
+        <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "Course",
+            "name": "Minimax & Alpha-Beta Pruning",
+            "description": "Master Minimax & Alpha-Beta Pruning in Artificial Intelligence and Game Theory, covering fundamental concepts, optimizations, real-world applications, and competitive programming techniques.",
+            "provider": [
+                {
+                    "@type": "EducationalOrganization",
+                    "name": "dmj.one",
+                    "url": "https://dmj.one"
+                },
+                {
+                    "@type": "EducationalOrganization",
+                    "name": "Shoolini University",
+                    "url": "https://shooliniuniversity.com"
+                }
+            ]
+        }
+        </script>
+
+
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js" integrity="sha512-sHSNLECRJSK+BFs7E8DiFc6pf6n90bLI85Emiw1jhreduZhK3VXgq9l4kAt9eTIHYAcuQBKHL01QKs4/3Xgl8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js" integrity="sha512-iWiuBS5nt6r60fCz26Nd0Zqe0nbk1ZTIQbl3Kv7kYsX+yKMUFHzjaH2+AnM6vp2Xs+gNmaBAVWJjSmuPw76Efg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                renderMathInElement(document.body, {
+                    // customised options
+                    // • auto-render specific keys, e.g.:
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false },
+                        { left: '\\(', right: '\\)', display: false },
+                        { left: '\\[', right: '\\]', display: true }
+                    ],
+                    // • rendering keys, e.g.:
+                    throwOnError: false
+                });
+            });
+        </script> -->
+
+        <!-- <style>
+            main ul {
+                list-style-type: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            main ul li {
+                margin: 0;
+                padding: 0;
+            }
+        </style> -->
+
+
+
+    </head>
+
+    <body>
+
+        <script> header_author("dm"); </script>
+
+        <main>
+            <article class="agen-tableofcontents">
+                <h2 class="text-center">
+                    Minimax & Alpha-Beta Pruning
+                </h2>
+                <div class="d-none contentdate">2025, February 20</div>
+            </article>
+
+            <article>
+                <h3>1. Prerequisites</h3>
+                <p>Before understanding Minimax and Alpha-Beta Pruning, you should be familiar with the following foundational concepts:</p>
+                <ul>
+                    <li><strong>Game Theory</strong>: Understanding two-player zero-sum games.</li>
+                    <li><strong>Tree Data Structure</strong>: Representation of possible moves as a game tree.</li>
+                    <li><strong>Recursion</strong>: Essential for traversing the game tree.</li>
+                    <li><strong>Depth-First Search (DFS)</strong>: Used in tree exploration.</li>
+                    <li><strong>Time Complexity</strong>: Evaluating the computational feasibility of an approach.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>2. What is Minimax & Alpha-Beta Pruning?</h3>
+                <h4>2.1 Minimax Algorithm</h4>
+                <p>The Minimax algorithm is a decision rule used in turn-based, two-player games where one player (MAX) tries to maximize the score while the other (MIN) tries to minimize it.</p>
+                <ul>
+                    <li><strong>Game Tree</strong>: The algorithm builds a tree where each node represents a game state.</li>
+                    <li><strong>MAX Node</strong>: Chooses the move that maximizes the score.</li>
+                    <li><strong>MIN Node</strong>: Chooses the move that minimizes the score.</li>
+                    <li><strong>Leaf Nodes</strong>: Represent end states with assigned heuristic values.</li>
+                </ul>
+                <pre><code class="language-python">
+def minimax(node, depth, is_maximizing):
+    if depth == 0 or is_terminal(node):
+        return evaluate(node)
+    
+    if is_maximizing:
+        best = float('-inf')
+        for child in get_children(node):
+            value = minimax(child, depth - 1, False)
+            best = max(best, value)
+        return best
+    else:
+        best = float('inf')
+        for child in get_children(node):
+            value = minimax(child, depth - 1, True)
+            best = min(best, value)
+        return best
+</code></pre>
+
+                <h4>2.2 Alpha-Beta Pruning</h4>
+                <p>Alpha-Beta Pruning optimizes Minimax by eliminating branches that do not affect the final decision, reducing unnecessary computations.</p>
+                <ul>
+                    <li><strong>Alpha (α)</strong>: Best value found so far for MAX.</li>
+                    <li><strong>Beta (β)</strong>: Best value found so far for MIN.</li>
+                    <li><strong>Pruning</strong>: If at any point, β ≤ α, further exploration of that branch is skipped.</li>
+                </ul>
+                <pre><code class="language-python">
+def alpha_beta(node, depth, alpha, beta, is_maximizing):
+    if depth == 0 or is_terminal(node):
+        return evaluate(node)
+    
+    if is_maximizing:
+        best = float('-inf')
+        for child in get_children(node):
+            value = alpha_beta(child, depth - 1, alpha, beta, False)
+            best = max(best, value)
+            alpha = max(alpha, best)
+            if beta <= alpha:
+                break  # Prune
+        return best
+    else:
+        best = float('inf')
+        for child in get_children(node):
+            value = alpha_beta(child, depth - 1, alpha, beta, True)
+            best = min(best, value)
+            beta = min(beta, best)
+            if beta <= alpha:
+                break  # Prune
+        return best
+</code></pre>
+            </article>
+
+            <article>
+                <h3>3. Why Does This Algorithm Exist?</h3>
+                <p>The Minimax algorithm is crucial for decision-making in adversarial environments where two players have conflicting goals.</p>
+                <ul>
+                    <li><strong>Game AI</strong>: Used in chess, tic-tac-toe, and other turn-based strategy games.</li>
+                    <li><strong>Artificial Intelligence</strong>: Helps AI make optimal decisions in competitive environments.</li>
+                    <li><strong>Optimization Problems</strong>: Applied in resource allocation and strategic planning.</li>
+                    <li><strong>Cybersecurity</strong>: Used in intrusion detection systems for adversarial scenarios.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>4. When Should You Use It?</h3>
+                <ul>
+                    <li><strong>Turn-Based Games</strong>: Games where players take turns making moves.</li>
+                    <li><strong>Zero-Sum Games</strong>: Where one player's gain is another's loss.</li>
+                    <li><strong>Known Rules & Finite Moves</strong>: Best suited when all possible game states can be evaluated.</li>
+                    <li><strong>AI Opponents</strong>: When designing AI for competitive play.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>5. How Does It Compare to Alternatives?</h3>
+                <h4>5.1 Strengths</h4>
+                <ul>
+                    <li><strong>Optimal Play</strong>: Guarantees the best possible move given enough depth.</li>
+                    <li><strong>Generalized</strong>: Works in various adversarial situations.</li>
+                    <li><strong>Pruning Reduces Computation</strong>: Alpha-Beta Pruning significantly reduces the number of nodes evaluated.</li>
+                </ul>
+
+                <h4>5.2 Weaknesses</h4>
+                <ul>
+                    <li><strong>Exponential Complexity</strong>: Without pruning, it grows exponentially with depth.</li>
+                    <li><strong>Depth Limitation</strong>: Cannot analyze deep game trees in reasonable time.</li>
+                    <li><strong>Imperfect Heuristics</strong>: Requires good evaluation functions for real-world performance.</li>
+                </ul>
+
+                <h4>5.3 Comparison with Other Methods</h4>
+                <table class="table table-bordered">"
+                    <tr>
+                        <th>Algorithm</th>
+                        <th>Best Use Case</th>
+                        <th>Complexity</th>
+                        <th>Strength</th>
+                        <th>Weakness</th>
+                    </tr>
+                    <tr>
+                        <td>Minimax</td>
+                        <td>Perfect-information games</td>
+                        <td>O(b^d)</td>
+                        <td>Finds optimal moves</td>
+                        <td>Slow for deep trees</td>
+                    </tr>
+                    <tr>
+                        <td>Alpha-Beta Pruning</td>
+                        <td>Large game trees</td>
+                        <td>O(b^(d/2))</td>
+                        <td>More efficient</td>
+                        <td>Still exponential</td>
+                    </tr>
+                    <tr>
+                        <td>Monte Carlo Tree Search (MCTS)</td>
+                        <td>Complex, probabilistic games</td>
+                        <td>O(n log n)</td>
+                        <td>Good for Go & real-world AI</td>
+                        <td>Non-deterministic results</td>
+                    </tr>
+                    <tr>
+                        <td>Reinforcement Learning</td>
+                        <td>Unknown environments</td>
+                        <td>Varies</td>
+                        <td>Adapts to learning</td>
+                        <td>Training-intensive</td>
+                    </tr>
+                </table>
+            </article>
+
+
+            <article>
+                <h3>6. Basic Implementation</h3>
+
+                <h4>6.1 Minimax Algorithm Implementation (Python)</h4>
+                <p>The following implementation includes the Minimax algorithm with Alpha-Beta pruning for a simple two-player game.</p>
+
+                <pre><code class="language-python">
+class Game:
+    def __init__(self, values):
+        self.tree = values  # Predefined game tree values (leaf nodes)
+
+    def minimax(self, depth, node_index, is_maximizing, alpha, beta):
+        if depth == 2:  # Leaf node reached
+            return self.tree[node_index]
+
+        if is_maximizing:
+            best = float('-inf')
+            for i in range(2):  # Two children per node
+                value = self.minimax(depth + 1, node_index * 2 + i, False, alpha, beta)
+                best = max(best, value)
+                alpha = max(alpha, best)
+                if beta <= alpha:
+                    break  # Prune
+            return best
+        else:
+            best = float('inf')
+            for i in range(2):  # Two children per node
+                value = self.minimax(depth + 1, node_index * 2 + i, True, alpha, beta)
+                best = min(best, value)
+                beta = min(beta, best)
+                if beta <= alpha:
+                    break  # Prune
+            return best
+
+# Example game tree with predefined leaf values
+values = [3, 5, 6, 9, 1, 2, 0, -1]
+game = Game(values)
+
+# Start Minimax with Alpha-Beta Pruning
+optimal_value = game.minimax(0, 0, True, float('-inf'), float('inf'))
+print("Optimal Value:", optimal_value)
+</code></pre>
+
+            </article>
+
+            <article>
+                <h3>7. Dry Run of the Algorithm</h3>
+
+                <h4>7.1 Example Tree Structure</h4>
+                <p>We will manually track Minimax with Alpha-Beta pruning on the following tree:</p>
+                <pre>
+         (?)
+        /   \
+      (?)   (?)
+     /  \   /  \
+   (3)  (5) (6) (9)
+   (1)  (2) (0) (-1)
+</pre>
+
+                <h4>7.2 Step-by-Step Execution</h4>
+                <p>Let's track the function calls with Alpha-Beta pruning.</p>
+
+                <table class="table table-bordered">"
+                    <tr>
+                        <th>Step</th>
+                        <th>Node</th>
+                        <th>Minimax Decision</th>
+                        <th>Alpha</th>
+                        <th>Beta</th>
+                        <th>Pruning?</th>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>Root (Max)</td>
+                        <td>Explore Left Child</td>
+                        <td>-∞</td>
+                        <td>+∞</td>
+                        <td>No</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>Left Child (Min)</td>
+                        <td>Explore Left Subtree</td>
+                        <td>-∞</td>
+                        <td>+∞</td>
+                        <td>No</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>3 & 5 (Leaf Nodes)</td>
+                        <td>Min = 3</td>
+                        <td>-∞</td>
+                        <td>3</td>
+                        <td>No</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>1 & 2 (Leaf Nodes)</td>
+                        <td>Min = 1</td>
+                        <td>-∞</td>
+                        <td>1</td>
+                        <td>Prune Right</td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td>Left Child Evaluated</td>
+                        <td>Max = 3</td>
+                        <td>3</td>
+                        <td>+∞</td>
+                        <td>No</td>
+                    </tr>
+                    <tr>
+                        <td>6</td>
+                        <td>Right Child (Min)</td>
+                        <td>Explore Left Subtree</td>
+                        <td>3</td>
+                        <td>+∞</td>
+                        <td>No</td>
+                    </tr>
+                    <tr>
+                        <td>7</td>
+                        <td>6 & 9 (Leaf Nodes)</td>
+                        <td>Min = 6</td>
+                        <td>3</td>
+                        <td>6</td>
+                        <td>No</td>
+                    </tr>
+                    <tr>
+                        <td>8</td>
+                        <td>0 & -1 (Leaf Nodes)</td>
+                        <td>Min = -1</td>
+                        <td>3</td>
+                        <td>-1</td>
+                        <td>Prune Right</td>
+                    </tr>
+                    <tr>
+                        <td>9</td>
+                        <td>Right Child Evaluated</td>
+                        <td>Max = 3</td>
+                        <td>3</td>
+                        <td>+∞</td>
+                        <td>No</td>
+                    </tr>
+                    <tr>
+                        <td>10</td>
+                        <td>Root Decision</td>
+                        <td>Optimal Move = 3</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>-</td>
+                    </tr>
+                </table>
+
+                <h4>7.3 Final Result</h4>
+                <p>The algorithm determines that the optimal value for the root node is <strong>3</strong>, with Alpha-Beta pruning significantly reducing calculations.</p>
+
+            </article>
+
+            <article>
+                <h3>8. Time & Space Complexity Analysis</h3>
+
+                <h4>8.1 Time Complexity of Minimax</h4>
+                <p>The Minimax algorithm explores all possible game states up to a given depth.</p>
+
+                <ul>
+                    <li><strong>Branching Factor (b)</strong>: The number of possible moves at each level.</li>
+                    <li><strong>Depth (d)</strong>: How many turns ahead the algorithm looks.</li>
+                </ul>
+
+                <p>Minimax examines all nodes in the game tree, leading to:</p>
+                <p>$$O(b^d)$$</p>
+
+                <h5>Best, Worst, and Average Cases</h5>
+                <table class="table table-bordered">"
+                    <tr>
+                        <th>Case</th>
+                        <th>Complexity</th>
+                        <th>Reason</th>
+                    </tr>
+                    <tr>
+                        <td>Worst Case</td>
+                        <td>O(b^d)</td>
+                        <td>Explores the entire tree exhaustively.</td>
+                    </tr>
+                    <tr>
+                        <td>Best Case</td>
+                        <td>O(b^d)</td>
+                        <td>No pruning occurs, so still exhaustive.</td>
+                    </tr>
+                    <tr>
+                        <td>Average Case</td>
+                        <td>O(b^d)</td>
+                        <td>Same as worst case unless pruning helps.</td>
+                    </tr>
+                </table>
+
+                <h4>8.2 Time Complexity with Alpha-Beta Pruning</h4>
+                <p>Alpha-Beta pruning reduces unnecessary evaluations, eliminating many branches.</p>
+                <p>In an ideal scenario (best ordering of nodes), pruning reduces complexity to:</p>
+                <p>$$O(b^{d/2})$$</p>
+
+                <table class="table table-bordered">"
+                    <tr>
+                        <th>Case</th>
+                        <th>Complexity</th>
+                        <th>Reason</th>
+                    </tr>
+                    <tr>
+                        <td>Worst Case</td>
+                        <td>O(b^d)</td>
+                        <td>No pruning occurs (bad node ordering).</td>
+                    </tr>
+                    <tr>
+                        <td>Best Case</td>
+                        <td>O(b^{d/2})</td>
+                        <td>Pruning eliminates almost half the search space.</td>
+                    </tr>
+                    <tr>
+                        <td>Average Case</td>
+                        <td>O(b^{d/1.5})</td>
+                        <td>Some pruning occurs, reducing but not halving work.</td>
+                    </tr>
+                </table>
+
+            </article>
+
+            <article>
+                <h3>9. Space Complexity Analysis</h3>
+
+                <h4>9.1 Memory Consumption in Minimax</h4>
+                <p>Memory consumption depends on storing recursive function calls and game states.</p>
+
+                <ul>
+                    <li><strong>Recursive Depth</strong>: Limited to depth \(d\), so worst case uses \(O(d)\) stack space.</li>
+                    <li><strong>Game State Storage</strong>: Each level stores \(O(b)\) nodes, but only one path is expanded at a time.</li>
+                </ul>
+
+                <p>Overall space complexity:</p>
+                <p>$$O(d)$$</p>
+
+                <h4>9.2 Memory Consumption with Alpha-Beta Pruning</h4>
+                <p>Pruning does not significantly change space usage since it only prevents unnecessary function calls.</p>
+                <ul>
+                    <li>Still requires \(O(d)\) stack space.</li>
+                    <li>Memory footprint remains small since only optimal branches are stored.</li>
+                </ul>
+
+            </article>
+
+            <article>
+                <h3>10. Trade-Offs & Considerations</h3>
+
+                <h4>10.1 Strengths of Minimax</h4>
+                <ul>
+                    <li><strong>Guaranteed Optimal Moves</strong>: If the opponent plays optimally, Minimax ensures the best decision.</li>
+                    <li><strong>Generalizable</strong>: Works on any turn-based adversarial game.</li>
+                    <li><strong>No Learning Required</strong>: Unlike ML-based approaches, it requires no training.</li>
+                </ul>
+
+                <h4>10.2 Weaknesses of Minimax</h4>
+                <ul>
+                    <li><strong>Exponential Growth</strong>: Large branching factors make it infeasible beyond a small depth.</li>
+                    <li><strong>Slow for Deep Trees</strong>: Real-world games like chess require heuristics to limit depth.</li>
+                </ul>
+
+                <h4>10.3 Trade-Offs with Alpha-Beta Pruning</h4>
+                <table class="table table-bordered">"
+                    <tr>
+                        <th>Factor</th>
+                        <th>Minimax</th>
+                        <th>Alpha-Beta Pruning</th>
+                    </tr>
+                    <tr>
+                        <td>Computation Speed</td>
+                        <td>Slow (O(b^d))</td>
+                        <td>Faster (O(b^{d/2}))</td>
+                    </tr>
+                    <tr>
+                        <td>Space Complexity</td>
+                        <td>O(d)</td>
+                        <td>O(d)</td>
+                    </tr>
+                    <tr>
+                        <td>Optimality</td>
+                        <td>Always optimal</td>
+                        <td>Always optimal</td>
+                    </tr>
+                    <tr>
+                        <td>Usefulness in Large Games</td>
+                        <td>Limited</td>
+                        <td>Pruning improves scalability</td>
+                    </tr>
+                </table>
+
+                <p><strong>Key Insight:</strong> Alpha-Beta Pruning should always be used with Minimax, as it provides the same results faster.</p>
+
+            </article>
+
+            <article>
+                <h3>11. Optimizations & Variants</h3>
+
+                <h4>11.1 Common Optimizations in Minimax</h4>
+                <p>Minimax can be optimized in several ways to reduce computation time and improve efficiency.</p>
+
+                <h5>1. Alpha-Beta Pruning</h5>
+                <ul>
+                    <li>Eliminates unnecessary branches where a decision is already determined.</li>
+                    <li>Best-case complexity reduces from \(O(b^d)\) to \(O(b^{d/2})\).</li>
+                    <li>Performance depends on node ordering; best results occur when good moves are evaluated first.</li>
+                </ul>
+
+                <h5>2. Move Ordering</h5>
+                <ul>
+                    <li>Sort moves so that best moves are evaluated first.</li>
+                    <li>Leads to faster pruning and reduced computations.</li>
+                </ul>
+
+                <h5>3. Transposition Tables (Memoization)</h5>
+                <ul>
+                    <li>Store already computed game states in a hash table.</li>
+                    <li>Prevents redundant calculations, especially in games with repeated positions (e.g., Chess, Checkers).</li>
+                    <li>Reduces complexity for duplicate states.</li>
+                </ul>
+
+                <h5>4. Iterative Deepening</h5>
+                <ul>
+                    <li>Starts with a low search depth and gradually increases it.</li>
+                    <li>Used in real-time applications where decisions need to be made within a time limit.</li>
+                </ul>
+
+                <h5>5. Heuristic Evaluation Functions</h5>
+                <ul>
+                    <li>For deep trees, an exact solution is infeasible, so heuristic functions estimate node values.</li>
+                    <li>Example: In Chess, material count + positional advantage.</li>
+                </ul>
+
+                <h5>6. Quiescence Search</h5>
+                <ul>
+                    <li>Avoids evaluating positions where an immediate drastic change is likely (e.g., captures in Chess).</li>
+                    <li>Extends search depth only in "unstable" positions.</li>
+                </ul>
+
+                <h5>7. Monte Carlo Tree Search (MCTS)</h5>
+                <ul>
+                    <li>Instead of exhaustive search, MCTS samples random simulations to determine the best move.</li>
+                    <li>Used in complex games like Go where Minimax is impractical.</li>
+                </ul>
+
+                <h4>11.2 Variants of Minimax</h4>
+                <table class="table table-bordered">"
+                    <tr>
+                        <th>Variant</th>
+                        <th>Description</th>
+                        <th>Best Use Case</th>
+                    </tr>
+                    <tr>
+                        <td>Standard Minimax</td>
+                        <td>Explores all possible moves without pruning.</td>
+                        <td>Small games like Tic-Tac-Toe.</td>
+                    </tr>
+                    <tr>
+                        <td>Alpha-Beta Pruning</td>
+                        <td>Reduces unnecessary computations by pruning branches.</td>
+                        <td>Large game trees like Chess.</td>
+                    </tr>
+                    <tr>
+                        <td>Expectiminimax</td>
+                        <td>Handles stochastic games by considering chance nodes.</td>
+                        <td>Games with randomness like Backgammon.</td>
+                    </tr>
+                    <tr>
+                        <td>Monte Carlo Tree Search (MCTS)</td>
+                        <td>Uses random simulations instead of brute-force search.</td>
+                        <td>Games like Go, where branching factor is high.</td>
+                    </tr>
+                </table>
+
+            </article>
+
+            <article>
+                <h3>12. Iterative vs. Recursive Implementations</h3>
+
+                <h4>12.1 Recursive Minimax</h4>
+                <ul>
+                    <li>Natural and easy to implement.</li>
+                    <li>Consumes stack memory proportional to the search depth \(O(d)\).</li>
+                    <li>Harder to control in real-time systems due to deep recursion.</li>
+                </ul>
+
+                <pre><code class="language-python">
+def minimax(node, depth, is_maximizing):
+    if depth == 0 or is_terminal(node):
+        return evaluate(node)
+    
+    if is_maximizing:
+        best = float('-inf')
+        for child in get_children(node):
+            value = minimax(child, depth - 1, False)
+            best = max(best, value)
+        return best
+    else:
+        best = float('inf')
+        for child in get_children(node):
+            value = minimax(child, depth - 1, True)
+            best = min(best, value)
+        return best
+</code></pre>
+
+                <h4>12.2 Iterative Minimax</h4>
+                <ul>
+                    <li>Avoids recursion, preventing stack overflow for deep trees.</li>
+                    <li>Can be combined with iterative deepening for real-time applications.</li>
+                    <li>Uses an explicit stack to simulate recursion.</li>
+                </ul>
+
+                <pre><code class="language-python">
+def iterative_minimax(root):
+    stack = [(root, 0, True, float('-inf'), float('inf'))]  # (node, depth, is_max, alpha, beta)
+    best_value = None
+    
+    while stack:
+        node, depth, is_max, alpha, beta = stack.pop()
+
+        if depth == 0 or is_terminal(node):
+            value = evaluate(node)
+        else:
+            if is_max:
+                value = float('-inf')
+                for child in get_children(node):
+                    stack.append((child, depth - 1, False, alpha, beta))
+            else:
+                value = float('inf')
+                for child in get_children(node):
+                    stack.append((child, depth - 1, True, alpha, beta))
+        
+        if best_value is None or (is_max and value > best_value) or (not is_max and value < best_value):
+            best_value = value
+    
+    return best_value
+</code></pre>
+
+                <h4>12.3 Comparison of Iterative vs. Recursive</h4>
+                <table class="table table-bordered">"
+                    <tr>
+                        <th>Factor</th>
+                        <th>Recursive</th>
+                        <th>Iterative</th>
+                    </tr>
+                    <tr>
+                        <td>Implementation Complexity</td>
+                        <td>Simple & intuitive</td>
+                        <td>More complex</td>
+                    </tr>
+                    <tr>
+                        <td>Memory Usage</td>
+                        <td>O(d) (stack space)</td>
+                        <td>O(d) (explicit stack)</td>
+                    </tr>
+                    <tr>
+                        <td>Performance</td>
+                        <td>Efficient for small depths</td>
+                        <td>More stable for deep trees</td>
+                    </tr>
+                    <tr>
+                        <td>Control & Debugging</td>
+                        <td>Hard to control</td>
+                        <td>Easier to modify dynamically</td>
+                    </tr>
+                    <tr>
+                        <td>Best Use Case</td>
+                        <td>Small, simple games</td>
+                        <td>Large-scale AI applications</td>
+                    </tr>
+                </table>
+
+                <h4>12.4 Key Insights</h4>
+                <ul>
+                    <li><strong>Recursive Minimax</strong> is preferred for small-scale problems where stack depth is not a concern.</li>
+                    <li><strong>Iterative Minimax</strong> is better for real-time decision-making, large games, or where stack overflows are a concern.</li>
+                    <li><strong>Best Choice:</strong> Combining iterative deepening with iterative Minimax provides a practical AI solution for complex games.</li>
+                </ul>
+
+            </article>
+
+            <article>
+                <h3>13. Edge Cases & Failure Handling</h3>
+
+                <h4>13.1 Common Pitfalls in Minimax & Alpha-Beta Pruning</h4>
+
+                <h5>1. Handling Terminal States Incorrectly</h5>
+                <ul>
+                    <li>Minimax must correctly identify terminal states (e.g., checkmate, tic-tac-toe win, or draw).</li>
+                    <li>Failure to do so may cause infinite recursion.</li>
+                </ul>
+
+                <h5>2. Incorrect Evaluation Function</h5>
+                <ul>
+                    <li>Heuristic evaluation must accurately reflect the game’s state.</li>
+                    <li>A poor heuristic may cause the AI to make suboptimal decisions.</li>
+                </ul>
+
+                <h5>3. Unbounded Recursion</h5>
+                <ul>
+                    <li>Minimax is recursive and may exceed the recursion depth limit in deep game trees.</li>
+                    <li>Solution: Implement an iterative version or limit depth.</li>
+                </ul>
+
+                <h5>4. Inefficient Move Ordering in Alpha-Beta Pruning</h5>
+                <ul>
+                    <li>Alpha-Beta pruning is most effective when the best moves are evaluated first.</li>
+                    <li>If ordering is not optimized, pruning provides little to no improvement.</li>
+                </ul>
+
+                <h5>5. Handling Draws & Stalemates</h5>
+                <ul>
+                    <li>Ensure that the evaluation function correctly recognizes drawn positions.</li>
+                    <li>Failure to detect a draw may result in unnecessary computation.</li>
+                </ul>
+
+                <h5>6. Floating-Point Precision Issues</h5>
+                <ul>
+                    <li>Comparisons between float values may cause inconsistencies.</li>
+                    <li>Solution: Use integer-based evaluation scores where possible.</li>
+                </ul>
+
+                <h5>7. Handling Games with Randomness (Expectiminimax)</h5>
+                <ul>
+                    <li>Minimax does not work well with games that have random elements like dice rolls.</li>
+                    <li>Solution: Use the Expectiminimax algorithm for stochastic environments.</li>
+                </ul>
+
+            </article>
+
+            <article>
+                <h3>14. Test Cases to Verify Correctness</h3>
+
+                <h4>14.1 Basic Unit Test Cases (Python)</h4>
+                <p>These tests validate the correctness of Minimax with Alpha-Beta Pruning.</p>
+
+                <pre><code class="language-python">
+import unittest
+
+class TestMinimax(unittest.TestCase):
+    def setUp(self):
+        # Sample game tree for testing
+        self.game = Game([3, 5, 6, 9, 1, 2, 0, -1])
+
+    def test_minimax_correctness(self):
+        """ Test Minimax returns the correct optimal value """
+        result = self.game.minimax(0, 0, True, float('-inf'), float('inf'))
+        self.assertEqual(result, 3)
+
+    def test_terminal_state(self):
+        """ Test that terminal states return correct heuristic value """
+        terminal_result = self.game.minimax(2, 0, True, float('-inf'), float('inf'))
+        self.assertIn(terminal_result, [3, 5, 6, 9, 1, 2, 0, -1])
+
+    def test_alpha_beta_pruning_effectiveness(self):
+        """ Test that alpha-beta pruning correctly reduces node evaluations """
+        unoptimized_count = self.game.minimax(0, 0, True, float('-inf'), float('inf'))  # Without pruning
+        optimized_count = self.game.minimax(0, 0, True, float('-inf'), float('inf'))  # With pruning
+        self.assertLess(optimized_count, unoptimized_count)
+
+    def test_draw_scenario(self):
+        """ Test that the game detects a draw correctly """
+        draw_game = Game([0, 0, 0, 0, 0, 0, 0, 0])
+        result = draw_game.minimax(0, 0, True, float('-inf'), float('inf'))
+        self.assertEqual(result, 0)
+
+if __name__ == "__main__":
+    unittest.main()
+</code></pre>
+
+                <h4>14.2 Test Cases for Edge Cases</h4>
+
+                <table class="table table-bordered">"
+                    <tr>
+                        <th>Test Case</th>
+                        <th>Expected Outcome</th>
+                    </tr>
+                    <tr>
+                        <td>Terminal state reached at depth 0</td>
+                        <td>Returns heuristic value of the node</td>
+                    </tr>
+                    <tr>
+                        <td>All moves lead to a draw</td>
+                        <td>Returns a neutral evaluation (e.g., 0)</td>
+                    </tr>
+                    <tr>
+                        <td>Alpha-beta pruning eliminates redundant computations</td>
+                        <td>Fewer nodes evaluated compared to Minimax without pruning</td>
+                    </tr>
+                    <tr>
+                        <td>Handling deep recursion (depth > 10)</td>
+                        <td>Does not exceed maximum recursion depth</td>
+                    </tr>
+                    <tr>
+                        <td>Game with randomized elements (Expectiminimax needed)</td>
+                        <td>Fails (since Minimax is deterministic)</td>
+                    </tr>
+                </table>
+
+            </article>
+
+            <article>
+                <h3>15. Real-World Failure Scenarios</h3>
+
+                <h4>15.1 Chess Engine Mistakes</h4>
+                <ul>
+                    <li>Chess engines using Minimax without depth limits can be too slow.</li>
+                    <li>Poor heuristic functions may cause engines to sacrifice valuable pieces for small positional advantages.</li>
+                </ul>
+
+                <h4>15.2 AI in Tic-Tac-Toe Playing Suboptimally</h4>
+                <ul>
+                    <li>If terminal states are not properly defined, the AI might fail to recognize a forced win.</li>
+                    <li>Example: If Minimax evaluates too early, it might miss a guaranteed victory.</li>
+                </ul>
+
+                <h4>15.3 Computational Overhead in Large Games</h4>
+                <ul>
+                    <li>Games like Go have an enormous search space (branching factor ~250).</li>
+                    <li>Minimax is infeasible, requiring alternatives like Monte Carlo Tree Search.</li>
+                </ul>
+
+                <h4>15.4 Alpha-Beta Pruning Misuse</h4>
+                <ul>
+                    <li>If moves are not ordered well, pruning provides little benefit.</li>
+                    <li>Example: Evaluating weak moves first prevents pruning of strong branches.</li>
+                </ul>
+
+                <h4>15.5 Stochastic Games Like Backgammon</h4>
+                <ul>
+                    <li>Minimax fails in games with randomness since it assumes deterministic outcomes.</li>
+                    <li>Solution: Use Expectiminimax to handle chance nodes.</li>
+                </ul>
+
+                <h4>15.6 Adversarial AI in Cybersecurity</h4>
+                <ul>
+                    <li>Intrusion detection systems using Minimax may fail against attackers adapting strategies dynamically.</li>
+                    <li>Solution: Combine Minimax with machine learning for adaptability.</li>
+                </ul>
+
+                <p><strong>Key Insight:</strong> Minimax & Alpha-Beta pruning are powerful but must be carefully implemented to avoid inefficiencies and miscalculations.</p>
+
+            </article>
+
+            <article>
+                <h3>16. Real-World Applications & Industry Use Cases</h3>
+
+                <h4>16.1 Game AI Development</h4>
+                <p>Minimax is widely used in turn-based strategy games where AI opponents need to make optimal decisions.</p>
+                <ul>
+                    <li><strong>Chess Engines</strong>: Stockfish, Deep Blue, and other chess engines use Minimax with Alpha-Beta pruning.</li>
+                    <li><strong>Tic-Tac-Toe & Checkers</strong>: Simple board games use Minimax for AI decision-making.</li>
+                    <li><strong>Go (Modified Minimax)</strong>: Go requires Monte Carlo Tree Search (MCTS) due to its complexity.</li>
+                </ul>
+
+                <h4>16.2 Robotics & Autonomous Agents</h4>
+                <p>Used in decision-making for robots in adversarial environments.</p>
+                <ul>
+                    <li><strong>Robot Soccer</strong>: AI-controlled robots strategize moves based on opponent behavior.</li>
+                    <li><strong>Pathfinding in Competitive Environments</strong>: Used in simulations where robots must avoid detection or capture.</li>
+                </ul>
+
+                <h4>16.3 Cybersecurity & Intrusion Detection</h4>
+                <p>Minimax helps model attacks and defenses in cybersecurity.</p>
+                <ul>
+                    <li><strong>Intrusion Detection Systems (IDS)</strong>: Models attacker-defender scenarios.</li>
+                    <li><strong>Automated Threat Analysis</strong>: Predicts possible security breaches using adversarial modeling.</li>
+                </ul>
+
+                <h4>16.4 Financial Trading & Risk Management</h4>
+                <p>Minimax is used to model worst-case scenarios in financial risk assessment.</p>
+                <ul>
+                    <li><strong>Portfolio Optimization</strong>: Ensures minimal losses in volatile markets.</li>
+                    <li><strong>Game-Theoretic Stock Trading</strong>: Predicts adversarial moves in algorithmic trading.</li>
+                </ul>
+
+                <h4>16.5 Medical Decision Support Systems</h4>
+                <p>Used in AI-driven diagnosis and treatment planning.</p>
+                <ul>
+                    <li><strong>Optimal Treatment Plans</strong>: AI suggests best treatment paths by considering potential risks.</li>
+                    <li><strong>Medical Imaging Analysis</strong>: AI evaluates tumor growth prediction using game-theoretic models.</li>
+                </ul>
+
+                <h4>16.6 Military & Defense Strategy</h4>
+                <p>Minimax is applied in AI-driven tactical decision-making.</p>
+                <ul>
+                    <li><strong>Autonomous Drone Navigation</strong>: AI-controlled drones strategize in combat scenarios.</li>
+                    <li><strong>Simulating Military Conflicts</strong>: AI predicts best defensive or offensive moves.</li>
+                </ul>
+
+            </article>
+
+            <article>
+                <h3>17. Open-Source Implementations</h3>
+
+                <h4>17.1 Minimax & Alpha-Beta Pruning in Open-Source Projects</h4>
+                <ul>
+                    <li><strong>Stockfish (Chess Engine)</strong>: <a href="https://github.com/official-stockfish/Stockfish">Stockfish GitHub</a></li>
+                    <li><strong>GNU Chess</strong>: <a href="https://www.gnu.org/software/chess/">GNU Chess Website</a></li>
+                    <li><strong>AlphaZero (Deep Reinforcement Learning + Minimax)</strong>: <a href="https://github.com/suragnair/alpha-zero-general">AlphaZero General</a></li>
+                    <li><strong>Simple Minimax Tic-Tac-Toe AI</strong>: <a href="https://github.com/Cledersonbc/tic-tac-toe-minimax">GitHub Repository</a></li>
+                    <li><strong>Checkers AI</strong>: <a href="https://github.com/dhruvrajan/checkers-ai">GitHub Repository</a></li>
+                </ul>
+
+                <h4>17.2 Libraries & Frameworks for Minimax</h4>
+                <ul>
+                    <li><strong>Python-Chess</strong>: Library implementing Chess AI with Minimax. (<a href="https://python-chess.readthedocs.io/en/latest/">Documentation</a>)</li>
+                    <li><strong>AI Gym (Reinforcement Learning)</strong>: Used to develop Minimax-based AI for games. (<a href="https://www.gymlibrary.dev/">Gym Library</a>)</li>
+                </ul>
+
+            </article>
+
+            <article>
+                <h3>18. Project: Implementing a Tic-Tac-Toe AI with Minimax</h3>
+
+                <h4>18.1 Project Description</h4>
+                <p>We will implement an AI-powered Tic-Tac-Toe game where the computer uses Minimax to play optimally.</p>
+
+                <h4>18.2 Python Implementation</h4>
+
+                <pre><code class="language-python">
+import math
+
+# Tic-Tac-Toe board representation
+board = [" " for _ in range(9)]
+
+def print_board():
+    for i in range(3):
+        print("|".join(board[i*3:(i+1)*3]))
+        if i < 2:
+            print("-----")
+
+def check_winner():
+    win_patterns = [(0,1,2), (3,4,5), (6,7,8), (0,3,6), (1,4,7), (2,5,8), (0,4,8), (2,4,6)]
+    for (x, y, z) in win_patterns:
+        if board[x] == board[y] == board[z] and board[x] != " ":
+            return board[x]
+    if " " not in board:
+        return "Draw"
+    return None
+
+def minimax(is_maximizing):
+    winner = check_winner()
+    if winner == "X": return -1
+    if winner == "O": return 1
+    if winner == "Draw": return 0
+
+    if is_maximizing:
+        best_score = -math.inf
+        for i in range(9):
+            if board[i] == " ":
+                board[i] = "O"
+                score = minimax(False)
+                board[i] = " "
+                best_score = max(best_score, score)
+        return best_score
+    else:
+        best_score = math.inf
+        for i in range(9):
+            if board[i] == " ":
+                board[i] = "X"
+                score = minimax(True)
+                board[i] = " "
+                best_score = min(best_score, score)
+        return best_score
+
+def best_move():
+    best_score = -math.inf
+    move = -1
+    for i in range(9):
+        if board[i] == " ":
+            board[i] = "O"
+            score = minimax(False)
+            board[i] = " "
+            if score > best_score:
+                best_score = score
+                move = i
+    board[move] = "O"
+
+def play_game():
+    while True:
+        print_board()
+        if check_winner():
+            print("Winner:", check_winner())
+            break
+        
+        # Player Move
+        move = int(input("Enter position (0-8): "))
+        if board[move] == " ":
+            board[move] = "X"
+        else:
+            print("Invalid move!")
+            continue
+
+        if check_winner():
+            print_board()
+            print("Winner:", check_winner())
+            break
+
+        # AI Move
+        best_move()
+
+play_game()
+</code></pre>
+
+                <h4>18.3 Features</h4>
+                <ul>
+                    <li>Uses Minimax to play optimally.</li>
+                    <li>Checks for game-ending conditions.</li>
+                    <li>Prevents invalid moves.</li>
+                    <li>AI always plays the best possible move.</li>
+                </ul>
+
+                <h4>18.4 Potential Enhancements</h4>
+                <ul>
+                    <li>Use Alpha-Beta Pruning to optimize search.</li>
+                    <li>Implement a graphical interface using Pygame.</li>
+                    <li>Train AI using Reinforcement Learning instead of Minimax.</li>
+                </ul>
+
+            </article>
+
+            <article>
+                <h3>19. Competitive Programming & System Design Integration</h3>
+
+                <h4>19.1 Minimax & Alpha-Beta Pruning in Competitive Programming</h4>
+                <p>Minimax is frequently used in coding competitions to solve problems involving turn-based games, AI decision-making, and adversarial optimization.</p>
+
+                <h5>1. Common Problem Types in Competitive Programming</h5>
+                <ul>
+                    <li><strong>Game Theory Problems</strong>: Games like Tic-Tac-Toe, Chess, Checkers, Nim, and Connect Four.</li>
+                    <li><strong>AI Decision-Making</strong>: Optimal moves in turn-based strategy problems.</li>
+                    <li><strong>Resource Allocation</strong>: Problems involving adversarial distribution of resources.</li>
+                    <li><strong>Combinatorial Games</strong>: Variants of Grundy Numbers and Nim Game.</li>
+                </ul>
+
+                <h5>2. Techniques to Improve Minimax Performance in Competitive Programming</h5>
+                <ul>
+                    <li><strong>Bitmasking</strong>: Represent game states efficiently for large input constraints.</li>
+                    <li><strong>Memoization</strong>: Cache already computed results to avoid redundant calculations.</li>
+                    <li><strong>Iterative Deepening</strong>: Useful when a time limit is imposed.</li>
+                    <li><strong>Alpha-Beta Pruning</strong>: Helps reduce the number of nodes explored.</li>
+                </ul>
+
+                <h4>19.2 Minimax in System Design</h4>
+                <p>Minimax is not just for games; it is also used in AI-driven decision-making and adversarial settings in system design.</p>
+
+                <h5>1. AI & Game Engines</h5>
+                <ul>
+                    <li>Decision-making in strategy games.</li>
+                    <li>Implementing difficulty levels for AI bots.</li>
+                </ul>
+
+                <h5>2. Adversarial Search in Cybersecurity</h5>
+                <ul>
+                    <li>Used in attack-defense modeling for cybersecurity simulations.</li>
+                    <li>Intrusion detection systems to predict hacker moves.</li>
+                </ul>
+
+                <h5>3. Financial Trading & Risk Analysis</h5>
+                <ul>
+                    <li>Models worst-case scenarios in investment strategies.</li>
+                    <li>AI-driven portfolio management for minimizing risks.</li>
+                </ul>
+
+                <h5>4. Healthcare Decision Systems</h5>
+                <ul>
+                    <li>AI-driven medical diagnosis and optimal treatment planning.</li>
+                    <li>Simulating doctor-patient interactions in a game-theoretic model.</li>
+                </ul>
+
+            </article>
+
+            <article>
+                <h3>20. Assignments & Practice Problems</h3>
+
+                <h4>20.1 Solve at Least 10 Problems Using Minimax & Alpha-Beta Pruning</h4>
+                <p>Practice solving the following problems to gain mastery over Minimax.</p>
+
+                <table class="table table-bordered">"
+                    <tr>
+                        <th>Problem</th>
+                        <th>Difficulty</th>
+                        <th>Concept</th>
+                        <th>Link</th>
+                    </tr>
+                    <tr>
+                        <td>Tic-Tac-Toe AI</td>
+                        <td>Easy</td>
+                        <td>Basic Minimax</td>
+                        <td><a href="https://www.geeksforgeeks.org/minimax-algorithm-in-game-theory-set-1-introduction/">GFG</a></td>
+                    </tr>
+                    <tr>
+                        <td>Nim Game</td>
+                        <td>Medium</td>
+                        <td>Game Theory</td>
+                        <td><a href="https://www.codechef.com/problems/NIM">CodeChef</a></td>
+                    </tr>
+                    <tr>
+                        <td>Checkers AI</td>
+                        <td>Medium</td>
+                        <td>Alpha-Beta Pruning</td>
+                        <td><a href="https://www.hackerrank.com/challenges/aichess/problem">HackerRank</a></td>
+                    </tr>
+                    <tr>
+                        <td>Chess Move Prediction</td>
+                        <td>Hard</td>
+                        <td>Move Ordering</td>
+                        <td><a href="https://www.chessprogramming.org/Alpha-Beta">ChessProgramming</a></td>
+                    </tr>
+                    <tr>
+                        <td>Connect Four</td>
+                        <td>Medium</td>
+                        <td>Tree Search</td>
+                        <td><a href="https://leetcode.com/discuss/interview-question/861183/">LeetCode</a></td>
+                    </tr>
+                    <tr>
+                        <td>Reversi AI</td>
+                        <td>Hard</td>
+                        <td>Adversarial AI</td>
+                        <td><a href="https://www.oreilly.com/library/view/artificial-intelligence-with/9781789533916/">O'Reilly</a></td>
+                    </tr>
+                    <tr>
+                        <td>Gomoku (Five in a Row)</td>
+                        <td>Medium</td>
+                        <td>Game Tree Search</td>
+                        <td><a href="https://www.kaggle.com/c/gomoku-ai">Kaggle</a></td>
+                    </tr>
+                    <tr>
+                        <td>Monte Carlo Tree Search</td>
+                        <td>Hard</td>
+                        <td>Minimax Alternative</td>
+                        <td><a href="https://www.jair.org/index.php/jair/article/view/11182">JAIR</a></td>
+                    </tr>
+                    <tr>
+                        <td>Ultimate Tic-Tac-Toe</td>
+                        <td>Hard</td>
+                        <td>Nested Minimax</td>
+                        <td><a href="https://www.researchgate.net/publication/330587299_The_Ultimate_Tic-Tac-Toe_Strategy">ResearchGate</a></td>
+                    </tr>
+                    <tr>
+                        <td>AI for Poker</td>
+                        <td>Expert</td>
+                        <td>Minimax in Probabilistic Games</td>
+                        <td><a href="https://poker.cs.ualberta.ca/">University of Alberta Poker AI</a></td>
+                    </tr>
+                </table>
+
+                <h4>20.2 System Design Problem Using Minimax</h4>
+                <p>Design a cybersecurity intrusion detection system using Minimax where:</p>
+                <ul>
+                    <li>Attacker tries to maximize intrusion success rate.</li>
+                    <li>Defender tries to minimize system vulnerability.</li>
+                    <li>Each move corresponds to an attacker exploiting a vulnerability.</li>
+                    <li>Minimax helps the system predict and prevent attacks.</li>
+                </ul>
+
+                <h5>Implementation Plan</h5>
+                <ul>
+                    <li>Define attacker and defender actions as game states.</li>
+                    <li>Use heuristic scoring to rank security weaknesses.</li>
+                    <li>Apply Alpha-Beta pruning to optimize response time.</li>
+                    <li>Use Monte Carlo Tree Search for probabilistic attack scenarios.</li>
+                </ul>
+
+                <h4>20.3 Implement Minimax Under Time Constraints</h4>
+                <p>Challenge: Implement a Minimax-based Tic-Tac-Toe AI within 30 minutes.</p>
+                <ul>
+                    <li>Time your implementation.</li>
+                    <li>Use only a basic evaluation function.</li>
+                    <li>Compare your solution's efficiency with Alpha-Beta pruning.</li>
+                    <li>Push your solution to GitHub.</li>
+                </ul>
+
+                <p><strong>Key Learning Outcome:</strong> Improve efficiency and accuracy under strict constraints.</p>
+
+            </article>
+
+
+
+        </main>
+
+        <script> copyright("all"); </script>
+
+    </body>
+
+</html>

@@ -1,0 +1,852 @@
+<!-------------------------- © 2007 - present, dmj.one and contributors. ----------------------------------
+   Part of the dmjone project. Licensed under the GNU AGPL. Provided as-is, without warranty of any kind. 
+-------------------- Redistribution and modifications must retain this notice. --------------------------->
+
+
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+    <!--<![endif]-->
+
+    <head>
+        <script src="/js/edu_su_common.js"></script>
+        <noscript>
+            <style>
+                html,
+                body {
+                    margin: 0;
+                    overflow: hidden;
+                }
+            </style>
+            <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+        </noscript>
+
+        <title>Max Flow (Ford-Fulkerson, Edmonds-Karp) - CSU083 | Shoolini University</title>
+        
+        <meta name="description" content="Learn Max Flow algorithms, including Ford-Fulkerson and Edmonds-Karp, covering concepts, implementations, optimizations, real-world applications, and competitive programming use cases. Part of the CSU083 course at Shoolini University.">
+        <meta name="keywords" content="Max Flow, Ford-Fulkerson, Edmonds-Karp, Network Flow Algorithms, Graph Theory, Residual Graphs, Augmenting Paths, Competitive Programming, System Design, Flow Networks">
+        <meta name="author" content="Divya Mohan">
+        <meta name="robots" content="index, follow">
+        
+        <!-- Open Graph for Social Media -->
+        <meta property="og:title" content="Max Flow (Ford-Fulkerson, Edmonds-Karp) - CSU083 | Shoolini University">
+        <meta property="og:description" content="Comprehensive guide on Max Flow algorithms, covering theory, implementation, optimizations, and real-world applications in networks, logistics, and competitive programming.">
+        <meta property="og:image" content="/logo.png">
+        <meta property="og:type" content="article">
+        
+        <!-- Twitter Cards -->
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:title" content="Max Flow (Ford-Fulkerson, Edmonds-Karp)">
+        <meta name="twitter:description" content="Master Max Flow algorithms with a deep dive into implementations, use cases, and optimizations in system design and competitive programming.">
+        <meta name="twitter:site" content="@divyamohan1993">
+        <meta name="twitter:creator" content="@divyamohan1993">
+        <meta name="twitter:image" content="/logo.png">
+        
+        <!-- Mobile Responsiveness -->
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        
+        <!-- JSON-LD Structured Data for SEO -->
+        <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "Course",
+            "name": "Max Flow (Ford-Fulkerson, Edmonds-Karp)",
+            "description": "Master Max Flow algorithms, covering fundamental concepts, augmenting paths, residual graphs, optimizations, and applications in logistics, networks, and competitive programming.",
+            "provider": [
+                {
+                    "@type": "EducationalOrganization",
+                    "name": "dmj.one",
+                    "url": "https://dmj.one"
+                },
+                {
+                    "@type": "EducationalOrganization",
+                    "name": "Shoolini University",
+                    "url": "https://shooliniuniversity.com"
+                }
+            ]
+        }
+        </script>
+
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js" integrity="sha512-sHSNLECRJSK+BFs7E8DiFc6pf6n90bLI85Emiw1jhreduZhK3VXgq9l4kAt9eTIHYAcuQBKHL01QKs4/3Xgl8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js" integrity="sha512-iWiuBS5nt6r60fCz26Nd0Zqe0nbk1ZTIQbl3Kv7kYsX+yKMUFHzjaH2+AnM6vp2Xs+gNmaBAVWJjSmuPw76Efg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                renderMathInElement(document.body, {
+                    // customised options
+                    // • auto-render specific keys, e.g.:
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false },
+                        { left: '\\(', right: '\\)', display: false },
+                        { left: '\\[', right: '\\]', display: true }
+                    ],
+                    // • rendering keys, e.g.:
+                    throwOnError: false
+                });
+            });
+        </script> -->
+
+        <!-- <style>
+            main ul {
+                list-style-type: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            main ul li {
+                margin: 0;
+                padding: 0;
+            }
+        </style> -->
+
+
+
+    </head>
+
+    <body>
+
+        <script> header_author("dm"); </script>
+
+        <main>
+            <article class="agen-tableofcontents">
+                <h2 class="text-center">
+                    Max Flow (Ford-Fulkerson, Edmonds-Karp)
+                </h2>
+                <div class="d-none contentdate">2025, February 7</div>
+            </article>
+
+            <article>
+                <h3>1. Prerequisites</h3>
+                <p>Before understanding the Max Flow algorithms, you need to be familiar with the following concepts:</p>
+
+                <h4>1.1 Graph Theory</h4>
+                <ul>
+                    <li><strong>Directed Graphs</strong>: Graphs with edges having a direction.</li>
+                    <li><strong>Adjacency List/Matrix</strong>: Ways to represent graphs.</li>
+                </ul>
+
+                <h4>1.2 Flow Networks</h4>
+                <ul>
+                    <li><strong>Capacity</strong>: Maximum flow an edge can handle.</li>
+                    <li><strong>Flow</strong>: Actual amount of flow passing through an edge.</li>
+                    <li><strong>Source & Sink</strong>: Starting and ending nodes of the flow.</li>
+                    <li><strong>Residual Graph</strong>: Adjusted capacities after considering current flows.</li>
+                    <li><strong>Augmenting Paths</strong>: Paths where additional flow can be pushed.</li>
+                </ul>
+
+                <h4>1.3 BFS and DFS</h4>
+                <ul>
+                    <li><strong>Depth First Search (DFS)</strong>: Used in Ford-Fulkerson.</li>
+                    <li><strong>Breadth First Search (BFS)</strong>: Used in Edmonds-Karp.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>2. What is Max Flow?</h3>
+                <p>Max Flow is an algorithmic problem that determines the maximum possible flow from a source node to a sink node in a flow network while respecting edge capacities.</p>
+
+                <h4>2.1 Ford-Fulkerson Algorithm</h4>
+                <p>A method using DFS (or BFS) to repeatedly find augmenting paths and push flow until no further flow can be added.</p>
+                <pre><code class="language-python">
+def ford_fulkerson(graph, source, sink):
+    max_flow = 0
+    while augmenting_path_exists(graph, source, sink):
+        path_flow = min_capacity_in_path(graph, source, sink)
+        max_flow += path_flow
+        update_residual_graph(graph, path_flow)
+    return max_flow
+</code></pre>
+
+                <h4>2.2 Edmonds-Karp Algorithm</h4>
+                <p>A specialization of Ford-Fulkerson that always uses BFS to find augmenting paths, ensuring polynomial time complexity.</p>
+                <pre><code class="language-python">
+from collections import deque
+
+def bfs(graph, source, sink, parent):
+    queue = deque([source])
+    visited = set([source])
+    while queue:
+        node = queue.popleft()
+        for neighbor, capacity in graph[node]:
+            if neighbor not in visited and capacity > 0:
+                parent[neighbor] = node
+                if neighbor == sink:
+                    return True
+                queue.append(neighbor)
+                visited.add(neighbor)
+    return False
+</code></pre>
+            </article>
+
+            <article>
+                <h3>3. Why does this algorithm exist?</h3>
+                <p>Max Flow algorithms are used to model and solve problems involving limited resources moving through a network:</p>
+
+                <ul>
+                    <li><strong>Network Traffic Optimization</strong>: Managing bandwidth in communication networks.</li>
+                    <li><strong>Transportation Systems</strong>: Optimizing traffic flow in road networks.</li>
+                    <li><strong>Matching Problems</strong>: Assigning jobs to workers (bipartite graph matching).</li>
+                    <li><strong>Image Segmentation</strong>: Graph-based image processing.</li>
+                    <li><strong>Project Scheduling</strong>: Managing dependencies in workflows.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>4. When should you use it?</h3>
+                <p>Use Max Flow when:</p>
+
+                <ul>
+                    <li><strong>Capacities and Flows Matter</strong>: When moving resources efficiently with constraints.</li>
+                    <li><strong>Dynamic Routing</strong>: In network and transport optimization where paths change dynamically.</li>
+                    <li><strong>Maximum Bipartite Matching</strong>: Matching students to schools, workers to jobs, etc.</li>
+                    <li><strong>Data Flow Management</strong>: Ensuring optimal bandwidth allocation in communication networks.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>5. Comparison with Alternatives</h3>
+
+                <h4>5.1 Strengths</h4>
+                <ul>
+                    <li><strong>Ford-Fulkerson (DFS-based)</strong>: Simple and intuitive, works well for small graphs.</li>
+                    <li><strong>Edmonds-Karp (BFS-based)</strong>: Guarantees polynomial time complexity \(O(VE^2)\), suitable for medium-sized graphs.</li>
+                    <li><strong>Good for Capacity-Constrained Networks</strong>: Ensures that no resource is wasted.</li>
+                </ul>
+
+                <h4>5.2 Weaknesses</h4>
+                <ul>
+                    <li><strong>Ford-Fulkerson (with DFS)</strong>: May run indefinitely for irrational capacities due to floating-point precision issues.</li>
+                    <li><strong>Edmonds-Karp</strong>: Slower compared to advanced algorithms like Push-Relabel \(O(V^3)\).</li>
+                    <li><strong>Does not work efficiently for dynamic graphs</strong>: When edges or capacities frequently change, re-computation is costly.</li>
+                </ul>
+
+                <h4>5.3 Alternatives</h4>
+                <ul>
+                    <li><strong>Push-Relabel Algorithm</strong>: More efficient for large graphs (\(O(V^3)\)).</li>
+                    <li><strong>Dinic’s Algorithm</strong>: Faster for dense graphs (\(O(V^2E)\)).</li>
+                    <li><strong>Capacity Scaling Algorithm</strong>: Optimized for graphs with large capacity ranges.</li>
+                </ul>
+            </article>
+            <article>
+                <h3>6. Basic Implementation</h3>
+                <p>Below is the basic implementation of the Max Flow algorithm using the Ford-Fulkerson method with BFS (Edmonds-Karp variation) in Python.</p>
+
+                <pre><code class="language-python">
+from collections import deque
+
+class MaxFlow:
+    def __init__(self, graph):
+        self.graph = graph  # Residual graph
+        self.n = len(graph)  # Number of nodes
+
+    def bfs(self, source, sink, parent):
+        """Perform BFS to find an augmenting path from source to sink."""
+        visited = [False] * self.n
+        queue = deque([source])
+        visited[source] = True
+
+        while queue:
+            u = queue.popleft()
+
+            for v, capacity in enumerate(self.graph[u]):
+                if not visited[v] and capacity > 0:  # Edge with available capacity
+                    queue.append(v)
+                    visited[v] = True
+                    parent[v] = u
+                    if v == sink:
+                        return True
+        return False
+
+    def ford_fulkerson(self, source, sink):
+        """Finds the maximum flow from source to sink."""
+        parent = [-1] * self.n
+        max_flow = 0
+
+        while self.bfs(source, sink, parent):
+            path_flow = float("Inf")
+            v = sink
+
+            # Find minimum residual capacity along the path
+            while v != source:
+                u = parent[v]
+                path_flow = min(path_flow, self.graph[u][v])
+                v = u
+
+            # Update residual graph
+            v = sink
+            while v != source:
+                u = parent[v]
+                self.graph[u][v] -= path_flow
+                self.graph[v][u] += path_flow  # Reverse flow for residual graph
+                v = u
+
+            max_flow += path_flow
+
+        return max_flow
+
+# Example graph as adjacency matrix
+graph = [
+    [0, 16, 13, 0, 0, 0],
+    [0, 0, 10, 12, 0, 0],
+    [0, 4, 0, 0, 14, 0],
+    [0, 0, 9, 0, 0, 20],
+    [0, 0, 0, 7, 0, 4],
+    [0, 0, 0, 0, 0, 0]
+]
+
+maxflow = MaxFlow(graph)
+source, sink = 0, 5
+print("The maximum possible flow is:", maxflow.ford_fulkerson(source, sink))
+</code></pre>
+            </article>
+
+            <article>
+                <h3>7. Dry Run</h3>
+                <p>Given the graph:</p>
+                <pre>
+    (0) --16--> (1) --10--> (2)
+      |          |          |
+     13         12         14
+      |          |          |
+    (3) --9--> (4) --7--> (5)
+           \      |      /
+           20    4     4
+</pre>
+
+                <h4>7.1 Initial Residual Graph</h4>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <tr class="table-dark">
+                        <th>Node</th>
+                        <th>Outgoing Edges (Capacity)</th>
+                    </tr>
+                    <tr>
+                        <td>0</td>
+                        <td>(1, 16), (2, 13)</td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>(2, 10), (3, 12)</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>(1, 4), (4, 14)</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>(2, 9), (5, 20)</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>(3, 7), (5, 4)</td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td>-</td>
+                    </tr>
+                </table>
+
+                <h4>7.2 Step-by-Step Execution</h4>
+
+                <h5>Iteration 1: BFS Finds Path 0 → 1 → 3 → 5</h5>
+                <ul>
+                    <li>Path Flow = min(16, 12, 20) = 12</li>
+                    <li>Update Residual Graph: Reduce forward capacities and increase reverse flows.</li>
+                </ul>
+
+                <h5>Iteration 2: BFS Finds Path 0 → 2 → 4 → 5</h5>
+                <ul>
+                    <li>Path Flow = min(13, 14, 4) = 4</li>
+                    <li>Update Residual Graph.</li>
+                </ul>
+
+                <h5>Iteration 3: BFS Finds Path 0 → 2 → 1 → 3 → 5</h5>
+                <ul>
+                    <li>Path Flow = min(9, 4, 8) = 4</li>
+                    <li>Update Residual Graph.</li>
+                </ul>
+
+                <h4>7.3 Final Flow</h4>
+                <p>The total maximum flow from source (0) to sink (5) is <strong>23</strong>.</p>
+            </article>
+
+            <article>
+                <h3>8. Time & Space Complexity Analysis</h3>
+
+                <h4>8.1 Ford-Fulkerson (DFS-based) Complexity</h4>
+                <ul>
+                    <li><strong>Worst-case:</strong> \(O(E \cdot \max F)\), where \(E\) is the number of edges and \(\max F\) is the maximum possible flow.</li>
+                    <li><strong>Best-case:</strong> \(O(E)\) (If the maximum flow is reached in one iteration).</li>
+                    <li><strong>Average-case:</strong> Dependent on network structure and initial flow conditions.</li>
+                </ul>
+
+                <p>Why \(O(E \cdot \max F)\) in the worst case?</p>
+                <ul>
+                    <li>Each augmenting path increases the flow by at least 1 unit.</li>
+                    <li>In the worst case, the algorithm might need \(\max F\) augmenting paths.</li>
+                    <li>Each path requires \(O(E)\) time (DFS traversal).</li>
+                </ul>
+
+                <h4>8.2 Edmonds-Karp (BFS-based) Complexity</h4>
+                <ul>
+                    <li><strong>Worst-case:</strong> \(O(VE^2)\)</li>
+                    <li><strong>Best-case:</strong> \(O(E)\) (Single augmenting path reaches the max flow).</li>
+                    <li><strong>Average-case:</strong> \(O(VE)\) (BFS finds augmenting paths efficiently).</li>
+                </ul>
+
+                <p>Why \(O(VE^2)\) in the worst case?</p>
+                <ul>
+                    <li>BFS finds the shortest augmenting path in \(O(E)\).</li>
+                    <li>The number of iterations is at most \(O(V)\) because each augmenting path at least doubles the shortest distance to the sink.</li>
+                    <li>Overall, \(O(VE^2)\) arises from running \(O(VE)\) augmenting paths.</li>
+                </ul>
+
+            </article>
+
+            <article>
+                <h3>9. Space Complexity Analysis</h3>
+
+                <h4>9.1 Ford-Fulkerson Space Complexity</h4>
+                <ul>
+                    <li><strong>Adjacency Matrix Representation:</strong> \(O(V^2)\) for storing capacities.</li>
+                    <li><strong>Adjacency List Representation:</strong> \(O(V + E)\).</li>
+                    <li><strong>Residual Graph Storage:</strong> Requires extra \(O(V^2)\) space.</li>
+                    <li><strong>DFS Stack Memory:</strong> \(O(V)\) (for recursion depth).</li>
+                </ul>
+
+                <h4>9.2 Edmonds-Karp Space Complexity</h4>
+                <ul>
+                    <li><strong>Graph Storage:</strong> \(O(V^2)\) for adjacency matrix, \(O(V + E)\) for adjacency list.</li>
+                    <li><strong>BFS Queue:</strong> \(O(V)\) (BFS traversal memory).</li>
+                    <li><strong>Parent Array:</strong> \(O(V)\) (stores paths for augmenting).</li>
+                    <li><strong>Total Space Complexity:</strong> \(O(V^2)\) in matrix representation, \(O(V + E)\) in list representation.</li>
+                </ul>
+
+            </article>
+
+            <article>
+                <h3>10. Trade-offs</h3>
+
+                <h4>10.1 Ford-Fulkerson vs. Edmonds-Karp</h4>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <tr class="table-dark">
+                        <th>Algorithm</th>
+                        <th>Advantages</th>
+                        <th>Disadvantages</th>
+                    </tr>
+                    <tr>
+                        <td>Ford-Fulkerson (DFS-based)</td>
+                        <td>Simple to implement, works well on small graphs.</td>
+                        <td>Unpredictable time complexity, may run indefinitely with irrational capacities.</td>
+                    </tr>
+                    <tr>
+                        <td>Edmonds-Karp (BFS-based)</td>
+                        <td>Guaranteed polynomial time \(O(VE^2)\), finds shortest augmenting paths.</td>
+                        <td>Slower than more advanced methods like Dinic’s or Push-Relabel for large graphs.</td>
+                    </tr>
+                </table>
+
+                <h4>10.2 When to Use Which Algorithm?</h4>
+                <ul>
+                    <li><strong>Ford-Fulkerson:</strong> When the graph is small or integer capacities are low.</li>
+                    <li><strong>Edmonds-Karp:</strong> When a reliable and predictable polynomial-time solution is required.</li>
+                    <li><strong>Push-Relabel (better than both for large graphs):</strong> \(O(V^3)\), often faster for dense graphs.</li>
+                    <li><strong>Dinic’s Algorithm:</strong> Best for large and dense graphs (\(O(V^2E)\)).</li>
+                </ul>
+
+            </article>
+
+            <article>
+                <h3>11. Optimizations & Variants</h3>
+
+                <h4>11.1 Common Optimizations</h4>
+
+                <ul>
+                    <li><strong>Capacity Scaling:</strong> Instead of using BFS/DFS blindly, prioritize edges with higher capacities first. This reduces the number of iterations.</li>
+                    <li><strong>Dynamic Graph Updates:</strong> Maintain adjacency lists dynamically instead of using a static adjacency matrix to improve memory efficiency.</li>
+                    <li><strong>Level Graphs (Dinic’s Algorithm):</strong> Introduces blocking flows by computing level graphs and pushing maximum flow in layers.</li>
+                    <li><strong>Push-Relabel (Preflow-Push Algorithm):</strong> Instead of finding paths, it distributes excess flow locally to improve performance.</li>
+                    <li><strong>Edge Splitting for Multi-Source/Sink:</strong> Convert multi-source/multi-sink problems into single-source/sink by adding a super-source and super-sink.</li>
+                </ul>
+
+                <h4>11.2 Variants of Max Flow Algorithms</h4>
+
+                <ul>
+                    <li><strong>Ford-Fulkerson (DFS-based):</strong> Basic version using depth-first search.</li>
+                    <li><strong>Edmonds-Karp (BFS-based):</strong> Uses BFS to ensure polynomial time complexity.</li>
+                    <li><strong>Dinic’s Algorithm:</strong> Uses BFS for level graphs and DFS for augmenting paths, running in \(O(V^2E)\).</li>
+                    <li><strong>Push-Relabel Algorithm:</strong> Uses local flow pushing instead of path finding, running in \(O(V^3)\).</li>
+                    <li><strong>Capacity Scaling Algorithm:</strong> Finds augmenting paths in decreasing order of capacity (\(O(EV \log U)\), where \(U\) is the max capacity).</li>
+                </ul>
+
+            </article>
+
+            <article>
+                <h3>12. Iterative vs. Recursive Implementations</h3>
+
+                <h4>12.1 Iterative Implementation (BFS/Queue-based)</h4>
+                <p>Edmonds-Karp uses an iterative BFS approach to find the shortest augmenting path efficiently.</p>
+                <pre><code class="language-python">
+from collections import deque
+
+def bfs(graph, source, sink, parent):
+    queue = deque([source])
+    visited = set([source])
+
+    while queue:
+        node = queue.popleft()
+        for neighbor, capacity in enumerate(graph[node]):
+            if neighbor not in visited and capacity > 0:
+                parent[neighbor] = node
+                queue.append(neighbor)
+                visited.add(neighbor)
+                if neighbor == sink:
+                    return True
+    return False
+</code></pre>
+
+                <ul>
+                    <li><strong>Advantages:</strong> Uses explicit queue structures, avoids stack overflow issues.</li>
+                    <li><strong>Disadvantages:</strong> Can be slower than a recursive DFS in small graphs due to queue overhead.</li>
+                </ul>
+
+                <h4>12.2 Recursive Implementation (DFS-based Ford-Fulkerson)</h4>
+                <p>The classic Ford-Fulkerson method can be implemented recursively using DFS.</p>
+
+                <pre><code class="language-python">
+def dfs(graph, u, sink, parent, flow):
+    if u == sink:
+        return flow
+
+    for v, capacity in enumerate(graph[u]):
+        if parent[v] == -1 and capacity > 0:
+            new_flow = min(flow, capacity)
+            parent[v] = u
+            bottleneck = dfs(graph, v, sink, parent, new_flow)
+
+            if bottleneck > 0:
+                graph[u][v] -= bottleneck
+                graph[v][u] += bottleneck
+                return bottleneck
+    return 0
+</code></pre>
+
+                <ul>
+                    <li><strong>Advantages:</strong> More concise, easier to read.</li>
+                    <li><strong>Disadvantages:</strong> May hit recursion depth limits in large graphs.</li>
+                </ul>
+
+                <h4>12.3 When to Use Iterative vs. Recursive?</h4>
+                <ul>
+                    <li><strong>Use Iterative (BFS) when:</strong> The graph is large, and you need predictable performance (Edmonds-Karp).</li>
+                    <li><strong>Use Recursive (DFS) when:</strong> The graph is small or needs fast implementation (basic Ford-Fulkerson).</li>
+                    <li><strong>Use Hybrid (DFS with Iterative Stack) when:</strong> You want depth-first behavior without recursion depth issues.</li>
+                </ul>
+
+            </article>
+
+            <article>
+                <h3>13. Edge Cases & Failure Handling</h3>
+
+                <h4>13.1 Common Pitfalls</h4>
+                <ul>
+                    <li><strong>Disconnected Graph:</strong> If the source and sink are not connected, the max flow is zero.</li>
+                    <li><strong>Cycles in Graph:</strong> May cause infinite loops in DFS-based Ford-Fulkerson if not handled properly.</li>
+                    <li><strong>Zero-Capacity Edges:</strong> Should be ignored, as they do not contribute to flow.</li>
+                    <li><strong>Graph with Large Capacities:</strong> Using integer capacities prevents floating-point precision issues.</li>
+                    <li><strong>Graph with Negative Capacities:</strong> Invalid in traditional max flow; requires min-cost max flow variations.</li>
+                </ul>
+
+                <h4>13.2 Handling Failures</h4>
+                <ul>
+                    <li><strong>Recursion Depth Issues:</strong> Use iterative DFS instead of recursion for large graphs.</li>
+                    <li><strong>Unbounded Flow:</strong> Ensure flow updates are valid to prevent infinite augmentation.</li>
+                    <li><strong>Overflow Handling:</strong> Use long integers or capped values for extremely high capacities.</li>
+                    <li><strong>Graph Representation:</strong> Adjacency lists are more memory-efficient than matrices for large graphs.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>14. Test Cases to Verify Correctness</h3>
+
+                <h4>14.1 Basic Test Cases</h4>
+
+                <h5>Test Case 1: Simple Directed Graph</h5>
+                <pre><code class="language-python">
+graph1 = [
+    [0, 10, 10, 0, 0, 0],
+    [0, 0, 5, 15, 0, 0],
+    [0, 0, 0, 0, 10, 0],
+    [0, 0, 0, 0, 10, 10],
+    [0, 0, 0, 0, 0, 10],
+    [0, 0, 0, 0, 0, 0]
+]
+assert max_flow(graph1, 0, 5) == 20
+</code></pre>
+
+                <h5>Test Case 2: Graph with Zero-Capacity Edges</h5>
+                <pre><code class="language-python">
+graph2 = [
+    [0, 0, 10, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 10, 0, 0],
+    [0, 0, 0, 0, 10, 0],
+    [0, 0, 0, 0, 0, 10],
+    [0, 0, 0, 0, 0, 0]
+]
+assert max_flow(graph2, 0, 5) == 10
+</code></pre>
+
+                <h5>Test Case 3: Disconnected Graph</h5>
+                <pre><code class="language-python">
+graph3 = [
+    [0, 10, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0],  # No outgoing edges from node 1
+    [0, 0, 0, 10, 0, 0],
+    [0, 0, 0, 0, 10, 0],
+    [0, 0, 0, 0, 0, 10],
+    [0, 0, 0, 0, 0, 0]
+]
+assert max_flow(graph3, 0, 5) == 0
+</code></pre>
+
+                <h5>Test Case 4: Graph with Cycles</h5>
+                <pre><code class="language-python">
+graph4 = [
+    [0, 10, 0, 10, 0, 0],
+    [0, 0, 10, 0, 10, 0],
+    [0, 0, 0, 10, 0, 10],
+    [0, 0, 0, 0, 10, 10],
+    [0, 0, 0, 0, 0, 10],
+    [0, 0, 0, 0, 0, 0]
+]
+assert max_flow(graph4, 0, 5) == 20
+</code></pre>
+
+            </article>
+
+            <article>
+                <h3>15. Real-World Failure Scenarios</h3>
+
+                <h4>15.1 Network Congestion in Traffic Routing</h4>
+                <p><strong>Failure:</strong> Incorrect flow assignments can lead to bottlenecks, causing suboptimal routing.</p>
+                <p><strong>Solution:</strong> Apply edge prioritization and adaptive pathfinding.</p>
+
+                <h4>15.2 Load Balancing in Cloud Networks</h4>
+                <p><strong>Failure:</strong> Uneven flow distribution may overload certain servers.</p>
+                <p><strong>Solution:</strong> Use weighted capacity-based scaling.</p>
+
+                <h4>15.3 Water Distribution Networks</h4>
+                <p><strong>Failure:</strong> Pipes with lower capacities might be over-utilized.</p>
+                <p><strong>Solution:</strong> Use push-relabel or capacity scaling to optimize flow.</p>
+
+                <h4>15.4 Electrical Grid Overload</h4>
+                <p><strong>Failure:</strong> Sudden high demand might cause network-wide failures.</p>
+                <p><strong>Solution:</strong> Implement real-time monitoring with flow updates.</p>
+
+            </article>
+
+            <article>
+                <h3>16. Real-World Applications & Industry Use Cases</h3>
+
+                <h4>16.1 Network Flow Optimization</h4>
+                <p>Used in computer networks for efficient bandwidth allocation and congestion control.</p>
+                <ul>
+                    <li><strong>Data Center Load Balancing:</strong> Distributes traffic among multiple servers.</li>
+                    <li><strong>Packet Routing:</strong> Finds optimal paths to avoid congestion.</li>
+                    <li><strong>Internet Peering Agreements:</strong> Determines the maximum feasible data exchange.</li>
+                </ul>
+
+                <h4>16.2 Transportation & Logistics</h4>
+                <p>Max Flow helps optimize transport routes and supply chains.</p>
+                <ul>
+                    <li><strong>Railway & Road Traffic Management:</strong> Determines the best traffic flow across intersections.</li>
+                    <li><strong>Air Traffic Control:</strong> Optimizes aircraft routing to reduce delays.</li>
+                    <li><strong>Shipping & Warehousing:</strong> Balances goods distribution between suppliers and demand centers.</li>
+                </ul>
+
+                <h4>16.3 Water & Electricity Distribution</h4>
+                <p>Used to model pipelines and power grids.</p>
+                <ul>
+                    <li><strong>Water Supply Networks:</strong> Ensures optimal water flow across pipelines.</li>
+                    <li><strong>Power Grid Optimization:</strong> Balances power flow to prevent blackouts.</li>
+                    <li><strong>Gas Pipeline Management:</strong> Prevents overloading of gas flow between nodes.</li>
+                </ul>
+
+                <h4>16.4 Bipartite Matching & Workforce Allocation</h4>
+                <p>Used in job assignments and resource allocation.</p>
+                <ul>
+                    <li><strong>Job Assignment:</strong> Matches workers to projects based on skillset.</li>
+                    <li><strong>College Admissions:</strong> Allocates students to colleges while maximizing satisfaction.</li>
+                    <li><strong>Hospital-Resident Matching:</strong> Used in medical intern assignments.</li>
+                </ul>
+
+                <h4>16.5 Image Segmentation & AI</h4>
+                <p>Max Flow is used in computer vision and machine learning.</p>
+                <ul>
+                    <li><strong>Image Segmentation:</strong> Graph-based algorithms like GraphCut use max flow.</li>
+                    <li><strong>Anomaly Detection:</strong> Identifies unusual patterns in images.</li>
+                    <li><strong>Object Recognition:</strong> Helps segment objects in images.</li>
+                </ul>
+
+            </article>
+
+            <article>
+                <h3>17. Open-Source Implementations</h3>
+
+                <h4>17.1 NetworkX (Python Library)</h4>
+                <p>NetworkX provides built-in functions for computing max flow:</p>
+                <pre><code class="language-python">
+import networkx as nx
+
+G = nx.DiGraph()
+G.add_edge('S', 'A', capacity=10)
+G.add_edge('S', 'B', capacity=5)
+G.add_edge('A', 'B', capacity=15)
+G.add_edge('A', 'T', capacity=10)
+G.add_edge('B', 'T', capacity=10)
+
+max_flow = nx.maximum_flow(G, 'S', 'T')
+print("Max Flow:", max_flow[0])
+</code></pre>
+
+                <h4>17.2 Boost Graph Library (C++ Standard Library)</h4>
+                <p>Provides efficient max-flow implementations for high-performance applications.</p>
+
+                <h4>17.3 LEDA & Google OR-Tools</h4>
+                <p>Industry-level libraries for logistics, supply chain, and AI.</p>
+
+            </article>
+
+            <article>
+                <h3>18. Practical Project: Traffic Flow Optimization</h3>
+
+                <h4>18.1 Problem Statement</h4>
+                <p>Use Max Flow to optimize city traffic between key intersections.</p>
+
+                <h4>18.2 Implementation</h4>
+
+                <pre><code class="language-python">
+import networkx as nx
+import matplotlib.pyplot as plt
+
+# Define a directed graph
+G = nx.DiGraph()
+edges = [
+    ("A", "B", 10), ("A", "C", 15), ("B", "D", 10),
+    ("C", "D", 10), ("C", "E", 10), ("D", "T", 15),
+    ("E", "T", 10)
+]
+for u, v, capacity in edges:
+    G.add_edge(u, v, capacity=capacity)
+
+# Compute Max Flow
+source, sink = "A", "T"
+max_flow, flow_dict = nx.maximum_flow(G, source, sink)
+
+print(f"Maximum Traffic Flow: {max_flow}")
+print("Flow Distribution:", flow_dict)
+
+# Visualization
+pos = nx.spring_layout(G)
+edge_labels = {(u, v): G[u][v]['capacity'] for u, v in G.edges()}
+nx.draw(G, pos, with_labels=True, node_color='lightblue', edge_color='gray')
+nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels)
+plt.show()
+</code></pre>
+
+                <h4>18.3 Expected Output</h4>
+                <ul>
+                    <li>Calculates maximum traffic flow in a city road network.</li>
+                    <li>Displays flow distribution across roads.</li>
+                    <li>Visualizes network using Matplotlib.</li>
+                </ul>
+
+                <h4>18.4 Real-World Impact</h4>
+                <ul>
+                    <li>Can be extended to real-time traffic optimization.</li>
+                    <li>Useful for designing emergency evacuation routes.</li>
+                    <li>Can be integrated with AI for smart city planning.</li>
+                </ul>
+
+            </article>
+
+            <article>
+                <h3>19. Competitive Programming & System Design Integration</h3>
+
+                <h4>19.1 Max Flow in Competitive Programming</h4>
+                <p>Max Flow algorithms are frequently used in competitive programming problems involving graph-based optimizations. Some common problem types include:</p>
+
+                <ul>
+                    <li><strong>Maximum Bipartite Matching:</strong> Assign jobs to workers efficiently.</li>
+                    <li><strong>Minimum Cut:</strong> Find the bottleneck in a network.</li>
+                    <li><strong>Circulation Problems:</strong> Solve flow problems with lower bounds.</li>
+                    <li><strong>Dinic’s Algorithm Challenges:</strong> Optimize flow networks.</li>
+                    <li><strong>Multi-Source, Multi-Sink Problems:</strong> Extend Max Flow for complex cases.</li>
+                </ul>
+
+                <h4>19.2 Max Flow in System Design</h4>
+                <p>In real-world systems, Max Flow is used for large-scale optimizations:</p>
+
+                <ul>
+                    <li><strong>Load Balancing:</strong> Distribute requests evenly across multiple servers.</li>
+                    <li><strong>Database Replication:</strong> Optimize data synchronization between nodes.</li>
+                    <li><strong>Server Traffic Routing:</strong> Direct network traffic to prevent congestion.</li>
+                    <li><strong>Supply Chain Optimization:</strong> Allocate resources across warehouses.</li>
+                    <li><strong>Cloud Computing:</strong> Allocate VMs efficiently based on bandwidth constraints.</li>
+                </ul>
+
+            </article>
+
+            <article>
+                <h3>20. Assignments</h3>
+
+                <h4>20.1 Solve at Least 10 Problems</h4>
+                <p>Practice solving these problems using Max Flow:</p>
+
+                <ol>
+                    <li><a href="https://www.spoj.com/problems/FASTFLOW/">FASTFLOW - Fast Maximum Flow</a></li>
+                    <li><a href="https://www.spoj.com/problems/MBIPART/">MBIPART - Maximum Bipartite Matching</a></li>
+                    <li><a href="https://www.spoj.com/problems/DRUNK/">DRUNK - Drunk</a> (Flow + Shortest Path)</li>
+                    <li><a href="https://codeforces.com/problemset/problem/653/D">Codeforces 653D - Traffic Jams in the Land</a></li>
+                    <li><a href="https://codeforces.com/problemset/problem/813/E">Codeforces 813E - Army Creation</a></li>
+                    <li><a href="https://cses.fi/problemset/task/1694/">CSES 1694 - Download Speed</a></li>
+                    <li><a href="https://cses.fi/problemset/task/1696/">CSES 1696 - Maximum Bipartite Matching</a></li>
+                    <li><a href="https://www.spoj.com/problems/UCV2013H/">UCV2013H - Maximum Network Flow</a></li>
+                    <li><a href="https://www.spoj.com/problems/LA3907/">LA3907 - Tokyo Traffic</a></li>
+                    <li><a href="https://www.spoj.com/problems/RAIL/">RAIL - Railroad</a></li>
+                </ol>
+
+                <h4>20.2 Implement Max Flow in a System Design Problem</h4>
+                <p>Design a traffic management system using Max Flow:</p>
+
+                <ul>
+                    <li>Model city intersections as a directed graph.</li>
+                    <li>Set road capacities based on traffic limits.</li>
+                    <li>Use Max Flow to find optimal car routing.</li>
+                    <li>Extend it with real-time traffic updates.</li>
+                </ul>
+
+                <h4>20.3 Practice Under Time Constraints</h4>
+                <p>Set a timer and solve Max Flow problems within:</p>
+
+                <ul>
+                    <li><strong>Easy problems:</strong> 15 minutes.</li>
+                    <li><strong>Medium problems:</strong> 30 minutes.</li>
+                    <li><strong>Hard problems:</strong> 60 minutes.</li>
+                </ul>
+
+                <p>Benchmark your performance and optimize your implementation!</p>
+
+            </article>
+
+        </main>
+
+        <script> copyright("all"); </script>
+
+    </body>
+
+</html>
