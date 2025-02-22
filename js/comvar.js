@@ -331,8 +331,8 @@ function processFolder(allAuthors, author_bio) {
                                     }
                                     break;
                                 case "csu083":
-                                    prof = "Puneet Kapoor";
-                                    prof_bio = "<p>Puneet Kapoor is Computer Science expert, researcher and a senior assistant professor at Shoolini University.</p>";
+                                    prof = "Dr. Puneet Kapoor";
+                                    prof_bio = "<p>Dr. Puneet Kapoor is Computer Science expert, researcher and a senior assistant professor at Shoolini University.</p>";
                                     prof_href = "contact@dmj.one";
                                     course = "CSU083";
                                     course_detail = "Design and Analysis of Algorithm";
@@ -500,8 +500,8 @@ const profDetailsBio = {
         bio: "<p class='professorbio header-p-author-description'>Dr. Anurag Rana is a research scientist and an assistant professor at Shoolini University.</p>",
         href: "contact@dmj.one"
     },
-    'Puneet Kapoor': {
-        bio: "<p class='professorbio header-p-author-description'>Puneet Kapoor is Computer Science expert, researcher and a senior assistant professor at Shoolini University.</p>",
+    'Dr. Puneet Kapoor': {
+        bio: "<p class='professorbio header-p-author-description'>Dr. Puneet Kapoor is Computer Science expert, researcher and a senior assistant professor at Shoolini University.</p>",
         href: "contact@dmj.one"
     },
     'Dr. Piyush Sewal': {
@@ -611,8 +611,8 @@ const courseDetailsMap = {
         'lab': ["Dr. Anurag Rana", "CSU1291", "Java Programming Lab"]
     },
     'csu083': {
-        'default': ["Puneet Kapoor", "CSU083", "Design and Analysis of Algorithm"],
-        'lab': ["Puneet Kapoor", "CSU083", "Design and Analysis of Algorithm"]
+        'default': ["Dr. Puneet Kapoor", "CSU083", "Design and Analysis of Algorithm"],
+        'lab': ["Dr. Puneet Kapoor", "CSU083", "Design and Analysis of Algorithm"]
     },
     'csu1075': { 'default': ["Dr. Brij Bhushan Sharma", "CSU1075", "Computer Organization"] },
     'csu1526': { 'default': ["Dr. Piyush Sewal", "CSU1526", "Microprocessor and Microcontroller"] },
