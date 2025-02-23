@@ -1,0 +1,866 @@
+<!-------------------------- © 2007 - present, dmj.one and contributors. ----------------------------------
+   Part of the dmjone project. Licensed under the GNU AGPL. Provided as-is, without warranty of any kind. 
+-------------------- Redistribution and modifications must retain this notice. --------------------------->
+
+
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+    <!--<![endif]-->
+
+    <head>
+        <script src="/js/edu_su_common.js"></script>
+        <noscript>
+            <style>
+                html,
+                body {
+                    margin: 0;
+                    overflow: hidden;
+                }
+            </style>
+            <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+        </noscript>
+
+        <title>Counting Sort - CSU083 | Shoolini University</title>
+        
+        <meta name="description" content="Learn Counting Sort in Data Structures, covering concepts, implementations, optimizations, real-world applications, and competitive programming use cases. Part of the CSU083 course at Shoolini University.">
+        <meta name="keywords" content="Counting Sort, Non-Comparative Sorting, Time Complexity, Space Complexity, Sorting Algorithm, Stable Sorting, Competitive Programming, System Design, Integer Sorting">
+        <meta name="author" content="Divya Mohan">
+        <meta name="robots" content="index, follow">
+        
+        <!-- Open Graph for Social Media -->
+        <meta property="og:title" content="Counting Sort in Data Structures - CSU083 | Shoolini University">
+        <meta property="og:description" content="Comprehensive guide on Counting Sort, covering theory, implementation, optimizations, and real-world applications in databases, competitive programming, and system design.">
+        <meta property="og:image" content="/logo.png">
+        <meta property="og:type" content="article">
+        
+        <!-- Twitter Cards -->
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:title" content="Counting Sort in Data Structures">
+        <meta name="twitter:description" content="Master Counting Sort with a deep dive into implementations, use cases, and optimizations in system design and competitive programming.">
+        <meta name="twitter:site" content="@divyamohan1993">
+        <meta name="twitter:creator" content="@divyamohan1993">
+        <meta name="twitter:image" content="/logo.png">
+        
+        <!-- Mobile Responsiveness -->
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        
+        <!-- JSON-LD Structured Data for SEO -->
+        <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "Course",
+            "name": "Counting Sort in Data Structures",
+            "description": "Master Counting Sort in Data Structures, covering fundamental concepts, time and space complexity, optimizations, and applications in databases, security, and competitive programming.",
+            "provider": [
+                {
+                    "@type": "EducationalOrganization",
+                    "name": "dmj.one",
+                    "url": "https://dmj.one"
+                },
+                {
+                    "@type": "EducationalOrganization",
+                    "name": "Shoolini University",
+                    "url": "https://shooliniuniversity.com"
+                }
+            ]
+        }
+        </script>
+
+
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js" integrity="sha512-sHSNLECRJSK+BFs7E8DiFc6pf6n90bLI85Emiw1jhreduZhK3VXgq9l4kAt9eTIHYAcuQBKHL01QKs4/3Xgl8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js" integrity="sha512-iWiuBS5nt6r60fCz26Nd0Zqe0nbk1ZTIQbl3Kv7kYsX+yKMUFHzjaH2+AnM6vp2Xs+gNmaBAVWJjSmuPw76Efg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                renderMathInElement(document.body, {
+                    // customised options
+                    // • auto-render specific keys, e.g.:
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false },
+                        { left: '\\(', right: '\\)', display: false },
+                        { left: '\\[', right: '\\]', display: true }
+                    ],
+                    // • rendering keys, e.g.:
+                    throwOnError: false
+                });
+            });
+        </script> -->
+
+        <!-- <style>
+            main ul {
+                list-style-type: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            main ul li {
+                margin: 0;
+                padding: 0;
+            }
+        </style> -->
+
+
+
+    </head>
+
+    <body>
+
+        <script> header_author("dm"); </script>
+
+        <main>
+            <article class="agen-tableofcontents">
+                <h2 class="text-center">
+                    Counting Sort
+                </h2>
+                <div class="d-none contentdate">2025, January 7</div>
+            </article>
+
+            <article>
+                <h3>1. Prerequisites</h3>
+                <p>Before understanding Counting Sort, you should be familiar with the following concepts:</p>
+                <ul>
+                    <li><strong>Arrays:</strong> Understanding how elements are stored and accessed.</li>
+                    <li><strong>Time Complexity:</strong> Basic knowledge of Big-O notation.</li>
+                    <li><strong>Sorting Basics:</strong> Understanding what sorting means and why it is needed.</li>
+                    <li><strong>Range of Data:</strong> Concept of data range and why it affects sorting performance.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>2. What is Counting Sort?</h3>
+                <p>Counting Sort is a non-comparative integer sorting algorithm that sorts elements by counting occurrences of each unique value within a range and using this information to place elements in order.</p>
+
+                <h4>2.1 Working Mechanism</h4>
+                <ul>
+                    <li>Determine the range of input values.</li>
+                    <li>Count occurrences of each value.</li>
+                    <li>Transform the count array to determine positions.</li>
+                    <li>Place elements in their correct positions using a temporary array.</li>
+                </ul>
+
+                <h5>2.1.1 Implementation</h5>
+                <pre><code class="language-python">
+def counting_sort(arr):
+    max_val = max(arr)
+    count = [0] * (max_val + 1)
+
+    for num in arr:
+        count[num] += 1
+
+    sorted_arr = []
+    for i in range(len(count)):
+        sorted_arr.extend([i] * count[i])
+
+    return sorted_arr
+
+arr = [4, 2, 2, 8, 3, 3, 1]
+print(counting_sort(arr))
+</code></pre>
+            </article>
+
+            <article>
+                <h3>3. Why Does Counting Sort Exist?</h3>
+                <p>Sorting large datasets efficiently is crucial in many real-world applications. Counting Sort was developed to handle cases where:</p>
+                <ul>
+                    <li><strong>Data values are within a small range:</strong> Avoiding unnecessary comparisons.</li>
+                    <li><strong>Sorting must be stable:</strong> Ensuring equal values retain their relative order.</li>
+                    <li><strong>Need for faster sorting:</strong> Achieves O(n) time complexity, unlike O(n log n) comparison-based sorts.</li>
+                </ul>
+
+                <h4>3.1 Real-World Applications</h4>
+                <ul>
+                    <li><strong>Sorting test scores:</strong> When scores range from 0 to 100.</li>
+                    <li><strong>Counting frequency of events:</strong> Useful in histogram-based analysis.</li>
+                    <li><strong>Data pre-processing:</strong> Optimizing radix sort when used as a subroutine.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>4. When Should You Use Counting Sort?</h3>
+                <ul>
+                    <li>When data is within a small, fixed range.</li>
+                    <li>When stability is required in sorting.</li>
+                    <li>When you need linear time sorting, and memory constraints are not a major concern.</li>
+                </ul>
+                <p><strong>Avoid using Counting Sort if:</strong></p>
+                <ul>
+                    <li>Data range is very large (e.g., millions of unique values).</li>
+                    <li>Sorting floating-point numbers or complex objects.</li>
+                    <li>Memory usage is a concern, as extra space is needed.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>5. How Does It Compare to Alternatives?</h3>
+                <table class="table table-responsive">
+                    <tr>
+                        <th>Sorting Algorithm</th>
+                        <th>Time Complexity</th>
+                        <th>Space Complexity</th>
+                        <th>Comparison-Based</th>
+                        <th>Stable</th>
+                        <th>Best Use Case</th>
+                    </tr>
+                    <tr>
+                        <td>Counting Sort</td>
+                        <td>O(n + k)</td>
+                        <td>O(k)</td>
+                        <td>No</td>
+                        <td>Yes</td>
+                        <td>Small integer ranges</td>
+                    </tr>
+                    <tr>
+                        <td>QuickSort</td>
+                        <td>O(n log n)</td>
+                        <td>O(log n)</td>
+                        <td>Yes</td>
+                        <td>No</td>
+                        <td>General-purpose sorting</td>
+                    </tr>
+                    <tr>
+                        <td>MergeSort</td>
+                        <td>O(n log n)</td>
+                        <td>O(n)</td>
+                        <td>Yes</td>
+                        <td>Yes</td>
+                        <td>Linked lists, large datasets</td>
+                    </tr>
+                    <tr>
+                        <td>Radix Sort</td>
+                        <td>O(nk)</td>
+                        <td>O(n + k)</td>
+                        <td>No</td>
+                        <td>Yes</td>
+                        <td>Sorting large numbers</td>
+                    </tr>
+                </table>
+            </article>
+
+
+            <article>
+                <h3>6. Basic Implementation</h3>
+                <h4>6.1 Basic Implementation in Python</h4>
+                <p>The following Python code implements Counting Sort:</p>
+                <pre><code class="language-python">
+def counting_sort(arr):
+    # Step 1: Find the maximum value in the array
+    max_val = max(arr)
+    
+    # Step 2: Create a count array of size (max_val + 1) initialized to zero
+    count = [0] * (max_val + 1)
+
+    # Step 3: Count occurrences of each element
+    for num in arr:
+        count[num] += 1
+
+    # Step 4: Transform count array to store actual positions
+    for i in range(1, len(count)):
+        count[i] += count[i - 1]
+
+    # Step 5: Build the sorted output array
+    output = [0] * len(arr)
+    for num in reversed(arr):  # Ensuring stability
+        output[count[num] - 1] = num
+        count[num] -= 1
+
+    return output
+
+# Example usage
+arr = [4, 2, 2, 8, 3, 3, 1]
+sorted_arr = counting_sort(arr)
+print("Sorted array:", sorted_arr)
+</code></pre>
+            </article>
+
+            <article>
+                <h3>7. Dry Run of Counting Sort</h3>
+                <p>We will manually track how variables change during execution for the input:</p>
+                <pre><code class="language-python">
+arr = [4, 2, 2, 8, 3, 3, 1]
+</code></pre>
+
+                <h4>7.1 Step-by-Step Execution</h4>
+                <table class="table table-responsive">
+                    <tr>
+                        <th>Step</th>
+                        <th>Operation</th>
+                        <th>count[]</th>
+                        <th>output[]</th>
+                    </tr>
+
+                    <tr>
+                        <td>1</td>
+                        <td>Find max value (max_val = 8)</td>
+                        <td>-</td>
+                        <td>-</td>
+                    </tr>
+
+                    <tr>
+                        <td>2</td>
+                        <td>Initialize count array (size 9)</td>
+                        <td>[0, 0, 0, 0, 0, 0, 0, 0, 0]</td>
+                        <td>-</td>
+                    </tr>
+
+                    <tr>
+                        <td>3</td>
+                        <td>Count occurrences</td>
+                        <td>[0, 1, 2, 2, 1, 0, 0, 0, 1]</td>
+                        <td>-</td>
+                    </tr>
+
+                    <tr>
+                        <td>4</td>
+                        <td>Convert count to cumulative positions</td>
+                        <td>[0, 1, 3, 5, 6, 6, 6, 6, 7]</td>
+                        <td>-</td>
+                    </tr>
+
+                    <tr>
+                        <td>5</td>
+                        <td>Place elements into output array (traverse in reverse for stability)</td>
+                        <td>Updating...</td>
+                        <td>[1, 2, 2, 3, 3, 4, 8]</td>
+                    </tr>
+
+                </table>
+
+                <h4>7.2 Final Output</h4>
+                <p>After all steps, the sorted array is:</p>
+                <pre><code class="language-python">
+[1, 2, 2, 3, 3, 4, 8]
+</code></pre>
+            </article>
+
+
+            <article>
+                <h3>8. Time & Space Complexity Analysis</h3>
+
+                <h4>8.1 Time Complexity Analysis</h4>
+                <p>Counting Sort operates in three main steps:</p>
+                <ul>
+                    <li><strong>Counting occurrences:</strong> Iterates through the input array → O(n)</li>
+                    <li><strong>Building cumulative sum:</strong> Iterates through the count array (size k) → O(k)</li>
+                    <li><strong>Sorting elements:</strong> Iterates through the input array again → O(n)</li>
+                </ul>
+
+                <p>Thus, the overall time complexity is:</p>
+                <p>$$ O(n + k) $$</p>
+
+                <h5>8.1.1 Worst-Case Complexity</h5>
+                <p>Occurs when the maximum value (k) is large relative to n.</p>
+                <p>$$ O(n + k) $$</p>
+
+                <h5>8.1.2 Best-Case Complexity</h5>
+                <p>When elements are already sorted, it still needs to count and place elements.</p>
+                <p>$$ O(n + k) $$</p>
+
+                <h5>8.1.3 Average-Case Complexity</h5>
+                <p>Since Counting Sort does not rely on element comparisons, its average-case remains:</p>
+                <p>$$ O(n + k) $$</p>
+
+            </article>
+
+            <article>
+                <h3>9. Space Complexity Analysis</h3>
+                <h4>9.1 Space Consumption Breakdown</h4>
+                <ul>
+                    <li>Input array: O(n)</li>
+                    <li>Count array: O(k)</li>
+                    <li>Output array: O(n)</li>
+                </ul>
+
+                <p>Total space complexity:</p>
+                <p>$$ O(n + k) $$</p>
+
+                <h4>9.2 Space Growth with Input Size</h4>
+                <ul>
+                    <li>If k (range of values) is small, space is close to O(n).</li>
+                    <li>If k is large, space grows significantly.</li>
+                </ul>
+
+                <p>Counting Sort is <strong>not in-place</strong> since it requires additional arrays.</p>
+
+            </article>
+
+            <article>
+                <h3>10. Trade-offs of Counting Sort</h3>
+
+                <h4>10.1 Strengths</h4>
+                <ul>
+                    <li><strong>Linear Time Complexity:</strong> O(n + k) is better than O(n log n) for small k.</li>
+                    <li><strong>Stable Sorting:</strong> Preserves the order of duplicate values.</li>
+                    <li><strong>Efficient for Small Ranges:</strong> Works well when k is not significantly larger than n.</li>
+                </ul>
+
+                <h4>10.2 Weaknesses</h4>
+                <ul>
+                    <li><strong>High Space Usage:</strong> Uses extra space proportional to k.</li>
+                    <li><strong>Limited Applicability:</strong> Only works for integers within a known range.</li>
+                    <li><strong>Not In-Place:</strong> Requires additional storage.</li>
+                </ul>
+
+                <h4>10.3 When to Use and When to Avoid</h4>
+                <table class="table table-responsive">
+                    <tr>
+                        <th>Use Counting Sort When</th>
+                        <th>Avoid Counting Sort When</th>
+                    </tr>
+                    <tr>
+                        <td>Sorting integers with a small range (e.g., 0-1000).</td>
+                        <td>Sorting large numbers or floating-point values.</td>
+                    </tr>
+                    <tr>
+                        <td>When stability is important.</td>
+                        <td>When memory is a constraint.</td>
+                    </tr>
+                    <tr>
+                        <td>Preprocessing step for Radix Sort.</td>
+                        <td>Sorting a very large range of numbers.</td>
+                    </tr>
+                </table>
+
+            </article>
+
+            <article>
+                <h3>11. Optimizations & Variants</h3>
+
+                <h4>11.1 Common Optimizations</h4>
+                <ul>
+                    <li><strong>Range Reduction:</strong> If values are within a specific range (e.g., from 100 to 200), adjust indices to minimize memory usage.</li>
+                    <li><strong>In-Place Modification:</strong> Modifying the input array directly can reduce auxiliary space, though it sacrifices stability.</li>
+                    <li><strong>Sparse Data Handling:</strong> Instead of allocating an array of size max value (k), use hash maps for non-continuous data.</li>
+                </ul>
+
+                <h4>11.2 Variants of Counting Sort</h4>
+
+                <h5>11.2.1 Stable Counting Sort</h5>
+                <p>Ensures equal elements retain their original order.</p>
+                <ul>
+                    <li>Uses an extra output array.</li>
+                    <li>Processes elements in reverse order.</li>
+                </ul>
+
+                <h5>11.2.2 In-Place Counting Sort</h5>
+                <p>Avoids extra memory by modifying the input array directly, but is unstable.</p>
+
+                <h5>11.2.3 Bucketed Counting Sort</h5>
+                <p>Used when input is spread unevenly across a large range:</p>
+                <ul>
+                    <li>Divides input into smaller buckets.</li>
+                    <li>Each bucket is sorted separately.</li>
+                    <li>Useful when input has gaps.</li>
+                </ul>
+
+                <h5>11.2.4 Counting Sort as a Subroutine in Radix Sort</h5>
+                <p>Since Counting Sort works well on fixed-length integer ranges, it is used in <strong>Radix Sort</strong> to sort digits place by place.</p>
+
+            </article>
+
+            <article>
+                <h3>12. Iterative vs. Recursive Counting Sort</h3>
+
+                <h4>12.1 Iterative Implementation</h4>
+                <p>Iterative Counting Sort follows a step-by-step loop-based approach:</p>
+
+                <pre><code class="language-python">
+def counting_sort(arr):
+    max_val = max(arr)
+    count = [0] * (max_val + 1)
+
+    for num in arr:
+        count[num] += 1
+
+    output = []
+    for i in range(len(count)):
+        output.extend([i] * count[i])
+
+    return output
+</code></pre>
+
+                <h4>12.2 Recursive Implementation</h4>
+                <p>A recursive approach can be implemented by recursively processing smaller subarrays:</p>
+
+                <pre><code class="language-python">
+def counting_sort_recursive(arr, count=None, index=0):
+    if count is None:
+        max_val = max(arr)
+        count = [0] * (max_val + 1)
+        for num in arr:
+            count[num] += 1
+
+    if index >= len(count):
+        return []
+
+    return [index] * count[index] + counting_sort_recursive(arr, count, index + 1)
+
+arr = [4, 2, 2, 8, 3, 3, 1]
+print(counting_sort_recursive(arr))
+</code></pre>
+
+                <h4>12.3 Efficiency Comparison</h4>
+                <table class="table table-responsive">
+                    <tr>
+                        <th>Approach</th>
+                        <th>Time Complexity</th>
+                        <th>Space Complexity</th>
+                        <th>Pros</th>
+                        <th>Cons</th>
+                    </tr>
+                    <tr>
+                        <td>Iterative</td>
+                        <td>O(n + k)</td>
+                        <td>O(k)</td>
+                        <td>Efficient, straightforward.</td>
+                        <td>Requires explicit loops.</td>
+                    </tr>
+                    <tr>
+                        <td>Recursive</td>
+                        <td>O(n + k)</td>
+                        <td>O(k) + O(k) (recursion stack)</td>
+                        <td>More readable.</td>
+                        <td>Consumes extra memory for recursive calls.</td>
+                    </tr>
+                </table>
+
+                <p><strong>Conclusion:</strong> The iterative version is preferred due to its lower memory overhead.</p>
+
+            </article>
+
+            <article>
+                <h3>13. Edge Cases & Failure Handling</h3>
+
+                <h4>13.1 Common Edge Cases</h4>
+                <ul>
+                    <li><strong>Empty Array:</strong> An empty input should return an empty output.</li>
+                    <li><strong>Single Element:</strong> If the array has only one element, it should return the same array.</li>
+                    <li><strong>All Identical Elements:</strong> The algorithm should return the same array.</li>
+                    <li><strong>Negative Numbers:</strong> Counting Sort does not naturally support negative numbers since it relies on array indices. A transformation is needed.</li>
+                    <li><strong>Large Range of Values:</strong> If the max value is much larger than n, memory usage becomes inefficient.</li>
+                    <li><strong>Floating Point or String Inputs:</strong> Counting Sort is designed for integers, so it fails when sorting floats or non-integer data.</li>
+                </ul>
+
+                <h4>13.2 Handling Failures</h4>
+                <ul>
+                    <li>For <strong>negative numbers</strong>, shift values by adding the absolute minimum to make them non-negative.</li>
+                    <li>For <strong>floating point numbers</strong>, use an alternative sorting algorithm like Radix Sort for fixed precision decimals.</li>
+                    <li>For <strong>large gaps in data</strong>, use a sparse data structure like a dictionary instead of an array.</li>
+                </ul>
+
+            </article>
+
+            <article>
+                <h3>14. Test Cases for Counting Sort</h3>
+
+                <h4>14.1 Basic Test Cases</h4>
+                <pre><code class="language-python">
+def test_counting_sort():
+    assert counting_sort([]) == [], "Failed: Empty array"
+    assert counting_sort([5]) == [5], "Failed: Single element"
+    assert counting_sort([1, 1, 1]) == [1, 1, 1], "Failed: All identical elements"
+    assert counting_sort([4, 2, 2, 8, 3, 3, 1]) == [1, 2, 2, 3, 3, 4, 8], "Failed: Unsorted input"
+    print("All test cases passed!")
+
+# Run tests
+test_counting_sort()
+</code></pre>
+
+                <h4>14.2 Edge Case Test Cases</h4>
+                <pre><code class="language-python">
+def test_edge_cases():
+    assert counting_sort([100, 99, 98]) == [98, 99, 100], "Failed: Reverse sorted"
+    assert counting_sort([10, 20, 30, 40, 50]) == [10, 20, 30, 40, 50], "Failed: Already sorted"
+    assert counting_sort([-5, -10, -3, -1]) == [-10, -5, -3, -1], "Failed: Negative numbers"
+    assert counting_sort([1000000, 500000, 0]) == [0, 500000, 1000000], "Failed: Large numbers"
+    print("All edge cases passed!")
+
+# Run edge case tests
+test_edge_cases()
+</code></pre>
+
+            </article>
+
+            <article>
+                <h3>15. Real-World Failure Scenarios</h3>
+
+                <h4>15.1 When Counting Sort Fails</h4>
+                <ul>
+                    <li><strong>Large Integer Ranges:</strong> Sorting ages (0-120) is fine, but sorting credit card numbers (16 digits) is inefficient.</li>
+                    <li><strong>Negative Numbers Without Preprocessing:</strong> Since array indices cannot be negative, the algorithm breaks.</li>
+                    <li><strong>Floating-Point Data:</strong> Counting Sort assumes discrete values, failing for continuous data like weights (e.g., 65.5 kg).</li>
+                    <li><strong>Large Sparse Data:</strong> If input has values like [1, 1000000, 5000000], using an array of size 5000000 is infeasible.</li>
+                </ul>
+
+                <h4>15.2 How to Handle Failures</h4>
+                <ul>
+                    <li>Use <strong>Radix Sort</strong> for large integer values.</li>
+                    <li>Apply <strong>offset transformation</strong> for negative numbers.</li>
+                    <li>Use a <strong>bucket sort approach</strong> for floating points.</li>
+                    <li>Opt for <strong>comparison-based sorting algorithms</strong> like Merge Sort for large, sparse, or unknown ranges.</li>
+                </ul>
+
+            </article>
+
+
+            <article>
+                <h3>16. Real-World Applications & Industry Use Cases</h3>
+
+                <h4>16.1 Real-World Uses of Counting Sort</h4>
+                <ul>
+                    <li><strong>Sorting Exam Scores:</strong> Universities often sort student marks within a small range (0-100) efficiently.</li>
+                    <li><strong>Data Analysis & Histogram Counting:</strong> Counting frequency of occurrences in datasets for statistical analysis.</li>
+                    <li><strong>Election Vote Counting:</strong> Used to tally votes when candidates are limited.</li>
+                    <li><strong>DNS Packet Sorting:</strong> Sorting IP packet headers efficiently in network traffic analysis.</li>
+                    <li><strong>Gene Sequencing:</strong> Used in bioinformatics to sort DNA sequences when nucleotide values are limited.</li>
+                </ul>
+
+                <h4>16.2 Industry Use Cases</h4>
+                <ul>
+                    <li><strong>Cybersecurity:</strong> Analyzing packet data and sorting threat levels within a fixed range.</li>
+                    <li><strong>Game Development:</strong> Sorting player scores in a leaderboard when values are constrained.</li>
+                    <li><strong>Inventory Management:</strong> Counting and sorting warehouse stock based on SKU numbers.</li>
+                </ul>
+
+            </article>
+
+            <article>
+                <h3>17. Open-Source Implementations</h3>
+
+                <h4>17.1 Python Open-Source Implementation</h4>
+                <p>Scipy provides a variation of Counting Sort for frequency-based sorting:</p>
+                <pre><code class="language-python">
+from scipy.stats import rankdata
+
+arr = [4, 2, 2, 8, 3, 3, 1]
+sorted_arr = rankdata(arr, method='dense')  # Dense ranking mimics counting sort
+print(sorted_arr)
+</code></pre>
+
+                <h4>17.2 C++ Open-Source Implementation</h4>
+                <pre><code class="language-cpp">
+#include &lt;iostream&gt;
+#include &lt;vector&gt;
+
+void countingSort(std::vector<int>& arr) {
+    int max_val = *max_element(arr.begin(), arr.end());
+    std::vector<int> count(max_val + 1, 0);
+    
+    for (int num : arr)
+        count[num]++;
+    
+    int index = 0;
+    for (int i = 0; i <= max_val; i++) {
+        while (count[i]-- > 0) {
+            arr[index++] = i;
+        }
+    }
+}
+
+int main() {
+    std::vector<int> arr = {4, 2, 2, 8, 3, 3, 1};
+    countingSort(arr);
+    
+    for (int num : arr)
+        std::cout << num << " ";
+    return 0;
+}
+</code></pre>
+
+                <h4>17.3 Java Open-Source Implementation</h4>
+                <pre><code class="language-java">
+import java.util.Arrays;
+
+public class CountingSort {
+    public static void sort(int[] arr) {
+        int max = Arrays.stream(arr).max().getAsInt();
+        int[] count = new int[max + 1];
+
+        for (int num : arr) count[num]++;
+        
+        int index = 0;
+        for (int i = 0; i < count.length; i++)
+            while (count[i]-- > 0)
+                arr[index++] = i;
+    }
+
+    public static void main(String[] args) {
+        int[] arr = {4, 2, 2, 8, 3, 3, 1};
+        sort(arr);
+        System.out.println(Arrays.toString(arr));
+    }
+}
+</code></pre>
+
+            </article>
+
+            <article>
+                <h3>18. Practical Script Using Counting Sort</h3>
+
+                <h4>18.1 Scenario: Sorting Student Scores & Assigning Grades</h4>
+                <p>This script sorts student scores and assigns letter grades based on percentile ranks.</p>
+
+                <pre><code class="language-python">
+def counting_sort(arr):
+    max_val = max(arr)
+    count = [0] * (max_val + 1)
+
+    for num in arr:
+        count[num] += 1
+
+    output = []
+    for i in range(len(count)):
+        output.extend([i] * count[i])
+
+    return output
+
+def assign_grades(scores):
+    sorted_scores = counting_sort(scores)
+    total = len(scores)
+    
+    grade_map = {
+        "A+": 90, "A": 80, "B+": 70, "B": 60, 
+        "C+": 50, "C": 40, "D": 30, "F": 0
+    }
+    
+    percentile_ranks = {}
+    for i, score in enumerate(sorted_scores):
+        percentile = (i / total) * 100
+        for grade, threshold in grade_map.items():
+            if percentile >= threshold:
+                percentile_ranks[score] = grade
+                break
+
+    return {score: percentile_ranks[score] for score in scores}
+
+# Example Usage
+scores = [85, 92, 75, 60, 45, 88, 70, 90, 50]
+grades = assign_grades(scores)
+print(grades)
+</code></pre>
+
+                <h4>18.2 How This Works</h4>
+                <ul>
+                    <li><strong>Step 1:</strong> Sorts scores using Counting Sort.</li>
+                    <li><strong>Step 2:</strong> Computes percentiles based on rank.</li>
+                    <li><strong>Step 3:</strong> Assigns grades based on percentile thresholds.</li>
+                    <li><strong>Step 4:</strong> Outputs a dictionary mapping scores to grades.</li>
+                </ul>
+
+                <h4>18.3 Example Output</h4>
+                <pre><code>
+{85: 'A', 92: 'A+', 75: 'B+', 60: 'B', 45: 'C+', 88: 'A', 70: 'B+', 90: 'A+', 50: 'C'}
+</code></pre>
+
+            </article>
+
+
+            <article>
+                <h3>19. Competitive Programming & System Design Integration</h3>
+
+                <h4>19.1 Counting Sort in Competitive Programming</h4>
+                <p>Counting Sort is commonly used in competitive programming when:</p>
+                <ul>
+                    <li><strong>Sorting constrained integer ranges:</strong> Problems with limited value ranges (e.g., 0 to 10⁶).</li>
+                    <li><strong>Frequency-based problems:</strong> Counting occurrences efficiently.</li>
+                    <li><strong>Handling large input sizes:</strong> Sorting in O(n) rather than O(n log n).</li>
+                </ul>
+
+                <h5>19.1.1 Example Problem: Frequency Sorting</h5>
+                <p>Given an array, sort elements by frequency, breaking ties by value.</p>
+
+                <pre><code class="language-python">
+from collections import Counter
+
+def frequency_sort(arr):
+    freq = Counter(arr)
+    max_val = max(arr)
+    
+    count = [0] * (max_val + 1)
+    for num in arr:
+        count[num] += 1
+
+    return sorted(arr, key=lambda x: (-freq[x], x))
+
+arr = [4, 2, 2, 8, 3, 3, 1]
+print(frequency_sort(arr))  # Output: [2, 2, 3, 3, 1, 4, 8]
+</code></pre>
+
+                <h4>19.2 Counting Sort in System Design</h4>
+                <p>While Counting Sort is primarily used in small-range sorting, it has system design applications:</p>
+                <ul>
+                    <li><strong>Load Balancing:</strong> Sorting server response times for efficiency analysis.</li>
+                    <li><strong>Analytics & Data Processing:</strong> Counting occurrences of user behavior in logs.</li>
+                    <li><strong>Cache Optimization:</strong> Sorting cache accesses to improve retrieval efficiency.</li>
+                </ul>
+
+                <h5>19.2.1 Example: Log Processing</h5>
+                <p>Suppose a system tracks HTTP response times. Counting Sort can be used to sort logs and identify slowest response categories.</p>
+
+                <pre><code class="language-python">
+def log_sort(response_times):
+    max_time = max(response_times)
+    count = [0] * (max_time + 1)
+
+    for time in response_times:
+        count[time] += 1
+
+    sorted_times = []
+    for i in range(len(count)):
+        sorted_times.extend([i] * count[i])
+
+    return sorted_times
+
+logs = [200, 500, 200, 404, 500, 200, 302, 404]
+print(log_sort(logs))  # Sorted response times
+</code></pre>
+
+            </article>
+
+            <article>
+                <h3>20. Assignments</h3>
+
+                <h4>20.1 Problem Solving Tasks</h4>
+                <p>Practice solving the following problems using Counting Sort:</p>
+                <ol>
+                    <li>Sort an array of integers where the maximum value is ≤ 10⁶.</li>
+                    <li>Sort elements by frequency (most frequent elements appear first).</li>
+                    <li>Find the kth smallest element in an array using Counting Sort.</li>
+                    <li>Sort an array containing only 0s, 1s, and 2s (Dutch National Flag problem).</li>
+                    <li>Given a range of ages (0-120), sort them efficiently.</li>
+                    <li>Sort a list of strings where each string has a known maximum length (apply Counting Sort per character).</li>
+                    <li>Sort timestamps in a web server log file (assuming fixed time granularity).</li>
+                    <li>Find duplicate numbers in a large dataset efficiently.</li>
+                    <li>Group anagrams using Counting Sort on character frequencies.</li>
+                    <li>Implement Counting Sort without using extra space (in-place version).</li>
+                </ol>
+
+                <h4>20.2 System Design Task</h4>
+                <p>Design a leaderboard system that ranks users based on scores ranging from 0 to 1000.</p>
+                <ul>
+                    <li>Implement efficient insertion, sorting, and retrieval using Counting Sort.</li>
+                    <li>Optimize memory usage when dealing with a large number of users.</li>
+                    <li>Extend functionality to track top K users dynamically.</li>
+                </ul>
+
+                <h4>20.3 Timed Implementation Practice</h4>
+                <p>Test your implementation skills under a time constraint:</p>
+                <ul>
+                    <li>Write a basic Counting Sort function in under 10 minutes.</li>
+                    <li>Modify it to be stable while maintaining O(n + k) complexity.</li>
+                    <li>Optimize space usage and implement it in different languages.</li>
+                    <li>Debug an implementation with an unknown bug within 5 minutes.</li>
+                </ul>
+
+            </article>
+
+
+        </main>
+
+        <script> copyright("all"); </script>
+
+    </body>
+
+</html>

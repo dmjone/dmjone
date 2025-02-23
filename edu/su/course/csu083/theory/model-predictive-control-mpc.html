@@ -1,0 +1,991 @@
+<!-------------------------- © 2007 - present, dmj.one and contributors. ----------------------------------
+   Part of the dmjone project. Licensed under the GNU AGPL. Provided as-is, without warranty of any kind. 
+-------------------- Redistribution and modifications must retain this notice. --------------------------->
+
+
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+    <!--<![endif]-->
+
+    <head>
+        <script src="/js/edu_su_common.js"></script>
+        <noscript>
+            <style>
+                html,
+                body {
+                    margin: 0;
+                    overflow: hidden;
+                }
+            </style>
+            <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+        </noscript>
+
+        <title>Model Predictive Control (MPC) - CSU083 | Shoolini University</title>
+        
+        <meta name="description" content="Learn Model Predictive Control (MPC), covering concepts, implementations, optimizations, real-world applications, system design, and competitive programming use cases. Part of the CSU083 course at Shoolini University.">
+        <meta name="keywords" content="Model Predictive Control, MPC, Optimal Control, Constrained Optimization, Quadratic Programming, Predictive Control, Robotics, Autonomous Systems, Industrial Control, Competitive Programming, System Design">
+        <meta name="author" content="Divya Mohan">
+        <meta name="robots" content="index, follow">
+        
+        <!-- Open Graph for Social Media -->
+        <meta property="og:title" content="Model Predictive Control (MPC) - CSU083 | Shoolini University">
+        <meta property="og:description" content="Comprehensive guide on Model Predictive Control (MPC), covering theory, implementation, optimizations, and real-world applications in robotics, industrial automation, and finance.">
+        <meta property="og:image" content="/logo.png">
+        <meta property="og:type" content="article">
+        
+        <!-- Twitter Cards -->
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:title" content="Model Predictive Control (MPC)">
+        <meta name="twitter:description" content="Master Model Predictive Control (MPC) with a deep dive into theory, implementation, optimizations, and real-world use cases in autonomous systems, process control, and finance.">
+        <meta name="twitter:site" content="@divyamohan1993">
+        <meta name="twitter:creator" content="@divyamohan1993">
+        <meta name="twitter:image" content="/logo.png">
+        
+        <!-- Mobile Responsiveness -->
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        
+        <!-- JSON-LD Structured Data for SEO -->
+        <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "Course",
+            "name": "Model Predictive Control (MPC)",
+            "description": "Master Model Predictive Control (MPC), covering fundamental concepts, optimization techniques, real-world applications in robotics, industrial control, finance, and competitive programming.",
+            "provider": [
+                {
+                    "@type": "EducationalOrganization",
+                    "name": "dmj.one",
+                    "url": "https://dmj.one"
+                },
+                {
+                    "@type": "EducationalOrganization",
+                    "name": "Shoolini University",
+                    "url": "https://shooliniuniversity.com"
+                }
+            ]
+        }
+        </script>
+
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js" integrity="sha512-sHSNLECRJSK+BFs7E8DiFc6pf6n90bLI85Emiw1jhreduZhK3VXgq9l4kAt9eTIHYAcuQBKHL01QKs4/3Xgl8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js" integrity="sha512-iWiuBS5nt6r60fCz26Nd0Zqe0nbk1ZTIQbl3Kv7kYsX+yKMUFHzjaH2+AnM6vp2Xs+gNmaBAVWJjSmuPw76Efg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                renderMathInElement(document.body, {
+                    // customised options
+                    // • auto-render specific keys, e.g.:
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false },
+                        { left: '\\(', right: '\\)', display: false },
+                        { left: '\\[', right: '\\]', display: true }
+                    ],
+                    // • rendering keys, e.g.:
+                    throwOnError: false
+                });
+            });
+        </script> -->
+
+        <!-- <style>
+            main ul {
+                list-style-type: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            main ul li {
+                margin: 0;
+                padding: 0;
+            }
+        </style> -->
+
+
+
+    </head>
+
+    <body>
+
+        <script> header_author("dm"); </script>
+
+        <main>
+            <article class="agen-tableofcontents">
+                <h2 class="text-center">
+                    Model Predictive Control (MPC)
+                </h2>
+                <div class="d-none contentdate">2025, January 29</div>
+            </article>
+
+            <article>
+                <h3>1. Prerequisites of Model Predictive Control (MPC)</h3>
+                <p>Before diving into Model Predictive Control, one must understand the following foundational concepts:</p>
+
+                <h4>1.1 Control Systems</h4>
+                <ul>
+                    <li><strong>Open-loop vs Closed-loop Control</strong>: Understanding feedback in control.</li>
+                    <li><strong>State-space Representation</strong>: Expressing system dynamics using matrices.</li>
+                    <li><strong>Transfer Functions</strong>: Mapping input-output relationships.</li>
+                </ul>
+
+                <h4>1.2 Optimization</h4>
+                <ul>
+                    <li><strong>Convex Optimization</strong>: Finding optimal solutions under constraints.</li>
+                    <li><strong>Quadratic Programming (QP)</strong>: A key optimization technique in MPC.</li>
+                    <li><strong>Linear and Nonlinear Programming</strong>: Understanding optimization methods.</li>
+                </ul>
+
+                <h4>1.3 Linear Algebra</h4>
+                <ul>
+                    <li><strong>Matrix Operations</strong>: Essential for state-space control.</li>
+                    <li><strong>Eigenvalues and Eigenvectors</strong>: Used in stability analysis.</li>
+                    <li><strong>Singular Value Decomposition (SVD)</strong>: Helps in system identification.</li>
+                </ul>
+
+                <h4>1.4 System Dynamics</h4>
+                <ul>
+                    <li><strong>Time Discretization</strong>: Required for digital implementation.</li>
+                    <li><strong>Differential Equations</strong>: Governing laws of dynamic systems.</li>
+                    <li><strong>Predictive Models</strong>: Understanding how future states are estimated.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>2. What is Model Predictive Control (MPC)?</h3>
+                <p>Model Predictive Control (MPC) is an advanced control algorithm that optimizes control inputs by predicting the system's future behavior over a finite time horizon.</p>
+
+                <h4>2.1 Core Principles</h4>
+                <ul>
+                    <li><strong>Prediction Model</strong>: Uses system dynamics to estimate future states.</li>
+                    <li><strong>Cost Function</strong>: Defines performance objectives (e.g., minimizing energy or tracking error).</li>
+                    <li><strong>Optimization</strong>: At each time step, solves an optimization problem to determine the optimal control action.</li>
+                    <li><strong>Receding Horizon</strong>: Only the first control action is applied, and the process repeats.</li>
+                </ul>
+
+                <h4>2.2 Mathematical Representation</h4>
+                <p>At each time step, MPC solves:</p>
+                <p>$$
+                    \min_{u} \sum_{k=0}^{N} (x_k^T Q x_k + u_k^T R u_k)
+                    $$</p>
+                <p>Subject to:</p>
+                <ul>
+                    <li>System dynamics: \( x_{k+1} = Ax_k + Bu_k \)</li>
+                    <li>State constraints: \( x_{min} \leq x_k \leq x_{max} \)</li>
+                    <li>Control constraints: \( u_{min} \leq u_k \leq u_{max} \)</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>3. Why Does Model Predictive Control Exist?</h3>
+                <p>MPC was developed to handle multivariable systems with constraints efficiently. It is widely used in:</p>
+
+                <h4>3.1 Industrial Process Control</h4>
+                <ul>
+                    <li>Refineries: Optimizing chemical processes while maintaining safety.</li>
+                    <li>Power Plants: Regulating turbine speed and energy distribution.</li>
+                </ul>
+
+                <h4>3.2 Autonomous Vehicles</h4>
+                <ul>
+                    <li>Trajectory planning: Ensures safe navigation in dynamic environments.</li>
+                    <li>Collision avoidance: Predicts and corrects potential collisions.</li>
+                </ul>
+
+                <h4>3.3 Robotics</h4>
+                <ul>
+                    <li>Motion planning: Provides smooth and optimal movement for robotic arms.</li>
+                    <li>Multi-agent coordination: Synchronizes actions of multiple robots.</li>
+                </ul>
+
+                <h4>3.4 Smart Grids</h4>
+                <ul>
+                    <li>Load balancing: Regulates electricity flow to avoid power outages.</li>
+                    <li>Renewable energy integration: Manages fluctuating solar/wind inputs.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>4. When Should You Use Model Predictive Control?</h3>
+                <p>MPC is best suited when:</p>
+
+                <h4>4.1 Systems Have Constraints</h4>
+                <ul>
+                    <li>MPC explicitly handles state and control constraints.</li>
+                    <li>Example: Limiting fuel injection in an engine.</li>
+                </ul>
+
+                <h4>4.2 Multivariable Control is Needed</h4>
+                <ul>
+                    <li>When multiple inputs and outputs interact.</li>
+                    <li>Example: Controlling temperature, pressure, and flow in chemical plants.</li>
+                </ul>
+
+                <h4>4.3 Future Predictions Improve Performance</h4>
+                <ul>
+                    <li>When anticipating future behavior leads to better decisions.</li>
+                    <li>Example: Avoiding traffic congestion in self-driving cars.</li>
+                </ul>
+
+                <h4>4.4 System Dynamics Are Well Understood</h4>
+                <ul>
+                    <li>MPC requires an accurate model for predictions.</li>
+                    <li>Poor models can degrade performance.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>5. How Does Model Predictive Control Compare to Alternatives?</h3>
+
+                <h4>5.1 Strengths of MPC</h4>
+                <ul>
+                    <li><strong>Handles Constraints Naturally</strong>: Unlike PID, MPC enforces physical and operational constraints.</li>
+                    <li><strong>Optimizes Future Behavior</strong>: Minimizes errors before they occur.</li>
+                    <li><strong>Works Well in Multivariable Systems</strong>: Adjusts multiple inputs simultaneously.</li>
+                    <li><strong>Flexible and Customizable</strong>: Can incorporate different cost functions.</li>
+                </ul>
+
+                <h4>5.2 Weaknesses of MPC</h4>
+                <ul>
+                    <li><strong>Computationally Expensive</strong>: Solving optimization problems in real-time is challenging.</li>
+                    <li><strong>Requires an Accurate Model</strong>: Poor models lead to poor performance.</li>
+                    <li><strong>Implementation Complexity</strong>: Harder to tune compared to simpler methods like PID.</li>
+                </ul>
+
+                <h4>5.3 Comparison with Other Controllers</h4>
+
+                <table class="table table-bordered">
+                    <tr>
+                        <th>Control Method</th>
+                        <th>Handles Constraints</th>
+                        <th>Predictive Capability</th>
+                        <th>Computational Complexity</th>
+                    </tr>
+                    <tr>
+                        <td>PID (Proportional-Integral-Derivative)</td>
+                        <td>No</td>
+                        <td>No</td>
+                        <td>Low</td>
+                    </tr>
+                    <tr>
+                        <td>State Feedback (LQR)</td>
+                        <td>No</td>
+                        <td>No</td>
+                        <td>Moderate</td>
+                    </tr>
+                    <tr>
+                        <td>MPC</td>
+                        <td>Yes</td>
+                        <td>Yes</td>
+                        <td>High</td>
+                    </tr>
+                </table>
+            </article>
+
+            <article>
+                <h3>6. Basic Implementation of Model Predictive Control (MPC)</h3>
+                <p>The following Python implementation demonstrates a simple linear MPC for controlling a system represented by the equation:</p>
+                <p>$$ x_{k+1} = Ax_k + Bu_k $$</p>
+
+                <p>We use Quadratic Programming (QP) to optimize the control input over a prediction horizon.</p>
+
+                <pre><code class="language-python">
+import numpy as np
+import cvxpy as cp
+
+# System dynamics: x_{k+1} = Ax_k + Bu_k
+A = np.array([[1, 1], [0, 1]])  # State transition matrix
+B = np.array([[0], [1]])        # Control matrix
+Q = np.eye(2)                    # State cost matrix
+R = np.eye(1) * 0.1              # Control effort cost matrix
+
+# Horizon
+N = 5
+
+# Constraints
+x_min = np.array([-10, -10])  # State constraints
+x_max = np.array([10, 10])
+u_min = np.array([-2])  # Control constraints
+u_max = np.array([2])
+
+# MPC optimization function
+def mpc_controller(x0):
+    x = cp.Variable((2, N + 1))
+    u = cp.Variable((1, N))
+    cost = 0
+    constraints = [x[:, 0] == x0]
+
+    for k in range(N):
+        cost += cp.quad_form(x[:, k], Q) + cp.quad_form(u[:, k], R)
+        constraints += [x[:, k + 1] == A @ x[:, k] + B @ u[:, k]]
+        constraints += [x_min <= x[:, k], x[:, k] <= x_max]
+        constraints += [u_min <= u[:, k], u[:, k] <= u_max]
+
+    problem = cp.Problem(cp.Minimize(cost), constraints)
+    problem.solve()
+
+    return u[:, 0].value  # Apply only the first control action
+
+# Initial state
+x0 = np.array([5, 0])
+
+# Compute control action
+u_optimal = mpc_controller(x0)
+print("Optimal Control Action:", u_optimal)
+</code></pre>
+
+                <p>This implementation:</p>
+                <ul>
+                    <li>Defines the system's dynamics using matrices \( A \) and \( B \).</li>
+                    <li>Uses <code>cvxpy</code> to solve the Quadratic Programming problem.</li>
+                    <li>Enforces constraints on state and control input.</li>
+                    <li>Applies only the first control action and repeats at the next time step.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>7. Dry Run of Model Predictive Control</h3>
+                <p>Let's analyze step by step how the variables change when the initial state is \( x_0 = [5, 0] \).</p>
+
+                <h4>7.1 Initial Conditions</h4>
+                <ul>
+                    <li>\( x_0 = [5, 0] \) (Initial state: position = 5, velocity = 0)</li>
+                    <li>Prediction horizon \( N = 5 \)</li>
+                    <li>Cost matrices: \( Q = I \), \( R = 0.1I \)</li>
+                    <li>Constraints: \( -10 \leq x_k \leq 10 \), \( -2 \leq u_k \leq 2 \)</li>
+                </ul>
+
+                <h4>7.2 Step-by-Step Execution</h4>
+                <table class="table table-bordered">
+                    <tr>
+                        <th>Step</th>
+                        <th>State \( x \)</th>
+                        <th>Control \( u \)</th>
+                        <th>Next State Calculation</th>
+                    </tr>
+
+                    <tr>
+                        <td>0</td>
+                        <td>\([5, 0]\)</td>
+                        <td>To be optimized</td>
+                        <td>\( x_1 = A x_0 + B u_0 \)</td>
+                    </tr>
+
+                    <tr>
+                        <td>1</td>
+                        <td>Computed \( x_1 \) based on \( u_0 \)</td>
+                        <td>New \( u_1 \) optimized</td>
+                        <td>\( x_2 = A x_1 + B u_1 \)</td>
+                    </tr>
+
+                    <tr>
+                        <td>2</td>
+                        <td>Computed \( x_2 \)</td>
+                        <td>New \( u_2 \) optimized</td>
+                        <td>\( x_3 = A x_2 + B u_2 \)</td>
+                    </tr>
+
+                    <tr>
+                        <td>3</td>
+                        <td>Computed \( x_3 \)</td>
+                        <td>New \( u_3 \) optimized</td>
+                        <td>\( x_4 = A x_3 + B u_3 \)</td>
+                    </tr>
+
+                    <tr>
+                        <td>4</td>
+                        <td>Computed \( x_4 \)</td>
+                        <td>New \( u_4 \) optimized</td>
+                        <td>\( x_5 = A x_4 + B u_4 \)</td>
+                    </tr>
+
+                </table>
+
+                <h4>7.3 Observations</h4>
+                <ul>
+                    <li>Each step, MPC computes the optimal control \( u_k \) that minimizes cost.</li>
+                    <li>Only the first control action is applied, and MPC re-optimizes at the next step.</li>
+                    <li>Constraints prevent unrealistic values (e.g., control efforts exceeding limits).</li>
+                    <li>The system gradually stabilizes, bringing \( x_k \) closer to zero.</li>
+                </ul>
+
+            </article>
+
+            <article>
+                <h3>8. Time & Space Complexity Analysis of Model Predictive Control</h3>
+
+                <h4>8.1 Time Complexity</h4>
+                <p>MPC solves a Quadratic Programming (QP) problem at each time step, which determines its complexity.</p>
+
+                <h5>8.1.1 Worst-case Complexity</h5>
+                <ul>
+                    <li>Solving a Quadratic Program (QP) takes \( O(N^3) \) time using interior-point methods.</li>
+                    <li>If the system has \( n \) states and \( m \) control inputs, the complexity becomes:</li>
+                    <p>$$ O(N(n+m)^3) $$</p>
+                    <li>Large horizons \( N \) or high-dimensional systems make computation expensive.</li>
+                </ul>
+
+                <h5>8.1.2 Best-case Complexity</h5>
+                <ul>
+                    <li>If the optimization is simple (e.g., diagonal matrices), QP solvers can converge in:</li>
+                    <p>$$ O(N(n+m)^2) $$</p>
+                    <li>For linear systems with explicit solutions, complexity can be as low as \( O(N(n+m)) \).</li>
+                </ul>
+
+                <h5>8.1.3 Average-case Complexity</h5>
+                <ul>
+                    <li>Most practical implementations use efficient QP solvers, averaging:</li>
+                    <p>$$ O(N(n+m)^{2.5}) $$</p>
+                </ul>
+            </article>
+
+            <article>
+                <h3>9. Space Complexity Analysis</h3>
+
+                <h4>9.1 Memory Consumption</h4>
+                <ul>
+                    <li>MPC requires storing:</li>
+                    <ul>
+                        <li>State matrix \( A \) and control matrix \( B \) → \( O(n^2 + nm) \)</li>
+                        <li>Prediction horizon state variables → \( O(Nn) \)</li>
+                        <li>Quadratic programming constraints → \( O(N(n+m)^2) \)</li>
+                    </ul>
+                    <li>Total space complexity is:</li>
+                    <p>$$ O(N(n+m)^2) $$</p>
+                    <li>Larger horizons or high-dimensional systems significantly increase memory usage.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>10. Trade-offs in Model Predictive Control</h3>
+
+                <h4>10.1 Accuracy vs. Computation Time</h4>
+                <ul>
+                    <li>Longer horizons \( N \) improve accuracy but increase complexity.</li>
+                    <li>Shorter horizons run faster but may result in suboptimal control.</li>
+                </ul>
+
+                <h4>10.2 Constraint Handling vs. Simplicity</h4>
+                <ul>
+                    <li>MPC naturally handles constraints, unlike PID.</li>
+                    <li>However, enforcing constraints requires QP solvers, increasing computational load.</li>
+                </ul>
+
+                <h4>10.3 Explicit vs. Implicit MPC</h4>
+                <ul>
+                    <li><strong>Explicit MPC</strong>: Pre-computes solutions, reducing real-time complexity to \( O(1) \) but increases storage.</li>
+                    <li><strong>Implicit MPC</strong>: Solves QP in real time, requiring more computation but using less memory.</li>
+                </ul>
+
+                <h4>10.4 Comparisons with Alternative Controllers</h4>
+                <table class="table table-bordered">
+                    <tr>
+                        <th>Controller</th>
+                        <th>Computation Cost</th>
+                        <th>Memory Usage</th>
+                        <th>Constraint Handling</th>
+                        <th>Predictive Capability</th>
+                    </tr>
+                    <tr>
+                        <td>PID</td>
+                        <td>O(1)</td>
+                        <td>O(1)</td>
+                        <td>No</td>
+                        <td>No</td>
+                    </tr>
+                    <tr>
+                        <td>LQR</td>
+                        <td>O(n^3)</td>
+                        <td>O(n^2)</td>
+                        <td>No</td>
+                        <td>No</td>
+                    </tr>
+                    <tr>
+                        <td>MPC</td>
+                        <td>O(N(n+m)^3)</td>
+                        <td>O(N(n+m)^2)</td>
+                        <td>Yes</td>
+                        <td>Yes</td>
+                    </tr>
+                </table>
+
+            </article>
+
+
+            <article>
+                <h3>11. Optimizations & Variants of Model Predictive Control (MPC)</h3>
+
+                <h4>11.1 Common Optimizations</h4>
+                <p>Since MPC is computationally expensive, several optimizations improve efficiency:</p>
+
+                <h5>11.1.1 Warm-starting Optimization</h5>
+                <ul>
+                    <li>Instead of solving the optimization problem from scratch at every step, reuse the previous solution as an initial guess.</li>
+                    <li>Reduces solver iterations, improving real-time performance.</li>
+                </ul>
+
+                <h5>11.1.2 Explicit MPC</h5>
+                <ul>
+                    <li>Pre-computes control laws offline for different system states.</li>
+                    <li>Transforms the optimization problem into a lookup table for real-time control.</li>
+                    <li>Effective for small-scale systems but requires large memory for complex systems.</li>
+                </ul>
+
+                <h5>11.1.3 Sparse Matrix Representation</h5>
+                <ul>
+                    <li>QP solvers often use dense matrices, increasing computation.</li>
+                    <li>Rewriting constraints in sparse form reduces memory and computation load.</li>
+                </ul>
+
+                <h5>11.1.4 Parallel Processing</h5>
+                <ul>
+                    <li>Divide optimization steps into multiple cores or GPUs.</li>
+                    <li>Speeds up solution for large systems (e.g., in automotive applications).</li>
+                </ul>
+
+                <h5>11.1.5 Constraint Relaxation</h5>
+                <ul>
+                    <li>Soft constraints allow slight violations, reducing solver infeasibility.</li>
+                    <li>Useful in real-time applications where strict constraints may cause instability.</li>
+                </ul>
+
+                <h4>11.2 Variants of MPC</h4>
+                <p>Different MPC formulations are used based on application requirements:</p>
+
+                <h5>11.2.1 Linear MPC</h5>
+                <ul>
+                    <li>Uses linear system models.</li>
+                    <li>Solves a Quadratic Programming (QP) problem.</li>
+                    <li>Best for systems with linear dynamics.</li>
+                </ul>
+
+                <h5>11.2.2 Nonlinear MPC (NMPC)</h5>
+                <ul>
+                    <li>Handles nonlinear system dynamics.</li>
+                    <li>Solves a Nonlinear Programming (NLP) problem, which is computationally expensive.</li>
+                    <li>Used in robotics, aerospace, and chemical processes.</li>
+                </ul>
+
+                <h5>11.2.3 Robust MPC</h5>
+                <ul>
+                    <li>Accounts for uncertainties in model predictions.</li>
+                    <li>Ensures stability even with modeling errors or disturbances.</li>
+                    <li>Widely used in power grids and autonomous systems.</li>
+                </ul>
+
+                <h5>11.2.4 Economic MPC</h5>
+                <ul>
+                    <li>Optimizes a user-defined economic objective rather than traditional cost functions.</li>
+                    <li>Used in energy management, manufacturing, and finance.</li>
+                </ul>
+
+            </article>
+
+            <article>
+                <h3>12. Iterative vs. Recursive Implementations of MPC</h3>
+
+                <h4>12.1 Iterative MPC</h4>
+                <ul>
+                    <li>At each time step, MPC solves an optimization problem independently from scratch.</li>
+                    <li>Works well when computational resources are sufficient.</li>
+                    <li>High computational load due to re-solving the optimization problem at every step.</li>
+                </ul>
+
+                <h4>12.2 Recursive MPC</h4>
+                <ul>
+                    <li>Uses past solutions as an initial guess for the next step (warm-starting).</li>
+                    <li>Reduces computational overhead by reusing past optimal trajectories.</li>
+                    <li>Maintains continuity, improving real-time performance.</li>
+                </ul>
+
+                <h4>12.3 Efficiency Comparison</h4>
+                <table class="table table-bordered">
+                    <tr>
+                        <th>Implementation</th>
+                        <th>Computation Time</th>
+                        <th>Memory Usage</th>
+                        <th>Suitability</th>
+                    </tr>
+                    <tr>
+                        <td>Iterative MPC</td>
+                        <td>High (O(N(n+m)^3))</td>
+                        <td>Moderate</td>
+                        <td>Simple problems, offline optimization</td>
+                    </tr>
+                    <tr>
+                        <td>Recursive MPC</td>
+                        <td>Lower (O(N(n+m)^2.5))</td>
+                        <td>Higher (stores past solutions)</td>
+                        <td>Real-time control, robotics, autonomous driving</td>
+                    </tr>
+                </table>
+
+                <h4>12.4 When to Use Which?</h4>
+                <ul>
+                    <li><strong>Use Iterative MPC</strong> when solving small-scale optimization problems where computation time is not a concern.</li>
+                    <li><strong>Use Recursive MPC</strong> when real-time performance is required, such as in self-driving cars or drone navigation.</li>
+                </ul>
+
+            </article>
+
+            <article>
+                <h3>13. Edge Cases & Failure Handling in Model Predictive Control (MPC)</h3>
+
+                <h4>13.1 Common Pitfalls & Edge Cases</h4>
+
+                <h5>13.1.1 Constraint Violations</h5>
+                <ul>
+                    <li><strong>Issue:</strong> The optimizer may find no feasible solution if constraints are too restrictive.</li>
+                    <li><strong>Fix:</strong> Use soft constraints or relaxation techniques to prevent solver failure.</li>
+                </ul>
+
+                <h5>13.1.2 Poor Model Accuracy</h5>
+                <ul>
+                    <li><strong>Issue:</strong> If the system model does not match the real dynamics, predictions become unreliable.</li>
+                    <li><strong>Fix:</strong> Use system identification techniques and robust MPC to handle uncertainties.</li>
+                </ul>
+
+                <h5>13.1.3 Computational Delays</h5>
+                <ul>
+                    <li><strong>Issue:</strong> MPC optimization takes too long, making real-time control impractical.</li>
+                    <li><strong>Fix:</strong> Reduce horizon \( N \), simplify constraints, or use explicit MPC.</li>
+                </ul>
+
+                <h5>13.1.4 Numerical Instabilities</h5>
+                <ul>
+                    <li><strong>Issue:</strong> Solvers can become unstable due to ill-conditioned matrices.</li>
+                    <li><strong>Fix:</strong> Normalize state variables, regularize cost matrices, and use robust solvers.</li>
+                </ul>
+
+                <h5>13.1.5 Actuator Saturation</h5>
+                <ul>
+                    <li><strong>Issue:</strong> Control inputs may exceed hardware limits, causing unexpected behavior.</li>
+                    <li><strong>Fix:</strong> Explicitly enforce control input constraints.</li>
+                </ul>
+
+            </article>
+
+            <article>
+                <h3>14. Writing Test Cases for Model Predictive Control</h3>
+
+                <h4>14.1 Basic Test Cases</h4>
+                <pre><code class="language-python">
+import numpy as np
+
+def test_mpc_constraints():
+    """Test if MPC respects control constraints."""
+    x0 = np.array([5, 0])  # Initial state
+    u_optimal = mpc_controller(x0)
+    assert np.all(u_optimal >= -2) and np.all(u_optimal <= 2), "Control input out of bounds"
+
+def test_mpc_stability():
+    """Test if MPC drives the system towards zero."""
+    x0 = np.array([5, 0])  # Initial state
+    for _ in range(10):  # Simulate multiple steps
+        u_optimal = mpc_controller(x0)
+        x0 = np.dot(A, x0) + np.dot(B, u_optimal)  # Apply control
+    assert np.all(np.abs(x0) < 0.1), "MPC failed to stabilize system"
+
+def test_mpc_solver():
+    """Test if solver successfully finds a solution."""
+    x0 = np.array([5, 0])
+    try:
+        u_optimal = mpc_controller(x0)
+        assert u_optimal is not None, "Solver failed"
+    except:
+        assert False, "MPC solver crashed"
+</code></pre>
+
+                <h4>14.2 Edge Case Test Scenarios</h4>
+                <ul>
+                    <li><strong>Test with tight constraints:</strong> Ensure MPC handles minimal feasible ranges.</li>
+                    <li><strong>Test with large initial states:</strong> Check if MPC stabilizes extreme values.</li>
+                    <li><strong>Test with varying prediction horizons:</strong> Ensure computation time remains manageable.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>15. Real-World Failure Scenarios in MPC</h3>
+
+                <h4>15.1 Autonomous Vehicle Control</h4>
+                <ul>
+                    <li><strong>Failure:</strong> Sudden changes in road conditions (e.g., ice) lead to incorrect predictions.</li>
+                    <li><strong>Mitigation:</strong> Use adaptive or robust MPC to handle unexpected disturbances.</li>
+                </ul>
+
+                <h4>15.2 Industrial Process Control</h4>
+                <ul>
+                    <li><strong>Failure:</strong> Power loss or sensor failure disrupts real-time control.</li>
+                    <li><strong>Mitigation:</strong> Implement fail-safe mechanisms and redundant sensors.</li>
+                </ul>
+
+                <h4>15.3 Robotics & Drone Navigation</h4>
+                <ul>
+                    <li><strong>Failure:</strong> Computational delay results in a lagging response, leading to crashes.</li>
+                    <li><strong>Mitigation:</strong> Use explicit MPC or hybrid control approaches.</li>
+                </ul>
+
+            </article>
+
+            <article>
+                <h3>16. Real-World Applications & Industry Use Cases of Model Predictive Control (MPC)</h3>
+                <p>MPC is widely used across various industries due to its ability to handle constraints and optimize control decisions.</p>
+
+                <h4>16.1 Autonomous Vehicles</h4>
+                <ul>
+                    <li><strong>Path Planning & Collision Avoidance:</strong> MPC ensures smooth and optimal driving trajectories while avoiding obstacles.</li>
+                    <li><strong>Adaptive Cruise Control (ACC):</strong> Predicts and adjusts vehicle speed to maintain safe distances.</li>
+                    <li><strong>Lane-Keeping Assist:</strong> Uses MPC to minimize deviations from the center of the lane.</li>
+                </ul>
+
+                <h4>16.2 Industrial Process Control</h4>
+                <ul>
+                    <li><strong>Oil Refineries & Chemical Plants:</strong> Optimizes temperature, pressure, and flow rates under constraints.</li>
+                    <li><strong>Power Grid Optimization:</strong> Controls energy distribution and load balancing to prevent failures.</li>
+                </ul>
+
+                <h4>16.3 Robotics & Drone Navigation</h4>
+                <ul>
+                    <li><strong>Robot Motion Planning:</strong> Smooth and stable movement in dynamic environments.</li>
+                    <li><strong>Multi-Robot Coordination:</strong> Ensures multiple robots perform tasks without collisions.</li>
+                    <li><strong>Drone Trajectory Optimization:</strong> Maintains flight stability in changing wind conditions.</li>
+                </ul>
+
+                <h4>16.4 Finance & Economic Systems</h4>
+                <ul>
+                    <li><strong>Stock Portfolio Optimization:</strong> Predicts future stock behavior and adjusts investments.</li>
+                    <li><strong>Supply Chain Management:</strong> Optimizes inventory levels while minimizing costs.</li>
+                </ul>
+
+                <h4>16.5 Medical & Biomedical Applications</h4>
+                <ul>
+                    <li><strong>Drug Dosage Optimization:</strong> Controls drug release rates for personalized medicine.</li>
+                    <li><strong>Artificial Pancreas for Diabetes:</strong> Uses MPC to regulate insulin injection in real time.</li>
+                </ul>
+
+            </article>
+
+            <article>
+                <h3>17. Open-Source Implementations of MPC</h3>
+
+                <h4>17.1 Python Libraries</h4>
+                <ul>
+                    <li><strong>CVXPY:</strong> Implements MPC optimization using convex programming.</li>
+                    <li><strong>CasADi:</strong> Provides nonlinear MPC solvers for complex systems.</li>
+                    <li><strong>mpcpy:</strong> A dedicated Python library for developing MPC-based controllers.</li>
+                </ul>
+
+                <h4>17.2 MATLAB & Simulink</h4>
+                <ul>
+                    <li>MATLAB's Model Predictive Control Toolbox provides extensive support for real-time MPC.</li>
+                    <li>Simulink allows real-world system simulations before deployment.</li>
+                </ul>
+
+                <h4>17.3 ROS (Robot Operating System) Integration</h4>
+                <ul>
+                    <li>Open-source robotics projects use MPC for motion planning.</li>
+                    <li>Libraries like ACADO and OCS2 (Optimal Control Software) provide efficient MPC implementations.</li>
+                </ul>
+
+                <h4>17.4 GitHub Repositories</h4>
+                <ul>
+                    <li><a href="https://github.com/ethz-adrl/ocp" target="_blank">ETH Zurich MPC Repository</a></li>
+                    <li><a href="https://github.com/python-control/python-control" target="_blank">Python Control Systems Library</a></li>
+                    <li><a href="https://github.com/robotology/wb-toolbox" target="_blank">Whole-Body MPC Toolbox</a></li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>18. Practical Project: Implementing MPC for Drone Path Planning</h3>
+                <p>This Python script simulates an MPC-based drone trajectory controller.</p>
+
+                <pre><code class="language-python">
+import numpy as np
+import cvxpy as cp
+import matplotlib.pyplot as plt
+
+# System dynamics: x_{k+1} = Ax_k + Bu_k
+A = np.array([[1, 1], [0, 1]])  # Position & velocity
+B = np.array([[0], [1]])        # Control influence
+Q = np.eye(2)                    # State cost matrix
+R = np.eye(1) * 0.1              # Control effort cost matrix
+N = 10  # Prediction Horizon
+
+# Constraints
+x_min = np.array([-10, -10])  # State constraints
+x_max = np.array([10, 10])
+u_min = np.array([-2])  # Control constraints
+u_max = np.array([2])
+
+def mpc_drone_controller(x0, target):
+    x = cp.Variable((2, N + 1))
+    u = cp.Variable((1, N))
+    cost = 0
+    constraints = [x[:, 0] == x0]
+
+    for k in range(N):
+        cost += cp.quad_form(x[:, k] - target, Q) + cp.quad_form(u[:, k], R)
+        constraints += [x[:, k + 1] == A @ x[:, k] + B @ u[:, k]]
+        constraints += [x_min <= x[:, k], x[:, k] <= x_max]
+        constraints += [u_min <= u[:, k], u[:, k] <= u_max]
+
+    problem = cp.Problem(cp.Minimize(cost), constraints)
+    problem.solve()
+
+    return u[:, 0].value  # Apply only the first control action
+
+# Initial state (position, velocity)
+x0 = np.array([5, 0])
+target = np.array([0, 0])  # Target landing position
+
+# Simulating control actions over time
+positions = []
+for _ in range(15):
+    u_optimal = mpc_drone_controller(x0, target)
+    x0 = np.dot(A, x0) + np.dot(B, u_optimal)  # Apply control
+    positions.append(x0[0])
+
+# Plot results
+plt.plot(positions, label="Drone Path")
+plt.axhline(y=0, color='r', linestyle='--', label="Target")
+plt.legend()
+plt.xlabel("Time Step")
+plt.ylabel("Position")
+plt.title("MPC Drone Landing Optimization")
+plt.show()
+</code></pre>
+
+                <h4>18.1 Explanation</h4>
+                <ul>
+                    <li>The script models a drone's movement in 1D using position and velocity states.</li>
+                    <li>MPC computes an optimal sequence of control actions to reach the target position smoothly.</li>
+                    <li>Constraints prevent excessive acceleration.</li>
+                    <li>The resulting trajectory stabilizes the drone at the target position.</li>
+                </ul>
+
+                <h4>18.2 Possible Extensions</h4>
+                <ul>
+                    <li>Extend to 3D trajectory planning.</li>
+                    <li>Integrate wind disturbance compensation.</li>
+                    <li>Implement real-world drone simulation with ROS.</li>
+                </ul>
+
+            </article>
+
+            <article>
+                <h3>19. Model Predictive Control (MPC) in Competitive Programming & System Design</h3>
+
+                <h4>19.1 Using MPC in Competitive Programming</h4>
+                <p>While MPC is mainly used in real-time control systems, it can be adapted for competitive programming problems that involve:</p>
+                <ul>
+                    <li><strong>Path Optimization:</strong> Finding the best sequence of moves with constraints.</li>
+                    <li><strong>Resource Allocation:</strong> Making optimal decisions over a planning horizon.</li>
+                    <li><strong>Constrained Optimization:</strong> Problems with hard limits on actions.</li>
+                </ul>
+
+                <h5>19.1.1 Example Problem (Path Planning)</h5>
+                <p><strong>Problem:</strong> Given a grid where some cells have penalties, find the optimal path from (0,0) to (n,m) such that the cumulative penalty is minimized.</p>
+
+                <p><strong>Approach:</strong></p>
+                <ul>
+                    <li>Use MPC to optimize the path selection by predicting the next few steps.</li>
+                    <li>Apply a cost function that penalizes high-cost paths.</li>
+                    <li>Enforce movement constraints to prevent invalid moves.</li>
+                </ul>
+
+                <h5>19.1.2 Implementation (Python)</h5>
+                <pre><code class="language-python">
+import numpy as np
+import cvxpy as cp
+
+# Define grid cost matrix (higher values = penalty)
+grid = np.array([[0, 2, 3], [1, 5, 1], [4, 1, 0]])
+
+# State-space representation
+A = np.eye(2)
+B = np.eye(2)
+N = 3  # Prediction horizon
+
+def mpc_path_planner(start, target):
+    x = cp.Variable((2, N + 1), integer=True)
+    u = cp.Variable((2, N))
+    cost = 0
+    constraints = [x[:, 0] == start]
+
+    for k in range(N):
+        cost += grid[int(x[0, k]), int(x[1, k])]
+        constraints += [x[:, k + 1] == x[:, k] + u[:, k]]  # Movement model
+        constraints += [0 <= x[:, k], x[:, k] < grid.shape[0]]  # Stay within bounds
+
+    problem = cp.Problem(cp.Minimize(cost), constraints)
+    problem.solve()
+
+    return x.value[:, 1]  # Return next best move
+
+# Simulate movement
+start = np.array([0, 0])
+target = np.array([2, 2])
+for _ in range(5):
+    move = mpc_path_planner(start, target)
+    print("Next Move:", move)
+    start = move
+</code></pre>
+
+                <h4>19.2 Using MPC in System Design</h4>
+                <p>MPC is often used in large-scale system designs for:</p>
+                <ul>
+                    <li><strong>Cloud Resource Management:</strong> Allocating compute resources based on workload predictions.</li>
+                    <li><strong>Traffic Signal Optimization:</strong> Predicting vehicle flow and adjusting signals dynamically.</li>
+                    <li><strong>Energy Grid Balancing:</strong> Managing renewable energy storage efficiently.</li>
+                </ul>
+
+                <h5>19.2.1 Example: Cloud Server Auto-Scaling</h5>
+                <ul>
+                    <li><strong>Problem:</strong> A cloud provider must allocate servers dynamically based on predicted workload to minimize costs.</li>
+                    <li><strong>Solution:</strong> Use MPC to predict demand and allocate resources optimally.</li>
+                    <li><strong>Constraints:</strong> Server boot time, cost per unit, maximum capacity.</li>
+                </ul>
+
+            </article>
+
+            <article>
+                <h3>20. Assignments: Practical MPC Challenges</h3>
+
+                <h4>20.1 Solve at least 10 problems using MPC</h4>
+                <ol>
+                    <li><strong>Path planning with obstacles:</strong> Find an optimal path avoiding obstacles.</li>
+                    <li><strong>Resource allocation:</strong> Distribute limited resources across multiple agents.</li>
+                    <li><strong>Warehouse robot navigation:</strong> Plan the best path for a robot collecting items.</li>
+                    <li><strong>Stock trading optimization:</strong> Maximize profit while managing risk.</li>
+                    <li><strong>Autonomous car lane switching:</strong> Decide the best lane-changing strategy.</li>
+                    <li><strong>Dynamic pricing strategy:</strong> Adjust product pricing based on demand forecasts.</li>
+                    <li><strong>Manufacturing scheduling:</strong> Optimize machine usage with time constraints.</li>
+                    <li><strong>Traffic signal control:</strong> Minimize congestion with adaptive timing.</li>
+                    <li><strong>Multi-agent decision making:</strong> Coordinate actions of multiple autonomous agents.</li>
+                    <li><strong>Drone delivery optimization:</strong> Find the fastest delivery route considering wind disturbances.</li>
+                </ol>
+
+                <h4>20.2 Implement MPC in a system design problem</h4>
+                <p>Choose one of the following:</p>
+                <ul>
+                    <li>Use MPC to manage a cloud computing cluster.</li>
+                    <li>Optimize energy distribution in a smart grid.</li>
+                    <li>Design a self-balancing robot using MPC.</li>
+                    <li>Build an MPC-based recommendation system for e-commerce.</li>
+                </ul>
+
+                <h4>20.3 Practice implementing MPC under time constraints</h4>
+                <ul>
+                    <li>Set a timer for 2 hours and solve a coding problem using MPC.</li>
+                    <li>Optimize your implementation to reduce runtime complexity.</li>
+                    <li>Profile execution time and memory usage.</li>
+                </ul>
+
+            </article>
+
+        </main>
+
+        <script> copyright("all"); </script>
+
+    </body>
+
+</html>

@@ -118,12 +118,12 @@ function get_menu_list(datetogen) {
                 link: "dijkstra-bellman-ford"                
             },
             {
-                title: "Floyd-Warshall & A Algorithm*",
+                title: "Floyd-Warshall & A* Algorithm",
                 desc: "Pathfinding in AI, robotics, and network routing are just a few of the applications of Floyd-Warshall and A*. Dive into the intricate world of Floyd-Warshall and A* with our comprehensive guide. Explore the foundational principles and advanced applications of Floyd-Warshall and A*, unraveling the complexities of this data structure. From basic concepts to advanced strategies, this guide offers a holistic view of Floyd-Warshall and A*. Begin your journey into the realm of efficient data structures now!",
                 codetype: "Concepts",
                 readtime: 20,
                 link: "floyd-warshall-a-star-algorithm"                
-            },            
+            },                        
             {
                 title: "Topological Sorting",
                 desc: "Task scheduling, dependency resolution (build systems), and course prerequisites are just a few of the applications of Topological Sorting. Dive into the intricate world of Topological Sorting with our comprehensive guide. Explore the foundational principles and advanced applications of Topological Sorting, unraveling the complexities of this data structure. From basic concepts to advanced strategies, this guide offers a holistic view of Topological Sorting. Begin your journey into the realm of efficient data structures now!",
@@ -250,6 +250,146 @@ function get_menu_list(datetogen) {
                 readtime: 20,
                 link: "quicksort-optimized-median-of-three-pivot"
             },
+            {
+                title: "Merge Sort",
+                desc: "Used in databases, file systems, and network routing, Merge Sort is a fundamental sorting algorithm. Dive into the intricate world of Merge Sort with our comprehensive guide. Explore the foundational principles and advanced applications of Merge Sort, unraveling the complexities of this data structure. From basic concepts to advanced strategies, this guide offers a holistic view of Merge Sort. Begin your journey into the realm of efficient data structures now!",
+                codetype: "Sorting Algorithms",
+                readtime: 20,
+                link: "merge-sort"
+            },
+            {
+                title: "Timsort", 
+                desc: "Used in Python, Java, and Android, Timsort is a hybrid sorting algorithm. Dive into the intricate world of Timsort with our comprehensive guide. Explore the foundational principles and advanced applications of Timsort, unraveling the complexities of this data structure. From basic concepts to advanced strategies, this guide offers a holistic view of Timsort. Begin your journey into the realm of efficient data structures now!",
+                codetype: "Sorting Algorithms",
+                readtime: 20,
+                link: "timsort"
+            },
+            {
+                title: "Counting Sort",
+                desc: "Used in databases, file systems, and network routing, Counting Sort is a fundamental sorting algorithm. Dive into the intricate world of Counting Sort with our comprehensive guide. Explore the foundational principles and advanced applications of Counting Sort, unraveling the complexities of this data structure. From basic concepts to advanced strategies, this guide offers a holistic view of Counting Sort. Begin your journey into the realm of efficient data structures now!",
+                codetype: "Sorting Algorithms",
+                readtime: 20,
+                link: "counting-sort"
+            },
+            {
+                title: "Radix Sort",
+                desc: "Used when sorting integers, Radix Sort is a fundamental sorting algorithm. Dive into the intricate world of Radix Sort with our comprehensive guide. Explore the foundational principles and advanced applications of Radix Sort, unraveling the complexities of this data structure. From basic concepts to advanced strategies, this guide offers a holistic view of Radix Sort. Begin your journey into the realm of efficient data structures now!",
+                codetype: "Sorting Algorithms",
+                readtime: 20,
+                link: "radix-sort"
+            },            
+            {
+                title: "Bucket Sort",
+                desc: "Used for sorting floating-point numbers, Bucket Sort is a fundamental sorting algorithm. Dive into the intricate world of Bucket Sort with our comprehensive guide. Explore the foundational principles and advanced applications of Bucket Sort, unraveling the complexities of this data structure. From basic concepts to advanced strategies, this guide offers a holistic view of Bucket Sort. Begin your journey into the realm of efficient data structures now!",
+                codetype: "Sorting Algorithms",
+                readtime: 20,
+                link: "bucket-sort"
+            },
+            {
+                title: "Monte Carlo Algorithm",
+                desc: "Used in simulations, finance, and statistics, Monte Carlo is a powerful algorithm. Dive into the intricate world of Monte Carlo with our comprehensive guide. Explore the foundational principles and advanced applications of Monte Carlo, unraveling the complexities of this data structure. From basic concepts to advanced strategies, this guide offers a holistic view of Monte Carlo. Begin your journey into the realm of efficient data structures now!",
+                codetype: "Concepts",
+                readtime: 20,
+                link: "monte-carlo-algorithm"
+            },
+            {
+                title: "Las Vegas Algorithm",
+                desc: "Used in cryptography, simulations, and statistics, Las Vegas is a powerful algorithm. Dive into the intricate world of Las Vegas with our comprehensive guide. Explore the foundational principles and advanced applications of Las Vegas, unraveling the complexities of this data structure. From basic concepts to advanced strategies, this guide offers a holistic view of Las Vegas. Begin your journey into the realm of efficient data structures now!",
+                codetype: "Concepts",
+                readtime: 20,
+                link: "las-vegas-algorithm"
+            },
+            {
+                title: "Simulated Annealing Algorithm",
+                desc: "Used in optimization, neural networks, and cryptography, Simulated Annealing is a powerful algorithm. Dive into the intricate world of Simulated Annealing with our comprehensive guide. Explore the foundational principles and advanced applications of Simulated Annealing, unraveling the complexities of this data structure. From basic concepts to advanced strategies, this guide offers a holistic view of Simulated Annealing. Begin your journey into the realm of efficient data structures now!",
+                codetype: "Concepts",
+                readtime: 20,
+                link: "simulated-annealing-algorithm"
+            },
+            {
+                title: "Genetic Algorithm",
+                desc: "Used in AI-based optimizations, neural networks, and cryptography, Genetic Algorithm is a powerful algorithm. Dive into the intricate world of Genetic Algorithm with our comprehensive guide. Explore the foundational principles and advanced applications of Genetic Algorithm, unraveling the complexities of this data structure. From basic concepts to advanced strategies, this guide offers a holistic view of Genetic Algorithm. Begin your journey into the realm of efficient data structures now!",
+                codetype: "Concepts",
+                readtime: 20,
+                link: "genetic-algorithm"
+            },
+            {
+                title: "Markov Decision Processes (MDP)",
+                desc: "Used in reinforcement learning (self-driving cars), AI, robotics, and economics, Markov Decision Processes are a powerful tool for sequential decision-making. Dive into the intricate world of Markov Decision Processes with our comprehensive guide. Explore the foundational principles and advanced applications of MDP, unraveling the complexities of this data structure. From basic concepts to advanced strategies, this guide offers a holistic view of MDP. Begin your journey into the realm of efficient data structures now!",
+                codetype: "Concepts",
+                readtime: 20,
+                link: "markov-decision-processes-mdp"
+            },
+            {
+                title: "Convex Hull (Graham’s Scan, Jarvis March)",
+                desc: "Used in GIS mapping, collision detection, image processing, robotics, and computer graphics, Convex Hull is a powerful algorithm. Dive into the intricate world of Convex Hull with our comprehensive guide. Explore the foundational principles and advanced applications of Convex Hull, unraveling the complexities of this data structure. From basic concepts to advanced strategies, this guide offers a holistic view of Convex Hull. Begin your journey into the realm of efficient data structures now!",
+                codetype: "Concepts",
+                readtime: 20,
+                link: "convex-hull-grahams-scan-jarvis-march"
+            },
+            {
+                title: "Line Intersection (Bentley-Ottmann Algorithm)",
+                desc: "What do computer graphics, GIS mapping, and robotics have in common? They all use the Line Intersection Algorithm. Dive into the intricate world of Line Intersection Algorithm with our comprehensive guide. Explore the foundational principles and advanced applications of Line Intersection Algorithm, unraveling the complexities of this data structure. From basic concepts to advanced strategies, this guide offers a holistic view of Line Intersection Algorithm. Begin your journey into the realm of efficient data structures now!",
+                codetype: "Concepts",
+                readtime: 20,
+                link: "line-intersection-bentley-ottmann-algorithm"
+            },
+            {
+                title: "Sweep Line Algorithm",
+                desc: "Whenever you need to find intersections, overlaps, or conflicts, the Sweep Line Algorithm is your go-to solution. Dive into the intricate world of Sweep Line Algorithm with our comprehensive guide. Explore the foundational principles and advanced applications of Sweep Line Algorithm, unraveling the complexities of this data structure. From basic concepts to advanced strategies, this guide offers a holistic view of Sweep Line Algorithm. Begin your journey into the realm of efficient data structures now!",
+                codetype: "Concepts",
+                readtime: 20,
+                link: "sweep-line-algorithm"
+            },
+            {
+                title: "Delaunay triangulation (Bowyer-Watson Algorithm)",
+                desc: "If you need to find the optimal triangulation of a set of points, the Delaunay triangulation is your go-to solution. Dive into the intricate world of Delaunay triangulation with our comprehensive guide. Explore the foundational principles and advanced applications of Delaunay triangulation, unraveling the complexities of this data structure. From basic concepts to advanced strategies, this guide offers a holistic view of Delaunay triangulation. Begin your journey into the realm of efficient data structures now!",
+                codetype: "Concepts",
+                readtime: 20,
+                link: "delaunay-triangulation-bowyer-watson-algorithm"
+            },
+            {
+                title: "Closest Pair of Points",
+                desc: "Essential in AI-driven algorithms, and frequently used in data clustering and image processing, the Closest Pair of Points algorithm is a powerful tool. Dive into the intricate world of Closest Pair of Points with our comprehensive guide. Explore the foundational principles and advanced applications of Closest Pair of Points, unraveling the complexities of this data structure. From basic concepts to advanced strategies, this guide offers a holistic view of Closest Pair of Points. Begin your journey into the realm of efficient data structures now!",
+                codetype: "Concepts",
+                readtime: 20,
+                link: "closest-pair-of-points"
+            },
+            {
+                title: "Voronoi Diagrams (Fortune’s Algorithm)",
+                desc: "One of the most powerful algorithms in computational geometry, Voronoi Diagrams are used in GIS mapping, collision detection, image processing, robotics, and computer graphics. Dive into the intricate world of Voronoi Diagrams with our comprehensive guide. Explore the foundational principles and advanced applications of Voronoi Diagrams, unraveling the complexities of this data structure. From basic concepts to advanced strategies, this guide offers a holistic view of Voronoi Diagrams. Begin your journey into the realm of efficient data structures now!",
+                codetype: "Concepts",
+                readtime: 20,
+                link: "voronoi-diagrams-fortunes-algorithm"
+            },
+            {
+                title: "End-to-End Multimodal AI Models",
+                desc: "Contributing 40% in autonomous vehicles, robotics, and industrial automation, this helps the ego vehicle in Decision-Making, Scene Understanding, Path Planning, and Control. Dive into the intricate world of End-to-End Multimodal AI Models with our comprehensive guide. Explore the foundational principles and advanced applications of End-to-End Multimodal AI Models, unraveling the complexities of this data structure. From basic concepts to advanced strategies, this guide offers a holistic view of End-to-End Multimodal AI Models. Begin your journey now!",
+                codetype: "Concepts",
+                readtime: 20,
+                link: "end-to-end-multimodal-ai-models"
+            },
+            {
+                title: "Advanced Perception (LiDAR, Liquid Neural Networks, Vision Transformers)",
+                desc: "Contributing 35% in autonomous vehicles, robotics, and industrial automation, Advanced Perception algorithms helps in Object Detection, Environment Awareness, and Scene Understanding.",
+                codetype: "Concepts",
+                readtime: 20,
+                link: "advanced-perception-lidar-liquid-neural-networks-vision-transformers"            
+            },
+            {
+                title: "Graph Simultaneous Localization and Mapping (Graph SLAM)",
+                desc: "Contributing 15% in autonomous systems, Graph SLAM algorithms allow a vehicle to build a map of an unknown environment while simultaneously tracking its location within that map. Dive into the intricate world of Graph SLAM with our comprehensive guide.",
+                codetype: "Concepts",
+                readtime: 20,
+                link: "graph-simultaneous-localization-and-mapping-graph-slam"
+            },            
+            {
+                title: "Model Predictive Control (MPC)",
+                desc: "Used for Control & Actuation in autonomous vehicles, robotics, and industrial automation, Model Predictive Control is a powerful algorithm which contributes more than 10% in todays ultra modern autonomous technologies. Dive into the intricate world of Model Predictive Control with our comprehensive guide. Explore the foundational principles and advanced applications of Model Predictive Control, unraveling the complexities of this data structure. From basic concepts to advanced strategies, this guide offers a holistic view of Model Predictive Control. Begin your journey now!",
+                codetype: "Concepts",
+                readtime: 20,
+                link: "model-predictive-control-mpc"
+            }
         ];
         body_genmenu.processData(arr, def_date, def_author);
     }
