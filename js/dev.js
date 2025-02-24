@@ -3471,9 +3471,9 @@ let header_author = async function (...args) {
                     } else {
                         if (window.location.pathname !== GLOBAL_login_page_path && window.location.pathname !== '/') {
                             document.addEventListener('DOMContentLoaded', () => {
-                                if (!GLOBAL_404safe_sitemap_spider_mode && Math.random() < 0.3) {
-                                    cL();
-                                    hidemainuntillogin();
+                                if (!GLOBAL_404safe_sitemap_spider_mode && Math.random() < 0.1) {
+                                    // cL();
+                                    // hidemainuntillogin();
                                 }
                             });
                         }
