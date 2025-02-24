@@ -6,15 +6,15 @@ function get_menu_list(datetogen) {
                 title: "HTML Laboratory",
                 desc: "Unleash Your Inner Coder with Our Classroom Masterpiece! From Basic to Beyond, We've Got HTML Labs that Will Make You a Pro in No Time. Let the Fun and Learning Begin!",
                 codetype: "HTML Labs",
-                link: "lab/",
                 date: "Wed November 23, 2022",
+                link: "lab/",
             },
             {
-                link : "file/",
                 date : "Sun December 25, 2022",
                 title:  "Practical File",
                 desc : "Step up your web game with progressive enhancement! Let's give those browsers a run for their money by crafting a top-notch HTML practical notebook. Accessibility for all, served on a silver platter. Ready, set, let's code!",
                 codetype: "HTML Labs",
+                link : "file/",
             },
             {
                 link: "misc/project_report_video",

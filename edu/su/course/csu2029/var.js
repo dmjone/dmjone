@@ -109,7 +109,7 @@ function get_menu_list(datetogen) {
                 codetype: "Concepts",
                 readtime: 5,
                 date: "Wed August 14, 2024",
-                link: "efficiency-effectiveness"
+                link: "efficiency-effectiveness-efficacy"
             },
             {
                 title: "EROI, AROI, and ROTI (Estimated Return on Investment, Actual Return on Investment, and Return on Time Invested)",

@@ -34,7 +34,7 @@ function get_menu_list(datetogen) {
                 desc: "Description of the topic.",
                 codetype: "Concepts",
                 readtime: 5,
-                link: "link-to-the-topic"
+                // link: "link-to-the-topic"
             },            
         ];
         body_genmenu.processData(arr, def_date, def_author);
@@ -44,7 +44,7 @@ function get_menu_list(datetogen) {
     /**********  AUTOMATION CONTROL **********/
     let title, link, date, desc, codetype, readtime, author = 1, semester, cardimage, continuereading;
     const functions = {
-        theory: get_class,
+        // theory: get_class,
         default: get_main
     };
     (functions[window.urlpart5] || functions.default)(datetogen, author);
