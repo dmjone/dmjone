@@ -2,15 +2,15 @@
 function get_menu_list(datetogen) {
     function get_main(def_date, def_author) {
         const arr = [
-            // {
-            //     link: "theory/",
-            //     title: "Theory: Course Overview and Concepts",
-            //     desc: "Description of the topic. This section provides an overview of the key concepts and principles related to the topic. Click to explore the fundamentals and advanced aspects of the subject, including real-world applications and case studies.",
-            //     codetype: "CSUCODE | Course",
-            //     cardimage: "https://cdn.dmj.one/edu/su/course/csuCODE/img/logo.webp",                
-            //     // cardimage_dark: "//cdn.dmj.one/img/needhelp.webp",               
-            //     // continuereading: " Click here to reach out to Faculty directly through email"
-            // },
+            {
+                link: "theory/",
+                title: "Theory: PhP and MySQL",
+                desc: "Explore the fundamentals of PhP programming, MySQL database design, and the integration of PhP and MySQL to create dynamic web applications. Click to access the theory section and learn the core concepts of PhP and MySQL.",
+                codetype: "CSU2101 | Concepts",
+                cardimage: "https://cdn.dmj.one/edu/su/course/csu2101/img/logo.webp",                
+                // cardimage_dark: "//cdn.dmj.one/img/needhelp.webp",               
+                // continuereading: " Click here to reach out to Faculty directly through email"
+            },
             // {
             //     link: "lab/",
             //     title: "Lab: Hands-On Practice and Exercises",
@@ -36,11 +36,11 @@ function get_menu_list(datetogen) {
     function get_class(def_date, def_author) {
         const arr = [
             {
-                title: "Topic Name",
-                desc: "Description of the topic.",
+                title: "Database Transactions, MIS, DSS, and SQL Optimization for Business Intelligence & Analytics",
+                desc: "Learn about database transactions, management information systems (MIS), decision support systems (DSS), and SQL optimization for business intelligence and analytics. This course covers the fundamentals of database transactions, MIS, and DSS, and explores SQL optimization techniques to enhance the performance of database queries for business intelligence and analytics applications.",
                 codetype: "Concepts",
                 readtime: 5,
-                link: "link-to-the-topic"
+                link: "database-transactions-mis-dss-sql-optimization-business-intelligence-analytics"
             },            
         ];
         body_genmenu.processData(arr, def_date, def_author);

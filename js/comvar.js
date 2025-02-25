@@ -578,6 +578,12 @@ const profDetailsBio = {
         bio: "<p class='professorbio header-p-author-description'>Anandita Garg is an Assistant Professor and researcher specializing in AI, machine learning, and electronics. A GATE 2023 qualifier and Stanford-certified in Machine Learning, she contributed to a Govt. of India-backed project on Automated Soil Nutrient Sensing and holds a patent for an anti-sleep alarm. With five years of experience in academia and research, she remains committed to AI-driven innovations in engineering and technology.</p>",
         href: "contact@dmj.one"
     },
+    'Manashwee Tripathi':
+    {
+        bio: "<p class='professorbio header-p-author-description'>Shri Manashwee Tripathi is a highly skilled and experienced database expert who offers industry-oriented training designed to bridge the gap between academic learning and real-world application. With years of expertise and a deep understanding of current industry needs, he crafts courses that equip you with the practical knowledge and hands-on experience required to excel in the professional world.</p>",
+        href: "contact@dmj.one"
+    },
+    
         
 };
 const courseDetailsMap = {
@@ -663,7 +669,7 @@ const courseDetailsMap = {
     // Semester 6    
     'dmjcclt': { 'default': ["Dr. Ahmad Waleed Salehi", "DMJCCLT", "Cloud Computing Concepts"] },
     'lse006': { 'default': ["Akshita Thakur", "LSE006", "English Communication Seminar 2"] },
-    'csu2101': { 'default': ["Aman Rajak", "CSU2101", "Programming in PHP & MySQL"] },    
+    'csu2101': { 'default': ["Manashwee Tripathi", "CSU2101", "Programming in PHP & MySQL"] },    
     
 };
 
