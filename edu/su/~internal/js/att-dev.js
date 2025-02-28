@@ -16,6 +16,31 @@
     // wait for the page to load
     document.addEventListener('DOMContentLoaded', function () {
 
+        function controlVisibility() {
+            const userEmail = localStorage.getItem('userEmail')?.toLowerCase();
+            const allowedEmails = [
+                atob('ZGl2eWFtb2hhbjE5OTNAZ21haWwuY29t'),
+            ];
+
+            console.log("inside")
+            if (!allowedEmails.includes(userEmail)) {
+                const mainElement = document.querySelector('main');
+                if (mainElement) {
+                    mainElement.innerHTML = '<div class="text-danger text-center display-1 page-center justify-content-center">410: Unauthorized</div>';
+                    mainElement.classList.remove('d-none');
+                    mainElement.style.display = 'block';
+                }
+            } else {
+                const mainElement = document.querySelector('main');
+                if (mainElement) {
+                    mainElement.classList.remove('d-none');
+                    mainElement.style.display = 'block';
+                }
+            }
+        }
+
+        controlVisibility();
+
         document.getElementById('sortAlphabetically').addEventListener('change', function () {
             updateAbsentList(); // Re-render the list whenever the toggle changes
         });
@@ -233,8 +258,9 @@
                     });
                 }
             }
-
+           
         });                
         
     });
+
 })();
