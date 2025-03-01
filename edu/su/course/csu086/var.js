@@ -4,25 +4,19 @@ function get_menu_list(datetogen) {
         const arr = [
             {
                 link: "theory/",
-                title: "Theory: Course Overview and Concepts",
-                desc: "Description of the topic. This section provides an overview of the key concepts and principles related to the topic. Click to explore the fundamentals and advanced aspects of the subject, including real-world applications and case studies.",
-                codetype: "CSUCODE | Course",
-                cardimage: "https://cdn.dmj.one/edu/su/course/csuCODE/img/logo.webp",                
+                title: "Concepts of Compiler Design",
+                desc: "Learn the fundamentals of Compiler Design, including lexical analysis, parsing, intermediate code generation, optimization, debugging, and real-world applications. This section provides a comprehensive guide to Compiler Design, covering essential concepts and advanced topics in Compiler Design.",
+                codetype: "CSU086 | Compiler Design",
+                cardimage: "https://cdn.dmj.one/edu/su/course/csu086/img/logo.webp",                
                 // cardimage_dark: "//cdn.dmj.one/img/needhelp.webp",               
                 // continuereading: " Click here to reach out to Faculty directly through email"
-            },
-            {
-                link: "lab/",
-                title: "Lab: Hands-On Practice and Exercises",
-                desc: "Description of the topic. This section offers practical exercises and interactive tools to help you apply the concepts learned in the theory section. Click to access hands-on labs, coding exercises, and simulations that will enhance your understanding of the topic.",
-                codetype: "CSUCODE | Course",
-            },
-            {
-                link: "practice/",
-                title: "Practice Operating Systems Concepts: Strengthen Your Knowledge",
-                desc: "Reinforce your understanding of Operating Systems with practice exercises and interactive tools. This section offers a range of resources to help you master operating system concepts, including sorting algorithms, virtual machine installation, and more. Click to access hands-on exercises that will enhance your comprehension of operating system principles and prepare you for advanced topics in computer science.",
-                codetype: "Practice | Operating Systems",                
-            }
+            },            
+            // {
+            //     link: "practice/",
+            //     title: "Practice Compiler Design Concepts",
+            //     desc: "Reinforce your understanding of Compiler Design concepts with practice exercises and interactive tools. This section offers a range of resources to help you master Compiler Design principles, including lexical analysis, parsing, intermediate code generation, optimization, and more. Click to access hands-on exercises that will enhance your comprehension of Compiler Design principles and prepare you for advanced topics in computer science.",
+            //     codetype: "Practice | Compiler Design",                
+            // }
         ];
 
         body_genmenu.processData(arr, def_date, def_author, { isMainCategory: true });
@@ -30,12 +24,13 @@ function get_menu_list(datetogen) {
     function get_class(def_date, def_author) {
         const arr = [
             {
-                title: "Topic Name",
-                desc: "Description of the topic.",
-                codetype: "Concepts",
-                readtime: 5,
-                link: "link-to-the-topic"
-            },            
+                "title": "Language Processing System & Compiler Design",
+                "desc": "Comprehensive guide on Compiler Design and Language Processing Systems, covering lexical analysis, parsing, intermediate code generation, optimization, AI-powered compilers, debugging, and real-world applications.",
+                "codetype": "Concepts",
+                "readtime": 30,
+                "date": "Mon February 03, 2024",
+                "link": "language-processing-system-compiler-design"
+            }            
         ];
         body_genmenu.processData(arr, def_date, def_author);
     }
