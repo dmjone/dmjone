@@ -108,7 +108,23 @@ function get_menu_list(datetogen) {
                 readtime: 20,
                 link: "software-models-requirement-engineering",
                 date: "Fri February 14, 2025"
-            }
+            },
+            {
+                title: "Fundamental Issues in Software Design",
+                desc: "Explore the fundamental issues in software design, including complexity, modularity, abstraction, and design patterns.",
+                codetype: "Concepts",
+                readtime: 15,
+                link: "fundamental-issues-in-software-design",
+                date: "Mon February 17, 2025"
+            },
+            {
+                title: "Cohesion and Coupling",
+                desc: "Learn how Cohesion and Coupling impact software architecture, and discover best practices for designing scalable, maintainable systems.",
+                codetype: "Concepts",
+                readtime: 15,
+                link: "cohesion-coupling-guide",
+                date: "Tue February 18, 2025"
+            },
         ];
         body_genmenu.processData(arr, def_date, def_author);
     } 
