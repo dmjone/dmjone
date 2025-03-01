@@ -30,12 +30,16 @@ function get_menu_list(datetogen) {
     function get_class(def_date, def_author) {
         const arr = [
             {
-                title: "Topic Name",
-                desc: "Description of the topic.",
+                title: "Most Commonly Used Software Design Models",
+                desc: "Explore key software design models like Waterfall, Agile, Spiral, V-Model, Iterative, Incremental, RAD, and Prototyping. Understand their principles, advantages, and real-world applications for professional software development.",
                 codetype: "Concepts",
-                readtime: 5,
-                link: "link-to-the-topic"
-            },            
+                readtime: 15,
+                link: "most-commonly-used-software-design-models",
+                date: "Mon February 03, 2024"
+            },
+            {
+                title: "Waterfall Model"
+            },
         ];
         body_genmenu.processData(arr, def_date, def_author);
     }
