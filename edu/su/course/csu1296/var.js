@@ -4,25 +4,25 @@ function get_menu_list(datetogen) {
         const arr = [
             {
                 link: "theory/",
-                title: "Theory: Course Overview and Concepts",
-                desc: "Description of the topic. This section provides an overview of the key concepts and principles related to the topic. Click to explore the fundamentals and advanced aspects of the subject, including real-world applications and case studies.",
-                codetype: "CSUCODE | Course",
-                cardimage: "https://cdn.dmj.one/edu/su/course/csuCODE/img/logo.webp",                
+                title: "Software Engineering Concepts",
+                desc: "Explore key concepts in software engineering, including software design models, software development life cycle (SDLC), and software process models. Learn about the principles, advantages, and real-world applications of software engineering in professional software development.",
+                codetype: "CSU1296 | Software Engineering",
+                cardimage: "https://cdn.dmj.one/edu/su/course/csu1296/img/logo.webp",                
                 // cardimage_dark: "//cdn.dmj.one/img/needhelp.webp",               
                 // continuereading: " Click here to reach out to Faculty directly through email"
             },
-            {
-                link: "lab/",
-                title: "Lab: Hands-On Practice and Exercises",
-                desc: "Description of the topic. This section offers practical exercises and interactive tools to help you apply the concepts learned in the theory section. Click to access hands-on labs, coding exercises, and simulations that will enhance your understanding of the topic.",
-                codetype: "CSUCODE | Course",
-            },
-            {
-                link: "practice/",
-                title: "Practice Operating Systems Concepts: Strengthen Your Knowledge",
-                desc: "Reinforce your understanding of Operating Systems with practice exercises and interactive tools. This section offers a range of resources to help you master operating system concepts, including sorting algorithms, virtual machine installation, and more. Click to access hands-on exercises that will enhance your comprehension of operating system principles and prepare you for advanced topics in computer science.",
-                codetype: "Practice | Operating Systems",                
-            }
+            // {
+            //     link: "lab/",
+            //     title: "Lab: Hands-On Practice and Exercises",
+            //     desc: "Description of the topic. This section offers practical exercises and interactive tools to help you apply the concepts learned in the theory section. Click to access hands-on labs, coding exercises, and simulations that will enhance your understanding of the topic.",
+            //     codetype: "CSUCODE | Course",
+            // },
+            // {
+            //     link: "practice/",
+            //     title: "Practice Operating Systems Concepts: Strengthen Your Knowledge",
+            //     desc: "Reinforce your understanding of Operating Systems with practice exercises and interactive tools. This section offers a range of resources to help you master operating system concepts, including sorting algorithms, virtual machine installation, and more. Click to access hands-on exercises that will enhance your comprehension of operating system principles and prepare you for advanced topics in computer science.",
+            //     codetype: "Practice | Software Engineering",                
+            // }
         ];
 
         body_genmenu.processData(arr, def_date, def_author, { isMainCategory: true });
