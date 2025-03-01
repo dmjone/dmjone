@@ -583,6 +583,16 @@ const profDetailsBio = {
         bio: "<p class='professorbio header-p-author-description'>Shri Manashwee Tripathi is a highly skilled and experienced database expert who offers industry-oriented training designed to bridge the gap between academic learning and real-world application. With years of expertise and a deep understanding of current industry needs, he crafts courses that equip you with the practical knowledge and hands-on experience required to excel in the professional world.</p>",
         href: "contact@dmj.one"
     },
+    'Kritika Rana':
+    {
+        bio: "<p class='professorbio header-p-author-description'>Kritika Rana is an Assistant Professor at the Yogananda School of AI, Computers, and Data Sciences. With a strong academic background in Artificial Intelligence and two years of teaching experience, she has made significant contributions as a research associate, publishing papers on autonomous vehicles and deep learning. Her expertise spans data analysis, project management, and software engineering, reflecting her adaptability and innovative approach. Passionate about student mentorship and academic advising, she is committed to advancing AI education and research.</p>",
+        href: "contact@dmj.one"
+    },
+    'Maya Thapa':
+    {
+        bio: "<p class='professorbio header-p-author-description'>Maya Thapa is an Assistant Professor at the Yogananda School of AI and Data Science with expertise in Machine Learning and Deep Learning. She holds a Bachelor's degree from the Atal Bihari Vajpayee Government Institute of Engineering and Technology, Shimla, and a Master's from the University Institute of Engineering and Technology, Panjab University. Her research focuses on image classification and Explainable AI (XAI), earning her the Best Paper Presentation award at the 2nd International Conference of Women Researchers in Electronics and Computing (Springer, 2023). Passionate about bridging theory and practice, she brings subjects like Algorithms and Web Development to life for her students.</p>",
+        href: "contact@dmj.one"
+    },
     
         
 };
@@ -670,6 +680,9 @@ const courseDetailsMap = {
     'dmjcclt': { 'default': ["Dr. Ahmad Waleed Salehi", "DMJCCLT", "Cloud Computing Concepts"] },
     'lse006': { 'default': ["Akshita Thakur", "LSE006", "English Communication Seminar 2"] },
     'csu2101': { 'default': ["Manashwee Tripathi", "CSU2101", "Programming in PHP & MySQL"] },    
+    'csu1296': { 'default': ["Kritika Rana", "CSU1296", "Software Engineering"] },    
+    'csu2104': { 'default': ["Dr. Sonia", "CSU2104", "Digital Forensics"] },    
+    'csu086': { 'default': ["Maya Thapa", "CSU086", "Compiler Design"] },
     
 };
 
