@@ -24,13 +24,53 @@ function get_menu_list(datetogen) {
     function get_class(def_date, def_author) {
         const arr = [
             {
-                "title": "Language Processing System & Compiler Design",
-                "desc": "Comprehensive guide on Compiler Design and Language Processing Systems, covering lexical analysis, parsing, intermediate code generation, optimization, AI-powered compilers, debugging, and real-world applications.",
-                "codetype": "Concepts",
-                "readtime": 30,
-                "date": "Mon February 03, 2024",
-                "link": "language-processing-system-compiler-design"
-            }            
+                title: "Language Processing System & Compiler Design",
+                desc: "Comprehensive guide on Compiler Design and Language Processing Systems, covering lexical analysis, parsing, intermediate code generation, optimization, AI-powered compilers, debugging, and real-world applications.",
+                codetype: "Concepts",
+                readtime: 30,
+                date: "Mon February 03, 2024",
+                link: "language-processing-system-compiler-design"
+            },
+            {
+                title: "Lexical Analysis (Scanning) in Compiler Design",
+                desc: "Understand the process of lexical analysis in Compiler Design, including tokenization, regular expressions, finite automata, and real-world applications.",
+                codetype: "Concepts",
+                readtime: 20,
+                date: "Tue February 04, 2024",
+                link: "lexical-analysis-scanning-compiler-design"
+            },
+            {
+                title: "Syntax Analysis (Parsing) in Compiler Design",
+                desc: "Learn about parsing in Compiler Design, including top-down parsing, bottom-up parsing, LR parsing, LALR parsing, and real-world applications.",
+                codetype: "Concepts",
+                readtime: 20,
+                date: "Wed February 05, 2024",
+                link: "syntax-analysis-parsing-compiler-design"
+            },
+            // {
+            //     title: "Intermediate Code Generation in Compiler Design",
+            //     desc: "Understand the process of intermediate code generation in Compiler Design, including syntax trees, abstract syntax trees, three-address code, quadruples, and real-world applications.",
+            //     codetype: "Concepts",
+            //     readtime: 20,
+            //     date: "Thu February 06, 2024",
+            //     link: "intermediate-code-generation-compiler-design"
+            // },
+            // {
+            //     title: "Code Optimization in Compiler Design",
+            //     desc: "Explore the process of code optimization in Compiler Design, including peephole optimization, loop optimization, constant folding, and real-world applications.",
+            //     codetype: "Concepts",
+            //     readtime: 20,
+            //     date: "Fri February 07, 2024",
+            //     link: "code-optimization-compiler-design"
+            // },
+            // {
+            //     title: "AI-Powered Compilers & Debugging",
+            //     desc: "Learn about AI-powered compilers and debugging tools in Compiler Design, including static analysis, dynamic analysis, symbolic execution, and real-world applications.",
+            //     codetype: "Concepts",
+            //     readtime: 20,
+            //     date: "Sat February 08, 2024",
+            //     link: "ai-powered-compilers-debugging"
+            // }
         ];
         body_genmenu.processData(arr, def_date, def_author);
     }
