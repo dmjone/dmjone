@@ -1,0 +1,195 @@
+<!-------------------------- © 2007 - present, dmj.one and contributors. ----------------------------------
+   Part of the dmjone project. Licensed under the GNU AGPL. Provided as-is, without warranty of any kind. 
+-------------------- Redistribution and modifications must retain this notice. --------------------------->
+
+
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+    <!--<![endif]-->
+
+    <head>
+        <script src="/js/edu_su_common.js"></script>
+        <noscript>
+            <style>
+                html,
+                body {
+                    margin: 0;
+                    overflow: hidden;
+                }
+            </style>
+            <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+        </noscript>
+
+        <title>Ambiguous Grammar - CSU086 - Shoolini U</title>
+        <meta name="description" content="Learn about ambiguous grammar and its implications in compiler design.">
+        
+        <meta property="og:image" content="/logo.png">
+        <meta property="og:type" content="article">
+        
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:site" content="@divyamohan1993">
+        <meta name="twitter:creator" content="@divyamohan1993">
+        <meta name="twitter:image" content="/logo.png">
+        
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        
+        <meta name="author" content="Divya Mohan">
+        <meta name="robots" content="index, follow">
+
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js" integrity="sha512-sHSNLECRJSK+BFs7E8DiFc6pf6n90bLI85Emiw1jhreduZhK3VXgq9l4kAt9eTIHYAcuQBKHL01QKs4/3Xgl8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js" integrity="sha512-iWiuBS5nt6r60fCz26Nd0Zqe0nbk1ZTIQbl3Kv7kYsX+yKMUFHzjaH2+AnM6vp2Xs+gNmaBAVWJjSmuPw76Efg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                renderMathInElement(document.body, {
+                    // customised options
+                    // • auto-render specific keys, e.g.:
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false },
+                        { left: '\\(', right: '\\)', display: false },
+                        { left: '\\[', right: '\\]', display: true }
+                    ],
+                    // • rendering keys, e.g.:
+                    throwOnError: false
+                });
+            });
+        </script> -->
+
+        <!-- <style>
+            main ul {
+                list-style-type: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            main ul li {
+                margin: 0;
+                padding: 0;
+            }
+        </style> -->
+
+
+
+
+    </head>
+
+    <body>
+
+        <script> header_author("dm"); </script>
+
+        <main>
+            <article class="agen-tableofcontents">
+                <h2 class="text-center">
+                    Ambiguous Grammar and Violations
+                </h2>
+                <div class="d-none contentdate">2025, February 1</div>
+            </article>
+
+            <article>
+                <h3>Ambiguous Grammar</h3>
+                <p>Ambiguous grammar is a formal grammar that allows more than one parse tree for the same string. This ambiguity leads to multiple interpretations, making it unsuitable for parsing in compilers. Such grammars often cause issues in syntax analysis, affecting compiler construction and program execution.</p>
+            </article>
+
+            <article>
+                <h4>1. Definition of Ambiguous Grammar</h4>
+                <p>A grammar is ambiguous if there exists at least one string in the language it generates that has more than one distinct parse tree. This means there are multiple ways to derive the same string using different rule applications.</p>
+            </article>
+
+            <article>
+                <h4>2. Common Causes of Ambiguity</h4>
+                <ul>
+                    <li><strong>Lack of Operator Precedence</strong>: Ambiguous grammars often fail to specify precedence levels for operators, leading to multiple parse trees.</li>
+                    <li><strong>Associativity Issues</strong>: Some grammars do not enforce left or right associativity, leading to different grouping of operators.</li>
+                    <li><strong>Dangling-Else Problem</strong>: This arises when an <code>else</code> statement can be associated with multiple <code>if</code> statements.</li>
+                    <li><strong>Recursive Definitions Without Clear Priority</strong>: If recursion is used without explicitly resolving conflicts, multiple derivations become possible.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h4>3. Violations Caused by Ambiguous Grammars</h4>
+                <p>Ambiguous grammars lead to multiple issues in compilers and language interpretation:</p>
+                <ul>
+                    <li><strong>Shift-Reduce and Reduce-Reduce Conflicts</strong>: Ambiguity in grammar creates conflicts in LR parsing tables, making it impossible to decide between shifting or reducing at a given point.</li>
+                    <li><strong>Unclear Code Semantics</strong>: If a program can be parsed in multiple ways, it can lead to unintended behavior, particularly in expression evaluation.</li>
+                    <li><strong>Parsing Errors</strong>: Ambiguous grammars cannot be handled by deterministic parsers like LL and LR without additional conflict resolution.</li>
+                    <li><strong>Compiler Inefficiencies</strong>: Extra processing is required to resolve ambiguities, increasing compilation time.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h4>4. Examples of Ambiguous Grammar</h4>
+                <p>Consider the following expression grammar:</p>
+                <pre><code class="">
+E → E + E | E * E | ( E ) | id
+</code></pre>
+                <p>This grammar is ambiguous because it does not specify precedence or associativity of <code>+</code> and <code>*</code>. The string <code>id + id * id</code> can have two parse trees:</p>
+
+                <h5>4.1 Parse Tree 1 (Multiplication has Higher Precedence)</h5>
+                <pre><code class="">
+.  E
+  /|\
+ E + E
+   /|\
+  E * E
+ id  id id
+</code></pre>
+
+                <h5>4.2 Parse Tree 2 (Addition Evaluated First)</h5>
+                <pre><code class="">
+.   E
+   /|\
+  E * E
+ /|\
+E  +  E
+id   id  id
+</code></pre>
+                <p>The two parse trees indicate different evaluation orders, leading to ambiguity in interpretation.</p>
+            </article>
+
+            <article>
+                <h4>5. Resolving Ambiguity</h4>
+                <p>Ambiguity can be resolved using several methods:</p>
+                <ul>
+                    <li><strong>Operator Precedence and Associativity Rules</strong>: Define precedence levels to enforce a single parse tree. Example:</li>
+                    <pre><code class="">
+E → E + T | T
+T → T * F | F
+F → (E) | id
+</code></pre>
+                    <li><strong>Disambiguating Rules</strong>: Specify explicit rules to determine how parsing should proceed.</li>
+                    <li><strong>Grammar Rewriting</strong>: Transform ambiguous grammar into an equivalent unambiguous form.</li>
+                    <li><strong>Using Parser Directives</strong>: In tools like Yacc, precedence and associativity can be specified explicitly.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h4>6. The Dangling-Else Ambiguity</h4>
+                <p>Another classic case of ambiguity is the dangling-else problem:</p>
+                <pre><code class="">
+stmt → if expr then stmt | if expr then stmt else stmt | other
+</code></pre>
+                <p>Given the input:</p>
+                <pre><code class="">
+if E1 then if E2 then S1 else S2
+</code></pre>
+                <p>The ambiguity arises because <code>else S2</code> could be associated with either the first or second <code>if</code>.</p>
+                <p><strong>Solution:</strong> Use separate rules for matched and unmatched statements:</p>
+                <pre><code class="">
+stmt → matched_stmt | unmatched_stmt
+matched_stmt → if expr then matched_stmt else matched_stmt | other
+unmatched_stmt → if expr then stmt | if expr then matched_stmt else unmatched_stmt
+</code></pre>
+                <p>This ensures each <code>else</code> is correctly matched with the nearest unmatched <code>if</code>.</p>
+            </article>            
+
+
+        </main>
+
+        <script> copyright("all"); </script>
+
+    </body>
+
+</html>

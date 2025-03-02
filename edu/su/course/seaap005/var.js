@@ -21,18 +21,7 @@ function get_menu_list(datetogen) {
 
         body_genmenu.processData(arr, def_date, def_author, { isMainCategory: true });
     }
-    function get_class(def_date, def_author) {
-        const arr = [
-            {
-                title: "Topic Name",
-                desc: "Description of the topic.",
-                codetype: "Concepts",
-                readtime: 5,
-                link: "link-to-the-topic"
-            },            
-        ];
-        body_genmenu.processData(arr, def_date, def_author);
-    }    
+      
 
 
     /**********  AUTOMATION CONTROL **********/

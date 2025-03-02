@@ -23,6 +23,7 @@ visited_lock = threading.Lock()
 good_links_lock = threading.Lock()
 flagged_links_lock = threading.Lock()
 queued_lock = threading.Lock()
+global_parent = {} # Global dictionary to track the parent URL for each discovered link
 
 # Suppress InsecureRequestWarning if using self-signed SSL
 import warnings
@@ -38,6 +39,7 @@ OUTPUT_FILENAME = 'sitemap.txt'
 WAIT_TIME = 0
 DEV_JS_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "js", "dev.js")
 ENABLE_VISIT_LOG = False  # Set to False to disable VISIT logging
+DEBUG_PARENT = False  # Set to False to disable parent debug tracking
 
 def set_crawler_mode(mode):
     """
@@ -113,7 +115,7 @@ def extract_links(driver, url):
     """
     driver.get(url)
     try:
-        WebDriverWait(driver, 10).until(
+        WebDriverWait(driver, 30).until(
             EC.presence_of_element_located((By.TAG_NAME, 'body'))
         )
         time.sleep(WAIT_TIME)  # Wait for additional JS to load if needed
@@ -142,6 +144,14 @@ def is_valid_link(link):
       - Exclude external domains like google.com
     """
     parsed_link = urllib.parse.urlparse(link)
+    
+    # Ignore Apache directory sorting links that use query strings like ?C=M;O=D etc.
+    if parsed_link.path.endswith("/") and parsed_link.query:
+        # For directory indexes, Apache typically appends query parameters starting with "C="
+        # and containing ";O=" which indicate sorting.
+        if parsed_link.query.startswith("C=") and ";O=" in parsed_link.query:
+            return False
+
     # Exclude images, docs, google.com, etc.
     excluded_extensions = ('.js', '.css', '.jpg', '.jpeg', '.png', '.gif',
                            '.pdf', '.doc', '.docx', '.xlsx')
@@ -184,7 +194,7 @@ def is_404(link):
     Performs a HEAD request for efficiency.
     """
     try:
-        response = requests.head(link, allow_redirects=True, verify=False, timeout=5)
+        response = requests.head(link, allow_redirects=True, verify=False, timeout=30)
         return (response.status_code == 404)
     except Exception as e:
         # If there's any connection error or timeout, treat it as flagged
@@ -362,11 +372,23 @@ def save_sitemap(good_links, flagged_links, filename):
     If the output file already exists, rename it with a datetime suffix.
     """
     # If file exists, rename it with a .bak-{datetime} suffix
+    # if os.path.exists(filename):
+    #     timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+    #     backup_filename = f"{filename}.bak-{timestamp}"
+    #     os.rename(filename, backup_filename)
+    #     print(f"[INFO] Existing file renamed to {backup_filename}")
+    
+    # Define backup folder path relative to the directory of the main sitemap file
+    backup_dir = os.path.join(os.path.dirname(filename), "sitemap_backups")
+    # Create the backup folder if it doesn't exist
+    if not os.path.exists(backup_dir):
+        os.makedirs(backup_dir)
     if os.path.exists(filename):
         timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-        backup_filename = f"{filename}.bak-{timestamp}"
+        backup_filename = os.path.join(backup_dir, f"{os.path.basename(filename)}.bak-{timestamp}")
         os.rename(filename, backup_filename)
         print(f"[INFO] Existing file renamed to {backup_filename}")
+
         
     # Sort by path for a more structured output
     sorted_good = sorted(good_links, key=lambda x: urllib.parse.urlparse(x).path)
@@ -375,14 +397,29 @@ def save_sitemap(good_links, flagged_links, filename):
     with open(filename, 'w', encoding='utf-8') as f:
         # Write good links first
         # f.write("# GOOD LINKS\n")
+        # for link in sorted_good:
+        #     f.write(f"{clean_link(link)}\n")
         for link in sorted_good:
-            f.write(f"{clean_link(link)}\n")
+            if DEBUG_PARENT:
+                parent = global_parent.get(link, "No parent recorded")
+                f.write(f"{clean_link(link)}  <-- found on: {clean_link(parent)}\n")
+            else:
+                f.write(f"{clean_link(link)}\n")
+
+
 
         # Write flagged links for manual review
         if sorted_flagged:
             f.write("\n\n\n\n# FLAGGED (404) LINKS -- REVIEW MANUALLY\n")
+            # for link in sorted_flagged:
+            #     f.write(f"{clean_link(link)}\n")
             for link in sorted_flagged:
-                f.write(f"{clean_link(link)}\n")
+                if DEBUG_PARENT:
+                    parent = global_parent.get(link, "No parent recorded")
+                    f.write(f"{clean_link(link)}  <-- found on: {clean_link(parent)}\n")
+                else:
+                    f.write(f"{clean_link(link)}\n")
+
                 
 def crawl_website_parallel(base_url, num_workers=5):
     """
@@ -396,7 +433,8 @@ def crawl_website_parallel(base_url, num_workers=5):
     
     with queued_lock:
         queued.add(base_url)
-    to_visit.put(base_url)
+    # Enqueue as a tuple: (URL, parent). For the base URL, there is no parent.
+    to_visit.put((base_url, None))
 
     with ThreadPoolExecutor(max_workers=num_workers) as executor:
         for _ in range(num_workers):
@@ -407,11 +445,12 @@ def crawl_website_parallel(base_url, num_workers=5):
     return good_links, flagged_links
 
 def worker(base_url, to_visit, visited, good_links, flagged_links, queued):
-    driver = get_driver()
+    driver = get_driver()    
+    
     try:
         while True:
             try:
-                current_url = to_visit.get(timeout=5)
+                current_url, parent = to_visit.get(timeout=30)
             except queue.Empty:
                 break
             
@@ -424,15 +463,16 @@ def worker(base_url, to_visit, visited, good_links, flagged_links, queued):
                     continue
                 
             if is_404(current_url):
-                print(f"[FLAG] Hard 404: {current_url}")
+                parent_info = f" (found on {parent})" if parent else ""
+                print(f"[FLAG] Hard 404: {current_url}{parent_info}")
                 with flagged_links_lock:
                     flagged_links.add(current_url)
                 with visited_lock:
                     visited.add(current_url)
                 to_visit.task_done()
-                continue
-            
-            links, soft_404_flag = extract_links(driver, current_url)
+                continue            
+                        
+            links, soft_404_flag = extract_links(driver, current_url)            
             if soft_404_flag:
                 if "localhost" in current_url:
                     new_url = clean_link(current_url)
@@ -480,8 +520,11 @@ def worker(base_url, to_visit, visited, good_links, flagged_links, queued):
                         link not in visited and 
                         link not in flagged_links and 
                         link not in queued):
-                        queued.add(link)
-                        to_visit.put(link)
+                        queued.add(link)     
+                        if DEBUG_PARENT:                   
+                            global_parent[link] = current_url # Record the parent for debugging (overwrite if already present)
+                        to_visit.put((link, current_url)) # Enqueue the link along with its parent (current_url)
+
             to_visit.task_done()
     finally:
         try:

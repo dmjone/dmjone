@@ -26,25 +26,12 @@ function get_menu_list(datetogen) {
         ];
 
         body_genmenu.processData(arr, def_date, def_author, { isMainCategory: true });
-    }
-    function get_class(def_date, def_author) {
-        const arr = [
-            {
-                title: "Syllabus",
-                desc: "Description of the topic.",
-                codetype: "Concepts",
-                readtime: 5,
-                // link: "link-to-the-topic"
-            },            
-        ];
-        body_genmenu.processData(arr, def_date, def_author);
-    }
+    }    
    
 
     /**********  AUTOMATION CONTROL **********/
     let title, link, date, desc, codetype, readtime, author = 1, semester, cardimage, continuereading;
-    const functions = {
-        // theory: get_class,
+    const functions = {        
         default: get_main
     };
     (functions[window.urlpart5] || functions.default)(datetogen, author);

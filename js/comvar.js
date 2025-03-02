@@ -600,7 +600,11 @@ const courseDetailsMap = {
     // Semester 1
     'csu1128': { 'default': ["Dr. Pankaj Vaidya", "CSU1128", "Logic Building with Computer Programming"] },
     'csu1128p': { 'default': ["Dr. Pankaj Vaidya", "CSU1128(P)", "Logic Building with Computer Programming Lab"] },
-    'csu953': { 'default': ["Dr. Bharti Thakur", "CSU953", "Front End Development Lab"] },
+    'csu953': {
+        'default': ["Dr. Bharti Thakur", "CSU953", "Front End Development Lab"],
+        'lab': ["Dr. Bharti Thakur", "CSU953", "Front End Development Lab"],
+        
+     },
     'fsu030': { 'default': ["Dr. Pawan Kumar", "FSU030", "Engineering Physics"] },
     'csu951': { 'default': ["Dr. Ravinder Thakur", "CSU951", "Basic Mathematics"] },
     'csu730': { 'default': ["Rajesh Williams", "CSU730", "Functional English - 1"] },

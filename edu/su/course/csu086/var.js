@@ -30,23 +30,47 @@ function get_menu_list(datetogen) {
                 readtime: 30,
                 date: "Mon February 03, 2025",
                 link: "language-processing-system-compiler-design"
-            },
+            },    
             {
                 title: "Lexical Analysis (Scanning) in Compiler Design",
                 desc: "Understand the process of lexical analysis in Compiler Design, including tokenization, regular expressions, finite automata, and real-world applications.",
-                codetype: "Concepts",
+                codetype: "Phase 1",
                 readtime: 20,
                 date: "Tue February 04, 2025",
                 link: "lexical-analysis-scanning-compiler-design"
             },
             {
+                title: "Parse Tree",
+                desc: "Understand the concept of Parse Trees in Compiler Design, including syntax trees, abstract syntax trees, and real-world applications.",
+                codetype: "Supporting Concepts",
+                readtime: 5,
+                date: "Tue February 04, 2025",
+                link: "parse-tree"
+            },
+            {
+                title: "Associativity and Precedence",
+                desc: "Learn about associativity and precedence in Compiler Design, including operator precedence parsing, shift-reduce parsing, and real-world applications.",
+                codetype: "Supporting Concepts",
+                readtime: 5,
+                date: "Wed February 05, 2025",
+                link: "associativity-precedence"
+            },
+            {
+                title: "Ambiguous Grammar and Its Violations",
+                desc: "Explore ambiguous grammar and its violations in Compiler Design, including left recursion, left factoring, and real-world applications.",
+                codetype: "Supporting Concepts",
+                readtime: 20,
+                date: "Wed February 05, 2025",
+                link: "ambiguous-grammar-violations"
+            },
+            {
                 title: "Syntax Analysis (Parsing) in Compiler Design",
                 desc: "Learn about parsing in Compiler Design, including top-down parsing, bottom-up parsing, LR parsing, LALR parsing, and real-world applications.",
-                codetype: "Concepts",
+                codetype: "Phase 2",
                 readtime: 20,
                 date: "Wed February 05, 2025",
                 link: "syntax-analysis-parsing-compiler-design"
-            },
+            },            
             // {
             //     title: "Intermediate Code Generation in Compiler Design",
             //     desc: "Understand the process of intermediate code generation in Compiler Design, including syntax trees, abstract syntax trees, three-address code, quadruples, and real-world applications.",
