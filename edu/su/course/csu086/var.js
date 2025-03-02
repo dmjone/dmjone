@@ -28,7 +28,7 @@ function get_menu_list(datetogen) {
                 desc: "Comprehensive guide on Compiler Design and Language Processing Systems, covering lexical analysis, parsing, intermediate code generation, optimization, AI-powered compilers, debugging, and real-world applications.",
                 codetype: "Concepts",
                 readtime: 30,
-                date: "Mon February 03, 2024",
+                date: "Mon February 03, 2025",
                 link: "language-processing-system-compiler-design"
             },
             {
@@ -36,7 +36,7 @@ function get_menu_list(datetogen) {
                 desc: "Understand the process of lexical analysis in Compiler Design, including tokenization, regular expressions, finite automata, and real-world applications.",
                 codetype: "Concepts",
                 readtime: 20,
-                date: "Tue February 04, 2024",
+                date: "Tue February 04, 2025",
                 link: "lexical-analysis-scanning-compiler-design"
             },
             {
@@ -44,7 +44,7 @@ function get_menu_list(datetogen) {
                 desc: "Learn about parsing in Compiler Design, including top-down parsing, bottom-up parsing, LR parsing, LALR parsing, and real-world applications.",
                 codetype: "Concepts",
                 readtime: 20,
-                date: "Wed February 05, 2024",
+                date: "Wed February 05, 2025",
                 link: "syntax-analysis-parsing-compiler-design"
             },
             // {
