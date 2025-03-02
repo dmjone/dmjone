@@ -166,11 +166,16 @@ def clean_link(link):
     """
     Example cleanup:
       - Replace 'localhost' with 'dmj.one'
+      - Replace 'http://' with 'https://' (for consistency)
       - Remove '.html' extension
     """
-    link = link.replace("localhost", "dmj.one")
-    if link.endswith('.html'):
-        link = link[:-5]
+    try :
+        link = link.replace("localhost", "dmj.one")
+        link = link.replace("http://", "https://")
+        if link.endswith('.html'):
+            link = link[:-5]
+    except Exception as e:
+        print(f"Error in function clean_link: {e}")
     return link
 
 def is_404(link):
