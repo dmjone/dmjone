@@ -3453,39 +3453,70 @@ let header_author = async function (...args) {
         }
     }
 
-    (() => {
-        try {
-            const isBotUserAgent = /bot|crawl|slurp|spider/i.test(navigator.userAgent);
-            const isBotGlobalVariables = typeof window.googlebot !== 'undefined' || typeof window._phantom !== 'undefined' || typeof window.callPhantom !== 'undefined';
-            const isBot = isBotUserAgent || isBotGlobalVariables;
+    // (() => {
+    //     try {
+    //         const isBotUserAgent = /bot|crawl|slurp|spider/i.test(navigator.userAgent);
+    //         const isBotGlobalVariables = typeof window.googlebot !== 'undefined' || typeof window._phantom !== 'undefined' || typeof window.callPhantom !== 'undefined';
+    //         const isBot = isBotUserAgent || isBotGlobalVariables;
 
-            if (!isBot) {
-                const shouldRunCL = () => {
-                    // Double-check just before running cL
-                    const isBotAgain = /bot|crawl|slurp|spider/i.test(navigator.userAgent);
-                    if (isBotAgain) return false;
-                    // Calls cL for sure if the path is under /my/ or else it has 0.1 (10%) chance that it will require login on any page. Don't run on the host url
-                    if (window.location.pathname.match(/\/my\/(.*)/)) {
-                        document.addEventListener('DOMContentLoaded', cL);
-                        hidemainuntillogin();
-                    } else {
-                        if (window.location.pathname !== GLOBAL_login_page_path && window.location.pathname !== '/') {
-                            document.addEventListener('DOMContentLoaded', () => {
-                                if (!GLOBAL_404safe_sitemap_spider_mode && Math.random() < 0.1) {
-                                    // cL();
-                                    // hidemainuntillogin();
-                                }
-                            });
-                        }
-                    }
-                };
-                document.addEventListener('DOMContentLoaded', shouldRunCL);
+    //         if (!isBot) {
+    //             const shouldRunCL = () => {
+    //                 // Double-check just before running cL
+    //                 const isBotAgain = /bot|crawl|slurp|spider/i.test(navigator.userAgent);
+    //                 if (isBotAgain) return false;
+    //                 // Calls cL for sure if the path is under /my/ or else it has 0.1 (10%) chance that it will require login on any page. Don't run on the host url
+    //                 if (window.location.pathname.match(/\/my\/(.*)/)) {
+    //                     document.addEventListener('DOMContentLoaded', cL);
+    //                     hidemainuntillogin();
+    //                 } else {
+    //                     if (window.location.pathname !== GLOBAL_login_page_path && window.location.pathname !== '/') {
+    //                         document.addEventListener('DOMContentLoaded', () => {
+    //                             if (!GLOBAL_404safe_sitemap_spider_mode && Math.random() < 0.1) {                                    
+    //                                 // cL();
+    //                                 // hidemainuntillogin();
+    //                             }
+    //                         });
+    //                     }
+    //                 }
+    //             };
+    //             document.addEventListener('DOMContentLoaded', shouldRunCL);
+    //         }
+    //     } catch (error) {
+    //         console.error('Error in conditional loading script:', error);
+    //         // You might want to log this error to your server for debugging purposes
+    //     }
+    // })();
+    
+    (() => {
+        // Use a comprehensive regex to detect common bots.
+        const botRegex = /bot|crawl|slurp|spider|googlebot|bingbot|yandex|baiduspider/i;
+        if (botRegex.test(navigator.userAgent)) {
+            console.log("Bot detected. Skipping login logic.");
+            return;
+        }
+
+        // Function to run login logic for human users.
+        const runLoginRequests = () => {
+            const pathname = window.location.pathname;
+            if (/\/my\//.test(pathname)) {
+                cL();
+                hidemainuntillogin();
+            } else if (pathname !== GLOBAL_login_page_path && pathname !== '/') {
+                if (!GLOBAL_404safe_sitemap_spider_mode && Math.random() < 0.1) {
+                    cL();
+                    hidemainuntillogin();
+                }
             }
-        } catch (error) {
-            console.error('Error in conditional loading script:', error);
-            // You might want to log this error to your server for debugging purposes
+        };
+
+        // Run login logic when DOM is ready.
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", runLoginRequests);
+        } else {
+            runLoginRequests();
         }
     })();
+
 
 
     document.addEventListener('DOMContentLoaded', displayLogin);
