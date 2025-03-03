@@ -230,12 +230,13 @@ function controlVisibility() {
             mainElement.style.display = 'block';
         }
     }
+    return;
 }
 
 // Check email and load absentee list on page load
 document.addEventListener("DOMContentLoaded", function () {
+    controlVisibility();
     checkUserEmail();
     loadAbsentees();
     cL();
-    controlVisibility();
 });

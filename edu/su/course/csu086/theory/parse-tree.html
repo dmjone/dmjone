@@ -135,27 +135,252 @@
 
             <article>
                 <h3>2. Example 1: Arithmetic Expression Parsing</h3>
-                <p>Consider the following <strong>context-free grammar (CFG)</strong> for arithmetic expressions:</p>
+                <p>Given the following CFG for arithmetic expressions:</p>
+                <pre><code class="language-plaintext">
+E → E + T | E - T | T
+T → T * F | T / F | F
+F → (E) | id
+  </code></pre>
+                <p>This grammar ensures that <code>*</code> and <code>/</code> have higher precedence than <code>+</code> and <code>-</code>, and that the operators <code>+</code> and <code>-</code> are left-associative.</p>
+
+                <h4>2.1 Leftmost Derivation for <code>id + id * id</code></h4>
+                <p>We perform a step-by-step leftmost derivation, always replacing the leftmost nonterminal:</p>
+
+                <h5>Step 1: Start with <code>E</code></h5>
+                <pre><code class="language-plaintext">
+E
+  </code></pre>
+
+                <h5>Step 2: Expand the leftmost <code>E</code> using <code>E → E + T</code></h5>
+                <pre><code class="language-plaintext">
+E ⇒ E + T
+  </code></pre>
+
+                <h5>Step 3: Replace the leftmost <code>E</code> (in <code>E + T</code>) using <code>E → T</code></h5>
+                <pre><code class="language-plaintext">
+E + T ⇒ T + T
+  </code></pre>
+
+                <h5>Step 4: Expand the leftmost <code>T</code> using <code>T → F</code></h5>
+                <pre><code class="language-plaintext">
+T + T ⇒ F + T
+  </code></pre>
+
+                <h5>Step 5: Replace <code>F</code> with an identifier (<code>F → id</code>)</h5>
+                <pre><code class="language-plaintext">
+F + T ⇒ id + T
+  </code></pre>
+
+                <h5>Step 6: Expand the remaining <code>T</code> (after the <code>+</code>) using <code>T → T * F</code></h5>
+                <pre><code class="language-plaintext">
+id + T ⇒ id + T * F
+  </code></pre>
+
+                <h5>Step 7: Replace the leftmost <code>T</code> in <code>T * F</code> using <code>T → F</code></h5>
+                <pre><code class="language-plaintext">
+id + T * F ⇒ id + F * F
+  </code></pre>
+
+                <h5>Step 8: Replace each <code>F</code> with <code>id</code> (<code>F → id</code>)</h5>
+                <pre><code class="language-plaintext">
+id + F * F ⇒ id + id * F ⇒ id + id * id
+  </code></pre>
+
+                <p>This leftmost derivation confirms that multiplication is performed before addition.</p>
+
+                <h4>2.2 Parse Tree Representation (Leftmost Derivation)</h4>
+                <p>The parse tree visually captures the hierarchy of operations. Since multiplication has higher precedence than addition, the subtree for <code>id * id</code> is built first.</p>
+
+                <h5>Step 1: Begin with the root node</h5>
+                <p>Start with the start symbol <code>E</code>:</p>
+                <div class="mermaid text-center">
+                    graph TD;
+                    E;
+                </div>
+
+                <h5>Step 2: Expand <code>E → E + T</code></h5>
+                <p>This expansion introduces the addition operator:</p>
+                <div class="mermaid text-center">
+                    graph TD;
+                    E --> E_left[E];
+                    E --> plus["\+"];
+                    E --> T_right[T];
+                </div>
+
+                <h5>Step 3: Expand the left <code>E</code> as <code>E → T</code> and then <code>T → F</code> with <code>F → id</code></h5>
+                <p>This gives the left operand:</p>
+                <div class="mermaid text-center">
+                    graph TD;
+                    E_left --> T_left[T];
+                    T_left --> F_left[F];
+                    F_left --> id1["id"];
+                </div>
+
+                <h5>Step 4: Expand the right <code>T</code> using <code>T → T * F</code></h5>
+                <p>This introduces the multiplication operator for the right operand:</p>
+                <div class="mermaid text-center">
+                    graph TD;
+                    T_right --> T_mult[T];
+                    T_right --> mult["\*"];
+                    T_right --> F_right[F];
+                </div>
+
+                <h5>Step 5: Expand the left <code>T</code> in the multiplication to <code>T → F</code> with <code>F → id</code></h5>
+                <p>This gives the left operand of multiplication:</p>
+                <div class="mermaid text-center">
+                    graph TD;
+                    T_mult --> F_mult[F];
+                    F_mult --> id2["id"];
+                </div>
+
+                <h5>Step 6: Replace the right <code>F</code> with <code>id</code></h5>
+                <p>This gives the right operand of multiplication:</p>
+                <div class="mermaid text-center">
+                    graph TD;
+                    F_right --> id3["id"];
+                </div>
+
+                <p>The complete parse tree confirms that <code>id + id * id</code> is grouped as <code>id + (id * id)</code>, reflecting correct operator precedence.</p>
+
+                <h4>2.3 Rightmost Derivation for <code>id + id * id</code></h4>
+                <p>In a rightmost derivation we always replace the rightmost nonterminal first:</p>
+
+                <h5>Step 1: Start with <code>E</code></h5>
+                <pre><code class="language-plaintext">
+E
+  </code></pre>
+
+                <h5>Step 2: Expand the rightmost nonterminal in <code>E</code> using <code>E → E + T</code></h5>
+                <pre><code class="language-plaintext">
+E ⇒ E + T
+  </code></pre>
+
+                <h5>Step 3: Expand the rightmost nonterminal (now <code>T</code>) using <code>T → T * F</code></h5>
+                <pre><code class="language-plaintext">
+E + T ⇒ E + T * F
+  </code></pre>
+
+                <h5>Step 4: Replace the rightmost nonterminal (<code>F</code>) with <code>id</code></h5>
+                <pre><code class="language-plaintext">
+E + T * F ⇒ E + T * id
+  </code></pre>
+
+                <h5>Step 5: Expand the rightmost nonterminal in <code>T * id</code> (the <code>T</code>) using <code>T → F</code></h5>
+                <pre><code class="language-plaintext">
+E + T * id ⇒ E + F * id
+  </code></pre>
+
+                <h5>Step 6: Replace the rightmost nonterminal (<code>F</code>) with <code>id</code></h5>
+                <pre><code class="language-plaintext">
+E + F * id ⇒ E + id * id
+  </code></pre>
+
+                <h5>Step 7: Now, the only remaining nonterminal is the leftmost <code>E</code> in <code>E + id * id</code>. Replace it using <code>E → T</code></h5>
+                <pre><code class="language-plaintext">
+E + id * id ⇒ T + id * id
+  </code></pre>
+
+                <h5>Step 8: Expand the remaining <code>T</code> using <code>T → F</code></h5>
+                <pre><code class="language-plaintext">
+T + id * id ⇒ F + id * id
+  </code></pre>
+
+                <h5>Step 9: Replace <code>F</code> with <code>id</code></h5>
+                <pre><code class="language-plaintext">
+F + id * id ⇒ id + id * id
+  </code></pre>
+
+                <p>This rightmost derivation also leads to the expression <code>id + id * id</code>, with the multiplication carried out before addition.</p>
+
+                <h4>2.4 Parse Tree for Rightmost Derivation</h4>
+                <p>The following parse tree illustrates the derivation when the rightmost nonterminal is replaced first:</p>
+
+                <h5>Step 1: Start with the root node</h5>
+                <div class="mermaid text-center">
+                    graph TD;
+                    E;
+                </div>
+
+                <h5>Step 2: Expand <code>E → E + T</code></h5>
+                <div class="mermaid text-center">
+                    graph TD;
+                    E --> E_left[E];
+                    E --> plus["\+"];
+                    E --> T_right[T];
+                </div>
+
+                <h5>Step 3: Expand the rightmost <code>T</code> using <code>T → T * F</code></h5>
+                <div class="mermaid text-center">
+                    graph TD;
+                    T_right --> T_mult[T];
+                    T_right --> mult["\*"];
+                    T_right --> F_right[F];
+                </div>
+
+                <h5>Step 4: Replace the rightmost <code>F</code> with <code>id</code></h5>
+                <div class="mermaid text-center">
+                    graph TD;
+                    F_right --> id3["id"];
+                </div>
+
+                <h5>Step 5: Expand <code>T_mult</code> using <code>T → F</code> and then <code>F → id</code></h5>
+                <div class="mermaid text-center">
+                    graph TD;
+                    T_mult --> F_mult[F];
+                    F_mult --> id2["id"];
+                </div>
+
+                <h5>Step 6: Finally, replace the remaining nonterminal in the left branch (<code>E_left</code>) by applying <code>E → T</code>, then <code>T → F</code>, and <code>F → id</code></h5>
+                <div class="mermaid text-center">
+                    graph TD;
+                    E_left --> T_left[T];
+                    T_left --> F_left[F];
+                    F_left --> id1["id"];
+                </div>
+
+                <p>The complete parse tree again shows that the expression is parsed as <code>id + (id * id)</code>, confirming the correct associativity and precedence.</p>
+
+                <h4>Quick Recap</h4>
+                <ul>
+                    <li><strong>Leftmost Derivation:</strong> Always replaces the leftmost nonterminal first.</li>
+                    <li><strong>Rightmost Derivation:</strong> Always replaces the rightmost nonterminal first.</li>
+                    <li><strong>Parse Trees:</strong> Both derivations lead to the same overall parse tree.</li>
+                    <li><strong>Correct Associativity:</strong> The tree ensures that multiplication (with higher precedence) is performed before addition.</li>
+                </ul>
+
+                <h3>Summary of Arithmetic Expression Parsing</h3>
+                <p>The parsing steps demonstrated above correctly follow the CFG:</p>
                 <pre><code class="">
 E → E + T | E - T | T
 T → T * F | T / F | F
 F → (E) | id
-</code></pre>
-
-                <p>For the input string: <strong>id + id * id</strong>, we construct a parse tree:</p>
-
-                <div class="text-center">
-                    <img class="img-fluid dynamicimg imgblacktowhite" loading="lazy" src="https://mermaid.ink/img/pako:eNp1kbFugzAQhl8F3URbgmwTDHGlTiFbpzI1zmDFLlgCjAiWmiLevY4pS5V4-q37_J3ON8HZSAUMqkH0dVDuX3kX_DtFsNm8BQUOiyeftMRHLU-PwL6xlyMHzl84PITKsFxkJV6TluS-tvTl1jbe-nzXujCH8LC6kpsLImjV0Aot3YTT7RWHsVat4sBcbHRVj87ZzQ4UdjQf1-4MbBysimAwtqqBfYnm4m62l2JUey3cP7Ur0osO2ATfwCiO8S5NUpRhmiCUbCO4AsMExRinW7LLKCIoz_M5gh9jnADFGcEZzQlFCBGcUOJ1n77411NJPZrhfdmPX9P8C11UbrE?type=png" />
+  </code></pre>
+  <p>The fact that both the leftmost and rightmost derivations yield the same final parse tree indicates that the grammar is unambiguous. Here, although there are different derivation orders (leftmost versus rightmost), they both lead to the same unique tree structure for the expression <code>id + (id * id)</code>.</p>
+                <div class="mermaid text-center">
+                    graph TD;
+                    E["E"]
+                    E --> E_left["E"]
+                    E --> plus["\+"]
+                    E --> T_right["T"]
+                    E_left --> T_left["T"]
+                    T_left --> F_left["F"]
+                    F_left --> id1["id"]
+                    T_right --> T_mult["T"]
+                    T_right --> mult["\*"]
+                    T_right --> F_right["F"]
+                    T_mult --> F_mult["F"]
+                    F_mult --> id2["id"]
+                    F_right --> id3["id"]
                 </div>
-
-
+                <p>The parse tree derived in section <strong>2.2 and 2.4</strong> confirms that <code>id + id * id</code> is grouped as <code>id + (id * id)</code> — ensuring that multiplication is evaluated before addition.</p>
                 <p><strong>Explanation:</strong></p>
                 <ul>
                     <li>The root node <code>E</code> represents the entire expression.</li>
-                    <li>Since addition <code>+</code> has lower precedence than multiplication <code>*</code>, <code>id + id * id</code> is parsed as <code>id + (id * id)</code>.</li>
-                    <li>The subtree for <code>id * id</code> (multiplication) is evaluated first before addition.</li>
+                    <li>Since addition (<code>+</code>) has lower precedence than multiplication (<code>*</code>), the expression is parsed as <code>id + (id * id)</code>.</li>
+                    <li>The subtree for <code>id * id</code> is evaluated first, reflecting the operator precedence.</li>
                 </ul>
             </article>
+
 
             <article>
                 <h3>3. Leftmost and Rightmost Derivations</h3>

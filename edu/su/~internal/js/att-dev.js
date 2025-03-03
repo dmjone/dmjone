@@ -37,6 +37,7 @@
                     mainElement.style.display = 'block';
                 }
             }
+            return;
         }
 
         controlVisibility();

@@ -16,7 +16,7 @@ const cdnjs_cryptoJS = "https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/c
 const google_login_js = "https://accounts.google.com/gsi/client";
 const cdnjs_DOMPurify = "https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.5/purify.min.js";
 const cdnjs_markdown = "https://cdnjs.cloudflare.com/ajax/libs/marked/14.1.2/marked.min.js";
-const cdnjs_mermaid = "https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.3.0/mermaid.min.js";
+const cdnjs_mermaid = "https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.4.0/mermaid.min.js";
 const cdnjs_3js = "https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js";
 const GLOBAL_login_page_path = window.location.hostname === 'localhost' ? '/login.html' : '/login';
 
