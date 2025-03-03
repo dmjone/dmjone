@@ -235,8 +235,8 @@ function controlVisibility() {
 
 // Check email and load absentee list on page load
 document.addEventListener("DOMContentLoaded", function () {
+    cL();
     controlVisibility();
     checkUserEmail();
     loadAbsentees();
-    cL();
 });
