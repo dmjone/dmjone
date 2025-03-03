@@ -209,34 +209,34 @@ function checkUserEmail() {
     }
 }
 
-function controlVisibility() {
-    const userEmail = localStorage.getItem('userEmail')?.toLowerCase();
-    const allowedEmails = [
-        atob('ZGl2eWFtb2hhbjE5OTNAZ21haWwuY29t'),
-    ];
+// function controlVisibility() {
+//     const userEmail = localStorage.getItem('userEmail')?.toLowerCase();
+//     const allowedEmails = [
+//         atob('ZGl2eWFtb2hhbjE5OTNAZ21haWwuY29t'),
+//     ];
 
-    console.log("inside")
-    if (!allowedEmails.includes(userEmail)) {
-        const mainElement = document.querySelector('main');
-        if (mainElement) {
-            mainElement.innerHTML = '<div class="text-danger text-center display-1 page-center justify-content-center">401: Unauthorized</div>';
-            mainElement.classList.remove('d-none');
-            mainElement.style.display = 'block';
-        }
-    } else {
-        const mainElement = document.querySelector('main');
-        if (mainElement) {
-            mainElement.classList.remove('d-none');
-            mainElement.style.display = 'block';
-        }
-    }
-    return;
-}
+//     console.log("inside")
+//     if (!allowedEmails.includes(userEmail)) {
+//         const mainElement = document.querySelector('main');
+//         if (mainElement) {
+//             mainElement.innerHTML = '<div class="text-danger text-center display-1 page-center justify-content-center">401: Unauthorized</div>';
+//             mainElement.classList.remove('d-none');
+//             mainElement.style.display = 'block';
+//         }
+//     } else {
+//         const mainElement = document.querySelector('main');
+//         if (mainElement) {
+//             mainElement.classList.remove('d-none');
+//             mainElement.style.display = 'block';
+//         }
+//     }
+//     return;
+// }
 
 // Check email and load absentee list on page load
 document.addEventListener("DOMContentLoaded", function () {
     cL();
-    controlVisibility();
+    // controlVisibility();
     checkUserEmail();
     loadAbsentees();
 });
