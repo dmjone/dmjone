@@ -202,76 +202,112 @@ graph TD;
                 <div class="text-center">                    
                     <figcaption class="figure-caption">Figure1.3.1: Phases of Compiler Design and Their Interactions: This diagram illustrates the step-by-step transformation of source code into an executable program. It highlights the flow of data between phases, the role of the symbol table, and error handling mechanisms at various stages, ensuring correctness and optimization of the final output.</figcaption>
                 </div>                
+                <div class="my-4 alert alert-danger text-center">Diagram too small? Right? Just scroll a bit more...</div>
             </article>
 
             <article>
                 <h4>1.4 All in one Diagram of Phases of Compiler Design</h4>
-                <div class="alert alert-warning text-center">Zoom in to view the tiny details.</div>
+                <div class="alert alert-warning text-center">Please Zoom in (pinch and zoom on touchpad) to view the tiny details.</div>
                 <div class="mermaid text-center">
                     graph TD;
-                    %% Input Source Code
-                    A[Source Code] -->|Character Stream| B["Lexical Analysis (Scanner)"]
-                
-                    %% Lexical Analysis
-                    B -->|Token Stream| C["Syntax Analysis (Parser)"]
-                    B -.->|Lexical Errors: Unrecognized symbols, illegal tokens| Error1[Error Reporting]
-                    B --> ST[Symbol Table]
-                    B --> FD[Finite Automata for Lexical Patterns]
-                
-                    %% Syntax Analysis
-                    C -->|Parse Tree| D[Semantic Analysis]
-                    C -.->|Syntax Errors: Missing brackets, incorrect grammar| Error2[Error Reporting]
-                    C --> ST
-                
-                    %% Semantic Analysis
-                    D -->|Annotated Parse Tree| E[Intermediate Code Generation]
-                    D -.->|Semantic Errors: Type mismatches, undefined variables| Error3[Error Reporting]
-                    D --> ST
-                    D --> CT[Type Checker]
-                
-                    %% Intermediate Code Generation
-                    E -->|"Intermediate Representation (IR)"| F[Code Optimization]
-                    E -.->|Conversion Errors: Unreachable code, invalid constructs| Error4[Error Reporting]
-                    E --> ST
-                
-                    %% Code Optimization
-                    F -->|Optimized IR| G[Code Generation]
-                    F -.->|Optimization Errors: Dead code, infinite loops, performance bottlenecks| Error5[Error Reporting]
-                    F --> ST
-                    F --> OC[Optimization Heuristics: Peephole, Loop Unrolling, Constant Folding]
-                
-                    %% Code Generation
-                    G -->|Target Assembly Code| H[Assembler]
-                    G -.->|Code Generation Errors: Register allocation failures, incorrect mappings| Error6[Error Reporting]
-                    G --> ST
-                
-                    %% Assembler
-                    H -->|"Object Code (Machine-Dependent Binary)"| I[Loader & Linker]
-                    H -.->|Assembly Errors: Invalid instructions, incorrect syntax| Error7[Error Reporting]
-                
-                    %% Loader and Linker
-                    I -->|Executable Code| J[Final Output Program]
-                    I -.->|Linking Errors: Undefined references, incompatible object files| Error8[Error Reporting]
-                
-                    %% Additional Components
-                    ST[Symbol Table] -->|Stores identifiers, variable types, function names| C
-                    ST -->|Used for Type Checking| D
-                    ST -->|Optimizations Refer to Symbol Table| F
-                    ST -->|Code Generation Uses Stored Values| G
-                
-                    FD[Finite Automata] -->|Pattern Matching for Tokenization| B
-                    CT[Type Checker] -->|Ensures Correct Type Assignments| D
-                    OC[Optimization Heuristics] -->|Performs Advanced Optimizations| F
-                
-                    %% Error Handling Paths
-                    Error1 -.-> B
-                    Error2 -.-> C
-                    Error3 -.-> D
-                    Error4 -.-> E
-                    Error5 -.-> F
-                    Error6 -.-> G
-                    Error7 -.-> H
-                    Error8 -.-> I
+                    %% Preprocessing Stage
+                    SRC["Source Code<br />(Raw Input)"] -->|Raw Text| PP["Preprocessor<br />(Macro Expansion,<br />Include Files, Conditional Compilation)"]
+                    PP -->|Preprocessed Source| LEX["Lexical Analysis<br />(Scanner)"]
+                    PP -.->|Preprocessing Errors:<br />Macro errors, missing files| PPE[Preprocessor Error Reporting]
+                    
+                    %% Lexical Analysis Stage
+                    LEX -->|Token Stream| SYN["Syntax Analysis<br />(Parser)"]
+                    LEX -.->|Lexical Errors:<br />Unrecognized symbols,<br />illegal tokens| LEXE[Lexical Error Reporting]
+                    LEX --> FA["Finite Automata & Regex Engine<br />(Pattern Matching)"]
+                    LEX --> ST1["Symbol Table (Lexical Phase)"]
+                    
+                    %% Syntax Analysis Stage
+                    SYN -->|"Concrete Syntax Tree (CST)"| SEM[Semantic Analysis]
+                    SYN -.->|Syntax Errors:<br />Grammar violations,<br />missing semicolons/brackets| SYNE[Syntax Error Reporting]
+                    SYN --> ST2["Symbol Table (Syntax Phase)"]
+                    
+                    %% Semantic Analysis Stage
+                    SEM -->|"Abstract Syntax Tree (AST)"<br />& Type-Annotated Tree| IR[Intermediate Code Generation]
+                    SEM -.->|Semantic Errors:<br />Type mismatches,<br />undeclared/ambiguous identifiers| SEME[Semantic Error Reporting]
+                    SEM --> TC["Type Checker<br />(Ensures Type Correctness)"]
+                    SEM --> SC["Scope Analyzer<br />(Determines Visibility)"]
+                    SEM --> DF["Data Flow Analyzer<br />(Live Variables, etc.)"]
+                    SEM --> ST3["Symbol Table (Semantic Phase)"]
+                    
+                    %% Intermediate Code Generation Stage
+                    IR -->|"Intermediate Representation (IR)<br />(Three-Address Code, AST variants)"| OPT[Code Optimization]
+                    IR -.->|IR Generation Errors:<br />Invalid constructs, unreachable code| IRE[IR Error Reporting]
+                    IR --> CFG["Control Flow Graph<br />(Basic Block Analysis)"]
+                    IR --> ST4["Symbol Table (IR Phase)"]
+                    
+                    %% Code Optimization Stage
+                    OPT -->|Optimized IR| CG[Code Generation]
+                    OPT -.->|Optimization Issues:<br />Dead code, improper folding| OPE[Optimization Error Reporting]
+                    OPT --> OH["Optimization Heuristics<br />(Peephole, Loop Unrolling,<br />Inlining, Constant Folding)"]
+                    OPT --> DFA["Data Flow Analysis<br />(Def-Use Chains, Liveness)"]
+                    OPT --> ST5["Symbol Table (Optimized Phase)"]
+                    CFG --> OPT
+                    OH --> OPT
+                    DFA --> OPT
+                    
+                    %% Code Generation Stage
+                    CG -->|Assembly Code| AS[Assembler]
+                    CG -.->|Code Generation Errors:<br />Register allocation issues,<br />instruction selection failures| CGE[CodeGen Error Reporting]
+                    CG --> RA[Register Allocator]
+                    CG --> IS[Instruction Scheduler]
+                    CG --> ST6["Symbol Table (CodeGen Phase)"]
+                    RA --> CG
+                    IS --> CG
+                    
+                    %% Assembler Stage
+                    AS -->|"Object Code<br />(Machine-dependent Binary)"| LL[Loader & Linker]
+                    AS -.->|Assembly Errors:<br />Invalid instructions,<br />pseudo-instruction misuse| ASE[Assembler Error Reporting]
+                    
+                    %% Loader & Linker Stage
+                    LL -->|Executable Code| RUN[Runtime Loader/Linker]
+                    LL -.->|Linking Errors:<br />Undefined symbols,<br />incompatible object files| LLE[Linker Error Reporting]
+                    LL --> DY["Dynamic/Static Linking<br />(Library Resolution)"]
+                    
+                    %% Runtime Execution
+                    RUN -->|Program Execution| OUT["Final Output<br />(User Observable Results)"]
+                    
+                    %% Global Symbol Table Integration
+                    ST1 --> STG[Global Symbol Table]
+                    ST2 --> STG
+                    ST3 --> STG
+                    ST4 --> STG
+                    ST5 --> STG
+                    ST6 --> STG
+                    
+                    %% Error Reporting Connections (Feedback Loops)
+                    PPE -.-> PP
+                    LEXE -.-> LEX
+                    SYNE -.-> SYN
+                    SEME -.-> SEM
+                    IRE -.-> IR
+                    OPE -.-> OPT
+                    CGE -.-> CG
+                    ASE -.-> AS
+                    LLE -.-> LL
+                    
+                    %% Supporting Flow and Annotations
+                    SRC ---|Initial Raw Data| PP
+                    PP ---|Preprocessed Data| LEX
+                    FA ---|Token Patterns| LEX
+                    TC ---|Type Info| SEM
+                    SC ---|Scope Info| SEM
+                    DF ---|Variable Usage| SEM
+                    CFG ---|Flow Analysis| OPT
+                    OH ---|Heuristic Optimizations| OPT
+                    DFA ---|Def-Use Info| OPT
+                    RA ---|Resource Allocation| CG
+                    IS ---|Timing & Scheduling| CG
+                    DY ---|Library & Module Resolution| LL
+                    
+                    %% Styling for phases (optional)
+                    classDef phase fill:#e0f7fa,stroke:#006064,stroke-width:2px;
+                    class PP,LEX,SYN,SEM,IR,OPT,CG,AS,LL,RUN phase;
+
                 </div>
                 <div class="text-center">
                     <figcaption class="figure-caption">Figure 1.4.1: Phases of Compiler Design, including every interaction, data transformation, errors, symbol table usage, and optimizations.</figcaption>
@@ -395,7 +431,7 @@ graph TD;
                 
                     %% Supporting Components
                     B --> ST["Symbol Table (Memory Address Mapping)"]
-                    B --> OC[Optimization Heuristics (Peephole, Loop Unrolling)]
+                    B --> OC["Optimization Heuristics (Peephole, Loop Unrolling)"]
                 </div>
                 <p>This phase produces an executable program tailored for the target architecture.</p>
             </article>
