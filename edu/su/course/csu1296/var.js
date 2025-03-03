@@ -38,6 +38,14 @@ function get_menu_list(datetogen) {
                 date: "Mon February 03, 2025"
             },
             {
+                title: "Software Crisis",
+                desc: "Understand the Software Crisis, its causes, effects, and solutions. Learn how software engineering practices address the challenges of software development and maintenance.",
+                codetype: "Concepts",
+                readtime: 20,
+                link: "software-crisis",
+                date: "Wed January 29, 2025"
+            },
+            {
                 title: "Software Development Life Cycle (SDLC)",
                 desc: "Used for planning, designing, developing, testing, and deploying software applications, SDLC is a structured approach to software development. Learn about the phases, models, and best practices of SDLC in this comprehensive guide.",
                 codetype: "Concepts",
