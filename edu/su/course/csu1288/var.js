@@ -76,6 +76,14 @@ function get_menu_list(datetogen) {
                 readtime: 5,
                 date: "Mon February 10, 2025",
                 link: "intrusion-prevention-systems-ips",
+            },
+            {
+                title: "Revision for Term 1",
+                desc: "Review the key concepts and topics covered in Term 1 of the course. This revision session will help you consolidate your understanding of intrusion detection and prevention, data threats, attack types, IDS types, and information sources for IDS.",
+                codetype: "Revision",
+                readtime: 5,
+                date: "Thu March 6, 2025",
+                link: "revision-for-term-1",
             }
         ];
         body_genmenu.processData(arr, def_date, def_author);
