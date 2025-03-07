@@ -34,6 +34,7 @@ function get_menu_list(datetogen) {
                 desc: "Explore the fundamentals of intrusion detection and prevention, including the types, components, and techniques used to detect and prevent network attacks. This topic covers the basic concepts and principles of intrusion detection and prevention, providing a foundation for understanding the role of IDS in network security.",
                 codetype: "Concepts",
                 readtime: 5,
+                date: "Mon February 03, 2025",
                 link: "intrusion-detection-and-prevention-overview",
             },            
             {
@@ -41,6 +42,7 @@ function get_menu_list(datetogen) {
                 desc: "Learn about the various threats to data security, including internal and external threats that can compromise the confidentiality, integrity, and availability of data. This topic covers the different types of threats, attack vectors, and security measures to protect data from unauthorized access and manipulation.",
                 codetype: "Concepts",
                 readtime: 5,
+                date: "Tue February 04, 2025",
                 link: "threats-to-data-internal-external",
             },
             {
@@ -48,7 +50,32 @@ function get_menu_list(datetogen) {
                 desc: "Explore the different types of cyber attacks, including malware, phishing, DDoS, and more. This topic covers the common attack vectors used by cybercriminals to compromise systems and networks, highlighting the impact and consequences of cyber attacks on organizations and individuals.",
                 codetype: "Concepts",
                 readtime: 5,
+                date: "Wed February 05, 2025",
                 link: "types-of-attacks-overview",
+            },
+            {
+                title: "Types of Intrusion Detection Systems",
+                desc: "Learn about the different types of Intrusion Detection Systems (IDS), including network-based, host-based, and hybrid IDS. This topic covers the features, advantages, and limitations of each IDS type, helping you understand the role of IDS in network security and threat detection.",
+                codetype: "Concepts",
+                readtime: 5,
+                date: "Thu February 06, 2025",
+                link: "types-of-intrusion-detection-systems",
+            },
+            {
+                title: "Information Sources for IDS",
+                desc: "Explore the information sources used by Intrusion Detection Systems (IDS) to detect and prevent network attacks. This topic covers the various data sources, including logs, packets, and alerts, that IDS tools analyze to identify suspicious activities and security incidents.",
+                codetype: "Concepts",
+                readtime: 5,
+                date: "Fri February 07, 2025",
+                link: "information-sources-for-ids",
+            },
+            {
+                title: "Intrusion Prevention Systems (IPS)",
+                desc: "Learn about Intrusion Prevention Systems (IPS) and their role in network security. This topic covers the features, benefits, and deployment options of IPS, highlighting the differences between IDS and IPS in detecting and preventing network attacks.",
+                codetype: "Concepts",
+                readtime: 5,
+                date: "Mon February 10, 2025",
+                link: "intrusion-prevention-systems-ips",
             }
         ];
         body_genmenu.processData(arr, def_date, def_author);
@@ -78,7 +105,7 @@ function get_menu_list(datetogen) {
     /**********  AUTOMATION CONTROL **********/
     let title, link, date, desc, codetype, readtime, author = 1, semester, cardimage, continuereading;
     const functions = {
-        // theory: get_class,
+        theory: get_class,
         // lab: get_lab,
         default: get_main
     };
