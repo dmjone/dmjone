@@ -30,12 +30,19 @@ function get_menu_list(datetogen) {
     function get_class(def_date, def_author) {
         const arr = [
             {
-                title: "Topic Name",
-                desc: "Description of the topic.",
+                title: "Introduction to Computer Forensics",
+                desc: "Explore the fundamentals of computer forensics, including the history, scope, and importance of digital forensics in cybersecurity. This topic covers the basic concepts and principles of computer forensics, providing a foundation for understanding the role of digital forensics in investigating cybercrimes and security incidents.",
                 codetype: "Concepts",
                 readtime: 5,
-                link: "link-to-the-topic"
-            },            
+                link: "introduction-to-computer-forensics",
+            },       
+            {
+                title: "Comprehensive Computer Forensics & Incident Response",
+                desc: "Learn about the comprehensive process of computer forensics and incident response, including the steps involved in investigating cybercrimes and security incidents. This topic covers the various phases of computer forensics and incident response, from evidence collection and analysis to reporting and legal considerations.",
+                codetype: "Concepts",
+                readtime: 5,
+                link: "comprehensive-computer-forensics-incident-response",
+            }
         ];
         body_genmenu.processData(arr, def_date, def_author);
     }

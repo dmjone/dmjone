@@ -27,18 +27,32 @@ function get_menu_list(datetogen) {
 
         body_genmenu.processData(arr, def_date, def_author, { isMainCategory: true });
     }
-    // function get_class(def_date, def_author) {
-    //     const arr = [
-    //         {
-    //             title: "Topic Name",
-    //             desc: "Description of the topic.",
-    //             codetype: "Concepts",
-    //             readtime: 5,
-    //             link: "link-to-the-topic"
-    //         },            
-    //     ];
-    //     body_genmenu.processData(arr, def_date, def_author);
-    // }
+    function get_class(def_date, def_author) {
+        const arr = [
+            {
+                title: "Intrusion Detection and Prevention: An Overview",
+                desc: "Explore the fundamentals of intrusion detection and prevention, including the types, components, and techniques used to detect and prevent network attacks. This topic covers the basic concepts and principles of intrusion detection and prevention, providing a foundation for understanding the role of IDS in network security.",
+                codetype: "Concepts",
+                readtime: 5,
+                link: "intrusion-detection-and-prevention-overview",
+            },            
+            {
+                title: "Threats to Data: Internal and External",
+                desc: "Learn about the various threats to data security, including internal and external threats that can compromise the confidentiality, integrity, and availability of data. This topic covers the different types of threats, attack vectors, and security measures to protect data from unauthorized access and manipulation.",
+                codetype: "Concepts",
+                readtime: 5,
+                link: "threats-to-data-internal-external",
+            },
+            {
+                title: "Types of Attacks: An Overview",
+                desc: "Explore the different types of cyber attacks, including malware, phishing, DDoS, and more. This topic covers the common attack vectors used by cybercriminals to compromise systems and networks, highlighting the impact and consequences of cyber attacks on organizations and individuals.",
+                codetype: "Concepts",
+                readtime: 5,
+                link: "types-of-attacks-overview",
+            }
+        ];
+        body_genmenu.processData(arr, def_date, def_author);
+    }
     // function get_lab(def_date, def_author) {
     //     const arr = [
     //         // {
