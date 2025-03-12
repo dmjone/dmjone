@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Class Response Sheet</title>
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" />
+        <!-- Bootstrap Icons -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+        <style>
+            body {
+                background-color: #f8f9fa;
+            }
+
+            h2 {
+                margin-bottom: 20px;
+            }
+
+            .card {
+                margin-bottom: 20px;
+            }
+
+            /* Print: Only show random tables, remove dark backgrounds */
+            @media print {
+                @page {
+                    margin: 1in;
+                }
+
+                body {
+                    font-family: 'Times New Roman', Times, serif;
+                    font-size: 12pt;
+                }
+
+                /* Existing print rules remain unchanged below */
+                body * {
+                    visibility: hidden;
+                }
+             
+                body {
+                    background-color: #ffffff;
+                }
+
+                #random-tables,
+                #random-tables * {
+                    visibility: visible;
+                }
+
+                #random-tables {
+                    position: absolute;
+                    left: 0;
+                    top: 0;
+                    width: 100%;
+                }
+
+                table {
+                    background-color: transparent !important;
+                    color: #000 !important;
+                }
+
+                .table,
+                .table th,
+                .table td {
+                    border: 1px solid #000 !important;
+                }
+
+                .card,
+                .card-body {
+                    background: transparent !important;
+                    border: none !important;
+                }
+
+            }
+
+        </style>
+    </head>
+
+    <body class="py-3">
+        <div class="container">
+            <div class="alert alert-warning text-center">
+                To access marksheet, please visit here: <a href="https://dmj.one/edu/su/~internal/names">Markslist</a>
+            </div>
+
+            <!-- Control Panel Card -->
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h2 class="card-title text-center">Student Randomizer</h2>
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label for="group-size-input" class="form-label">Group Size</label>
+                            <input type="number" id="group-size-input" class="form-control" value="3" min="1" />
+                        </div>
+                        <div class="col-md-3">
+                            <label for="group-strategy-select" class="form-label">Grouping Strategy</label>
+                            <select id="group-strategy-select" class="form-select">
+                                <option value="random" selected>Truly Random</option>
+                                <option value="same">Same Specialization</option>
+                                <option value="alphabetical">Alphabetical by Name</option>
+                                <option value="rollSorted">Sorted by Roll Number</option>
+                                <option value="interleaved">Interleaved Specializations</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="exclude-rolls-input" class="form-label">Exclude Rolls (comma separated)</label>
+                            <input type="text" id="exclude-rolls-input" class="form-control" placeholder="e.g. GF202213793, GF202215303" />
+                        </div>
+                    </div>
+                    <div class="mt-4 d-flex justify-content-center align-items-center gap-2">
+                        <button id="randomize-btn" class="btn btn-primary">
+                            <i class="bi bi-shuffle"></i> Randomize
+                        </button>
+                        <!-- Actions Dropdown -->
+                        <div class="dropdown">
+                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="actionsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-gear"></i> Actions
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="actionsDropdown">
+                                <li><a class="dropdown-item" id="export-csv-btn" href="#"><i class="bi bi-file-earmark-spreadsheet"></i> Export CSV</a></li>
+                                <li><a class="dropdown-item" id="download-json-btn" href="#"><i class="bi bi-filetype-json"></i> Download JSON</a></li>
+                                <li><a class="dropdown-item" id="copy-clipboard-btn" href="#"><i class="bi bi-clipboard"></i> Copy to Clipboard</a></li>
+                                <li><a class="dropdown-item" id="print-groups-btn" href="#"><i class="bi bi-printer"></i> Print Groups</a></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li><a class="dropdown-item" id="clear-groups-btn" href="#"><i class="bi bi-x-circle"></i> Clear Groups</a></li>
+                                <li><a class="dropdown-item" id="toggle-dark-mode-btn" href="#"><i class="bi bi-moon"></i> Toggle Dark Mode</a></li>
+                                <li><a class="dropdown-item" id="save-groups-btn" href="#"><i class="bi bi-save"></i> Save Groups</a></li>
+                                <li><a class="dropdown-item" id="load-groups-btn" href="#"><i class="bi bi-folder2-open"></i> Load Saved Groups</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Random Groups Display -->
+            <div id="random-tables">
+                <!-- Generated tables will appear here -->
+            </div>
+        </div>
+
+        <!-- Bootstrap Bundle with Popper -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+        <script>
+            // Data for students remains unchanged.
+            const students = [
+                { name: "Shambhav Chhetri", roll: "GF202213793", specialization: "Cloud Computing", marks: "" },
+                { name: "Vanshika Painuly", roll: "GF202215303", specialization: "Cloud Computing", marks: "" },
+                { name: "Krish Saini", roll: "GF202216008", specialization: "Cloud Computing", marks: "" },
+                { name: "Nitin Thakur", roll: "GF202216583", specialization: "Cloud Computing", marks: "" },
+                { name: "Anshika Bhuria", roll: "GF202213991", specialization: "Cloud Computing", marks: "" },
+                { name: "Lakshay Sharma", roll: "GF202216641", specialization: "Cloud Computing", marks: "" },
+                { name: "Aerish Verma", roll: "GF202217911", specialization: "Cloud Computing", marks: "" },
+                { name: "Jasmeen Sharma", roll: "GF202217536", specialization: "Cloud Computing", marks: "" },
+                { name: "Rijul chaudhary", roll: "GF202218418", specialization: "Cloud Computing", marks: "" },
+                { name: "Aryan Sharma", roll: "GF202218457", specialization: "Cloud Computing", marks: "" },
+                { name: "Kamaksha dogra", roll: "GF202218486", specialization: "Cloud Computing", marks: "" },
+                { name: "Shivam Sharma", roll: "GF202218544", specialization: "Cloud Computing", marks: "" },
+                { name: "Armaan Gautam", roll: "GF202219099", specialization: "Cloud Computing", marks: "" },
+                { name: "Piyush Sharma", roll: "GF202218943", specialization: "Cloud Computing", marks: "" },
+                { name: "Asmi goyal", roll: "GF202218101", specialization: "Cloud Computing", marks: "" },
+                { name: "Anshuman Mohanty", roll: "GF202217744", specialization: "Cloud Computing", marks: "" },
+                { name: "Rohit Kumar", roll: "GF202220522", specialization: "Cloud Computing", marks: "" },
+                { name: "Lakshika", roll: "GF202220476", specialization: "Cloud Computing", marks: "" },
+                { name: "Yuvraj Kumar", roll: "GF202350495", specialization: "Cloud Computing", marks: "" },
+                { name: "Astha Chandel", roll: "GF202214559", specialization: "Cyber Security", marks: "" },
+                { name: "Divya Mohan", roll: "GF202214698", specialization: "Cyber Security", marks: "" },
+                { name: "Shivam Garg", roll: "GF202215586", specialization: "Cyber Security", marks: "" },
+                { name: "Arpit", roll: "GF202214861", specialization: "Cyber Security", marks: "" },
+                { name: "Rohit Mehta", roll: "GF202216619", specialization: "Cyber Security", marks: "" },
+                { name: "Harshal Khajuria", roll: "GF202218277", specialization: "Cyber Security", marks: "" },
+                { name: "Vipul Verma", roll: "GF202214829", specialization: "Cyber Security", marks: "" },
+                { name: "Abhay Chandel", roll: "GF202217661", specialization: "Cyber Security", marks: "" },
+                { name: "Piyush Snate", roll: "GF202217922", specialization: "Cyber Security", marks: "" },
+                { name: "Anurag", roll: "GF202218710", specialization: "Cyber Security", marks: "" },
+                { name: "Shreshth Srivastav", roll: "GF202218982", specialization: "Cyber Security", marks: "" },
+                { name: "Amandeep kumar", roll: "GF202219136", specialization: "Cyber Security", marks: "" },
+                { name: "Mayank Banga", roll: "GF202218364", specialization: "Cyber Security", marks: "" },
+                { name: "Aryan Thakur", roll: "GF202218659", specialization: "Cyber Security", marks: "" },
+                { name: "Parshav Pathania", roll: "GF202219568", specialization: "Cyber Security", marks: "" },
+                { name: "Prithak Thapa", roll: "IN/2022/1191", specialization: "Cyber Security", marks: "" },
+                { name: "Akshit", roll: "GF202220189", specialization: "Cyber Security", marks: "" },
+                { name: "Ashutosh Rana", roll: "GF202221023", specialization: "Cyber Security", marks: "" },
+                { name: "Samarth Singh", roll: "GF202341183", specialization: "Cyber Security", marks: "" },
+                { name: "Subhojeet ghosh", roll: "GF202347000", specialization: "Cyber Security", marks: "" },
+                { name: "Tarun kumar", roll: "GF202214708", specialization: "Data Science", marks: "" },
+                { name: "Arpit Bhardwaj", roll: "GF202216002", specialization: "Data Science", marks: "" },
+                { name: "Adarsh sharma", roll: "GF202215162", specialization: "Data Science", marks: "" },
+                { name: "Prikshit", roll: "GF202216395", specialization: "Data Science", marks: "" },
+                { name: "Ankit Saini", roll: "GF202215717", specialization: "Data Science", marks: "" },
+                { name: "Anugraha Tamang", roll: "GF202216959", specialization: "Data Science", marks: "" },
+                { name: "Rishu Kumar gupta", roll: "GF202216818", specialization: "Data Science", marks: "" },
+                { name: "Adarsh choudhary", roll: "GF202216680", specialization: "Data Science", marks: "" },
+                { name: "Atul Chauhan", roll: "GF202216859", specialization: "Data Science", marks: "" },
+                { name: "Paras Chauhan ch", roll: "GF202216945", specialization: "Data Science", marks: "" },
+                { name: "Rameshwar Katoch", roll: "GF202216821", specialization: "Data Science", marks: "" },
+                { name: "Aarushi", roll: "GF202217642", specialization: "Data Science", marks: "" },
+                { name: "Divyanshu", roll: "GF202218328", specialization: "Data Science", marks: "" },
+                { name: "Aman Thakur", roll: "GF202216027", specialization: "Data Science", marks: "" },
+                { name: "Vinayak Awasthi", roll: "GF202218584", specialization: "Data Science", marks: "" },
+                { name: "Shruti Thakur", roll: "GF202218590", specialization: "Data Science", marks: "" },
+                { name: "Siddharth Singh Markam", roll: "GF202218839", specialization: "Data Science", marks: "" },
+                { name: "Vedansh Sharma", roll: "GF202218482", specialization: "Data Science", marks: "" },
+                { name: "Manish Kumar", roll: "GF202218585", specialization: "Data Science", marks: "" },
+                { name: "Ansh", roll: "GF202215982", specialization: "Data Science", marks: "" },
+                { name: "Vineet Dhiman", roll: "GF202218953", specialization: "Data Science", marks: "" },
+                { name: "Riyant Thakur", roll: "GF202215973", specialization: "Data Science", marks: "" },
+                { name: "Jatin", roll: "GF202219717", specialization: "Data Science", marks: "" },
+                { name: "Vidya Parmar", roll: "GF202215292", specialization: "Data Science", marks: "" },
+                { name: "Rohit Dhiman", roll: "GF202219890", specialization: "Data Science", marks: "" },
+                { name: "Saksham Awasthi", roll: "GF202219306", specialization: "Data Science", marks: "" },
+                { name: "Akshit Thakur", roll: "GF202220107", specialization: "Data Science", marks: "" },
+                { name: "Riddhi sahu", roll: "GF202220064", specialization: "Data Science", marks: "" },
+                { name: "Kumkum", roll: "GF202220969", specialization: "Data Science", marks: "" }
+            ];
+
+            let groups = []; // Global storage for groups
+
+            // Helper: Chunk an array into groups of given size.
+            function chunkArray(array, size) {
+                const chunks = [];
+                for (let i = 0; i < array.length; i += size) {
+                    chunks.push(array.slice(i, i + size));
+                }
+                return chunks;
+            }
+
+            // Render groups into tables.
+            function renderGroups() {
+                const randomTablesDiv = document.getElementById("random-tables");
+                randomTablesDiv.innerHTML = "";
+                groups.forEach((group, index) => {
+                    const table = document.createElement("table");
+                    table.className = "table table-bordered table-hover mt-3";
+                    const thead = document.createElement("thead");
+                    thead.className = "table";
+                    thead.innerHTML = `<tr>
+                              <th colspan="4" class="text-center">Group ${index + 1}</th>
+                            </tr>
+                            <tr>
+                              <th>Roll Number</th>
+                              <th>Name</th>
+                              <th>Specialization</th>
+                              <th>Marks</th>
+                            </tr>`;
+                    table.appendChild(thead);
+                    const tbody = document.createElement("tbody");
+                    group.forEach(student => {
+                        const tr = document.createElement("tr");
+                        tr.innerHTML = `<td>${student.roll}</td>
+                          <td>${student.name}</td>
+                          <td>${student.specialization}</td>
+                          <td>${student.marks}</td>`;
+                        tbody.appendChild(tr);
+                    });
+                    table.appendChild(tbody);
+                    randomTablesDiv.appendChild(table);
+                });
+            }
+
+            // Randomize Groups event.
+            document.getElementById("randomize-btn").addEventListener("click", () => {
+                const groupSizeInput = document.getElementById("group-size-input");
+                const strategySelect = document.getElementById("group-strategy-select");
+                const excludeInput = document.getElementById("exclude-rolls-input").value;
+                const inputValue = parseInt(groupSizeInput.value) || 3;
+                const strategy = strategySelect.value;
+                groups = [];
+
+                // Process exclusion list.
+                const excludeRolls = excludeInput.split(',')
+                    .map(r => r.trim())
+                    .filter(r => r.length > 0);
+
+                // Filter out excluded students.
+                const filteredStudents = students.filter(student => !excludeRolls.includes(student.roll));
+
+                if (strategy === "random") {
+                    let shuffled = [...filteredStudents].sort(() => 0.5 - Math.random());
+                    groups = chunkArray(shuffled, inputValue);
+                } else if (strategy === "same") {
+                    const specMap = {};
+                    filteredStudents.forEach(student => {
+                        if (!specMap[student.specialization]) specMap[student.specialization] = [];
+                        specMap[student.specialization].push(student);
+                    });
+                    Object.keys(specMap).forEach(spec => {
+                        let specStudents = specMap[spec].sort(() => 0.5 - Math.random());
+                        groups = groups.concat(chunkArray(specStudents, inputValue));
+                    });
+                } else if (strategy === "alphabetical") {
+                    let sorted = [...filteredStudents].sort((a, b) => a.name.localeCompare(b.name));
+                    groups = chunkArray(sorted, inputValue);
+                } else if (strategy === "rollSorted") {
+                    let sorted = [...filteredStudents].sort((a, b) => a.roll.localeCompare(b.roll));
+                    groups = chunkArray(sorted, inputValue);
+                } else if (strategy === "interleaved") {
+                    const specMap = {};
+                    filteredStudents.forEach(student => {
+                        if (!specMap[student.specialization]) specMap[student.specialization] = [];
+                        specMap[student.specialization].push(student);
+                    });
+                    Object.keys(specMap).forEach(spec => {
+                        specMap[spec].sort(() => 0.5 - Math.random());
+                    });
+                    const interleaved = [];
+                    let more = true;
+                    while (more) {
+                        more = false;
+                        Object.keys(specMap).forEach(spec => {
+                            if (specMap[spec].length > 0) {
+                                interleaved.push(specMap[spec].shift());
+                                more = true;
+                            }
+                        });
+                    }
+                    groups = chunkArray(interleaved, inputValue);
+                }
+                renderGroups();
+            });
+
+            // Ensure group size input remains enabled.
+            document.getElementById("group-strategy-select").addEventListener("change", () => {
+                const groupSizeInput = document.getElementById("group-size-input");
+                groupSizeInput.disabled = false;
+                if (!groupSizeInput.value) groupSizeInput.value = 3;
+            });
+
+            // Export Groups as CSV.
+            document.getElementById("export-csv-btn").addEventListener("click", () => {
+                let csv = "Group,Roll,Name,Specialization,Marks\n";
+                document.querySelectorAll("#random-tables table").forEach((table, groupIndex) => {
+                    table.querySelectorAll("tbody tr").forEach(row => {
+                        const cells = Array.from(row.querySelectorAll("td")).map(cell => cell.innerText.trim());
+                        csv += `Group ${groupIndex + 1},${cells.join(",")}\n`;
+                    });
+                });
+                const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement("a");
+                link.href = url;
+                link.download = "groups.csv";
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            });
+
+            // Print Groups.
+            document.getElementById("print-groups-btn").addEventListener("click", () => {
+                window.print();
+            });
+
+            // Clear Groups.
+            document.getElementById("clear-groups-btn").addEventListener("click", () => {
+                groups = [];
+                document.getElementById("random-tables").innerHTML = "";
+                localStorage.removeItem("savedGroups");
+            });
+
+            // Download Groups as JSON.
+            document.getElementById("download-json-btn").addEventListener("click", () => {
+                const json = JSON.stringify(groups, null, 2);
+                const blob = new Blob([json], { type: "application/json" });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement("a");
+                link.href = url;
+                link.download = "groups.json";
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            });
+
+            // Copy Groups to Clipboard.
+            document.getElementById("copy-clipboard-btn").addEventListener("click", () => {
+                let text = "";
+                groups.forEach((group, index) => {
+                    text += `Group ${index + 1}:\n`;
+                    group.forEach(student => {
+                        text += `Roll: ${student.roll}, Name: ${student.name}, Specialization: ${student.specialization}, Marks: ${student.marks}\n`;
+                    });
+                    text += "\n";
+                });
+                navigator.clipboard.writeText(text).then(() => {
+                    alert("Groups copied to clipboard.");
+                }, () => {
+                    alert("Failed to copy groups.");
+                });
+            });
+
+            // Toggle Dark Mode.
+            document.getElementById("toggle-dark-mode-btn").addEventListener("click", () => {
+                document.body.classList.toggle("dark-mode");
+            });
+
+            // Save/Load Groups to/from Local Storage.
+            document.getElementById("save-groups-btn").addEventListener("click", () => {
+                if (groups.length > 0) {
+                    localStorage.setItem("savedGroups", JSON.stringify(groups));
+                    alert("Groups saved successfully.");
+                } else {
+                    alert("No groups to save. Please generate groups first.");
+                }
+            });
+
+            document.getElementById("load-groups-btn").addEventListener("click", () => {
+                const saved = localStorage.getItem("savedGroups");
+                if (saved) {
+                    groups = JSON.parse(saved);
+                    renderGroups();
+                    alert("Saved groups loaded.");
+                } else {
+                    alert("No saved groups found.");
+                }
+            });
+        </script>
+    </body>
+
+</html>
