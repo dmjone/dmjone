@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Happy Holi Dynamic Splash Animation</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+        <style>
+            @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap");
+
+            body {
+                margin: 0;
+                overflow: hidden;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                height: 100vh;
+                background: transparent;
+                position: relative;
+            }
+
+            /* Happy Holi Text */
+            .holi-text {
+                font-size: 6rem;
+                font-weight: bold;
+                font-family: "Poppins", sans-serif;
+                text-transform: uppercase;
+                text-align: center;
+                position: absolute;
+                z-index: 3;
+            }
+
+            /* Particle Container */
+            .particles {
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                z-index: 1;
+                pointer-events: none;
+            }
+
+            .particle {
+                position: absolute;
+                border-radius: 50%;
+                opacity: 0.8;
+                will-change: transform, opacity;
+            }
+
+            .splash {
+                position: absolute;
+                width: 500px;
+                height: 500px;
+                --splashColor: #0000ff;
+                background:
+                    repeating-conic-gradient(#00f 0 3%, #0000 0 11%),
+                    repeating-conic-gradient(#0000 0 5%, #00f 0 7%) 50% / 60% 60%,
+                    repeating-conic-gradient(#0000 0 7%,  #00f 0 9%) 50% / 70% 70%,
+                    repeating-conic-gradient(#0000 0 11%, #00f 0 13%) 50% / 80% 80%,
+                    radial-gradient(#00f 22%, #0000 0),
+                    #fff;
+                background-repeat: no-repeat;
+                filter: blur(20px) contrast(50);
+                box-shadow: 0 0 0 50px #fff;
+            }
+
+            /* Splash effect – using your original code structure with a dynamic color *
+            .splash {
+                position: absolute;
+                width: 500px;
+                height: 500px;                
+                --splashColor: #0000ff;                
+                background:
+                    repeating-conic-gradient(var(--splashColor) 0 3%, transparent 0 11%),
+                    repeating-conic-gradient(transparent 0 5%, var(--splashColor) 0 7%) 50% / 60% 60%,
+                    repeating-conic-gradient(transparent 0 7%, var(--splashColor) 0 9%) 50% / 70% 70%,
+                    repeating-conic-gradient(transparent 0 11%, var(--splashColor) 0 13%) 50% / 80% 80%,
+                    radial-gradient(var(--splashColor) 22%, transparent 0),
+                    #fff;
+                background-repeat: no-repeat;
+                filter: blur(20px) contrast(50);
+                box-shadow: 0 0 0 50px var(--splashColor);
+                pointer-events: none;
+            }*/
+        </style>
+    </head>
+
+    <body>
+        <div class="holi-text">Happy Holi!</div>
+        <div class="particles"></div>
+
+        <script>
+            // Helper: generate a random hex color.
+            function getRandomColor() {
+                return "#" + Math.floor(Math.random() * 16777215).toString(16).padStart(6, "0");
+            }
+
+            // Cycle the text color randomly every second.
+            const holiText = document.querySelector(".holi-text");
+            setInterval(() => {
+                const randomColor = getRandomColor();
+                holiText.style.color = randomColor;
+                holiText.style.textShadow = `0 0 15px ${randomColor}`;
+            }, 1000);
+
+            // Create particles (restored from previous version)
+            document.addEventListener("DOMContentLoaded", () => {
+                const numParticles = 40;
+                const particlesContainer = document.querySelector(".particles");
+
+                for (let i = 0; i < numParticles; i++) {
+                    const particle = document.createElement("div");
+                    particle.classList.add("particle");
+                    const size = Math.random() * 20 + 10;
+                    particle.style.width = `${size}px`;
+                    particle.style.height = `${size}px`;
+                    particle.style.background = getRandomColor();
+
+                    const startX = Math.random() * window.innerWidth;
+                    const startY = Math.random() * window.innerHeight;
+                    particle.style.left = `${startX}px`;
+                    particle.style.top = `${startY}px`;
+
+                    const duration = Math.random() * 3000 + 2000; // between 2000 and 5000 ms
+                    particle.animate(
+                        [
+                            { transform: `translateY(0) scale(1)`, opacity: 1 },
+                            { transform: `translateY(-200px) scale(0.5)`, opacity: 0 }
+                        ],
+                        {
+                            duration: duration,
+                            iterations: Infinity,
+                            easing: "linear",
+                            delay: Math.random() * 2000
+                        }
+                    );
+
+                    particlesContainer.appendChild(particle);
+                }
+            });
+
+            // Function to create a dynamic splash with erratic properties.
+            function createSplash() {
+                const splash = document.createElement("div");
+                splash.classList.add("splash");
+
+                // Randomize width and height independently to break the square shape.
+                const width = Math.floor(Math.random() * 400) + 300;  // 100 to 500px
+                const height = Math.floor(Math.random() * 400) + 300; // 100 to 500px
+                splash.style.width = `${width}px`;
+                splash.style.height = `${height}px`;
+
+                // Position the splash randomly ensuring it remains fully visible.
+                const posX = Math.random() * (window.innerWidth - width);
+                const posY = Math.random() * (window.innerHeight - height);
+                splash.style.left = `${posX}px`;
+                splash.style.top = `${posY}px`;
+
+                // Set a single random color for the splash via CSS variable.
+                const splashColor = getRandomColor();
+                splash.style.setProperty("--splashColor", splashColor);
+
+                // Apply a random rotation for erratic appearance.
+                splash.style.transform = `rotate(${Math.random() * 360}deg)`;
+
+                document.body.appendChild(splash);
+
+                // Random duration for the shrink/fade animation (between 0.8 and 2 seconds)
+                const duration = Math.random() * 1.2 + 0.8;
+                // Random final scale (to simulate erratic shrink)
+                const finalScale = Math.random() * 0.5 + 0.3; // between 0.3 and 0.8
+
+                gsap.to(splash, {
+                    opacity: 0,
+                    scale: finalScale,
+                    duration: duration,
+                    ease: "power2.in",
+                    onComplete: () => splash.remove()
+                });
+
+                // Schedule the next splash after a random delay (between 500ms and 3000ms)
+                const nextSplashDelay = Math.random() * 2500 + 500;
+                setTimeout(createSplash, nextSplashDelay);
+            }
+
+            // Start the splash creation loop after a random initial delay.
+            setTimeout(createSplash, Math.random() * 2500 + 500);
+        </script>
+    </body>
+
+</html>

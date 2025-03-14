@@ -126,7 +126,7 @@
                                             ${cardImage}
                                         </a>
                                     </div>
-                                    <div class="card-body justify-content-center align-items-center">
+                                    <div class="card-body bg-random justify-content-center align-items-center">
                                         <div class="d-flex flex-column text-center">
                                             <div class="flex-grow-1 my-1">
                                                 <a href="${url}" target="_blank"><h3 class="pt-0 scale-2 ${randomTextColor} ${glowClass}" title="Click to verify the certificate for ${cert.name} issued by ${certifications.platform}"><strong>${cert.name}</strong></h3></a>
