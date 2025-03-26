@@ -42,6 +42,14 @@ function get_menu_list(datetogen) {
                 codetype: "Concepts",
                 readtime: 5,
                 link: "comprehensive-computer-forensics-incident-response",
+            },
+            {
+                title: "Whitepaper: Analysis of Blockchain-Based Homomorphic Voting Systems",
+                desc: "Explore the analysis of blockchain-based homomorphic voting systems in this whitepaper. This document covers the concept of homomorphic encryption, its application in blockchain-based voting systems, and the benefits and challenges of using homomorphic voting systems for secure and transparent elections.",
+                codetype: "Whitepaper",
+                readtime: 60,
+                date: "Wed March 26, 2025",
+                link: "analysis-of-blockchain-based-homomorphic-voting-systems",
             }
         ];
         body_genmenu.processData(arr, def_date, def_author);

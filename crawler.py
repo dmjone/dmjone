@@ -153,8 +153,7 @@ def is_valid_link(link):
             return False
 
     # Exclude images, docs, google.com, etc.
-    excluded_extensions = ('.js', '.css', '.jpg', '.jpeg', '.png', '.gif',
-                           '.pdf', '.doc', '.docx', '.xlsx')
+    excluded_extensions = ('.js', '.css', '.jpg', '.jpeg', '.png', '.gif', '.doc', '.docx', '.xlsx')
     return (
         parsed_link.scheme in {'http', 'https'} and
         not parsed_link.path.lower().endswith(excluded_extensions) and
