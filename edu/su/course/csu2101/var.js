@@ -42,6 +42,13 @@ function get_menu_list(datetogen) {
                 readtime: 5,
                 link: "database-transactions-mis-dss-sql-optimization-business-intelligence-analytics"
             },            
+            {
+                title: "SQL Joins",
+                desc: "Explore the concept of SQL joins and learn how to use them to combine data from multiple tables in a relational database. This topic covers the different types of SQL joins, including inner joins, outer joins, and self-joins, and provides examples to help you understand how SQL joins work.",
+                codetype: "Concepts",
+                readtime: 15,
+                link: "sql-joins"
+            }
         ];
         body_genmenu.processData(arr, def_date, def_author);
     }
