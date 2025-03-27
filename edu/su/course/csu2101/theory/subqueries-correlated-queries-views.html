@@ -1,0 +1,452 @@
+<!-------------------------- © 2007 - present, dmj.one and contributors. ----------------------------------
+   Part of the dmjone project. Licensed under the GNU AGPL. Provided as-is, without warranty of any kind. 
+-------------------- Redistribution and modifications must retain this notice. --------------------------->
+
+
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+    <!--<![endif]-->
+
+    <head>
+
+        <script src="/js/edu_su_common.js"></script>
+        <noscript>
+            <style>
+                html,
+                body {
+                    margin: 0;
+                    overflow: hidden;
+                }
+            </style>
+            <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+        </noscript>
+
+        <title>Subqueries, Correlated Queries, and Views - CSU2101 | Shoolini University</title>
+
+        <meta name="description" content="An in-depth guide on SQL queries including subqueries, correlated queries, views, inline views, and common table expressions (CTEs), illustrated through real-world examples and best practices.">
+
+        <meta property="og:image" content="/logo.png">
+        <meta property="og:type" content="article">
+
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:site" content="@divyamohan1993">
+        <meta name="twitter:creator" content="@divyamohan1993">
+        <meta name="twitter:image" content="/logo.png">
+
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+        <meta name="author" content="Divya Mohan">
+        <meta name="robots" content="index, follow">
+
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js" integrity="sha512-sHSNLECRJSK+BFs7E8DiFc6pf6n90bLI85Emiw1jhreduZhK3VXgq9l4kAt9eTIHYAcuQBKHL01QKs4/3Xgl8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js" integrity="sha512-iWiuBS5nt6r60fCz26Nd0Zqe0nbk1ZTIQbl3Kv7kYsX+yKMUFHzjaH2+AnM6vp2Xs+gNmaBAVWJjSmuPw76Efg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                renderMathInElement(document.body, {
+                    // customised options
+                    // • auto-render specific keys, e.g.:
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false },
+                        { left: '\\(', right: '\\)', display: false },
+                        { left: '\\[', right: '\\]', display: true }
+                    ],
+                    // • rendering keys, e.g.:
+                    throwOnError: false
+                });
+            });
+        </script> -->
+
+        <!-- <style>
+            main ul {
+                list-style-type: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            main ul li {
+                margin: 0;
+                padding: 0;
+            }
+        </style> -->
+
+        <!-- JSON-LD Structured Data for SEO -->
+        <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "TechArticle",
+          "headline": "SQL: Subqueries, Correlated Queries, and Views",
+          "description": "An in-depth guide on SQL queries including subqueries, correlated queries, views, inline views, and common table expressions (CTEs), illustrated through real-world examples and best practices.",
+          "dateModified": "2025-03-27",
+          "author": [
+            {
+              "@type": "Person",
+              "name": "Divya Mohan",
+              "url": "https://dmj.one/resume/",
+              "sameAs": [
+                "https://www.credly.com/users/divyamohan1993",
+                "https://www.linkedin.com/in/divyamohan1993/",
+                "https://hackerrank.com/divyamohan1993",
+                "https://www.coursera.org/learner/divyamohan1993"
+              ]
+            }
+          ],
+          "publisher": {
+            "@type": "EducationalOrganization",
+            "name": "dmj.one",
+            "url": "https://dmj.one"
+          },
+          "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https://dmj.one/edu/su/course/csu2101/theory/"
+          },
+          "keywords": [
+            "SQL",
+            "Subqueries",
+            "Correlated Queries",
+            "Views",
+            "Inline Views",
+            "Common Table Expressions",
+            "Database Management",
+            "SQL Best Practices"
+          ],
+          "articleSection": [
+            "Introduction",
+            "Subqueries",
+            "Correlated Subqueries",
+            "Practical SQL Query Examples",
+            "Views",
+            "Inline Views",
+            "Common Table Expressions (CTE)",
+            "SQL Functions",
+            "Mastery Tips",
+            "Quick Comparison",
+            "Mastery Checkpoint"
+          ],
+          "isAccessibleForFree": true,
+          "inLanguage": "en-US",
+          "license": "https://creativecommons.org/licenses/by-sa/4.0/"
+        }
+        </script>
+
+
+
+    </head>
+
+    <body>
+
+        <script> header_author("dm"); </script>
+
+        <main>
+            <article class="agen-tableofcontents">
+                <h2 class="text-center">
+                    Subqueries, Correlated Queries, and Views
+                </h2>
+                <div class="d-none contentdate">2025, March 27</div>
+            </article>
+
+
+            <div class="alert alert-info text-center d-print-none mb-0">This document provides an in-depth explanation of the topics covered in class and is designed to be your go-to reference as you continue to build your knowledge and skills. <i class="bi bi-patch-check-fill text-success" data-bs-toggle="tooltip" title="Verified by Shri Manashwee Tripathi"></i></div>
+
+
+            <article>
+                <h3>Introduction</h3>
+                <p>SQL isn't just about fetching rows—it's about building powerful, layered logic that mirrors real-world relationships. Subqueries, views, and correlated queries help you express logic like “Who’s the best in their department?” or “Who reports to someone who reports to the president?”</p>
+            </article>
+
+            <article>
+                <h3>1. Subqueries</h3>
+
+                <h4>1.1 What is a Subquery?</h4>
+                <p>A <strong>subquery</strong> is a query nested inside another query. It's used when the result of one query is required as <strong>input</strong> for another.</p>
+                <p><em>Think of it like:</em> “Get me all employees who have the same salary as the person earning the highest salary.”</p>
+
+                <h5>1.1.1 Example: Highest Paid Employee</h5>
+                <pre><code class="language-sql">
+SELECT * FROM emp 
+WHERE sal = (SELECT MAX(sal) FROM emp);
+</code></pre>
+                <ul>
+                    <li><strong>Outer query</strong>: fetches full details</li>
+                    <li><strong>Inner query</strong>: calculates max salary</li>
+                    <li>The inner query is <strong>independent</strong> (can run alone)</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>2. Correlated Subqueries</h3>
+
+                <h4>2.1 What is a Correlated Subquery?</h4>
+                <p>A <strong>correlated subquery</strong> depends on each row of the outer query. It runs <strong>once for every row</strong> of the outer query.</p>
+                <p><em>Real-world:</em> “Find employees whose salary is the maximum <em>in their own department</em>.”</p>
+
+                <h5>2.1.1 Example: Department-wise Top Earner</h5>
+                <pre><code class="language-sql">
+SELECT * 
+FROM emp e1 
+WHERE e1.sal = (
+  SELECT MAX(sal) 
+  FROM emp e2 
+  WHERE e1.deptno = e2.deptno
+);
+</code></pre>
+                <ul>
+                    <li>Inner query uses <code>e1.deptno</code> from outer query</li>
+                    <li>Called for <strong>each</strong> employee — can be slower</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>3. More Practical Examples</h3>
+
+                <h4>3.1 Employees whose managers are not managers</h4>
+                <pre><code class="language-sql">
+SELECT * 
+FROM emp 
+WHERE mgr IN (
+  SELECT empno FROM emp 
+  WHERE empno NOT IN (SELECT DISTINCT mgr FROM emp WHERE mgr IS NOT NULL)
+);
+</code></pre>
+
+                <h4>3.2 Employees working under the president</h4>
+                <pre><code class="language-sql">
+SELECT * 
+FROM emp 
+WHERE mgr = (
+  SELECT empno FROM emp 
+  WHERE job = 'PRESIDENT'
+);
+</code></pre>
+
+                <h4>3.3 Employees hired before their manager</h4>
+                <pre><code class="language-sql">
+SELECT w.ename AS worker, m.ename AS manager 
+FROM emp w, emp m 
+WHERE w.mgr = m.empno 
+AND w.hiredate < m.hiredate;
+</code></pre>
+            </article>
+
+            <article>
+                <h3>4. Views</h3>
+
+                <h4>4.1 What is a View?</h4>
+                <p>A <strong>view</strong> is a virtual table based on a SQL query. It <strong>doesn't store data</strong>, it stores <strong>logic</strong>. Query results are generated in real-time.</p>
+                <p><em>Analogy:</em> A named shortcut to a complex query.</p>
+
+                <h4>4.2 Create and Use a View</h4>
+                <pre><code class="language-sql">
+CREATE VIEW v1 AS 
+SELECT w.ename AS worker, m.ename AS manager 
+FROM emp w, emp m 
+WHERE w.mgr = m.empno 
+AND w.hiredate < m.hiredate;
+
+SELECT * FROM v1;
+</code></pre>
+                <ul>
+                    <li>Updates in <code>emp</code> will reflect in <code>v1</code> automatically.</li>
+                    <li><strong>No extra storage</strong> used.</li>
+                </ul>
+
+                <h4>4.3 Types of Views</h4>
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Based On</th>
+                            <th>Updatable</th>
+                            <th>Use Case</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Simple View</td>
+                            <td>Single table</td>
+                            <td>Yes</td>
+                            <td>Lightweight, quick operations</td>
+                        </tr>
+                        <tr>
+                            <td>Complex View</td>
+                            <td>Joins/Subqueries</td>
+                            <td>No</td>
+                            <td>Analytics, reporting (read-only)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </article>
+
+            <article>
+                <h3>5. Inline Views</h3>
+
+                <h4>5.1 What is an Inline View?</h4>
+                <p>An <strong>inline view</strong> is a subquery used in the <code>FROM</code> clause—treated like a temporary table.</p>
+                <p><em>Real-world:</em> Instead of creating a separate view, just plug it inside the query.</p>
+
+                <h4>5.2 Example</h4>
+                <pre><code class="language-sql">
+SELECT deptno, MAX(sal) AS max_sal 
+FROM (
+  SELECT deptno, sal FROM emp
+) AS dept_salaries 
+GROUP BY deptno;
+</code></pre>
+                <ul>
+                    <li>Avoids creating a permanent view</li>
+                    <li>Great for <strong>on-the-fly aggregations</strong></li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>6. CTE (Common Table Expression)</h3>
+
+                <h4>6.1 What is a CTE?</h4>
+                <p>A <strong>CTE</strong> (introduced using <code>WITH</code>) is a temporary result set used by the main query.</p>
+                <p><em>Like giving a name to a subquery block for reuse and readability.</em></p>
+
+                <h4>6.2 Example</h4>
+                <pre><code class="language-sql">
+WITH MaxSalaries AS (
+  SELECT deptno, MAX(sal) AS max_sal
+  FROM emp 
+  GROUP BY deptno
+)
+SELECT * 
+FROM emp e
+JOIN MaxSalaries m 
+ON e.deptno = m.deptno AND e.sal = m.max_sal;
+</code></pre>
+            </article>
+
+            <article>
+                <h3>7. Predefined Functions You Should Know</h3>
+
+                <p>Useful with subqueries and views:</p>
+
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>Function</th>
+                            <th>Purpose</th>
+                            <th>Example</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>MAX()</code></td>
+                            <td>Highest value</td>
+                            <td><code>MAX(sal)</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>MIN()</code></td>
+                            <td>Lowest value</td>
+                            <td><code>MIN(sal)</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>AVG()</code></td>
+                            <td>Average</td>
+                            <td><code>AVG(sal)</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>COUNT()</code></td>
+                            <td>Total count</td>
+                            <td><code>COUNT(*)</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>COALESCE()</code></td>
+                            <td>Handle <code>NULL</code> values</td>
+                            <td><code>COALESCE(comm, 0)</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>NVL()</code></td>
+                            <td>Replace <code>NULL</code> (Oracle-specific)</td>
+                            <td><code>NVL(comm, 0)</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </article>
+
+            <article>
+                <h3>8. Mastery Tips</h3>
+                <ul>
+                    <li>Use <strong>subqueries</strong> when filtering by result of another query.</li>
+                    <li>Use <strong>correlated subqueries</strong> when comparison depends row-by-row.</li>
+                    <li>Use <strong>views</strong> to simplify repeated queries.</li>
+                    <li>Use <strong>inline views</strong> for readable one-time complex queries.</li>
+                    <li>Use <strong>CTEs</strong> for modular and recursive logic.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>9. Quick Comparison</h3>
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>Concept</th>
+                            <th>Stored?</th>
+                            <th>Use Case</th>
+                            <th>Performance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Subquery</td>
+                            <td>No</td>
+                            <td>Filters, lookups</td>
+                            <td>Fast (if scalar)</td>
+                        </tr>
+                        <tr>
+                            <td>Correlated Subquery</td>
+                            <td>No</td>
+                            <td>Row-wise logic</td>
+                            <td>Slower</td>
+                        </tr>
+                        <tr>
+                            <td>View</td>
+                            <td>Logic only</td>
+                            <td>Reusable named query</td>
+                            <td>Fast (depends)</td>
+                        </tr>
+                        <tr>
+                            <td>Inline View</td>
+                            <td>No</td>
+                            <td>Temporary table in FROM</td>
+                            <td>Fast</td>
+                        </tr>
+                        <tr>
+                            <td>CTE</td>
+                            <td>No</td>
+                            <td>Clean readable subquery</td>
+                            <td>Optimal</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </article>
+
+            <article>
+                <h3>10. Apply What You've Learned</h3>
+                <p>Complete the following tasks to test your mastery of subqueries, correlated queries, views, and inline views:</p>
+                <ol>
+                    <li>Create a query using a <strong>simple subquery</strong> to find employees earning the highest salary in the organization.</li>
+                    <li>Write a <strong>correlated subquery</strong> to list employees getting the highest salary in their respective departments.</li>
+                    <li>Create a <strong>view</strong> that lists employees who joined before their manager and query from it.</li>
+                    <li>Use an <strong>inline view</strong> to display each department with its highest-paid employee’s details.</li>
+                    <li>Use a <strong>CTE</strong> to break down a complex query for readability (e.g., total salary by department).</li>
+                    <li>Use <strong>aggregate functions</strong> like <code>MAX</code>, <code>AVG</code>, or <code>COUNT</code> inside a join or subquery to answer a real-world scenario (e.g., departments with more than 3 employees).</li>
+                </ol>
+                <p>💡 Submit your queries with a short explanation of why you chose each approach.</p>
+            </article>
+
+
+
+        </main>
+
+        <script> copyright("all"); </script>
+
+    </body>
+
+</html>

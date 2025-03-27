@@ -48,6 +48,13 @@ function get_menu_list(datetogen) {
                 codetype: "Concepts",
                 readtime: 15,
                 link: "sql-joins"
+            },
+            {
+                title: "Subqueries, Correlated Queries, and Views",
+                desc: "Learn about subqueries, correlated queries, and views in SQL. This topic covers the use of subqueries to retrieve data from multiple tables, correlated queries to compare values across different tables, and views to create virtual tables in a database.",
+                codetype: "Concepts",
+                readtime: 10,
+                link: "subqueries-correlated-queries-views"
             }
         ];
         body_genmenu.processData(arr, def_date, def_author);
