@@ -688,7 +688,10 @@ const courseDetailsMap = {
     // Semester 6    
     'dmjcclt': { 'default': ["Dr. Ahmad Waleed Salehi", "DMJCCLT", "Cloud Computing Concepts"] },
     'lse006': { 'default': ["Akshita Thakur", "LSE006", "English Communication Seminar 2"] },
-    'csu2101': { 'default': ["Manashwee Tripathi", "CSU2101", "Programming in PHP & MySQL"] },    
+    'csu2101': {
+        'default': ["Manashwee Tripathi", "CSU2101", "Programming in PHP & MySQL"],
+        'lab': ["Manashwee Tripathi", "CSU2101P", "Programming in PHP & MySQL Lab"]
+     },    
     'csu1296': { 'default': ["Kritika Rana", "CSU1296", "Software Engineering"] },    
     'csu2104': { 'default': ["Dr. Sonia", "CSU2104", "Digital Forensics"] },
     'csu1288': { 'default': ["Abdullahi Adem", "CSU1288", "Intrusion Detection System"] },
