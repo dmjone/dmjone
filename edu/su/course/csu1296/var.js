@@ -133,6 +133,14 @@ function get_menu_list(datetogen) {
                 link: "cohesion-coupling-guide",
                 date: "Tue February 18, 2025"
             },
+            {
+                title: "Unified Modeling Language (UML)",
+                desc: "Explore the Unified Modeling Language (UML), its diagrams, and its role in software design and documentation.",
+                codetype: "Concepts",
+                readtime: 20,
+                link: "unified-modeling-language-uml",
+                date: "Wed April 2, 2025"
+            }
         ];
         body_genmenu.processData(arr, def_date, def_author);
     } 
