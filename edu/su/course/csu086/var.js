@@ -70,7 +70,15 @@ function get_menu_list(datetogen) {
                 readtime: 20,
                 date: "Wed February 05, 2025",
                 link: "syntax-analysis-parsing-compiler-design"
-            },            
+            },           
+            {
+                title: "Assignment 1: Recursive Descent Parser",
+                desc: "Learn about recursive descent parsing in Compiler Design, including top-down parsing, backtracking, and real-world applications.",
+                codetype: "Assignment",
+                readtime: 20,
+                date: "Thu April 03, 2025",
+                link: "assignment-1-recursive-descent-parser"
+            },
             // {
             //     title: "Intermediate Code Generation in Compiler Design",
             //     desc: "Understand the process of intermediate code generation in Compiler Design, including syntax trees, abstract syntax trees, three-address code, quadruples, and real-world applications.",

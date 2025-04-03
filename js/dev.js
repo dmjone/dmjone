@@ -52,7 +52,7 @@ const GLOBAL_NewArticle_message = `A new article has been published. <a href="/e
 const notification_article_update = 0;
 const GLOBAL_ArticleUpdate_message = `An article has been updated. <a href="/my/articles/2022/01/01/sample-article" class="alert-link">Read more</a>.`;
 
-const notification_new_course = 1;
+const notification_new_course = 0;
 const GLOBAL_NewCourse_message = `A new course on <strong>Cloud Computing</strong> has been added. <a href="/edu/su/course/dmjcclt/" class="alert-link">Explore now</a>.`;
 
 const GLOBAL_crawler_mode = 0;
