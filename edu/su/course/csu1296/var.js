@@ -140,6 +140,38 @@ function get_menu_list(datetogen) {
                 readtime: 20,
                 link: "unified-modeling-language-uml",
                 date: "Wed April 2, 2025"
+            },
+            {
+                title: "Function Oriented Design",
+                desc: "Learn about function-oriented design, its principles, advantages, and real-world applications in software engineering.",
+                codetype: "Concepts",
+                readtime: 20,
+                link: "function-oriented-design",
+                date: "Thu April 3, 2025"
+            },
+            {
+                title: "Structured Analysis and Design",
+                desc: "Explore structured analysis and design, its techniques, tools, and real-world applications in software engineering.",
+                codetype: "Concepts",
+                readtime: 20,
+                link: "structured-analysis-design",
+                date: "Fri April 4, 2025"
+            },
+            {
+                title: "Practically Understand Unified Modeling Language (UML)",
+                desc: "A practical guide to Unified Modeling Language (UML) with hands-on projects, real-world case studies, and expert best practices.",
+                codetype: "Concepts",
+                readtime: 20,
+                link: "practical-unified-modeling-language-uml",
+                date: "Fri April 4, 2025"
+            },
+            {
+                title: "User Interface Design",
+                desc: "Explore user interface design principles, techniques, and best practices for creating user-friendly software applications.",
+                codetype: "Concepts",
+                readtime: 20,
+                link: "user-interface-design",
+                date: "Sat April 5, 2025"
             }
         ];
         body_genmenu.processData(arr, def_date, def_author);
