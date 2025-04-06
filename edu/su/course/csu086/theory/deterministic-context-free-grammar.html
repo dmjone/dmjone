@@ -1,0 +1,835 @@
+<!-------------------------- © 2007 - present, dmj.one and contributors. ----------------------------------
+   Part of the dmjone project. Licensed under the GNU AGPL. Provided as-is, without warranty of any kind. 
+-------------------- Redistribution and modifications must retain this notice. --------------------------->
+
+
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+    <!--<![endif]-->
+
+    <head>
+        <script src="/js/edu_su_common.js"></script>
+        <noscript>
+            <style>
+                html,
+                body {
+                    margin: 0;
+                    overflow: hidden;
+                }
+            </style>
+            <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+        </noscript>
+
+        <title>Deterministic CFG - CSU086 - Shoolini U</title>
+        <meta name="description" content="A comprehensive and visual guide to Deterministic Context-Free Grammars (DCFGs), including LL(1), LR(1), and LALR(1) grammar classes, parsing algorithms, examples, automata, conflicts, and real-world use in programming language compilers like C and Java.">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Deterministic Context-Free Grammar: Foundations and Real-World Applications",
+  "description": "A comprehensive and visual guide to Deterministic Context-Free Grammars (DCFGs), including LL(1), LR(1), and LALR(1) grammar classes, parsing algorithms, examples, automata, conflicts, and real-world use in programming language compilers like C and Java.",
+  "dateModified": "2025-03-20",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Divya Mohan",
+      "url": "https://dmj.one/resume/",
+      "sameAs": [
+        "https://www.credly.com/users/divyamohan1993",
+        "https://www.linkedin.com/in/divyamohan1993/",
+        "https://hackerrank.com/divyamohan1993",
+        "https://www.coursera.org/learner/divyamohan1993"
+      ]
+    }
+  ],
+  "publisher": {
+    "@type": "EducationalOrganization",
+    "name": "dmj.one",
+    "url": "https://dmj.one"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://dmj.one/edu/su/course/csu086/theory/deterministic-context-free-grammar"
+  },
+  "keywords": [
+    "DCFG",
+    "Context-Free Grammar",
+    "LL(1)",
+    "LR(1)",
+    "LALR(1)",
+    "Parsing Table",
+    "Shift-Reduce",
+    "Predictive Parser",
+    "Bottom-Up Parsing",
+    "Compiler Design",
+    "Ambiguity Resolution",
+    "Deterministic PDA",
+    "SLR(1)",
+    "YACC",
+    "ANTLR",
+    "Syntax Analysis"
+  ],
+  "articleSection": [
+    "1. Deterministic Context-Free Grammar (DCFG)",
+    "1.1 What is DCFG?",
+    "1.2 Why is DCFG Needed?",
+    "1.3 Difference Between CFG and DCFG",
+    "1.4 Real-World Example",
+    "1.5 Visualizing the Automaton",
+    "2. LL(1), LR(1), LALR(1) Grammars",
+    "2.1 LL(1) Grammar",
+    "2.2 LR(1) Grammar",
+    "2.3 LALR(1) Grammar",
+    "2.4 Comparison Summary",
+    "2.5 Real World Scenarios",
+    "3. LL(1) Grammar and DCFG",
+    "3.1 Definition of LL(1)",
+    "3.2 Conditions for LL(1) Grammar",
+    "3.3 LL(1) Parsing Table Example",
+    "3.4 Predictive Parsing",
+    "4. LR(1) Grammar and DCFG",
+    "4.1 Bottom-Up Parsing",
+    "4.2 Canonical LR(1) vs SLR(1) vs LALR(1)",
+    "4.3 Parsing Table Conflicts",
+    "4.4 Real-World Relevance",
+    "5. Applications and Limitations of DCFGs",
+    "5.1 Use in Real-World Compilers",
+    "5.2 Limitations of DCFGs",
+    "5.3 Trade-offs: Simplicity vs Power"
+  ],
+  "isAccessibleForFree": true,
+  "inLanguage": "en-US",
+  "license": "https://www.gnu.org/licenses/agpl-3.0.en.html"
+}
+</script>
+
+
+        <meta name="author" content="Divya Mohan">
+        <meta name="robots" content="index, follow">
+
+        <!-- Open Graph for Social Media -->
+        <meta property="og:image" content="/logo.png">
+        <meta property="og:type" content="article">
+
+        <!-- Twitter Cards -->
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:site" content="@divyamohan1993">
+        <meta name="twitter:creator" content="@divyamohan1993">
+        <meta name="twitter:image" content="/logo.png">
+
+        <!-- Mobile Responsiveness -->
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js" integrity="sha512-sHSNLECRJSK+BFs7E8DiFc6pf6n90bLI85Emiw1jhreduZhK3VXgq9l4kAt9eTIHYAcuQBKHL01QKs4/3Xgl8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js" integrity="sha512-iWiuBS5nt6r60fCz26Nd0Zqe0nbk1ZTIQbl3Kv7kYsX+yKMUFHzjaH2+AnM6vp2Xs+gNmaBAVWJjSmuPw76Efg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                renderMathInElement(document.body, {
+                    // customised options
+                    // • auto-render specific keys, e.g.:
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false },
+                        { left: '\\(', right: '\\)', display: false },
+                        { left: '\\[', right: '\\]', display: true }
+                    ],
+                    // • rendering keys, e.g.:
+                    throwOnError: false
+                });
+            });
+        </script> -->
+
+        <!-- <style>
+            main ul {
+                list-style-type: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            main ul li {
+                margin: 0;
+                padding: 0;
+            }
+        </style> -->
+
+
+
+
+    </head>
+
+    <body>
+
+        <script> header_author("dm"); </script>
+
+        <main>
+            <article class="agen-tableofcontents">
+                <h2 class="text-center">
+                    Deterministic Context-Free Grammar
+                </h2>
+                <div class="d-none contentdate">2025, March 20</div>
+            </article>
+
+            <article>
+                <h3>1. Deterministic Context-Free Grammar (DCFG)</h3>
+                <p>A <strong>Deterministic Context-Free Grammar</strong> (DCFG) is a special kind of Context-Free Grammar (CFG) whose strings can be parsed by a <strong>Deterministic Pushdown Automaton (DPDA)</strong>. This means that at any step in parsing, there is at most <strong>one valid move</strong> based on the current state, stack top, and input symbol—<em>no guessing or backtracking required</em>.</p>
+            </article>
+
+            <article>
+                <h4>1.1 What is DCFG?</h4>
+                <p>DCFG is a subset of CFG. Just like every square is a rectangle but not every rectangle is a square, every DCFG is a CFG, but not every CFG is a DCFG.</p>
+                <ul>
+                    <li><strong>DCFG:</strong> Can be parsed using a <em>deterministic</em> pushdown automaton.</li>
+                    <li><strong>CFG:</strong> May require <em>non-deterministic</em> pushdown automata to parse.</li>
+                </ul>
+                <p>Think of DCFG as a traffic system where only one turn is allowed at each signal. In contrast, CFG may have multiple valid roads at each signal, requiring a map or trial-and-error.</p>
+            </article>
+
+            <article>
+                <h4>1.2 Why is DCFG Needed?</h4>
+                <p>DCFGs are the foundation of <strong>efficient parsers</strong> like LL(1), LR(1), and LALR(1), which are used in real-world programming languages such as C, Java, and Python.</p>
+                <p>They provide:</p>
+                <ul>
+                    <li><strong>Determinism</strong>: Removes ambiguity—only one valid way to parse.</li>
+                    <li><strong>Efficiency</strong>: Linear-time parsing using stack-based methods.</li>
+                    <li><strong>Implementability</strong>: Suitable for compiler design and syntax analyzers.</li>
+                </ul>
+                <p>Example from the real world: Imagine you're building a compiler. DCFG ensures you can write a fast, predictable parser without backtracking. This is crucial when compiling millions of lines of code.</p>
+            </article>
+
+            <article>
+                <h4>1.3 Difference Between CFG and DCFG</h4>
+
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>Aspect</th>
+                                <th>CFG</th>
+                                <th>DCFG</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Parsing Machine</td>
+                                <td>NPDA (Non-deterministic PDA)</td>
+                                <td>DPDA (Deterministic PDA)</td>
+                            </tr>
+                            <tr>
+                                <td>Backtracking</td>
+                                <td>Allowed</td>
+                                <td>Not Allowed</td>
+                            </tr>
+                            <tr>
+                                <td>Ambiguity</td>
+                                <td>Can be ambiguous</td>
+                                <td>Must be unambiguous</td>
+                            </tr>
+                            <tr>
+                                <td>Efficiency</td>
+                                <td>Less efficient for large grammars</td>
+                                <td>Highly efficient (used in real-world parsers)</td>
+                            </tr>
+                            <tr>
+                                <td>Examples</td>
+                                <td>Natural language, ambiguous constructs</td>
+                                <td>Programming languages like C, Java</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </article>
+
+            <article>
+                <h4>1.4 Real-World Example</h4>
+                <p><strong>CFG Example:</strong> Consider a grammar that generates expressions like <code>if-then-else</code>.</p>
+                <pre><code class="">
+S → if E then S else S | if E then S | a
+</code></pre>
+                <p>This CFG is <em>ambiguous</em>. A string like <code>if E then if E then a else a</code> has two different parse trees. So it is not deterministic.</p>
+
+                <p><strong>DCFG Example:</strong> Modify the grammar to enforce determinism:</p>
+                <pre><code class="">
+S → M else S | a
+M → if E then S
+</code></pre>
+                <p>This grammar ensures there's only one parse tree by delaying the parsing of <code>else</code> until a full <code>if-then</code> is complete.</p>
+            </article>
+
+            <article>
+                <h4>1.5 Visualizing the Automaton</h4>
+                <pre class="mermaid text-center">
+stateDiagram-v2
+    [*] --> q0
+    q0 --> q1 : read 'if'
+    q1 --> q2 : read 'then'
+    q2 --> q3 : read 'else'
+    q3 --> [*]
+</pre>
+                <p>This shows a <strong>DPDA</strong> handling a deterministic grammar with no state conflict.</p>
+            </article>
+
+            <article>
+                <h3>2. LL(1), LR(1), LALR(1) Grammars</h3>
+                <p>These are types of <strong>Deterministic Context-Free Grammars (DCFGs)</strong> used in real-world compilers. The names reflect <strong>how</strong> they parse and <strong>how much</strong> lookahead they use:</p>
+                <ul>
+                    <li><strong>LL(1)</strong>: Left-to-right scan, Leftmost derivation, 1 token lookahead.</li>
+                    <li><strong>LR(1)</strong>: Left-to-right scan, Rightmost derivation in reverse, 1 token lookahead.</li>
+                    <li><strong>LALR(1)</strong>: LookAhead LR – merges states of LR(1) to reduce table size.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h4>2.1 LL(1) Grammar</h4>
+                <p><strong>LL(1) parsers</strong> are top-down and predictive. They require the grammar to be:</p>
+                <ul>
+                    <li><strong>Left-factored</strong>: No common prefixes in rules.</li>
+                    <li><strong>No left recursion</strong>: Cannot call itself first in the production rule.</li>
+                </ul>
+                <p><strong>Real-world analogy:</strong> Reading a document line by line, making a decision without going back.</p>
+
+                <h5>2.1.1 Example: LL(1) Grammar</h5>
+                <pre><code class="">
+E  → T E'
+E' → + T E' | ε
+T  → F T'
+T' → * F T' | ε
+F  → ( E ) | id
+</code></pre>
+                <p>This grammar has no left recursion and no common prefixes, so it's LL(1).</p>
+
+                <h5>2.1.2 LL(1) Parsing Table Construction</h5>
+                <pre><code class="">
+Follow(E)  = { $, ) }
+First(E)   = { (, id }
+
+Table:
++-------+--------+---------+-------+------+
+| NonT  |   id   |   (     |   )   |  $   |
++-------+--------+---------+-------+------+
+|   E   | E → T E'| E → T E'|       |      |
+|  E'   |        |         | E'→ε  |E'→ε  |
+|   T   | T → F T'|T → F T'|       |      |
+|  T'   |        |         | T'→ε |T'→ε |
+|   F   |F→id    |F→( E )  |       |      |
++-------+--------+---------+-------+------+
+</code></pre>
+            </article>
+
+            <article>
+                <h4>2.2 LR(1) Grammar</h4>
+                <p><strong>LR(1) parsers</strong> are bottom-up and shift-reduce based. They are powerful and can parse all DCFGs, including those with left recursion.</p>
+                <p><strong>Real-world analogy:</strong> Reading a sentence backwards and reconstructing the grammar rules used to create it.</p>
+
+                <h5>2.2.1 Example: LR(1) Grammar</h5>
+                <pre><code class="">
+S → L = R | R
+L → * R | id
+R → L
+</code></pre>
+                <p>This grammar is not LL(1) due to ambiguity, but it is <strong>LR(1)</strong>.</p>
+
+                <h5>2.2.2 LR(1) Item and State</h5>
+                <pre><code class="">
+Item: [S → • L = R, $]
+
+Closure and GOTO algorithms build a DFA from such items.
+</code></pre>
+            </article>
+
+            <article>
+                <h4>2.3 LALR(1) Grammar</h4>
+                <p><strong>LALR(1)</strong> is a practical compromise: same power as LR(1) for most programming languages but with fewer states. It's the <strong>default in most parser generators</strong> (YACC, Bison).</p>
+
+                <h5>2.3.1 Difference: LR(1) vs LALR(1)</h5>
+                <ul>
+                    <li><strong>LR(1)</strong>: Full lookahead and item distinction → large table</li>
+                    <li><strong>LALR(1)</strong>: Merges states with same core items → smaller table, risk of conflicts</li>
+                </ul>
+
+                <h5>2.3.2 Merging States in LALR</h5>
+                <pre><code class="">
+LR(1) Item Set 1: [A → α •, a]
+LR(1) Item Set 2: [A → α •, b]
+
+LALR merges them:
+[A → α •, a/b]
+</code></pre>
+                <p>If merging introduces shift-reduce or reduce-reduce conflicts, grammar must be refactored.</p>
+            </article>
+
+            <article>
+                <h4>2.4 Comparison Summary</h4>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>Parser</th>
+                                <th>Direction</th>
+                                <th>Derivation</th>
+                                <th>Lookahead</th>
+                                <th>Strength</th>
+                                <th>Speed</th>
+                                <th>Used In</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>LL(1)</td>
+                                <td>Left-to-right</td>
+                                <td>Leftmost</td>
+                                <td>1</td>
+                                <td>Simple, fast</td>
+                                <td>Very fast</td>
+                                <td>Handwritten parsers, ANTLR</td>
+                            </tr>
+                            <tr>
+                                <td>LR(1)</td>
+                                <td>Left-to-right</td>
+                                <td>Rightmost (reverse)</td>
+                                <td>1</td>
+                                <td>Powerful</td>
+                                <td>Moderate</td>
+                                <td>Bison, YACC (full mode)</td>
+                            </tr>
+                            <tr>
+                                <td>LALR(1)</td>
+                                <td>Left-to-right</td>
+                                <td>Rightmost (reverse)</td>
+                                <td>1</td>
+                                <td>Balanced</td>
+                                <td>Fast</td>
+                                <td>Most practical compilers</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </article>
+
+            <article>
+                <h4>2.5 Real World Scenarios</h4>
+                <ul>
+                    <li><strong>C/C++ compilers</strong> use LALR(1) parsers for speed and size optimization.</li>
+                    <li><strong>Interpreter tools like ANTLR</strong> use LL(*) variations for user-friendliness and custom grammars.</li>
+                    <li><strong>High-performance parsers</strong> for systems programming languages prefer LR(1) for accuracy and grammar depth.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>3. LL(1) Grammar and DCFG</h3>
+                <p>LL(1) is a subclass of <strong>Deterministic Context-Free Grammar (DCFG)</strong>. It is the simplest and most efficient form of parsing grammar, ideal for top-down parsers known as <strong>Predictive Parsers</strong>. The ‘1’ indicates one-symbol lookahead is enough to make parsing decisions without backtracking.</p>
+            </article>
+
+            <article>
+                <h4>3.1 Definition of LL(1)</h4>
+                <p>An LL(1) grammar is a type of context-free grammar that can be parsed by a top-down parser:</p>
+                <ul>
+                    <li><strong>L</strong>: Left-to-right scanning of the input.</li>
+                    <li><strong>L</strong>: Leftmost derivation of the production.</li>
+                    <li><strong>1</strong>: One lookahead symbol is used to decide the parsing action.</li>
+                </ul>
+                <p>Think of it like reading instructions step-by-step without needing to look ahead more than one word. This makes the parser very fast and memory-efficient.</p>
+            </article>
+
+            <article>
+                <h4>3.2 Conditions for LL(1) Grammar</h4>
+                <p>To qualify as LL(1), a grammar must satisfy the following:</p>
+                <ul>
+                    <li><strong>No Left Recursion</strong>: A non-terminal should not call itself as the first symbol on the right-hand side.</li>
+                    <li>
+                        <strongLeft Factored</strong>: If two productions for the same non-terminal begin with the same symbol, they must be rewritten to eliminate the ambiguity.
+                    </li>
+                    <li><strong>Disjoint FIRST and FOLLOW Sets</strong>: For any non-terminal <code>A</code> with productions <code>A → α | β</code>, the following must hold:
+                        <ul>
+                            <li><strong>FIRST(α)</strong> ∩ <strong>FIRST(β)</strong> = ∅</li>
+                            <li>If ε ∈ FIRST(α), then FIRST(β) ∩ FOLLOW(A) = ∅</li>
+                        </ul>
+                    </li>
+                </ul>
+                <p>This ensures that the parser can always choose the correct production with only one token of lookahead.</p>
+            </article>
+
+            <article>
+                <h4>3.3 LL(1) Parsing Table Example</h4>
+                <p>Given the grammar:</p>
+                <pre><code class="language-auto">
+E  → T E'
+E' → + T E' | ε
+T  → F T'
+T' → * F T' | ε
+F  → ( E ) | id
+</code></pre>
+
+                <h5>Step 1: Compute FIRST and FOLLOW</h5>
+                <pre><code class="language-auto">
+FIRST(E)  = FIRST(T) = FIRST(F) = { (, id }
+FIRST(E') = { +, ε }
+FIRST(T') = { *, ε }
+FOLLOW(E)  = { ), $ }
+FOLLOW(E') = FOLLOW(E) = { ), $ }
+FOLLOW(T)  = FIRST(E') ∪ FOLLOW(E) = { +, ), $ }
+FOLLOW(T') = FOLLOW(T) = { +, ), $ }
+FOLLOW(F)  = FIRST(T') ∪ FOLLOW(T) = { *, +, ), $ }
+</code></pre>
+
+                <h5>Step 2: LL(1) Table</h5>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>Non-Terminal</th>
+                                <th>id</th>
+                                <th>(</th>
+                                <th>+</th>
+                                <th>*</th>
+                                <th>)</th>
+                                <th>$</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>E</td>
+                                <td>E → T E'</td>
+                                <td>E → T E'</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>E'</td>
+                                <td></td>
+                                <td></td>
+                                <td>E' → + T E'</td>
+                                <td></td>
+                                <td>E' → ε</td>
+                                <td>E' → ε</td>
+                            </tr>
+                            <tr>
+                                <td>T</td>
+                                <td>T → F T'</td>
+                                <td>T → F T'</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>T'</td>
+                                <td></td>
+                                <td></td>
+                                <td>T' → ε</td>
+                                <td>T' → * F T'</td>
+                                <td>T' → ε</td>
+                                <td>T' → ε</td>
+                            </tr>
+                            <tr>
+                                <td>F</td>
+                                <td>F → id</td>
+                                <td>F → ( E )</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </article>
+
+            <article>
+                <h4>3.4 Predictive Parsing</h4>
+                <p><strong>Predictive Parser</strong> is a non-backtracking recursive descent parser that uses the LL(1) table to parse the input.</p>
+                <p><strong>Steps:</strong></p>
+                <ul>
+                    <li>Start with a stack containing <code>$</code> and the start symbol.</li>
+                    <li>Read the input symbol.</li>
+                    <li>Use the parsing table to replace the top of the stack.</li>
+                    <li>Repeat until the stack matches the input or an error occurs.</li>
+                </ul>
+
+                <h5>Algorithm:</h5>
+                <pre><code class="language-auto">
+initialize stack with [$, StartSymbol]
+repeat:
+    X ← top of stack
+    a ← current input token
+    if X is terminal or $:
+        if X == a:
+            pop X and advance input
+        else:
+            error
+    else:
+        if table[X, a] = X → Y1 Y2 ... Yn:
+            pop X
+            push Yn ... Y1
+        else:
+            error
+until stack is empty
+</code></pre>
+
+                <h5>Example:</h5>
+                <p>Parsing: <code>id + id * id</code></p>
+                <pre><code class="language-auto">
+Stack              Input             Action
+$ E                id + id * id $    Use E → T E'
+$ E' T             id + id * id $    Use T → F T'
+$ E' T' F          id + id * id $    Use F → id
+$ E' T' id         id + id * id $    Match id
+$ E' T'            + id * id $       T' → ε
+$ E'               + id * id $       E' → + T E'
+... (continues)
+</code></pre>
+            </article>
+
+            <article>
+                <h3>4. LR(1) Grammar and DCFG</h3>
+                <p><strong>LR(1)</strong> grammars belong to the family of <strong>Deterministic Context-Free Grammars (DCFGs)</strong> and are used in bottom-up parsing. Unlike LL(1) (top-down), LR(1) works by <strong>reconstructing the rightmost derivation in reverse</strong>. These grammars are powerful enough to parse complex programming languages like C/C++ with precision.</p>
+            </article>
+
+            <article>
+                <h4>4.1 Bottom-Up Parsing</h4>
+                <p><strong>Bottom-Up Parsing</strong> starts from the input string and tries to build the parse tree up to the start symbol. It works using a <strong>Shift-Reduce</strong> mechanism:</p>
+                <ul>
+                    <li><strong>Shift</strong>: Push the next input symbol onto the stack.</li>
+                    <li><strong>Reduce</strong>: Replace the handle (a right-hand side of a production) with its corresponding non-terminal.</li>
+                </ul>
+
+                <p><strong>Example</strong>: Given grammar:</p>
+                <pre><code class="language-auto">
+S → a A d
+A → b c
+</code></pre>
+
+                <p>Parsing <code>a b c d</code> proceeds as:</p>
+                <pre><code class="language-auto">
+Stack       Input        Action
+$           a b c d $    Shift
+$ a         b c d $      Shift
+$ a b       c d $        Shift
+$ a b c     d $          Reduce b c → A
+$ a A       d $          Shift
+$ a A d     $            Reduce a A d → S
+$ S         $            Accept
+</code></pre>
+            </article>
+
+            <article>
+                <h4>4.2 Canonical LR(1) vs SLR(1) vs LALR(1)</h4>
+
+                <h5>4.2.1 Canonical LR(1)</h5>
+                <ul>
+                    <li>Most powerful LR parser.</li>
+                    <li>Uses <strong>item sets</strong> with full 1-symbol lookahead.</li>
+                    <li>Large parsing tables (can reach thousands of states).</li>
+                </ul>
+
+                <pre><code class="language-auto">
+Item: [A → α • β, a]
+</code></pre>
+
+                <p>Means: Currently in the middle of rule A → αβ, we’ve parsed α, expect β next, and <strong>‘a’</strong> is a lookahead terminal to help resolve reduce conflicts.</p>
+
+                <h5>4.2.2 SLR(1): Simple LR</h5>
+                <ul>
+                    <li>Based on LR(0) items + FOLLOW sets.</li>
+                    <li>Compact but <strong>less powerful</strong>.</li>
+                    <li>Fails for some grammars where Canonical LR(1) works.</li>
+                </ul>
+
+                <h5>4.2.3 LALR(1): LookAhead LR</h5>
+                <ul>
+                    <li>Merges states with same core (LR(0) items), even if lookahead differs.</li>
+                    <li><strong>Same number of states</strong> as SLR(1), but more precise due to 1-symbol lookahead.</li>
+                    <li>Used in real-world tools like YACC, Bison.</li>
+                </ul>
+
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>Parser</th>
+                                <th>Item Type</th>
+                                <th>Lookahead</th>
+                                <th>State Count</th>
+                                <th>Power</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Canonical LR(1)</td>
+                                <td>LR(1)</td>
+                                <td>✓</td>
+                                <td>High</td>
+                                <td>Highest</td>
+                            </tr>
+                            <tr>
+                                <td>SLR(1)</td>
+                                <td>LR(0)</td>
+                                <td>✗ (uses FOLLOW)</td>
+                                <td>Low</td>
+                                <td>Low</td>
+                            </tr>
+                            <tr>
+                                <td>LALR(1)</td>
+                                <td>LR(1) merged</td>
+                                <td>✓</td>
+                                <td>Medium</td>
+                                <td>Medium (Practical)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </article>
+
+            <article>
+                <h4>4.3 Parsing Table Conflicts</h4>
+                <p>Conflicts occur when the parser can't decide between <strong>Shift</strong> and <strong>Reduce</strong>, or between multiple <strong>Reduces</strong>.</p>
+
+                <h5>4.3.1 Shift-Reduce Conflict</h5>
+                <p>Occurs when parser can either shift or reduce at a particular state and input symbol.</p>
+                <p><strong>Example:</strong></p>
+                <pre><code class="language-auto">
+if E then S else S
+</code></pre>
+                <p>Ambiguity: does <code>else</code> belong to inner or outer <code>if</code>?</p>
+
+                <h5>4.3.2 Reduce-Reduce Conflict</h5>
+                <p>Occurs when multiple productions are valid reductions at same point.</p>
+                <p><strong>Example:</strong> Grammar:</p>
+                <pre><code class="language-auto">
+S → A | B
+A → a
+B → a
+</code></pre>
+                <p>On input <code>a</code>, the parser cannot choose whether to reduce using A or B.</p>
+            </article>
+
+            <article>
+                <h4>4.4 Real-World Relevance</h4>
+                <p><strong>Why use LR(1) or LALR(1)?</strong></p>
+                <ul>
+                    <li>Can handle more complex grammars than LL(1), including left recursion.</li>
+                    <li>Real-world compilers for <strong>C, C++, Java, Rust</strong> use LALR(1).</li>
+                    <li><strong>Bison/YACC</strong>: Tools to auto-generate LALR(1) parsers from grammar specs.</li>
+                    <li>Allows efficient, deterministic parsing with <strong>no backtracking</strong>.</li>
+                </ul>
+
+                <p><strong>Example:</strong> In C language parsing:</p>
+                <pre><code class="language-auto">
+// Grammar Snippet:
+declaration → type id ;
+type → int | float | char
+</code></pre>
+                <p>Using LALR(1), we can efficiently and correctly parse these using parsing tables even with ambiguous symbols like <code>*</code> in declarations.</p>
+            </article>
+
+            <article>
+                <h3>5. Applications and Limitations of DCFGs</h3>
+                <p><strong>Deterministic Context-Free Grammars (DCFGs)</strong> are the foundation of real-world compiler syntax analysis. They represent the class of languages that can be parsed <strong>deterministically using a single pass and a stack</strong> — critical for performance in programming languages. However, they have boundaries and trade-offs in grammar expressiveness.</p>
+            </article>
+
+            <article>
+                <h4>5.1 Use in Real-World Compilers</h4>
+                <p>DCFGs are central to <strong>efficient parsing in modern programming languages</strong>. Their deterministic nature allows for predictable and fast parser behavior.</p>
+
+                <ul>
+                    <li><strong>Programming Language Parsers:</strong> Most languages use DCFGs for syntax parsing — C, C++, Java, Python, Go, Rust.</li>
+                    <li><strong>Parser Generators:</strong> Tools like <strong>YACC, Bison, ANTLR, JavaCC</strong> depend on DCFGs (LL(1), LALR(1), etc.).</li>
+                    <li><strong>IDE Syntax Highlighting & Auto-completion:</strong> Use predictive parsing based on LL(1) variants.</li>
+                    <li><strong>Syntax-Directed Translation:</strong> Intermediate code generation relies on deterministic structure from DCFGs.</li>
+                    <li><strong>Code Formatting Tools:</strong> Use LL-based parsers for checking indentation and blocks.</li>
+                </ul>
+
+                <p><strong>Real-world Example:</strong> A C compiler uses a LALR(1) parser (a DCFG parser) to read code like <code>int x = 10;</code> and translate it to machine-level intermediate representation using only one token of lookahead.</p>
+            </article>
+
+            <article>
+                <h4>5.2 Limitations of DCFGs</h4>
+                <p>DCFGs are not powerful enough for every aspect of a language. Some limitations include:</p>
+
+                <ul>
+                    <li><strong>Cannot handle ambiguous grammars</strong> directly (like natural language).</li>
+                    <li><strong>Cannot parse context-sensitive constructs</strong> like:
+                        <ul>
+                            <li>Variable declarations vs usage</li>
+                            <li>Type checking</li>
+                            <li>Indentation-based syntax (e.g., Python)</li>
+                            <li>Matching nested <code>typedef</code> names or symbol table lookups</li>
+                        </ul>
+                    </li>
+                    <li><strong>Cannot detect semantic errors</strong>: e.g., using an undeclared variable.</li>
+                    <li>Some grammars are deterministic but require more than one lookahead symbol (LL(k) or LR(k)) → increased complexity.</li>
+                </ul>
+
+                <p><strong>Example:</strong> The famous <code>if-then-else</code> ambiguity cannot be resolved using simple LL(1) without modifying the grammar.</p>
+            </article>
+
+            <article>
+                <h4>5.3 Trade-offs: Simplicity vs Power</h4>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>Feature</th>
+                                <th>LL(1)</th>
+                                <th>LALR(1)</th>
+                                <th>Full CFG</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Speed</td>
+                                <td>Fastest</td>
+                                <td>Fast</td>
+                                <td>Slow (may require backtracking)</td>
+                            </tr>
+                            <tr>
+                                <td>Memory Use</td>
+                                <td>Low</td>
+                                <td>Moderate</td>
+                                <td>High</td>
+                            </tr>
+                            <tr>
+                                <td>Grammar Complexity</td>
+                                <td>Low</td>
+                                <td>Moderate</td>
+                                <td>High</td>
+                            </tr>
+                            <tr>
+                                <td>Ambiguity Handling</td>
+                                <td>✗</td>
+                                <td>✗</td>
+                                <td>✓ (if allowed)</td>
+                            </tr>
+                            <tr>
+                                <td>Use in Compilers</td>
+                                <td>Simple languages, expression evaluators</td>
+                                <td>Most real-world compilers</td>
+                                <td>Rarely used in compilers directly</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p><strong>Designers choose DCFGs (LL/LR variants) because:</strong></p>
+                <ul>
+                    <li>They are efficient to parse.</li>
+                    <li>They strike a balance between expressiveness and determinism.</li>
+                    <li>They integrate well with semantic analyzers and code generators.</li>
+                </ul>
+
+                <p>In practice, <strong>complex features not expressible in DCFG</strong> are handled later during <strong>semantic analysis</strong> or by <strong>refactoring the grammar</strong>.</p>
+            </article>
+
+
+        </main>
+
+        <script> copyright("all"); </script>
+
+    </body>
+
+</html>
