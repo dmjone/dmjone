@@ -137,11 +137,11 @@ function get_menu_list(datetogen) {
             },
             {
                 title: "Revision of Example Questions for Term 2",
-                desc: "Revise the example questions of Compiler Design covered in Term 2, including lexical analysis, parsing, intermediate code generation, optimization, and debugging.",
+                desc: "Comprehensive breakdown of FIRST and FOLLOW sets, left factoring transformations, parse tables, and LL(1) analysis for all example and exercise grammars from compiler design. Includes standard expression grammar, dangling else problem, and canonical LR parse tables.",
                 codetype: "Revision",
                 readtime: 20,
                 date: "Sun April 06, 2025",
-                link: "revision-of-example-questions-term-2"
+                link: "first-follow-leftfactoring-parsetable"
             }
             // {
             //     title: "Intermediate Code Generation in Compiler Design",
