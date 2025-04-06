@@ -70,15 +70,7 @@ function get_menu_list(datetogen) {
                 readtime: 20,
                 date: "Wed February 05, 2025",
                 link: "syntax-analysis-parsing-compiler-design"
-            },           
-            {
-                title: "Assignment 1: Recursive Descent Parser",
-                desc: "Learn about recursive descent parsing in Compiler Design, including top-down parsing, backtracking, and real-world applications.",
-                codetype: "Assignment",
-                readtime: 20,
-                date: "Thu April 03, 2025",
-                link: "assignment-1-recursive-descent-parser"
-            },
+            },                       
             {
                 title: "Types of Recursion",
                 desc: "Explore the different types of recursion in Compiler Design, including direct recursion, indirect recursion, and real-world applications.",
@@ -92,7 +84,7 @@ function get_menu_list(datetogen) {
                 desc: "Learn about deterministic context-free grammar in Compiler Design, including parsing techniques, applications, and real-world examples.",
                 codetype: "Supporting Concepts",
                 readtime: 20,
-                date: "Thu March 20, 2025",
+                date: "Sun April 06, 2025",
                 link: "deterministic-context-free-grammar"
             },
             {
@@ -100,7 +92,7 @@ function get_menu_list(datetogen) {
                 desc: "Explore non-deterministic context-free grammar in Compiler Design, including parsing techniques, applications, and real-world examples.",
                 codetype: "Supporting Concepts",
                 readtime: 20,
-                date: "Thu March 20, 2025",
+                date: "Sun April 06, 2025",
                 link: "non-deterministic-context-free-grammar"
             },
             {
@@ -108,8 +100,32 @@ function get_menu_list(datetogen) {
                 desc: "Learn how to make a context-free grammar deterministic in Compiler Design, including parsing techniques, applications, and real-world examples.",
                 codetype: "Supporting Concepts",
                 readtime: 20,
-                date: "Thu March 20, 2025",
+                date: "Sun April 06, 2025",
                 link: "how-to-make-cfg-deterministic"
+            },
+            {   
+                title: "Parsers",
+                desc: "Explore the different types of parsers in Compiler Design, including top-down parsers, bottom-up parsers, and real-world applications.",
+                codetype: "Supporting Concepts",
+                readtime: 20,
+                date: "Sun April 06, 2025",
+                link: "parsers"
+            },
+            {
+                title: "Assignment 1: Recursive Descent Parser",
+                desc: "Learn about recursive descent parsing in Compiler Design, including top-down parsing, backtracking, and real-world applications.",
+                codetype: "Assignment",
+                readtime: 20,
+                date: "Thu April 03, 2025",
+                link: "assignment-1-recursive-descent-parser"
+            },
+            {
+                title: "LL(1) Parser",
+                desc: "Learn about LL(1) parsing in Compiler Design, including top-down parsing, predictive parsing, and real-world applications.",
+                codetype: "Phase 3",
+                readtime: 20,
+                date: "Sun April 06, 2025",
+                link: "ll1-parser"
             }
             // {
             //     title: "Intermediate Code Generation in Compiler Design",

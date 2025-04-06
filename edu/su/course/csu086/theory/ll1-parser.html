@@ -1,0 +1,647 @@
+<!-------------------------- © 2007 - present, dmj.one and contributors. ----------------------------------
+   Part of the dmjone project. Licensed under the GNU AGPL. Provided as-is, without warranty of any kind. 
+-------------------- Redistribution and modifications must retain this notice. --------------------------->
+
+
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+    <!--<![endif]-->
+
+    <head>
+        <script src="/js/edu_su_common.js"></script>
+        <noscript>
+            <style>
+                html,
+                body {
+                    margin: 0;
+                    overflow: hidden;
+                }
+            </style>
+            <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+        </noscript>
+
+        <title>LL(1) Parser - CSU086 - Shoolini U</title>
+        <meta name="description" content="Comprehensive article explaining LL(1) parsers used in compiler design. Covers the definition, working, computation of FIRST and FOLLOW sets, parse table construction, stack operation, and parse tree generation with real-world analogies and book examples.">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "LL(1) Parser",
+  "description": "Comprehensive article explaining LL(1) parsers used in compiler design. Covers the definition, working, computation of FIRST and FOLLOW sets, parse table construction, stack operation, and parse tree generation with real-world analogies and book examples.",
+  "dateModified": "2025-03-20",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Divya Mohan",
+      "url": "https://dmj.one/resume/",
+      "sameAs": [
+        "https://www.credly.com/users/divyamohan1993",
+        "https://www.linkedin.com/in/divyamohan1993/",
+        "https://hackerrank.com/divyamohan1993",
+        "https://www.coursera.org/learner/divyamohan1993"
+      ]
+    }
+  ],
+  "publisher": {
+    "@type": "EducationalOrganization",
+    "name": "dmj.one",
+    "url": "https://dmj.one"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://dmj.one/edu/su/course/csu086/theory/ll1-parser"
+  },
+  "keywords": [
+    "LL(1) Parser",
+    "Compiler Design",
+    "FIRST Set",
+    "FOLLOW Set",
+    "Parse Table",
+    "Predictive Parser",
+    "Top-Down Parsing",
+    "Parsing Stack",
+    "Syntax Analysis",
+    "Parse Tree Construction"
+  ],
+  "articleSection": [
+    "1. LL(1) Parser",
+    "1.1 What is LL(1) Parser?",
+    "1.2 Why is LL(1) Parser Needed?",
+    "1.3 Advantages of LL(1) Parser",
+    "1.4 Disadvantages of LL(1) Parser",
+    "1.5 Book Example of LL(1) Grammar",
+    "2. Architecture of LL(1) Parser",
+    "2.1 Components of LL(1) Parser Architecture",
+    "2.2 Flowchart of LL(1) Parsing Algorithm",
+    "3. FIRST() Function in LL(1) Parsing",
+    "4. FOLLOW() Function in LL(1) Parsing",
+    "5. Construction of LL(1) Parse Table",
+    "6. Stack Operation of LL(1) Parser",
+    "7. LL(1) Parse Tree",
+    "8. Rules to Check if a Grammar is LL(1)"
+  ],
+  "isAccessibleForFree": true,
+  "inLanguage": "en-US",
+  "license": "https://www.gnu.org/licenses/agpl-3.0.en.html"
+}
+</script>
+
+
+        <meta name="author" content="Divya Mohan">
+        <meta name="robots" content="index, follow">
+
+        <!-- Open Graph for Social Media -->
+        <meta property="og:image" content="/logo.png">
+        <meta property="og:type" content="article">
+
+        <!-- Twitter Cards -->
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:site" content="@divyamohan1993">
+        <meta name="twitter:creator" content="@divyamohan1993">
+        <meta name="twitter:image" content="/logo.png">
+
+        <!-- Mobile Responsiveness -->
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js" integrity="sha512-sHSNLECRJSK+BFs7E8DiFc6pf6n90bLI85Emiw1jhreduZhK3VXgq9l4kAt9eTIHYAcuQBKHL01QKs4/3Xgl8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js" integrity="sha512-iWiuBS5nt6r60fCz26Nd0Zqe0nbk1ZTIQbl3Kv7kYsX+yKMUFHzjaH2+AnM6vp2Xs+gNmaBAVWJjSmuPw76Efg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                renderMathInElement(document.body, {
+                    // customised options
+                    // • auto-render specific keys, e.g.:
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false },
+                        { left: '\\(', right: '\\)', display: false },
+                        { left: '\\[', right: '\\]', display: true }
+                    ],
+                    // • rendering keys, e.g.:
+                    throwOnError: false
+                });
+            });
+        </script> -->
+
+        <!-- <style>
+            main ul {
+                list-style-type: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            main ul li {
+                margin: 0;
+                padding: 0;
+            }
+        </style> -->
+
+
+
+
+    </head>
+
+    <body>
+
+        <script> header_author("dm"); </script>
+
+        <main>
+            <article class="agen-tableofcontents">
+                <h2 class="text-center">
+                    LL(1) Parser
+                </h2>
+                <div class="d-none contentdate">2025, April 06</div>
+            </article>
+
+            <article>
+                <h3>1. LL(1) Parser</h3>
+                <p>LL(1) parsers are top-down parsers that read input from <strong>Left-to-right</strong>, perform <strong>Leftmost derivation</strong>, and use <strong>1 symbol of lookahead</strong>. This makes them deterministic and efficient for real-time parsing with minimal memory.</p>
+            </article>
+
+            <article>
+                <h4>1.1 What is LL(1) Parser?</h4>
+                <p>An LL(1) parser predicts which production to use by looking only at the <strong>current input symbol</strong> and the current <strong>nonterminal</strong>.</p>
+                <p>This allows the parser to make parsing decisions without backtracking.</p>
+
+                <h5>1.1.1 Formal Definition</h5>
+                <p>A grammar is LL(1) if and only if for each pair of productions <code>A → α | β</code>:</p>
+                <ul>
+                    <li><strong>FIRST(α)</strong> ∩ <strong>FIRST(β)</strong> = ∅</li>
+                    <li>If <strong>ε ∈ FIRST(α)</strong>, then <strong>FIRST(β)</strong> ∩ <strong>FOLLOW(A)</strong> = ∅ (and vice versa)</li>
+                </ul>
+
+                <h5>1.1.2 Real-world Analogy</h5>
+                <p>Think of a ticket counter where you decide which line to stand in just by reading the signboard — no trial and error. LL(1) parsers work the same way: no backtracking.</p>
+            </article>
+
+            <article>
+                <h4>1.2 Why is LL(1) Parser Needed?</h4>
+                <p>LL(1) parsers are required when:</p>
+                <ul>
+                    <li><strong>Efficiency</strong> is critical — they allow fast parsing with minimal overhead.</li>
+                    <li><strong>Manual parser implementation</strong> is preferred — the parser logic is easy to implement with recursive functions or a table.</li>
+                    <li><strong>Real-time applications</strong> — such as interactive code editors where immediate feedback is expected.</li>
+                </ul>
+
+                <h5>1.2.1 In Compiler Design</h5>
+                <p>In early phases of compilation, like syntax checking for <code>if</code>, <code>while</code>, etc., LL(1) is sufficient and simple to use.</p>
+            </article>
+
+            <article>
+                <h4>1.3 Advantages of LL(1) Parser</h4>
+                <ul>
+                    <li><strong>Simple Implementation</strong>: Uses recursive-descent or table-driven parsers, easy to write by hand.</li>
+                    <li><strong>No Backtracking</strong>: Decisions are made with only one token lookahead.</li>
+                    <li><strong>Faster Error Detection</strong>: Syntax errors can be identified early.</li>
+                    <li><strong>Suitable for Real-Time Parsing</strong>: Used in syntax-highlighting editors.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h4>1.4 Disadvantages of LL(1) Parser</h4>
+                <ul>
+                    <li><strong>Restrictive Grammar</strong>: Cannot handle left recursion or common prefixes (must be eliminated).</li>
+                    <li><strong>Not Powerful Enough</strong>: Fails for many useful context-free grammars.</li>
+                    <li><strong>Grammar Rewriting Required</strong>: Needs left-factoring and transformation for compatibility.</li>
+                </ul>
+
+                <h5>1.4.1 Real-world Analogy</h5>
+                <p>Imagine a GPS that only works if you provide a very simple and specific address format. Any deviation causes errors — LL(1) is that strict.</p>
+            </article>
+
+            <article>
+                <h4>1.5 Book Example of LL(1) Grammar</h4>
+                <pre><code class="language-auto">
+E  → T E'
+E' → + T E' | ε
+T  → F T'
+T' → * F T' | ε
+F  → ( E ) | id
+</code></pre>
+                <p>Predictive parser can be built for this because the FIRST and FOLLOW sets are disjoint as required by LL(1) rules.</p>
+            </article>
+
+            <article>
+                <h3>2. Architecture of LL(1) Parser</h3>
+                <p>The architecture of an LL(1) parser is designed for predictive parsing using a parsing table and a stack. It operates top-down and left-to-right, performing leftmost derivations with one lookahead symbol. This structure is simple, efficient, and suitable for hand-written parsers or applications where fast response is crucial.</p>
+            </article>
+
+            <article>
+                <h4>2.1 Components of LL(1) Parser Architecture</h4>
+                <ul>
+                    <li><strong>Input Buffer</strong>: Contains the string to be parsed, ending with <code>$</code> (end-of-input marker).</li>
+                    <li><strong>Stack</strong>: Used to track grammar symbols, initialized with <code>$</code> and the start symbol on top.</li>
+                    <li><strong>Parsing Table</strong>: A 2D table indexed by nonterminals and input symbols; tells which production to apply.</li>
+                    <li><strong>Driver Program</strong>: Executes the parsing algorithm using the stack and table.</li>
+                    <li><strong>Output (Optional)</strong>: Derivation steps, parse tree construction, or translated code.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h4>2.2 Flowchart of LL(1) Parsing Algorithm</h4>
+                <pre class="mermaid text-center">
+flowchart TD
+    A[Start] --> B[Initialize Stack with $ and Start Symbol]
+    B --> C[Read Next Input Symbol (lookahead)]
+    C --> D{Top of Stack = Input Symbol?}
+    
+    D -- Yes --> E[Pop Stack and Advance Input]
+    D -- No --> F{Top of Stack is Nonterminal?}
+    
+    F -- Yes --> G[Use Parsing Table M[X, a]]
+    G --> H{M[X, a] is Production?}
+    
+    H -- Yes --> I[Pop Stack and Push Production RHS]
+    H -- No --> Z[Error: Invalid Table Entry]
+
+    F -- No --> J{Top of Stack = $ and Input = $?}
+    J -- Yes --> K[Accept Input]
+    J -- No --> L[Error: Mismatch]
+    
+    E --> C
+    I --> C
+</pre>
+                <p>This flow mimics a leftmost derivation by matching terminals and expanding nonterminals using the parsing table entries.</p>
+            </article>
+
+
+            <article>
+                <h3>3. FIRST() Function in LL(1) Parsing</h3>
+                <p>The <strong>FIRST</strong> set of a grammar symbol or string tells us which terminals can appear as the <strong>first symbol</strong> in some string derived from it. It is essential for constructing LL(1) parsing tables and predicting which production to apply.</p>
+            </article>
+
+            <article>
+                <h4>3.1 Formal Definition</h4>
+                <p>Let <code>α</code> be any string of grammar symbols (terminals and/or nonterminals).</p>
+                <p><strong>FIRST(α)</strong> is the set of terminals that begin strings derived from <code>α</code>.</p>
+                <ul>
+                    <li>If <code>α ⇒* ε</code>, then <code>ε ∈ FIRST(α)</code>.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h4>3.2 Computation Rules for FIRST</h4>
+                <p>Apply the following rules until no more symbols can be added to any FIRST set:</p>
+                <ol>
+                    <li>If <code>X</code> is a terminal, then <code>FIRST(X) = {X}</code>.</li>
+                    <li>If <code>X → Y₁Y₂...Yk</code> is a production and for some <code>i</code>:
+                        <ul>
+                            <li>All of <code>Y₁, ..., Y<sub>i-1</sub></code> can derive <code>ε</code>, and</li>
+                            <li><code>a ∈ FIRST(Y<sub>i</sub>)</code></li>
+                            <li>Then <code>a ∈ FIRST(X)</code>.</li>
+                            <li>If <code>ε ∈ FIRST(Y<sub>j</sub>)</code> for all <code>j = 1...k</code>, then <code>ε ∈ FIRST(X)</code>.</li>
+                        </ul>
+                    </li>
+                    <li>If <code>X → ε</code> is a production, then <code>ε ∈ FIRST(X)</code>.</li>
+                </ol>
+            </article>
+
+            <article>
+                <h4>3.3 Computing FIRST(α) where α = X₁X₂...Xₙ</h4>
+                <p>To compute <code>FIRST(α)</code>:</p>
+                <ul>
+                    <li>Add all non-<code>ε</code> symbols from <code>FIRST(X₁)</code>.</li>
+                    <li>If <code>ε ∈ FIRST(X₁)</code>, also add non-<code>ε</code> symbols of <code>FIRST(X₂)</code>.</li>
+                    <li>Continue this process...</li>
+                    <li>Add <code>ε</code> if <code>ε ∈ FIRST(X<sub>i</sub>)</code> for all <code>i = 1 to n</code>.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h4>3.4 Real-world Analogy</h4>
+                <p>Imagine you want to decide what to wear based on the first thing you pull out of your wardrobe. If you pull a coat, you wear it. If it’s an empty hanger (ε), you keep checking the next item. That’s how FIRST works — it predicts what’s coming by looking at the beginning.</p>
+            </article>
+
+            <article>
+                <h4>3.5 Book Example for FIRST()</h4>
+                <pre><code class="language-auto">
+Grammar:
+E  → T E'
+E' → + T E' | ε
+T  → F T'
+T' → * F T' | ε
+F  → ( E ) | id
+
+Then:
+FIRST(F)  = {(, id}
+FIRST(T)  = FIRST(F) = {(, id}
+FIRST(E)  = FIRST(T) = {(, id}
+FIRST(E') = {+, ε}
+FIRST(T') = {*, ε}
+</code></pre>
+                <p>This is used to populate the parsing table by checking the current input token against the FIRST set.</p>
+            </article>
+
+            <article>
+                <h4>3.6 Predictive Use</h4>
+                <p>In an LL(1) parser, if <code>FIRST(α)</code> and <code>FIRST(β)</code> are disjoint for alternatives of a nonterminal <code>A → α | β</code>, then the parser can choose the correct rule just by looking at one input symbol.</p>
+            </article>
+
+
+            <article>
+                <h3>4. FOLLOW() Function in LL(1) Parsing</h3>
+                <p>The <strong>FOLLOW</strong> set of a nonterminal tells us what terminals can appear immediately after it in a valid derivation. This is crucial for placing productions in the parsing table, especially when the production body can derive ε (empty string).</p>
+            </article>
+
+            <article>
+                <h4>4.1 Formal Definition</h4>
+                <p>Let <code>A</code> be a nonterminal in grammar <code>G</code>.</p>
+                <p><strong>FOLLOW(A)</strong> = set of terminals <code>a</code> such that there exists a derivation <code>S ⇒ αAaβ</code>, where <code>S</code> is the start symbol and <code>a</code> is the next terminal to appear after <code>A</code>.</p>
+                <ul>
+                    <li>If A can be the rightmost symbol, then include <code>$</code> (end of input marker) in <code>FOLLOW(A)</code>.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h4>4.2 Rules to Compute FOLLOW Sets</h4>
+                <p>Apply the rules iteratively until no more symbols can be added:</p>
+                <ol>
+                    <li>Start with <code>$ ∈ FOLLOW(S)</code> where <code>S</code> is the start symbol.</li>
+                    <li>If <code>A → αBβ</code>, then <code>FIRST(β) - {ε} ⊆ FOLLOW(B)</code>.</li>
+                    <li>If <code>A → αB</code> or <code>A → αBβ</code> where <code>FIRST(β)</code> contains <code>ε</code>, then <code>FOLLOW(A) ⊆ FOLLOW(B)</code>.</li>
+                </ol>
+                <p>These rules account for all contexts where a nonterminal can be followed by another symbol or reach the end of a string.</p>
+            </article>
+
+            <article>
+                <h4>4.3 Real-world Analogy</h4>
+                <p>If <code>FIRST()</code> tells you what you might see first, <code>FOLLOW()</code> tells you what you're allowed to see <em>after</em> something is over. Like predicting what's allowed on the road just after a green signal — FOLLOW tells you what's coming next, not what started.</p>
+            </article>
+
+            <article>
+                <h4>4.4 Book Example for FOLLOW()</h4>
+                <pre><code class="language-auto">
+Grammar:
+E  → T E'
+E' → + T E' | ε
+T  → F T'
+T' → * F T' | ε
+F  → ( E ) | id
+
+FOLLOW(E)  = FOLLOW(E') = { ), $ }
+FOLLOW(T)  = FOLLOW(T') = { +, ), $ }
+FOLLOW(F)  = { *, +, ), $ }
+</code></pre>
+                <p>This information is used to decide which production to apply when the FIRST set contains ε and we must check FOLLOW.</p>
+            </article>
+
+            <article>
+                <h4>4.5 Practical Use in LL(1) Table</h4>
+                <p>FOLLOW helps in filling the parsing table entries when <code>FIRST(α)</code> contains <code>ε</code> in a production <code>A → α</code>. In this case, the production is added to all <code>M[A, a]</code> for <code>a ∈ FOLLOW(A)</code>.</p>
+            </article>
+
+            <article>
+                <h3>5. Construction of LL(1) Parse Table</h3>
+                <p>The LL(1) parse table is a two-dimensional matrix <code>M[A, a]</code> where <code>A</code> is a nonterminal and <code>a</code> is a terminal or <code>$</code> (end-of-input). The table directs which production rule to apply during parsing.</p>
+            </article>
+
+            <article>
+                <h4>5.1 Rules for Filling the LL(1) Table</h4>
+                <p>Given a grammar <code>G</code> with productions <code>A → α</code>, follow these steps for every production:</p>
+
+                <ol>
+                    <li><strong>For each terminal <code>a ∈ FIRST(α)</code></strong>: Add the production <code>A → α</code> to <code>M[A, a]</code>.</li>
+                    <li><strong>If ε ∈ FIRST(α)</strong>:
+                        <ul>
+                            <li>For each <code>b ∈ FOLLOW(A)</code>, add <code>A → α</code> to <code>M[A, b]</code>.</li>
+                            <li>If <code>$ ∈ FOLLOW(A)</code>, then also add <code>A → α</code> to <code>M[A, $]</code>.</li>
+                        </ul>
+                    </li>
+                    <li><strong>If no rule is applicable</strong>: Leave <code>M[A, a]</code> empty (treated as error).</li>
+                </ol>
+
+                <p>This ensures a deterministic choice with one lookahead symbol — the hallmark of LL(1) parsing.</p>
+            </article>
+
+            <article>
+                <h4>5.2 Real-world Analogy</h4>
+                <p>Think of a smart vending machine. You press a button (input symbol), and based on the product label (nonterminal), it knows exactly which mechanism (production rule) to trigger — unless it’s broken (error).</p>
+            </article>
+
+            <article>
+                <h4>5.3 Example Parse Table (From Book)</h4>
+                <pre><code class="language-auto">
+Grammar:
+E  → T E'
+E' → + T E' | ε
+T  → F T'
+T' → * F T' | ε
+F  → ( E ) | id
+
+Terminals: id, +, *, (, ), $
+
+Table M:
+
+        id     +     *     (     )     $
+E     E→TE'           E→TE'
+E'          E'→+TE'        E'→ε  E'→ε
+T     T→FT'           T→FT'
+T'          T'→ε  T'→*FT' T'→ε  T'→ε
+F     F→id         F→(E)
+</code></pre>
+                <p>Notice how <code>FIRST</code> and <code>FOLLOW</code> guide exact entries, ensuring no ambiguity arises during parsing.</p>
+            </article>
+
+            <article>
+                <h3>6. Stack Operation of LL(1) Parser</h3>
+                <p>LL(1) parsing uses a stack to simulate leftmost derivations. This is called a <strong>non-recursive predictive parser</strong>. The parser pushes and pops grammar symbols based on the input token and entries in the parse table.</p>
+            </article>
+
+            <article>
+                <h4>6.1 Key Stack Components</h4>
+                <ul>
+                    <li><strong>Stack</strong>: Initialized with <code>$</code> (bottom marker) and <code>Start Symbol</code> on top.</li>
+                    <li><strong>Input Buffer</strong>: Contains the input string followed by <code>$</code>.</li>
+                    <li><strong>Parse Table</strong>: Guides which production to apply based on the top of stack and input.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h4>6.2 Stack Operation Rules</h4>
+                <ol>
+                    <li><strong>If Top of Stack = terminal</strong> and it matches input symbol: Pop it and advance input.</li>
+                    <li><strong>If Top of Stack = terminal</strong> and it doesn’t match: <strong>Error</strong>.</li>
+                    <li><strong>If Top of Stack = nonterminal A</strong>: Consult M[A, a] in parse table.
+                        <ul>
+                            <li>If M[A, a] = A → α: Pop A and push α (right-to-left).</li>
+                            <li>If M[A, a] = error: <strong>Error</strong>.</li>
+                        </ul>
+                    </li>
+                    <li><strong>If Top of Stack = $</strong> and input = $: <strong>Accept</strong>.</li>
+                </ol>
+            </article>
+
+            <article>
+                <h4>6.3 Real-World Analogy</h4>
+                <p>Think of the stack as a "to-do list" for the parser. Each time you get an instruction (symbol), you check the current situation (input symbol) and expand or execute that instruction accordingly. Once it’s done, you cross it off (pop), and move to the next.</p>
+            </article>
+
+            <article>
+                <h4>6.4 Trace Example</h4>
+                <pre><code class="language-auto">
+Grammar:
+E  → T E'
+E' → + T E' | ε
+T  → F T'
+T' → * F T' | ε
+F  → ( E ) | id
+
+Input: id + id * id $
+
+Step     Stack          Input          Action
+---------------------------------------------------
+1        $ E            id + id * id $  Push E
+2        $ T E'         id + id * id $  E → T E'
+3        $ F T' E'      id + id * id $  T → F T'
+4        $ id T' E'     id + id * id $  F → id
+5        $ T' E'        + id * id $     Match id
+6        $ E'           + id * id $     T' → ε
+7        $ + T E'       + id * id $     E' → + T E'
+8        $ T E'         id * id $       Match +
+...      ...            ...             Continues
+</code></pre>
+                <p>Each row simulates one action: either matching a terminal or applying a production. This continues until both input and stack reduce to <code>$</code> — i.e., parsing is successful.</p>
+            </article>
+
+            <article>
+                <h3>7. LL(1) Parse Tree</h3>
+                <p>A parse tree for LL(1) parsing represents a <strong>leftmost derivation</strong> of a string from the grammar's start symbol. It is built <strong>top-down</strong> — starting from the root and applying grammar rules to grow the tree until all leaves are terminals.</p>
+            </article>
+
+            <article>
+                <h4>7.1 Properties of LL(1) Parse Trees</h4>
+                <ul>
+                    <li><strong>Root</strong>: Start symbol of the grammar.</li>
+                    <li><strong>Internal Nodes</strong>: Nonterminals, expanded using production rules.</li>
+                    <li><strong>Leaf Nodes</strong>: Terminals or ε (empty string).</li>
+                    <li><strong>Yield</strong>: Left-to-right sequence of leaf nodes gives the parsed string.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h4>7.2 LL(1) Parse Tree Construction Rules</h4>
+                <ol>
+                    <li>Start with the start symbol at the root.</li>
+                    <li>Apply productions as per the parse table entries using the lookahead token.</li>
+                    <li>For each nonterminal, expand it using the RHS of its chosen production.</li>
+                    <li>Repeat until all leaves are terminals or ε.</li>
+                </ol>
+            </article>
+
+            <article>
+                <h4>7.3 Real-World Analogy</h4>
+                <p>Think of constructing a sentence by choosing the right parts of speech: subject → verb → object. You grow the sentence step-by-step, top-down, like growing branches from the trunk of a tree. Every rule you apply adds branches until the sentence is complete.</p>
+            </article>
+
+            <article>
+                <h4>7.4 Book Example: Parse Tree for <code>id + id * id</code></h4>
+                <p>Using the grammar:</p>
+                <pre><code class="language-auto">
+E  → T E'
+E' → + T E' | ε
+T  → F T'
+T' → * F T' | ε
+F  → ( E ) | id
+</code></pre>
+
+                <p>The parse tree for <code>id + id * id</code>:</p>
+                <pre class="mermaid text-center">
+graph TD
+    E --> T
+    T --> F
+    F --> id1[id]
+    T --> Tdash1[T']
+    Tdash1 --> ε1[ε]
+    E --> Ep1[E']
+    Ep1 --> plus[+]
+    Ep1 --> T2[T]
+    T2 --> F2[F]
+    F2 --> id2[id]
+    T2 --> Tdash2[T']
+    Tdash2 --> star[*]
+    Tdash2 --> F3[F]
+    F3 --> id3[id]
+    Tdash2 --> Tdash3[T']
+    Tdash3 --> ε2[ε]
+    Ep1 --> Ep2[E']
+    Ep2 --> ε3[ε]
+</pre>
+                <p>This corresponds to a leftmost derivation: <code>E ⇒ T E' ⇒ F T' E' ⇒ id T' E' ⇒ id E' ⇒ id + T E' ⇒ id + F T' E' ⇒ id + id T' E' ⇒ id + id * F T' E' ⇒ id + id * id T' E' ⇒ ...</code></p>
+            </article>
+
+            <article>
+                <h4>7.5 Parse Tree vs Derivation</h4>
+                <p>Every parse tree corresponds to exactly one leftmost and one rightmost derivation. However, ambiguous grammars may lead to <strong>multiple valid parse trees</strong> for the same string. LL(1) grammars avoid this by construction.</p>
+            </article>
+
+            <article>
+                <h3>8. Rules to Check if a Grammar is LL(1)</h3>
+                <p>LL(1) grammars are those for which a predictive parser can choose the correct production using a <strong>single lookahead symbol</strong>. To ensure this, the grammar must satisfy strict disjointness and predictability rules based on <code>FIRST</code> and <code>FOLLOW</code> sets.</p>
+            </article>
+
+            <article>
+                <h4>8.1 Formal Rules for LL(1) Grammar</h4>
+                <p>Let <code>A → α | β</code> be two or more productions for a nonterminal <code>A</code>. The grammar is LL(1) if and only if:</p>
+                <ol>
+                    <li><strong>FIRST(α) ∩ FIRST(β) = ∅</strong>
+                        <br />No terminal can be the first symbol derived from both α and β.
+                    </li>
+                    <li><strong>At most one of α or β can derive ε</strong></li>
+                    <li><strong>If ε ∈ FIRST(β)</strong>, then <code>FIRST(α) ∩ FOLLOW(A) = ∅</code><br />And vice versa for α and β.</li>
+                </ol>
+                <p>These ensure that there's <strong>no ambiguity</strong> in selecting a production for <code>A</code> based on the next input token.</p>
+            </article>
+
+            <article>
+                <h4>8.2 Practical Method to Check LL(1)</h4>
+                <ol>
+                    <li>Compute <strong>FIRST</strong> and <strong>FOLLOW</strong> sets for all nonterminals.</li>
+                    <li>For each nonterminal with multiple productions, apply the above rules.</li>
+                    <li>If any rule fails for a production pair, grammar is <strong>not</strong> LL(1).</li>
+                </ol>
+            </article>
+
+            <article>
+                <h4>8.3 Real-world Analogy</h4>
+                <p>Imagine you're in a vending machine line. If two buttons dispense similar products and look alike (violate disjoint FIRST sets), or if one button does nothing but also overlaps with the default option (violates FOLLOW-based rule), the user can't make a reliable decision. LL(1) grammars make sure every input leads to exactly one predictable output.</p>
+            </article>
+
+            <article>
+                <h4>8.4 Detailed Book Example: Expression Grammar</h4>
+                <pre><code class="language-auto">
+Grammar:
+E  → T E'
+E' → + T E' | ε
+T  → F T'
+T' → * F T' | ε
+F  → ( E ) | id
+
+Check for LL(1):
+- For E' → + T E' and E' → ε:
+  FIRST(+ T E') = {+}
+  FIRST(ε) = {ε}
+  FOLLOW(E') = {), $}
+  → + ∉ FOLLOW(E') → OK ✅
+
+- For T' → * F T' and T' → ε:
+  FIRST(* F T') = {*}
+  FIRST(ε) = {ε}
+  FOLLOW(T') = {+, ), $}
+  → * ∉ FOLLOW(T') → OK ✅
+
+- All FIRST sets for same nonterminal are disjoint → LL(1) confirmed ✅
+</code></pre>
+                <p>This grammar satisfies all conditions — FIRST sets are disjoint, only one ε-derivable option per rule, and FOLLOW checks pass. Hence, it's LL(1).</p>
+            </article>
+
+
+        </main>
+
+        <script> copyright("all"); </script>
+
+    </body>
+
+</html>
