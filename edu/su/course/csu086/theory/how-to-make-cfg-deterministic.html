@@ -1,0 +1,1870 @@
+<!-------------------------- © 2007 - present, dmj.one and contributors. ----------------------------------
+   Part of the dmjone project. Licensed under the GNU AGPL. Provided as-is, without warranty of any kind. 
+-------------------- Redistribution and modifications must retain this notice. --------------------------->
+
+
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+    <!--<![endif]-->
+
+    <head>
+        <script src="/js/edu_su_common.js"></script>
+        <noscript>
+            <style>
+                html,
+                body {
+                    margin: 0;
+                    overflow: hidden;
+                }
+            </style>
+            <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+        </noscript>
+
+        <title>How to Make CFG Deterministic - CSU086 - Shoolini U</title>
+        <meta name="description" content="Comprehensive step-by-step technical guide to converting any context-free grammar (CFG) into a deterministic CFG suitable for LL(1) parsers, covering ambiguity elimination, left recursion removal, left factoring, FIRST/FOLLOW computation, LL(1) validation, and predictive parsing table construction.">
+
+        <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "TechArticle",
+          "headline": "How to Make CFG Deterministic",
+          "description": "Comprehensive step-by-step technical guide to converting any context-free grammar (CFG) into a deterministic CFG suitable for LL(1) parsers, covering ambiguity elimination, left recursion removal, left factoring, FIRST/FOLLOW computation, LL(1) validation, and predictive parsing table construction.",
+          "dateModified": "2025-03-20",
+          "author": [
+            {
+              "@type": "Person",
+              "name": "Divya Mohan",
+              "url": "https://dmj.one/resume/",
+              "sameAs": [
+                "https://www.credly.com/users/divyamohan1993",
+                "https://www.linkedin.com/in/divyamohan1993/",
+                "https://hackerrank.com/divyamohan1993",
+                "https://www.coursera.org/learner/divyamohan1993"
+              ]
+            }
+          ],
+          "publisher": {
+            "@type": "EducationalOrganization",
+            "name": "dmj.one",
+            "url": "https://dmj.one"
+          },
+          "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https://dmj.one/edu/su/course/csu086/theory/how-to-make-cfg-deterministic"
+          },
+          "keywords": [
+            "Deterministic CFG",
+            "LL(1) Parsing",
+            "Ambiguity Elimination",
+            "Left Recursion",
+            "Left Factoring",
+            "FIRST FOLLOW Sets",
+            "Predictive Parsing Table",
+            "Parsing Algorithms",
+            "Compiler Design",
+            "Dangling Else Problem"
+          ],
+          "articleSection": [
+            "Understanding Deterministic CFG",
+            "Eliminate Ambiguity",
+            "Remove Left Recursion",
+            "Apply Left Factoring",
+            "Construct FIRST and FOLLOW Sets",
+            "Check LL(1) Conditions",
+            "Build the Predictive Parsing Table",
+            "Validate Determinism",
+            "Detailed Step-by-Step Example"
+          ],
+          "isAccessibleForFree": true,
+          "inLanguage": "en-US",
+          "license": "https://www.gnu.org/licenses/agpl-3.0.en.html"
+        }
+        </script>
+
+
+        <meta name="author" content="Divya Mohan">
+        <meta name="robots" content="index, follow">
+
+        <!-- Open Graph for Social Media -->
+        <meta property="og:image" content="/logo.png">
+        <meta property="og:type" content="article">
+
+        <!-- Twitter Cards -->
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:site" content="@divyamohan1993">
+        <meta name="twitter:creator" content="@divyamohan1993">
+        <meta name="twitter:image" content="/logo.png">
+
+        <!-- Mobile Responsiveness -->
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js" integrity="sha512-sHSNLECRJSK+BFs7E8DiFc6pf6n90bLI85Emiw1jhreduZhK3VXgq9l4kAt9eTIHYAcuQBKHL01QKs4/3Xgl8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js" integrity="sha512-iWiuBS5nt6r60fCz26Nd0Zqe0nbk1ZTIQbl3Kv7kYsX+yKMUFHzjaH2+AnM6vp2Xs+gNmaBAVWJjSmuPw76Efg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                renderMathInElement(document.body, {
+                    // customised options
+                    // • auto-render specific keys, e.g.:
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false },
+                        { left: '\\(', right: '\\)', display: false },
+                        { left: '\\[', right: '\\]', display: true }
+                    ],
+                    // • rendering keys, e.g.:
+                    throwOnError: false
+                });
+            });
+        </script> -->
+
+        <!-- <style>
+            main ul {
+                list-style-type: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            main ul li {
+                margin: 0;
+                padding: 0;
+            }
+        </style> -->
+
+
+
+
+    </head>
+
+    <body>
+
+        <script> header_author("dm"); </script>
+
+        <main>
+            <article class="agen-tableofcontents">
+                <h2 class="text-center">
+                    How to make CFG Deterministic
+                </h2>
+                <div class="d-none contentdate">2025, March 20</div>
+            </article>
+
+            <article>
+                <h3>1. Understanding Deterministic CFG</h3>
+                <p>A <strong>Deterministic Context-Free Grammar (DCFG)</strong> is a context-free grammar that allows parsing without any ambiguity or backtracking. It is the foundation for constructing predictive parsers (like LL(1)) and shift-reduce parsers (like LR(1)), where a single correct parse action exists for each input symbol and parser state.</p>
+            </article>
+
+            <article>
+                <h4>1.1 What is a Deterministic CFG?</h4>
+                <p>In a deterministic CFG, for any given input symbol and parsing context, the parser should be able to decide the next step uniquely. This contrasts with a general CFG, where multiple choices might exist, requiring backtracking or lookahead.</p>
+
+                <ul>
+                    <li><strong>Key Property</strong>: <em>No ambiguity + unique parsing decision at each step</em></li>
+                    <li><strong>Used in</strong>: Predictive parsing (LL), Shift-reduce parsing (LR)</li>
+                </ul>
+
+                <p>For example, consider a grammar:</p>
+                <pre><code class="">
+S → a A | a B
+A → b
+B → c
+</code></pre>
+                <p>This is <strong>non-deterministic</strong> because after seeing 'a', the parser can't decide whether to choose <code>a A</code> or <code>a B</code> without further lookahead.</p>
+
+                <p>To make it <strong>deterministic</strong>, we can left-factor it:</p>
+                <pre><code class="">
+S → a S'
+S' → b | c
+</code></pre>
+                <p>Now, after reading 'a', we move to a state where the next token will determine whether to go to 'b' or 'c'. This is LL(1) deterministic.</p>
+            </article>
+
+            <article>
+                <h4>1.2 Why is Determinism Needed?</h4>
+                <p>Real-world compilers must process code in <strong>linear time</strong> with high efficiency. Determinism ensures:</p>
+                <ul>
+                    <li><strong>No backtracking</strong>: Improves speed and predictability</li>
+                    <li><strong>Error detection</strong>: Easier and faster to identify invalid input</li>
+                    <li><strong>Parser generation</strong>: Tools like <code>YACC</code>, <code>Bison</code>, and <code>ANTLR</code> require deterministic CFGs</li>
+                </ul>
+
+                <h5>1.2.1 Real-world Analogy</h5>
+                <p>Imagine an ATM menu:</p>
+                <pre><code>
+1. Withdraw
+2. Deposit
+3. Balance
+</code></pre>
+                <p>You press "1", and the ATM takes you to "Withdraw". There's no ambiguity. If the ATM gave two different options after pressing "1", it would confuse the user. Similarly, a deterministic parser should always know the next step.</p>
+
+                <h5>1.2.2 When is it a Problem?</h5>
+                <p>Consider this CFG used in natural languages:</p>
+                <pre><code class="">
+S → if E then S | if E then S else S | other
+</code></pre>
+                <p>This is known as the "dangling else" problem. The ambiguity comes from not knowing which <code>if</code> the <code>else</code> belongs to. Real programming languages like C resolve this by associating <code>else</code> with the nearest <code>if</code>.</p>
+
+                <h5>1.2.3 Real Compiler Impact</h5>
+                <p>Without determinism:</p>
+                <ul>
+                    <li>Parsing becomes O(n²) or worse</li>
+                    <li>Compiler becomes slow and buggy</li>
+                    <li>Tooling (like syntax highlighting, error messages) becomes unreliable</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>2. Eliminate Ambiguity</h3>
+                <p>Ambiguity occurs when a grammar generates a string that can have <strong>more than one parse tree</strong>. This is a fundamental problem in parsing because it leads to confusion in semantic interpretation.</p>
+            </article>
+
+            <article>
+                <h4>2.1 What is Ambiguity?</h4>
+                <p>If a string derived from a grammar has <strong>two or more different leftmost derivations</strong> (or parse trees), the grammar is ambiguous.</p>
+
+                <p>Example:</p>
+                <pre><code class="">
+E → E + E | E * E | id
+</code></pre>
+                <p>String: <code>id + id * id</code></p>
+
+                <p>This string has two parse trees:</p>
+                <ul>
+                    <li>One where <code>+</code> is applied after <code>*</code>: (id + (id * id))</li>
+                    <li>One where <code>*</code> is applied after <code>+</code>: ((id + id) * id)</li>
+                </ul>
+
+                <p>Both are valid derivations, but they imply different meanings. Compilers must produce exactly one interpretation — ambiguity breaks this requirement.</p>
+            </article>
+
+            <article>
+                <h4>2.2 Why Eliminate Ambiguity?</h4>
+                <p>In programming languages, ambiguity can cause:</p>
+                <ul>
+                    <li><strong>Incorrect code generation</strong>: Different parse trees = different instructions</li>
+                    <li><strong>Unpredictable behavior</strong>: Compiler may pick arbitrary interpretation</li>
+                    <li><strong>Parsing failures</strong>: Deterministic parsers (LL/LR) cannot handle ambiguity</li>
+                </ul>
+            </article>
+
+            <article>
+                <h4>2.3 Strategies to Eliminate Ambiguity</h4>
+
+                <h5>2.3.1 Enforce Operator Precedence and Associativity</h5>
+                <p>To fix the arithmetic expression grammar, we split it by precedence:</p>
+                <pre><code class="">
+E → E + T | T
+T → T * F | F
+F → id
+</code></pre>
+                <ul>
+                    <li><code>*</code> has higher precedence than <code>+</code></li>
+                    <li>Operators are left-associative (e.g., a + b + c = (a + b) + c)</li>
+                </ul>
+
+                <h5>2.3.2 Disambiguate with Language Rules</h5>
+                <p>Classic case: "dangling else"</p>
+                <pre><code class="">
+S → if E then S | if E then S else S | other
+</code></pre>
+
+                <p>Make it unambiguous by associating <code>else</code> with the nearest unmatched <code>if</code>:</p>
+                <pre><code class="">
+S → M | U
+M → if E then M else M | other
+U → if E then S
+</code></pre>
+
+                <h5>2.3.3 Rewrite the Grammar</h5>
+                <p>Sometimes, restructuring rules removes ambiguity. Example:</p>
+
+                <p>Ambiguous:</p>
+                <pre><code class="">
+S → a S b | ε
+</code></pre>
+                <p>This allows multiple ways to generate the same string like <code>aabb</code>.</p>
+
+                <p>Unambiguous version (balanced a's and b's):</p>
+                <pre><code class="">
+S → a S b | ε
+</code></pre>
+                <p>In this case, the ambiguity was not real — the original grammar was actually unambiguous. You must prove ambiguity formally before rewriting.</p>
+            </article>
+
+            <article>
+                <h4>2.4 Real-World Compiler Example</h4>
+                <p>In C/C++, the following expression is parsed differently depending on operator precedence:</p>
+                <pre><code class="">
+a + b * c
+</code></pre>
+
+                <p>The compiler refers to a deterministic grammar that gives <code>*</code> higher precedence:</p>
+                <ul>
+                    <li><code>b * c</code> is evaluated first</li>
+                    <li>Then <code>a + (result)</code></li>
+                </ul>
+
+                <p>If grammar allowed both <code>(a + b) * c</code> and <code>a + (b * c)</code>, it would cause ambiguity. Therefore, operator tables are translated into disambiguated CFGs.</p>
+            </article>
+
+            <article>
+                <h3>3. Remove Left Recursion</h3>
+                <p>Left recursion in a grammar occurs when a non-terminal calls itself as the first symbol in one of its productions. Left-recursive grammars are problematic for top-down parsers (like LL(1)) because they can cause <strong>infinite recursion</strong>.</p>
+            </article>
+
+            <article>
+                <h4>3.1 What is Left Recursion?</h4>
+                <p>A grammar has <strong>left recursion</strong> if there exists a non-terminal <code>A</code> such that:</p>
+                <pre><code class="">
+A → A α | β
+</code></pre>
+                <p>where <code>α</code> and <code>β</code> are sequences of terminals and/or non-terminals, and <code>β</code> does not start with <code>A</code>.</p>
+
+                <p>Example of left recursion:</p>
+                <pre><code class="">
+E → E + T | T
+</code></pre>
+                <p>Here, <code>E</code> is calling itself first, directly. For LL parsers, this causes an infinite loop.</p>
+            </article>
+
+            <article>
+                <h4>3.2 Eliminate Immediate Left Recursion</h4>
+                <p>The standard technique is to refactor the grammar by introducing a new non-terminal to handle recursion.</p>
+
+                <p><strong>General Rule:</strong></p>
+                <pre><code class="">
+A → A α₁ | A α₂ | ... | β₁ | β₂ | ...
+</code></pre>
+                <p>where each <code>βᵢ</code> does not start with A. This is transformed into:</p>
+                <pre><code class="">
+A → β₁ A' | β₂ A' | ...
+A' → α₁ A' | α₂ A' | ... | ε
+</code></pre>
+
+                <h5>3.2.1 Example: Arithmetic Expressions</h5>
+                <p>Original grammar (left-recursive):</p>
+                <pre><code class="">
+E → E + T | T
+T → T * F | F
+F → ( E ) | id
+</code></pre>
+
+                <p>Step-by-step removal of left recursion:</p>
+
+                <h5>For E:</h5>
+                <ul>
+                    <li>Left-recursive: E → E + T</li>
+                    <li>Non-left-recursive: E → T</li>
+                </ul>
+
+                <p>Apply transformation:</p>
+                <pre><code class="">
+E → T E'
+E' → + T E' | ε
+</code></pre>
+
+                <h5>For T:</h5>
+                <pre><code class="">
+T → F T'
+T' → * F T' | ε
+</code></pre>
+
+                <h5>F remains unchanged:</h5>
+                <pre><code class="">
+F → ( E ) | id
+</code></pre>
+
+                <p>This grammar is now free from left recursion and suitable for LL(1) parsing.</p>
+            </article>
+
+            <article>
+                <h4>3.3 Why Remove Left Recursion?</h4>
+                <ul>
+                    <li>Top-down parsers use recursive function calls to simulate derivation.</li>
+                    <li>Left recursion causes these calls to recurse infinitely.</li>
+                    <li>Removing it enables <strong>predictive parsing</strong>.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h4>3.4 Real-world Compiler Scenario</h4>
+                <p>In compilers like <code>javac</code> or <code>g++</code>, parser generators (like ANTLR or YACC) reject grammars with direct left recursion if configured for top-down parsing.</p>
+                <p>To write a parser that understands arithmetic expressions, you must first eliminate left recursion as shown above.</p>
+            </article>
+
+
+            <article>
+                <h3>4. Apply Left Factoring</h3>
+                <p>Left factoring is a grammar transformation technique used to remove <strong>common prefixes</strong> from multiple productions of a non-terminal. It is essential when a parser cannot decide which production to choose based on the next input symbol.</p>
+            </article>
+
+            <article>
+                <h4>4.1 What is Left Factoring?</h4>
+                <p>Given a non-terminal <code>A</code> with multiple productions starting with the same prefix:</p>
+                <pre><code class="">
+A → α β₁ | α β₂
+</code></pre>
+                <p>This makes the parser unable to choose between <code>β₁</code> and <code>β₂</code> just by looking at <code>α</code>. Left factoring rewrites this as:</p>
+                <pre><code class="">
+A → α A'
+A' → β₁ | β₂
+</code></pre>
+                <p>Now the decision is delayed until enough input is seen.</p>
+            </article>
+
+            <article>
+                <h4>4.2 Why Apply Left Factoring?</h4>
+                <ul>
+                    <li><strong>Predictive parsing</strong> requires a single production per lookahead symbol.</li>
+                    <li><strong>Reduces ambiguity</strong> when common prefixes exist.</li>
+                    <li><strong>Enables LL(1)</strong> parser construction with FIRST/FOLLOW sets.</li>
+                </ul>
+
+                <h5>4.2.1 Real-World Analogy</h5>
+                <p>Imagine a voice menu:</p>
+                <pre><code>
+Say "book flight"
+Say "book hotel"
+</code></pre>
+                <p>The system hears "book" and gets confused. Instead, restructure:</p>
+                <pre><code>
+Say "book"
+Then say "flight" or "hotel"
+</code></pre>
+                <p>Left factoring works the same way — delay the decision.</p>
+            </article>
+
+            <article>
+                <h4>4.3 Detailed Example</h4>
+
+                <p>Original Grammar:</p>
+                <pre><code class="">
+S → if E then S else S | if E then S | other
+</code></pre>
+
+                <p>This grammar is ambiguous due to common prefix <code>if E then S</code>. Parser cannot decide between the two branches without lookahead.</p>
+
+                <p>Left-factored version:</p>
+                <pre><code class="">
+S → if E then S S'
+S' → else S | ε
+S → other
+</code></pre>
+
+                <p>Now, after reading <code>if E then S</code>, the parser checks whether <code>else</code> follows. If yes, parse <code>else S</code>. If not, move on.</p>
+
+                <h5>4.3.1 Another Example</h5>
+                <p>Original Grammar:</p>
+                <pre><code class="">
+A → int id ; | int id = num ;
+</code></pre>
+
+                <p>Common prefix: <code>int id</code></p>
+
+                <p>Left-factored:</p>
+                <pre><code class="">
+A → int id A'
+A' → ; | = num ;
+</code></pre>
+                <p>Now the parser reads <code>int id</code> and decides based on the next token.</p>
+            </article>
+
+            <article>
+                <h4>4.4 Implementation Note</h4>
+                <p>Left factoring is automated in many parser generators. But for handwritten parsers, this step is manual and necessary to avoid parse conflicts.</p>
+
+                <p>After left factoring, the grammar becomes suitable for constructing parsing tables or recursive descent parsers.</p>
+            </article>
+
+            <article>
+                <h3>5. Construct FIRST and FOLLOW Sets</h3>
+                <p>To build an LL(1) parser or check grammar determinism, we must compute two essential sets for each non-terminal:</p>
+                <ul>
+                    <li><strong>FIRST</strong>: What terminals can appear first in a derivation from a non-terminal?</li>
+                    <li><strong>FOLLOW</strong>: What terminals can appear immediately after a non-terminal in any valid string?</li>
+                </ul>
+                <p>These sets ensure deterministic parsing decisions by guiding which production to apply based on lookahead symbols.</p>
+            </article>
+
+            <article>
+                <h4>5.1 FIRST Set</h4>
+                <p>The <strong>FIRST(X)</strong> of a symbol X is the set of terminals that begin strings derived from X. It includes:</p>
+                <ul>
+                    <li>The terminal itself if X is a terminal</li>
+                    <li>FIRST of the symbols in the production if X is a non-terminal</li>
+                    <li><code>ε</code> if X can derive ε</li>
+                </ul>
+
+                <h5>Rules to Compute FIRST</h5>
+                <ul>
+                    <li>If X is a terminal, then FIRST(X) = {X}</li>
+                    <li>If X → ε is a production, then ε ∈ FIRST(X)</li>
+                    <li>If X → Y₁ Y₂ ... Yₙ, then:
+                        <ul>
+                            <li>add FIRST(Y₁) excluding ε</li>
+                            <li>if FIRST(Y₁) contains ε, add FIRST(Y₂), and so on</li>
+                            <li>if all Yᵢ derive ε, add ε to FIRST(X)</li>
+                        </ul>
+                    </li>
+                </ul>
+            </article>
+
+            <article>
+                <h4>5.2 FOLLOW Set</h4>
+                <p>The <strong>FOLLOW(A)</strong> of a non-terminal A is the set of terminals that can appear immediately after A in some derivation.</p>
+
+                <h5>Rules to Compute FOLLOW</h5>
+                <ul>
+                    <li>If S is the start symbol, add <code>$</code> to FOLLOW(S)</li>
+                    <li>If A → α B β, then add FIRST(β) \ {ε} to FOLLOW(B)</li>
+                    <li>If A → α B or A → α B β and FIRST(β) contains ε, add FOLLOW(A) to FOLLOW(B)</li>
+                </ul>
+            </article>
+
+            <article>
+                <h4>5.3 Detailed Example</h4>
+                <p>Consider this grammar:</p>
+                <pre><code class="">
+S → A B
+A → a A | ε
+B → b B | c
+</code></pre>
+
+                <h5>Step 1: Compute FIRST</h5>
+
+                <p><strong>FIRST(A)</strong></p>
+                <ul>
+                    <li>A → a A → starts with <code>a</code></li>
+                    <li>A → ε → includes ε</li>
+                    <li>⇒ FIRST(A) = {a, ε}</li>
+                </ul>
+
+                <p><strong>FIRST(B)</strong></p>
+                <ul>
+                    <li>B → b B → starts with <code>b</code></li>
+                    <li>B → c → starts with <code>c</code></li>
+                    <li>⇒ FIRST(B) = {b, c}</li>
+                </ul>
+
+                <p><strong>FIRST(S)</strong></p>
+                <ul>
+                    <li>S → A B</li>
+                    <li>FIRST(A) = {a, ε}</li>
+                    <li>If A ⇒ ε, then consider FIRST(B) too</li>
+                    <li>⇒ FIRST(S) = FIRST(A) ∪ FIRST(B) = {a, b, c}</li>
+                </ul>
+
+                <h5>Step 2: Compute FOLLOW</h5>
+
+                <p><strong>FOLLOW(S)</strong></p>
+                <ul>
+                    <li>S is start symbol ⇒ <code>$</code> ∈ FOLLOW(S)</li>
+                </ul>
+
+                <p><strong>FOLLOW(A)</strong></p>
+                <ul>
+                    <li>S → A B ⇒ FIRST(B) = {b, c} ⊆ FOLLOW(A)</li>
+                    <li>⇒ FOLLOW(A) = {b, c}</li>
+                </ul>
+
+                <p><strong>FOLLOW(B)</strong></p>
+                <ul>
+                    <li>B is at the end of S → A B ⇒ FOLLOW(S) = {$} ⊆ FOLLOW(B)</li>
+                    <li>⇒ FOLLOW(B) = {$}</li>
+                </ul>
+
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>Non-terminal</th>
+                                <th>FIRST</th>
+                                <th>FOLLOW</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>S</td>
+                                <td>{a, b, c}</td>
+                                <td>{$}</td>
+                            </tr>
+                            <tr>
+                                <td>A</td>
+                                <td>{a, ε}</td>
+                                <td>{b, c}</td>
+                            </tr>
+                            <tr>
+                                <td>B</td>
+                                <td>{b, c}</td>
+                                <td>{$}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </article>
+
+            <article>
+                <h4>5.4 How It Enables Determinism</h4>
+                <p>LL(1) table uses:</p>
+                <ul>
+                    <li><strong>FIRST</strong> to choose rule on lookahead</li>
+                    <li><strong>FOLLOW</strong> when ε appears in FIRST, to decide when to apply the ε-production</li>
+                </ul>
+
+                <p>Example: If input starts with <code>a</code>, parser chooses A → a A. If input is <code>b</code> or <code>c</code>, parser chooses A → ε and proceeds with B.</p>
+            </article>
+
+            <article>
+                <h3>6. Check LL(1) Conditions</h3>
+                <p>A grammar is said to be <strong>LL(1)</strong> if it can be parsed by an LL(1) parser — a top-down parser that uses:</p>
+                <ul>
+                    <li><strong>Left-to-right</strong> scanning of input (first L)</li>
+                    <li><strong>Leftmost derivation</strong> (second L)</li>
+                    <li>1-symbol lookahead (1)</li>
+                </ul>
+                <p>For LL(1) parsing, we need to ensure that at every step, the parser can uniquely determine the correct production using only the next input symbol. This requires checking two specific conditions using the <strong>FIRST</strong> and <strong>FOLLOW</strong> sets.</p>
+            </article>
+
+            <article>
+                <h4>6.1 LL(1) Grammar Conditions</h4>
+
+                <p>For any non-terminal <code>A</code> with two or more productions:</p>
+                <pre><code class="">
+A → α | β
+</code></pre>
+
+                <p>The grammar is LL(1) <strong>only if</strong>:</p>
+                <ul>
+                    <li><strong>Condition 1:</strong> FIRST(α) ∩ FIRST(β) = ∅</li>
+                    <li><strong>Condition 2:</strong> If ε ∈ FIRST(α), then FIRST(β) ∩ FOLLOW(A) = ∅</li>
+                    <li><strong>Similarly</strong>, if ε ∈ FIRST(β), then FIRST(α) ∩ FOLLOW(A) = ∅</li>
+                </ul>
+            </article>
+
+            <article>
+                <h4>6.2 Detailed Example</h4>
+
+                <p>Consider the grammar:</p>
+                <pre><code class="">
+S → A B
+A → a A | ε
+B → b B | c
+</code></pre>
+
+                <h5>Step 1: Use Previously Computed FIRST and FOLLOW</h5>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>Non-terminal</th>
+                                <th>FIRST</th>
+                                <th>FOLLOW</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>S</td>
+                                <td>{a, b, c}</td>
+                                <td>{$}</td>
+                            </tr>
+                            <tr>
+                                <td>A</td>
+                                <td>{a, ε}</td>
+                                <td>{b, c}</td>
+                            </tr>
+                            <tr>
+                                <td>B</td>
+                                <td>{b, c}</td>
+                                <td>{$}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h5>Step 2: Check LL(1) Conditions for A → a A | ε</h5>
+                <ul>
+                    <li>FIRST(a A) = {a}</li>
+                    <li>FIRST(ε) = {ε}</li>
+                    <li>⇒ FIRST(a A) ∩ FIRST(ε) = ∅ ✅</li>
+                    <li>Since ε ∈ FIRST(A), check FIRST(a A) ∩ FOLLOW(A) = {a} ∩ {b, c} = ∅ ✅</li>
+                </ul>
+
+                <h5>Step 3: Check LL(1) Conditions for B → b B | c</h5>
+                <ul>
+                    <li>FIRST(b B) = {b}</li>
+                    <li>FIRST(c) = {c}</li>
+                    <li>⇒ FIRST(b B) ∩ FIRST(c) = ∅ ✅</li>
+                </ul>
+
+                <p>✅ All conditions are satisfied. Therefore, the grammar is <strong>LL(1)</strong>.</p>
+            </article>
+
+            <article>
+                <h4>6.3 When Grammar is Not LL(1)</h4>
+                <p>Example of an <strong>ambiguous grammar</strong> that fails LL(1) condition:</p>
+                <pre><code class="">
+E → E + T | T
+</code></pre>
+
+                <p><strong>FIRST(E + T) = FIRST(E)</strong>, which causes recursion</p>
+
+                <p>We remove left recursion and left factor to make it LL(1)-compliant (as done in earlier sections):</p>
+                <pre><code class="">
+E → T E'
+E' → + T E' | ε
+</code></pre>
+
+                <h5>Check LL(1) for E' → + T E' | ε</h5>
+                <ul>
+                    <li>FIRST(+ T E') = {+}</li>
+                    <li>FIRST(ε) = {ε}</li>
+                    <li>FOLLOW(E') = {$, )}</li>
+                    <li>⇒ {+} ∩ FOLLOW(E') = ∅ ✅</li>
+                </ul>
+
+                <p>✅ LL(1) satisfied after transformation.</p>
+            </article>
+
+            <article>
+                <h4>6.4 Practical Compiler Insight</h4>
+                <p>Most parser generators like <code>ANTLR</code> or <code>Bison</code> show a warning when LL(1) conflicts exist. For real-time applications like IDE autocompletion, LL(1) parsing ensures instant and correct parsing without delay or backtracking.</p>
+            </article>
+
+            <article>
+                <h3>7. Build the Predictive Parsing Table</h3>
+                <p>The Predictive Parsing Table is a two-dimensional table used by LL(1) parsers to decide which production rule to apply, based on:</p>
+                <ul>
+                    <li>Current non-terminal (row)</li>
+                    <li>Next input symbol (column)</li>
+                </ul>
+                <p>This table enables parsing with <strong>one lookahead symbol</strong> — hence "LL(1)". It is built using the <code>FIRST</code> and <code>FOLLOW</code> sets.</p>
+            </article>
+
+            <article>
+                <h4>7.1 Construction Steps</h4>
+
+                <ol>
+                    <li>For each production <code>A → α</code>:
+                        <ul>
+                            <li>For each terminal <code>a</code> ∈ FIRST(α), add <code>A → α</code> to <code>TABLE[A, a]</code></li>
+                            <li>If <code>ε ∈ FIRST(α)</code>, then for each terminal <code>b</code> ∈ FOLLOW(A), add <code>A → α</code> to <code>TABLE[A, b]</code></li>
+                        </ul>
+                    </li>
+                    <li>Mark each invalid entry as error or blank</li>
+                </ol>
+
+                <p>This ensures that only one entry per cell exists — the defining condition of LL(1).</p>
+            </article>
+
+            <article>
+                <h4>7.2 Example Grammar</h4>
+                <pre><code class="">
+S → A B
+A → a A | ε
+B → b B | c
+</code></pre>
+
+                <p>From earlier computations:</p>
+
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>Non-terminal</th>
+                                <th>FIRST</th>
+                                <th>FOLLOW</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>S</td>
+                                <td>{a, b, c}</td>
+                                <td>{$}</td>
+                            </tr>
+                            <tr>
+                                <td>A</td>
+                                <td>{a, ε}</td>
+                                <td>{b, c}</td>
+                            </tr>
+                            <tr>
+                                <td>B</td>
+                                <td>{b, c}</td>
+                                <td>{$}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h5>Productions:</h5>
+                <pre><code class="">
+S → A B
+A → a A | ε
+B → b B | c
+</code></pre>
+            </article>
+
+            <article>
+                <h4>7.3 FIRST + FOLLOW Table Fill</h4>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>Non-terminal</th>
+                                <th>a</th>
+                                <th>b</th>
+                                <th>c</th>
+                                <th>$</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>S</strong></td>
+                                <td>S → A B</td>
+                                <td>S → A B</td>
+                                <td>S → A B</td>
+                                <td>error</td>
+                            </tr>
+                            <tr>
+                                <td><strong>A</strong></td>
+                                <td>A → a A</td>
+                                <td>A → ε</td>
+                                <td>A → ε</td>
+                                <td>error</td>
+                            </tr>
+                            <tr>
+                                <td><strong>B</strong></td>
+                                <td>error</td>
+                                <td>B → b B</td>
+                                <td>B → c</td>
+                                <td>error</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p>✅ One production per cell → this grammar is LL(1) and parsing table is ready.</p>
+            </article>
+
+            <article>
+                <h4>7.4 Real-world Analogy</h4>
+                <p>Think of the parsing table like a GPS system:</p>
+                <ul>
+                    <li>You are at a "non-terminal" (current location)</li>
+                    <li>You see a "lookahead symbol" (road sign)</li>
+                    <li>GPS (table) tells you the exact route (production) to follow</li>
+                </ul>
+                <p>Because only one route exists for each sign at each location, you never get lost — that’s the power of LL(1).</p>
+            </article>
+
+            <article>
+                <h4>7.5 Use in Predictive Parser</h4>
+                <p>The parser uses the table as follows:</p>
+                <pre><code class="">
+stack ← [S, $]
+input ← [tokens, $]
+
+while stack not empty:
+    X = top of stack
+    a = current input symbol
+    if X is terminal or $:
+        if X == a: pop both
+        else: error
+    else:
+        if TABLE[X, a] = X → α:
+            replace X with α on stack
+        else:
+            error
+</code></pre>
+            </article>
+
+            <article>
+                <h3>8. Validate Determinism</h3>
+                <p>Validation of determinism ensures the grammar and parsing table conform to the <strong>LL(1)</strong> requirements — one unique parsing decision for each input symbol at every step. This validation confirms that:</p>
+                <ul>
+                    <li>Each cell in the parsing table contains <strong>at most one production rule</strong></li>
+                    <li>No conflicts exist (no multiple entries or ambiguity)</li>
+                    <li>FIRST and FOLLOW sets do not overlap improperly</li>
+                </ul>
+                <p>This is the final step to ensure the CFG is now <strong>deterministic and parser-ready</strong>.</p>
+            </article>
+
+            <article>
+                <h4>8.1 What Makes a Grammar Non-Deterministic?</h4>
+                <p>A grammar fails determinism if:</p>
+                <ul>
+                    <li><code>FIRST(α) ∩ FIRST(β) ≠ ∅</code> for two productions <code>A → α | β</code></li>
+                    <li>ε ∈ FIRST(α) and <code>FIRST(β) ∩ FOLLOW(A) ≠ ∅</code></li>
+                    <li>Parsing table has multiple entries for any [Non-terminal, terminal] pair</li>
+                </ul>
+
+                <h5>Example of Conflict</h5>
+                <pre><code class="">
+A → a B | a C
+</code></pre>
+                <p>BOTH start with <code>a</code> ⇒ FIRST sets overlap ⇒ Not LL(1)</p>
+            </article>
+
+            <article>
+                <h4>8.2 How to Validate Determinism</h4>
+
+                <ol>
+                    <li>Construct the <strong>FIRST</strong> and <strong>FOLLOW</strong> sets</li>
+                    <li>Build the <strong>predictive parsing table</strong></li>
+                    <li>Scan each table cell:
+                        <ul>
+                            <li>Check that each [Non-terminal, Terminal] has ≤ 1 rule</li>
+                            <li>If any cell has more than one rule, grammar is NOT LL(1)</li>
+                        </ul>
+                    </li>
+                </ol>
+
+                <h5>Automated Validator Logic:</h5>
+                <pre><code class="language-python">
+for non_terminal in grammar:
+    for terminal in terminals:
+        if len(table[non_terminal][terminal]) > 1:
+            print("Grammar is not LL(1)")
+</code></pre>
+            </article>
+
+            <article>
+                <h4>8.3 Validated Example (From Previous Sections)</h4>
+
+                <p>Recall:</p>
+                <pre><code class="">
+S → A B
+A → a A | ε
+B → b B | c
+</code></pre>
+
+                <p>The predictive parsing table:</p>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>Non-terminal</th>
+                                <th>a</th>
+                                <th>b</th>
+                                <th>c</th>
+                                <th>$</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>S</strong></td>
+                                <td>S → A B</td>
+                                <td>S → A B</td>
+                                <td>S → A B</td>
+                                <td>error</td>
+                            </tr>
+                            <tr>
+                                <td><strong>A</strong></td>
+                                <td>A → a A</td>
+                                <td>A → ε</td>
+                                <td>A → ε</td>
+                                <td>error</td>
+                            </tr>
+                            <tr>
+                                <td><strong>B</strong></td>
+                                <td>error</td>
+                                <td>B → b B</td>
+                                <td>B → c</td>
+                                <td>error</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p>✅ Each cell contains ≤ 1 rule. Grammar is <strong>deterministic</strong>.</p>
+            </article>
+
+            <article>
+                <h4>8.4 Real-World Usage</h4>
+                <ul>
+                    <li>Parser generators like <code>ANTLR</code> or <code>Bison</code> will flag LL(1) violations</li>
+                    <li>IDE autocompletion, code linters, and syntax highlighters depend on deterministic grammars to work without lag</li>
+                </ul>
+                <p>Without validation, hidden non-determinism causes parsing bugs, miscompilation, or infinite loops.</p>
+            </article>
+
+            <article>
+                <h3 class="text-center">Detailed Step By Step Example From Book</h3>
+                <p>Consider the following grammar:</p>
+                <pre><code class="">
+stmt → if expr then stmt
+     | if expr then stmt else stmt
+     | other
+</code></pre>
+                <p>The grammar is ambiguous because the <code>else</code> can be associated with either of the two <code>if</code> statements. This is known as the "dangling else" problem.</p>
+                <p>We will go through the steps to make this grammar deterministic.</p>
+
+                <ul>
+                    <li>Step 1: Identify Ambiguity</li>
+                    <li>Step 2: Rewrite the Grammar</li>
+                    <li>Step 3: Remove Left Recursion</li>
+                    <li>Step 4: Apply Left Factoring</li>
+                    <li>Step 5: Construct FIRST and FOLLOW Sets</li>
+                    <li>Step 6: Check LL(1) Conditions</li>
+                    <li>Step 7: Build the Predictive Parsing Table</li>
+                    <li>Step 8: Validate Determinism</li>
+                </ul>
+                <p>After following these steps, we can conclude that the grammar is now deterministic and suitable for LL(1) parsing.</p>
+                <p>In practice, this process is often automated by parser generators, but understanding the underlying principles is crucial for effective grammar design.</p>
+
+                <article>
+                    <h3>9.1 Eliminate Ambiguity — Step-by-Step (Dangling-Else Problem)</h3>
+                    <p>This classic ambiguity occurs in conditional statements where an <code>else</code> can be associated with more than one <code>if</code>. The example from the book illustrates the problem and the transformation to eliminate it.</p>
+                </article>
+
+                <article>
+                    <h4>9.1.1 Original Ambiguous Grammar</h4>
+                    <pre><code class="">
+stmt → if expr then stmt
+     | if expr then stmt else stmt
+     | other
+</code></pre>
+
+                    <p>This grammar is ambiguous. For instance, the sentence:</p>
+                    <pre><code class="">
+if E1 then if E2 then S1 else S2
+</code></pre>
+
+                    <p>can be parsed in two ways — either associating the <code>else</code> with the first <code>if</code> or the second. But programming languages like C, Java, etc., match <strong>each else with the closest unmatched then</strong> — this preference must be encoded into an unambiguous grammar.</p>
+                </article>
+
+                <article>
+                    <h4>9.1.2 Disambiguation Strategy</h4>
+                    <p>Split statements into two categories:</p>
+                    <ul>
+                        <li><strong>Matched</strong>: Fully enclosed if-then-else (no ambiguity)</li>
+                        <li><strong>Open</strong>: May have unmatched then</li>
+                    </ul>
+
+                    <p>This transformation ensures <code>else</code> is always associated with the nearest unmatched <code>then</code>.</p>
+                </article>
+
+                <article>
+                    <h4>9.1.3 Unambiguous Grammar</h4>
+                    <pre><code class="">
+stmt         → matched_stmt | open_stmt
+
+matched_stmt → if expr then matched_stmt else matched_stmt
+             | other
+
+open_stmt    → if expr then stmt
+             | if expr then matched_stmt else open_stmt
+</code></pre>
+
+                    <p>Now, for:</p>
+                    <pre><code class="">
+if E1 then if E2 then S1 else S2
+</code></pre>
+
+                    <p>It parses as:</p>
+                    <pre><code class="">
+stmt
+└── open_stmt
+    └── if expr then matched_stmt else open_stmt
+                     └── matched_stmt → if expr then matched_stmt else matched_stmt
+</code></pre>
+
+                    <p>This guarantees <code>else</code> always binds to the nearest <code>then</code>.</p>
+                </article>
+
+                <article>
+                    <h4>9.1.4 Real-World Example</h4>
+                    <p>In Java/C:</p>
+                    <pre><code class="language-java">
+if (x > 0)
+  if (y > 0)
+    System.out.println("A");
+  else
+    System.out.println("B");
+</code></pre>
+
+                    <p>The <code>else</code> binds to the inner <code>if</code>. The rewritten unambiguous grammar matches this behavior exactly, which is why it is preferred in compiler frontend design.</p>
+                </article>
+
+                <article>
+                    <h4>9.1.5 Summary Table</h4>
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Form</th>
+                                    <th>Meaning</th>
+                                    <th>Handled by</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>if E1 then if E2 then S1 else S2</code></td>
+                                    <td>Associates else with inner if</td>
+                                    <td>Unambiguous Grammar</td>
+                                </tr>
+                                <tr>
+                                    <td><code>if E1 then if E2 then S1</code></td>
+                                    <td>No ambiguity</td>
+                                    <td>Both grammars</td>
+                                </tr>
+                                <tr>
+                                    <td><code>if E1 then S1 else if E2 then S2 else S3</code></td>
+                                    <td>Right association of elses</td>
+                                    <td>Unambiguous Grammar</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </article>
+
+                <article>
+                    <h4>9.1.6 Why This Matters</h4>
+                    <ul>
+                        <li>Ambiguity causes confusion for parser generators (LL/LR)</li>
+                        <li>Ambiguous grammars can't be parsed without extra logic</li>
+                        <li>Unambiguous grammar directly maps source to single parse tree</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h3>9.2 Remove Left Recursion — Step-by-Step on Disambiguated If-Else Grammar</h3>
+                    <p>In the unambiguous grammar constructed to eliminate the <strong>dangling-else ambiguity</strong>, we now check and eliminate <strong>left recursion</strong> to make it suitable for top-down (LL(1)) parsing.</p>
+                    <p>Let’s recall the grammar from 9.1:</p>
+                    <pre><code class="">
+stmt         → matched_stmt | open_stmt
+matched_stmt → if expr then matched_stmt else matched_stmt | other
+open_stmt    → if expr then stmt | if expr then matched_stmt else open_stmt
+</code></pre>
+                    <p>None of these productions are <em>directly</em> left-recursive, but they do contain potential <strong>indirect left recursion</strong>. Let’s analyze step-by-step.</p>
+                </article>
+
+                <article>
+                    <h4>9.2.1 Step 1: List All Non-Terminals</h4>
+                    <ul>
+                        <li>S = stmt</li>
+                        <li>M = matched_stmt</li>
+                        <li>O = open_stmt</li>
+                    </ul>
+                    <p>We’ll check for left recursion in each non-terminal: <strong>stmt, matched_stmt, open_stmt</strong>.</p>
+                </article>
+
+                <article>
+                    <h4>9.2.2 Step 2: Substitution for Indirect Recursion</h4>
+                    <p>First substitute <code>stmt → matched_stmt | open_stmt</code> into the productions where <code>stmt</code> appears, namely in <code>open_stmt</code>:</p>
+                    <pre><code class="">
+open_stmt → if expr then matched_stmt
+          | if expr then open_stmt
+          | if expr then matched_stmt else open_stmt
+</code></pre>
+
+                    <p>The rule <code>if expr then open_stmt</code> has the non-terminal <code>open_stmt</code> as the first symbol after expansion ⇒ this is <strong>direct left recursion</strong>.</p>
+                </article>
+
+                <article>
+                    <h4>9.2.3 Step 3: Eliminate Direct Left Recursion in open_stmt</h4>
+                    <p>We now isolate the recursive and non-recursive parts of <code>open_stmt</code>.</p>
+
+                    <h5>Recursive form:</h5>
+                    <pre><code class="">
+open_stmt → if expr then open_stmt
+</code></pre>
+
+                    <h5>Non-recursive forms:</h5>
+                    <pre><code class="">
+open_stmt → if expr then matched_stmt
+open_stmt → if expr then matched_stmt else open_stmt
+</code></pre>
+
+                    <h5>Apply standard transformation:</h5>
+                    <pre><code class="">
+open_stmt → if expr then matched_stmt open_stmt'
+open_stmt' → else open_stmt open_stmt' | ε
+</code></pre>
+
+                    <p>This eliminates the left recursion while preserving the structure.</p>
+                </article>
+
+                <article>
+                    <h4>9.2.4 Final Refactored Grammar (Left Recursion Removed)</h4>
+                    <pre><code class="">
+stmt         → matched_stmt | open_stmt
+
+matched_stmt → if expr then matched_stmt else matched_stmt
+             | other
+
+open_stmt    → if expr then matched_stmt open_stmt'
+
+open_stmt'   → else open_stmt open_stmt' | ε
+</code></pre>
+
+                    <h5>Explanation:</h5>
+                    <ul>
+                        <li><strong>open_stmt</strong> now begins with a <em>non-recursive form</em> only</li>
+                        <li><strong>open_stmt'</strong> handles the repeated chaining of <code>else open_stmt</code> recursively (right-recursion only)</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>9.2.5 Parse Tree Example (No Left Recursion)</h4>
+                    <p>For the string:</p>
+                    <pre><code class="">
+if E1 then matched_stmt else open_stmt else open_stmt
+</code></pre>
+
+                    <p>Derivation:</p>
+                    <pre><code class="">
+open_stmt
+→ if expr then matched_stmt open_stmt'
+→ if expr then matched_stmt else open_stmt open_stmt'
+→ if expr then matched_stmt else open_stmt else open_stmt open_stmt'
+</code></pre>
+
+                    <p>At each stage, we apply only one rule — determinism is preserved and no left recursion occurs.</p>
+                </article>
+
+                <article>
+                    <h4>9.2.6 Why This Matters</h4>
+                    <ul>
+                        <li>Removes infinite loops in recursive-descent parsers</li>
+                        <li>Enables FIRST and FOLLOW computation</li>
+                        <li>Makes grammar suitable for predictive parsing (LL(1))</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h3>9.3 Apply Left Factoring — Step-by-Step on Disambiguated & Recursion-Free Grammar</h3>
+                    <p>Now that we have eliminated ambiguity and left recursion, the final step before constructing the parsing table is to <strong>apply left factoring</strong>. This transformation ensures that the parser can always make a deterministic choice based on a single lookahead symbol.</p>
+                </article>
+
+                <article>
+                    <h4>9.3.1 Refactored Grammar from Previous Step</h4>
+                    <pre><code class="">
+stmt         → matched_stmt | open_stmt
+
+matched_stmt → if expr then matched_stmt else matched_stmt
+             | other
+
+open_stmt    → if expr then matched_stmt open_stmt'
+
+open_stmt'   → else open_stmt open_stmt' | ε
+</code></pre>
+                    <p>We will inspect each non-terminal and factor out any common prefixes.</p>
+                </article>
+
+                <article>
+                    <h4>9.3.2 Step 1: Left Factoring <code>matched_stmt</code></h4>
+                    <pre><code class="">
+matched_stmt → if expr then matched_stmt else matched_stmt
+             | other
+</code></pre>
+
+                    <p>No common prefix between the two alternatives: <code>if expr then ...</code> and <code>other</code>. ✅ No factoring needed here.</p>
+                </article>
+
+                <article>
+                    <h4>9.3.3 Step 2: Left Factoring <code>open_stmt</code></h4>
+                    <pre><code class="">
+open_stmt → if expr then matched_stmt open_stmt'
+</code></pre>
+                    <p>Only one production exists, so ✅ nothing to factor.</p>
+                </article>
+
+                <article>
+                    <h4>9.3.4 Step 3: Left Factoring <code>open_stmt'</code></h4>
+                    <pre><code class="">
+open_stmt' → else open_stmt open_stmt' | ε
+</code></pre>
+
+                    <p>Here too, the productions are <code>else ...</code> and <code>ε</code>, with no overlapping prefix. ✅ No factoring needed.</p>
+                </article>
+
+                <article>
+                    <h4>9.3.5 Is Left Factoring Required at All?</h4>
+                    <p>No, because:</p>
+                    <ul>
+                        <li>Each non-terminal has unique prefixes</li>
+                        <li>No two productions of the same non-terminal begin with the same token (terminal)</li>
+                        <li>The grammar is already in LL(1)-ready form after <strong>ambiguity removal</strong> and <strong>left recursion removal</strong></li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>9.3.6 Final LL(1)-Ready Grammar (No Left Factoring Needed)</h4>
+                    <pre><code class="">
+stmt         → matched_stmt | open_stmt
+
+matched_stmt → if expr then matched_stmt else matched_stmt
+             | other
+
+open_stmt    → if expr then matched_stmt open_stmt'
+
+open_stmt'   → else open_stmt open_stmt' | ε
+</code></pre>
+
+                    <p>✅ Already suitable for predictive parsing table construction.</p>
+                </article>
+
+                <article>
+                    <h4>9.3.7 Real-World Impact</h4>
+                    <ul>
+                        <li>Parser never needs backtracking or multi-symbol lookahead</li>
+                        <li>Code completion engines in IDEs like VSCode rely on such deterministic grammars</li>
+                        <li>This structure reflects real language design choices (e.g., C/C++ associating else with nearest if)</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h3>9.4 Construct FIRST and FOLLOW Sets — Step-by-Step on Final Grammar</h3>
+                    <p>To build a predictive parser, we must compute <strong>FIRST</strong> and <strong>FOLLOW</strong> sets for each non-terminal in the grammar. These sets tell us which production to choose when parsing a symbol and help handle <code>ε</code>-productions properly.</p>
+                </article>
+
+                <article>
+                    <h4>9.4.1 Final Grammar</h4>
+                    <pre><code class="">
+stmt         → matched_stmt | open_stmt
+
+matched_stmt → if expr then matched_stmt else matched_stmt
+             | other
+
+open_stmt    → if expr then matched_stmt open_stmt'
+
+open_stmt'   → else open_stmt open_stmt' | ε
+</code></pre>
+                    <p>Non-terminals: stmt, matched_stmt, open_stmt, open_stmt'</p>
+                    <p>Terminals: <code>if</code>, <code>expr</code>, <code>then</code>, <code>else</code>, <code>other</code></p>
+                    <p>Note: <code>expr</code> is treated as a terminal (assumed lexical unit).</p>
+                </article>
+
+                <article>
+                    <h4>9.4.2 Compute FIRST Sets</h4>
+
+                    <h5>FIRST(matched_stmt)</h5>
+                    <pre><code>
+matched_stmt → if expr then matched_stmt else matched_stmt
+             → other
+</code></pre>
+                    <p>Starts with either <code>if</code> or <code>other</code></p>
+                    <p><strong>FIRST(matched_stmt) = {if, other}</strong></p>
+
+                    <h5>FIRST(open_stmt)</h5>
+                    <pre><code>
+open_stmt → if expr then matched_stmt open_stmt'
+</code></pre>
+                    <p>Starts with <code>if</code></p>
+                    <p><strong>FIRST(open_stmt) = {if}</strong></p>
+
+                    <h5>FIRST(open_stmt')</h5>
+                    <pre><code>
+open_stmt' → else open_stmt open_stmt' | ε
+</code></pre>
+                    <p><strong>FIRST(open_stmt') = {else, ε}</strong></p>
+
+                    <h5>FIRST(stmt)</h5>
+                    <pre><code>
+stmt → matched_stmt | open_stmt
+</code></pre>
+                    <p>FIRST(matched_stmt) = {if, other}, FIRST(open_stmt) = {if}</p>
+                    <p>⇒ Combined: <strong>FIRST(stmt) = {if, other}</strong></p>
+                </article>
+
+                <article>
+                    <h4>9.4.3 Compute FOLLOW Sets</h4>
+                    <p>Rules:</p>
+                    <ul>
+                        <li>Add <code>$</code> to FOLLOW(start symbol)</li>
+                        <li>If A → αBβ, then FIRST(β) \ {ε} ⊆ FOLLOW(B)</li>
+                        <li>If A → αB or A → αBβ and ε ∈ FIRST(β), then FOLLOW(A) ⊆ FOLLOW(B)</li>
+                    </ul>
+
+                    <h5>FOLLOW(stmt)</h5>
+                    <ul>
+                        <li>stmt is start symbol ⇒ <strong>FOLLOW(stmt) = {$}</strong></li>
+                    </ul>
+
+                    <h5>FOLLOW(matched_stmt)</h5>
+                    <p>Occurs in:</p>
+                    <ul>
+                        <li>stmt → matched_stmt → FOLLOW(stmt) = {$}</li>
+                        <li>open_stmt → if expr then matched_stmt open_stmt'</li>
+                        <ul>
+                            <li>⇒ FIRST(open_stmt') = {else, ε}</li>
+                        </ul>
+                        <li>matched_stmt → if expr then matched_stmt else matched_stmt
+                            <ul>
+                                <li>matched_stmt before and after 'else'</li>
+                            </ul>
+                    </ul>
+
+                    <p>So we add:</p>
+                    <ul>
+                        <li><code>else</code> from FIRST(open_stmt')</li>
+                        <li><code>$</code> from FOLLOW(stmt)</li>
+                    </ul>
+
+                    <p><strong>FOLLOW(matched_stmt) = {else, $}</strong></p>
+
+                    <h5>FOLLOW(open_stmt)</h5>
+                    <ul>
+                        <li>stmt → open_stmt ⇒ FOLLOW(stmt) = {$}</li>
+                        <li>open_stmt' → else open_stmt open_stmt'</li>
+                        <ul>
+                            <li>⇒ FOLLOW(open_stmt') ⊆ FOLLOW(open_stmt)</li>
+                        </ul>
+                        <li>⇒ include FOLLOW(open_stmt') (to be determined)</li>
+                    </ul>
+                    <p>Assume temporary FOLLOW(open_stmt') = X</p>
+                    <p>So far: <strong>FOLLOW(open_stmt) = {else, $}</strong></p>
+
+                    <h5>FOLLOW(open_stmt')</h5>
+                    <ul>
+                        <li>From open_stmt → if expr then matched_stmt open_stmt'</li>
+                        <ul>
+                            <li>⇒ FOLLOW(open_stmt) ⊆ FOLLOW(open_stmt')</li>
+                        </ul>
+                        <li>From open_stmt' → else open_stmt open_stmt'</li>
+                        <ul>
+                            <li>⇒ FOLLOW(open_stmt') ⊆ FOLLOW(open_stmt')</li>
+                        </ul>
+                        <li>Recursive, but no new terminals</li>
+                    </ul>
+
+                    <p>Eventually: <strong>FOLLOW(open_stmt') = FOLLOW(open_stmt) = {else, $}</strong></p>
+                </article>
+
+                <article>
+                    <h4>9.4.4 Final FIRST and FOLLOW Table</h4>
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Non-terminal</th>
+                                    <th>FIRST</th>
+                                    <th>FOLLOW</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>stmt</strong></td>
+                                    <td>{if, other}</td>
+                                    <td>{$}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>matched_stmt</strong></td>
+                                    <td>{if, other}</td>
+                                    <td>{else, $}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>open_stmt</strong></td>
+                                    <td>{if}</td>
+                                    <td>{else, $}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>open_stmt'</strong></td>
+                                    <td>{else, ε}</td>
+                                    <td>{else, $}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </article>
+
+                <article>
+                    <h4>9.4.5 Why This Step is Crucial</h4>
+                    <ul>
+                        <li>Used directly to build the LL(1) parsing table</li>
+                        <li>Validates correctness and determinism of the grammar</li>
+                        <li>Reveals any hidden ambiguity or conflict via FIRST/FOLLOW overlap</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h3>9.5 Check LL(1) Conditions — Step-by-Step</h3>
+                    <p>To validate that the grammar is LL(1), we must confirm that at every choice point for a non-terminal, the parser can make a <strong>unique decision</strong> using a <strong>single lookahead symbol</strong>.</p>
+                    <p>This is done using <strong>FIRST</strong> and <strong>FOLLOW</strong> sets from step 9.4.</p>
+                </article>
+
+                <article>
+                    <h4>9.5.1 LL(1) Conditions to Check</h4>
+                    <p>For each non-terminal <code>A</code> with multiple productions <code>A → α | β | ...</code>:</p>
+                    <ol>
+                        <li><strong>Condition 1:</strong> FIRST(α) ∩ FIRST(β) = ∅</li>
+                        <li><strong>Condition 2:</strong> If ε ∈ FIRST(α), then FIRST(β) ∩ FOLLOW(A) = ∅</li>
+                    </ol>
+                    <p>If these conditions hold for all production choices, the grammar is LL(1).</p>
+                </article>
+
+                <article>
+                    <h4>9.5.2 Grammar</h4>
+                    <pre><code class="">
+stmt         → matched_stmt | open_stmt
+matched_stmt → if expr then matched_stmt else matched_stmt
+             | other
+open_stmt    → if expr then matched_stmt open_stmt'
+open_stmt'   → else open_stmt open_stmt' | ε
+</code></pre>
+                </article>
+
+                <article>
+                    <h4>9.5.3 Step-by-Step LL(1) Check</h4>
+
+                    <h5>Check stmt → matched_stmt | open_stmt</h5>
+                    <ul>
+                        <li>FIRST(matched_stmt) = {if, other}</li>
+                        <li>FIRST(open_stmt) = {if}</li>
+                        <li>⇒ {if} ∩ {if, other} ≠ ∅ ❌</li>
+                        <li><strong>Conflict:</strong> Overlap on 'if' → violates Condition 1</li>
+                    </ul>
+                    <p>However, this is a <strong>false conflict</strong> because matched_stmt and open_stmt differ structurally, and parser can be rewritten using a single entry for 'if'. But in strict LL(1), this overlap is not allowed unless handled via factoring or lookahead.</p>
+
+                    <hr>
+
+                    <h5>Check matched_stmt → if ... | other</h5>
+                    <ul>
+                        <li>FIRST(if ...) = {if}</li>
+                        <li>FIRST(other) = {other}</li>
+                        <li>⇒ {if} ∩ {other} = ∅ ✅</li>
+                    </ul>
+
+                    <hr>
+
+                    <h5>Check open_stmt' → else open_stmt open_stmt' | ε</h5>
+                    <ul>
+                        <li>FIRST(else open_stmt open_stmt') = {else}</li>
+                        <li>FIRST(ε) = {ε}</li>
+                        <li>FOLLOW(open_stmt') = {else, $}</li>
+                        <li>⇒ {else} ∩ FOLLOW(open_stmt') = {else} ❌</li>
+                        <li><strong>Violates Condition 2</strong> because <code>ε</code> is in FIRST and FIRST(other alt) ∩ FOLLOW ≠ ∅</li>
+                    </ul>
+
+                    <p>This means the parser may not know whether to apply ε or else-rule upon seeing 'else' — ambiguity for predictive parser.</p>
+                </article>
+
+                <article>
+                    <h4>9.5.4 Final Verdict</h4>
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Non-terminal</th>
+                                    <th>Conflict?</th>
+                                    <th>Reason</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>stmt</td>
+                                    <td>❌</td>
+                                    <td>FIRST(matched_stmt) ∩ FIRST(open_stmt) = {if}</td>
+                                </tr>
+                                <tr>
+                                    <td>matched_stmt</td>
+                                    <td>✅</td>
+                                    <td>FIRSTs disjoint → {if} ∩ {other} = ∅</td>
+                                </tr>
+                                <tr>
+                                    <td>open_stmt'</td>
+                                    <td>❌</td>
+                                    <td>FIRST(else) ∩ FOLLOW(open_stmt') = {else}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <p>So while the grammar was made unambiguous and left-recursion free, it is <strong>not strictly LL(1)</strong> due to the FIRST/FOLLOW conflicts.</p>
+
+                    <h5>Possible Fix?</h5>
+                    <ul>
+                        <li><strong>Merge stmt → open_stmt only</strong> and handle matched_stmt structurally inside</li>
+                        <li><strong>Use parser with lookahead or semantic check</strong></li>
+                        <li>Or redesign <code>stmt</code> productions using <code>if_stmt</code> to split concern</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>9.5.5 Real Compiler Insight</h4>
+                    <ul>
+                        <li>Many real compilers use <strong>LR parsers</strong> or <strong>GLR parsers</strong> to handle such patterns</li>
+                        <li>Some use disambiguating rules like "else binds to nearest if"</li>
+                        <li>Still, LL(1) is useful in hand-written or simple parser cases</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h3>9.6 Build the Predictive Parsing Table — Step-by-Step</h3>
+                    <p>To construct the <strong>LL(1) Predictive Parsing Table</strong>, we use the FIRST and FOLLOW sets calculated in step 9.4 and validate their entries using step 9.5. Each cell in the table is filled with a production rule according to these rules:</p>
+
+                    <h5>Table Construction Rules:</h5>
+                    <ol>
+                        <li>For each production <code>A → α</code>, and for each terminal <code>a ∈ FIRST(α)</code>, add <code>A → α</code> to <code>TABLE[A, a]</code></li>
+                        <li>If ε ∈ FIRST(α), then for each terminal <code>b ∈ FOLLOW(A)</code>, add <code>A → α</code> to <code>TABLE[A, b]</code></li>
+                    </ol>
+                </article>
+
+                <article>
+                    <h4>9.6.1 Grammar Recap</h4>
+                    <pre><code class="">
+stmt         → matched_stmt | open_stmt
+matched_stmt → if expr then matched_stmt else matched_stmt
+             | other
+open_stmt    → if expr then matched_stmt open_stmt'
+open_stmt'   → else open_stmt open_stmt' | ε
+</code></pre>
+                    <p>Start Symbol: <code>stmt</code></p>
+                </article>
+
+                <article>
+                    <h4>9.6.2 FIRST and FOLLOW (from step 9.4)</h4>
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Non-terminal</th>
+                                    <th>FIRST</th>
+                                    <th>FOLLOW</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>stmt</td>
+                                    <td>{if, other}</td>
+                                    <td>{$}</td>
+                                </tr>
+                                <tr>
+                                    <td>matched_stmt</td>
+                                    <td>{if, other}</td>
+                                    <td>{else, $}</td>
+                                </tr>
+                                <tr>
+                                    <td>open_stmt</td>
+                                    <td>{if}</td>
+                                    <td>{else, $}</td>
+                                </tr>
+                                <tr>
+                                    <td>open_stmt'</td>
+                                    <td>{else, ε}</td>
+                                    <td>{else, $}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </article>
+
+                <article>
+                    <h4>9.6.3 Fill the Predictive Parsing Table</h4>
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Non-terminal</th>
+                                    <th>if</th>
+                                    <th>other</th>
+                                    <th>else</th>
+                                    <th>$</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>stmt</strong></td>
+                                    <td>stmt → matched_stmt<br>stmt → open_stmt ⚠️</td>
+                                    <td>stmt → matched_stmt</td>
+                                    <td>error</td>
+                                    <td>error</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>matched_stmt</strong></td>
+                                    <td>matched_stmt → if expr then matched_stmt else matched_stmt</td>
+                                    <td>matched_stmt → other</td>
+                                    <td>error</td>
+                                    <td>error</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>open_stmt</strong></td>
+                                    <td>open_stmt → if expr then matched_stmt open_stmt'</td>
+                                    <td>error</td>
+                                    <td>error</td>
+                                    <td>error</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>open_stmt'</strong></td>
+                                    <td>error</td>
+                                    <td>error</td>
+                                    <td>open_stmt' → else open_stmt open_stmt'</td>
+                                    <td>open_stmt' → ε</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h5>⚠️ LL(1) Conflict at [stmt, if]</h5>
+                    <p>Due to overlapping FIRST sets of <code>matched_stmt</code> and <code>open_stmt</code>. This is what makes the grammar non-LL(1).</p>
+                </article>
+
+                <article>
+                    <h4>9.6.4 Final Notes</h4>
+                    <ul>
+                        <li>Except for <code>stmt</code>, all non-terminals are LL(1) compliant</li>
+                        <li><strong>Conflicting entry</strong> in [stmt, if] → more than one production applicable</li>
+                        <li>Resolved using:
+                            <ul>
+                                <li>Grammar transformation (refactor <code>stmt</code>)</li>
+                                <li>Or switch to a more powerful parser (e.g. LL(k), LR)</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>9.6.5 Real-World Compiler Relevance</h4>
+                    <ul>
+                        <li>Parsing table is used in recursive-descent parser to drive parsing logic</li>
+                        <li>Conflicts indicate a need to redesign grammar or increase lookahead</li>
+                        <li>In tools like ANTLR, this table is built behind the scenes but essential to parser generation</li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h3>9.7 Simulate Parsing with Stack — Step-by-Step</h3>
+                    <p>We simulate how a predictive parser uses the parsing table and a <strong>stack</strong> to parse an input string. The parser maintains:</p>
+                    <ul>
+                        <li>A <strong>stack</strong> initialized with the start symbol and <code>$</code> (end-marker)</li>
+                        <li>An <strong>input buffer</strong> containing tokens followed by <code>$</code></li>
+                        <li>A <strong>parsing table</strong> to decide which production to apply based on [top of stack, lookahead]</li>
+                    </ul>
+                    <p>We simulate this using our grammar from step 9.6.</p>
+                </article>
+
+                <article>
+                    <h4>9.7.1 Grammar Recap (Final Form)</h4>
+                    <pre><code class="">
+stmt         → matched_stmt | open_stmt
+matched_stmt → if expr then matched_stmt else matched_stmt
+             | other
+open_stmt    → if expr then matched_stmt open_stmt'
+open_stmt'   → else open_stmt open_stmt' | ε
+</code></pre>
+                </article>
+
+                <article>
+                    <h4>9.7.2 Input String to Parse</h4>
+                    <pre><code class="">
+if expr then other else other $
+</code></pre>
+
+                    <p>Token stream: <code>if, expr, then, other, else, other, $</code></p>
+                </article>
+
+                <article>
+                    <h4>9.7.3 Stack Parsing Simulation Table</h4>
+                    <p>Start stack: <code>[stmt, $]</code></p>
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Step</th>
+                                    <th>Stack</th>
+                                    <th>Input</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td>stmt, $</td>
+                                    <td>if expr then other else other $</td>
+                                    <td>stmt → matched_stmt (from table)</td>
+                                </tr>
+                                <tr>
+                                    <td>2</td>
+                                    <td>matched_stmt, $</td>
+                                    <td>if expr then other else other $</td>
+                                    <td>matched_stmt → if expr then matched_stmt else matched_stmt</td>
+                                </tr>
+                                <tr>
+                                    <td>3</td>
+                                    <td>if, expr, then, matched_stmt, else, matched_stmt, $</td>
+                                    <td>if expr then other else other $</td>
+                                    <td>Match if</td>
+                                </tr>
+                                <tr>
+                                    <td>4</td>
+                                    <td>expr, then, matched_stmt, else, matched_stmt, $</td>
+                                    <td>expr then other else other $</td>
+                                    <td>Match expr</td>
+                                </tr>
+                                <tr>
+                                    <td>5</td>
+                                    <td>then, matched_stmt, else, matched_stmt, $</td>
+                                    <td>then other else other $</td>
+                                    <td>Match then</td>
+                                </tr>
+                                <tr>
+                                    <td>6</td>
+                                    <td>matched_stmt, else, matched_stmt, $</td>
+                                    <td>other else other $</td>
+                                    <td>matched_stmt → other</td>
+                                </tr>
+                                <tr>
+                                    <td>7</td>
+                                    <td>other, else, matched_stmt, $</td>
+                                    <td>other else other $</td>
+                                    <td>Match other</td>
+                                </tr>
+                                <tr>
+                                    <td>8</td>
+                                    <td>else, matched_stmt, $</td>
+                                    <td>else other $</td>
+                                    <td>Match else</td>
+                                </tr>
+                                <tr>
+                                    <td>9</td>
+                                    <td>matched_stmt, $</td>
+                                    <td>other $</td>
+                                    <td>matched_stmt → other</td>
+                                </tr>
+                                <tr>
+                                    <td>10</td>
+                                    <td>other, $</td>
+                                    <td>other $</td>
+                                    <td>Match other</td>
+                                </tr>
+                                <tr>
+                                    <td>11</td>
+                                    <td>$</td>
+                                    <td>$</td>
+                                    <td>Parsing successful ✅</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </article>
+
+                <article>
+                    <h4>9.7.4 Key Observations</h4>
+                    <ul>
+                        <li>Each step used a single production from the parsing table</li>
+                        <li>Stack mirrors the expected derivation</li>
+                        <li>No backtracking or ambiguity occurred</li>
+                        <li>Parser terminated successfully when both input and stack reached <code>$</code></li>
+                    </ul>
+                </article>
+
+                <article>
+                    <h4>9.7.5 Real-World Use</h4>
+                    <ul>
+                        <li>Recursive-descent parsers simulate this logic with real function calls instead of a stack</li>
+                        <li>Compiler frontend uses such simulation to parse programs token-by-token</li>
+                        <li>Errors are caught by mismatches in top-of-stack vs input lookahead</li>
+                    </ul>
+                </article>
+
+            </article>
+
+        </main>
+
+        <script> copyright("all"); </script>
+
+    </body>
+
+</html>
