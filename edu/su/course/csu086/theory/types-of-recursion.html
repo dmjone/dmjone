@@ -1,0 +1,551 @@
+<!-------------------------- © 2007 - present, dmj.one and contributors. ----------------------------------
+   Part of the dmjone project. Licensed under the GNU AGPL. Provided as-is, without warranty of any kind. 
+-------------------- Redistribution and modifications must retain this notice. --------------------------->
+
+
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+    <!--<![endif]-->
+
+    <head>
+        <script src="/js/edu_su_common.js"></script>
+        <noscript>
+            <style>
+                html,
+                body {
+                    margin: 0;
+                    overflow: hidden;
+                }
+            </style>
+            <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+        </noscript>
+
+        <title>Recursion in Grammar - CSU086 - Shoolini U</title>
+        <meta name="description" content="An in-depth article on recursion in formal grammars, covering direct, indirect, left, and right recursion with practical implications for compiler design and parser implementation. Includes algorithms for eliminating left recursion and transforming grammars for top-down parsing.">
+
+        <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "TechArticle",
+          "headline": "Recursion in Grammar",
+          "description": "An in-depth article on recursion in formal grammars, covering direct, indirect, left, and right recursion with practical implications for compiler design and parser implementation. Includes algorithms for eliminating left recursion and transforming grammars for top-down parsing.",
+          "dateModified": "2025-03-20",
+          "author": [
+            {
+              "@type": "Person",
+              "name": "Divya Mohan",
+              "url": "https://dmj.one/resume/",
+              "sameAs": [
+                "https://www.credly.com/users/divyamohan1993",
+                "https://www.linkedin.com/in/divyamohan1993/",
+                "https://hackerrank.com/divyamohan1993",
+                "https://www.coursera.org/learner/divyamohan1993"
+              ]
+            }
+          ],
+          "publisher": {
+            "@type": "EducationalOrganization",
+            "name": "dmj.one",
+            "url": "https://dmj.one"
+          },
+          "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https://dmj.one/edu/su/course/csu2104/theory/types-of-recursion"
+          },
+          "keywords": [
+            "Recursion in Grammar",
+            "Direct Recursion",
+            "Indirect Recursion",
+            "Left Recursion",
+            "Right Recursion",
+            "Mutual Recursion",
+            "Recursive Descent Parsing",
+            "Algorithm 4.19",
+            "Compiler Design",
+            "Parsing Techniques"
+          ],
+          "articleSection": [
+            "1. Introduction to Recursion in Grammar",
+            "1.1 What is Recursion in Grammar?",
+            "1.2 Why is Recursion Needed?",
+            "1.3 Direct Recursion",
+            "1.4 Indirect Recursion",
+            "2. Compiler-Specific Types of Recursion",
+            "2.1 Left Recursion (Grammar)",
+            "2.2 Right Recursion",
+            "2.3 Mutual Recursion",
+            "3. Application-Based Recursion",
+            "3.1 Recursive Descent Parsing",
+            "3.2 Backtracking Recursion",
+            "3.3 Divide and Conquer Recursion",
+            "4. Conversion from Left to Right Recursion",
+            "4.1 Methods to Eliminate Left Recursion",
+            "4.2 Examples from the Book",
+            "4.3 Real-World Analogy",
+            "5. Steps to Change a Left-Recursive Grammar to Right-Recursive Grammar"
+          ],
+          "isAccessibleForFree": true,
+          "inLanguage": "en-US",
+          "license": "https://www.gnu.org/licenses/agpl-3.0.en.html"
+        }
+        </script>
+
+
+        <meta name="author" content="Divya Mohan">
+        <meta name="robots" content="index, follow">
+
+        <!-- Open Graph for Social Media -->
+        <meta property="og:image" content="/logo.png">
+        <meta property="og:type" content="article">
+
+        <!-- Twitter Cards -->
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:site" content="@divyamohan1993">
+        <meta name="twitter:creator" content="@divyamohan1993">
+        <meta name="twitter:image" content="/logo.png">
+
+        <!-- Mobile Responsiveness -->
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js" integrity="sha512-sHSNLECRJSK+BFs7E8DiFc6pf6n90bLI85Emiw1jhreduZhK3VXgq9l4kAt9eTIHYAcuQBKHL01QKs4/3Xgl8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js" integrity="sha512-iWiuBS5nt6r60fCz26Nd0Zqe0nbk1ZTIQbl3Kv7kYsX+yKMUFHzjaH2+AnM6vp2Xs+gNmaBAVWJjSmuPw76Efg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                renderMathInElement(document.body, {
+                    // customised options
+                    // • auto-render specific keys, e.g.:
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false },
+                        { left: '\\(', right: '\\)', display: false },
+                        { left: '\\[', right: '\\]', display: true }
+                    ],
+                    // • rendering keys, e.g.:
+                    throwOnError: false
+                });
+            });
+        </script> -->
+
+        <!-- <style>
+            main ul {
+                list-style-type: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            main ul li {
+                margin: 0;
+                padding: 0;
+            }
+        </style> -->
+
+
+
+
+    </head>
+
+    <body>
+
+        <script> header_author("dm"); </script>
+
+        <main>
+            <article class="agen-tableofcontents">
+                <h2 class="text-center">
+                    Recursion in Grammar
+                </h2>
+                <div class="d-none contentdate">2025, March 20</div>
+            </article>
+
+            <article>
+                <h3>1. Introduction to Recursion in Grammar</h3>
+                <p>Recursion in grammar allows a nonterminal to eventually refer back to itself. This recursive property enables the definition of infinitely large language constructs using finite rules. It's the backbone of how compilers understand nested or repeated structures.</p>
+            </article>
+
+            <article>
+                <h4>1.1 What is Recursion in Grammar?</h4>
+                <p>A grammar is <strong>recursive</strong> if a nonterminal derives a string that includes itself. This can happen directly or through other nonterminals. For instance:</p>
+                <pre><code class="">
+A → A α | β
+</code></pre>
+                <p>Here, <code>A</code> refers to itself in the first production—this is recursion.</p>
+            </article>
+
+            <article>
+                <h4>1.2 Why is Recursion Needed?</h4>
+                <p>Recursion is essential to model constructs like:</p>
+                <ul>
+                    <li><strong>Arithmetic expressions</strong>: <code>expr → expr + term | term</code></li>
+                    <li><strong>Nested statements</strong>: <code>stmt → if expr then stmt else stmt</code></li>
+                    <li><strong>Function calls or lists</strong>: <code>args → arg, args | arg</code></li>
+                </ul>
+                <p>Imagine trying to write a grammar that supports an infinite number of nested parentheses without recursion—you'd need infinite rules. Recursion handles this elegantly.</p>
+            </article>
+
+            <article>
+                <h4>1.3 Direct Recursion</h4>
+                <p>When a nonterminal directly calls itself on the left side of its production, it's called <strong>direct left recursion</strong>.</p>
+                <pre><code class="">
+E → E + T | T
+</code></pre>
+                <p>This says that expression <code>E</code> can call itself directly—it's the first symbol on the right. This form creates infinite recursion in top-down parsers unless transformed.</p>
+
+                <h5>1.3.1 Problem</h5>
+                <p>In recursive-descent parsers, applying a rule like <code>E → E + T</code> calls the <code>E</code> function again, which loops infinitely without consuming input.</p>
+
+                <h5>1.3.2 Elimination Technique</h5>
+                <p>To convert left recursion to a right-recursive form:</p>
+                <pre><code class="">
+E  → T E'
+E' → + T E' | ε
+</code></pre>
+
+                <h5>1.3.3 Real World Scenario</h5>
+                <p>Suppose you're building a calculator. Users can write: <code>3 + 4 + 5</code>. Left recursion helps define the repeating <code>+</code> operations. But to avoid infinite recursion in the parser, we rewrite it using helper rules like <code>E'</code>.</p>
+            </article>
+
+            <article>
+                <h4>1.4 Indirect Recursion</h4>
+                <p>When a nonterminal indirectly refers to itself through other rules, it's <strong>indirect recursion</strong>.</p>
+                <pre><code class="">
+S → A a | b
+A → A c | S d | ε
+</code></pre>
+                <p>Here, <code>S</code> calls <code>A</code>, which again calls <code>S</code>. So <code>S → A a → S d a</code>. Even though it's not direct, it's still recursive.</p>
+
+                <h5>1.4.1 Handling Indirect Recursion</h5>
+                <p>Use Algorithm 4.19 (from the Dragon Book) to eliminate indirect recursion systematically:</p>
+                <pre><code class="">
+1. Arrange nonterminals A1, A2, ..., An
+2. For i = 1 to n:
+    For j = 1 to i-1:
+        Replace Ai → Aj γ with productions using Aj's current rules
+    Eliminate direct recursion among Ai productions
+</code></pre>
+
+                <h5>1.4.2 Real World Scenario</h5>
+                <p>Consider nested HTML tags where one tag opens another, which may again nest the original. This indirect structure mimics indirect recursion. The parser must handle such nesting correctly by eliminating indirect loops.</p>
+            </article>
+
+            <article>
+                <h3>2. Compiler-Specific Types of Recursion</h3>
+                <p>In grammar design for compilers, recursion defines how nonterminals derive patterns. It governs the structure and parse strategy. Understanding these recursion types helps in building LL parsers (top-down) or LR parsers (bottom-up).</p>
+            </article>
+
+            <article>
+                <h4>2.1 Left Recursion (Grammar)</h4>
+                <p><strong>Definition:</strong> A grammar rule is left-recursive if a nonterminal refers to itself as the leftmost symbol in its production.</p>
+                <pre><code class="">
+E → E + T | T
+</code></pre>
+                <p>Recursive-descent parsers get stuck in infinite loops with such rules. That’s why left recursion is problematic for top-down parsers.</p>
+
+                <h5>2.1.1 Problem</h5>
+                <p>Suppose you're parsing <code>3 + 4 + 5</code> using <code>E → E + T</code>. The parser keeps calling <code>E()</code> on <code>E</code> without consuming any tokens, leading to infinite recursion.</p>
+
+                <h5>2.1.2 Elimination</h5>
+                <p>Convert to right-recursion using a helper rule:</p>
+                <pre><code class="">
+E  → T E'
+E' → + T E' | ε
+</code></pre>
+
+                <h5>2.1.3 Real-World Analogy</h5>
+                <p>Imagine Russian nesting dolls. Left recursion tries to insert a doll into itself first—impossible. Right recursion adds one doll inside the previous one, which works structurally.</p>
+            </article>
+
+            <article>
+                <h4>2.2 Right Recursion</h4>
+                <p><strong>Definition:</strong> A production is right-recursive if the nonterminal appears at the end of its rule.</p>
+                <pre><code class="">
+A → α A | ε
+</code></pre>
+                <p>Right recursion works well with top-down parsers since it consumes tokens before calling the next instance.</p>
+
+                <h5>2.2.1 Parse Tree Shape</h5>
+                <p>Right recursion builds trees leaning to the right, useful for expressions in postfix form (reverse Polish notation).</p>
+
+                <h5>2.2.2 Real-World Analogy</h5>
+                <p>Think of a stack of plates being placed one after another. Each new plate is added after placing the previous—sequential and safe, similar to right recursion.</p>
+
+                <h5>2.2.3 Code Example</h5>
+                <pre><code class="">
+A → x A | ε
+
+# Derives:
+x x x ... x ε
+</code></pre>
+            </article>
+
+            <article>
+                <h4>2.3 Mutual Recursion (a.k.a. Indirect Recursion)</h4>
+                <p><strong>Definition:</strong> A grammar has mutual (indirect) recursion if two or more nonterminals refer to each other in a recursive cycle.</p>
+                <pre><code class="">
+A → B α
+B → A β | γ
+</code></pre>
+                <p>This is equivalent to A eventually deriving A through B: <code>A → B α → A β α</code>.</p>
+
+                <h5>2.3.1 Problem</h5>
+                <p>Top-down parsers face ambiguity in selecting production rules without infinite regress unless recursion is removed.</p>
+
+                <h5>2.3.2 Elimination Algorithm (Algorithm 4.19)</h5>
+                <pre><code class="">
+1. List all nonterminals A1, A2, ..., An
+2. For i = 1 to n:
+   For j = 1 to i-1:
+     Replace Ai → Aj γ with Aj’s productions
+   Eliminate direct recursion in Ai
+</code></pre>
+                <p>This transforms mutually recursive rules into non-recursive or right-recursive ones.</p>
+
+                <h5>2.3.3 Real-World Analogy</h5>
+                <p>Imagine two friends who keep asking each other what to do next. Without breaking the cycle and making one decide, the conversation never ends—this is indirect recursion in grammar.</p>
+            </article>
+
+            <article>
+                <h3>3. Application-Based Recursion</h3>
+                <p>These recursion types are not only conceptual—they directly determine how parsers are implemented and optimized. They form the backbone of real parser behavior in compilers and interpreters.</p>
+            </article>
+
+            <article>
+                <h4>3.1 Recursive Descent Parsing</h4>
+                <p><strong>Definition:</strong> A top-down parsing technique where each nonterminal is implemented as a recursive function in the compiler.</p>
+
+                <h5>3.1.1 Pseudocode</h5>
+                <pre><code class="language-c">
+void A() {
+    choose an A → X1X2...Xk;
+    for (i = 1 to k)
+        if (Xi is nonterminal) call Xi();
+        else if (Xi matches current input symbol) advance input;
+        else error();
+}
+</code></pre>
+
+                <h5>3.1.2 Characteristics</h5>
+                <ul>
+                    <li>Uses one procedure per nonterminal</li>
+                    <li>Parses the input left to right, producing a leftmost derivation</li>
+                    <li>Backtracking may be required if the wrong rule is picked</li>
+                </ul>
+
+                <h5>3.1.3 Real-World Analogy</h5>
+                <p>Imagine following a decision tree for diagnosing a problem. You try one path, and if it doesn’t work, you backtrack and try another—this is recursive-descent in action.</p>
+            </article>
+
+            <article>
+                <h4>3.2 Backtracking Recursion</h4>
+                <p><strong>Definition:</strong> A form of recursion where upon failure, the parser returns to a previous state and tries an alternate production.</p>
+
+                <h5>3.2.1 Why it's needed</h5>
+                <ul>
+                    <li>Used when the grammar is ambiguous or lacks lookahead capabilities</li>
+                    <li>Often slow and inefficient—better replaced by predictive parsing</li>
+                </ul>
+
+                <h5>3.2.2 Modified Pseudocode (Backtracking)</h5>
+                <pre><code class="language-c">
+void A() {
+    save input pointer;
+    try production A → X1X2...;
+    if (error) restore input pointer and try next production;
+}
+</code></pre>
+
+                <h5>3.2.3 Real-World Analogy</h5>
+                <p>Trying a password from a list—each time you fail, you reset and try the next one. Inefficient but exhaustive.</p>
+
+                <h5>3.2.4 Drawback</h5>
+                <p>Highly inefficient for programming languages. More efficient tabular methods like Earley’s parser or CYK are used for such grammars.</p>
+            </article>
+
+            <article>
+                <h4>3.3 Divide and Conquer Recursion</h4>
+                <p><strong>Definition:</strong> This is a recursive technique where problems are broken into sub-problems that are solved independently and combined later.</p>
+
+                <h5>3.3.1 Role in Compilers</h5>
+                <p>This technique appears in:</p>
+                <ul>
+                    <li><strong>Syntax tree evaluation</strong> — Evaluating subexpressions recursively (like <code>3 + (2 * 4)</code>)</li>
+                    <li><strong>Code generation</strong> — Breaking expressions/statements into manageable parts</li>
+                    <li><strong>Optimization</strong> — Local optimizations applied recursively to subtrees</li>
+                </ul>
+
+                <h5>3.3.2 Real-World Analogy</h5>
+                <p>Like solving a jigsaw puzzle by solving smaller sections and merging them—efficient and parallelizable.</p>
+
+                <h5>3.3.3 Code Example</h5>
+                <pre><code class="language-python">
+def evaluate(expr):
+    if is_simple(expr):
+        return value(expr)
+    left, op, right = split(expr)
+    return apply(op, evaluate(left), evaluate(right))
+</code></pre>
+
+                <h5>3.3.4 Advantage</h5>
+                <p>Promotes modular, clean, and recursive solutions across the compiler pipeline: parsing, optimization, and code generation.</p>
+            </article>
+
+            <article>
+                <h3>4. Conversion from Left to Right Recursion</h3>
+                <p>To make grammars suitable for top-down parsing (like recursive-descent), left recursion must be eliminated. This process transforms left-recursive productions into right-recursive or iterative forms using helper nonterminals.</p>
+            </article>
+
+            <article>
+                <h4>4.1 Methods to Eliminate Left Recursion</h4>
+
+                <h5>4.1.1 Immediate Left Recursion</h5>
+                <p>Given a nonterminal <code>A</code> with productions:</p>
+                <pre><code class="">
+A → Aα₁ | Aα₂ | ... | β₁ | β₂ | ...
+</code></pre>
+                <p>Where <code>βᵢ</code> does not begin with <code>A</code>. We rewrite it as:</p>
+                <pre><code class="">
+A  → β₁ A' | β₂ A' | ...
+A' → α₁ A' | α₂ A' | ... | ε
+</code></pre>
+
+                <h5>4.1.2 General (Indirect) Left Recursion</h5>
+                <p>Use <strong>Algorithm 4.19</strong> from the book:</p>
+                <pre><code class="">
+Input: Grammar G without cycles or ε-productions
+Output: Grammar with no left recursion
+
+1. Arrange nonterminals A₁, A₂, ..., Aₙ
+2. For i = 1 to n:
+   a. For j = 1 to i - 1:
+      - Replace all productions of the form Ai → Aj γ
+        with Aj's current productions: γ₁, γ₂, ...
+   b. Eliminate immediate left recursion from Ai
+</code></pre>
+            </article>
+
+            <article>
+                <h4>4.2 Examples from the Book</h4>
+
+                <h5>4.2.1 Example 1: Expression Grammar</h5>
+                <pre><code class="">
+Original:
+E → E + T | T
+T → T * F | F
+F → ( E ) | id
+
+Eliminated:
+E  → T E'
+E' → + T E' | ε
+
+T  → F T'
+T' → * F T' | ε
+</code></pre>
+                <p>This transforms left-recursive arithmetic expressions into a right-recursive form.</p>
+
+                <h5>4.2.2 Example 2: Grammar (4.18)</h5>
+                <pre><code class="">
+Original:
+S → A a | b
+A → A c | S d | ε
+
+Apply Algorithm 4.19:
+A → A c | A a d | b d | ε
+
+Converted:
+S  → A a | b
+A  → b d A' | A'
+A' → c A' | a d A' | ε
+</code></pre>
+                <p>Left recursion across productions (indirect) is eliminated step-by-step.</p>
+
+                <h5>4.2.3 Example 3: With Semantic Actions</h5>
+                <pre><code class="">
+Original:
+E → E + T { print('+') }
+  | E - T { print('-') }
+  | T
+
+Transformed:
+E → T R
+R → + T { print('+') } R
+   | - T { print('-') } R
+   | ε
+</code></pre>
+                <p>Actions are treated as terminals and embedded during conversion.</p>
+            </article>
+
+            <article>
+                <h4>4.3 Real-World Analogy</h4>
+                <p>Left recursion is like trying to define a word using itself as the first word in its own definition. You get stuck. Rewriting to right recursion lets you finish the sentence before referring back—much like giving instructions step by step instead of looping back too early.</p>
+            </article>
+
+            <article>
+                <h3>5. Steps to Change a Left-Recursive Grammar to Right-Recursive Grammar</h3>
+                <p>We demonstrate the process using an example from the Dragon Book (Example 4.20), which hasn’t been previously explained. The grammar includes both indirect and immediate left recursion and uses Algorithm 4.19 to eliminate them.</p>
+            </article>
+
+            <article>
+                <h4>5.1 Original Grammar</h4>
+                <pre><code class="">
+S → A a | b
+A → A c | S d | ε
+</code></pre>
+                <p><strong>Observation:</strong> <code>S</code> indirectly recurses through <code>A</code>: <code>S → A a → S d a</code>. The grammar has indirect left recursion.</p>
+            </article>
+
+            <article>
+                <h4>5.2 Step-by-Step Elimination Using Algorithm 4.19</h4>
+
+                <h5>Step 1: Order Nonterminals</h5>
+                <p>Order them as: <code>S, A</code></p>
+
+                <h5>Step 2: For i = 1 (S)</h5>
+                <p><code>S</code> has no immediate or indirect recursion. Keep <code>S → A a | b</code> unchanged.</p>
+
+                <h5>Step 3: For i = 2 (A)</h5>
+                <p><code>A</code> has <code>S</code> on RHS via <code>A → S d</code>. Replace <code>S</code> with its productions:</p>
+                <pre><code class="">
+A → A c | A a d | b d | ε
+</code></pre>
+
+                <h5>Step 4: Separate Left-Recursive and Non-Left-Recursive Productions</h5>
+                <p>Group left-recursive (starts with <code>A</code>) and others:</p>
+                <ul>
+                    <li>Left-recursive: <code>A → A c</code>, <code>A → A a d</code></li>
+                    <li>Others: <code>A → b d</code>, <code>A → ε</code></li>
+                </ul>
+
+                <h5>Step 5: Apply Standard Left Recursion Removal</h5>
+                <p>Use helper nonterminal <code>A'</code>:</p>
+                <pre><code class="">
+A  → b d A' | A'
+A' → c A' | a d A' | ε
+</code></pre>
+            </article>
+
+            <article>
+                <h4>5.3 Final Converted Grammar</h4>
+                <pre><code class="">
+S  → A a | b
+A  → b d A' | A'
+A' → c A' | a d A' | ε
+</code></pre>
+
+                <h5>5.3.1 Parse Tree Shape</h5>
+                <p>This transformation ensures that recursive-descent parsers won’t fall into infinite loops and the grammar is suitable for LL(1) parsing.</p>
+            </article>
+
+            <article>
+                <h4>5.4 Real-World Analogy</h4>
+                <p>Imagine a person (S) getting a task done either by calling another person (A), or doing it directly (b). Now if A keeps handing the task back to S, they’ll keep bouncing the task forever. We make sure the task gets done linearly without cycles by rewriting how they handle the delegation (using A').</p>
+            </article>
+
+
+        </main>
+
+        <script> copyright("all"); </script>
+
+    </body>
+
+</html>

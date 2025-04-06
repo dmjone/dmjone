@@ -79,6 +79,38 @@ function get_menu_list(datetogen) {
                 date: "Thu April 03, 2025",
                 link: "assignment-1-recursive-descent-parser"
             },
+            {
+                title: "Types of Recursion",
+                desc: "Explore the different types of recursion in Compiler Design, including direct recursion, indirect recursion, and real-world applications.",
+                codetype: "Supporting Concepts",
+                readtime: 20,
+                date: "Thu March 20, 2025",
+                link: "types-of-recursion"
+            },
+            {
+                title: "Deterministic Context-Free Grammar",
+                desc: "Learn about deterministic context-free grammar in Compiler Design, including parsing techniques, applications, and real-world examples.",
+                codetype: "Supporting Concepts",
+                readtime: 20,
+                date: "Thu March 20, 2025",
+                link: "deterministic-context-free-grammar"
+            },
+            {
+                title: "Non-Deterministic Context-Free Grammar",
+                desc: "Explore non-deterministic context-free grammar in Compiler Design, including parsing techniques, applications, and real-world examples.",
+                codetype: "Supporting Concepts",
+                readtime: 20,
+                date: "Thu March 20, 2025",
+                link: "non-deterministic-context-free-grammar"
+            },
+            {
+                title: "How to make CFG Deterministic",
+                desc: "Learn how to make a context-free grammar deterministic in Compiler Design, including parsing techniques, applications, and real-world examples.",
+                codetype: "Supporting Concepts",
+                readtime: 20,
+                date: "Thu March 20, 2025",
+                link: "how-to-make-cfg-deterministic"
+            }
             // {
             //     title: "Intermediate Code Generation in Compiler Design",
             //     desc: "Understand the process of intermediate code generation in Compiler Design, including syntax trees, abstract syntax trees, three-address code, quadruples, and real-world applications.",

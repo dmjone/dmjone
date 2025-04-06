@@ -1,0 +1,427 @@
+<!-------------------------- © 2007 - present, dmj.one and contributors. ----------------------------------
+   Part of the dmjone project. Licensed under the GNU AGPL. Provided as-is, without warranty of any kind. 
+-------------------- Redistribution and modifications must retain this notice. --------------------------->
+
+
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+    <!--<![endif]-->
+
+    <head>
+        <script src="/js/edu_su_common.js"></script>
+        <noscript>
+            <style>
+                html,
+                body {
+                    margin: 0;
+                    overflow: hidden;
+                }
+            </style>
+            <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+        </noscript>
+
+        <title>Non-Deterministic Context-Free Grammar - CSU086 - Shoolini U</title>
+        <meta name="description" content="A comprehensive article exploring Non-Deterministic Context-Free Grammars (CFGs), highlighting differences from deterministic CFGs, identifying sources of non-determinism, and explaining techniques like left factoring and recursion elimination to make grammars suitable for parsing.">
+
+        <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "TechArticle",
+          "headline": "Non-Deterministic Context-Free Grammar",
+          "description": "A comprehensive article exploring Non-Deterministic Context-Free Grammars (CFGs), highlighting differences from deterministic CFGs, identifying sources of non-determinism, and explaining techniques like left factoring and recursion elimination to make grammars suitable for parsing.",
+          "dateModified": "2025-03-20",
+          "author": [
+            {
+              "@type": "Person",
+              "name": "Divya Mohan",
+              "url": "https://dmj.one/resume/",
+              "sameAs": [
+                "https://www.credly.com/users/divyamohan1993",
+                "https://www.linkedin.com/in/divyamohan1993/",
+                "https://hackerrank.com/divyamohan1993",
+                "https://www.coursera.org/learner/divyamohan1993"
+              ]
+            }
+          ],
+          "publisher": {
+            "@type": "EducationalOrganization",
+            "name": "dmj.one",
+            "url": "https://dmj.one"
+          },
+          "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https://dmj.one/edu/su/course/csu086/theory/non-deterministic-context-free-grammar"
+          },
+          "keywords": [
+            "Context-Free Grammar",
+            "Non-Deterministic Parsing",
+            "Ambiguity in Grammars",
+            "Recursive Descent Parsing",
+            "Left Recursion",
+            "Left Factoring",
+            "Top-Down Parsing",
+            "Bottom-Up Parsing",
+            "Predictive Parsing",
+            "Compiler Design"
+          ],
+          "articleSection": [
+            "1. Understanding Non-Deterministic CFGs",
+            "2. Identifying and Handling Non-Determinism",
+            "3. Step-by-Step Left Factoring",
+            "4. Practical Applications"
+          ],
+          "isAccessibleForFree": true,
+          "inLanguage": "en-US",
+          "license": "https://www.gnu.org/licenses/agpl-3.0.en.html"
+        }
+        </script>
+
+
+        <meta name="author" content="Divya Mohan">
+        <meta name="robots" content="index, follow">
+
+        <!-- Open Graph for Social Media -->
+        <meta property="og:image" content="/logo.png">
+        <meta property="og:type" content="article">
+
+        <!-- Twitter Cards -->
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:site" content="@divyamohan1993">
+        <meta name="twitter:creator" content="@divyamohan1993">
+        <meta name="twitter:image" content="/logo.png">
+
+        <!-- Mobile Responsiveness -->
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js" integrity="sha512-sHSNLECRJSK+BFs7E8DiFc6pf6n90bLI85Emiw1jhreduZhK3VXgq9l4kAt9eTIHYAcuQBKHL01QKs4/3Xgl8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js" integrity="sha512-iWiuBS5nt6r60fCz26Nd0Zqe0nbk1ZTIQbl3Kv7kYsX+yKMUFHzjaH2+AnM6vp2Xs+gNmaBAVWJjSmuPw76Efg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                renderMathInElement(document.body, {
+                    // customised options
+                    // • auto-render specific keys, e.g.:
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false },
+                        { left: '\\(', right: '\\)', display: false },
+                        { left: '\\[', right: '\\]', display: true }
+                    ],
+                    // • rendering keys, e.g.:
+                    throwOnError: false
+                });
+            });
+        </script> -->
+
+        <!-- <style>
+            main ul {
+                list-style-type: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            main ul li {
+                margin: 0;
+                padding: 0;
+            }
+        </style> -->
+
+
+
+
+    </head>
+
+    <body>
+
+        <script> header_author("dm"); </script>
+
+        <main>
+            <article class="agen-tableofcontents">
+                <h2 class="text-center">
+                    Non-Deterministic Context-Free Grammar
+                </h2>
+                <div class="d-none contentdate">2025, March 20</div>
+            </article>
+
+            <article>
+                <h3>1. Understanding Non-Deterministic CFGs</h3>
+
+                <h4>1.1 What is a Non-Deterministic Context-Free Grammar?</h4>
+                <p>A Context-Free Grammar (CFG) is <strong>non-deterministic</strong> if a parser cannot uniquely decide which production rule to apply based on the current input and the grammar state.</p>
+                <p>In simple terms, the parser stands at a fork with multiple roads and no clear signpost — it doesn’t know which rule will lead to a successful parse without trying all options.</p>
+
+                <h5>1.1.1 Real-World Analogy</h5>
+                <p>Imagine a voice assistant trying to interpret "Book a table". Should it book a restaurant table or reserve a spot at a library? Without additional context (lookahead), it's non-deterministic.</p>
+
+                <h4>1.2 Why is it Needed?</h4>
+                <p>Languages like natural languages or ambiguous programming syntax often require expressive grammars that cannot always be made deterministic.</p>
+                <ul>
+                    <li><strong>Compact Design</strong>: Non-deterministic grammars can describe complex syntax with fewer rules.</li>
+                    <li><strong>Real Language Support</strong>: Some constructs (like the "dangling else") naturally require non-determinism for complete expression.</li>
+                </ul>
+
+                <h4>1.3 Deterministic vs Non-Deterministic CFGs</h4>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>Aspect</th>
+                                <th>Deterministic CFG</th>
+                                <th>Non-Deterministic CFG</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Parsing Decision</td>
+                                <td>Single production chosen based on input</td>
+                                <td>Multiple productions may apply</td>
+                            </tr>
+                            <tr>
+                                <td>Parsing Speed</td>
+                                <td>Fast (linear)</td>
+                                <td>Slow (may require backtracking or lookahead)</td>
+                            </tr>
+                            <tr>
+                                <td>Examples</td>
+                                <td>LL(1), LR(1) grammars</td>
+                                <td>Ambiguous grammars, natural languages</td>
+                            </tr>
+                            <tr>
+                                <td>Parser Implementation</td>
+                                <td>Simple and efficient</td>
+                                <td>Complex, needs more logic or power</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </article>
+
+            <article>
+                <h3>2. Identifying and Handling Non-Determinism</h3>
+
+                <h4>2.1 Sources of Non-Determinism</h4>
+                <ul>
+                    <li><strong>Ambiguity</strong>: More than one parse tree for a string</li>
+                    <li><strong>Common Prefix</strong>: Multiple rules start with the same symbols (left common)</li>
+                    <li><strong>Left Recursion</strong>: Rules like A → Aα cause infinite recursion in top-down parsers</li>
+                </ul>
+
+                <h4>2.2 Eliminating Ambiguity (when possible)</h4>
+                <p>Ambiguity cannot be completely eliminated from all CFGs. However, rewriting helps in special cases:</p>
+
+                <h5>2.2.1 Example: Dangling Else Ambiguity</h5>
+                <pre><code class="language-auto">stmt → if expr then stmt
+     | if expr then stmt else stmt
+     | other</code></pre>
+
+                <p>This grammar is ambiguous. Solution:</p>
+                <pre><code class="language-auto">stmt → matched_stmt | open_stmt
+
+matched_stmt → if expr then matched_stmt else matched_stmt | other
+open_stmt → if expr then stmt | if expr then matched_stmt else open_stmt</code></pre>
+                <p>This ensures every <code>else</code> pairs with the nearest unmatched <code>then</code>&#8203;:contentReference[oaicite:0]{index=0}.</p>
+
+                <h4>2.3 Left Factoring</h4>
+                <p>Used to delay decision-making until enough input is seen.</p>
+                <pre><code class="language-auto">stmt → if expr then stmt
+     | if expr then stmt else stmt</code></pre>
+
+                <p>Left-factored:</p>
+                <pre><code class="language-auto">stmt → if expr then stmt stmt'
+stmt' → else stmt | ε</code></pre>
+
+                <p>This transformation enables predictive parsing&#8203;:contentReference[oaicite:1]{index=1}.</p>
+
+                <h4>2.4 Eliminating Left Recursion</h4>
+                <p>Recursive descent parsers fail on left recursion. General transformation:</p>
+
+                <h5>2.4.1 Rule Transformation</h5>
+                <p>Given:</p>
+                <pre><code class="language-auto">A → Aα | β</code></pre>
+                <p>Transform to:</p>
+                <pre><code class="language-auto">A → βA'
+A' → αA' | ε</code></pre>
+
+                <h5>2.4.2 Algorithm</h5>
+                <p><strong>Algorithm 4.19</strong> handles indirect and direct left recursion:</p>
+                <pre><code class="language-auto">
+1. Order nonterminals A₁, A₂, ..., Aₙ
+2. for i = 1 to n
+    for j = 1 to i-1
+        Replace Aᵢ → Aⱼγ with Aᵢ → δγ for all Aⱼ → δ
+    Eliminate immediate left recursion on Aᵢ
+</code></pre>
+
+                <h5>2.4.3 Example</h5>
+                <p>Given:</p>
+                <pre><code class="language-auto">
+S → Aa | b
+A → Ac | Sd | ε
+</code></pre>
+                <p>Final grammar after removing left recursion:</p>
+                <pre><code class="language-auto">
+S → Aa | b
+A → bd A' | A'
+A' → c A' | ad A' | ε
+</code></pre>
+                <p>Now it's ready for top-down parsing&#8203;:contentReference[oaicite:2]{index=2}.</p>
+            </article>
+
+            <article>
+                <h3>3. Step-by-Step Left Factoring</h3>
+
+                <h4>3.1 Purpose of Left Factoring</h4>
+                <p>Left factoring is a transformation applied to grammars to make them suitable for predictive parsing. When two or more productions for a non-terminal begin with the same symbols, we delay decision-making by factoring the common prefix out.</p>
+
+                <h4>3.2 Left Factoring Algorithm (Book Algorithm 4.21)</h4>
+                <p>For a non-terminal A with productions:</p>
+                <pre><code class="language-auto">A → αβ₁ | αβ₂ | ... | αβₙ | γ</code></pre>
+                <p>Where <code>α</code> is the longest common prefix, the left-factored grammar becomes:</p>
+                <pre><code class="language-auto">A → αA'
+A' → β₁ | β₂ | ... | βₙ
+A → γ (if γ doesn't start with α)</code></pre>
+                <p>Repeat this until no two alternatives for a non-terminal share a prefix&#8203;:contentReference[oaicite:0]{index=0}.</p>
+
+                <h4>3.3 Example 1: Dangling-Else Grammar</h4>
+                <pre><code class="language-auto">S → if E then S
+  | if E then S else S
+  | a
+E → b</code></pre>
+                <p><strong>Step-by-step left factoring:</strong></p>
+                <ol>
+                    <li>Find common prefix: <code>if E then S</code></li>
+                    <li>Factor it out into a new non-terminal <code>S'</code></li>
+                </ol>
+                <pre><code class="language-auto">S → if E then S S' | a
+S' → else S | ε
+E → b</code></pre>
+                <p>This form defers the decision until after <code>if E then S</code> is processed&#8203;:contentReference[oaicite:1]{index=1}.</p>
+
+                <h4>3.4 Example 2: Abstract Grammar for Regular Expressions</h4>
+                <pre><code class="language-auto">
+rexpr → rexpr + rterm
+       | rterm
+rterm → rterm rfactor
+       | rfactor
+rfactor → rfactor *
+        | rprimary
+rprimary → a
+         | b
+</code></pre>
+
+                <h5>Step-by-step Left Factoring for <code>rexpr</code></h5>
+                <ul>
+                    <li>Common prefix: <code>rexpr</code></li>
+                    <li>Rewrite:</li>
+                </ul>
+                <pre><code class="language-auto">
+rexpr → rterm rexpr'
+rexpr' → + rterm rexpr' | ε
+</code></pre>
+
+                <h5>For <code>rterm</code> and <code>rfactor</code></h5>
+                <pre><code class="language-auto">
+rterm → rfactor rterm'
+rterm' → rfactor rterm' | ε
+
+rfactor → rprimary rfactor'
+rfactor' → * rfactor' | ε
+</code></pre>
+
+                <h5>Final Left-Factored Grammar</h5>
+                <pre><code class="language-auto">
+rexpr → rterm rexpr'
+rexpr' → + rterm rexpr' | ε
+
+rterm → rfactor rterm'
+rterm' → rfactor rterm' | ε
+
+rfactor → rprimary rfactor'
+rfactor' → * rfactor' | ε
+
+rprimary → a | b
+</code></pre>
+
+                <p>This grammar is now suitable for top-down parsing (e.g., recursive descent)&#8203;:contentReference[oaicite:2]{index=2}.</p>
+            </article>
+
+            <article>
+                <h3>4. Practical Applications</h3>
+
+                <h4>4.1 Top-Down Parsing and Backtracking</h4>
+                <p>Top-down parsers build parse trees from the root downward using recursive function calls or parsing tables. The simplest form is the recursive-descent parser.</p>
+                <ul>
+                    <li><strong>With Backtracking</strong>: Tries all productions for a non-terminal in order. If parsing fails, it backtracks and tries the next one.</li>
+                    <li><strong>Without Backtracking (Predictive Parsing)</strong>: Uses FIRST and FOLLOW sets to pick the correct production immediately. LL(1) grammars support this&#8203;:contentReference[oaicite:0]{index=0}.</li>
+                </ul>
+                <p><strong>Example (Recursive-Descent Parser):</strong></p>
+                <pre><code class="language-auto">void A() {
+  save input pointer;
+  for each production A → α:
+    if match(α) then return success;
+    else reset input pointer;
+}
+</code></pre>
+
+                <p>Backtracking is rarely used in compilers due to inefficiency. It may require scanning input multiple times&#8203;:contentReference[oaicite:1]{index=1}.</p>
+
+                <h4>4.2 Bottom-Up Parsing (Shift-Reduce)</h4>
+                <p>Bottom-up parsing works in reverse: it builds the parse tree from leaves (tokens) up to the root (start symbol).</p>
+                <p><strong>Shift-Reduce Parser Actions:</strong></p>
+                <ol>
+                    <li><strong>Shift</strong>: Push the next input symbol onto the stack.</li>
+                    <li><strong>Reduce</strong>: Replace a sequence of symbols on the stack with the left-hand side of a production.</li>
+                    <li><strong>Accept</strong>: When the start symbol is on the stack and input is empty.</li>
+                    <li><strong>Error</strong>: If no valid action exists for the stack/input configuration.</li>
+                </ol>
+
+                <p><strong>Example:</strong> Parsing <code>id * id</code></p>
+                <pre><code class="language-auto">
+STACK      INPUT       ACTION
+$          id * id $   shift
+$id        * id $      reduce F → id
+$F         * id $      reduce T → F
+$T         * id $      shift
+$T *       id $        shift
+$T * id    $           reduce F → id
+$T * F     $           reduce T → T * F
+$T         $           reduce E → T
+$E         $           accept
+</code></pre>
+                <p>It uses a stack and handles are detected and reduced one at a time&#8203;:contentReference[oaicite:2]{index=2}.</p>
+
+                <h4>4.3 Tools to Deal with Non-Determinism</h4>
+                <p>Real-world compilers use parser generators to handle non-deterministic CFGs efficiently.</p>
+
+                <h5>4.3.1 Predictive Parsers (LL)</h5>
+                <ul>
+                    <li><strong>Tools</strong>: Hand-written or generated using <code>ANTLR</code>, <code>JavaCC</code>.</li>
+                    <li><strong>Requirements</strong>: Grammar must be LL(1); needs FIRST/FOLLOW sets and left-factoring, left-recursion removal.</li>
+                </ul>
+
+                <h5>4.3.2 Shift-Reduce Parsers (LR Family)</h5>
+                <ul>
+                    <li><strong>Tools</strong>: <code>Yacc</code>, <code>Bison</code>, <code>Menhir</code>, <code>CUP</code></li>
+                    <li><strong>Variants</strong>: SLR, Canonical LR, LALR</li>
+                    <li><strong>LALR Parsers</strong>: Used in real compilers; compact like SLR, accurate like canonical LR</li>
+                </ul>
+
+                <h5>4.3.3 Dynamic Programming Parsers</h5>
+                <ul>
+                    <li><strong>Earley Parser</strong>: Handles all CFGs, even ambiguous ones; suitable for natural languages</li>
+                    <li><strong>CYK Parser</strong>: Based on table-filling; cubic time but powerful</li>
+                </ul>
+
+                <p>These tools manage ambiguity and non-determinism by using lookahead, parse tables, and automaton states, turning impractical grammars into efficiently parsed constructs&#8203;:contentReference[oaicite:3]{index=3}.</p>
+            </article>
+
+
+        </main>
+
+        <script> copyright("all"); </script>
+
+    </body>
+
+</html>
