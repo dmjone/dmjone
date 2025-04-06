@@ -126,6 +126,22 @@ function get_menu_list(datetogen) {
                 readtime: 20,
                 date: "Sun April 06, 2025",
                 link: "ll1-parser"
+            },
+            {
+                title: "Revision of Concepts for Term 2",
+                desc: "Revise the key concepts of Compiler Design covered in Term 2, including lexical analysis, parsing, intermediate code generation, optimization, and debugging.",
+                codetype: "Revision",
+                readtime: 20,
+                date: "Sun April 06, 2025",
+                link: "revision-of-concepts-term-2"
+            },
+            {
+                title: "Revision of Example Questions for Term 2",
+                desc: "Revise the example questions of Compiler Design covered in Term 2, including lexical analysis, parsing, intermediate code generation, optimization, and debugging.",
+                codetype: "Revision",
+                readtime: 20,
+                date: "Sun April 06, 2025",
+                link: "revision-of-example-questions-term-2"
             }
             // {
             //     title: "Intermediate Code Generation in Compiler Design",
