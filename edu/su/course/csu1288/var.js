@@ -70,20 +70,44 @@ function get_menu_list(datetogen) {
                 link: "information-sources-for-ids",
             },
             {
-                title: "Intrusion Prevention Systems (IPS)",
-                desc: "Learn about Intrusion Prevention Systems (IPS) and their role in network security. This topic covers the features, benefits, and deployment options of IPS, highlighting the differences between IDS and IPS in detecting and preventing network attacks.",
-                codetype: "Concepts",
-                readtime: 5,
-                date: "Mon February 10, 2025",
-                link: "intrusion-prevention-systems-ips",
-            },
-            {
                 title: "Revision for Term 1",
                 desc: "Review the key concepts and topics covered in Term 1 of the course. This revision session will help you consolidate your understanding of intrusion detection and prevention, data threats, attack types, IDS types, and information sources for IDS.",
                 codetype: "Revision",
                 readtime: 5,
                 date: "Thu March 6, 2025",
                 link: "revision-for-term-1",
+            },
+            {
+                title: "Intrusion Prevention Systems (IPS)",
+                desc: "Learn about Intrusion Prevention Systems (IPS) and their role in network security. This topic covers the features, benefits, and deployment options of IPS, highlighting the differences between IDS and IPS in detecting and preventing network attacks.",
+                codetype: "Concepts",
+                readtime: 5,
+                date: "Mon February 10, 2025",
+                link: "intrusion-prevention-systems-ips",
+            },            
+            {
+                title: "IDS Analysis Models and Techniques",
+                desc: "Explore the various models and techniques used in Intrusion Detection Systems (IDS) analysis. This topic covers the different approaches to analyzing network traffic and identifying suspicious activities, including signature-based, anomaly-based, and hybrid detection methods.",
+                codetype: "Concepts",
+                readtime: 5,
+                date: "Mon March 10, 2025",
+                link: "ids-analysis-models-and-techniques",
+            },
+            {
+                title: "Process Models for Intrusion Detection",
+                desc: "Learn about the process models used in Intrusion Detection Systems (IDS) for analyzing network traffic and detecting intrusions. This topic covers the different stages of the intrusion detection process, including data collection, analysis, and response.",
+                codetype: "Concepts",
+                readtime: 5,
+                date: "Tue March 11, 2025",
+                link: "process-models-for-intrusion-detection",
+            },
+            {
+                title: "Analysis Schemes - Credentialed vs Non-credentialed Vulnerability Analysis",
+                desc: "Explore the differences between credentialed and non-credentialed vulnerability analysis schemes. This topic covers the advantages and disadvantages of each approach, helping you understand how to effectively assess vulnerabilities in systems and networks.",
+                codetype: "Concepts",
+                readtime: 5,
+                date: "Wed March 12, 2025",
+                link: "credentialed-vs-non-credentialed-vulnerability-analysis",
             }
         ];
         body_genmenu.processData(arr, def_date, def_author);
