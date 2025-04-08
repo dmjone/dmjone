@@ -108,6 +108,14 @@ function get_menu_list(datetogen) {
                 readtime: 5,
                 date: "Wed March 12, 2025",
                 link: "credentialed-vs-non-credentialed-vulnerability-analysis",
+            },
+            {
+                title: "Practice Sets Based on L6, L7, L8, L9",
+                desc: "Test your knowledge and understanding of the concepts covered in Lectures 6, 7, 8, and 9. This practice set includes questions and exercises to reinforce your learning and prepare you for assessments.",
+                codetype: "Practice",
+                readtime: 5,
+                date: "Wed April 9, 2025",
+                link: "practice-sets-l6-l7-l8-l9",
             }
         ];
         body_genmenu.processData(arr, def_date, def_author);
