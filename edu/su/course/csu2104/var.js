@@ -50,6 +50,14 @@ function get_menu_list(datetogen) {
                 readtime: 60,
                 date: "Wed March 26, 2025",
                 link: "analysis-of-blockchain-based-homomorphic-voting-systems",
+            },
+            {
+                title: "Understanding the Computer Forensic Process",
+                desc: "Learn about the computer forensic process, including the steps involved in collecting, preserving, and analyzing digital evidence. This topic covers the various phases of the computer forensic process, from initial investigation to reporting and legal considerations.",
+                codetype: "Concepts",
+                readtime: 5,
+                link: "understanding-the-computer-forensic-process",
+                date: "Wed April 09, 2024",
             }
         ];
         body_genmenu.processData(arr, def_date, def_author);
