@@ -172,6 +172,14 @@ function get_menu_list(datetogen) {
                 readtime: 20,
                 link: "user-interface-design",
                 date: "Sat April 5, 2025"
+            },
+            {
+                title: "Revision - Term 2",
+                desc: "Revision of the topics covered for the second term of the course.",
+                codetype: "Revision",
+                readtime: 20,
+                link: "revision-term-2",
+                date: "Wed April 9, 2025"
             }
         ];
         body_genmenu.processData(arr, def_date, def_author);
