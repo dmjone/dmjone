@@ -178,7 +178,7 @@ function get_menu_list(datetogen) {
                 desc: "Revision of the topics covered for the second term of the course.",
                 codetype: "Revision",
                 readtime: 20,
-                link: "revision-term-2",
+                link: "revision-of-concepts-term-2",
                 date: "Wed April 9, 2025"
             }
         ];
