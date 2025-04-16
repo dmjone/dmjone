@@ -390,8 +390,11 @@ def save_sitemap(good_links, flagged_links, filename):
 
         
     # Sort by path for a more structured output
-    sorted_good = sorted(good_links, key=lambda x: urllib.parse.urlparse(x).path)
-    sorted_flagged = sorted(flagged_links, key=lambda x: urllib.parse.urlparse(x).path)
+    # sorted_good = sorted(good_links, key=lambda x: urllib.parse.urlparse(x).path)
+    # sorted_flagged = sorted(flagged_links, key=lambda x: urllib.parse.urlparse(x).path)
+    sorted_good = sorted(set(map(clean_link, good_links)), key=lambda x: urllib.parse.urlparse(x).path)
+    sorted_flagged = sorted(set(map(clean_link, flagged_links)), key=lambda x: urllib.parse.urlparse(x).path)
+
 
     with open(filename, 'w', encoding='utf-8') as f:
         # Write good links first
