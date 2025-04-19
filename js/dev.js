@@ -4842,6 +4842,7 @@ function maintenance_mode() {
                 "01-26": "indian-flag-background",
                 "03-13": "holi-background",
                 "03-14": "holi-background",
+                "04-20": "bday-background",
                 "08-15": "indian-flag-background",
                 "12-25": "christmas-background",
                 "12-31": "new-year-background",                
