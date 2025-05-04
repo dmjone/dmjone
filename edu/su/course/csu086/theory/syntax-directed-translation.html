@@ -1,0 +1,277 @@
+<!-------------------------- © 2007 - present, dmj.one and contributors. ----------------------------------
+   Part of the dmjone project. Licensed under the GNU AGPL. Provided as-is, without warranty of any kind. 
+-------------------- Redistribution and modifications must retain this notice. --------------------------->
+
+
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+    <!--<![endif]-->
+
+    <head>
+        <script src="/js/edu_su_common.js"></script>
+        <noscript>
+            <style>
+                html,
+                body {
+                    margin: 0;
+                    overflow: hidden;
+                }
+            </style>
+            <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+        </noscript>
+
+        <title>Syntax Directed Translation - CSU086 - Shoolini U</title>
+        <meta name="description" content="Learn about syntax-directed translation in Compiler Design, including syntax trees, semantic actions, and real-world applications.">
+
+        <meta property="og:image" content="/logo.png">
+        <meta property="og:type" content="article">
+
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:site" content="@divyamohan1993">
+        <meta name="twitter:creator" content="@divyamohan1993">
+        <meta name="twitter:image" content="/logo.png">
+
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+        <meta name="author" content="Divya Mohan">
+        <meta name="robots" content="index, follow">
+
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js" integrity="sha512-sHSNLECRJSK+BFs7E8DiFc6pf6n90bLI85Emiw1jhreduZhK3VXgq9l4kAt9eTIHYAcuQBKHL01QKs4/3Xgl8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js" integrity="sha512-iWiuBS5nt6r60fCz26Nd0Zqe0nbk1ZTIQbl3Kv7kYsX+yKMUFHzjaH2+AnM6vp2Xs+gNmaBAVWJjSmuPw76Efg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                renderMathInElement(document.body, {
+                    // customised options
+                    // • auto-render specific keys, e.g.:
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false },
+                        { left: '\\(', right: '\\)', display: false },
+                        { left: '\\[', right: '\\]', display: true }
+                    ],
+                    // • rendering keys, e.g.:
+                    throwOnError: false
+                });
+            });
+        </script> -->
+
+        <!-- <style>
+            main ul {
+                list-style-type: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            main ul li {
+                margin: 0;
+                padding: 0;
+            }
+        </style> -->
+
+
+
+
+    </head>
+
+    <body>
+
+        <script> header_author("dm"); </script>
+
+        <main>
+            <article class="agen-tableofcontents">
+                <h2 class="text-center">
+                    Syntax Directed Translation
+                </h2>
+                <div class="d-none contentdate">2025, May 4</div>
+            </article>
+
+            <article>
+                <h3>1. Syntax-Directed Program Evaluation</h3>
+                <p><strong>Concept:</strong> A <em>syntax-directed definition</em> (SDD) augments a context-free grammar with <em>attributes</em> on its symbols and <em>semantic rules</em> on its productions.</p>
+                <ul>
+                    <li><strong>Synthesized attributes</strong> flow <strong>up</strong> the parse tree (computed from children).</li>
+                    <li><strong>Inherited attributes</strong> flow <strong>down</strong> or <strong>across</strong> (computed from parent or left siblings).</li>
+                    <li>To evaluate an SDD, we build an <strong>annotated parse tree</strong> and compute attributes in an order respecting the <strong>dependency graph</strong> (no cycles).</li>
+                </ul>
+                <p><strong>Key Points</strong></p>
+                <ol>
+                    <li>Define SDD: grammar + attributes + rules.</li>
+                    <li>Distinguish synthesized vs inherited.</li>
+                    <li>Explain dependency graph and topological sort.</li>
+                    <li>Show evaluation order (e.g. postorder for all synthesized).</li>
+                </ol>
+                <p><strong>Example:</strong> The simple desk-calculator SDD below evaluates expressions “E + T”, “T * F”, parentheses and digits. Each nonterminal has synthesized attribute <code>val</code>.</p>
+                <pre><code>1) L → E n           L.val   = E.val  
+2) E → E1 + T        E.val   = E1.val + T.val  
+3) E → T             E.val   = T.val  
+4) T → T1 * F        T.val   = T1.val * F.val  
+5) T → F             T.val   = F.val  
+6) F → ( E )         F.val   = E.val  
+7) F → digit         F.val   = digit.lexval  
+</code></pre>
+                <p>Here, <code>digit.lexval</code> is provided by the lexer. Attributes are computed in a bottom-up (postorder) traversal of the parse tree .</p>
+            </article>
+            <article>
+                <h3>2. Different Translation Schemes &amp; Their Implementation</h3>
+                <p><strong>Concept:</strong> Two complementary notations for syntax-directed translation:</p>
+                <ol>
+                    <li><strong>SDD</strong> (declarative): attributes &amp; semantic rules on productions.</li>
+                    <li><strong>SDT</strong> (operational): grammar with <em>semantic actions</em> <code>{…}</code> embedded.</li>
+                </ol>
+                <p> <strong>Classes &amp; Implementation:</strong></p>
+                <ul>
+                    <li>
+                        <p><strong>S-attributed → Postfix SDT:</strong> All attributes are synthesized; place actions at end of productions; implement during <strong>bottom-up</strong> (LR) parsing by executing actions on <strong>reduce</strong>.</p>
+                    </li>
+                    <li>
+                        <p><strong>L-attributed → Embedded SDT:</strong> Inherited attrs computed <em>before</em> the symbol, synthesized at end; implement during <strong>top-down</strong> (LL) parsing (recursive-descent or table-driven).</p>
+                        <p><strong>Example (Postfix SDT for Desk Calculator):</strong></p>
+                    </li>
+                </ul>
+                <pre><code>L → E n    { print(E.val); }
+E → E1 + T { E.val = E1.val + T.val; }
+E → T      { E.val = T.val; }
+T → T1 * F { T.val = T1.val * F.val; }
+T → F      { T.val = F.val; }
+F → ( E )  { F.val = E.val; }
+F → digit  { F.val = digit.lexval; }
+</code></pre>
+                <p>Each action fires when its production is reduced .</p>
+            </article>
+            <article>
+                <h3>3. Intermediate-Code Generation</h3>
+                <p><strong>Concept:</strong> An <em>intermediate language</em> provides a machine-independent code form that sits between source and machine code. Benefits: easier optimization, retargeting, simpler back-ends.
+                    <strong>Forms of Intermediate Code:</strong>
+                </p>
+                <ul>
+                    <li>Syntax trees (high-level)</li>
+                    <li>Three-address code (linear, 3 operands)</li>
+                    <li>Quadruples, Triples (table representations)</li>
+                </ul>
+                <p><strong>Example (While-Statement SDD):</strong> String-valued attribute <code>code</code> generates labels and jumps:</p>
+                <pre><code>S → while ( C ) S1
+    { L1=new(); L2=new();
+      C.true=L2; C.false=S.next;
+      S1.next=L1;
+      S.code = "label " L1  + C.code +
+                "label " L2  + S1.code;
+    }
+</code></pre>
+                <p>C and S1 themselves generate C.code and S1.code similarly.</p>
+                <p>This SDD computes complete intermediate code for the loop, with new label generation e.g. L1, L2.</p>
+            </article>
+            <article>
+                <h3>4. Syntax Trees</h3>
+                <p><strong>Concept:</strong> A <em>syntax tree</em> (abstract syntax tree) is a hierarchical, tree-structured representation of program constructs:</p>
+                <ul>
+                    <li><strong>Interior nodes</strong> represent operators or syntactic constructs.</li>
+                    <li><strong>Leaf nodes</strong> represent operands (identifiers, constants).</li>
+                </ul>
+                <p><strong>Why Use Them:</strong> Preserve program structure, simplify optimizations and code generation, avoid heavy parse-tree detail (like parentheses).</p>
+                <p><strong>Example (Building Syntax Tree for “a – 4 + c”):</strong></p>
+                <p><strong>Grammar</strong> with semantic actions:</p>
+                <pre><code>E → E1 – T   { E.node = new Node(‘–’, E1.node, T.node); }
+E → E1 + T   { E.node = new Node(‘+’, E1.node, T.node); }
+E → T        { E.node = T.node; }
+T → id       { T.node = new Leaf(id, id.entry); }
+T → num      { T.node = new Leaf(num, num.val); }
+T → ( E )    { T.node = E.node; }
+</code></pre>
+                <p><strong>Resulting Tree:</strong> interior “+” with left child “–” node (children: “a”, 4) and right child “c” .</p>
+            </article>
+            <article>
+                <h3>5. Three-Address Code Generation</h3>
+                <p><strong>Concept:</strong> A <em>three-address instruction</em> has at most one operator and up to three addresses (operands/results). Typically of form</p>
+                <pre><code>x = y op z    or    x = op y
+</code></pre>
+                <p>where <code>x, y, z</code> are variables, constants, or temporaries.</p>
+                <p><strong>Key Points</strong></p>
+                <ol>
+                    <li>Define three-address code (TAC).</li>
+                    <li>Show use of <em>temporary variables</em> (<code>t1, t2</code>, …).</li>
+                    <li>Explain linear ordering; ease of generation.</li>
+                    <li>Mention it’s convenient for common subexpression elimination, etc.</li>
+                </ol>
+                <p><strong>Example:</strong> Translate <code>a = b + c * d</code> into TAC:</p>
+                <pre><code>t1 = c * d  
+t2 = b + t1  
+a  = t2
+</code></pre>
+                <hr>
+            </article>
+            <article>
+                <h3>6. Quadruples</h3>
+                <p><strong>Concept:</strong> A <em>quadruple</em> represents each TAC instruction as a 4-field record:</p>
+                <pre><code>( op, arg1, arg2, result )</code></pre>
+                <p><strong>Key Points</strong></p>
+                <ol>
+                    <li>Field meanings.</li>
+                    <li>Easy to implement; result field holds destination.</li>
+                    <li>Good for code generation on stack machines or simple back-ends.</li>
+                </ol>
+                <p><strong>Example:</strong> For the TAC above:</p>
+                <pre><code>( ’*’,  c,    d,   t1 )  
+( ’+’,  b,    t1,  t2 )  
+( ’=’,  t2,   –,   a  )  
+</code></pre>
+            </article>
+            <article>
+                <h3>7. Triples</h3>
+                <p><strong>Concept:</strong> A <em>triple</em> omits the result field by implicitly using the instruction’s index as its result:</p>
+                <pre><code>[0] (*, c, d)  
+[1] (+, b,  T0)    ← T0 refers to result of instruction [0]  
+[2] (=, T1, a)     ← T1 refers to result of [1]  
+</code></pre>
+                <p><strong>Key Points</strong></p>
+                <ol>
+                    <li>No dedicated result field; refer by instruction number.</li>
+                    <li>Saves space but harder to reorder or optimize.</li>
+                    <li>Useful for simple intermediate representations.</li>
+                </ol>
+            </article>
+            <article>
+                <h3>8. Translation of Assignment Statements</h3>
+                <p><strong>Concept:</strong> For a production</p>
+                <pre><code>S → id = E</code></pre>
+                <p>we:</p>
+                <ol>
+                    <li>Compute the address (or place) where <code>E</code>’s value ends up.</li>
+                    <li>Emit code for <code>E</code>, leaving its result in some location (<code>E.place</code>).</li>
+                    <li>Emit the final assignment to <code>id</code>.</li>
+                </ol>
+                <p> <strong>Key Points</strong></p>
+                <ol>
+                    <li>Attribute <code>E.place</code> holds the variable or temporary with <code>E</code>’s value.</li>
+                    <li><code>S.code = E.code ‖ id = E.place</code>.</li>
+                    <li>Example shows concatenation of code fragments.
+                        <strong>Example SDT Fragment:</strong>
+                    </li>
+                </ol>
+                <pre><code>S → id = E {  
+      S.code = E.code + "\n" + id.name + " = " + E.place;  
+    }
+E → E1 + T {  
+      E.place = newTemp();  
+      E1.code ‖ T.code ‖ 
+      E.place + " = " + E1.place + " + " + T.place  
+    }
+…  
+</code></pre>
+                <p>This generates, for <code>x = a + b</code>, e.g.:</p>
+                <pre><code>t1 = a  
+t2 = b  
+t3 = t1 + t2  
+x  = t3</code></pre>
+            </article>
+
+            
+        </main>
+
+        <script> copyright("all"); </script>
+
+    </body>
+
+</html>

@@ -150,6 +150,22 @@ function get_menu_list(datetogen) {
                 readtime: 20,
                 date: "Sun April 27, 2025",
                 link: "assignment-3-directed-acyclic-graph-dag"
+            },
+            {
+                title: "Syntax Directed Translation",
+                desc: "Learn about syntax-directed translation in Compiler Design, including syntax trees, semantic actions, and real-world applications.",
+                codetype: "Phase 3",
+                readtime: 20,
+                date: "Sun May 4, 2025",
+                link: "syntax-directed-translation"
+            },
+            {
+                title: "Code optimization and code generation",
+                desc: "Learn about code optimization and code generation in Compiler Design, including optimization techniques, code generation strategies, and real-world applications.",
+                codetype: "Phase 4",
+                readtime: 20,
+                date: "Sun May 4, 2025",
+                link: "code-optimization-code-generation"
             }
             // {
             //     title: "Intermediate Code Generation in Compiler Design",

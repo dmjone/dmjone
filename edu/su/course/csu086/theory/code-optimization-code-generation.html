@@ -1,0 +1,343 @@
+<!-------------------------- © 2007 - present, dmj.one and contributors. ----------------------------------
+   Part of the dmjone project. Licensed under the GNU AGPL. Provided as-is, without warranty of any kind. 
+-------------------- Redistribution and modifications must retain this notice. --------------------------->
+
+
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+    <!--<![endif]-->
+
+    <head>
+        <script src="/js/edu_su_common.js"></script>
+        <noscript>
+            <style>
+                html,
+                body {
+                    margin: 0;
+                    overflow: hidden;
+                }
+            </style>
+            <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+        </noscript>
+
+        <title>Code Optimization Code Generation - CSU086 - Shoolini U</title>
+        <meta name="description" content="Learn about code optimization and code generation in compiler design.">
+
+        <meta property="og:image" content="/logo.png">
+        <meta property="og:type" content="article">
+
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:site" content="@divyamohan1993">
+        <meta name="twitter:creator" content="@divyamohan1993">
+        <meta name="twitter:image" content="/logo.png">
+
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+        <meta name="author" content="Divya Mohan">
+        <meta name="robots" content="index, follow">
+
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js" integrity="sha512-sHSNLECRJSK+BFs7E8DiFc6pf6n90bLI85Emiw1jhreduZhK3VXgq9l4kAt9eTIHYAcuQBKHL01QKs4/3Xgl8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js" integrity="sha512-iWiuBS5nt6r60fCz26Nd0Zqe0nbk1ZTIQbl3Kv7kYsX+yKMUFHzjaH2+AnM6vp2Xs+gNmaBAVWJjSmuPw76Efg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                renderMathInElement(document.body, {
+                    // customised options
+                    // • auto-render specific keys, e.g.:
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false },
+                        { left: '\\(', right: '\\)', display: false },
+                        { left: '\\[', right: '\\]', display: true }
+                    ],
+                    // • rendering keys, e.g.:
+                    throwOnError: false
+                });
+            });
+        </script> -->
+
+        <!-- <style>
+            main ul {
+                list-style-type: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            main ul li {
+                margin: 0;
+                padding: 0;
+            }
+        </style> -->
+
+
+
+
+    </head>
+
+    <body>
+
+        <script> header_author("dm"); </script>
+
+        <main>
+            <article class="agen-tableofcontents">
+                <h2 class="text-center">
+                    Code Optimization Code Generation
+                </h2>
+                <div class="d-none contentdate">2025, May 4</div>
+            </article>
+
+            <article>
+                <h3>Introduction to Code Optimization and Code Generation</h3>
+                <p>Code generation is the compiler phase that translates an intermediate representation (e.g. three-address code) into target machine code. Code optimization is the preceding phase that transforms the IR to run faster or use less space without changing its meaning.
+                    <em>Example:</em> Starting from
+                </p>
+                <pre><code>t1 = b * c  
+t2 = b * c 
+x = t1 + t2
+</code></pre>
+                <p>an optimizer would merge the repeated multiplication, yielding</p>
+                <pre><code>t1 = b * c  
+x = t1 + t1
+</code></pre>
+                <p>so the code generator emits fewer instructions.</p>
+            </article>
+            <article>
+                <h3>Basic Blocks &amp; Flow Graphs</h3>
+                <p>A <strong>basic block</strong> is a maximal sequence of consecutive statements or instructions in which control enters at the beginning and leaves at the end without halting or branching except at the end. To identify basic blocks, you mark:</p>
+                <ol>
+                    <li><strong>Entry leaders</strong>: the first instruction, any target of a jump, and any instruction following a jump.</li>
+                    <li><strong>Boundaries</strong>: each leader begins a new block, which ends just before the next leader.</li>
+                </ol>
+                <p>A <strong>control-flow graph (CFG)</strong> represents these blocks as nodes and adds directed edges for possible transfers of control (e.g., fall-through, conditional and unconditional jumps). CFGs are the foundation for data‐flow and optimization analyses.</p>
+                <p><strong>Example:</strong></p>
+                <pre><code class="language-c"></code>1: if (x < 0) goto L2  
+2: y = x + 1  
+3: goto L3  
+L2: y = 0  
+L3: print(y)
+</code></pre>
+                <ul>
+                    <li>
+                        <p>Blocks:</p>
+                        <ul>
+                            <li>B1 = {1}</li>
+                            <li>B2 = {2, 3}</li>
+                            <li>B3 = {L2}</li>
+                            <li>B4 = {L3}</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <p>Edges: B1→B2 (when x≥0), B1→B3 (when x&lt;0), B2→B4, B3→B4.</p>
+                    </li>
+                </ul>
+                <p>This CFG enables optimizations like dead‐code elimination and live‐variable analysis by tracking how data flows between blocks.</p>
+                <hr>
+            </article>
+            <article>
+                <h3>Directed Acyclic Graphs (DAGs)</h3>
+                <p>A <strong>DAG</strong> for a basic block is a graph with no cycles that captures computations and shares common sub-expressions. Nodes represent either operators (e.g., <code>+</code>, <code>*</code>) or leaf operands (variables/constants). Edges point from operator nodes to their operand nodes. By reusing existing nodes for identical operations, a DAG uncovers and removes redundant computations within the block.</p>
+                <p><strong>Building a DAG:</strong></p>
+                <ol>
+                    <li>For each operand, create or reuse its node.</li>
+                    <li>For each operation, check if a node with the same operator and operand pointers exists—if yes, reuse it; otherwise, create a new node.</li>
+                    <li>Record the mapping from variables to nodes.</li>
+                </ol>
+                <p><strong>Example:</strong></p>
+                <pre><code>t1 = b + c  
+t2 = b + c  
+t3 = t1 * t2
+</code></pre>
+                <p>The DAG has:</p>
+                <ul>
+                    <li>One ‘+’ node with children <code>b</code>, <code>c</code>.</li>
+                    <li>One ‘*’ node whose two children both point to that same ‘+’ node.
+                        Code generated from this DAG evaluates <code>b+c</code> only once, eliminating the duplicate addition.</li>
+                </ul>
+                <hr>
+            </article>
+            <article>
+                <h3>Principle Sources of Optimization: Loop Optimization</h3>
+                <p>Loops often dominate execution time, so compilers focus on minimizing work inside loop bodies and reducing control overhead. Principal loop‐focused optimizations include:</p>
+                <ul>
+                    <li><strong>Loop-Invariant Code Motion:</strong> Move calculations whose results don’t change across iterations to just before the loop.</li>
+                    <li><strong>Induction-Variable Elimination:</strong> Replace arithmetic on loop-index‐derived variables with simpler updates.</li>
+                    <li><strong>Common Sub-expression Elimination:</strong> Compute repeated expressions once and reuse the result.</li>
+                    <li><strong>Loop Unrolling:</strong> Duplicate the loop body several times to reduce the number of branch and test instructions.</li>
+                    <li><strong>Loop Fusion (Jamming):</strong> Merge adjacent loops with the same bounds to improve data locality and reduce overhead.</li>
+                </ul>
+                <p>Applying these reduces instruction counts, cut down on pipeline stalls, and often enhances cache performance, yielding significant speedups for tight loops.</p>
+                <hr>
+            </article>
+            <article>
+                <h3>Eliminating Induction Variable</h3>
+                <p>An <strong>induction variable</strong> changes by a fixed amount each loop iteration, typically used in address computations or simple counters. Multiplications or complex calculations on it can be replaced by simpler increments to reduce expensive operations.</p>
+                <p><strong>Technique:</strong></p>
+                <ul>
+                    <li>Introduce a new variable initialized outside the loop.</li>
+                    <li>Update it by a constant addition each iteration instead of recomputing via multiplication.</li>
+                </ul>
+                <p><strong>Example:</strong></p>
+                <pre><code class="language-c">// Original
+for (i = 0; i < n; i++) {
+  addr = base + 4*i;
+  A[i] = M[addr];
+}
+
+// After eliminating induction variable
+p = base;
+for (i = 0; i < n; i++) {
+  A[i] = M[p];
+  p += 4;
+}
+</code></pre>
+                <p>Here, computing <code>4*i</code> inside the loop (a multiplication) is replaced by a simple <code>p += 4</code> addition, reducing the per‐iteration cost and improving performance.</p>
+                <hr>
+            </article>
+            <article>
+                <h3>Eliminating Common Sub-expression</h3>
+                <p>A <strong>common sub-expression</strong> is an expression repeated more than once with invariant operands. Computing it only once and reusing the result avoids redundant work.</p>
+                <p><strong>Technique:</strong></p>
+                <ul>
+                    <li>Introduce a temporary to hold the repeated expression.</li>
+                    <li>Replace subsequent occurrences with the temporary.</li>
+                </ul>
+                <p><strong>Example:</strong></p>
+                <pre><code class="language-c">// Original
+x = a + b + c;
+y = a + b - d;
+
+// After elimination
+t = a + b;      // common sub-expression
+x = t + c;
+y = t - d;
+</code></pre>
+                <p>The addition <code>a + b</code> is calculated only once instead of twice. This both reduces instruction count and can enable further optimizations like code motion if placed outside a loop.</p>
+                <hr>
+            </article>
+            <article>
+                <h3>Loop Unrolling</h3>
+                <p><strong>Loop unrolling</strong> replicates the loop body multiple times to decrease the number of branch tests and jumps, trading code size for speed. It exposes more straight-line code for instruction-level parallelism.</p>
+                <p><strong>Technique:</strong></p>
+                <ol>
+                    <li>Choose an unroll factor <code>k</code> based on loop trip count and register availability.</li>
+                    <li>Replace the original loop with one that increments by <code>k</code> and contains <code>k</code> copies of the body.</li>
+                    <li>Handle any leftover iterations with a separate loop or conditional tail.</li>
+                </ol>
+                <p><strong>Example:</strong></p>
+                <pre><code class="language-c">// Original
+sum = 0;
+for (i = 0; i < 8; i++)
+  sum += A[i];
+
+// Unrolled by 4
+sum = 0;
+for (i = 0; i < 8; i += 4) {
+  sum += A[i];
+  sum += A[i+1];
+  sum += A[i+2];
+  sum += A[i+3];
+}
+</code></pre>
+                <p>This cuts the number of loop‐control branches from eight to two, reducing branch overhead and allowing better pipelining.</p>
+                <hr>
+            </article>
+            <article>
+                <h3>Loop Jamming (Loop Fusion)</h3>
+                <p><strong>Loop jamming</strong>, also known as fusion, merges multiple loops iterating over the same index range into one loop. This reduces loop overhead, improves cache utilization, and may unlock cross‐iteration optimizations.</p>
+                <p><strong>Technique:</strong></p>
+                <ul>
+                    <li>Verify that loops have the same bounds and that fusing does not change dependences.</li>
+                    <li>Combine their bodies in sequence under one loop header.</li>
+                </ul>
+                <p><strong>Example:</strong></p>
+                <pre><code class="language-c">// Before fusion
+for (i = 0; i < n; i++)
+  X[i] = A[i] + B[i];
+for (i = 0; i < n; i++)
+  Y[i] = C[i] * D[i];
+
+// After fusion
+for (i = 0; i < n; i++) {
+  X[i] = A[i] + B[i];
+  Y[i] = C[i] * D[i];
+}
+</code></pre>
+                <p>This halves the loop‐entry and branch instructions, and by touching arrays in one pass, it leverages temporal locality and can reduce cache misses.</p>
+                <hr>
+            </article>
+            <article>
+                <h3>Peephole Optimization</h3>
+                <p>A <strong>peephole optimizer</strong> examines short sequences (“windows”) of generated machine instructions and applies local transformations to simplify them. It uses pattern‐matching rules to eliminate inefficiencies without global analysis.</p>
+                <p><strong>Common Transformations:</strong></p>
+                <ul>
+                    <li>Remove instructions with no effect (<code>ADD R1, #0</code>).</li>
+                    <li>Delete redundant loads/stores (<code>LOAD R1, X; LOAD R1, X</code>).</li>
+                    <li>Eliminate canceling moves (<code>MOV R1, R2; MOV R2, R1</code>).</li>
+                    <li>Fold small sequences into single complex instructions if the architecture supports it (<code>ADD [R1], #4</code> instead of separate <code>ADD</code> and <code>STORE</code>).</li>
+                </ul>
+                <p><strong>Example:</strong></p>
+                <pre><code>MOV R1, R2
+MOV R2, R1
+</code></pre>
+                <p>Both moves undo one another and can be deleted entirely. Peephole optimization shrinks code size and removes needless operations, improving runtime and memory usage.</p>
+                <hr>
+            </article>
+            <article>
+                <h3>Issues in the Design of Code Generator</h3>
+                <p>A code generator must translate the intermediate representation into efficient machine code while respecting target‐machine constraints. Key challenges include:</p>
+                <ol>
+                    <li><strong>Instruction Selection:</strong> Mapping IR operations to target instructions, choosing between multiple addressing modes and complex CISC vs simple RISC forms.</li>
+                    <li><strong>Register Allocation:</strong> Assigning a limited set of physical registers to many temporaries, deciding when to spill to memory.</li>
+                    <li><strong>Instruction Scheduling:</strong> Ordering instructions to avoid pipeline hazards and exploit parallel execution units.</li>
+                    <li><strong>Calling Conventions:</strong> Managing parameter passing, return‐value placement, and callee/caller‐saved registers.</li>
+                    <li><strong>Resource Constraints:</strong> Handling fixed instruction sizes, alignment, delay slots, and special machine idioms.
+                        Balancing these factors affects both code speed and size.</li>
+                </ol>
+                <hr>
+            </article>
+            <article>
+                <h3>A Simple Code Generator</h3>
+                <p>A <strong>simple (tree-walker) code generator</strong> performs a recursive traversal of the abstract syntax tree to emit target code directly. Steps for each AST node:</p>
+                <ol>
+                    <li>Recursively generate code for left and right subtrees, yielding registers or temporaries holding their results.</li>
+                    <li>Emit the machine instruction corresponding to the node’s operator, using those registers.</li>
+                    <li>Return the register containing the result.</li>
+                </ol>
+                <p><strong>Example for <code>a + b * c</code>:</strong></p>
+                <pre><code>// Visit '*' node
+LOAD R1, b       ; R1 ← b
+LOAD R2, c       ; R2 ← c
+MUL  R3, R1, R2  ; R3 ← R1 * R2
+// Visit '+' node
+LOAD R4, a       ; R4 ← a
+ADD  R5, R4, R3  ; R5 ← R4 + R3
+</code></pre>
+                <p>While straightforward to implement, this approach may produce suboptimal code without additional passes for register allocation and instruction scheduling.</p>
+                <hr>
+            </article>
+            <article>
+                <h3>Register Allocation &amp; Assignment</h3>
+                <p><strong>Register allocation</strong> assigns program values (variables or temporaries) to a limited set of machine registers to minimize slow memory accesses. <strong>Assignment</strong> maps each live value to a specific register or spills it to memory if registers are exhausted.</p>
+                <p><strong>Graph-Coloring Method:</strong></p>
+                <ol>
+                    <li>Build an interference graph where nodes are temporaries and an edge means two are live at the same time.</li>
+                    <li>Color the graph with k colors, where k is the number of registers—adjacent nodes cannot share a color.</li>
+                    <li>Spill (store to memory) nodes that cannot be colored, then repeat.</li>
+                </ol>
+                <p><strong>Linear-Scan Method:</strong></p>
+                <ol>
+                    <li>Sort live intervals by start point.</li>
+                    <li>Allocate registers in one pass, freeing them when intervals end; spill when none are available.</li>
+                </ol>
+                <p><strong>Example:</strong>
+                    Temporaries <code>t1, t2, t3</code> are all live simultaneously but only two registers <code>R1, R2</code> exist. The interference graph is a triangle. A coloring algorithm assigns <code>R1</code> to <code>t1</code>, <code>R2</code> to <code>t2</code>, and spills <code>t3</code> to memory (inserting load/store around its uses). Effective register allocation reduces load/store penalties and significantly speeds up execution.</p>
+            </article>
+        </main>
+
+        <script> copyright("all"); </script>
+
+    </body>
+
+</html>
