@@ -142,6 +142,14 @@ function get_menu_list(datetogen) {
                 readtime: 20,
                 date: "Sun April 06, 2025",
                 link: "first-follow-leftfactoring-parsetable"
+            },
+            {
+                title: "Assignment 3: Directed Acyclic Graph (DAG)",
+                desc: "Learn about directed acyclic graphs (DAG) in Compiler Design, including graph theory, applications, and real-world examples.",
+                codetype: "Assignment",
+                readtime: 20,
+                date: "Sun April 27, 2025",
+                link: "assignment-3-directed-acyclic-graph-dag"
             }
             // {
             //     title: "Intermediate Code Generation in Compiler Design",

@@ -16,7 +16,13 @@ function get_menu_list(datetogen) {
                 title: "Syllabus",
                 desc: "The syllabus for the course is designed to provide a comprehensive overview of the topics covered in the English Communication course. This section outlines the course structure, learning objectives, and assessment criteria to help you understand the key concepts and principles of English Communication. Click to access the syllabus and prepare for the course effectively.",
                 codetype: "Syllabus | English Communication",
-            },       
+            },
+            {
+                link: "theory/assignment-1",
+                title: "Assignment 1",
+                desc: "Assignment 1 focuses on influence of effective public speaking on career success.",
+                codetype: "Assignment 1 | English Communication",
+            },                  
             // {
             //     link: "practice/",
             //     title: "Practice English Communication Skills: Strengthen Your Knowledge",
