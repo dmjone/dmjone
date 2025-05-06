@@ -166,6 +166,22 @@ function get_menu_list(datetogen) {
                 readtime: 20,
                 date: "Sun May 4, 2025",
                 link: "code-optimization-code-generation"
+            },
+            {
+                title: "Term 1 Answers",
+                desc: "Answers to the questions from the Term 1 exam paper.",
+                codetype: "Revision",
+                readtime: 20,
+                date: "Sun May 4, 2025",
+                link: "term-1-answers"
+            },
+            {
+                title: "Term 2 Answers",
+                desc: "Answers to the questions from the Term 2 exam paper.",
+                codetype: "Revision",
+                readtime: 20,
+                date: "Sun May 4, 2025",
+                link: "term-2-answers"
             }
             // {
             //     title: "Intermediate Code Generation in Compiler Design",
