@@ -182,6 +182,14 @@ function get_menu_list(datetogen) {
                 readtime: 20,
                 date: "Sun May 4, 2025",
                 link: "term-2-answers"
+            },
+            {
+                title: "Revision of Concepts for Term 3",
+                desc: "Revise the key concepts of Compiler Design covered in Term 3, including lexical analysis, parsing, intermediate code generation, optimization, and debugging.",
+                codetype: "Revision",
+                readtime: 20,
+                date: "Sun May 4, 2025",
+                link: "revision-of-concepts-term-3"
             }
             // {
             //     title: "Intermediate Code Generation in Compiler Design",
