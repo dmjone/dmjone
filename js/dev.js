@@ -19,6 +19,7 @@ const cdnjs_markdown = "https://cdnjs.cloudflare.com/ajax/libs/marked/14.1.2/mar
 const cdnjs_mermaid = "https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.4.0/mermaid.min.js";
 const cdnjs_3js = "https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js";
 const GLOBAL_login_page_path = window.location.hostname === 'localhost' ? '/login.html' : '/login';
+const GLOBAL_deepwiki_link = "https://deepwiki.com/dmjone/dmjone";
 
 const GLOBAL_SERVICEWORKER_REINSTALL = 0;
 const GLOBAL_SERVICEWORKER_INSTALL = 1;
