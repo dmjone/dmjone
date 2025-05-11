@@ -70,6 +70,13 @@ function get_menu_list(datetogen) {
                 readtime: 5,
                 link: "term-2-answers"
             },
+            {
+                title: "Term 3 Revision",
+                desc: "Explore the concepts covered for the Term 3 revision for the CSU2101 course. This resource provides a comprehensive overview of the key topics and concepts to help you prepare for the exam.",
+                codetype: "Revision",
+                readtime: 15,
+                link: "term-3-revision"
+            }
             
         ];
         body_genmenu.processData(arr, def_date, def_author);
