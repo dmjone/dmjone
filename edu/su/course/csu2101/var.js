@@ -55,7 +55,22 @@ function get_menu_list(datetogen) {
                 codetype: "Concepts",
                 readtime: 10,
                 link: "subqueries-correlated-queries-views"
-            }
+            },
+            {
+                title: "Term 1 Answers",
+                desc: "Explore the answers to the Term 1 exam questions for the CSU2101 course. This resource provides detailed explanations and solutions to help you understand the concepts covered in the exam.",
+                codetype: "Answers",
+                readtime: 5,
+                link: "term-1-answers"
+            },
+            {
+                title: "Term 2 Answers",
+                desc: "Explore the answers to the Term 2 exam questions for the CSU2101 course. This resource provides detailed explanations and solutions to help you understand the concepts covered in the exam.",
+                codetype: "Answers",
+                readtime: 5,
+                link: "term-2-answers"
+            },
+            
         ];
         body_genmenu.processData(arr, def_date, def_author);
     }
