@@ -58,6 +58,13 @@ function get_menu_list(datetogen) {
                 readtime: 5,
                 link: "understanding-the-computer-forensic-process",
                 date: "Wed April 09, 2024",
+            },
+            {
+                title: "Terminal 3 Revision",
+                desc: "This section provides a comprehensive revision of Terminal 3 concepts, including the key topics and principles covered in the course. This revision is designed to help you reinforce your understanding of Terminal 3 concepts and prepare for assessments.",
+                codetype: "Revision",
+                readtime: 5,
+                link: "t3-revision",
             }
         ];
         body_genmenu.processData(arr, def_date, def_author);
