@@ -60,12 +60,26 @@ function get_menu_list(datetogen) {
                 date: "Wed April 09, 2024",
             },
             {
-                title: "Terminal 3 Revision",
-                desc: "This section provides a comprehensive revision of Terminal 3 concepts, including the key topics and principles covered in the course. This revision is designed to help you reinforce your understanding of Terminal 3 concepts and prepare for assessments.",
+                title: "Term 3 Revision",
+                desc: "This section provides a comprehensive revision of Terminal 3 concepts, including the key topics and principles covered in the course. This revision is designed to help you reinforce your understanding of Term 3 concepts and prepare for assessments.",
                 codetype: "Revision",
                 readtime: 5,
                 link: "t3-revision",
-            }
+            },
+            {
+                title: "Term 1 & 2 Answers",
+                desc: "This section provides answers to the questions covered in Term 1 and 2. This resource is designed to help you review and reinforce your understanding of the key concepts and principles covered in these term.",
+                codetype: "Answers",
+                readtime: 5,
+                link: "t1-t2-answers",
+            },
+            {
+                title: "Term 3 Practice Questions",
+                desc: "This section provides practice questions for Term 3. This resource is designed to help you review and reinforce your understanding of the key concepts and principles covered in this term.",
+                codetype: "Practice Questions",
+                readtime: 5,
+                link: "t3-practice-questions",
+            },            
         ];
         body_genmenu.processData(arr, def_date, def_author);
     }
