@@ -145,16 +145,134 @@
                 <div class="d-none contentdate">2025, May 13</div>
             </article>
 
+            <!-- <article>
+                <h3>Question 1</h3>
+                <p><strong>Question</strong>: How Snort is installed and configured. What are rule headers, rule options and Snort modules (preprocessors, plugins, outputs etc)?</p>
+                <p><strong>Installation and Configuration of Snort</strong>
+                    Snort is an open-source network intrusion detection and prevention system. To install and configure:</p>
+                <ol>
+                    <li><strong>Prerequisites</strong>: Install libpcap (packet capture), libpcre (regular expressions), zlib (compression) and DAQ (Data Acquisition) library.</li>
+                    <li><strong>Download &amp; Compile</strong>:</li>
+                </ol>
+                <pre><code class="">wget https://www.snort.org/downloads/snort/snort-2.9.20.tar.gz
+tar -xzf snort-2.9.20.tar.gz
+cd snort-2.9.20
+./configure --enable-sourcefire
+make &amp;&amp; sudo make install
+</code></pre>
+                <ol start="3">
+                    <li><strong>Directory Setup</strong>:</li>
+                </ol>
+                <pre><code class="">sudo useradd snort
+sudo mkdir -p /etc/snort/rules /var/log/snort /usr/local/lib/snort_dynamicrules
+sudo chown -R snort:snort /etc/snort /var/log/snort /usr/local/lib/snort_dynamicrules
+</code></pre>
+                <ol start="4">
+                    <li>
+                        <p><strong>Configuration Files</strong>: Copy <code>snort.conf</code>, <code>classification.config</code>, <code>threshold.conf</code> into <code>/etc/snort/</code>. Edit <code>/etc/snort/snort.conf</code> to set:</p>
+                        <ul>
+                            <li><code>var HOME_NET 192.168.1.0/24</code></li>
+                            <li><code>var EXTERNAL_NET !$HOME_NET</code></li>
+                            <li><code>include $RULE_PATH/local.rules</code></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <p><strong>Testing</strong>:</p>
+                    </li>
+                </ol>
+                <pre><code class="">snort -T -c /etc/snort/snort.conf
+</code></pre>
+                <ol start="6">
+                    <li><strong>Running Snort</strong>:</li>
+                </ol>
+                <pre><code class="">snort -A console -q -c /etc/snort/snort.conf -i eth0
+</code></pre>
+                <p><em>Example:</em> On Ubuntu, one may instead use <code>sudo apt-get install snort</code> and then edit <code>/etc/snort/snort.conf</code> before <code>sudo systemctl start snort</code>.</p>
+                
+                <p><strong>Rule Headers</strong>
+                    A Snort rule header defines the basic packet match parameters and action. Its syntax is:</p>
+                <pre><code class="">action  protocol  src_IP  src_port  direction  dst_IP  dst_port
+</code></pre>
+                <ul>
+                    <li><strong>action</strong>: what Snort does when matched (e.g. <code>alert</code>, <code>log</code>, <code>pass</code>, <code>drop</code>).</li>
+                    <li><strong>protocol</strong>: network layer protocol (<code>tcp</code>, <code>udp</code>, <code>icmp</code>, <code>ip</code>).</li>
+                    <li><strong>src_IP/src_port</strong>: source address or network (<code>any</code>, CIDR) and port (<code>any</code>, number, range).</li>
+                    <li><strong>direction</strong>: packet flow arrow (<code>-&gt;</code> for uni-directional, <code>&lt;-&gt;</code> for bi-directional).</li>
+                    <li><strong>dst_IP/dst_port</strong>: destination address and port.</li>
+                </ul>
+                <p><em>Example:</em></p>
+                <pre><code class="">alert tcp any any -&gt; 192.168.1.0/24 80  
+</code></pre>
+                <p>This rule “alerts” on any TCP packet from any host/port to the 192.168.1.0/24 network on port 80.</p>
+                
+                <p><strong>Rule Options</strong>
+                    Rule options refine detection and specify alert details. They are enclosed in parentheses and separated by semicolons:</p>
+                <pre><code class="">(action …) (option1; option2; …; sid:ID; rev:revision;)
+</code></pre>
+                <p>Common options:</p>
+                <ul>
+                    <li><code>msg:"text"</code> – alert message.</li>
+                    <li><code>sid:number</code> – unique Snort ID.</li>
+                    <li><code>rev:number</code> – revision counter.</li>
+                    <li><code>content:"string"</code> – payload pattern to match.</li>
+                    <li><code>nocase</code> – case-insensitive content match.</li>
+                    <li><code>flow:to_server,established</code> – packet flow direction and TCP state.</li>
+                    <li><code>classtype:policy-violation</code> – classification category.</li>
+                    <li><code>priority:number</code> – alert priority.</li>
+                </ul>
+                <p><em>Example:</em></p>
+                <pre><code class="">alert tcp any any -&gt; $HOME_NET 80 (msg:"HTTP GET attempt"; flow:to_server,established; content:"GET "; http_uri; sid:1000001; rev:1;)  
+</code></pre>
+                <p>This alerts when “GET ” appears in the URI of an established TCP session to port 80.</p>
+                
+                <p><strong>Snort Modules</strong>
+                    Snort modules extend sniffing, normalization and output capabilities.</p>
+                <ol>
+                    <li>
+                        <p><strong>Preprocessors</strong></p>
+                        <ul>
+                            <li>Process packets before detection.</li>
+                            <li><strong>frag3_engine</strong>: reassembles IP fragments.</li>
+                            <li><strong>stream5_tcp</strong>: reassembles TCP streams.</li>
+                            <li><strong>http_inspect</strong>: normalizes HTTP traffic, detects anomalies.</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <p><strong>Dynamic Plugins</strong></p>
+                        <ul>
+                            <li>Loadable libraries for specialized tasks.</li>
+                            <li>e.g. <code>sfportscan</code> for port scan detection, <code>sf_ssh</code> for SSH protocol logging.</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <p><strong>Output Modules</strong></p>
+                        <ul>
+                            <li>Control how alerts and logs are stored or forwarded.</li>
+                            <li><strong>alert_fast</strong>: one-line console alerts.</li>
+                            <li><strong>alert_full</strong>: full packet dump.</li>
+                            <li><strong>unified2</strong>: binary format for analyzers (e.g. Barnyard2).</li>
+                            <li><strong>syslog</strong>: sends alerts to syslog server.</li>
+                        </ul>
+                    </li>
+                </ol>
+                <p><em>Configuration Example in snort.conf:</em></p>
+                <p>These modules ensure correct packet reassembly, protocol normalization and efficient alert logging.</p>
+                <pre><code class="">preprocessor frag3_engine: policy linux detect_anomalies
+preprocessor stream5_global: track_tcp yes
+output unified2: filename snort.u2, limit 128
+</code></pre>
+            </article> -->
+
             <article>
                 <h3>Question 1</h3>
                 <p><strong>Question</strong>: How Snort is installed and configured. What are rule headers, rule options and Snort modules (preprocessors, plugins, outputs etc)?</p>
-
+            
                 <p><strong>Installation &amp; Configuration on Ubuntu</strong></p>
                 <ol>
                     <li>
                         <strong>Install Snort</strong>:
                         <pre><code class="">sudo apt update
-sudo apt install snort -y</code></pre>
+            sudo apt install snort -y</code></pre>
                     </li>
                     <li>
                         <strong>Set Network Variables</strong>:
@@ -182,10 +300,10 @@ sudo apt install snort -y</code></pre>
                     <li>
                         <strong>Start &amp; Enable</strong>:
                         <pre><code class="">sudo systemctl start snort
-sudo systemctl enable snort</code></pre>
+            sudo systemctl enable snort</code></pre>
                     </li>
                 </ol>
-
+            
                 <p><strong>Rule Headers</strong>: define which packets to match and what Snort does.</p>
                 <pre><code class="">action protocol src_IP src_port direction dst_IP dst_port</code></pre>
                 <ul>
@@ -194,10 +312,10 @@ sudo systemctl enable snort</code></pre>
                     <li><code>any</code> or specific IP/CIDR and port</li>
                     <li><code>-></code> (one-way) or <code><-></code> (two-way)</li>
                 </ul>
-
+            
                 <p><strong>Rule Options</strong>: refine matching and set alert details. Enclosed in parentheses, separated by semicolons.</p>
                 <pre><code class="">(msg:"text"; sid:1000001; rev:1; content:"pattern"; nocase;)</code></pre>
-
+            
                 <p><strong>Snort Modules</strong>:</p>
                 <ol>
                     <li>
@@ -223,7 +341,6 @@ sudo systemctl enable snort</code></pre>
                     </li>
                 </ol>
             </article>
-
             <article>
                 <h3>Question 2</h3>
                 <p><strong>Question</strong>: Summarize how malware differs across Windows, Linux and Android systems. Provide examples of platform-specific malware.</p>
@@ -505,7 +622,7 @@ sudo systemctl enable snort</code></pre>
                         </ul>
                     </li>
                 </ul>
-
+                
                 <p><strong>3. Simple Models</strong></p>
                 <ul>
                     <li>
@@ -525,7 +642,7 @@ sudo systemctl enable snort</code></pre>
                         </ul>
                     </li>
                 </ul>
-
+                
                 <p><strong>4. Advanced Models</strong></p>
                 <ul>
                     <li>
@@ -571,7 +688,7 @@ sudo systemctl enable snort</code></pre>
                         </ul>
                     </li>
                 </ul>
-
+                
                 <p><strong>5. Technique Selection</strong></p>
                 <table class="table table-bordered table-striped">
                     <thead>
