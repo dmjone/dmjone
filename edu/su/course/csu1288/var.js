@@ -122,8 +122,16 @@ function get_menu_list(datetogen) {
                 desc: "Learn about the process of mapping responses to security policies in Intrusion Detection Systems (IDS). This topic covers the importance of aligning IDS responses with organizational security policies and procedures to effectively manage security incidents.",
                 codetype: "Concepts",
                 readtime: 5,
-                date: "Wed May 13, 2025",
+                date: "Tue May 13, 2025",
                 link: "mapping-intrusion-responses-to-security-policies",
+            },
+            {
+                title: "Assignment Questions",
+                desc: "This section provides a set of assignment questions related to the course material. These questions are designed to help you review and reinforce your understanding of the key concepts and principles covered in the course.",
+                codetype: "Assignment",
+                readtime: 5,
+                date: "Tue May 13, 2025",
+                link: "assignment-questions",
             }
         ];
         body_genmenu.processData(arr, def_date, def_author);
