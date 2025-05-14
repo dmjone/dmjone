@@ -116,6 +116,14 @@ function get_menu_list(datetogen) {
                 readtime: 5,
                 date: "Wed April 9, 2025",
                 link: "practice-sets-l6-l7-l8-l9",
+            },
+            {
+                title: "Mapping Intrusion Responses to Security Policies",
+                desc: "Learn about the process of mapping responses to security policies in Intrusion Detection Systems (IDS). This topic covers the importance of aligning IDS responses with organizational security policies and procedures to effectively manage security incidents.",
+                codetype: "Concepts",
+                readtime: 5,
+                date: "Wed May 13, 2025",
+                link: "mapping-intrusion-responses-to-security-policies",
             }
         ];
         body_genmenu.processData(arr, def_date, def_author);
