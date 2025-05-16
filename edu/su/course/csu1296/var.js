@@ -180,6 +180,14 @@ function get_menu_list(datetogen) {
                 readtime: 20,
                 link: "revision-of-concepts-term-2",
                 date: "Wed April 9, 2025"
+            },
+            {
+                title: "Revision - Term 3",
+                desc: "Revision of the topics covered for the third term of the course.",
+                codetype: "Revision",
+                readtime: 20,
+                link: "t3-revision",
+                date: "Fri May 16, 2025"
             }
         ];
         body_genmenu.processData(arr, def_date, def_author);
