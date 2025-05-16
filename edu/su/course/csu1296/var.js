@@ -186,7 +186,7 @@ function get_menu_list(datetogen) {
                 desc: "Revision of the topics covered for the third term of the course.",
                 codetype: "Revision",
                 readtime: 20,
-                link: "t3-revision",
+                link: "t3-esm-revision",
                 date: "Fri May 16, 2025"
             }
         ];
