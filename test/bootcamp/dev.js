@@ -555,9 +555,9 @@ function speakAndWait({ name, id }, cb) {
         const v = getVoice();
         if (v) u.voice = v;
         u.rate = 1.5; u.pitch = 5.05;
-        u.onend = () => setTimeout(cb, 100);
+        u.onend = () => setTimeout(cb, 500);
         speechSynthesis.speak(u);
-    } else setTimeout(cb, 100);
+    } else setTimeout(cb, 500);
 }
 
 // 7. Render date
@@ -610,7 +610,7 @@ document.getElementById('rollcall').onclick = () => {
 // 10. Enter = mark highlighted absent
 document.addEventListener('keydown', e => {
     if (e.key === 'Enter' && idx > 0) {
-        tiles[idx].click();
+        tiles[idx - 1].click();
     }
 });
 
