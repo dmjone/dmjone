@@ -166,7 +166,7 @@ document.getElementById("copyAbsenteesButton").addEventListener("click", copyAbs
 function checkUserEmail() {
     const userEmail = localStorage.getItem('userEmail')?.toLowerCase();
     const allowedEmail = atob('ZGl2eWFtb2hhbjE5OTNAZ21haWwuY29t');
-    const buttons = ['copyAbsenteesButton', 'takeattendance', 'simulate', 'allabsent', 'allpresent', 'lockportal'];    
+    const buttons = ['copyAbsenteesButton', 'takeattendance', 'simulate', 'allabsent', 'allpresent', 'lockportal', 'downloadcsv'];    
 
     buttons.forEach(id => {
         const button = document.getElementById(id);
@@ -198,7 +198,7 @@ function checkUserEmail() {
             simulate: { simulate: 'true' },
             allabsent: { all_absent: 'true' },
             allpresent: { all_present: 'true' },
-            lockportal: { lock_portal: 'true' }
+            lockportal: { lock_portal: 'true' },
         };
 
         Object.keys(paramMap).forEach(id => {
