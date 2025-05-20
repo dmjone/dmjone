@@ -61,7 +61,7 @@ function loadAbsentees() {
         .then(data => {
             const absenteesList = document.getElementById("absentees");
             const namecontainer = document.getElementById("name-container");
-            
+
             absenteeData = data.results || []; // Save data to be used in the clipboard function
             absenteesList.innerHTML = ''; // Clear current list
 
@@ -69,23 +69,23 @@ function loadAbsentees() {
                 document.getElementById('absenteeblock').classList.remove('d-none');
                 document.getElementById('attendanceFormBlock').classList.toggle('d-none');
                 document.getElementById('helpnote').classList.toggle('d-none');
-                
+
                 try {
                     namecontainer.classList.remove('page-center', 'flex-column');
                     document.getElementById('customcontent-kajdio479eaugd371u2').innerHTML = ''; // Use '' instead of null for clearing innerHTML
-                } catch (e) {}
+                } catch (e) { }
 
-                
-                absenteeData.forEach(item => {                
+
+                absenteeData.forEach(item => {
                     const listItem = document.createElement('li');
                     listItem.textContent = `${item.name} (${item.roll})`;
                     listItem.classList.add('list-group-item');
                     absenteesList.appendChild(listItem);
                 });
-            } else {                
+            } else {
                 absenteesList.innerHTML = '<li class="list-group-item text-danger fw-bold fs-4"><i class="bi bi-lock"></i> Portal Locked!</li>';
                 namecontainer.classList.add('page-center', 'flex-column');
-                
+
                 namecontainer.innerHTML += `
                 <div id="customcontent-kajdio479eaugd371u2">
                     <div class="d-flex justify-content-center align-items-center my-3">
@@ -96,14 +96,14 @@ function loadAbsentees() {
                       </div>
                     </div>
                 </div>
-                `;                
+                `;
             }
         })
         .catch(error => {
             showMessage('danger', 'Error loading absentees list: ' + error);
             console.error('Error:', error);
         });
-        
+
 }
 
 // Copy absentees to clipboard function
@@ -166,7 +166,7 @@ document.getElementById("copyAbsenteesButton").addEventListener("click", copyAbs
 function checkUserEmail() {
     const userEmail = localStorage.getItem('userEmail')?.toLowerCase();
     const allowedEmail = atob('ZGl2eWFtb2hhbjE5OTNAZ21haWwuY29t');
-    const buttons = ['copyAbsenteesButton', 'takeattendance', 'simulate', 'allabsent', 'allpresent', 'lockportal', 'downloadcsv'];    
+    const buttons = ['copyAbsenteesButton', 'takeattendance', 'simulate', 'allabsent', 'allpresent', 'lockportal', 'downloadcsv'];
 
     buttons.forEach(id => {
         const button = document.getElementById(id);
@@ -199,7 +199,33 @@ function checkUserEmail() {
             allabsent: { all_absent: 'true' },
             allpresent: { all_present: 'true' },
             lockportal: { lock_portal: 'true' },
+            downloadcsv: { download_csv: 'true' }
         };
+        
+        delete paramMap.downloadcsv;
+
+        document.getElementById('downloadcsv').addEventListener('click', () => {
+            const url = new URL('https://dmj.one/api/attendance/');
+            url.searchParams.set('download_csv', 'true');
+
+            fetch(url)
+                .then(res => {
+                    if (!res.ok) throw new Error(res.statusText);
+                    return res.blob();
+                })
+                .then(blob => {
+                    const filename = `attendance_${new Date().toISOString().slice(0, 10)}.csv`;
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = filename;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(link.href);
+                })
+                .catch(err => showMessage('danger', 'CSV download failed: ' + err.message));
+        });
+
 
         Object.keys(paramMap).forEach(id => {
             document.getElementById(id).addEventListener('click', () =>
