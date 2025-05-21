@@ -5022,7 +5022,7 @@ function maintenance_mode() {
         }
         const lines = element.textContent.split('\n');
         if (Math.random() < 0.5) {
-            removelines(element, lines);
+            removelines(element, lines); // uncomment this line to enable the renaming of variables
         }
     }
 
