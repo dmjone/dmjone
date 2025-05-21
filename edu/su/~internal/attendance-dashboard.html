@@ -2,46 +2,143 @@
 <html lang="en">
 
     <head>
-        <meta charset="UTF-8">
+        <meta charset="UTF-8" />
         <title>Attendance Dashboard</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
 
         <!-- Bootstrap 5.3 CSS -->
         <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
 
+        <!-- Sci-fi font -->
+        <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet" />
+
         <style>
-            /* make header stick at top of viewport */
-            thead.sticky-top th {
-                background-color: #f8f9fa;
+            :root {
+                --bg-dark: #0d1117;
+                --panel-bg: rgba(255, 255, 255, 0.05);
+                --accent: #00ffea;
+                --neon-green: #39ff14;
+                --neon-red: #ff073a;
+                --neon-secondary: #8888ff;
+                --fade-duration: 0.8s;
             }
 
-            /* narrow P/A columns */
+            body {
+                background-color: var(--bg-dark);
+                color: #c9d1d9;
+                font-family: 'Orbitron', sans-serif;
+            }
+
+            .navbar {
+                background: linear-gradient(90deg, transparent, var(--accent), transparent);
+                box-shadow: 0 0 20px var(--accent);
+            }
+
+            .navbar-brand {
+                color: var(--accent) !important;
+                text-shadow: 0 0 8px var(--accent);
+            }
+
+            /* Glass panel */
+            .container-fluid.py-4 {
+                background: var(--panel-bg);
+                backdrop-filter: blur(12px);
+                border-radius: 12px;
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+            }
+
+            #loading .spinner-border {
+                width: 4rem;
+                height: 4rem;
+                border-width: 0.5rem;
+            }
+
+            #loading div {
+                color: var(--neon-secondary);
+                animation: neon-flicker 2s infinite;
+            }
+
+            @keyframes neon-flicker {
+
+                0%,
+                18%,
+                22%,
+                25%,
+                53%,
+                57%,
+                100% {
+                    opacity: 0.8;
+                    text-shadow: 0 0 4px var(--neon-secondary), 0 0 8px var(--neon-secondary);
+                }
+
+                20%,
+                24%,
+                55% {
+                    opacity: 0.4;
+                    text-shadow: none;
+                }
+            }
+
+            table {
+                opacity: 0;
+                animation: fade-in var(--fade-duration) forwards;
+            }
+
+            @keyframes fade-in {
+                to {
+                    opacity: 1;
+                }
+            }
+
+            thead.sticky-top th {
+                background: rgba(0, 0, 0, 0.7);
+                backdrop-filter: blur(6px);
+                color: #fff;
+                border-bottom: 1px solid var(--accent);
+            }
+
             td .badge {
                 display: inline-block;
-                width: 1.5rem;
+                width: 1.8rem;
                 text-align: center;
+                font-weight: 700;
+                text-shadow: 0 0 4px rgba(0, 0, 0, 0.7);
+            }
+
+            .badge.bg-success {
+                background-color: var(--neon-green) !important;
+                box-shadow: 0 0 8px var(--neon-green);
+            }
+
+            .badge.bg-danger {
+                background-color: var(--neon-red) !important;
+                box-shadow: 0 0 8px var(--neon-red);
+            }
+
+            .badge.bg-secondary {
+                background-color: var(--neon-secondary) !important;
+                box-shadow: 0 0 8px var(--neon-secondary);
             }
         </style>
     </head>
 
     <body>
-
-        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <nav class="navbar navbar-expand-lg">
             <div class="container-fluid">
                 <span class="navbar-brand mb-0 h1">Attendance Dashboard</span>
             </div>
         </nav>
 
-        <div class="container-fluid py-4">
+        <div class="container-fluid py-4 my-4">
             <div id="loading" class="text-center my-5">
-                <div class="spinner-border text-primary" role="status">
+                <div class="spinner-border text-light" role="status">
                     <span class="visually-hidden">Loading…</span>
                 </div>
-                <div class="mt-2">Loading attendance data…</div>
+                <div class="mt-3 fs-4">Loading attendance data…</div>
             </div>
 
             <div id="table-container" class="table-responsive" style="display:none">
-                <table class="table table-striped table-hover align-middle">
+                <table class="table table-borderless table-hover align-middle">
                     <thead class="sticky-top"></thead>
                     <tbody></tbody>
                 </table>
@@ -71,7 +168,7 @@
                     headers.forEach((h, idx) => {
                         const th = document.createElement('th');
                         th.textContent = h;
-                        if (idx < 2) th.style.minWidth = '150px';
+                        if (idx < 2) th.style.minWidth = '160px';
                         trHead.appendChild(th);
                     });
                     thead.appendChild(trHead);
@@ -85,7 +182,6 @@
                         cols.forEach((cell, idx) => {
                             const td = document.createElement('td');
                             if (idx >= 2) {
-                                // P/A badges
                                 const badge = document.createElement('span');
                                 badge.classList.add('badge');
                                 badge.textContent = cell || '';
