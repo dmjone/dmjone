@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <title>Attendance Dashboard</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <!-- Bootstrap 5.3 CSS -->
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
+
+        <style>
+            /* make header stick at top of viewport */
+            thead.sticky-top th {
+                background-color: #f8f9fa;
+            }
+
+            /* narrow P/A columns */
+            td .badge {
+                display: inline-block;
+                width: 1.5rem;
+                text-align: center;
+            }
+        </style>
+    </head>
+
+    <body>
+
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+            <div class="container-fluid">
+                <span class="navbar-brand mb-0 h1">Attendance Dashboard</span>
+            </div>
+        </nav>
+
+        <div class="container-fluid py-4">
+            <div id="loading" class="text-center my-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading…</span>
+                </div>
+                <div class="mt-2">Loading attendance data…</div>
+            </div>
+
+            <div id="table-container" class="table-responsive" style="display:none">
+                <table class="table table-striped table-hover align-middle">
+                    <thead class="sticky-top"></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Bootstrap JS bundle -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+        <script>
+            const API_URL = 'https://dmj.one/api/attendance/?view_history=true&download_history_csv=true';
+
+            async function loadAttendance() {
+                try {
+                    const res = await fetch(API_URL);
+                    if (!res.ok) throw new Error(res.status + ' ' + res.statusText);
+                    const text = await res.text();
+                    const lines = text.trim().split(/\r?\n/).filter(l => l);
+
+                    // parse CSV
+                    const [headerLine, ...dataLines] = lines;
+                    const headers = headerLine.split(',');
+
+                    // build table header
+                    const thead = document.querySelector('thead');
+                    const trHead = document.createElement('tr');
+                    headers.forEach((h, idx) => {
+                        const th = document.createElement('th');
+                        th.textContent = h;
+                        if (idx < 2) th.style.minWidth = '150px';
+                        trHead.appendChild(th);
+                    });
+                    thead.appendChild(trHead);
+
+                    // build table body
+                    const tbody = document.querySelector('tbody');
+                    dataLines.forEach(line => {
+                        const cols = line.split(',');
+                        const tr = document.createElement('tr');
+
+                        cols.forEach((cell, idx) => {
+                            const td = document.createElement('td');
+                            if (idx >= 2) {
+                                // P/A badges
+                                const badge = document.createElement('span');
+                                badge.classList.add('badge');
+                                badge.textContent = cell || '';
+                                if (cell === 'P') badge.classList.add('bg-success');
+                                else if (cell === 'A') badge.classList.add('bg-danger');
+                                else badge.classList.add('bg-secondary');
+                                td.appendChild(badge);
+                            } else {
+                                td.textContent = cell;
+                            }
+                            tr.appendChild(td);
+                        });
+
+                        tbody.appendChild(tr);
+                    });
+
+                    // show table, hide loader
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('table-container').style.display = 'block';
+
+                } catch (err) {
+                    document.getElementById('loading').innerHTML =
+                        `<div class="alert alert-danger">Error loading data: ${err.message}</div>`;
+                }
+            }
+
+            loadAttendance();
+        </script>
+    </body>
+
+</html>
