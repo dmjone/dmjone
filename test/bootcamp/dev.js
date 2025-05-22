@@ -374,6 +374,46 @@ const shuffle = arr => {
     return arr;
 };
 
+function titleCase(fullName) {
+    return fullName
+        .split(' ')
+        .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+        .join(' ');
+  }
+
+const officialRollOrder = [
+    "GF202217642", "GF202219013", "GF202217661", "GF202218683", "GF202219716",
+    "GF202216680", "GF202218941", "GF202215162", "GF202349954", "GF202218718",
+    "GF202217911", "GF202217069", "GF202218465", "GF202217215", "GF202215081",
+    "GF202220189", "GF202220107", "GF202216027", "GF202219136", "GF202340427",
+    "GF202217577", "GF202216452", "GF202215717", "GF202215982", "GF202219995",
+    "GF202219910", "GF202213991", "GF202217744", "GF202216959", "GF202214751",
+    "GF202218710", "GF202216884", "GF202219099", "GF202214861", "GF202216002",
+    "GF202219588", "GF202218457", "GF202218659", "GF202221023", "GF202218101",
+    "GF202214559", "GF202216859", "GF202215719", "GF202220590", "GF202216782",
+    "GF202216426", "GF202218776", "GF202344200", "GF202220123", "GF202214698",
+    "GF202218328", "GF202218756", "GF202215401", "GF202216583", "GF202219897",
+    "GF202218277", "GF202215237", "GF202215904", "GF202218795", "GF202216775",
+    "GF202218652", "GF202217023", "GF202217536", "GF202217952", "GF202219717",
+    "GF202218486", "GF202218455", "GF202216008", "GF202220345", "GF202217428",
+    "GF202214673", "GF202220969", "GF202216641", "GF202220476", "GF202217875",
+    "GF202219772", "GF202218585", "GF202218364", "GF202218910", "GF202219177",
+    "GF202215980", "GF202218643", "GF202218595", "GF202220815", "GF202219794",
+    "GF202216945", "GF202219568", "GF202217706", "GF202218943", "GF202217922",
+    "GF202218129", "GF202215557", "GF202216921", "GF202216395", "IN20221191",
+    "GF202218040", "GF202344308", "GF202347734", "GF202213862", "GF202346910",
+    "GF202216821", "GF202217662", "GF202218734", "GF202220756", "GF202220064",
+    "GF202218418", "GF202216818", "GF202215284", "GF202215973", "GF202219890",
+    "GF202220522", "GF202216619", "GF202219306", "GF202218711", "GF202341183",
+    "GF202218625", "GF202220516", "GF202213793", "GF202215586", "GF202218544",
+    "GF202218982", "GF202219655", "GF202218590", "GF202350614", "GF202218839",
+    "GF202344756", "GF202217243", "GF202213662", "GF202347000", "GF202214891",
+    "IN20221052", "GF202216843", "GF202218362", "GF202219644", "GF202219386",
+    "GF202214708", "GF202218880", "GF202215303", "GF202218737", "GF202218482",
+    "GF202218143", "GF202215292", "GF202218584", "GF202218953", "GF202214829",
+    "GF202219757", "GF202350495"
+];
+
 // 2. Students (shuffled once)
 const students = shuffle([
     { name: "Aarushi", id: "GF202217642" },
@@ -616,12 +656,22 @@ document.addEventListener('keydown', e => {
 
 // 11. Generate Excel (alphabetical by name)
 document.getElementById('generate').onclick = () => {
+    // const data = students.map((s, i) => ({
+    //     name: s.name,
+    //     id: s.id,
+    //     status: attStatus[i] === 'absent' ? 'A' : attStatus[i] === 'present' ? 'P' : ''
+    // }))
+    //     .sort((a, b) => a.name.localeCompare(b.name));
+
     const data = students.map((s, i) => ({
-        name: s.name,
+        name: titleCase(s.name),
         id: s.id,
         status: attStatus[i] === 'absent' ? 'A' : attStatus[i] === 'present' ? 'P' : ''
     }))
-        .sort((a, b) => a.name.localeCompare(b.name));
+        .sort((a, b) =>
+            officialRollOrder.indexOf(a.id) - officialRollOrder.indexOf(b.id)
+        );
+
 
     const wb = XLSX.utils.book_new();
     const header = ['Name', 'ID', document.getElementById('date').textContent];
