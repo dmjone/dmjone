@@ -46,10 +46,48 @@ async function loadAttendance() {
 
             tbody.appendChild(tr);
         });
+        
+        // 1) After you finish counting presentCounts/absentCounts and before showing the table:
+        const summaryDiv = document.getElementById('attendance-summary');
+        const totalStudents = dataLines.length;
+        const totalDays = headers.length - 2;
+
+        // 2) Build a small card for overall stats
+        const cards = [
+            `<div class="card me-3 mb-3" style="min-width:120px">
+              <div class="card-body p-2 text-center">
+                <h6 class="card-title mb-1">Students</h6>
+                <p class="mb-0">${totalStudents}</p>
+              </div>
+            </div>`,
+            `<div class="card me-3 mb-3" style="min-width:120px">
+              <div class="card-body p-2 text-center">
+                <h6 class="card-title mb-1">Days</h6>
+                <p class="mb-0">${totalDays}</p>
+              </div>
+            </div>`
+        ];
+
+        // 3) One card per date with P/A counts
+        headers.slice(2).forEach((date, idx) => {
+            cards.push(`
+              <div class="card me-3 mb-3" style="min-width:100px">
+                <div class="card-body p-2 text-center">
+                  <h6 class="card-title mb-1">${date}</h6>
+                  <p class="mb-0 text-success">P: ${presentCounts[idx + 2]}</p>
+                  <p class="mb-0 text-danger">A: ${absentCounts[idx + 2]}</p>
+                </div>
+              </div>
+            `);
+        });
+
+        // 4) Render them
+        summaryDiv.innerHTML = cards.join('');
 
         // show table, hide loader
         document.getElementById('loading').style.display = 'none';
         document.getElementById('table-container').style.display = 'block';
+
     } catch (err) {
         document.getElementById('loading').innerHTML =
             `<div class="alert alert-danger">Error loading data: ${err.message}</div>`;
