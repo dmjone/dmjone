@@ -116,3 +116,19 @@ async function loadAttendance() {
 
 // Run on page load
 document.addEventListener('DOMContentLoaded', loadAttendance);
+
+// ---------------
+// Export CSV handler
+// ---------------
+document.getElementById('export-csv').addEventListener('click', () => {
+    // reuse the same API but with download param
+    const url = 'https://dmj.one/api/attendance/?view_history=true&download_history_csv=true';
+    // create a temporary link to trigger download
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `attendance_history_${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+});
+  
