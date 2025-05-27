@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <title>Attendance History</title>
+        <style>
+            table {
+                border-collapse: collapse;
+                width: 100%;
+            }
+
+            th,
+            td {
+                border: 1px solid #ccc;
+                padding: 8px;
+                text-align: center;
+            }
+
+            td.clickable {
+                cursor: pointer;
+            }
+
+            td.P {
+                background: #d4edda;
+            }
+
+            /* light green */
+            td.A {
+                background: #f8d7da;
+            }
+
+            /* light red */
+        </style>
+    </head>
+
+    <body>
+        <h2>Attendance History</h2>
+        <table id="histTable">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Roll</th>
+                    <th>Name</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+
+        <script>
+            async function loadHistory() {
+                const res = await fetch('?history_json=true');
+                const data = await res.json();
+                const tbody = document.querySelector('#histTable tbody');
+                tbody.innerHTML = '';
+                data.forEach(r => {
+                    const tr = document.createElement('tr');
+                    ['ts', 'roll', 'name'].forEach(f => {
+                        const td = document.createElement('td');
+                        td.textContent = f === 'ts' ? r.ts.slice(0, 10) : r[f];
+                        tr.appendChild(td);
+                    });
+                    const td = document.createElement('td');
+                    td.textContent = r.status;
+                    td.className = `clickable ${r.status}`;
+                    td.dataset.roll = r.roll;
+                    td.dataset.ts = r.ts;
+                    td.addEventListener('click', toggleStatus);
+                    tr.appendChild(td);
+                    tbody.appendChild(tr);
+                });
+            }
+
+            async function toggleStatus(evt) {
+                const td = evt.currentTarget;
+                const roll = td.dataset.roll;
+                const ts = td.dataset.ts;
+                const res = await fetch(`?toggle_history=true&roll=${roll}&ts=${encodeURIComponent(ts)}`);
+                if (res.ok) {
+                    // flip in UI
+                    td.textContent = td.textContent === 'P' ? 'A' : 'P';
+                    td.classList.toggle('P');
+                    td.classList.toggle('A');
+                } else {
+                    alert('Toggle failed: ' + await res.text());
+                }
+            }
+
+            // initial load
+            loadHistory();
+        </script>
+    </body>
+
+</html>
