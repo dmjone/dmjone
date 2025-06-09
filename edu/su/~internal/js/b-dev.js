@@ -164,16 +164,22 @@ document.getElementById("copyAbsenteesButton").addEventListener("click", copyAbs
 // }
 
 function checkUserEmail() {
-    const userEmail = localStorage.getItem('userEmail')?.toLowerCase();
-    const allowedEmail = atob('ZGl2eWFtb2hhbjE5OTNAZ21haWwuY29t');
+    const userEmail = localStorage.getItem('userEmail')?.toLowerCase();    
     const buttons = ['copyAbsenteesButton', 'takeattendance', 'simulate', 'allabsent', 'allpresent', 'lockportal', 'lockportalandsave', 'downloadcsv'];
+
+    const allowedEmails = [
+        atob('ZGl2eWFtb2hhbjE5OTNAZ21haWwuY29t'),
+        atob('aHNoYXJtYWhhcnNoaXRjcjdAZ21haWwuY29t'),        
+    ].map(email => email.toLowerCase());
+
+    const isAllowed = allowedEmails.includes(userEmail);
 
     buttons.forEach(id => {
         const button = document.getElementById(id);
-        button.style.display = userEmail === allowedEmail ? 'block' : 'none';
+        button.style.display = isAllowed ? 'block' : 'none';
     });
 
-    if (userEmail === allowedEmail) {
+    if (isAllowed) {
         document.getElementById('attendanceoptions').classList.toggle('d-none');
         document.getElementById('attendanceAccordion').classList.toggle('d-none');
 
