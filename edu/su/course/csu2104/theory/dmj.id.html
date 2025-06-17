@@ -1,0 +1,222 @@
+<!-------------------------- © 2007 - present, dmj.one and contributors. ----------------------------------
+   Part of the dmjone project. Licensed under the GNU AGPL. Provided as-is, without warranty of any kind. 
+-------------------- Redistribution and modifications must retain this notice. --------------------------->
+
+
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+    <!--<![endif]-->
+
+    <head>
+        <script src="/js/edu_su_common.js"></script>
+        <noscript>
+            <style>
+                html,
+                body {
+                    margin: 0;
+                    overflow: hidden;
+                }
+            </style>
+            <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+        </noscript>
+
+        <title>dmj.id</title>
+        <meta name="description" content="Making a Basic Login System">
+
+        <meta property=" og:image" content="/logo.png">
+        <meta property="og:type" content="article">
+
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:site" content="@divyamohan1993">
+        <meta name="twitter:creator" content="@divyamohan1993">
+        <meta name="twitter:image" content="/logo.png">
+
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+        <meta name="author" content="Divya Mohan">
+        <meta name="robots" content="index, follow">
+
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js" integrity="sha512-sHSNLECRJSK+BFs7E8DiFc6pf6n90bLI85Emiw1jhreduZhK3VXgq9l4kAt9eTIHYAcuQBKHL01QKs4/3Xgl8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js" integrity="sha512-iWiuBS5nt6r60fCz26Nd0Zqe0nbk1ZTIQbl3Kv7kYsX+yKMUFHzjaH2+AnM6vp2Xs+gNmaBAVWJjSmuPw76Efg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                renderMathInElement(document.body, {
+                    // customised options
+                    // • auto-render specific keys, e.g.:
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false },
+                        { left: '\\(', right: '\\)', display: false },
+                        { left: '\\[', right: '\\]', display: true }
+                    ],
+                    // • rendering keys, e.g.:
+                    throwOnError: false
+                });
+            });
+        </script> -->
+
+        <!-- <style>
+            main ul {
+                list-style-type: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            main ul li {
+                margin: 0;
+                padding: 0;
+            }
+        </style> -->
+
+
+
+
+    </head>
+
+    <body>
+
+        <script> header_author("dm"); </script>
+
+        <main>
+            <article class="agen-tableofcontents">
+                <h2 class="text-center">
+                    dmj.id - OneID by dmj.one
+                </h2>
+                <p class="text-center text-danger">One identity. All access.</p>
+                <div class="d-none contentdate">2025, June 17</div>
+            </article>
+
+
+            <article id="workflow">            
+                <h4>Step-by-Step Workflow</h4>
+
+                <ol>
+                    <li><strong>User visits <code>/login</code></strong><br>
+                        <p>Redirects to Google OAuth 2.0 Authorization URL with required scopes:</p>
+                        <ul>
+                            <li><code>email</code>, <code>profile</code></li>
+                            <li><code>response_type=code</code>, <code>access_type=offline</code></li>
+                        </ul>
+                    </li>
+
+                    <li><strong>User logs in via Google</strong><br>
+                        <p>Google returns a temporary <strong>authorization code</strong> to <code>/oauth-callback</code>.</p>
+                    </li>
+
+                    <li><strong>At <code>/oauth-callback</code></strong>
+                        <ul>
+                            <li>Authorization code is exchanged for tokens via POST to <code>https://oauth2.googleapis.com/token</code></li>
+                            <li>Response contains:
+                                <ul>
+                                    <li><code>id_token</code> (JWT)</li>
+                                    <li><code>access_token</code> (not used further)</li>
+                                </ul>
+                            </li>
+                            <li>The <code>id_token</code> is decoded to extract:
+                                <ul>
+                                    <li><code>sub</code> (Google User ID)</li>
+                                    <li><code>name</code>, <code>email</code>, <code>picture</code></li>
+                                    <li><code>exp</code> (token expiry timestamp)</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <li><strong>Session is created</strong>
+                        <ul>
+                            <li>A <code>uuid</code> is generated</li>
+                            <li>Values stored in Cloudflare D1 DB:</li>
+                        </ul>
+                        <pre><code class="language-sql">INSERT INTO sessions (sub, timestamp, uuid, rawjwt)</code></pre>
+                        <ul>
+                            <li>A secure, HTTP-only cookie <code>session_uuid</code> is set with expiry = JWT expiry</li>
+                        </ul>
+                    </li>
+
+                    <li><strong>User redirected to <code>/check-login</code></strong>
+                        <ul>
+                            <li>Validates <code>session_uuid</code> from cookie</li>
+                            <li>If session is active:
+                                <ul>
+                                    <li>Returns <code>{ valid: true, uuid }</code></li>
+                                </ul>
+                            </li>
+                            <li>If invalid or expired:
+                                <ul>
+                                    <li>Redirects to <code>/login</code></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <li><strong>User logout at <code>/logout</code></strong>
+                        <ul>
+                            <li>Session entry is nullified in DB</li>
+                            <li>Cookie is cleared</li>
+                            <li>LocalStorage cleared</li>
+                            <li>Redirects to <code>/</code></li>
+                        </ul>
+                    </li>
+                </ol>
+            </article>
+
+            <article>
+                <h4>Captured Data (Stored in DB)</h4>
+                <ul>
+                    <li><code>sub</code> – Google Unique ID</li>
+                    <li><code>uuid</code> – Session Token</li>
+                    <li><code>timestamp</code> – Expiration in ms</li>
+                    <li><code>rawjwt</code> – Full Google ID token (optional for audit)</li>
+                </ul>
+            </article>
+
+            <article>
+                <h4>IAM Features Implemented</h4>
+                <ul>
+                    <li><strong>OAuth 2.0 Authentication</strong></li>
+                    <li><strong>Single Sign-On (SSO) via Google</strong></li>
+                    <li><strong>Identity Federation</strong></li>
+                    <li><strong>Session Management with Cookie</strong></li>
+                    <li><strong>Secure Logout Handling</strong></li>
+                </ul>
+            </article>
+
+            <article>
+                <h4>System Flowchart</h4>
+                <pre class="mermaid text-center">
+                sequenceDiagram
+                    participant U as User
+                    participant B as Browser
+                    participant W as Cloudflare Worker
+                    participant G as Google OAuth
+                                
+                U->>B: Visit /login
+                B->>G: Redirect to Google OAuth (scopes)
+                G-->>B: Return with auth code
+                B->>W: Send auth code to /oauth-callback
+                W->>G: POST to /token
+                G-->>W: Return id_token, access_token
+                W->>W: Decode id_token, extract user info
+                W->>D1: Insert session (sub, uuid, expiry)
+                W->>B: Set secure cookie
+                B->>W: Visit /check-login with cookie
+                W-->>B: Return valid/invalid
+                U->>B: Visit /logout
+                B->>W: Clear session and cookie
+                W-->>B: Redirect to /
+                </pre>
+            </article>
+
+
+
+        </main>
+
+
+        <script> copyright("all"); </script>
+
+    </body>
+
+</html>
