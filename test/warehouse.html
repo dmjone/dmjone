@@ -1,0 +1,181 @@
+Here’s a single PowerShell script that gives you a one-click call:
+
+Function Sync-DataWarehouse takes one or more CSV paths.
+
+Batch-processes 50 records at a time.
+
+Waits for CPU < 40%, then bumps its own priority.
+
+Dedupes via a SHA-256 hash of all original fields.
+
+Appends transformed rows (with a GUID) to your warehouse CSV.
+
+Keeps an audit trail CSV with RecordHash, UniqueId, source file, timestamp.
+
+Backs up each processed source into a date-stamped folder.
+
+Logs warnings and alerts to an alert log.
+
+
+Save this as DataWarehouseSync.ps1 and invoke it like:
+
+.\DataWarehouseSync.ps1 C:\Input\file1.csv,C:\Input\file2.csv
+# or
+Sync-DataWarehouse -InputPaths 'C:\Input\*.csv'
+
+
+---
+
+<#
+.SYNOPSIS
+    One-click CSV→Warehouse sync with batching, CPU throttle, dedupe, audit & backup.
+#>
+#region Configuration
+# You can adjust these paths & thresholds
+$WarehouseCsv   = "C:\Warehouse\data_warehouse.csv"
+$AuditCsv       = "C:\Warehouse\audit_trail.csv"
+$BackupFolder   = "C:\Warehouse\Backup"
+$AlertLog       = "C:\Warehouse\alert.log"
+$BatchSize      = 50
+$CPUThreshold   = 40
+#endregion
+
+function Get-CPUUsage {
+    (Get-Counter '\Processor(_Total)\% Processor Time').CounterSamples[0].CookedValue
+}
+
+function Get-RecordHash {
+    param($rec)
+    $vals = $rec.PSObject.Properties |
+            Where Name -NotIn 'ProcessedOn' |
+            Sort-Object Name |
+            ForEach-Object { $_.Value }
+    $bytes = [System.Text.Encoding]::UTF8.GetBytes(($vals -join '|'))
+    $h    = [System.Security.Cryptography.SHA256]::Create().ComputeHash($bytes)
+    ($h | ForEach-Object { $_.ToString("x2") }) -join ''
+}
+
+function Send-Alert {
+    param($msg)
+    $entry = "[{0:yyyy-MM-dd HH:mm:ss}] {1}" -f (Get-Date), $msg
+    Add-Content -Path $AlertLog -Value $entry
+    Write-Warning $msg
+}
+
+function Sync-DataWarehouse {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
+        [string[]] $InputPaths
+    )
+    Begin {
+        # bump priority
+        $MyProc = Get-Process -Id $PID
+        $MyProc.PriorityClass = 'AboveNormal'
+        # load existing audit hashes
+        $existing = @{}
+        if (Test-Path $AuditCsv) {
+            Import-Csv $AuditCsv | ForEach-Object { $existing[$_.RecordHash] = $true }
+        }
+        # ensure dirs
+        foreach ($p in @($WarehouseCsv,$AuditCsv,$AlertLog)) {
+            $d = Split-Path $p
+            if (!(Test-Path $d)) { New-Item $d -ItemType Dir | Out-Null }
+        }
+        if (!(Test-Path $BackupFolder)) { New-Item $BackupFolder -ItemType Dir | Out-Null }
+    }
+    Process {
+        foreach ($pattern in $InputPaths) {
+            foreach ($file in Get-ChildItem -Path $pattern -File) {
+                Write-Host "🔄 Processing: $($file.FullName)"
+                $rows = Import-Csv $file.FullName
+                for ($i = 0; $i -lt $rows.Count; $i += $BatchSize) {
+                    # wait for CPU slot
+                    while ((Get-CPUUsage) -ge $CPUThreshold) {
+                        Send-Alert "High CPU: $([math]::Round((Get-CPUUsage),1))%. Waiting..."
+                        Start-Sleep -Seconds 5
+                    }
+                    $batch = $rows[$i..([math]::Min($i+$BatchSize-1,$rows.Count-1))]
+                    $out   = @()
+                    $audit = @()
+                    foreach ($r in $batch) {
+                        $hash = Get-RecordHash $r
+                        if ($existing.ContainsKey($hash)) { continue }
+                        $existing[$hash] = $true
+                        $uid = [guid]::NewGuid().ToString()
+                        $out += [PSCustomObject]@{
+                            UniqueId    = $uid
+                            RecordHash  = $hash
+                            # transform as needed:
+                            ID          = $r.ID
+                            FirstName   = $r.FirstName.ToUpper()
+                            LastName    = $r.LastName.ToUpper()
+                            Email       = $r.Email
+                            ProcessedOn = (Get-Date).ToString("u")
+                        }
+                        $audit += [PSCustomObject]@{
+                            RecordHash  = $hash
+                            UniqueId    = $uid
+                            SourceFile  = $file.Name
+                            Timestamp   = (Get-Date).ToString("u")
+                        }
+                    }
+                    if ($out.Count) {
+                        $out   | Export-Csv $WarehouseCsv -Append -NoTypeInformation
+                        $audit | Export-Csv $AuditCsv     -Append -NoTypeInformation
+                        Write-Host "  ✅ Batches $(($i+1))–$([math]::Min($i+$BatchSize,$rows.Count)) → $($out.Count) new"
+                    } else {
+                        Write-Host "  ⚪ No new records in batch $(($i+1))–$([math]::Min($i+$BatchSize,$rows.Count))"
+                    }
+                }
+                # backup source
+                $ts = Get-Date -Format 'yyyyMMdd_HHmmss'
+                $dest = Join-Path $BackupFolder $ts
+                if (!(Test-Path $dest)) { New-Item $dest -ItemType Dir | Out-Null }
+                Copy-Item $file.FullName -Destination $dest -Force
+                Write-Host "  📦 Backed up to $dest"
+            }
+        }
+    }
+    End {
+        Write-Host "🎯 Sync complete. Warehouse: $WarehouseCsv"
+    }
+}
+
+# if script called directly:
+if ($MyInvocation.InvocationName -eq '.\DataWarehouseSync.ps1') {
+    Sync-DataWarehouse -InputPaths ($args -split ',')
+}
+
+
+---
+
+How to use
+
+1. Save as DataWarehouseSync.ps1.
+
+
+2. Run from PowerShell (Admin recommended):
+
+.\DataWarehouseSync.ps1 'C:\Input\file1.csv,C:\Input\file2.csv'
+
+or dot-source & call the function directly:
+
+. .\DataWarehouseSync.ps1
+Sync-DataWarehouse -InputPaths 'C:\Input\*.csv'
+
+
+3. Audit trail is in C:\Warehouse\audit_trail.csv.
+
+
+4. Alerts go to C:\Warehouse\alert.log.
+
+
+5. Backups appear under C:\Warehouse\Backup\{timestamp}\.
+
+
+
+You can schedule this script in Task Scheduler (or via Register-ScheduledTask) to run automatically, or trigger it manually whenever you like with just:
+
+Sync-DataWarehouse -InputPaths '<your CSV files>'
+
