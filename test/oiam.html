@@ -1,0 +1,257 @@
+Below are the three “layers” you need—each named and tuned to hand off cleanly to the next.
+
+
+---
+
+1. One Identity VB.NET Script
+
+Name: CCC_CopyValidPersons
+Runs in: Designer → Scripts (VB.NET sandbox)
+Target table: CCC_PersonMirror in your OneIM database
+
+Imports VI.DB
+Imports System.Text.RegularExpressions
+
+Public Sub CCC_CopyValidPersons()
+    Const INDIA_CC As String = "IN"
+    Dim phoneRx As New Regex("^\+91\d{6,}$", RegexOptions.Compiled)
+
+    Using db As ISession = Session
+        Dim tgt As Table = db.Tables("CCC_PersonMirror")
+
+        ' 1) pick all valid Person rows
+        Dim q = db.CreateQuery(Of IEntity)() _
+                   .From("Person") _
+                   .Where("IsNull(FirstName,'') <> ''") _
+                   .And("IsNull(LastName,'')  <> ''") _
+                   .And("IsNull(DefaultEmailAddress,'') <> ''") _
+                   .And("UID_DialogCountry IN (SELECT UID_DialogCountry FROM DialogCountry WHERE CountryCode = @cc)") _
+                   .And("IsNull(TelPriv,'') LIKE '+91%'")
+        q.Parameters.Add("@cc", INDIA_CC)
+
+        For Each p As IEntity In db.GetCollection(q)
+            Dim phone = p.GetValue(Of String)("TelPriv")
+            If Not phoneRx.IsMatch(phone) Then Continue For
+
+            Dim key = p.GetValue(Of String)("UID_Person")
+            Dim m = db.GetEntity(tgt, key)
+            If m Is Nothing Then
+                m = db.CreateNew(tgt)
+                m.PutValue("UID_CCC_PersonMirror", key)
+            End If
+
+            m.PutValue("FirstName",  p.GetValue(Of String)("FirstName"))
+            m.PutValue("LastName",   p.GetValue(Of String)("LastName"))
+            m.PutValue("Email",      p.GetValue(Of String)("DefaultEmailAddress"))
+            m.PutValue("Phone",      phone)
+            m.PutValue("Country",    INDIA_CC)
+            m.PutValue("IsProcessed", False)      ' reset for warehouse sync
+            m.Save(Session)
+        Next
+    End Using
+End Sub
+
+> Table schema reminder (Designer → Schema Editor):
+
+CREATE TABLE CCC_PersonMirror (
+  UID_CCC_PersonMirror varchar(38) NOT NULL PRIMARY KEY,  -- mirrors UID_Person
+  FirstName            nvarchar(100),
+  LastName             nvarchar(100),
+  Email                nvarchar(200),
+  Phone                nvarchar(50),
+  Country              char(2),
+  IsProcessed          bit       NOT NULL DEFAULT(0),
+  ProcessedAt          datetime2 NULL,
+  WorkerId             sysname   NULL
+);
+
+
+
+
+---
+
+2. T-SQL Stored Procedure
+
+Name: dbo.usp_ProcessCCCToWarehouse
+Runs in: Your OLTP SQL Server database
+Pushes into: Warehouse.dbo.CCC_PersonMirror
+
+CREATE OR ALTER PROCEDURE dbo.usp_ProcessCCCToWarehouse
+  @MaxLoops   INT      = 0,     -- 0 = go until done
+  @ThrottleMs INT      = 200,   -- back-off if idle
+  @WorkerName SYSNAME  = NULL
+AS
+BEGIN
+  SET NOCOUNT, XACT_ABORT ON;
+  IF @WorkerName IS NULL
+    SELECT @WorkerName = CONCAT('WW_', @@SPID);
+
+  DECLARE @loops INT = 0;
+
+  WHILE 1=1
+  BEGIN
+    BEGIN TRAN;
+      -- grab up to 50 unprocessed staging rows
+      WITH todo AS (
+        SELECT TOP (50) UID_CCC_PersonMirror
+        FROM dbo.CCC_PersonMirror WITH (ROWLOCK, READPAST)
+        WHERE IsProcessed = 0
+        ORDER BY UID_CCC_PersonMirror
+      )
+      UPDATE src
+      SET    IsProcessed = 1,
+             ProcessedAt = SYSDATETIME(),
+             WorkerId    = @WorkerName
+      OUTPUT deleted.UID_CCC_PersonMirror INTO #pkbatch
+      FROM   dbo.CCC_PersonMirror AS src
+      JOIN   todo ON todo.UID_CCC_PersonMirror = src.UID_CCC_PersonMirror;
+
+      IF @@ROWCOUNT = 0
+      BEGIN
+        ROLLBACK;
+        WAITFOR DELAY '00:00:00.' + RIGHT('000' + CAST(@ThrottleMs AS VARCHAR(3)),3);
+        BREAK;
+      END
+    COMMIT;
+
+    -- merge into warehouse
+    MERGE Warehouse.dbo.CCC_PersonMirror AS wh
+    USING (
+      SELECT m.UID_CCC_PersonMirror, m.FirstName, m.LastName, m.Email, m.Phone, m.Country
+      FROM dbo.CCC_PersonMirror AS m
+      JOIN #pkbatch AS b ON b.UID_CCC_PersonMirror = m.UID_CCC_PersonMirror
+    ) AS src
+    ON wh.UID_CCC_PersonMirror = src.UID_CCC_PersonMirror
+    WHEN MATCHED THEN
+      UPDATE SET 
+        FirstName = src.FirstName,
+        LastName  = src.LastName,
+        Email     = src.Email,
+        Phone     = src.Phone,
+        Country   = src.Country,
+        SyncedAt  = SYSDATETIME()
+    WHEN NOT MATCHED BY TARGET THEN
+      INSERT (UID_CCC_PersonMirror, FirstName, LastName, Email, Phone, Country, SyncedAt)
+      VALUES (src.UID_CCC_PersonMirror, src.FirstName, src.LastName, src.Email, src.Phone, src.Country, SYSDATETIME());
+
+    DROP TABLE #pkbatch;
+
+    SET @loops += 1;
+    IF @MaxLoops <> 0 AND @loops >= @MaxLoops
+      BREAK;
+  END
+END
+GO
+
+> Warehouse table schema (Warehouse.dbo.CCC_PersonMirror):
+
+CREATE TABLE Warehouse.dbo.CCC_PersonMirror (
+  UID_CCC_PersonMirror varchar(38) NOT NULL PRIMARY KEY,
+  FirstName            nvarchar(100),
+  LastName             nvarchar(100),
+  Email                nvarchar(200),
+  Phone                nvarchar(50),
+  Country              char(2),
+  SyncedAt             datetime2 NOT NULL
+);
+
+
+
+
+---
+
+3. PowerShell Orchestration (NightWarehouse.ps1)
+
+Monitors server load and fans out up to $MaxWorkers parallel calls to your sync proc.
+
+# CONFIGURATION
+$SqlServer   = "YourSqlServer"
+$SqlDatabase = "YourDb"            # where usp_ProcessCCCToWarehouse lives
+$Cred        = Get-Credential      # use an account with EXEC rights
+$MaxWorkers  = 4
+$IdleCpuPct  = 10
+$IdleQPS     = 20
+$IdleMins    = 5
+$PollSec     = 30
+$BackoffMs   = 200
+
+Import-Module SqlServer
+
+function Invoke-SyncWorker {
+  param($Name)
+  $tsql = "EXEC dbo.usp_ProcessCCCToWarehouse @MaxLoops=0, @ThrottleMs=$BackoffMs, @WorkerName='$Name';"
+  Invoke-Sqlcmd -ServerInstance $SqlServer -Database $SqlDatabase -Credential $Cred `
+                -Query $tsql -QueryTimeout 0
+}
+
+function Get-Load {
+  $cpu = (Get-Counter '\Processor(_Total)\% Processor Time' -MaxSamples 1).CounterSamples.CookedValue
+  $qps = Invoke-Sqlcmd -ServerInstance $SqlServer -Database master -Credential $Cred `
+        -Query "SELECT COUNT(*) FROM sys.dm_exec_requests WHERE session_id>50" |
+        Select-Object -ExpandProperty Column1
+  return [pscustomobject]@{ CPU=[int]$cpu; QPS=[int]$qps }
+}
+
+Write-Host "Starting NightWarehouse…"
+$idleSince = $null
+
+while ($true) {
+  $load = Get-Load
+  Write-Host ("[{0}] CPU {1}% | QPS {2}" -f (Get-Date), $load.CPU, $load.QPS)
+
+  if ($load.CPU -lt $IdleCpuPct -and $load.QPS -lt $IdleQPS) {
+    if (-not $idleSince) { $idleSince = Get-Date }
+    elseif ((Get-Date) - $idleSince -gt [timespan]::FromMinutes($IdleMins)) {
+      $running = Get-Job -State Running
+      $toStart = $MaxWorkers - $running.Count
+      1..$toStart | ForEach-Object {
+        $n = "SyncWorker_$_"
+        Start-Job -Name $n -ScriptBlock ${function:Invoke-SyncWorker} -ArgumentList $n
+        Write-Host " Launched $n"
+      }
+    }
+  } else {
+    $idleSince = $null
+    Get-Job -State Running | ForEach-Object {
+      Write-Host "Stopping $($_.Name)…"
+      Stop-Job $_.Id
+    }
+  }
+
+  # cleanup
+  Get-Job | Where-Object State -in 'Completed','Failed' | ForEach-Object {
+    Receive-Job $_ -ErrorAction SilentlyContinue | Out-Null
+    Remove-Job $_
+  }
+
+  Start-Sleep -Seconds $PollSec
+}
+
+
+---
+
+How they tie together
+
+1. Daytime → Users hit Person table; your VB.NET script (CCC_CopyValidPersons) keeps CCC_PersonMirror up-to-date and flags IsProcessed = 0.
+
+
+2. Nighttime → Task Scheduler runs NightWarehouse.ps1 at, say, 6 PM. It idles until the server is truly quiet for 5 minutes.
+
+
+3. On idle → PS fires up to 4 parallel PowerShell jobs. Each calls usp_ProcessCCCToWarehouse, which:
+
+Batches 50 unprocessed rows, marks them processed,
+
+MERGEs them into your warehouse table.
+
+
+
+4. Load spike → PS detects CPU/QPS rising, gently stops all jobs.
+
+
+5. Morning → All rows have IsProcessed=1 and your warehouse is fully in sync.
+
+
+
+You now have a fully automated, low-impact, multi-threaded ETL chain from One Identity → SQL Server staging → data warehouse.
+
