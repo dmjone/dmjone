@@ -179,3 +179,176 @@ You can schedule this script in Task Scheduler (or via Register-ScheduledTask) t
 
 Sync-DataWarehouse -InputPaths '<your CSV files>'
 
+
+
+
+
+<#
+.SYNOPSIS
+    One-click CSV→Warehouse sync with batching, CPU throttle, dedupe, audit, backup, validation & sanitization.
+#>
+#region Configuration
+$WarehouseCsv   = "C:\Warehouse\data_warehouse.csv"
+$AuditCsv       = "C:\Warehouse\audit_trail.csv"
+$BackupFolder   = "C:\Warehouse\Backup"
+$AlertLog       = "C:\Warehouse\alert.log"
+$BatchSize      = 50
+$CPUThreshold   = 40
+#endregion
+
+function Get-CPUUsage {
+    (Get-Counter '\Processor(_Total)\% Processor Time').CounterSamples[0].CookedValue
+}
+
+function Get-RecordHash {
+    param($rec)
+    # Only include key columns in hash
+    $keys = 'ID','FirstName','LastName','Email','Location','PhoneNumber'
+    $vals = $rec.PSObject.Properties |
+            Where-Object { $keys -contains $_.Name } |
+            Sort-Object Name |
+            ForEach-Object { $_.Value }
+    $bytes = [System.Text.Encoding]::UTF8.GetBytes(($vals -join '|'))
+    $hash  = [System.Security.Cryptography.SHA256]::Create().ComputeHash($bytes)
+    return ($hash | ForEach-Object { $_.ToString("x2") }) -join ''
+}
+
+function Send-Alert {
+    param($msg)
+    $entry = "[{0:yyyy-MM-dd HH:mm:ss}] {1}" -f (Get-Date), $msg
+    Add-Content -Path $AlertLog -Value $entry
+    Write-Warning $msg
+}
+
+function Validate-Record {
+    param($rec, $sourceFile)
+    $required = 'ID','FirstName','LastName','Email','Location','PhoneNumber'
+    foreach ($col in $required) {
+        if (-not $rec.PSObject.Properties.Match($col) -or [string]::IsNullOrWhiteSpace($rec.$col)) {
+            Send-Alert "Skipping record in $sourceFile: Missing or empty '$col'"
+            return $false
+        }
+    }
+    if (-not ($rec.ID -as [int])) {
+        Send-Alert "Skipping record in $sourceFile: ID '$($rec.ID)' is not numeric"
+        return $false
+    }
+    if ($rec.Email -notmatch '^[^@\s]+@[^@\s]+\.[^@\s]+$') {
+        Send-Alert "Skipping record in $sourceFile: Invalid email '$($rec.Email)'"
+        return $false
+    }
+    if ($rec.Location -ne 'IN') {
+        Send-Alert "Skipping record in $sourceFile: Location '$($rec.Location)' is not 'IN'"
+        return $false
+    }
+    if ($rec.PhoneNumber -notmatch '^\+91\d+$') {
+        Send-Alert "Skipping record in $sourceFile: PhoneNumber '$($rec.PhoneNumber)' does not start with +91"
+        return $false
+    }
+    return $true
+}
+
+function Sync-DataWarehouse {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)][string[]] $InputPaths
+    )
+
+    Begin {
+        # raise priority
+        (Get-Process -Id $PID).PriorityClass = 'AboveNormal'
+        # load existing hashes
+        $existing = @{}
+        if (Test-Path $AuditCsv) {
+            Import-Csv $AuditCsv | ForEach-Object { $existing[$_.RecordHash] = $true }
+        }
+        # ensure directories
+        foreach ($p in $WarehouseCsv, $AuditCsv, $AlertLog) {
+            $d = Split-Path $p
+            if (!(Test-Path $d)) { New-Item $d -ItemType Directory | Out-Null }
+        }
+        if (!(Test-Path $BackupFolder)) { New-Item $BackupFolder -ItemType Directory | Out-Null }
+    }
+
+    Process {
+        foreach ($pattern in $InputPaths) {
+            foreach ($file in Get-ChildItem -Path $pattern -File) {
+                Write-Host "🔄 Processing: $($file.FullName)"
+                try {
+                    $rows = Import-Csv -Path $file.FullName -ErrorAction Stop
+                } catch {
+                    Send-Alert "Failed to parse CSV $($file.Name): $_"
+                    continue
+                }
+
+                for ($i = 0; $i -lt $rows.Count; $i += $BatchSize) {
+                    # throttle on CPU
+                    while ((Get-CPUUsage) -ge $CPUThreshold) {
+                        Send-Alert "High CPU: $([math]::Round((Get-CPUUsage),1))%. Waiting..."
+                        Start-Sleep -Seconds 5
+                    }
+
+                    $batch = $rows[$i..([math]::Min($i + $BatchSize - 1, $rows.Count - 1))]
+                    $out   = @(); $audit = @()
+
+                    foreach ($r in $batch) {
+                        if (-not (Validate-Record $r $file.Name)) { continue }
+
+                        # sanitize
+                        $r.FirstName   = $r.FirstName.Trim()
+                        $r.LastName    = $r.LastName.Trim()
+                        $r.Location    = $r.Location.Trim()
+                        $r.PhoneNumber = $r.PhoneNumber.Trim()
+
+                        $hash = Get-RecordHash $r
+                        if ($existing.ContainsKey($hash)) { continue }
+                        $existing[$hash] = $true
+
+                        $uid = [guid]::NewGuid().ToString()
+                        $out += [PSCustomObject]@{
+                            UniqueId    = $uid
+                            RecordHash  = $hash
+                            ID          = [int]$r.ID
+                            FirstName   = $r.FirstName.ToUpper()
+                            LastName    = $r.LastName.ToUpper()
+                            Email       = $r.Email
+                            Location    = $r.Location
+                            PhoneNumber = $r.PhoneNumber
+                            ProcessedOn = (Get-Date).ToString("u")
+                        }
+                        $audit += [PSCustomObject]@{
+                            RecordHash  = $hash
+                            UniqueId    = $uid
+                            SourceFile  = $file.Name
+                            Timestamp   = (Get-Date).ToString("u")
+                        }
+                    }
+
+                    if ($out.Count) {
+                        $out   | Export-Csv $WarehouseCsv -Append -NoTypeInformation
+                        $audit | Export-Csv $AuditCsv     -Append -NoTypeInformation
+                        Write-Host "  ✅ Processed batch $($i+1)-$([math]::Min($i+$BatchSize,$rows.Count)): $($out.Count) new records"
+                    } else {
+                        Write-Host "  ⚪ No new records in batch $($i+1)-$([math]::Min($i+$BatchSize,$rows.Count))"
+                    }
+                }
+
+                # backup source
+                $ts   = Get-Date -Format 'yyyyMMdd_HHmmss'
+                $dest = Join-Path $BackupFolder $ts
+                if (!(Test-Path $dest)) { New-Item $dest -ItemType Directory | Out-Null }
+                Copy-Item $file.FullName -Destination $dest -Force
+                Write-Host "  📦 Backed up to $dest"
+            }
+        }
+    }
+
+    End {
+        Write-Host "🎯 Sync complete. Warehouse at: $WarehouseCsv"
+    }
+}
+
+# one-click invocation
+if ($MyInvocation.InvocationName -match 'DataWarehouseSync\.ps1$') {
+    Sync-DataWarehouse -InputPaths ($args -split ',')
+}
