@@ -352,3 +352,213 @@ function Sync-DataWarehouse {
 if ($MyInvocation.InvocationName -match 'DataWarehouseSync\.ps1$') {
     Sync-DataWarehouse -InputPaths ($args -split ',')
 }
+
+
+
+
+
+
+
+<#
+.SYNOPSIS
+    One-click CSV → Warehouse sync:
+    • Batches of 50  
+    • CPU-throttle (< 40%)  
+    • Deduplication via SHA-256  
+    • Audit trail & backup  
+    • Validation & sanitization (Location=IN; Phone starts +91)  
+    • Adaptive priority escalation to guarantee completion within 24 h  
+#>
+#region Configuration
+$WarehouseCsv   = "C:\Warehouse\data_warehouse.csv"
+$AuditCsv       = "C:\Warehouse\audit_trail.csv"
+$BackupFolder   = "C:\Warehouse\Backup"
+$AlertLog       = "C:\Warehouse\alert.log"
+$BatchSize      = 50
+$CPUThreshold   = 40
+$DeadlineHours  = 24
+#endregion
+
+function Get-CPUUsage {
+    (Get-Counter '\Processor(_Total)\% Processor Time').CounterSamples[0].CookedValue
+}
+
+function Send-Alert {
+    param($msg)
+    $entry = "[{0:yyyy-MM-dd HH:mm:ss}] {1}" -f (Get-Date), $msg
+    Add-Content -Path $AlertLog -Value $entry
+    Write-Warning $msg
+}
+
+function Get-RecordHash {
+    param($rec)
+    $keys = 'ID','FirstName','LastName','Email','Location','PhoneNumber'
+    $vals = $keys | ForEach-Object { $rec.$_ }
+    $bytes = [System.Text.Encoding]::UTF8.GetBytes(($vals -join '|'))
+    $h     = [System.Security.Cryptography.SHA256]::Create().ComputeHash($bytes)
+    return ($h | ForEach-Object { $_.ToString("x2") }) -join ''
+}
+
+function Validate-Record {
+    param($r, $fileName)
+    foreach ($col in 'ID','FirstName','LastName','Email','Location','PhoneNumber') {
+        if (-not $r.PSObject.Properties.Match($col) -or [string]::IsNullOrWhiteSpace($r.$col)) {
+            Send-Alert "[$fileName] Missing or empty '$col'"
+            return $false
+        }
+    }
+    if (-not ($r.ID -as [int])) {
+        Send-Alert "[$fileName] ID '$($r.ID)' not numeric"
+        return $false
+    }
+    if ($r.Email -notmatch '^[^@\s]+@[^@\s]+\.[^@\s]+$') {
+        Send-Alert "[$fileName] Invalid Email '$($r.Email)'"
+        return $false
+    }
+    if ($r.Location -ne 'IN') {
+        Send-Alert "[$fileName] Location '$($r.Location)' ≠ IN"
+        return $false
+    }
+    if ($r.PhoneNumber -notmatch '^\+91\d+$') {
+        Send-Alert "[$fileName] Phone '$($r.PhoneNumber)' not start +91"
+        return $false
+    }
+    return $true
+}
+
+function Adjust-Priority {
+    param($processed)
+    $now      = Get-Date
+    $elapsed  = ($now - $global:startTime).TotalHours
+    $left     = $DeadlineHours - $elapsed
+    if ($processed -le 0 -or $elapsed -le 0) { return }
+    $tput     = $processed / $elapsed                   # records/hour
+    $remaining= $global:totalRecords - $processed
+    $estHours = $remaining / $tput
+    # Choose priority based on urgency
+    if    ($estHours -gt  $left)    { $prio = 'High' }
+    elseif ($estHours -gt  $left/2)  { $prio = 'AboveNormal' }
+    elseif ($estHours -gt  $left/4)  { $prio = 'Normal' }
+    elseif ($estHours -gt  $left/6)  { $prio = 'BelowNormal' }
+    else                             { $prio = 'Idle' }
+    $proc = Get-Process -Id $PID
+    if ($proc.PriorityClass -ne $prio) {
+        $proc.PriorityClass = $prio
+        Write-Host "🔧 Priority → $prio | Est: {0:N2}h | Left: {1:N2}h" -f $estHours, $left
+    }
+}
+
+function Sync-DataWarehouse {
+    [CmdletBinding()]
+    param([Parameter(Mandatory)][string[]] $InputPaths)
+
+    Begin {
+        $global:startTime      = Get-Date
+        (Get-Process -Id $PID).PriorityClass = 'Idle'
+
+        # Ensure dirs & load existing
+        $global:processedCount = 0
+        $global:totalRecords   = 0
+        $existing = @{}
+        foreach ($path in $WarehouseCsv, $AuditCsv, $AlertLog) {
+            $d = Split-Path $path; if (-not (Test-Path $d)) { New-Item $d -ItemType Directory | Out-Null }
+        }
+        if (-not (Test-Path $BackupFolder)) { New-Item $BackupFolder -ItemType Directory | Out-Null }
+        if (Test-Path $AuditCsv) {
+            Import-Csv $AuditCsv | ForEach-Object { $existing[$_.RecordHash] = $true }
+        }
+        # Count all rows across inputs
+        foreach ($pattern in $InputPaths) {
+            foreach ($f in Get-ChildItem -Path $pattern -File) {
+                try {
+                    $cnt = (Import-Csv $f.FullName | Measure-Object).Count
+                    $global:totalRecords += $cnt
+                } catch {
+                    Send-Alert "Cannot count rows in $($f.Name): $_"
+                }
+            }
+        }
+    }
+
+    Process {
+        foreach ($pattern in $InputPaths) {
+            foreach ($file in Get-ChildItem -Path $pattern -File) {
+                Write-Host "`n🔄 Processing $($file.Name)"
+                try {
+                    $rows = Import-Csv $file.FullName -ErrorAction Stop
+                } catch {
+                    Send-Alert "Parse error: $($file.Name): $_"
+                    continue
+                }
+
+                for ($i = 0; $i -lt $rows.Count; $i += $BatchSize) {
+                    # throttle CPU
+                    while ((Get-CPUUsage) -ge $CPUThreshold) {
+                        Send-Alert "CPU at $([math]::Round((Get-CPUUsage),1))%—waiting"
+                        Start-Sleep 5
+                    }
+
+                    $batch = $rows[$i..([math]::Min($i+$BatchSize-1, $rows.Count-1))]
+                    $out = @(); $audit = @()
+
+                    foreach ($r in $batch) {
+                        if (-not (Validate-Record $r $file.Name)) { continue }
+                        # sanitize
+                        foreach ($col in 'FirstName','LastName','Location','PhoneNumber') {
+                            $r.$col = $r.$col.Trim()
+                        }
+                        $hash = Get-RecordHash $r
+                        if ($existing[$hash]) { continue }
+                        $existing[$hash] = $true
+                        $uid = [guid]::NewGuid().ToString()
+
+                        $out += [PSCustomObject]@{
+                            UniqueId    = $uid
+                            RecordHash  = $hash
+                            ID          = [int]$r.ID
+                            FirstName   = $r.FirstName.ToUpper()
+                            LastName    = $r.LastName.ToUpper()
+                            Email       = $r.Email
+                            Location    = $r.Location
+                            PhoneNumber = $r.PhoneNumber
+                            ProcessedOn = (Get-Date).ToString("u")
+                        }
+                        $audit += [PSCustomObject]@{
+                            RecordHash  = $hash
+                            UniqueId    = $uid
+                            SourceFile  = $file.Name
+                            Timestamp   = (Get-Date).ToString("u")
+                        }
+                        $global:processedCount++
+                    }
+
+                    if ($out.Count) {
+                        $out   | Export-Csv $WarehouseCsv -Append -NoTypeInformation
+                        $audit | Export-Csv $AuditCsv     -Append -NoTypeInformation
+                        Write-Host "  ✅ Records $($i+1)-$([math]::Min($i+$BatchSize,$rows.Count)): +$($out.Count)"
+                    } else {
+                        Write-Host "  ⚪ Records $($i+1)-$([math]::Min($i+$BatchSize,$rows.Count)): none new"
+                    }
+
+                    Adjust-Priority $global:processedCount
+                }
+
+                # backup source file
+                $ts   = Get-Date -Format 'yyyyMMdd_HHmmss'
+                $dest = Join-Path $BackupFolder $ts
+                if (-not (Test-Path $dest)) { New-Item $dest -ItemType Directory | Out-Null }
+                Copy-Item $file.FullName -Destination $dest -Force
+                Write-Host "  📦 Backed up to $dest"
+            }
+        }
+    }
+
+    End {
+        Write-Host "`n🎯 Sync completed: $global:processedCount of $global:totalRecords records processed."
+    }
+}
+
+# One-click invocation
+if ($MyInvocation.InvocationName -match 'DataWarehouseSync\.ps1$') {
+    Sync-DataWarehouse -InputPaths ($args -split ',')
+}
