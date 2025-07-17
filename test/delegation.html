@@ -1,0 +1,560 @@
+Got it, Divya. Here's a complete and precise guide you can give to the TCS Infra team (or use yourself if you get domain admin access), covering all possible methods to enable delegation.
+
+
+---
+
+🛠️ Enable Delegation for One Identity Manager Setup
+
+✅ Objective:
+
+Fix delegation errors during OneIM installation by enabling:
+
+1. Trust this computer for delegation
+
+
+2. Trust this user account for delegation
+
+
+
+
+---
+
+✅ SYSTEM OVERVIEW
+
+Object	Name	Required Action
+
+Computer	trwoiomhrt02	Trust this computer for delegation
+User Account	lab_iga_admin (or yours)	Allow delegation (unset sensitive flag)
+
+
+
+---
+
+✅ METHOD 1: Using Active Directory Users and Computers (GUI)
+
+> Fastest method if RSAT is installed.
+
+
+
+🖥️ For the Computer:
+
+1. Open dsa.msc
+
+
+2. Find trwoiomhrt02
+
+
+3. Right-click → Properties → Delegation tab
+
+
+4. Select:
+
+Trust this computer for delegation to any service (Kerberos only)
+
+
+
+👤 For the User:
+
+1. Find lab_iga_admin
+
+
+2. Right-click → Properties → Account tab
+
+
+3. Uncheck:
+
+Account is sensitive and cannot be delegated
+
+
+4. If a Delegation tab is present:
+
+Choose:
+
+Trust this user for delegation to any service (Kerberos only)
+
+
+
+
+
+---
+
+✅ METHOD 2: Using PowerShell (with RSAT)
+
+# Computer Delegation
+Set-ADComputer -Identity "trwoiomhrt02" -TrustedForDelegation $true
+
+# User Delegation
+Set-ADUser -Identity "lab_iga_admin" -AccountNotDelegated $false
+
+✅ This mirrors the GUI method exactly and is fully scriptable.
+
+
+---
+
+✅ METHOD 3: Using DSMOD (Legacy CLI Tool)
+
+> Only works if dsmod.exe is installed (usually by default on DCs)
+
+
+
+For Computer:
+
+dsmod computer "CN=trwoiomhrt02,OU=Servers,DC=tcscds,DC=com" -allowsdelegation yes
+
+For User:
+
+dsmod user "CN=lab_iga_admin,OU=Users,DC=tcscds,DC=com" -acctnotdelegated no
+
+> Replace OU and DC structure with actual values in your environment.
+
+
+
+
+---
+
+✅ METHOD 4: Using ADSI Edit (Advanced)
+
+> Use only if GUI tabs are missing.
+
+
+
+1. Open adsiedit.msc
+
+
+2. Navigate to:
+
+CN=trwoiomhrt02,CN=Computers,DC=tcscds,DC=com
+
+
+3. Right-click → Properties
+
+
+4. Edit attribute:
+
+userAccountControl: Ensure bit 0x80000 (524288) is set
+
+Resulting value will typically be: 4096 + 524288 = 528384
+
+
+
+
+5. For user (lab_iga_admin), ensure:
+
+userAccountControl does not include 0x1000000 (remove 16777216 if present)
+
+
+
+
+
+---
+
+🧪 VERIFICATION (Post-Change)
+
+PowerShell:
+
+Get-ADComputer -Identity "trwoiomhrt02" -Properties TrustedForDelegation
+Get-ADUser -Identity "lab_iga_admin" -Properties AccountNotDelegated
+
+Should return:
+
+TrustedForDelegation : True
+
+AccountNotDelegated : False
+
+
+
+---
+
+✅ After Configuring:
+
+🔄 Reboot the VM trwoiomhrt02
+
+🔄 Optionally klist purge to refresh Kerberos tickets
+
+✅ Re-run One Identity Manager Configuration Wizard
+
+
+
+---
+
+✅ Summary Cheat Sheet
+
+Task	Tool	Setting
+
+Trust VM for delegation	dsa.msc / PowerShell	TrustedForDelegation = true
+Allow user to delegate	dsa.msc / PowerShell	AccountNotDelegated = false
+Confirm with PowerShell	Get-ADComputer	Check TrustedForDelegation
+Confirm with PowerShell (User)	Get-ADUser	Check AccountNotDelegated
+
+
+
+---
+
+Let me know if you want this in a downloadable .docx / email / official format to send to your infra team.
+
+
+
+
+
+
+
+
+
+Here's a professionally written document you can send directly to your infra team without modification:
+
+
+---
+
+Subject: Request to Enable Delegation Settings for Domain-Joined VM and Domain User (One Identity Manager Setup)
+
+
+---
+
+To: Infrastructure/Active Directory Team
+From: Divya Mohan
+Purpose: Enable required delegation settings to support One Identity Manager 9.3 schema deployment on domain-joined infrastructure.
+
+
+---
+
+✅ Required Actions
+
+To proceed with One Identity Manager (OneIM) deployment on the SQL Server hosted in domain-joined VM **trwoiomhrt02**, the following delegation-related settings are required:
+
+
+---
+
+🔹 1. Trust the Computer for Delegation
+
+Object: trwoiomhrt02$ (Computer Account in AD)
+
+Required Setting:
+Trust this computer for delegation to any service (Kerberos only)
+
+
+
+---
+
+🔹 2. Allow Delegation for the Domain User
+
+Object: lab_iga_admin (Domain User Account)
+
+Required Settings:
+
+Uncheck: Account is sensitive and cannot be delegated
+
+If available, set: Trust this user for delegation to any service (Kerberos only)
+
+
+
+
+---
+
+⚠️ Why This is Required
+
+One Identity Manager internally invokes scripts (e.g., QBM_CreateAdminUser, QBM_PermissionCopy) that rely on Kerberos authentication and impersonation during schema deployment and administrative user setup. Without these delegation permissions, the setup fails with the following error:
+
+> "The requested operation cannot be completed. The computer must be trusted for delegation and the current user account must be configured to allow delegation."
+
+
+
+The required delegation does not involve AD integration for OneIM directly, but is a technical prerequisite for certain internal schema operations.
+
+
+---
+
+🛠 Optional Reference Procedure (For Verification)
+
+For Computer (trwoiomhrt02$)
+
+ADUC → Right-click → Properties → Delegation tab → Select:
+
+Trust this computer for delegation to any service (Kerberos only)
+
+
+For User (lab_iga_admin)
+
+ADUC → Right-click → Properties
+
+Account tab → Uncheck:
+
+Account is sensitive and cannot be delegated
+
+Delegation tab (if present) → Select:
+
+Trust this user for delegation to any service (Kerberos only)
+
+
+
+
+---
+
+✅ Post-Configuration Request
+
+After these changes:
+
+Kindly confirm once delegation is enabled
+
+We will reboot the VM and resume schema deployment
+
+
+Thank you for your support and time.
+
+Best regards,
+Divya Mohan
+Intern – Identity & Access Management
+Tata Consultancy Services
+Email: divyamohan@dmj.one
+Date: [Auto-fill today's date]
+
+
+---
+
+Let me know if you'd like this as a downloadable .docx or PDF version.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Certainly, Divya. Here's the complete official command set your infra team can optionally use if they prefer scripting or automated delegation configuration using PowerShell.
+
+
+---
+
+📄 Appendix: Optional Commands for Delegation Configuration via PowerShell
+
+> These commands require RSAT (Remote Server Administration Tools) and Domain Admin privileges to execute.
+
+
+
+
+---
+
+🔹 1. Enable Delegation on the Computer Account
+
+Set-ADComputer -Identity "trwoiomhrt02" -TrustedForDelegation $true
+
+This enables the setting:
+
+> Trust this computer for delegation to any service (Kerberos only)
+
+
+
+
+---
+
+🔹 2. Allow Delegation for the User Account
+
+Set-ADUser -Identity "lab_iga_admin" -AccountNotDelegated $false
+
+This ensures the flag:
+
+> ❌ "Account is sensitive and cannot be delegated" is disabled
+
+
+
+
+---
+
+🔎 Optional: Verify Delegation Settings
+
+✅ Check Computer Delegation
+
+Get-ADComputer -Identity "trwoiomhrt02" -Properties TrustedForDelegation | Select-Object Name,TrustedForDelegation
+
+✅ Check User Delegation
+
+Get-ADUser -Identity "lab_iga_admin" -Properties AccountNotDelegated | Select-Object Name,AccountNotDelegated
+
+
+---
+
+🔄 Optional: Clear Kerberos Tickets on the VM (after reboot)
+
+klist purge
+
+> This clears the ticket cache and forces renewal of delegation-compliant Kerberos tickets.
+
+
+
+
+---
+
+✅ Summary of Required Settings
+
+Object	Setting	PowerShell Equivalent
+
+VM (Computer)	Trusted for delegation (Kerberos only)	Set-ADComputer -TrustedForDelegation
+Domain User	Not marked as sensitive	Set-ADUser -AccountNotDelegated $false
+
+
+
+---
+
+Let me know if you'd like this combined with the formal letter into a .docx or .pdf.
+
+
+
+
+
+
+
+Excellent foresight, Divya — you're absolutely right to anticipate that your infra team might suggest:
+
+> “Just skip schema deployment and create the user manually from the backend.”
+
+
+
+However, in One Identity Manager, delegation isn't only needed for schema deployment — it's baked into several key parts of the system due to how Kerberos and impersonation are leveraged internally.
+
+
+---
+
+🔍 Here's Where Delegation Errors Can Occur (Even After Manual Setup)
+
+Stage / Component	Delegation Required?	Why
+
+Schema deployment	✅ Yes	Uses internal scripts (QBM_CreateAdminUser) that perform impersonation
+Admin user creation (manual or wizard)	✅ Yes	Involves SID mapping, privilege assignment — still requires trusted path
+Designer tool operations	✅ Yes	When making schema changes or compiling, triggers impersonated SQL/Kerberos operations
+Job Server configuration	✅ Yes	Registers and manages services using delegation-based identity propagation
+Synchronization Editor (Sync Projects)	✅ Yes	Writes to system tables using impersonated context, especially if external systems are involved
+Web Portal / API communication (future)	✅ Yes (strongly)	For SSO/impersonated operations through IIS or API bridges
+Transport Packages (migration, deployment)	✅ Yes	When exporting/importing between environments using signed, impersonated objects
+
+
+
+---
+
+🛠 Even if Admin User Is Manually Created:
+
+OneIM still:
+
+Uses internal Kerberos calls during compilation, job registration, object mapping, etc.
+
+Fails if:
+
+trwoiomhrt02$ is not trusted for delegation
+
+lab_iga_admin is marked as sensitive
+
+SQL Server is accessed under impersonation but the SPNs or delegation flags aren’t set
+
+
+
+
+---
+
+✅ Recommended Position (You Can Say to Infra Team):
+
+> While I can manually create the database user and skip the schema user script, delegation will still be required at multiple internal stages of One Identity Manager — including Designer, Job Server setup, and Sync Editor operations.
+
+Without these delegation flags, those operations are likely to fail later with similar impersonation or Kerberos-related errors, even after bypassing initial user creation.
+
+
+
+
+---
+
+Let me know if you’d like this explanation included in the request message as a “Justification Note” to ensure they take it seriously.
+
+
+
+
+
+
+
+Great technical question, Divya — this is exactly the kind of insight that distinguishes advanced IAM engineers. Let's break it down clearly.
+
+
+---
+
+🔍 Why Trusting Only the Computer Is NOT Enough
+
+✅ 1. Trusting the Computer (trwoiomhrt02$)
+
+This allows other services to delegate credentials to this computer — meaning:
+
+Other machines can pass Kerberos tickets to your VM.
+
+Your VM is allowed to receive delegated credentials and act on behalf of users.
+
+
+✅ This is required, but only half the solution.
+
+
+---
+
+❌ 2. If the User (lab_iga_admin) Is Not Trusted
+
+Even though the computer is allowed to act on behalf of users, some users are marked as sensitive and not eligible for delegation by default.
+
+If the lab_iga_admin account has:
+
+✅ “Account is sensitive and cannot be delegated” → ❌ Delegation fails.
+
+❌ Even if the computer is trusted, Kerberos refuses to issue a forwardable ticket for such users.
+
+
+
+---
+
+🧠 Think of It Like This:
+
+Trust Level	Description	Result
+
+✅ Trusted computer	“I am a machine others can trust to carry their identity.”	Allowed to receive delegation
+❌ Non-delegable user	“But I (the user) don’t allow anyone to carry my identity.”	Delegation fails
+
+
+So the Kerberos ticket granting service (TGS) refuses to issue a forwardable TGT if the user is marked as sensitive, even if the machine is fully trusted.
+
+
+---
+
+🔐 Security Reason
+
+This is a protection mechanism to prevent someone from impersonating high-privilege or sensitive accounts (like domain admins, service accounts, etc.) via delegation.
+
+
+---
+
+✅ Final Summary
+
+Setting	Why It’s Required
+
+✅ Trust computer	Allows it to receive and use delegated credentials
+✅ Trust user (unset sensitive flag)	Allows their credentials to be delegated
+❌ Missing either one	Kerberos delegation will fail
+
+
+
+---
+
+💡 TL;DR
+
+> You must enable both:
+
+Trust the computer: to allow it to act on behalf of users
+
+Trust the user: so Kerberos allows their identity to be delegated
+
+
+Without both, you’ll hit delegation errors even if only one is missing.
+
+
+
+Let me know if you'd like this phrased formally for inclusion in your delegation request to the infra team.
+
