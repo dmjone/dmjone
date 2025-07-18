@@ -1,0 +1,150 @@
+Here’s a T-SQL template you can run directly against your One Identity Manager 9.3 database to:
+
+1. Create a new “admin” user account in the back-end
+
+
+2. Set its password (SHA-512 hash)
+
+
+3. (Optionally) Assign it the built-in “IdentityAdministrators” application role
+
+
+4. Create a new database connection entry in the Databases table
+
+
+
+Replace every <…> placeholder with your actual values before running.
+
+BEGIN TRANSACTION;
+GO
+
+-- 1. Create a new Person (identity) for the admin user
+DECLARE @PersonID UNIQUEIDENTIFIER = NEWID();
+INSERT INTO dbo.Person
+(
+    XObjectKey,           -- primary key
+    CCC_Name,             -- display name
+    CCC_FirstName,
+    CCC_LastName,
+    CCC_IsActive
+)
+VALUES
+(
+    @PersonID,
+    'Admin User',
+    'Admin',
+    'User',
+    1                     -- active
+);
+
+-- 2. Create the corresponding login in DialogUser
+DECLARE @DialogUserID UNIQUEIDENTIFIER = NEWID();
+INSERT INTO dbo.DialogUser
+(
+    XObjectKey,           -- primary key
+    UID_Person,           -- FK → Person
+    CCC_UserName,         -- login name
+    CCC_IsActive,         -- active flag
+    CCC_FrontendLoginAllowed,
+    CCC_WebPortalLoginAllowed,
+    CCC_SetAsDefault,
+    CCC_SingleSignOn
+)
+VALUES
+(
+    @DialogUserID,
+    @PersonID,
+    '<YourLoginName>',    -- e.g. 'admin'
+    1,                    -- active
+    1,                    -- front-end login allowed
+    1,                    -- web portal login allowed
+    0,                    -- not default identity
+    0                     -- no single sign-on
+);  
+-- (These fields map to the “User account” properties in the Auth & Auth guide) 0
+
+-- 3. Set the user’s password (hashed with SHA2_512)
+INSERT INTO dbo.DialogUserPassword
+(
+    SourceTable,         -- must be 'DialogUser'
+    UID,                 -- the DialogUser instance
+    PasswordHash,
+    ChangeDate
+)
+VALUES
+(
+    'DialogUser',
+    @DialogUserID,
+    HASHBYTES('SHA2_512', CONVERT(VARBINARY(MAX), '<YourPlainTextPassword>')),
+    SYSUTCDATETIME()
+);
+-- (Password hashes are stored in DialogUserPassword) 1
+
+-- 4. (Optional) Assign the “IdentityAdministrators” application role
+DECLARE @AppRoleID UNIQUEIDENTIFIER =
+    (SELECT XObjectKey
+       FROM dbo.QERApplicationRole
+      WHERE CCC_Name = 'IdentityAdministrators');
+INSERT INTO dbo.QERAccess
+(
+    XObjectKey,
+    UID_Identity,        -- the Person ID
+    UID_ESet,            -- the AppRole ID
+    XOrigin              -- assignment origin (1 = direct)
+)
+VALUES
+(
+    NEWID(),
+    @PersonID,
+    @AppRoleID,
+    1
+);
+
+-- 5. Create a new connection entry in the Databases table
+DECLARE @DbConnID UNIQUEIDENTIFIER = NEWID();
+INSERT INTO dbo.Databases
+(
+    XObjectKey,
+    CCC_Name,            -- display name
+    MainDatabase,        -- 1 = this is the main DB
+    CCC_Description,
+    CCC_Server,
+    CCC_Database,
+    CCC_User,            -- SQL login for OneIM to use
+    CCC_Password,        -- SQL login password
+    CCC_AuthenticationModule,  
+    CCC_Provider,        -- e.g. 'VI.DB.ViSqlFactory'
+    CCC_ConnectionParameter,
+    Disabled
+)
+VALUES
+(
+    @DbConnID,
+    'OneIM Main DB',
+    1,
+    'Created via backend script',
+    '<DatabaseServer>',          -- e.g. 'sqlprod01.contoso.com'
+    '<DatabaseName>',            -- e.g. 'OneIdentity_IM93'
+    '<DbUser>',                  -- e.g. 'oneimsvc'
+    '<DbPassword>',              -- secure credential
+    'Module=DialogUser;User=<YourLoginName>;Password=<YourPlainTextPassword>',
+    'VI.DB.ViSqlFactory',
+    'Data Source=<DatabaseServer>;Initial Catalog=<DatabaseName>;User ID=<DbUser>;Password=<DbPassword>;',
+    0
+);
+-- (The Databases table is shown under Base Data > General > Databases) 2
+
+COMMIT TRANSACTION;
+GO
+
+Notes:
+
+Make sure the account you use to run this script has db_owner or equivalent rights on the One Identity Manager database.
+
+After running, you should be able to log into the Designer/Manager as <YourLoginName> with the password you specified.
+
+If you skip step 4, you can still assign the IdentityAdministrators role later via the UI.
+
+Always back up your database before making direct inserts.
+
+
