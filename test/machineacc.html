@@ -1,0 +1,371 @@
+Absolutely. Here’s a comprehensive, phase-by-phase, from-scratch blueprint to deploy machine accounts and hand over assets to employees in a BFSI environment—ensuring full accountability, auditability, and compliance at every step.
+
+
+---
+
+📋 Phase 1: Project Governance & Planning
+
+1. Establish Stakeholders & Roles
+
+Project Sponsor (e.g., CISO)
+
+Project Manager (e.g., You/Divya)
+
+Infrastructure Lead (network & servers)
+
+AD/Identity Lead (Active Directory & OneIM)
+
+Security & Compliance Officer
+
+Service Desk & Asset Team
+
+
+
+2. Define Scope & Deliverables
+
+Deliverable 1: Fully operational AD domain + OneIM instance
+
+Deliverable 2: Automated machine-account onboarding workflow
+
+Deliverable 3: Asset-management integration & employee handoff process
+
+
+
+3. Change Management & Approvals
+
+Raise a formal Change Request (CR) in ServiceNow
+
+Obtain sign-off from Compliance & InfoSec
+
+Schedule maintenance windows
+
+
+
+4. Documentation & Ticketing
+
+Create a Runbook repository (e.g., Confluence)
+
+Template all tasks as tickets (ServiceNow/Remedy) for full audit trail
+
+
+
+
+
+---
+
+🏗️ Phase 2: Infrastructure & Environment Setup
+
+2.1 Network & Servers
+
+Network
+
+VLANs: Mgmt, DCs, App, User
+
+Firewalls: Allow ports 88, 389, 636, 445, 1433, 8080-8081 between subnets
+
+
+Servers
+
+DC01, DC02 (Windows Server 2019/2022)
+
+SQL01 (Windows + SQL Server Enterprise)
+
+ONEIM01 (Windows Server for OneIM components)
+
+
+
+2.2 DNS & NTP
+
+Configure authoritative DNS on DCs
+
+Point all servers to internal NTP pool for time sync (critical for Kerberos)
+
+
+
+---
+
+🖥️ Phase 3: Active Directory Deployment
+
+1. Promote Domain Controllers
+
+Install-WindowsFeature AD-Domain-Services,DNS -IncludeManagementTools
+Install-ADDSForest `
+  -DomainName corp.bank.local `
+  -SafeModeAdministratorPassword (ConvertTo-SecureString P@ssw0rd! -AsPlainText -Force) `
+  -InstallDNS
+
+
+2. OU & Group Structure
+
+OU: corp.bank.local/Computers/Servers/Prod
+
+OU: corp.bank.local/Computers/Workstations
+
+Security Groups: SG_Machine_Admins, SG_Machine_Users, SG_Machine_Dept_<DeptName>
+
+
+
+3. GPOs for Machine Accounts
+
+Naming Convention: Enforce via logon script or OneIM rule
+
+Security Baseline: Apply CIS benchmarks for Windows servers
+
+
+
+4. Delegation & ACLs
+
+Delegate “Create Computer objects” to Service Account OU-level
+
+Audit “Write” and “Delete” on Computers container
+
+
+
+
+
+---
+
+🛡️ Phase 4: One Identity Manager (OneIM) Installation
+
+1. Pre-install Checklist
+
+SQL Server instance created with a dedicated DB (OneIM_DB)
+
+Service accounts:
+
+svc_OneIM_SQL with db_owner on OneIM_DB
+
+svc_OneIM_Service as local admin on ONEIM01
+
+
+
+
+2. Install Designer & Components
+
+Mount OneIM ISO on ONEIM01
+
+Launch Setup → choose Designer, Sync Editor, Data Importer, Manager
+
+Point to OneIM_DB, specify service accounts
+
+Activate license key
+
+
+
+3. Secure Service Communication
+
+Generate TLS cert for oneim.corp.bank.local
+
+Bind to IIS sites for Manager & Data Importer
+
+Enforce HTTPS only
+
+
+
+
+
+---
+
+🔌 Phase 5: Connector & Sync Configuration
+
+1. Active Directory Connector
+
+In Sync Editor, create connector:
+
+Type: LDAP/AD
+
+Bind DN: svc_OneIM_Sync@corp.bank.local
+
+Base DN: OU=Servers,DC=corp,DC=bank,DC=local
+
+
+
+
+2. Define Object Mappings
+
+Map UNSAccountB → distinguishedName
+
+Map HostName → sAMAccountName$
+
+Add custom attribute AssetTag
+
+
+
+3. CSV Import Connector (for bulk asset import)
+
+Template CSV:
+
+HostName,AssetTag,SerialNumber,Owner,Dept,PurchaseDate,WarrantyExpiry
+SQL-PROD-BANK01,ASSET-1001,SN12345,John.Smith,DBA,2025-01-15,2028-01-14
+
+Configure Data Importer to run nightly, “Create missing UNSAccountB entries”
+
+
+
+
+
+---
+
+⚙️ Phase 6: Machine-Account Onboarding Workflow
+
+1. Ticket-driven Onboarding
+
+Employee requests new server/VM via ServiceNow
+
+Ticket contains asset details + intended owner
+
+
+
+2. Approval Gate
+
+Manager & InfoSec must approve → ticket updated to “Approved”
+
+
+
+3. Automated Provisioning Script
+
+param($HostName,$OU,$DomainCred)
+New-ADComputer -Name $HostName -Path $OU -Credential $DomainCred
+
+Triggered by OneIM workflow after CSV import
+
+
+
+4. Domain Join & Configuration
+
+Once VM spins up, run:
+
+Add-Computer -DomainName corp.bank.local `
+  -Credential (Get-Credential svc_OneIM_Svc) -Restart
+
+Machine pulls GPOs, inventory agent installs
+
+
+
+5. Asset Tag Labeling
+
+Physical label affixed; barcode scanned back into CMDB → updates OneIM asset attribute
+
+
+
+
+
+---
+
+🎁 Phase 7: Employee Handoff & Accountability
+
+1. Generate Asset Handoff Form
+
+Pre-populate: HostName, AssetTag, SerialNumber, OS, Owner, Dept
+
+Require digital signature (ServiceNow form or e-signature tool)
+
+
+
+2. Delivery & Training
+
+Ops team hands asset to employee against signed form
+
+Log in ServiceNow: Ticket “Provisioned” + attach signed form
+
+
+
+3. Audit Trail
+
+All actions (AD creation, domain join, CSV import) logged in OneIM audit logs
+
+ServiceNow ticket history retains timestamps, approvers, attachments
+
+
+
+
+
+---
+
+🔍 Phase 8: Monitoring, Reviews & Compliance
+
+1. Daily Sync Health Check
+
+OneIM → Sync Editor logs → send email alert if sync fails
+
+
+
+2. SIEM Integration
+
+Forward OneIM audit events + Windows Security logs → Splunk/QRadar
+
+Correlate machine-account creations, deletions, and domain-join anomalies
+
+
+
+3. Periodic Access Certification
+
+Quarterly review: Security Officer reviews all machine-accounts in scope
+
+Use OneIM Manager → “Certification Campaign” → notify owners
+
+
+
+4. Compliance Reporting
+
+Generate report: “All machine accounts created last quarter”
+
+Include ticket IDs, approval timestamps, and asset-tag details
+
+
+
+
+
+---
+
+🗑️ Phase 9: Decommissioning & Offboarding
+
+1. Retirement Request
+
+Employee/Manager raises ticket to retire VM/asset
+
+
+
+2. Grace Period & Data Archival
+
+Archive logs & data for 90 days (per BFSI retention policy)
+
+
+
+3. Disable & Delete
+
+OneIM workflow:
+
+Disable-ADComputer –Identity <HostName>
+
+After 30 days, Remove-ADComputer –Identity <HostName>
+
+
+Update CMDB to “Retired” + attach final audit record
+
+
+
+4. Physical Disposal
+
+Wipe device per NIST 800-88 → mark asset “Disposed” in CMDB
+
+
+
+
+
+---
+
+📑 Phase 10: Documentation & Handover
+
+Finalize Runbooks for each step (with screenshots & commands)
+
+Training Session for Ops & Service Desk
+
+Handover Meeting: Review workflows, SLAs, and emergency playbooks
+
+
+
+---
+
+This end-to-end process ensures full accountability, audit readiness, and seamless experience for both IT and end users—critical in the BFSI domain. Let me know if you need any of the specific scripts, runbook templates, or configuration snapshots.
+
