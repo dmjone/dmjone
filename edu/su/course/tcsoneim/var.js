@@ -4,25 +4,25 @@ function get_menu_list(datetogen) {
         const arr = [
             {
                 link: "theory/",
-                title: "Theory: Course Overview and Concepts",
-                desc: "Description of the topic. This section provides an overview of the key concepts and principles related to the topic. Click to explore the fundamentals and advanced aspects of the subject, including real-world applications and case studies.",
-                codetype: "CSUCODE | Course",
-                cardimage: "https://cdn.dmj.one/edu/su/course/csuCODE/img/logo.webp",                
+                title: "Theory: One Identity Manager",
+                desc: "Explore the comprehensive theory behind One Identity Manager, a powerful tool for managing identities and access in enterprise environments. This section provides in-depth knowledge about the architecture, features, and functionalities of One Identity Manager, enabling you to understand its role in identity governance and administration. Click to delve into the theoretical aspects of this essential software solution.",
+                codetype: "TCSONEIM | Course",
+                // cardimage: "https://cdn.dmj.one/edu/su/course/csuCODE/img/logo.webp",                
                 // cardimage_dark: "//cdn.dmj.one/img/needhelp.webp",               
                 // continuereading: " Click here to reach out to Faculty directly through email"
             },
-            {
-                link: "lab/",
-                title: "Lab: Hands-On Practice and Exercises",
-                desc: "Description of the topic. This section offers practical exercises and interactive tools to help you apply the concepts learned in the theory section. Click to access hands-on labs, coding exercises, and simulations that will enhance your understanding of the topic.",
-                codetype: "CSUCODE | Course",
-            },
-            {
-                link: "practice/",
-                title: "Practice Operating Systems Concepts: Strengthen Your Knowledge",
-                desc: "Reinforce your understanding of Operating Systems with practice exercises and interactive tools. This section offers a range of resources to help you master operating system concepts, including sorting algorithms, virtual machine installation, and more. Click to access hands-on exercises that will enhance your comprehension of operating system principles and prepare you for advanced topics in computer science.",
-                codetype: "Practice | Operating Systems",                
-            }
+            // {
+            //     link: "lab/",
+            //     title: "Lab: Hands-On Practice and Exercises",
+            //     desc: "Description of the topic. This section offers practical exercises and interactive tools to help you apply the concepts learned in the theory section. Click to access hands-on labs, coding exercises, and simulations that will enhance your understanding of the topic.",
+            //     codetype: "CSUCODE | Course",
+            // },
+            // {
+            //     link: "practice/",
+            //     title: "Practice Operating Systems Concepts: Strengthen Your Knowledge",
+            //     desc: "Reinforce your understanding of Operating Systems with practice exercises and interactive tools. This section offers a range of resources to help you master operating system concepts, including sorting algorithms, virtual machine installation, and more. Click to access hands-on exercises that will enhance your comprehension of operating system principles and prepare you for advanced topics in computer science.",
+            //     codetype: "Practice | Operating Systems",                
+            // }
         ];
 
         body_genmenu.processData(arr, def_date, def_author, { isMainCategory: true });
@@ -30,11 +30,11 @@ function get_menu_list(datetogen) {
     function get_class(def_date, def_author) {
         const arr = [
             {
-                title: "Topic Name",
-                desc: "Description of the topic.",
+                title: "Architecture of One Identity Manager [WIP]",
+                desc: "Dive into the architecture of One Identity Manager, a robust solution for identity and access management. This section covers the core components, data models, and workflows that make up the One Identity Manager framework. Understand how these elements work together to provide a comprehensive identity management solution in enterprise environments.",
                 codetype: "Concepts",
                 readtime: 5,
-                link: "link-to-the-topic"
+                link: "architecture-of-one-identity-manager"
             },            
         ];
         body_genmenu.processData(arr, def_date, def_author);
