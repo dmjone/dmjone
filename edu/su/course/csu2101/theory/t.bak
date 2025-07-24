@@ -1,0 +1,1446 @@
+<pre id="markdown-raws" class=d-none>
+### Database
+A **database** is an organized collection of related data stored electronically. It enables efficient storage, retrieval, update and management of large volumes of information.
+
+
+#### Definition & Purpose
+
+* **Definition:** A database is a structured set of data, usually stored in tables, that models real-world entities and their relationships.
+* **Purpose:**
+
+  1. **Centralize data** so multiple users/applications can share it.
+  2. **Ensure consistency** and integrity by enforcing rules.
+  3. **Support efficient queries** and reports.
+  4. **Provide security, backup and recovery.**
+
+#### Types of Databases
+
+> **(A)** *By Data Model*
+
+1. **Flat-file**
+
+   * *Structure:* Single plain text file (e.g. CSV).
+   * *Use-case:* Simple lists (e.g. address book).
+2. **Hierarchical**
+
+   * *Structure:* Tree-like parent-child.
+   * *Example:* IBM’s IMS storing bill-of-materials.
+3. **Network**
+
+   * *Structure:* Graph of records with many-to-many links.
+   * *Example:* CODASYL DBMS.
+4. **Relational**
+
+   * *Structure:* Tables (rows & columns) with keys.
+   * *Example:* MySQL, Oracle.
+5. **Object-Oriented**
+
+   * *Structure:* Data as “objects” (attributes + methods).
+   * *Example:* db4o for CAD/CAM applications.
+6. **NoSQL**
+
+   * *Variants:*
+
+     * *Key-Value:* Redis (sessions).
+     * *Document:* MongoDB (JSON docs).
+     * *Column-Family:* Cassandra (time-series).
+     * *Graph:* Neo4j (social networks).
+
+> **(B)** *By Usage*
+
+* **OLTP (Online Transaction Processing):** Fast, high-volume transactions (e.g. banking).
+* **OLAP (Online Analytical Processing):** Complex queries on historical data (e.g. data warehousing).
+
+> **(C)** *By Architecture*
+
+* **Centralized:** Single server hosts data.
+* **Client-Server:** Clients query a server-based DBMS.
+* **Distributed:** Data spread over multiple sites (replication/fragmentation).
+* **Cloud Database:** Hosted on cloud platforms (scalable).
+* **Data Warehouse:** Integrated, subject-oriented store for analysis.
+
+#### 3. Key Features
+
+1. **Data Independence**
+
+   * *Logical:* Schema changes don’t affect applications.
+   * *Physical:* Storage changes transparent to users.
+2. **ACID Properties**
+
+   * *Atomicity:* All or nothing for transactions.
+   * *Consistency:* Transitions preserve integrity constraints.
+   * *Isolation:* Concurrent transactions do not interfere.
+   * *Durability:* Committed data survives failures.
+3. **Integrity Constraints**
+
+   * *Entity:* Primary keys non-NULL & unique.
+   * *Referential:* Foreign keys match primary keys.
+   * *Domain:* Valid data types & ranges.
+4. **Concurrency Control**
+
+   * Locks/Multiversion to allow safe parallel access.
+5. **Security**
+
+   * Authentication, authorization, encryption.
+6. **Backup & Recovery**
+
+   * Regular backups; restore after crash.
+7. **Data Dictionary**
+
+   * Metadata repository describing structure.
+
+---
+
+#### 4. Advantages
+
+* **Reduced Redundancy:** Central storage avoids duplicate data.
+* **Improved Consistency:** Single source of truth.
+* **Data Sharing:** Multiple users/applications can access concurrently.
+* **Data Integrity:** Enforced rules prevent invalid data.
+* **Enhanced Security:** Fine-grained access control.
+* **Efficient Querying:** Indexes and optimizers speed retrieval.
+* **Backup & Recovery:** Automated procedures minimize data loss.
+* **Scalability:** Distributed/cloud DBs handle growth.
+
+#### 5. Disadvantages
+
+* **High Cost:** Hardware, software licenses, skilled personnel.
+* **Complexity:** Requires careful design and administration.
+* **Performance Overhead:** ACID and concurrency controls incur costs.
+* **Single Point of Failure:** Without replication, server crash halts service.
+* **Vendor Lock-In:** Migration between DBMS products can be hard.
+* **Maintenance Effort:** Regular tuning, patching, backups.
+
+
+#### 6. Example: Simple Relational Database
+
+**Scenario:** University stores Students and Courses.
+
+| Student(StudentID, Name, Dept) | Course(CourseID, Title, Credits) | Enroll(StudentID, CourseID, Grade) |
+| ------------------------------ | -------------------------------- | ---------------------------------- |
+| (101, “Divya”, “CSE”)          | (CS201, “DBMS”, 4)               | (101, CS201, “A”)                  |
+| (102, “Rahul”, “EEE”)          | (EE301, “Circuits”, 3)           | (102, EE301, “B”)                  |
+
+* **Demonstrates:**
+
+  * **Referential Integrity:** `Enroll.StudentID → Student.StudentID`
+  * **Query Example:**
+
+  ```language-auto
+  SELECT S.Name, C.Title, E.Grade
+    FROM Student S
+    JOIN Enroll E ON S.StudentID = E.StudentID
+    JOIN Course C ON E.CourseID = C.CourseID;
+  ```
+* **ACID in Action:** A student’s enrollment and fee payment (two updates) succeed or both roll back.
+
+
+---
+
+### SQL: Definition and Purpose
+
+**Structured Query Language (SQL)** is the standard language for interacting with relational databases. It lets you **define**, **manipulate**, **control**, and **query** data through simple, English-like statements.
+
+---
+
+#### Data Definition Language (DDL)
+
+**Concept:** DDL commands specify the **structure** of database objects—tables, indexes, schemas—by creating, altering, or dropping them. Changes made by DDL statements are **auto-committed**.
+**Key Commands:**
+
+* `CREATE` — make a new table or object
+* `ALTER` — change an existing object
+* `DROP` — delete an object
+* `TRUNCATE` — remove all rows from a table
+
+**Example:** Create, modify, and drop a table
+
+```language-auto
+-- Create a table for employees
+CREATE TABLE Employee (
+  EmpID    INT      PRIMARY KEY,
+  Name     VARCHAR(50),
+  Dept     VARCHAR(30)
+);
+
+-- Add a new column for salary
+ALTER TABLE Employee
+  ADD COLUMN Salary DECIMAL(10,2);
+
+-- Remove the table completely
+DROP TABLE Employee;
+```
+
+---
+
+#### 2. Data Manipulation Language (DML)
+
+**Concept:** DML commands **change** the data within tables but do not alter table structure. These statements can be **rolled back** if within a transaction.
+**Key Commands:**
+
+* `INSERT` — add new rows
+* `UPDATE` — modify existing rows
+* `DELETE` — remove rows
+
+**Example:** Insert, update, and delete rows
+
+```language-auto
+-- Add two new employees
+INSERT INTO Employee (EmpID, Name, Dept, Salary)
+VALUES
+  (101, 'Divya Mohan', 'CSE', 75000),
+  (102, 'Rahul Singh', 'ECE', 68000);
+
+-- Give Rahul a raise
+UPDATE Employee
+  SET Salary = 70000
+  WHERE EmpID = 102;
+
+-- Remove an employee record
+DELETE FROM Employee
+  WHERE EmpID = 101;
+```
+
+---
+
+#### 3. Data Query Language (DQL)
+
+*(Often considered part of DML, but focused on data retrieval.)*
+**Concept:** DQL commands **fetch** data from one or more tables. Results are read-only unless wrapped in DML statements.
+**Key Command:**
+
+* `SELECT` — retrieve rows matching specified criteria
+
+**Example:** Retrieve employee names in CSE department
+
+```language-auto
+SELECT EmpID, Name, Salary
+  FROM Employee
+  WHERE Dept = 'CSE'
+  ORDER BY Salary DESC;
+```
+
+---
+
+#### 4. Transaction Control Language (TCL)
+
+**Concept:** TCL commands manage **transactions**, grouping multiple DML operations into a single atomic unit.
+**Key Commands:**
+
+* `COMMIT` — make all changes permanent
+* `ROLLBACK` — undo changes since last commit
+* `SAVEPOINT` — set a point within a transaction to roll back to
+
+**Example:** Use a savepoint and rollback
+
+```language-auto
+BEGIN;  -- start transaction
+
+UPDATE Employee
+  SET Salary = Salary * 1.1
+  WHERE Dept = 'ECE';
+
+SAVEPOINT before_bonus;
+
+DELETE FROM Employee
+  WHERE EmpID = 999;  -- oops, wrong record
+
+ROLLBACK TO before_bonus;  -- undo only the delete
+
+COMMIT;  -- finalize the salary update
+```
+
+---
+
+#### 5. Data Control Language (DCL)
+
+**Concept:** DCL commands regulate **access** and **permissions** for database users and roles.
+**Key Commands:**
+
+* `GRANT` — give privileges to users
+* `REVOKE` — remove granted privileges
+
+**Example:** Grant and revoke privileges
+
+```language-auto
+-- Allow user 'alice' to read and insert in Employee
+GRANT SELECT, INSERT
+  ON Employee
+  TO alice;
+
+-- Later, remove insert privilege
+REVOKE INSERT
+  ON Employee
+  FROM alice;
+```
+
+
+---
+
+### Queries
+
+**Concept:**
+A **query** is an instruction to the database to **retrieve** or **manipulate** data. In SQL, the primary retrieval query is the **`SELECT`** statement. Queries can range from simple single-table lookups to complex nested and joined queries.
+
+**Key Types & Examples:**
+
+**Simple Query**
+
+   * Retrieves all columns or specific columns from one table.
+
+   ```language-auto
+   -- All columns
+   SELECT * 
+     FROM Employee;
+
+   -- Specific columns
+   SELECT EmpID, Name, Dept 
+     FROM Employee;
+   ```
+2. **Filtered Query**
+
+   * Uses **`WHERE`** to restrict rows.
+
+   ```language-auto
+   SELECT EmpID, Name
+     FROM Employee
+    WHERE Dept = 'CSE';
+   ```
+3. **Aggregate Query**
+
+   * Summarizes data using functions like **`COUNT`**, **`SUM`**, **`AVG`**, **`MAX`**, **`MIN`**.
+
+   ```language-auto
+   -- Total salary by department
+   SELECT Dept, SUM(Salary) AS TotalSal
+     FROM Employee
+    GROUP BY Dept;
+   ```
+4. **Join Query**
+
+   * Combines rows from two or more tables on a related column.
+
+   ```language-auto
+   SELECT S.Name, C.Title, E.Grade
+     FROM Student S
+     JOIN Enroll E ON S.StudentID = E.StudentID
+     JOIN Course C  ON E.CourseID  = C.CourseID;
+   ```
+5. **Subquery (Nested Query)**
+
+   * A query inside another.
+
+   ```language-auto
+   -- Employees earning above the average salary
+   SELECT Name, Salary
+     FROM Employee
+    WHERE Salary > (
+      SELECT AVG(Salary)
+        FROM Employee
+    );
+   ```
+6. **Correlated Subquery**
+
+   * References outer query row.
+
+   ```language-auto
+   SELECT E1.EmpID, E1.Name, E1.Salary
+     FROM Employee E1
+    WHERE E1.Salary > (
+      SELECT AVG(E2.Salary)
+        FROM Employee E2
+       WHERE E2.Dept = E1.Dept
+    );
+   ```
+
+---
+
+### Operators
+
+**Concept:**
+**Operators** perform computations or comparisons on data. SQL operators fall into several categories:
+
+1. **Arithmetic Operators**
+
+   * `+`, `-`, `*`, `/`, `%`
+
+   ```language-auto
+   SELECT EmpID, Salary, Salary * 0.10 AS Bonus
+     FROM Employee;
+   ```
+2. **Comparison Operators**
+
+   * `=`, `&lt;>` (not equal), `&lt;`, `>`, `&lt;=`, `>=`
+
+   ```language-auto
+   SELECT Name
+     FROM Employee
+    WHERE Salary >= 60000;
+   ```
+3. **Logical Operators**
+
+   * `AND`, `OR`, `NOT`
+
+   ```language-auto
+   SELECT *
+     FROM Employee
+    WHERE Dept = 'CSE'
+      AND Salary > 70000;
+   ```
+4. **Set Operators & Conditions**
+
+   * `IN`, `NOT IN`, `BETWEEN … AND …`, `LIKE`, `IS NULL`
+
+   ```language-auto
+   -- IN
+   SELECT Name
+     FROM Employee
+    WHERE Dept IN ('CSE', 'ECE');
+
+   -- BETWEEN
+   SELECT Name
+     FROM Employee
+    WHERE Salary BETWEEN 50000 AND 80000;
+
+   -- LIKE (pattern match)
+   SELECT Name
+     FROM Employee
+    WHERE Name LIKE 'A%';  -- starts with 'A'
+   ```
+5. **String Operators**
+
+   * Concatenation (`||` or `CONCAT`)
+
+   ```language-auto
+   SELECT EmpID, Name || ' (' || Dept || ')' AS Info
+     FROM Employee;
+   ```
+
+---
+
+### 3. Clauses
+
+**Concept:**
+A **clause** is a component of an SQL statement that defines **what**, **where**, **how**, and **in what order** data is processed. In a `SELECT` query, common clauses include:
+
+| Clause         | Purpose                                             | Example                       |
+| -------------- | --------------------------------------------------- | ----------------------------- |
+| **`SELECT`**   | Specify columns or expressions to retrieve          | `SELECT Name, Salary`         |
+| **`FROM`**     | Identify source table(s)                            | `FROM Employee`               |
+| **`WHERE`**    | Filter rows before grouping or selecting            | `WHERE Dept = 'CSE'`          |
+| **`GROUP BY`** | Aggregate rows sharing common values                | `GROUP BY Dept`               |
+| **`HAVING`**   | Filter groups after aggregation                     | `HAVING SUM(Salary) > 200000` |
+| **`ORDER BY`** | Sort result rows                                    | `ORDER BY Salary DESC`        |
+| **`LIMIT`**    | Restrict number of rows returned (MySQL/PostgreSQL) | `LIMIT 5`                     |
+| **`DISTINCT`** | Remove duplicate rows                               | `SELECT DISTINCT Dept`        |
+
+**Full Example Combining Clauses:**
+
+```language-auto
+SELECT Dept,
+       COUNT(*) AS NumEmployees,
+       AVG(Salary) AS AvgSalary
+  FROM Employee
+ WHERE Salary > 40000
+ GROUP BY Dept
+ HAVING AVG(Salary) > 50000
+ ORDER BY AvgSalary DESC
+ LIMIT 3;
+```
+
+> **Explanation:**
+>
+> 1. **`SELECT`** columns and aggregates.
+> 2. **`FROM`** source table.
+> 3. **`WHERE`** filters individual rows.
+> 4. **`GROUP BY`** groups them by department.
+> 5. **`HAVING`** filters groups on aggregate.
+> 6. **`ORDER BY`** sorts results.
+> 7. **`LIMIT`** shows top 3 departments.
+
+
+---
+
+### Joins in SQL
+
+A **join** combines rows from two or more tables based on a related column, letting you fetch related data in a single query.
+
+---
+
+#### Inner Join (Equi-Join)
+
+**Concept:** Returns only rows where the join condition matches in both tables.
+**Syntax:**
+
+```language-auto
+SELECT columns
+  FROM A
+  INNER JOIN B
+    ON A.key = B.key;
+```
+
+**Example:**
+Tables:
+
+* **Student**(StudID, Name, DeptID)
+* **Department**(DeptID, DeptName)
+
+```language-auto
+SELECT S.StudID, S.Name, D.DeptName
+  FROM Student S
+  INNER JOIN Department D
+    ON S.DeptID = D.DeptID;
+```
+
+---
+
+#### 2. Left Outer Join
+
+**Concept:** Returns all rows from the **left** table, plus matching rows from the right. Non-matching right-side columns are NULL.
+**Syntax:**
+
+```language-auto
+SELECT columns
+  FROM A
+  LEFT JOIN B
+    ON A.key = B.key;
+```
+
+**Example:**
+
+```language-auto
+SELECT S.StudID, S.Name, D.DeptName
+  FROM Student S
+  LEFT JOIN Department D
+    ON S.DeptID = D.DeptID;
+```
+
+* Students without a valid DeptID still appear; DeptName will be NULL.
+
+---
+
+#### 3. Right Outer Join
+
+**Concept:** Returns all rows from the **right** table, plus matching rows from the left. Non-matching left-side columns are NULL.
+**Syntax:**
+
+```language-auto
+SELECT columns
+  FROM A
+  RIGHT JOIN B
+    ON A.key = B.key;
+```
+
+**Example:**
+
+```language-auto
+SELECT S.StudID, S.Name, D.DeptName
+  FROM Student S
+  RIGHT JOIN Department D
+    ON S.DeptID = D.DeptID;
+```
+
+* Departments with no students still appear; StudID and Name will be NULL.
+
+---
+
+#### 4. Full Outer Join
+
+**Concept:** Returns **all** rows when there is a match in either left or right table. Non-matches fill with NULLs.
+**Syntax:**
+
+```language-auto
+SELECT columns
+  FROM A
+  FULL OUTER JOIN B
+    ON A.key = B.key;
+```
+
+**Example:**
+
+```language-auto
+SELECT S.StudID, S.Name, D.DeptName
+  FROM Student S
+  FULL OUTER JOIN Department D
+    ON S.DeptID = D.DeptID;
+```
+
+* Covers every student and every department, matching where possible.
+
+---
+
+#### 5. Cross Join (Cartesian Product)
+
+**Concept:** Returns every combination of rows from both tables (no join condition). Use sparingly—result grows multiplicatively.
+**Syntax:**
+
+```language-auto
+SELECT columns
+  FROM A
+  CROSS JOIN B;
+```
+
+**Example:**
+
+```language-auto
+SELECT S.Name, D.DeptName
+  FROM Student S
+  CROSS JOIN Department D;
+```
+
+* If Student has 5 rows and Department has 3, result has 15 rows.
+
+---
+
+#### 6. Self Join
+
+**Concept:** A table joined to **itself**. Useful for hierarchical or comparative queries.
+**Syntax:**
+
+```language-auto
+SELECT A.cols, B.cols
+  FROM Table A
+  JOIN Table B
+    ON A.key = B.key2;
+```
+
+**Example:** (Employees with their managers)
+Table: **Employee**(EmpID, Name, ManagerID)
+
+```language-auto
+SELECT E.EmpID,
+       E.Name      AS Employee,
+       M.Name      AS Manager
+  FROM Employee E
+  LEFT JOIN Employee M
+    ON E.ManagerID = M.EmpID;
+```
+
+---
+
+#### 7. Natural Join
+
+**Concept:** Automatically joins tables by **all columns with the same names**. Equivalent to inner join on every matching column.
+**Syntax:**
+
+```language-auto
+SELECT *
+  FROM A
+  NATURAL JOIN B;
+```
+
+**Example:**
+
+```language-auto
+SELECT StudID, Name, DeptName
+  FROM Student
+  NATURAL JOIN Department;
+```
+
+* Automatically uses `DeptID` as the join column.
+
+---
+
+#### 8. Theta Join (Non-Equi Join)
+
+**Concept:** General join using a comparison operator other than `=` (e.g., `&lt;`, `>`, `&lt;=`, `>=`, `&lt;>`).
+**Syntax:**
+
+```language-auto
+SELECT columns
+  FROM A, B
+ WHERE A.col operator B.col;
+```
+
+**Example:** (Find students and departments where DeptID is less than student’s DeptID)
+
+```language-auto
+SELECT S.Name, D.DeptName
+  FROM Student S, Department D
+ WHERE S.DeptID > D.DeptID;
+```
+
+---
+
+### Key Points to Remember
+
+* **Inner vs. Outer:** Inner hides non-matches; outer shows non-matches with NULLs.
+* **Cross Join:** No condition—Cartesian explosion.
+* **Self Join:** Alias same table twice for hierarchical data.
+* **Natural Join:** Convenient but can be error-prone if extra common columns exist.
+* **Theta Join:** Supports non-equality conditions.
+
+
+
+---
+
+#### Subqueries (Nested Queries)
+
+**Concept:**
+A **subquery** is a complete query placed inside another SQL statement. The database executes the subquery first and then uses its result in the outer query.
+
+**Common Forms:**
+
+1. **Single‐row**: Returns one value
+2. **Multi‐row**: Returns a list of values
+3. **Multi‐column**: Returns multiple columns
+4. **Scalar**: Used in `SELECT` or expressions
+
+**Syntax Pattern:**
+
+```language-auto
+SELECT … 
+  FROM MainTable
+ WHERE column operator 
+       (SELECT … FROM OtherTable WHERE …);
+```
+
+**Example 1 – Single‐row Subquery**
+Find all employees in the “CSE” department:
+
+```language-auto
+SELECT EmpID, Name, Salary
+  FROM Employee
+ WHERE DeptID = (
+       SELECT DeptID
+         FROM Department
+        WHERE DeptName = 'CSE'
+ );
+```
+
+* **Inner query**: finds the ID of the CSE department.
+* **Outer query**: retrieves employees matching that ID.
+
+**Example 2 – Multi‐row Subquery**
+List employees earning more than the company average salary:
+
+```language-auto
+SELECT Name, Salary
+  FROM Employee
+ WHERE Salary > (
+       SELECT AVG(Salary)
+         FROM Employee
+ );
+```
+
+* **Inner query**: computes average salary.
+* **Outer query**: selects employees above that average.
+
+---
+
+#### 2. Correlated Subqueries
+
+**Concept:**
+A **correlated subquery** refers to columns from the outer query. It is re-evaluated once for each row of the outer query, making it “correlated.”
+
+**Syntax Pattern:**
+
+```language-auto
+SELECT … 
+  FROM A
+ WHERE A.col operator
+       (SELECT … 
+          FROM B
+         WHERE B.related_col = A.col);
+```
+
+**Example – Department‐wise Comparison**
+Show employees whose salary is above the average salary *in their own* department:
+
+```language-auto
+SELECT E.Name, E.DeptID, E.Salary
+  FROM Employee E
+ WHERE E.Salary > (
+       SELECT AVG(E2.Salary)
+         FROM Employee E2
+        WHERE E2.DeptID = E.DeptID
+ );
+```
+
+* For **each** row **E** in the outer query:
+
+  * The inner query computes the average salary of **E**’s department.
+  * Then checks if **E**’s salary exceeds that value.
+
+---
+
+**Key Differences:**
+
+* **Subquery**: Runs once, result independent of outer rows.
+* **Correlated**: Runs per outer row, depends on outer values.
+
+
+
+---
+
+### Concept of a View
+
+A **view** is a **virtual table** defined by a SQL query. It does **not** store data itself but presents rows from one or more base tables. Views simplify complex queries, encapsulate business logic, and can restrict user access to specific columns or rows.
+
+---
+
+#### Types of Views
+
+| View Type                  | Definition & Characteristics                                                                                                                                                                    | Example Use                                        |
+| -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
+| **Simple View**            | - Based on a single table<br>- Contains no aggregates, `GROUP BY`, `DISTINCT`, or joins<br>- Often updatable                                                                                    | Show only CSE students                             |
+| **Complex View**           | - May use joins, aggregates, `GROUP BY`, `HAVING`, `DISTINCT`, or subqueries<br>- Usually read-only                                                                                             | Department salary totals                           |
+| **Inline View**            | - A subquery in the `FROM` clause of another query<br>- Temporary, not named in the schema                                                                                                      | Top 3 salaries per dept                            |
+| **Materialized View**      | - Stores the result set physically<br>- Must be refreshed manually or on a schedule<br>- Speeds up complex reports                                                                              | Yearly sales summary                               |
+| **Partitioned View**       | - Combines identical‐structure tables (often on different servers)<br>- Presents them as one table                                                                                              | Sales data by region, each region in its own table |
+| **Updatable vs Read-Only** | - *Updatable:* Simple views meeting SQL rules (one table, key preserved) can be modified via `INSERT`/`UPDATE`/`DELETE`<br>- *Read-Only:* Complex or aggregate views cannot be changed directly | Allow managers to update salaries through a view   |
+
+---
+
+#### Examples
+
+#### a) Simple View
+
+```language-auto
+-- Create: only CSE students
+CREATE VIEW CSE_Students AS
+  SELECT StudID, Name, GPA
+    FROM Student
+   WHERE MajorSubject = 'Computer Science';
+
+-- Use:
+SELECT * FROM CSE_Students;
+```
+
+#### b) Complex View
+
+```language-auto
+-- Create: total and average salary by department
+CREATE VIEW Dept_Salary_Stats AS
+  SELECT DeptID,
+         COUNT(*)    AS EmpCount,
+         SUM(Salary) AS TotalSal,
+         AVG(Salary) AS AvgSal
+    FROM Employee
+GROUP BY DeptID;
+
+-- Use:
+SELECT DeptID, AvgSal
+  FROM Dept_Salary_Stats
+ WHERE AvgSal > 60000;
+```
+
+#### c) Inline View
+
+```language-auto
+SELECT DeptID, Name, Salary
+  FROM (
+         SELECT DeptID, Name, Salary,
+                ROW_NUMBER() OVER (PARTITION BY DeptID
+                                   ORDER BY Salary DESC) AS rn
+           FROM Employee
+       ) AS TopEarners
+ WHERE rn &lt;= 3;
+```
+
+#### d) Materialized View  *(Oracle / PostgreSQL)*
+
+```language-auto
+-- Create and populate
+CREATE MATERIALIZED VIEW Sales_Yrly AS
+  SELECT EXTRACT(YEAR FROM SaleDate) AS Yr,
+         SUM(Amount)                  AS TotalSales
+    FROM Sales
+GROUP BY EXTRACT(YEAR FROM SaleDate);
+
+-- Refresh later
+REFRESH MATERIALIZED VIEW Sales_Yrly;
+
+-- Use:
+SELECT * FROM Sales_Yrly;
+```
+
+#### e) Partitioned View *(SQL Server)*
+
+```language-auto
+-- Assume tables Sales_East, Sales_West with same columns
+CREATE VIEW All_Sales AS
+  SELECT * FROM Sales_East
+  UNION ALL
+  SELECT * FROM Sales_West;
+
+-- Query:
+SELECT Region, SUM(Amount)
+  FROM All_Sales
+ GROUP BY Region;
+```
+
+#### f) Updatable View vs Read-Only
+
+```language-auto
+-- Updatable: one table, all NOT NULL columns included
+CREATE VIEW Emp_Basic AS
+  SELECT EmpID, Name, Salary
+    FROM Employee;
+
+/* Allowed: */
+UPDATE Emp_Basic
+   SET Salary = Salary * 1.05
+ WHERE EmpID = 101;
+
+/* Not allowed on complex view: */
+UPDATE Dept_Salary_Stats
+   SET TotalSal = 500000;  -- ERROR: read-only view
+```
+
+
+---
+
+### Integrity Rules
+
+Integrity rules (constraints) ensure data in a database is **accurate**, **consistent**, and **reliable** by enforcing conditions at the schema level.
+
+---
+
+#### Entity Integrity
+
+* **Concept:** Every table must have a primary key (PK) that uniquely identifies each row, and PK columns **cannot be NULL**.
+* **SQL Enforcement:** `PRIMARY KEY` constraint.
+* **Example:**
+
+  ```language-auto
+  CREATE TABLE Student (
+    StudID      INT     PRIMARY KEY,   -- PK: never NULL, unique
+    Name        VARCHAR(50),
+    Major       VARCHAR(30)
+  );
+  ```
+
+  * Here, `StudID` ensures each student row is unique and never empty.
+
+---
+
+#### Key Integrity
+
+* **Concept:** Beyond the PK, any **candidate key** must also be unique. A **unique key** constraint enforces no duplicate values in a column (or set of columns).
+* **SQL Enforcement:** `UNIQUE` constraint.
+* **Example:**
+
+  ```language-auto
+  CREATE TABLE Employee (
+    EmpID       INT      PRIMARY KEY,
+    Email       VARCHAR(100) UNIQUE,   -- no two employees share an email
+    Name        VARCHAR(50)
+  );
+  ```
+
+  * `Email` cannot repeat across different employee rows.
+
+---
+
+#### Referential Integrity
+
+* **Concept:** A **foreign key (FK)** in one table must match an existing primary (or unique) key in the referenced table, or be NULL. This prevents “orphan” records.
+* **SQL Enforcement:** `FOREIGN KEY … REFERENCES … [ON DELETE|UPDATE …]`
+* **Example:**
+
+  ```language-auto
+  CREATE TABLE Department (
+    DeptID      INT     PRIMARY KEY,
+    DeptName    VARCHAR(50)
+  );
+
+  CREATE TABLE Student (
+    StudID      INT     PRIMARY KEY,
+    Name        VARCHAR(50),
+    DeptID      INT,
+    FOREIGN KEY (DeptID)
+      REFERENCES Department(DeptID)
+      ON DELETE SET NULL   -- if a department is removed, set DeptID to NULL
+  );
+  ```
+
+  * Each `Student.DeptID` must refer to a valid `Department.DeptID`.
+
+---
+
+#### Domain Integrity
+
+* **Concept:** Each column’s values must belong to a defined **domain**: correct data type, format, length, and optional value ranges.
+* **SQL Enforcement:**
+
+  * **Data types** (e.g., `INT`, `VARCHAR(…)`)
+  * **NOT NULL** (no missing values)
+  * **DEFAULT** (fallback value)
+  * **CHECK** (custom rule on values)
+* **Example:**
+
+  ```language-auto
+  CREATE TABLE Course (
+    CourseID    CHAR(6)       NOT NULL,
+    Title       VARCHAR(100)  NOT NULL,
+    Credits     INT           DEFAULT 3,
+    CHECK (Credits BETWEEN 1 AND 5)  -- must be 1–5
+  );
+  ```
+
+  * `Credits` always falls between 1 and 5; `CourseID` and `Title` cannot be empty.
+
+---
+
+#### User-Defined Integrity
+
+* **Concept:** Business rules specific to the application that aren’t covered by standard constraints. Enforced using **triggers**, **assertions**, or **stored procedures**.
+* **SQL Enforcement:**
+
+  * **Triggers** (`BEFORE`/`AFTER INSERT/UPDATE/DELETE`)
+  * **Assertions** (`CREATE ASSERTION … CHECK (…)`) — not universally supported
+* **Example (Trigger):**
+
+  ```language-auto
+  -- Rule: Grade must be A, B, C, D, or F
+  CREATE TABLE Enroll (
+    StudID   INT,
+    CourseID CHAR(6),
+    Grade    CHAR(1),
+    PRIMARY KEY (StudID, CourseID)
+  );
+
+  CREATE TRIGGER validate_grade
+    BEFORE INSERT OR UPDATE ON Enroll
+    FOR EACH ROW
+  BEGIN
+    IF NEW.Grade NOT IN ('A','B','C','D','F') THEN
+      SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Invalid grade value';
+    END IF;
+  END;
+  ```
+
+  * This trigger stops any insertion or update if `Grade` is outside the allowed set.
+
+---
+
+## Summary
+
+* **Entity & Key Integrity** ensure uniqueness and non-null keys.
+* **Referential Integrity** maintains valid links between tables.
+* **Domain Integrity** restricts columns to correct types and value ranges.
+* **User-Defined Integrity** implements custom business rules.
+
+
+---
+
+### PHP Superglobals (System Variables)
+
+PHP provides built-in **superglobal arrays**—always accessible regardless of scope—to retrieve request data, session info, and server/environment details. Key ones include: `$_GET`, `$_POST`, `$_REQUEST`, `$_SESSION`, and `$_SERVER`.
+
+---
+
+#### `$_GET`
+
+* **Concept:** Retrieves data sent via URL query string (`?key=value`). Used for safe, idempotent requests (e.g., search filters).
+* **Syntax:** `$_GET['field_name']`
+
+**Example:**
+
+```
+&lt;!-- URL: product.php?id=42&category=books -->
+&lt;?php
+// product.php
+$productId  = $_GET['id'];       // "42"
+$category   = $_GET['category']; // "books"
+
+echo "Showing product {$productId} in {$category}";
+?>
+```
+
+---
+
+#### `$_POST`
+
+* **Concept:** Retrieves data sent via HTTP POST (form submissions). Suitable for sensitive data (passwords) or large payloads.
+* **Syntax:** `$_POST['field_name']`
+
+**Example:**
+
+```
+&lt;!-- form.html -->
+&lt;form action="submit.php" method="post">
+  Name: &lt;input name="username">&lt;br>
+  Pass: &lt;input name="password" type="password">&lt;br>
+  &lt;button type="submit">Login&lt;/button>
+&lt;/form>
+
+&lt;?php
+// submit.php
+$username = $_POST['username'];
+$password = $_POST['password'];
+
+echo "Welcome, {$username}";
+?>
+```
+
+---
+
+#### `$_REQUEST`
+
+* **Concept:** Merges `$_GET`, `$_POST`, and `$_COOKIE`. Handy when method doesn’t matter, but less secure—may mix sources.
+* **Syntax:** `$_REQUEST['field_name']`
+
+**Example:**
+
+```
+&lt;!-- URL: search.php?q=php -->
+&lt;form action="search.php" method="post">
+  &lt;input name="q">
+  &lt;button>Go&lt;/button>
+&lt;/form>
+
+&lt;?php
+// search.php
+$query = $_REQUEST['q'];  // from GET or POST
+echo "Search for: {$query}";
+?>
+```
+
+---
+
+#### `$_SESSION`
+
+* **Concept:** Persists data across multiple pages for a user. Requires session start and usually a session cookie.
+* **Setup:**
+
+  1. Call `session_start()` at the top of each script.
+  2. Store/retrieve via `$_SESSION['key']`.
+
+**Example:**
+
+```
+&lt;?php
+// login.php
+session_start();
+$_SESSION['user'] = 'DivyaMohan'; 
+echo "Logged in as {$_SESSION['user']}";
+?>
+
+&lt;?php
+// dashboard.php
+session_start();
+if(isset($_SESSION['user'])) {
+  echo "Hello, {$_SESSION['user']}";
+} else {
+  echo "Please log in.";
+}
+?>
+```
+
+---
+
+#### 5. `$_SERVER`
+
+* **Concept:** Contains server and execution environment info (headers, paths, script locations). Read-only.
+* **Common Keys:**
+
+  * `$_SERVER['HTTP_HOST']` – current host
+  * `$_SERVER['REQUEST_URI']` – requested resource path
+  * `$_SERVER['SCRIPT_NAME']` – current script
+  * `$_SERVER['QUERY_STRING']` – URL query string
+
+**Example:**
+
+```
+&lt;?php
+echo "Host: " . $_SERVER['HTTP_HOST'] . "&lt;br>";
+echo "URI: "  . $_SERVER['REQUEST_URI'] . "&lt;br>";
+echo "Script: " . $_SERVER['SCRIPT_NAME'];
+?>
+```
+
+---
+
+**Summary:**
+
+* **`$_GET`**: URL parameters
+* **`$_POST`**: Form data via POST
+* **`$_REQUEST`**: Combined GET/POST/COOKIE
+* **`$_SESSION`**: User-specific persistent data
+* **`$_SERVER`**: Environment and request metadata
+
+
+---
+
+### Session in PHP
+
+A **session** lets you store user-specific data on the server across multiple page requests. Unlike cookies (which live in the browser), session data is kept on the server and only a small session ID is sent to the client. This makes sessions more secure for sensitive data like login status.
+
+---
+
+#### How Sessions Work
+
+1. **Start a session** with `session_start()`—PHP sends a session cookie (e.g. `PHPSESSID`) to the browser if none exists.
+2. **Store/retrieve** data in `$_SESSION` array.
+3. **End or destroy** the session when done (`session_unset()` + `session_destroy()`).
+
+---
+
+#### Database Connection (MySQLi)
+
+```
+&lt;?php
+// db_connect.php
+$host     = 'localhost';
+$user     = 'db_user';
+$password = 'db_pass';
+$database = 'my_app';
+
+$mysqli = new mysqli($host, $user, $password, $database);
+if ($mysqli->connect_error) {
+    die('DB Connection Error: ' . $mysqli->connect_error);
+}
+?>
+```
+
+---
+
+#### Creating (Login) Session
+
+**login.php**
+
+```
+&lt;?php
+session_start();                  // 1. Start session
+require 'db_connect.php';        // 2. Include DB connection
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $username = $mysqli->real_escape_string($_POST['username']);
+    $password = $_POST['password']; // in real apps, hash & verify
+
+    // 3. Check credentials
+    $sql = "SELECT id, username, password_hash 
+              FROM users 
+             WHERE username = '$username'
+             LIMIT 1";
+    $result = $mysqli->query($sql);
+
+    if ($result && $user = $result->fetch_assoc()) {
+        // 4. Verify password (assuming password_hash used)
+        if (password_verify($password, $user['password_hash'])) {
+            // 5. Store user info in session
+            $_SESSION['user_id']   = $user['id'];
+            $_SESSION['username']  = $user['username'];
+            $_SESSION['logged_in'] = true;
+
+            header('Location: dashboard.php');
+            exit;
+        }
+    }
+    $error = 'Invalid username or password';
+}
+?>
+&lt;!DOCTYPE html>
+&lt;html>
+&lt;body>
+  &lt;h2>Login&lt;/h2>
+  &lt;?php if (!empty($error)) echo "&lt;p style='color:red;'>$error&lt;/p>"; ?>
+  &lt;form method="post">
+    Username: &lt;input name="username" required>&lt;br>
+    Password: &lt;input type="password" name="password" required>&lt;br>
+    &lt;button type="submit">Log In&lt;/button>
+  &lt;/form>
+&lt;/body>
+&lt;/html>
+```
+
+---
+
+#### Executing (Using) the Session
+
+**dashboard.php**
+
+```
+&lt;?php
+session_start();                // Resume session
+// 1. Protect page—redirect if not logged in
+if (empty($_SESSION['logged_in'])) {
+    header('Location: login.php');
+    exit;
+}
+
+// 2. Use session data
+echo "&lt;h1>Welcome, " . htmlspecialchars($_SESSION['username']) . "&lt;/h1>";
+echo "&lt;p>Your User ID: " . $_SESSION['user_id'] . "&lt;/p>";
+?>
+&lt;p>&lt;a href="logout.php">Log Out&lt;/a>&lt;/p>
+```
+
+---
+
+#### Destroying (Logout) the Session
+
+**logout.php**
+
+```
+&lt;?php
+session_start();
+// 1. Unset all session variables
+$_SESSION = [];
+
+// 2. Destroy session cookie on client
+if (ini_get("session.use_cookies")) {
+    setcookie(
+      session_name(), 
+      '', 
+      time() - 3600, 
+      ini_get("session.cookie_path"),
+      ini_get("session.cookie_domain"),
+      ini_get("session.cookie_secure"),
+      ini_get("session.cookie_httponly")
+    );
+}
+
+// 3. Destroy server‐side session data
+session_destroy();
+
+header('Location: login.php');
+exit;
+?>
+```
+
+---
+
+#### Key Points
+
+* Always call `session_start()` before any output.
+* **Sanitize** inputs and **hash** passwords (`password_hash()`, `password_verify()`).
+* **Regenerate** session ID on login (`session_regenerate_id(true)`) for security.
+* Unset and destroy both session data and the session cookie on logout.
+* Use `$_SESSION` only after verifying user authentication.
+
+
+
+### Introduction
+
+Web applications often need to **collect user input**, **store** it in a **database**, and later **retrieve** it for display. In PHP & MySQL:
+
+* **HTML form** gathers data
+* **PHP script** uses **mysqli** to INSERT/SELECT
+* **POST** method sends data securely
+
+---
+
+#### 2. Database & Table Creation (5 M)
+
+**SQL commands** to set up the database and table:
+
+```sql
+-- 1. Create database
+CREATE DATABASE IF NOT EXISTS mydb;
+
+-- 2. Use database
+USE mydb;
+
+-- 3. Create table
+CREATE TABLE IF NOT EXISTS student (
+  roll INT      PRIMARY KEY,
+  name VARCHAR(50),
+  city VARCHAR(50)
+);
+```
+
+* **roll** is PRIMARY KEY (unique, NOT NULL)
+* **name**, **city** hold text up to 50 chars
+
+---
+
+#### 3. HTML Form Page (5 M)
+
+```html
+&lt;!-- data.html -->
+&lt;form action="save_data.php" method="post">
+  &lt;label>Roll: &lt;input name="roll" required>&lt;/label>&lt;br>
+  &lt;label>Name: &lt;input name="name" required>&lt;/label>&lt;br>
+  &lt;label>City: &lt;input name="city" required>&lt;/label>&lt;br>
+  &lt;button type="submit">Save&lt;/button>
+&lt;/form>
+```
+
+* **method="post"** → data in `$_POST`, not URL
+* **required** → basic browser validation
+
+---
+
+#### 4. PHP Insert Script (5 M)
+
+```
+&lt;?php
+// save_data.php
+$conn = new mysqli("localhost","root","","mydb");
+if ($conn->connect_error) die("Connection failed");
+
+$roll = (int)$_POST['roll'];
+$name = $conn->real_escape_string($_POST['name']);
+$city = $conn->real_escape_string($_POST['city']);
+
+$sql = "INSERT INTO student (roll,name,city)
+        VALUES ($roll,'$name','$city')";
+
+if ($conn->query($sql)) {
+    echo "Record saved. &lt;a href='view_data.php'>View all&lt;/a>";
+} else {
+    echo "Error: " . $conn->error;
+}
+$conn->close();
+```
+
+* **(int)** cast prevents injection via roll
+* **real\_escape\_string** escapes quotes in text
+* **error handling** reports failures
+
+---
+
+#### 5. PHP Fetch & Display Script (5 M)
+
+```
+&lt;?php
+// view_data.php
+$conn = new mysqli("localhost","root","","mydb");
+if ($conn->connect_error) die("Connection failed");
+
+$result = $conn->query("SELECT * FROM student");
+
+echo "&lt;table border=1>
+        &lt;tr>&lt;th>Roll&lt;/th>&lt;th>Name&lt;/th>&lt;th>City&lt;/th>&lt;/tr>";
+while ($r = $result->fetch_assoc()) {
+    echo "&lt;tr>
+            &lt;td>{$r['roll']}&lt;/td>
+            &lt;td>{$r['name']}&lt;/td>
+            &lt;td>{$r['city']}&lt;/td>
+          &lt;/tr>";
+}
+echo "&lt;/table>";
+$conn->close();
+```
+
+* **SELECT \*** retrieves all columns
+* **fetch\_assoc()** returns each row as an associative array
+
+---
+
+#### 6. Flow Diagram & Best Practices (5 M)
+
+```
+[data.html form] 
+     ↓ POST
+[save_data.php] ──INSERT──▶ [MySQL student table]
+     ↓ link
+[view_data.php] ──SELECT──▶ [HTML table display]
+```
+
+**Best Practices:**
+
+* **Validate** inputs (e.g., `required`, `is_numeric`)
+* **Sanitize** data (`real_escape_string`)
+* **Error handling** for DB connection & queries
+* **Separate** presentation (HTML) from logic (PHP)
+
+---
+
+
+
+            </pre>
