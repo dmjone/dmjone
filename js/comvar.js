@@ -583,6 +583,11 @@ const profDetailsBio = {
         bio: "<p class='professorbio header-p-author-description'>Shri Manashwee Tripathi is a highly skilled and experienced database expert who offers industry-oriented training designed to bridge the gap between academic learning and real-world application. With years of expertise and a deep understanding of current industry needs, he crafts courses that equip you with the practical knowledge and hands-on experience required to excel in the professional world.</p>",
         href: "contact@dmj.one"
     },
+    'Sachin Saroch':
+    {
+        bio: "<p class='professorbio header-p-author-description'>Shri Sachin Saroch is a highly skilled and experienced software development expert who offers industry-oriented training designed to bridge the gap between academic learning and real-world application. With years of expertise and a deep understanding of current industry needs, he crafts courses that equip you with the practical knowledge and hands-on experience required to excel in the professional world.</p>",
+        href: "sachin.saroch@tcs.com"
+    },
     'Dr. Kritika Rana':
     {
         bio: "<p class='professorbio header-p-author-description'>Dr. Kritika Rana is an Assistant Professor at the Yogananda School of AI, Computers, and Data Sciences. With a strong academic background in Artificial Intelligence and two years of teaching experience, she has made significant contributions as a research associate, publishing papers on autonomous vehicles and deep learning. Her expertise spans data analysis, project management, and software engineering, reflecting her adaptability and innovative approach. Passionate about student mentorship and academic advising, she is committed to advancing AI education and research.</p>",
@@ -696,6 +701,7 @@ const courseDetailsMap = {
     'csu2104': { 'default': ["Dr. Sonia", "CSU2104", "Digital Forensics"] },
     'csu1288': { 'default': ["Abdullahi Adem", "CSU1288", "Intrusion Detection System"] },
     'csu086': { 'default': ["Maya Thapa", "CSU086", "Compiler Design"] },
+    'tcsoneim': { 'default': ["Sachin Saroch", "TCSOneIM", "One Identity Manager"] },
     
 };
 
