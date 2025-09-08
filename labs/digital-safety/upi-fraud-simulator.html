@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>UPI Fraud Simulator - Digital Safety Labs by Vidya Parmar | dmj.one</title>
+        <!-- Bootstrap 5.3 from cdnjs -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+        <style>
+            /* Minimal custom CSS for readability */
+            .mono {
+                font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace
+            }
+
+            .vh-25 {
+                height: 25vh
+            }
+
+            .scroll {
+                overflow: auto
+            }
+
+            .large-btn .btn {
+                min-width: 170px;
+                font-size: 1.05rem
+            }
+
+            .faux-sms {
+                background: #f8f9fa;
+                border: 1px solid #e9ecef;
+                border-radius: 12px;
+                padding: 12px
+            }
+
+            .danger-pill {
+                display: inline-block;
+                padding: .15rem .5rem;
+                border-radius: 9999px;
+                background: #dc3545;
+                color: #fff;
+                font-size: .75rem
+            }
+
+            .safe-pill {
+                display: inline-block;
+                padding: .15rem .5rem;
+                border-radius: 9999px;
+                background: #198754;
+                color: #fff;
+                font-size: .75rem
+            }
+        </style>
+    </head>
+
+    <body>
+        <nav class="navbar navbar-expand-lg bg-body-tertiary border-bottom">
+            <div class="container-fluid">
+                <span class="navbar-brand fw-semibold">UPI Fraud Simulator</span>
+                <div class="d-flex gap-2">
+                    <button id="langToggle" class="btn btn-outline-secondary btn-sm" type="button">हिंदी</button>
+                    <button id="resetBtn" class="btn btn-outline-danger btn-sm" type="button">Reset Demo</button>
+                </div>
+            </div>
+        </nav>
+
+        <main class="container py-4">
+            <div class="alert alert-info" role="alert">
+                <strong data-i18n="banner_head">Show, don’t tell:</strong>
+                <span data-i18n="banner_body">This single HTML page simulates a common UPI/KYC scam sequence — fake SMS, phishing page, and a UPI “collect request”. Nothing leaves your browser; it’s an educational offline demo.</span>
+            </div>
+
+            <!-- Participant (demo identity) -->
+            <section class="mb-3">
+                <div class="card">
+                    <div class="card-header fw-semibold" data-i18n="sec_who">Participant (demo identity)</div>
+                    <div class="card-body">
+                        <form id="whoForm" class="row gy-3">
+                            <div class="col-md-4">
+                                <label class="form-label" data-i18n="label_name">Name</label>
+                                <input id="name" class="form-control" placeholder="Ravi / Seema" />
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label" data-i18n="label_phone">Phone</label>
+                                <input id="phone" class="form-control" placeholder="99999-99999" />
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label" data-i18n="label_bank">Bank (for demo)</label>
+                                <input id="bank" class="form-control" placeholder="Your Bank" />
+                            </div>
+                            <div class="col-12 d-flex flex-wrap gap-2">
+                                <button class="btn btn-primary" type="submit" data-i18n="btn_save">Save</button>
+                                <span id="whoSaved" class="text-muted align-self-center"></span>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 1: Fake SMS / WhatsApp preview -->
+            <section class="mb-3">
+                <div class="card">
+                    <div class="card-header fw-semibold" data-i18n="sec_sms">Step 1 — Suspicious message</div>
+                    <div class="card-body">
+                        <div class="row g-3 align-items-center">
+                            <div class="col-lg-7">
+                                <div class="faux-sms">
+                                    <div class="small text-muted mb-1">SMS</div>
+                                    <div id="smsPreview" class="mono"></div>
+                                    <div class="small text-muted mt-2" data-i18n="sms_hint">(Looks urgent? That’s the trap.)</div>
+                                </div>
+                                <div class="large-btn d-flex flex-wrap gap-2 mt-3">
+                                    <button id="btnClickLink" class="btn btn-dark" type="button" data-i18n="btn_click_link">Tap the link</button>
+                                    <button id="btnIgnore" class="btn btn-outline-secondary" type="button" data-i18n="btn_ignore">Ignore</button>
+                                </div>
+                            </div>
+                            <div class="col-lg-5">
+                                <ul class="mb-0">
+                                    <li><span class="danger-pill" data-i18n="rf_urgency">Urgency</span> — <span data-i18n="rf_urgency_txt">“48 hrs or account blocked”</span></li>
+                                    <li><span class="danger-pill" data-i18n="rf_link">Weird link</span> — <span data-i18n="rf_link_txt">not your bank’s domain</span></li>
+                                    <li><span class="danger-pill" data-i18n="rf_asking">Asks OTP/PIN</span> — <span data-i18n="rf_asking_txt">banks never ask</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 2: Phishing page simulation -->
+            <section class="mb-3" id="phishSection" hidden>
+                <div class="card border-danger">
+                    <div class="card-header fw-semibold">Step 2 — Fake KYC Page</div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-lg-6">
+                                <form id="phishForm" class="row gy-2">
+                                    <div class="col-12">
+                                        <label class="form-label">Full name</label>
+                                        <input id="p_name" class="form-control" />
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label">DOB</label>
+                                        <input id="p_dob" type="date" class="form-control" />
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label">Aadhaar last 4 (demo)</label>
+                                        <input id="p_aad4" maxlength="4" class="form-control" />
+                                    </div>
+                                    <div class="col-12">
+                                        <button class="btn btn-outline-primary" id="btnSendOtp" type="button">Send OTP</button>
+                                    </div>
+                                    <div class="col-12 d-flex gap-2 align-items-end">
+                                        <div class="flex-grow-1">
+                                            <label class="form-label">Enter OTP</label>
+                                            <input id="p_otp" class="form-control" maxlength="6" placeholder="6-digit" />
+                                        </div>
+                                        <button class="btn btn-primary" id="btnSubmitOtp" type="button">Submit</button>
+                                    </div>
+                                </form>
+                                <div class="small text-muted mt-2">This entire page is fake. Submitting helps the attacker link your identity.</div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="alert alert-warning small">
+                                    <strong>Red flags:</strong>
+                                    <ul class="mb-0">
+                                        <li>URL doesn’t match your bank</li>
+                                        <li>Spelling/grammar mistakes</li>
+                                        <li>Demands OTP outside official app/IVR</li>
+                                    </ul>
+                                </div>
+                                <div class="alert alert-secondary small">
+                                    <strong>Safe habit:</strong> open your bank/UPI app yourself — don’t follow links.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 3: UPI collect request simulation -->
+            <section class="mb-3" id="collectSection" hidden>
+                <div class="card border-warning">
+                    <div class="card-header fw-semibold">Step 3 — UPI “Collect Request”</div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-lg-6">
+                                <div class="card">
+                                    <div class="card-header p-2 small">Incoming Request</div>
+                                    <div class="card-body p-2">
+                                        <div><span class="text-muted">From:</span> <span class="mono" id="cr_from">Refund Dept</span></div>
+                                        <div><span class="text-muted">Amount:</span> <strong class="mono" id="cr_amt">₹299.00</strong></div>
+                                        <div><span class="text-muted">Reason:</span> <span class="mono">KYC verification</span></div>
+                                    </div>
+                                </div>
+                                <div class="large-btn d-flex flex-wrap gap-2 mt-3">
+                                    <button class="btn btn-success" id="btnApprove" type="button">Approve (enter UPI PIN)</button>
+                                    <button class="btn btn-outline-secondary" id="btnReject" type="button">Reject</button>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="alert alert-danger small">
+                                    <strong>Warning:</strong> Entering your UPI PIN **sends money**. Refunds never need your UPI PIN.
+                                </div>
+                                <div class="alert alert-success small">
+                                    <strong>Correct action:</strong> **Reject** the request. If you approved by mistake, call <strong>1930</strong> quickly.
+                                </div>
+                            </div>
+                        </div>
+                        <div id="pinSection" class="mt-3" hidden>
+                            <div class="card">
+                                <div class="card-header p-2 small">Enter UPI PIN (demo)</div>
+                                <div class="card-body p-2 d-flex gap-2 align-items-end">
+                                    <input id="pin" type="password" class="form-control" maxlength="6" placeholder="6-digit" style="max-width:200px" />
+                                    <button id="btnPinSubmit" class="btn btn-danger" type="button">Confirm</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Outcome + helpline -->
+            <section class="mb-3" id="outcomeSection" hidden>
+                <div class="card">
+                    <div class="card-header fw-semibold">Outcome</div>
+                    <div class="card-body">
+                        <div id="outcomeText" class="mb-2"></div>
+                        <div class="alert alert-warning small mb-0">
+                            <strong>Emergency:</strong> If money was debited, call <strong>1930</strong> immediately to attempt freezing the transfer.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Event stream -->
+            <section class="mb-3">
+                <div class="card">
+                    <div class="card-header fw-semibold">Event Stream</div>
+                    <div class="card-body p-2 vh-25 scroll">
+                        <table class="table table-sm align-middle mb-0">
+                            <thead>
+                                <tr class="small">
+                                    <th>Time</th>
+                                    <th>Event</th>
+                                    <th>Details</th>
+                                </tr>
+                            </thead>
+                            <tbody id="eventT"></tbody>
+                        </table>
+                    </div>
+                    <div class="card-footer d-flex flex-wrap gap-2">
+                        <button id="btnExport" class="btn btn-outline-secondary btn-sm" type="button">Export Evidence (JSON)</button>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <footer class="border-top py-3 text-center small text-muted">
+            Digital Safety Labs — stores demo data under <span class="mono">localStorage["DSL_<slug>_V1"]</span>
+        </footer>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+            // ===== Storage namespace (slugified filename) =====
+            const SLUG = (location.pathname.split('/').filter(Boolean).pop() || 'upi-fraud-simulator.html')
+                .replace(/[^a-z0-9-]/gi, '_').toLowerCase();
+            const KEY = `DSL_${SLUG}_V1`;
+
+            // ===== State shape =====
+            const DEFAULT = () => ({
+                version: '1.0.0',
+                sessionId: 'dsl-' + Math.random().toString(36).slice(2, 10),
+                user: { name: '', phone: '', bank: '' },
+                otp: null,
+                collect: { from: 'Refund Dept', amount: 299.00, approved: false, rejected: false },
+                events: []
+            });
+
+            let state = load();
+
+            // ===== Helpers =====
+            function load() { try { return JSON.parse(localStorage.getItem(KEY)) || DEFAULT(); } catch (e) { return DEFAULT(); } }
+            function save() { localStorage.setItem(KEY, JSON.stringify(state)); }
+            function now() { return new Date().toISOString(); }
+            function addEvent(type, payload) { state.events.unshift({ ts: now(), type, payload }); save(); renderEvents(); }
+            function esc(x) { x = String(x ?? ''); return x.replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" }[c])); }
+
+            // ===== UI bindings =====
+            function renderSMS() {
+                const name = state.user.name || 'Customer';
+                const bank = state.user.bank || 'Your Bank';
+                const msg = `Dear ${name}, your ${bank} KYC will be blocked in 48 hrs. Verify now: http://kyc-update-example.com`;
+                document.getElementById('smsPreview').textContent = msg;
+            }
+
+            function setSection(elId, show) { document.getElementById(elId).hidden = !show; }
+
+            function renderEvents() {
+                const t = document.getElementById('eventT'); t.innerHTML = '';
+                for (const ev of state.events) {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `<td class="small text-muted">${esc(ev.ts)}</td><td>${esc(ev.type)}</td><td><span class="mono">${esc(JSON.stringify(ev.payload))}</span></td>`;
+                    t.appendChild(tr);
+                }
+            }
+
+            // ===== Actions =====
+            function saveWho(e) {
+                e.preventDefault();
+                state.user.name = document.getElementById('name').value.trim();
+                state.user.phone = document.getElementById('phone').value.trim();
+                state.user.bank = document.getElementById('bank').value.trim();
+                save(); addEvent('who_saved', { ...state.user });
+                document.getElementById('whoSaved').textContent = 'Saved.'; setTimeout(() => document.getElementById('whoSaved').textContent = '', 1500);
+                renderSMS();
+                document.getElementById('p_name').value = state.user.name;
+            }
+
+            function clickLink() { addEvent('sms_link_clicked', {}); setSection('phishSection', true); }
+            function ignoreLink() { addEvent('sms_ignored', {}); setSection('phishSection', false); setSection('collectSection', false); setOutcome('safe_ignore'); }
+
+            function sendOtp() {
+                const otp = String(Math.floor(100000 + Math.random() * 900000));
+                state.otp = otp; save();
+                addEvent('otp_sent', { otp: '******' }); // do not reveal here
+                alert('Demo: An OTP would be sent. Attacker will ask you to share it.');
+            }
+
+            function submitOtp() {
+                const got = document.getElementById('p_otp').value.trim();
+                if (!got) { alert('Enter the OTP (demo).'); return; }
+                const ok = (state.otp && got.length === 6);
+                addEvent('otp_submitted', { match: ok });
+                // Move to collect request stage regardless — many scams jump here via app notification
+                setSection('collectSection', true);
+                // prefill collect from bank name
+                document.getElementById('cr_from').textContent = (state.user.bank ? state.user.bank + ' Support' : 'Refund Dept');
+            }
+
+            function approveCollect() {
+                setSection('pinSection', true);
+            }
+
+            function pinSubmit() {
+                const pin = document.getElementById('pin').value.trim();
+                if (pin.length < 4) { alert('Enter a 4-6 digit PIN (demo).'); return; }
+                state.collect.approved = true; save();
+                addEvent('upi_pin_entered', { len: pin.length });
+                setOutcome('debit');
+            }
+
+            function rejectCollect() {
+                state.collect.rejected = true; save();
+                addEvent('collect_rejected', {});
+                setOutcome('rejected');
+            }
+
+            function setOutcome(kind) {
+                setSection('outcomeSection', true);
+                const box = document.getElementById('outcomeText');
+                if (kind === 'debit') {
+                    box.innerHTML = `<div class="h5 text-danger mb-2">Money Debited: <span class="mono">₹${state.collect.amount.toFixed(2)}</span></div>
+        <div>Because you entered the UPI PIN, the app sent money to the attacker. Refunds and KYC fixes never require your UPI PIN.</div>`;
+                    addEvent('money_debited', { amount: state.collect.amount });
+                } else if (kind === 'rejected') {
+                    box.innerHTML = `<div class="h5 text-success mb-2">Safe: Request Rejected</div>
+        <div>You rejected the request. Correct action. If you had approved by mistake, immediately call <strong>1930</strong>.</div>`;
+                } else if (kind === 'safe_ignore') {
+                    box.innerHTML = `<div class="h5 text-success mb-2">Safe: Message Ignored</div>
+        <div>Never open unknown links. Open your bank app yourself if in doubt.</div>`;
+                }
+            }
+
+            function exportJSON() {
+                const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+                const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+                a.download = `upi-evidence-${state.sessionId}.json`; a.click(); URL.revokeObjectURL(a.href);
+            }
+
+            function resetAll() { localStorage.removeItem(KEY); state = DEFAULT(); save(); location.reload(); }
+
+            // ===== Language (EN/HI minimal keys) =====
+            const I18N = {
+                en: {
+                    banner_head: 'Show, don’t tell:',
+                    banner_body: 'This single HTML page simulates a common UPI/KYC scam sequence — fake SMS, phishing page, and a UPI “collect request”. Nothing leaves your browser; it’s an educational offline demo.',
+                    sec_who: 'Participant (demo identity)', label_name: 'Name', label_phone: 'Phone', label_bank: 'Bank (for demo)', btn_save: 'Save',
+                    sec_sms: 'Step 1 — Suspicious message', sms_hint: '(Looks urgent? That’s the trap.)', btn_click_link: 'Tap the link', btn_ignore: 'Ignore',
+                    rf_urgency: 'Urgency', rf_urgency_txt: '“48 hrs or account blocked”', rf_link: 'Weird link', rf_link_txt: 'not your bank’s domain', rf_asking: 'Asks OTP/PIN', rf_asking_txt: 'banks never ask'
+                },
+                hi: {
+                    banner_head: 'दिखाकर समझाएं:',
+                    banner_body: 'यह पेज एक आम UPI/KYC ठगी को दिखाता है — नकली SMS, फिशिंग पेज और UPI “कलेक्ट रिक्वेस्ट”। यह सब आपके ब्राउज़र में ही चलता है; कोई डेटा इंटरनेट पर नहीं जाता।',
+                    sec_who: 'प्रतिभागी (डेमो पहचान)', label_name: 'नाम', label_phone: 'फ़ोन', label_bank: 'बैंक (डेमो हेतु)', btn_save: 'सेव',
+                    sec_sms: 'चरण 1 — संदिग्ध संदेश', sms_hint: '(ज़्यादा जल्दबाज़ी? यही जाल है.)', btn_click_link: 'लिंक खोलें', btn_ignore: 'नज़रअंदाज़ करें',
+                    rf_urgency: 'तुरंत', rf_urgency_txt: '“48 घंटे में बंद”', rf_link: 'अजीब लिंक', rf_link_txt: 'बैंक का डोमेन नहीं', rf_asking: 'OTP/PIN माँगे', rf_asking_txt: 'बैंक कभी नहीं मांगते'
+                }
+            };
+            let lang = localStorage.getItem('DSL_LANG') || (navigator.language.startsWith('hi') ? 'hi' : 'en');
+            function applyLang() {
+                const d = I18N[lang];
+                document.querySelectorAll('[data-i18n]').forEach(el => { const k = el.getAttribute('data-i18n'); if (d[k]) el.textContent = d[k]; });
+                document.getElementById('langToggle').textContent = (lang === 'en' ? 'हिंदी' : 'English');
+            }
+
+            // ===== Init =====
+            function init() {
+                renderSMS(); renderEvents(); applyLang();
+                // prefill
+                document.getElementById('name').value = state.user.name;
+                document.getElementById('phone').value = state.user.phone;
+                document.getElementById('bank').value = state.user.bank;
+                document.getElementById('p_name').value = state.user.name;
+
+                document.getElementById('whoForm').addEventListener('submit', saveWho);
+                document.getElementById('btnClickLink').addEventListener('click', clickLink);
+                document.getElementById('btnIgnore').addEventListener('click', ignoreLink);
+                document.getElementById('btnSendOtp').addEventListener('click', sendOtp);
+                document.getElementById('btnSubmitOtp').addEventListener('click', submitOtp);
+                document.getElementById('btnApprove').addEventListener('click', approveCollect);
+                document.getElementById('btnReject').addEventListener('click', rejectCollect);
+                document.getElementById('btnPinSubmit').addEventListener('click', pinSubmit);
+                document.getElementById('btnExport').addEventListener('click', exportJSON);
+                document.getElementById('resetBtn').addEventListener('click', resetAll);
+                document.getElementById('langToggle').addEventListener('click', () => { lang = (lang === 'en' ? 'hi' : 'en'); localStorage.setItem('DSL_LANG', lang); applyLang(); });
+
+                addEvent('demo_loaded', { ua: navigator.userAgent, lang: navigator.language });
+            }
+
+            document.addEventListener('DOMContentLoaded', init);
+        </script>
+    </body>
+
+</html>

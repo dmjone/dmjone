@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>QR "Receive Money" Scam Simulator — Digital Safety Labs | dmj.one</title>
+        <!-- Bootstrap 5.3 from cdnjs -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+        <style>
+            /* Minimal custom CSS */
+            .mono {
+                font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace
+            }
+
+            .vh-25 {
+                height: 25vh
+            }
+
+            .scroll {
+                overflow: auto
+            }
+
+            .large-btn .btn {
+                min-width: 170px;
+                font-size: 1.05rem
+            }
+
+            .qr-box {
+                width: 220px;
+                height: 220px;
+                border: 8px solid #212529;
+                border-radius: 8px;
+                position: relative;
+                background: repeating-linear-gradient(45deg, #212529 0, #212529 8px, #f8f9fa 8px, #f8f9fa 16px)
+            }
+
+            .qr-label {
+                position: absolute;
+                bottom: -10px;
+                left: 0;
+                right: 0;
+                text-align: center;
+                font-size: .8rem;
+                color: #6c757d
+            }
+        </style>
+    </head>
+
+    <body>
+        <nav class="navbar navbar-expand-lg bg-body-tertiary border-bottom">
+            <div class="container-fluid">
+                <span class="navbar-brand fw-semibold">QR "Receive Money" Scam Simulator</span>
+                <div class="d-flex gap-2">
+                    <button id="langToggle" class="btn btn-outline-secondary btn-sm" type="button">हिंदी</button>
+                    <button id="resetBtn" class="btn btn-outline-danger btn-sm" type="button">Reset Demo</button>
+                </div>
+            </div>
+        </nav>
+
+        <main class="container py-4">
+            <div class="alert alert-info" role="alert">
+                <strong data-i18n="banner_head">Show, don’t tell:</strong>
+                <span data-i18n="banner_body">This page simulates the common "scan QR to receive money" scam. Scanning a QR usually creates a <em>payment</em> (debit) — not a receipt. Nothing leaves your browser; it’s an offline demo.</span>
+            </div>
+
+            <!-- Participant (demo identity) -->
+            <section class="mb-3">
+                <div class="card">
+                    <div class="card-header fw-semibold" data-i18n="sec_who">Participant (demo identity)</div>
+                    <div class="card-body">
+                        <form id="whoForm" class="row gy-3">
+                            <div class="col-md-4">
+                                <label class="form-label" data-i18n="label_name">Name</label>
+                                <input id="name" class="form-control" placeholder="Ravi / Seema" />
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label" data-i18n="label_upi">UPI ID</label>
+                                <input id="upi" class="form-control" placeholder="name@bank" />
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label" data-i18n="label_phone">Phone (optional)</label>
+                                <input id="phone" class="form-control" placeholder="99999-99999" />
+                            </div>
+                            <div class="col-12 d-flex flex-wrap gap-2">
+                                <button class="btn btn-primary" type="submit" data-i18n="btn_save">Save</button>
+                                <span id="whoSaved" class="text-muted align-self-center"></span>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 1: The lure: "scan to receive" -->
+            <section class="mb-3">
+                <div class="card">
+                    <div class="card-header fw-semibold" data-i18n="sec_lure">Step 1 — Lure message</div>
+                    <div class="card-body">
+                        <div class="row g-3 align-items-center">
+                            <div class="col-lg-7">
+                                <div class="faux-sms border rounded p-3 bg-light">
+                                    <div class="small text-muted mb-2">Message</div>
+                                    <div id="lureText" class="mono"></div>
+                                    <div class="small text-muted mt-2" data-i18n="lure_hint">(If they want to send you money, why do <em>you</em> need to scan a QR?)</div>
+                                </div>
+                                <div class="large-btn d-flex flex-wrap gap-2 mt-3">
+                                    <button id="btnScan" class="btn btn-dark" type="button" data-i18n="btn_scan">Scan QR</button>
+                                    <button id="btnAskCollect" class="btn btn-outline-primary" type="button" data-i18n="btn_ask_collect">Ask for bank transfer</button>
+                                    <button id="btnIgnore" class="btn btn-outline-secondary" type="button" data-i18n="btn_ignore">Ignore</button>
+                                </div>
+                            </div>
+                            <div class="col-lg-5 d-flex flex-column align-items-center">
+                                <div class="qr-box"></div>
+                                <div class="qr-label">(Fake QR for demo)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 2: Decoded UPI intent (payment) -->
+            <section class="mb-3" id="decodedSection" hidden>
+                <div class="card border-warning">
+                    <div class="card-header fw-semibold" data-i18n="sec_decoded">Step 2 — Decoded QR reveals a payment</div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-lg-6">
+                                <div class="card">
+                                    <div class="card-header p-2 small">Decoded UPI intent</div>
+                                    <div class="card-body p-2">
+                                        <div><span class="text-muted">URL:</span> <span class="mono" id="upiUrl"></span></div>
+                                        <hr class="my-2" />
+                                        <div><span class="text-muted">Pay to (pa):</span> <span class="mono" id="pa"></span></div>
+                                        <div><span class="text-muted">Name (pn):</span> <span class="mono" id="pn"></span></div>
+                                        <div><span class="text-muted">Amount (am):</span> <span class="mono" id="am"></span></div>
+                                        <div><span class="text-muted">Note (tn):</span> <span class="mono" id="tn"></span></div>
+                                    </div>
+                                </div>
+                                <div class="alert alert-danger small mt-3" data-i18n="warn_payment">Warning: Scanning a QR usually creates a <strong>payment</strong>. Receiving money does not need your UPI PIN.</div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="large-btn d-flex flex-wrap gap-2">
+                                    <button class="btn btn-success" id="btnOpenApp" type="button" data-i18n="btn_open_upi">Open in UPI app</button>
+                                    <button class="btn btn-outline-secondary" id="btnCancelOpen" type="button" data-i18n="btn_cancel">Cancel</button>
+                                </div>
+                                <div class="alert alert-secondary small mt-3" data-i18n="safe_tip">Safe habit: If someone wants to pay you, share <strong>your</strong> UPI ID or show <strong>your</strong> QR, or ask them to do a normal transfer from their app.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 3: UPI payment confirmation (asks for PIN) -->
+            <section class="mb-3" id="paySection" hidden>
+                <div class="card border-danger">
+                    <div class="card-header fw-semibold" data-i18n="sec_pay">Step 3 — Payment screen asks for your UPI PIN</div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-lg-6">
+                                <div class="card">
+                                    <div class="card-header p-2 small">Payment Details</div>
+                                    <div class="card-body p-2">
+                                        <div><span class="text-muted">To:</span> <span class="mono" id="pay_to"></span></div>
+                                        <div><span class="text-muted">Amount:</span> <span class="mono fw-semibold" id="pay_am"></span></div>
+                                        <div><span class="text-muted">Reason:</span> <span class="mono" id="pay_tn"></span></div>
+                                    </div>
+                                </div>
+                                <div class="alert alert-danger small mt-3" data-i18n="warn_pin">Entering UPI PIN means <strong>you pay</strong>. Never enter PIN to "receive" money.</div>
+                                <div class="large-btn d-flex flex-wrap gap-2">
+                                    <button class="btn btn-danger" id="btnPay" type="button" data-i18n="btn_pay">Enter PIN & Pay</button>
+                                    <button class="btn btn-outline-secondary" id="btnReject" type="button" data-i18n="btn_reject">Reject</button>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="card">
+                                    <div class="card-header p-2 small">Enter UPI PIN (demo)</div>
+                                    <div class="card-body p-2 d-flex gap-2 align-items-end">
+                                        <input id="pin" type="password" class="form-control" maxlength="6" placeholder="6-digit" style="max-width:200px" />
+                                        <button id="btnConfirmPay" class="btn btn-dark" type="button" data-i18n="btn_confirm">Confirm</button>
+                                    </div>
+                                </div>
+                                <div class="alert alert-success small mt-3" data-i18n="warn_reject">Correct action: **Reject**. Ask the sender to transfer directly to your UPI ID instead.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Outcome + helpline -->
+            <section class="mb-3" id="outcomeSection" hidden>
+                <div class="card">
+                    <div class="card-header fw-semibold" data-i18n="sec_outcome">Outcome</div>
+                    <div class="card-body">
+                        <div id="outcomeText" class="mb-2"></div>
+                        <div class="alert alert-warning small mb-0">
+                            <strong>Emergency:</strong> If money was debited, call <strong>1930</strong> immediately to try freezing the transfer.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Event stream -->
+            <section class="mb-3">
+                <div class="card">
+                    <div class="card-header fw-semibold">Event Stream</div>
+                    <div class="card-body p-2 vh-25 scroll">
+                        <table class="table table-sm align-middle mb-0">
+                            <thead>
+                                <tr class="small">
+                                    <th>Time</th>
+                                    <th>Event</th>
+                                    <th>Details</th>
+                                </tr>
+                            </thead>
+                            <tbody id="eventT"></tbody>
+                        </table>
+                    </div>
+                    <div class="card-footer d-flex flex-wrap gap-2">
+                        <button id="btnExport" class="btn btn-outline-secondary btn-sm" type="button">Export Evidence (JSON)</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="border-top py-3 text-center small text-muted">
+            Digital Safety Labs — stores demo data under <span class="mono">localStorage["DSL_<slug>_V1"]</span>
+        </footer>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+            // ===== Storage namespace (slugified filename) =====
+            const SLUG = (location.pathname.split('/').filter(Boolean).pop() || 'qr-receive-scam-simulator.html').replace(/[^a-z0-9-]/gi, '_').toLowerCase();
+            const KEY = `DSL_${SLUG}_V1`;
+
+            // ===== State =====
+            const DEFAULT = () => ({
+                version: '1.0.0',
+                sessionId: 'dsl-' + Math.random().toString(36).slice(2, 10),
+                user: { name: '', upi: '', phone: '' },
+                decoded: { url: '', pa: '', pn: '', am: '', tn: '' },
+                events: []
+            });
+            let state = load();
+
+            function load() { try { return JSON.parse(localStorage.getItem(KEY)) || DEFAULT(); } catch (e) { return DEFAULT(); } }
+            function save() { localStorage.setItem(KEY, JSON.stringify(state)); }
+            function now() { return new Date().toISOString(); }
+            function addEvent(type, payload) { state.events.unshift({ ts: now(), type, payload }); save(); renderEvents(); }
+            function esc(x) { x = String(x ?? ''); return x.replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" }[c])); }
+
+            // ===== Lure text =====
+            function renderLure() {
+                const name = state.user.name || 'Customer';
+                const amt = (Math.random() > 0.5 ? '₹499 cashback' : '₹1,000 refund');
+                const msg = `${name}, ${amt} pending. Scan QR to receive instantly.`;
+                document.getElementById('lureText').textContent = msg;
+            }
+
+            // ===== Decoding QR (simulated) =====
+            function scanQR() {
+                // Create a fake UPI payment URL: upi://pay?pa=<handle>&pn=<name>&am=<amount>&tn=<note>
+                const pa = 'scammer@okbank';
+                const pn = 'Prize Dept';
+                const am = (Math.random() > 0.5 ? '299.00' : '999.00');
+                const tn = 'KYC / refund';
+                const url = `upi://pay?pa=${encodeURIComponent(pa)}&pn=${encodeURIComponent(pn)}&am=${encodeURIComponent(am)}&tn=${encodeURIComponent(tn)}`;
+                state.decoded = { url, pa, pn, am, tn }; save();
+                document.getElementById('upiUrl').textContent = url;
+                document.getElementById('pa').textContent = pa;
+                document.getElementById('pn').textContent = pn;
+                document.getElementById('am').textContent = `₹${am}`;
+                document.getElementById('tn').textContent = tn;
+                addEvent('qr_scanned', { url });
+                setVisible('decodedSection', true);
+            }
+
+            function askCollect() { addEvent('asked_for_transfer', { to: state.user.upi || '(your upi id)' }); setOutcome('safe_collect'); }
+            function ignore() { addEvent('ignored_message', {}); setOutcome('safe_ignore'); }
+
+            // ===== Payment flow =====
+            function openInUPI() { addEvent('open_upi_app', {}); setVisible('paySection', true); fillPayDetails(); }
+            function cancelOpen() { addEvent('cancel_open', {}); setVisible('paySection', false); }
+            function fillPayDetails() {
+                const d = state.decoded; document.getElementById('pay_to').textContent = `${d.pn} (${d.pa})`;
+                document.getElementById('pay_am').textContent = `₹${d.am}`; document.getElementById('pay_tn').textContent = d.tn;
+            }
+            function pay() { addEvent('enter_pin_prompt', {}); }
+            function confirmPay() {
+                const pin = document.getElementById('pin').value.trim(); if (pin.length < 4) { alert('Enter a 4-6 digit PIN (demo).'); return; }
+                addEvent('upi_pin_entered', { len: pin.length }); setOutcome('debit');
+            }
+            function reject() { addEvent('payment_rejected', {}); setOutcome('rejected'); }
+
+            // ===== Outcome =====
+            function setOutcome(kind) {
+                const box = document.getElementById('outcomeText'); setVisible('outcomeSection', true);
+                if (kind === 'debit') {
+                    box.innerHTML = `<div class="h5 text-danger mb-2">Money Debited: <span class="mono">${esc('₹' + state.decoded.am)}</span></div>
+        <div>You entered your UPI PIN on a payment screen created by the QR. Scanning QR usually creates a <strong>payment</strong>, not a receipt.</div>`;
+                    addEvent('money_debited', { amount: state.decoded.am });
+                } else if (kind === 'rejected') {
+                    box.innerHTML = `<div class="h5 text-success mb-2">Safe: Payment Rejected</div>
+        <div>Correct action. Never enter your UPI PIN to "receive" money.</div>`;
+                } else if (kind === 'safe_collect') {
+                    box.innerHTML = `<div class="h5 text-success mb-2">Safe: Asked for proper transfer</div>
+        <div>Share <strong>your</strong> UPI ID / your own QR. If they insist on sending a QR, it’s a red flag.</div>`;
+                } else if (kind === 'safe_ignore') {
+                    box.innerHTML = `<div class="h5 text-success mb-2">Safe: Ignored suspicious message</div>
+        <div>When in doubt, do nothing. Contact the company number from their official website/app.</div>`;
+                }
+            }
+
+            // ===== Utility =====
+            function setVisible(id, show) { document.getElementById(id).hidden = !show; }
+            function renderEvents() { const t = document.getElementById('eventT'); t.innerHTML = ''; for (const ev of state.events) { const tr = document.createElement('tr'); tr.innerHTML = `<td class="small text-muted">${esc(ev.ts)}</td><td>${esc(ev.type)}</td><td><span class=\"mono\">${esc(JSON.stringify(ev.payload))}</span></td>`; t.appendChild(tr); } }
+            function exportJSON() { const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `qr-evidence-${state.sessionId}.json`; a.click(); URL.revokeObjectURL(a.href); }
+            function resetAll() { localStorage.removeItem(KEY); state = DEFAULT(); save(); location.reload(); }
+
+            // ===== Language (EN/HI minimal keys) =====
+            const I18N = {
+                en: {
+                    banner_head: 'Show, don’t tell:',
+                    banner_body: 'This page simulates the common "scan QR to receive money" scam. Scanning a QR usually creates a payment (debit) — not a receipt. Nothing leaves your browser; it’s an offline demo.',
+                    sec_who: 'Participant (demo identity)', label_name: 'Name', label_upi: 'UPI ID', label_phone: 'Phone (optional)', btn_save: 'Save',
+                    sec_lure: 'Step 1 — Lure message', lure_hint: '(If they want to send you money, why do you need to scan a QR?)', btn_scan: 'Scan QR', btn_ask_collect: 'Ask for bank transfer', btn_ignore: 'Ignore',
+                    sec_decoded: 'Step 2 — Decoded QR reveals a payment', warn_payment: 'Warning: Scanning a QR usually creates a payment. Receiving money does not need your UPI PIN.', btn_open_upi: 'Open in UPI app', btn_cancel: 'Cancel', safe_tip: 'Safe habit: If someone wants to pay you, share your UPI ID or show your own QR, or ask them to do a normal transfer from their app.',
+                    sec_pay: 'Step 3 — Payment screen asks for your UPI PIN', warn_pin: 'Entering UPI PIN means you pay. Never enter PIN to "receive" money.', btn_pay: 'Enter PIN & Pay', btn_reject: 'Reject', btn_confirm: 'Confirm',
+                    sec_outcome: 'Outcome'
+                },
+                hi: {
+                    banner_head: 'दिखाकर समझाएं:',
+                    banner_body: 'यह पेज "QR स्कैन कर पैसे पाएं" ठगी दिखाता है। QR स्कैन करने से आम तौर पर भुगतान (डेबिट) बनता है, रिसीव नहीं। यह ऑफलाइन डेमो है — कोई डेटा बाहर नहीं जाता।',
+                    sec_who: 'प्रतिभागी (डेमो पहचान)', label_name: 'नाम', label_upi: 'UPI आईडी', label_phone: 'फ़ोन (वैकल्पिक)', btn_save: 'सेव',
+                    sec_lure: 'चरण 1 — लुभावना संदेश', lure_hint: '(अगर वे आपको पैसे भेजना चाहते हैं तो QR आप क्यों स्कैन करें?)', btn_scan: 'QR स्कैन करें', btn_ask_collect: 'ट्रांसफ़र बोलें', btn_ignore: 'नज़रअंदाज़',
+                    sec_decoded: 'चरण 2 — QR डिकोड: यह भुगतान है', warn_payment: 'चेतावनी: QR स्कैन करने से भुगतान बनता है। पैसे पाने के लिए UPI PIN की जरूरत नहीं।', btn_open_upi: 'UPI ऐप खोलें', btn_cancel: 'रद्द', safe_tip: 'सुरक्षित तरीका: अपनी UPI ID/अपना QR दें या उनसे अपने ऐप से सामान्य ट्रांसफ़र करने को कहें।',
+                    sec_pay: 'चरण 3 — भुगतान स्क्रीन UPI PIN माँगती है', warn_pin: 'UPI PIN डालना मतलब आप भुगतान कर रहे हैं। पैसे पाने के लिए PIN न डालें।', btn_pay: 'PIN डालें व भुगतान', btn_reject: 'रिजेक्ट', btn_confirm: 'कन्फर्म',
+                    sec_outcome: 'परिणाम'
+                }
+            };
+            let lang = localStorage.getItem('DSL_LANG') || (navigator.language.startsWith('hi') ? 'hi' : 'en');
+            function applyLang() { const d = I18N[lang]; document.querySelectorAll('[data-i18n]').forEach(el => { const k = el.getAttribute('data-i18n'); if (d[k]) el.textContent = d[k]; }); document.getElementById('langToggle').textContent = (lang === 'en' ? 'हिंदी' : 'English'); }
+
+            // ===== Init =====
+            function init() {
+                // Prefill
+                document.getElementById('name').value = state.user.name;
+                document.getElementById('upi').value = state.user.upi;
+                document.getElementById('phone').value = state.user.phone;
+                renderLure(); renderEvents(); applyLang();
+
+                // Listeners
+                document.getElementById('whoForm').addEventListener('submit', (e) => { e.preventDefault(); state.user.name = document.getElementById('name').value.trim(); state.user.upi = document.getElementById('upi').value.trim(); state.user.phone = document.getElementById('phone').value.trim(); save(); addEvent('who_saved', { ...state.user }); document.getElementById('whoSaved').textContent = 'Saved.'; setTimeout(() => document.getElementById('whoSaved').textContent = '', 1500); renderLure(); });
+                document.getElementById('btnScan').addEventListener('click', scanQR);
+                document.getElementById('btnAskCollect').addEventListener('click', askCollect);
+                document.getElementById('btnIgnore').addEventListener('click', ignore);
+                document.getElementById('btnOpenApp').addEventListener('click', openInUPI);
+                document.getElementById('btnCancelOpen').addEventListener('click', cancelOpen);
+                document.getElementById('btnPay').addEventListener('click', pay);
+                document.getElementById('btnConfirmPay').addEventListener('click', confirmPay);
+                document.getElementById('btnReject').addEventListener('click', reject);
+                document.getElementById('btnExport').addEventListener('click', exportJSON);
+                document.getElementById('resetBtn').addEventListener('click', resetAll);
+                document.getElementById('langToggle').addEventListener('click', () => { lang = (lang === 'en' ? 'hi' : 'en'); localStorage.setItem('DSL_LANG', lang); applyLang(); });
+
+                addEvent('demo_loaded', { ua: navigator.userAgent, lang: navigator.language });
+            }
+
+            document.addEventListener('DOMContentLoaded', init);
+        </script>
+    </body>
+
+</html>

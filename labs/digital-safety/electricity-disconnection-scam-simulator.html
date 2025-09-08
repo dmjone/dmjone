@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Electricity Disconnection Scam Simulator — Digital Safety Labs</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+        <style>
+            /* Minimal custom CSS for readability + rural friendly */
+            .mono {
+                font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace
+            }
+
+            .vh-25 {
+                height: 25vh
+            }
+
+            .scroll {
+                overflow: auto
+            }
+
+            .large-btn .btn {
+                min-width: 170px;
+                font-size: 1.05rem
+            }
+
+            .faux-sms {
+                background: #f8f9fa;
+                border: 1px solid #e9ecef;
+                border-radius: 12px;
+                padding: 12px
+            }
+
+            .timer {
+                font-variant-numeric: tabular-nums
+            }
+        </style>
+    </head>
+
+    <body>
+        <nav class="navbar navbar-expand-lg bg-body-tertiary border-bottom">
+            <div class="container-fluid">
+                <span class="navbar-brand fw-semibold">Electricity Disconnection Scam</span>
+                <div class="d-flex gap-2">
+                    <button id="langToggle" class="btn btn-outline-secondary btn-sm" type="button">हिंदी</button>
+                    <button id="resetBtn" class="btn btn-outline-danger btn-sm" type="button">Reset Demo</button>
+                </div>
+            </div>
+        </nav>
+
+        <main class="container py-4">
+            <div class="alert alert-info" role="alert">
+                <strong data-i18n="banner_head">Show, don’t tell:</strong>
+                <span data-i18n="banner_body">This single page simulates the common “electricity will be disconnected tonight” scam: a fake SMS, a pressure call, and a small pending “bill” through a risky link or UPI request. Nothing leaves your browser; it’s an offline demo.</span>
+            </div>
+
+            <!-- Participant (demo identity) -->
+            <section class="mb-3">
+                <div class="card">
+                    <div class="card-header fw-semibold" data-i18n="sec_who">Participant (demo identity)</div>
+                    <div class="card-body">
+                        <form id="whoForm" class="row gy-3">
+                            <div class="col-md-4">
+                                <label class="form-label" data-i18n="label_name">Name</label>
+                                <input id="name" class="form-control" placeholder="Ravi / Seema" />
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label" data-i18n="label_consumer">Consumer No. (demo)</label>
+                                <input id="consumer" class="form-control" placeholder="1234567890" />
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label" data-i18n="label_discom">DISCOM (demo)</label>
+                                <input id="discom" class="form-control" placeholder="Your Electricity Board" />
+                            </div>
+                            <div class="col-12 d-flex flex-wrap gap-2">
+                                <button class="btn btn-primary" type="submit" data-i18n="btn_save">Save</button>
+                                <span id="whoSaved" class="text-muted align-self-center"></span>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 1: Fake SMS / WhatsApp preview -->
+            <section class="mb-3">
+                <div class="card">
+                    <div class="card-header fw-semibold" data-i18n="sec_sms">Step 1 — Suspicious message</div>
+                    <div class="card-body">
+                        <div class="row g-3 align-items-center">
+                            <div class="col-lg-7">
+                                <div class="faux-sms">
+                                    <div class="small text-muted mb-1">SMS</div>
+                                    <div id="smsPreview" class="mono"></div>
+                                    <div class="small text-muted mt-2" data-i18n="sms_hint">(Urgency + small fee is the trap.)</div>
+                                </div>
+                                <div class="large-btn d-flex flex-wrap gap-2 mt-3">
+                                    <button id="btnCall" class="btn btn-dark" type="button" data-i18n="btn_call">Call the number</button>
+                                    <button id="btnOpenLink" class="btn btn-outline-primary" type="button" data-i18n="btn_open_link">Open payment link</button>
+                                    <button id="btnIgnore" class="btn btn-outline-secondary" type="button" data-i18n="btn_ignore">Ignore</button>
+                                </div>
+                            </div>
+                            <div class="col-lg-5">
+                                <ul class="mb-0">
+                                    <li><span class="badge text-bg-danger" data-i18n="rf_urgency">Urgency</span> — <span class="timer" id="deadline">00:20:00</span> <span data-i18n="rf_urgency_txt">left or power cut</span></li>
+                                    <li><span class="badge text-bg-danger" data-i18n="rf_weird">Weird link</span> — <span data-i18n="rf_weird_txt">not your DISCOM’s domain</span></li>
+                                    <li><span class="badge text-bg-danger" data-i18n="rf_small">Small fee</span> — <span data-i18n="rf_small_txt">₹49–₹199 to lower your guard</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 2A: Call script pressure -->
+            <section class="mb-3" id="callSection" hidden>
+                <div class="card border-warning">
+                    <div class="card-header fw-semibold" data-i18n="sec_call">Step 2 — Pressure call from “Electricity Dept”</div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-lg-6">
+                                <div class="border rounded p-3 bg-light">
+                                    <div class="small text-muted mb-2">Caller Script</div>
+                                    <div id="callScript" class="mono"></div>
+                                </div>
+                                <div class="large-btn d-flex flex-wrap gap-2 mt-3">
+                                    <button id="btnCollect" class="btn btn-success" type="button" data-i18n="btn_collect">Approve UPI collect</button>
+                                    <button id="btnHangup" class="btn btn-outline-secondary" type="button" data-i18n="btn_hangup">Hang up</button>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="alert alert-danger small" data-i18n="warn_pin">Warning: UPI PIN is only for sending money. Power bill refunds/verification never need your PIN.</div>
+                                <div class="alert alert-secondary small" data-i18n="safe_tip">Safe habit: Open your official DISCOM app/site yourself or the number on your last bill. Do not call numbers in SMS.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 2B: Payment link phishing page -->
+            <section class="mb-3" id="linkSection" hidden>
+                <div class="card border-warning">
+                    <div class="card-header fw-semibold" data-i18n="sec_link">Step 2 — Fake payment page</div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-lg-6">
+                                <div class="p-3 border rounded bg-light">
+                                    <div class="small text-muted">Consumer</div>
+                                    <div class="mono" id="lk_consumer">—</div>
+                                    <div class="small text-muted mt-2">Pending amount</div>
+                                    <div class="mono" id="lk_amount">₹99.00</div>
+                                    <div class="small text-muted mt-2">Reference</div>
+                                    <div class="mono" id="lk_ref">REF-0000</div>
+                                </div>
+                                <div class="alert alert-danger small mt-3" data-i18n="warn_fake">Logos/pages can be copied. The link decides where your money/data goes.</div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="large-btn d-flex flex-wrap gap-2">
+                                    <button class="btn btn-primary" id="payCard" type="button" data-i18n="btn_card">Pay by Card</button>
+                                    <button class="btn btn-outline-primary" id="payUPI" type="button" data-i18n="btn_upi">Pay by UPI</button>
+                                    <button class="btn btn-outline-secondary" id="verifyOfficial" type="button" data-i18n="btn_verify">Verify on official site</button>
+                                </div>
+                                <div class="alert alert-secondary small mt-3" data-i18n="safe_official">Always type your DISCOM name in the browser or use the official app. Do not trust links from messages.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 3A: Card flow -->
+            <section class="mb-3" id="cardSection" hidden>
+                <div class="card border-danger">
+                    <div class="card-header fw-semibold" data-i18n="sec_card">Step 3 — Card payment page</div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-lg-6">
+                                <form id="cardForm" class="row gy-2">
+                                    <div class="col-12">
+                                        <label class="form-label" data-i18n="label_card">Card number</label>
+                                        <input id="c_num" class="form-control" maxlength="19" placeholder="4111 1111 1111 1111" />
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label" data-i18n="label_exp">Expiry</label>
+                                        <input id="c_exp" class="form-control" placeholder="MM/YY" />
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label" data-i18n="label_cvv">CVV</label>
+                                        <input id="c_cvv" class="form-control" maxlength="3" placeholder="123" />
+                                    </div>
+                                    <div class="col-12 d-flex gap-2">
+                                        <button class="btn btn-danger" id="btnCardPay" type="button" data-i18n="btn_pay_card">Pay</button>
+                                    </div>
+                                </form>
+                                <div class="small text-muted mt-2" data-i18n="card_hint">Fake sites often save your card for future charges.</div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="alert alert-warning small" data-i18n="redflags">Red flags: domain mismatch, no HTTPS lock, spelling mistakes, hidden “subscription”.</div>
+                                <div class="alert alert-danger small" data-i18n="never_card">Never enter card details from an SMS link. Use official apps/sites only.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- OTP step for card -->
+            <section class="mb-3" id="otpSection" hidden>
+                <div class="card border-warning">
+                    <div class="card-header fw-semibold" data-i18n="sec_otp">Step 4 — “3D Secure” OTP</div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-lg-6">
+                                <div class="mb-2" data-i18n="enter_otp">Enter OTP sent by bank (demo)</div>
+                                <div class="d-flex gap-2 align-items-end">
+                                    <input id="c_otp" class="form-control" maxlength="6" placeholder="6-digit" style="max-width:200px" />
+                                    <button id="btnOtpSubmit" class="btn btn-primary" type="button" data-i18n="btn_submit">Submit</button>
+                                </div>
+                                <div class="small text-muted mt-2" data-i18n="otp_hint">Attacker may call & pressure you to read the OTP aloud.</div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="alert alert-danger small" data-i18n="card_saved">If you give the OTP, the small fee succeeds and card may be <strong>saved</strong>; future debits become easier.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 3B: UPI collect request -->
+            <section class="mb-3" id="upiSection" hidden>
+                <div class="card border-warning">
+                    <div class="card-header fw-semibold" data-i18n="sec_upi">Step 3 — UPI “Collect Request”</div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-lg-6">
+                                <div class="card">
+                                    <div class="card-header p-2 small">Incoming request</div>
+                                    <div class="card-body p-2">
+                                        <div><span class="text-muted">From:</span> <span class="mono" id="u_from">Electricity Fees</span></div>
+                                        <div><span class="text-muted">Amount:</span> <span class="mono" id="u_amt">₹99.00</span></div>
+                                        <div><span class="text-muted">Reason:</span> <span class="mono">Service continuity</span></div>
+                                    </div>
+                                </div>
+                                <div class="large-btn d-flex flex-wrap gap-2 mt-3">
+                                    <button class="btn btn-success" id="btnApprove" type="button" data-i18n="btn_approve">Approve (enter UPI PIN)</button>
+                                    <button class="btn btn-outline-secondary" id="btnReject" type="button" data-i18n="btn_reject">Reject</button>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="alert alert-danger small" data-i18n="warn_upi">Entering your UPI PIN **sends money**. Paying to avoid disconnection is a common scam tactic.</div>
+                                <div class="alert alert-success small" data-i18n="safe_reject">Correct action: **Reject** and check your bill status on the official app/site you open yourself.</div>
+                            </div>
+                        </div>
+                        <div id="pinSection" class="mt-3" hidden>
+                            <div class="card">
+                                <div class="card-header p-2 small">Enter UPI PIN (demo)</div>
+                                <div class="card-body p-2 d-flex gap-2 align-items-end">
+                                    <input id="u_pin" type="password" class="form-control" maxlength="6" placeholder="6-digit" style="max-width:200px" />
+                                    <button id="btnPinSubmit" class="btn btn-danger" type="button" data-i18n="btn_confirm">Confirm</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Outcome + helpline -->
+            <section class="mb-3" id="outcomeSection" hidden>
+                <div class="card">
+                    <div class="card-header fw-semibold" data-i18n="sec_outcome">Outcome</div>
+                    <div class="card-body">
+                        <div id="outcomeText" class="mb-2"></div>
+                        <div class="alert alert-warning small mb-0">
+                            <strong>Emergency:</strong> If money was debited, call <strong>1930</strong> immediately to attempt freezing the transfer.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Event stream -->
+            <section class="mb-3">
+                <div class="card">
+                    <div class="card-header fw-semibold">Event Stream</div>
+                    <div class="card-body p-2 vh-25 scroll">
+                        <table class="table table-sm align-middle mb-0">
+                            <thead>
+                                <tr class="small">
+                                    <th>Time</th>
+                                    <th>Event</th>
+                                    <th>Details</th>
+                                </tr>
+                            </thead>
+                            <tbody id="eventT"></tbody>
+                        </table>
+                    </div>
+                    <div class="card-footer d-flex flex-wrap gap-2">
+                        <button id="btnExport" class="btn btn-outline-secondary btn-sm" type="button">Export Evidence (JSON)</button>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <footer class="border-top py-3 text-center small text-muted">
+            Digital Safety Labs — stores demo data under <span class="mono">localStorage["DSL_<slug>_V1"]</span>
+        </footer>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+            // ===== Storage namespace (slugified filename) =====
+            const SLUG = (location.pathname.split('/').filter(Boolean).pop() || 'electricity-disconnection-scam.html').replace(/[^a-z0-9-]/gi, '_').toLowerCase();
+            const KEY = `DSL_${SLUG}_V1`;
+
+            // ===== State =====
+            const DEFAULT = () => ({
+                version: '1.0.0',
+                sessionId: 'dsl-' + Math.random().toString(36).slice(2, 10),
+                user: { name: '', consumer: '', discom: '' },
+                amount: (Math.random() > 0.5 ? 49.00 : 99.00),
+                ref: 'REF-' + Math.floor(100000 + Math.random() * 900000),
+                events: []
+            });
+            let state = load();
+
+            function load() { try { return JSON.parse(localStorage.getItem(KEY)) || DEFAULT(); } catch (e) { return DEFAULT(); } }
+            function save() { localStorage.setItem(KEY, JSON.stringify(state)); }
+            function now() { return new Date().toISOString(); }
+            function addEvent(type, payload) { state.events.unshift({ ts: now(), type, payload }); save(); renderEvents(); }
+            function esc(x) { x = String(x ?? ''); return x.replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" }[c])); }
+
+            // ===== SMS + countdown =====
+            function renderSMS() {
+                const name = state.user.name || 'Customer';
+                const discom = state.user.discom || 'Your Electricity Board';
+                const fee = '₹' + state.amount.toFixed(2);
+                const link = 'http://pay-electricity-example.com';
+                const phone = '+91-98XXXXXX25';
+                document.getElementById('smsPreview').textContent = `${name}, ${discom}: your power will be disconnected tonight. Pending bill ${fee}. Call ${phone} or pay: ${link}`;
+                document.getElementById('lk_amount').textContent = fee;
+                document.getElementById('u_amt').textContent = fee;
+                document.getElementById('lk_ref').textContent = state.ref;
+                document.getElementById('lk_consumer').textContent = state.user.consumer || '—';
+            }
+            function startCountdown() {
+                let secs = 20 * 60; const el = document.getElementById('deadline');
+                function tick() { if (secs < 0) return; const h = String(Math.floor(secs / 3600)).padStart(2, '0'); const m = String(Math.floor((secs % 3600) / 60)).padStart(2, '0'); const s = String(secs % 60).padStart(2, '0'); el.textContent = `${h}:${m}:${s}`; secs--; }
+                setInterval(tick, 1000);
+            }
+
+            // ===== Flow: SMS actions =====
+            function openCall() { addEvent('called_number', {}); setVisible('callSection', true); setVisible('linkSection', false); setVisible('cardSection', false); setVisible('otpSection', false); setVisible('upiSection', false); renderCallScript(); }
+            function openLink() { addEvent('opened_link', {}); setVisible('linkSection', true); setVisible('callSection', false); }
+            function ignoreSMS() { addEvent('sms_ignored', {}); setOutcome('safe_ignore'); }
+
+            // Call script
+            function renderCallScript() {
+                const name = state.user.name || 'Customer';
+                const amount = '₹' + state.amount.toFixed(2);
+                const msg = `Hello ${name}, I am from the electricity department. Your meter will be disconnected tonight. Pay a small reconnection fee ${amount} now. I will send a UPI collect request — please enter your UPI PIN to approve.`;
+                document.getElementById('callScript').textContent = msg;
+            }
+
+            function sendCollect() { addEvent('collect_requested', { amount: state.amount }); setVisible('upiSection', true); }
+            function hangup() { addEvent('call_hungup', {}); setOutcome('safe_hangup'); }
+
+            // Payment link choices
+            function chooseCard() { addEvent('choose_card', {}); setVisible('cardSection', true); setVisible('upiSection', false); }
+            function chooseUPI() { addEvent('choose_upi', {}); setVisible('upiSection', true); setVisible('cardSection', false); }
+            function verifyOfficial() { addEvent('verify_official', {}); alert('Demo: Open your DISCOM app/site yourself or the number on your last bill. Do NOT trust SMS links.'); }
+
+            // Card payments
+            function payCard() {
+                const num = document.getElementById('c_num').value.replace(/\s+/g, '');
+                const cvv = document.getElementById('c_cvv').value.trim();
+                if (num.length < 12 || cvv.length < 3) { alert('Enter demo card details'); return; }
+                addEvent('card_entered', { last4: num.slice(-4) }); setVisible('otpSection', true);
+            }
+            function otpSubmit() {
+                const otp = document.getElementById('c_otp').value.trim(); if (otp.length < 4) { alert('Enter OTP (demo).'); return; }
+                addEvent('otp_submitted', { len: otp.length }); setOutcome('card_saved');
+            }
+
+            // UPI
+            function approveUPI() { setVisible('pinSection', true); addEvent('upi_collect_view', {}); }
+            function submitPin() {
+                const pin = document.getElementById('u_pin').value.trim(); if (pin.length < 4) { alert('Enter a 4-6 digit PIN (demo).'); return; }
+                addEvent('upi_pin_entered', { len: pin.length }); setOutcome('debit');
+            }
+            function rejectUPI() { addEvent('upi_rejected', {}); setOutcome('rejected'); }
+
+            // Outcome
+            function setOutcome(kind) {
+                setVisible('outcomeSection', true); const box = document.getElementById('outcomeText');
+                if (kind === 'card_saved') {
+                    box.innerHTML = `<div class="h5 text-danger mb-2">Small payment succeeded</div><div>Your card may be <strong>saved</strong> on a fake gateway. Bigger debits can follow. Contact your bank to block card & dispute.</div>`;
+                    addEvent('small_fee_success', { amount: state.amount });
+                } else if (kind === 'debit') {
+                    box.innerHTML = `<div class="h5 text-danger mb-2">Money Debited</div><div>You entered your UPI PIN for a “collect request”. That sends money. Receiving service never needs your PIN.</div>`;
+                    addEvent('money_debited', { amount: state.amount });
+                } else if (kind === 'rejected') {
+                    box.innerHTML = `<div class="h5 text-success mb-2">Safe: Request Rejected</div><div>Correct action. Check your account only on the official app/site you open yourself.</div>`;
+                } else if (kind === 'safe_ignore') {
+                    box.innerHTML = `<div class="h5 text-success mb-2">Safe: Message Ignored</div><div>Never call numbers or click links from such SMS. Use official channels only.</div>`;
+                } else if (kind === 'safe_hangup') {
+                    box.innerHTML = `<div class="h5 text-success mb-2">Safe: You ended the call</div><div>Do not install apps or share OTP/PIN. Verify directly via official app/site.</div>`;
+                }
+            }
+
+            // Utility
+            function setVisible(id, show) { document.getElementById(id).hidden = !show; }
+            function renderEvents() { const t = document.getElementById('eventT'); t.innerHTML = ''; for (const ev of state.events) { const tr = document.createElement('tr'); tr.innerHTML = `<td class="small text-muted">${esc(ev.ts)}</td><td>${esc(ev.type)}</td><td><span class=\"mono\">${esc(JSON.stringify(ev.payload))}</span></td>`; t.appendChild(tr); } }
+            function exportJSON() { const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `electricity-evidence-${state.sessionId}.json`; a.click(); URL.revokeObjectURL(a.href); }
+            function resetAll() { localStorage.removeItem(KEY); state = DEFAULT(); save(); location.reload(); }
+
+            // Language (EN/HI minimal)
+            const I18N = {
+                en: {
+                    banner_head: 'Show, don’t tell:',
+                    banner_body: 'This single page simulates the common “electricity will be disconnected tonight” scam: a fake SMS, a pressure call, and a small pending “bill” through a risky link or UPI request. Nothing leaves your browser; it’s an offline demo.',
+                    sec_who: 'Participant (demo identity)', label_name: 'Name', label_consumer: 'Consumer No. (demo)', label_discom: 'DISCOM (demo)', btn_save: 'Save',
+                    sec_sms: 'Step 1 — Suspicious message', sms_hint: '(Urgency + small fee is the trap.)', btn_call: 'Call the number', btn_open_link: 'Open payment link', btn_ignore: 'Ignore', rf_urgency: 'Urgency', rf_urgency_txt: 'left or power cut', rf_weird: 'Weird link', rf_weird_txt: 'not your DISCOM’s domain', rf_small: 'Small fee', rf_small_txt: '₹49–₹199 to lower your guard',
+                    sec_call: 'Step 2 — Pressure call from “Electricity Dept”', btn_collect: 'Approve UPI collect', btn_hangup: 'Hang up', warn_pin: 'Warning: UPI PIN is only for sending money. Power bill refunds/verification never need your PIN.', safe_tip: 'Safe habit: Open your official DISCOM app/site yourself or the number on your last bill. Do not call numbers in SMS.',
+                    sec_link: 'Step 2 — Fake payment page', warn_fake: 'Logos/pages can be copied. The link decides where your money/data goes.', btn_card: 'Pay by Card', btn_upi: 'Pay by UPI', btn_verify: 'Verify on official site', safe_official: 'Always type your DISCOM name in the browser or use the official app. Do not trust links from messages.',
+                    sec_card: 'Step 3 — Card payment page', label_card: 'Card number', label_exp: 'Expiry', label_cvv: 'CVV', btn_pay_card: 'Pay', card_hint: 'Fake sites often save your card for future charges.', redflags: 'Red flags: domain mismatch, no HTTPS lock, spelling mistakes, hidden “subscription”.', never_card: 'Never enter card details from an SMS link. Use official apps/sites only.',
+                    sec_otp: 'Step 4 — “3D Secure” OTP', enter_otp: 'Enter OTP sent by bank (demo)', btn_submit: 'Submit', otp_hint: 'Attacker may call & pressure you to read the OTP aloud.', card_saved: 'If you give the OTP, the small fee succeeds and card may be saved; future debits become easier.',
+                    sec_upi: 'Step 3 — UPI “Collect Request”', btn_approve: 'Approve (enter UPI PIN)', btn_reject: 'Reject', warn_upi: 'Entering your UPI PIN **sends money**. Paying to avoid disconnection is a common scam tactic.', safe_reject: 'Correct action: **Reject** and check your bill status on the official app/site you open yourself.', btn_confirm: 'Confirm',
+                    sec_outcome: 'Outcome'
+                },
+                hi: {
+                    banner_head: 'दिखाकर समझाएं:',
+                    banner_body: 'यह पेज “आज रात बिजली कटेगी” ठगी दिखाता है — नकली SMS, दबाव वाला कॉल, और छोटी “बकाया बिल” राशि जिसे लिंक/UPI से दिलवाने की कोशिश। यह ऑफलाइन डेमो है — कोई डेटा बाहर नहीं जाता।',
+                    sec_who: 'प्रतिभागी (डेमो पहचान)', label_name: 'नाम', label_consumer: 'कंज्यूमर नंबर (डेमो)', label_discom: 'डिस्कॉम (डेमो)', btn_save: 'सेव',
+                    sec_sms: 'चरण 1 — संदिग्ध संदेश', sms_hint: '(जल्दबाज़ी + छोटी फीस ही जाल है.)', btn_call: 'नंबर पर कॉल करें', btn_open_link: 'पेमेंट लिंक खोलें', btn_ignore: 'नज़रअंदाज़', rf_urgency: 'तुरंत', rf_urgency_txt: 'वरना बिजली कटेगी', rf_weird: 'अजीब लिंक', rf_weird_txt: 'आपके डिस्कॉम का डोमेन नहीं', rf_small: 'छोटा भुगतान', rf_small_txt: '₹49–₹199 ताकि सावधानी कम हो',
+                    sec_call: 'चरण 2 — “बिजली विभाग” का दबाव वाला कॉल', btn_collect: 'UPI कलेक्ट अप्रूव करें', btn_hangup: 'कॉल काटें', warn_pin: 'चेतावनी: UPI PIN केवल पैसे भेजने के लिए होता है। बिल/रिफंड के लिए PIN की जरूरत नहीं।', safe_tip: 'सुरक्षित तरीका: अपनी डिस्कॉम की आधिकारिक ऐप/वेबसाइट खुद खोलें या बिल पर दिए नंबर से बात करें। SMS में दिए नंबर पर कॉल न करें।',
+                    sec_link: 'चरण 2 — नकली पेमेंट पेज', warn_fake: 'लोगो/पेज की नकल हो सकती है। लिंक तय करता है कि पैसा/डाटा कहाँ जाएगा।', btn_card: 'कार्ड से भुगतान', btn_upi: 'UPI से भुगतान', btn_verify: 'आधिकारिक साइट पर जाँचें', safe_official: 'हमेशा ब्राउज़र में खुद डिस्कॉम का नाम टाइप करें या आधिकारिक ऐप इस्तेमाल करें।',
+                    sec_card: 'चरण 3 — कार्ड पेमेंट पेज', label_card: 'कार्ड नंबर', label_exp: 'समाप्ति', label_cvv: 'CVV', btn_pay_card: 'पेमेंट', card_hint: 'नकली साइटें कार्ड सेव करके बाद में बड़े भुगतान कर सकती हैं।', redflags: 'डोमेन मैच नहीं, ताला नहीं (HTTPS), स्पेलिंग गलतियाँ, छुपी “सब्सक्रिप्शन”.', never_card: 'SMS लिंक से कार्ड डिटेल्स न डालें। आधिकारिक ऐप/साइट ही इस्तेमाल करें।',
+                    sec_otp: 'चरण 4 — “3D Secure” OTP', enter_otp: 'बैंक का OTP डालें (डेमो)', btn_submit: 'सबमिट', otp_hint: 'ठग कॉल करके OTP ज़ोर डालकर पूछ सकता है।', card_saved: 'OTP देने पर छोटा पेमेंट सफल और कार्ड सेव हो सकता है। बाद में बड़े कटौती संभव।',
+                    sec_upi: 'चरण 3 — UPI “कलेक्ट रिक्वेस्ट”', btn_approve: 'अप्रूव (UPI PIN डालें)', btn_reject: 'रिजेक्ट', warn_upi: 'UPI PIN डालना मतलब आप पैसा भेज रहे हैं। “बिजली कटने” से बचने के नाम पर पैसा मत भेजें।', safe_reject: 'सही कदम: **रिजेक्ट** करें और केवल आधिकारिक ऐप/साइट पर बिल जाँचें।', btn_confirm: 'कन्फर्म',
+                    sec_outcome: 'परिणाम'
+                }
+            };
+
+            let lang = localStorage.getItem('DSL_LANG') || (navigator.language.startsWith('hi') ? 'hi' : 'en');
+            function applyLang() { const L = I18N[lang]; document.querySelectorAll('[data-i18n]').forEach(el => { const k = el.getAttribute('data-i18n'); if (L[k]) el.textContent = L[k]; }); document.getElementById('langToggle').textContent = (lang === 'en' ? 'हिंदी' : 'English'); }
+
+            // Init
+            function init() {
+                // Prefill
+                document.getElementById('name').value = state.user.name;
+                document.getElementById('consumer').value = state.user.consumer;
+                document.getElementById('discom').value = state.user.discom;
+                renderSMS(); renderEvents(); applyLang(); startCountdown();
+
+                // Listeners
+                document.getElementById('whoForm').addEventListener('submit', (e) => { e.preventDefault(); state.user.name = document.getElementById('name').value.trim(); state.user.consumer = document.getElementById('consumer').value.trim(); state.user.discom = document.getElementById('discom').value.trim(); save(); addEvent('who_saved', { ...state.user }); document.getElementById('whoSaved').textContent = 'Saved.'; setTimeout(() => document.getElementById('whoSaved').textContent = '', 1500); renderSMS(); });
+                document.getElementById('btnCall').addEventListener('click', openCall);
+                document.getElementById('btnOpenLink').addEventListener('click', openLink);
+                document.getElementById('btnIgnore').addEventListener('click', ignoreSMS);
+
+                document.getElementById('btnCollect').addEventListener('click', sendCollect);
+                document.getElementById('btnHangup').addEventListener('click', hangup);
+
+                document.getElementById('payCard').addEventListener('click', chooseCard);
+                document.getElementById('payUPI').addEventListener('click', chooseUPI);
+                document.getElementById('verifyOfficial').addEventListener('click', verifyOfficial);
+
+                document.getElementById('btnCardPay').addEventListener('click', payCard);
+                document.getElementById('btnOtpSubmit').addEventListener('click', otpSubmit);
+
+                document.getElementById('btnApprove').addEventListener('click', approveUPI);
+                document.getElementById('btnReject').addEventListener('click', rejectUPI);
+                document.getElementById('btnPinSubmit').addEventListener('click', submitPin);
+
+                document.getElementById('btnExport').addEventListener('click', exportJSON);
+                document.getElementById('resetBtn').addEventListener('click', resetAll);
+                document.getElementById('langToggle').addEventListener('click', () => { lang = (lang === 'en' ? 'hi' : 'en'); localStorage.setItem('DSL_LANG', lang); applyLang(); });
+
+                addEvent('demo_loaded', { ua: navigator.userAgent, lang: navigator.language });
+            }
+
+            document.addEventListener('DOMContentLoaded', init);
+        </script>
+    </body>
+
+</html>
