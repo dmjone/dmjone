@@ -1872,8 +1872,8 @@ let header_author = async function (...args) {
         // GLOBAL CONTROL CENTER - For manual entry just add like this 'Your Text Here' || null || previous values.
         const IS_STUDENT_MODE = window.GLOBAL_get_isstudentmode_ || 0;
         const SITE_URL = 'https://dmj.one';
-        // const CURRENT_LOCATION = `https://dmj.one/${urlpart1}/${urlpart2}/${urlpart3}/${urlpart4}/` || null || SITE_URL + window.location.pathname.replace(/\.html$/, '') || window.location.href;
-        const CURRENT_LOCATION = IS_STUDENT_MODE ? `https://dmj.one/` : SITE_URL + window.location.pathname.replace(/\.html$/, '') || window.location.href;
+        const CURRENT_LOCATION = `https://dmj.one/${urlpart1}/${urlpart2}/${urlpart3}/${urlpart4}/` || null || SITE_URL + window.location.pathname.replace(/\.html$/, '') || window.location.href;
+        // const CURRENT_LOCATION = IS_STUDENT_MODE ? `https://dmj.one/` : SITE_URL + window.location.pathname.replace(/\.html$/, '') || window.location.href;
         const QR_CODE_MODE = 4;
         const QR_CODE_MAX_WIDTH = '1.25in';
         const QR_CODE_MAX_HEIGHT = '1.25in';
@@ -1927,9 +1927,9 @@ let header_author = async function (...args) {
             }
 
             // DEPENDEDS ON THE PAGE STRUCTURE
-            // const TITLE_OF_THE_PAGE = `${COURSE_DETAILS} (${COURSE})`; // For Creating course related main header page
+            const TITLE_OF_THE_PAGE = `${COURSE_DETAILS} (${COURSE})`; // For Creating course related main header page
             // Get the title of the page and the date of the page
-            const TITLE_OF_THE_PAGE = null || articleElement.querySelector('h2').innerText;
+            // const TITLE_OF_THE_PAGE = null || articleElement.querySelector('h2').innerText;
             const DATE_OF_THE_PAGE = null || articleElement.querySelector('.contentdate') ? articleElement.querySelector('.contentdate').innerText : "n.d."
 
 
