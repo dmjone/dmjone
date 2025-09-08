@@ -602,6 +602,16 @@ const profDetailsBio = {
     {
         bio: "<p class='professorbio header-p-author-description'>Maya Thapa is an Assistant Professor at the Yogananda School of AI and Data Science with expertise in Machine Learning and Deep Learning. She holds a Bachelor's degree from the Atal Bihari Vajpayee Government Institute of Engineering and Technology, Shimla, and a Master's from the University Institute of Engineering and Technology, Panjab University. Her research focuses on image classification and Explainable AI (XAI), earning her the Best Paper Presentation award at the 2nd International Conference of Women Researchers in Electronics and Computing (Springer, 2023). Passionate about bridging theory and practice, she brings subjects like Algorithms and Web Development to life for her students.</p>",
         href: "contact@dmj.one"
+    },    
+    'Prateek Daweshar':
+    {
+        bio: "<p class='professorbio header-p-author-description'>Prateek Daweshar is an Assistant Professor at Shoolini University.</p>",
+        href: "contact@dmj.one"
+    },
+    'Prachi Agarwal':
+    {
+        bio: "<p class='professorbio header-p-author-description'>Prachi Agarwal is an Assistant Professor at Shoolini University.</p>",
+        href: "contact@dmj.one"
     },
     
         
@@ -693,6 +703,7 @@ const courseDetailsMap = {
     // Semester 6    
     'dmjcclt': { 'default': ["Dr. Ahmad Waleed Salehi", "DMJCCLT", "Cloud Computing Concepts"] },
     'lse006': { 'default': ["Akshita Thakur", "LSE006", "English Communication Seminar 2"] },
+    'seaap006': { 'default': ["Prachi Agarwal", "SEA-AP006", "Aptitude Development 006"] },
     'csu2101': {
         'default': ["Manashwee Tripathi", "CSU2101", "Programming in PHP & MySQL"],
         'lab': ["Manashwee Tripathi", "CSU2101P", "Programming in PHP & MySQL Lab"]
@@ -701,6 +712,7 @@ const courseDetailsMap = {
     'csu2104': { 'default': ["Dr. Sonia", "CSU2104", "Digital Forensics"] },
     'csu1288': { 'default': ["Abdullahi Adem", "CSU1288", "Intrusion Detection System"] },
     'csu086': { 'default': ["Maya Thapa", "CSU086", "Compiler Design"] },
+    'csu1442': { 'default': ["Prateek Daweshar", "CSU1442", "Forensic Psychology"] },    
     'tcsoneim': { 'default': ["Sachin Saroch", "TCSOneIM", "One Identity Manager"] },
     
 };
