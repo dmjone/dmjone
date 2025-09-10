@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Email Phishing & BEC — Advanced Simulator</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+        <style>
+            .mono {
+                font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace
+            }
+
+            .shadow-soft {
+                box-shadow: 0 .35rem 1rem rgba(0, 0, 0, .06)
+            }
+
+            .vh-25 {
+                height: 25vh
+            }
+
+            .scroll {
+                overflow: auto
+            }
+
+            .large-btn .btn {
+                min-width: 170px
+            }
+
+            .pill {
+                border: 1px solid #dee2e6;
+                border-radius: 9999px;
+                padding: .1rem .5rem;
+                display: inline-block
+            }
+
+            .kv {
+                display: grid;
+                grid-template-columns: 160px 1fr;
+                gap: .25rem .75rem
+            }
+
+            .kv .k {
+                color: #6c757d
+            }
+
+            .risk-high {
+                color: #dc3545
+            }
+
+            .risk-med {
+                color: #fd7e14
+            }
+
+            .risk-low {
+                color: #198754
+            }
+
+            .email-card:hover {
+                background: #f8f9fa
+            }
+
+            .badge-cat {
+                font-weight: 600
+            }
+
+            .badge-cred {
+                background: #ffe3e3;
+                color: #c92a2a
+            }
+
+            .badge-oauth {
+                background: #e7f5ff;
+                color: #0b7285
+            }
+
+            .badge-invoice {
+                background: #fff3bf;
+                color: #ad6800
+            }
+
+            .badge-attach {
+                background: #f1f3f5;
+                color: #495057
+            }
+
+            @media (max-width: 991.98px) {
+                .kv {
+                    grid-template-columns: 120px 1fr
+                }
+            }
+        </style>
+    </head>
+
+    <body>
+        <nav class="navbar navbar-expand-lg bg-body-tertiary border-bottom">
+            <div class="container-fluid">
+                <span class="navbar-brand fw-semibold"><i class="bi bi-envelope-exclamation me-2" aria-hidden="true"></i>Email Phishing & BEC — Advanced Simulator</span>
+                <div class="d-flex gap-2">
+                    <button id="langToggle" class="btn btn-outline-secondary btn-sm" type="button">हिंदी</button>
+                    <button id="resetBtn" class="btn btn-outline-danger btn-sm" type="button">Reset Demo</button>
+                </div>
+            </div>
+        </nav>
+
+        <main class="container py-4">
+            <div class="alert alert-info shadow-soft" role="alert">
+                <strong data-i18n="info_head">Show, don’t tell:</strong>
+                <span data-i18n="info_body">This page simulates <strong>email‑based scams</strong>: phishing logins, OAuth consent hijack, Business Email Compromise (BEC), fake invoices, attachment traps, and display‑name spoofing. It runs fully in your browser; nothing leaves your device.</span>
+            </div>
+
+            <!-- Participant Identity -->
+            <section class="mb-3">
+                <div class="card">
+                    <div class="card-header fw-semibold" data-i18n="who_title">Participant (demo identity)</div>
+                    <div class="card-body">
+                        <form id="whoForm" class="row gy-3">
+                            <div class="col-md-4">
+                                <label class="form-label" data-i18n="who_name">Name</label>
+                                <input id="name" class="form-control" placeholder="Ravi / Seema" />
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label" data-i18n="who_email">Email address</label>
+                                <input id="email" class="form-control" placeholder="you@example.com" />
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label" data-i18n="who_role">Role (demo)</label>
+                                <input id="role" class="form-control" placeholder="Teacher / Shop owner / Accountant" />
+                            </div>
+                            <div class="col-12 d-flex flex-wrap gap-2">
+                                <button class="btn btn-primary" type="submit" data-i18n="btn_save">Save</button>
+                                <span id="whoSaved" class="text-muted align-self-center"></span>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Inbox & Controls -->
+            <section class="mb-3">
+                <div class="card">
+                    <div class="card-header fw-semibold d-flex justify-content-between align-items-center">
+                        <span data-i18n="inbox_title">Inbox (simulated)</span>
+                        <div class="d-flex flex-wrap gap-2 align-items-center">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="imagesBlocked">
+                                <label class="form-check-label" for="imagesBlocked" data-i18n="block_images">Block remote images</label>
+                            </div>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="trustedMode">
+                                <label class="form-check-label" for="trustedMode" data-i18n="trusted_mode">Treat sender as trusted</label>
+                            </div>
+                            <button class="btn btn-outline-primary btn-sm" id="btnGenerate" type="button" data-i18n="gen_new">Generate new inbox</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-lg-5">
+                                <div class="list-group" id="inboxList" role="listbox" aria-label="Inbox list"></div>
+                            </div>
+                            <div class="col-lg-7">
+                                <!-- Reader -->
+                                <div class="border rounded p-3" id="reader" hidden>
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <div>
+                                            <div class="h5 mb-1" id="rd_subject">—</div>
+                                            <div class="small text-muted" id="rd_meta">—</div>
+                                        </div>
+                                        <div class="d-flex flex-wrap gap-2">
+                                            <button class="btn btn-outline-secondary btn-sm" id="rd_headers" type="button"><i class="bi bi-card-text me-1"></i><span data-i18n="show_headers">Show headers</span></button>
+                                            <button class="btn btn-outline-secondary btn-sm" id="rd_inspect" type="button"><i class="bi bi-search me-1"></i><span data-i18n="inspect_links">Inspect links</span></button>
+                                            <button class="btn btn-outline-warning btn-sm" id="rd_report" type="button"><i class="bi bi-flag me-1"></i><span data-i18n="report">Report phishing</span></button>
+                                        </div>
+                                    </div>
+                                    <div id="rd_headers_box" class="bg-light border rounded p-2 mb-2 mono small" hidden></div>
+                                    <div id="rd_body" class="mb-2"></div>
+                                    <div id="rd_attach" class="mt-3"></div>
+                                    <div class="mt-3 large-btn d-flex flex-wrap gap-2">
+                                        <button class="btn btn-primary" id="rd_open" type="button" data-i18n="open_link">Open primary link</button>
+                                        <button class="btn btn-outline-primary" id="rd_oauth" type="button" data-i18n="oauth_flow">Open OAuth consent</button>
+                                        <button class="btn btn-outline-secondary" id="rd_reply" type="button" data-i18n="reply">Reply with info</button>
+                                        <button class="btn btn-outline-secondary" id="rd_pay" type="button" data-i18n="pay_invoice">Pay invoice (demo)</button>
+                                    </div>
+                                </div>
+                                <!-- Empty state -->
+                                <div id="emptyReader" class="text-center text-muted py-5">
+                                    <div class="mb-2"><i class="bi bi-inboxes" style="font-size:2rem" aria-hidden="true"></i></div>
+                                    <div data-i18n="empty_reader">Select an email on the left to preview and simulate actions.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Risk Analyzer -->
+            <section class="mb-3">
+                <div class="card">
+                    <div class="card-header fw-semibold" data-i18n="risk_title">Risk analyzer (for selected email)</div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-lg-6">
+                                <div class="kv">
+                                    <div class="k">Display name</div>
+                                    <div id="rk_disp">—</div>
+                                    <div class="k">From address</div>
+                                    <div id="rk_from">—</div>
+                                    <div class="k">Domain match</div>
+                                    <div id="rk_domain">—</div>
+                                    <div class="k">SPF / DKIM / DMARC</div>
+                                    <div id="rk_auth">—</div>
+                                    <div class="k">Links</div>
+                                    <div id="rk_links">—</div>
+                                    <div class="k">Attachments</div>
+                                    <div id="rk_files">—</div>
+                                    <div class="k">Urgency / Tone</div>
+                                    <div id="rk_tone">—</div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="p-3 border rounded bg-light h-100">
+                                    <div class="small text-muted">Risk score</div>
+                                    <div class="h3" id="rk_score">—</div>
+                                    <div class="small text-muted" id="rk_explain">—</div>
+                                    <div class="mt-2">
+                                        <button class="btn btn-outline-secondary btn-sm" id="rk_print" type="button">Print tips</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Simulation Modals -->
+            <div class="modal fade" id="inspectModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5"><i class="bi bi-search me-2"></i>Link inspection</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div id="inspectBody" class="mono small"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="webModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="webTitle">Website (demo)</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body" id="webBody"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Event Stream -->
+            <section class="mb-3">
+                <div class="card">
+                    <div class="card-header fw-semibold">Event Stream</div>
+                    <div class="card-body p-2 vh-25 scroll">
+                        <table class="table table-sm align-middle mb-0">
+                            <thead>
+                                <tr class="small">
+                                    <th>Time</th>
+                                    <th>Event</th>
+                                    <th>Details</th>
+                                </tr>
+                            </thead>
+                            <tbody id="eventT"></tbody>
+                        </table>
+                    </div>
+                    <div class="card-footer d-flex flex-wrap gap-2">
+                        <button id="btnExport" class="btn btn-outline-secondary btn-sm" type="button">Export Evidence (JSON)</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="border-top py-3 text-center small text-muted">
+            Digital Safety Labs — stores demo data under <span class="mono">localStorage["DSL_<slug>_V1"]</span>
+        </footer>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+            // ===== Storage namespace =====
+            const SLUG = (location.pathname.split('/').filter(Boolean).pop() || 'email-phishing-bec-advanced.html').replace(/[^a-z0-9-]/gi, '_').toLowerCase();
+            const KEY = `DSL_${SLUG}_V1`;
+
+            const DEFAULT = () => ({
+                version: '1.0.0', sessionId: 'dsl-' + Math.random().toString(36).slice(2, 10),
+                user: { name: '', email: '', role: '' },
+                inbox: [], selected: null, imagesBlocked: true, trusted: false,
+                events: []
+            });
+            let state = load();
+
+            function load() { try { return JSON.parse(localStorage.getItem(KEY)) || DEFAULT(); } catch (e) { return DEFAULT(); } }
+            function save() { localStorage.setItem(KEY, JSON.stringify(state)); }
+            function now() { return new Date().toISOString(); }
+            function addEvent(type, payload) { state.events.unshift({ ts: now(), type, payload }); save(); renderEvents(); }
+            function esc(x) { x = String(x ?? ''); return x.replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" }[c])); }
+
+            // ===== Sample email factory =====
+            function sampleInbox() {
+                const you = state.user.email || 'you@example.com';
+                const n = state.user.name || 'You';
+                const items = [
+                    // Credential phishing
+                    E({
+                        cat: 'cred', subject: 'Password reset required', disp: 'Microsoft Account', from: 'security@mícrοsoft.support',
+                        body: `Hi ${n}, we detected unusual sign‑in. Reset within 1 hour.`, primaryLink: { text: 'Reset password', url: 'http://security-microsoft-support.example/reset', final: 'http://signin-check.example/login' },
+                        headers: { spf: 'fail', dkim: 'fail', dmarc: 'fail' }, urgency: true, brand: 'microsoft', links: [{ text: 'Security Center', url: 'http://security.example' }],
+                        attachments: []
+                    }),
+                    // OAuth consent 
+                    E({
+                        cat: 'oauth', subject: 'Grant access to Mail Security Scan', disp: 'IT Admin', from: 'it-admin@company‑security.com',
+                        body: `${n}, grant one‑time audit tool access to your mailbox.`, oauth: { app: 'Mail Guard Auditor', scopes: ['Read mail', 'Send mail', 'Read contacts', 'Maintain access (offline)'] },
+                        headers: { spf: 'pass', dkim: 'pass', dmarc: 'none' }, urgency: true, brand: 'generic', links: [{ text: 'Privacy policy', url: 'https://example.com/policy' }], attachments: []
+                    }),
+                    // BEC wire fraud
+                    E({
+                        cat: 'invoice', subject: 'URGENT: Update beneficiary for today’s transfer', disp: 'CEO — Arjun Mehta', from: 'arjun.mehta@company‑mail.co',
+                        body: `Please process payment immediately. New account details attached.`, headers: { spf: 'pass', dkim: 'fail', dmarc: 'fail' }, urgency: true,
+                        attachments: [{ name: 'Invoice_8471.pdf', type: 'pdf' }, { name: 'New_Beneficiary_Details.html', type: 'html' }], invoice: { amount: '₹4,80,000', acct: 'HDFC 5020 88•• 721', ifsc: 'HDFC0001234' }
+                    }),
+                    // Attachment malware (simulated)
+                    E({
+                        cat: 'attach', subject: 'Courier receipt — pay ₹99 to release parcel', disp: 'BlueDart Billing', from: 'noreply@bluedart‑billing.co',
+                        body: `Attached receipt. Pay small fee to release.`, headers: { spf: 'fail', dkim: 'fail', dmarc: 'fail' }, urgency: true,
+                        attachments: [{ name: 'Receipt.pdf.exe', type: 'exe' }, { name: 'Fees.zip', type: 'zip' }], links: [{ text: 'Track parcel', url: 'http://track‑bluedart.example' }]
+                    }),
+                    // Reply‑chain hijack
+                    E({
+                        cat: 'cred', subject: 'Re: Meeting notes', disp: 'Colleague — Neha', from: 'neha@company‑mail.co',
+                        body: `Sharing updated notes. Please sign in to view.`, headers: { spf: 'pass', dkim: 'fail', dmarc: 'quarantine' }, links: [{ text: 'View document', url: 'http://docs‑share.example/login' }], attachments: [], replyChain: true
+                    }),
+                    // Homoglyph + QR invoice
+                    E({
+                        cat: 'invoice', subject: 'Invoice for August', disp: 'Amazon India', from: 'billing@amazοn.in',
+                        body: `Your invoice is ready. Scan QR to pay.`, headers: { spf: 'softfail', dkim: 'fail', dmarc: 'fail' }, urgency: false,
+                        attachments: [{ name: 'Invoice_Aug_QR.html', type: 'html' }], links: [{ text: 'View invoice', url: 'http://amaz0n‑billing.example' }]
+                    })
+                ];
+                // assign ids & dates
+                const nowms = Date.now();
+                return items.map((m, i) => ({ ...m, id: 'm' + (i + 1), date: new Date(nowms - i * 3600e3).toLocaleString() }));
+            }
+
+            function E(o) {
+                return {
+                    cat: o.cat, subject: o.subject, disp: o.disp, from: o.from, body: o.body, headers: o.headers || { spf: '?', dkim: '?', dmarc: '?' },
+                    urgency: !!o.urgency, brand: o.brand || 'generic', links: o.links || [], attachments: o.attachments || [],
+                    primaryLink: o.primaryLink || null, oauth: o.oauth || null, invoice: o.invoice || null, replyChain: !!o.replyChain
+                };
+            }
+
+            // ===== Rendering inbox =====
+            function renderInbox() {
+                const box = document.getElementById('inboxList'); box.innerHTML = '';
+                for (const m of state.inbox) {
+                    const a = document.createElement('button'); a.className = 'list-group-item list-group-item-action email-card'; a.type = 'button'; a.setAttribute('data-id', m.id);
+                    const catBadge = m.cat === 'cred' ? '<span class="badge badge-cat badge-cred ms-1">Credential</span>' : m.cat === 'oauth' ? '<span class="badge badge-cat badge-oauth ms-1">OAuth</span>' : m.cat === 'invoice' ? '<span class="badge badge-cat badge-invoice ms-1">Invoice</span>' : '<span class="badge badge-cat badge-attach ms-1">Attachment</span>';
+                    a.innerHTML = `
+          <div class="d-flex justify-content-between">
+            <div>
+              <div class="fw-semibold">${esc(m.subject)} ${catBadge}</div>
+              <div class="small text-muted">${esc(m.disp)} &lt;${esc(m.from)}&gt;</div>
+            </div>
+            <div class="small text-muted">${esc(m.date)}</div>
+          </div>`;
+                    a.addEventListener('click', () => openMail(m.id));
+                    box.appendChild(a);
+                }
+            }
+
+            // ===== Open mail =====
+            function openMail(id) {
+                const m = state.inbox.find(x => x.id === id); if (!m) return;
+                state.selected = id; save();
+                document.getElementById('emptyReader').hidden = true;
+                const reader = document.getElementById('reader'); reader.hidden = false;
+                document.getElementById('rd_subject').textContent = m.subject;
+                document.getElementById('rd_meta').innerHTML = `${esc(m.disp)} &lt;${esc(m.from)}&gt; · ${esc(m.date)}`;
+                document.getElementById('rd_headers_box').hidden = true;
+                document.getElementById('rd_headers_box').textContent = renderHeaders(m);
+                // Body
+                const body = document.getElementById('rd_body');
+                let html = `<p>${esc(m.body)}</p>`;
+                if (m.replyChain) { html += `<blockquote class="small text-muted">Earlier: "Please see attached."</blockquote>`; }
+                if (!state.imagesBlocked) { html += `<div class="small text-muted">(Remote images loaded)</div>`; if (Math.random() > 0.5) { html += `<div class="mono small">[Tracking pixel fetched: /open.gif?uid=${rnd(8)}]</div>`; addEvent('tracking_pixel_loaded', { id: rnd(6) }); } }
+                body.innerHTML = html;
+                // Links
+                const primaryBtn = document.getElementById('rd_open'); primaryBtn.disabled = !m.primaryLink; primaryBtn.dataset.id = id;
+                const oauthBtn = document.getElementById('rd_oauth'); oauthBtn.disabled = !m.oauth; oauthBtn.dataset.id = id;
+                // Attachments
+                const att = document.getElementById('rd_attach'); att.innerHTML = '';
+                if (m.attachments.length) {
+                    const list = document.createElement('div'); list.className = 'd-flex flex-wrap gap-2';
+                    for (const f of m.attachments) { const b = document.createElement('button'); b.className = 'btn btn-outline-secondary btn-sm'; b.textContent = `${f.name}`; b.addEventListener('click', () => openAttachment(m, f)); list.appendChild(b); }
+                    att.appendChild(list);
+                }
+                analyze(m);
+                addEvent('mail_opened', { id });
+            }
+
+            function renderHeaders(m) {
+                const r = [];
+                r.push(`From: ${m.disp} <${m.from}>`);
+                r.push(`To: ${state.user.email || 'you@example.com'}`);
+                r.push(`Subject: ${m.subject}`);
+                r.push(`Received: from ${domainOf(m.from)} (HELO smtp.${domainOf(m.from)}) by mx.example with TLS`);
+                r.push(`Authentication-Results: spf=${m.headers.spf}; dkim=${m.headers.dkim}; dmarc=${m.headers.dmarc}`);
+                return r.join('\n');
+            }
+
+            // ===== Actions =====
+            function showHeaders() { const el = document.getElementById('rd_headers_box'); el.hidden = !el.hidden; addEvent('toggle_headers', { visible: !el.hidden }); }
+            function inspectLinks() {
+                const m = current(); if (!m) return; const out = []; const L = [...m.links]; if (m.primaryLink) L.unshift(m.primaryLink);
+                for (const l of L) { out.push(`${l.text} -> ${l.url}`); if (l.final) out.push(`  \u2514 expands to -> ${l.final}`); }
+                if (!L.length) out.push('(no links)');
+                document.getElementById('inspectBody').textContent = out.join('\n');
+                new bootstrap.Modal(document.getElementById('inspectModal')).show(); addEvent('inspect_links', { count: L.length });
+            }
+
+            function openPrimary() { const m = current(); if (!m || !m.primaryLink) return; const link = m.primaryLink; webShow({ type: 'login', brand: m.brand || 'generic', url: link.final || link.url }); addEvent('open_link', { url: link.final || link.url }); }
+            function openOAuth() { const m = current(); if (!m || !m.oauth) return; webShow({ type: 'oauth', oauth: m.oauth }); addEvent('open_oauth', { app: m.oauth.app }); }
+            function replyInfo() { const m = current(); if (!m) return; const asked = m.cat === 'invoice' ? 'bank details' : m.cat === 'cred' ? 'password reset confirmation' : 'personal info'; addEvent('replied_with_info', { asked }); alert('Demo: Never send passwords, OTP, or card/UPI details by email.'); }
+            function payInvoice() { const m = current(); if (!m || !m.invoice) return; webShow({ type: 'invoice', invoice: m.invoice }); addEvent('pay_invoice_view', { amount: m.invoice.amount }); }
+
+            function openAttachment(m, f) {
+                addEvent('download_attachment', { name: f.name });
+                const risky = /(\.exe|\.zip|\.html|\.htm|\.docm)$/i.test(f.name) || /\.pdf\.exe$/i.test(f.name);
+                const msg = risky ? `<span class="text-danger">Risky attachment</span> — may install malware or open a fake page.` : 'Looks like a normal file (still verify).';
+                alert(msg + '\nDemo only — no real file opened.');
+            }
+
+            function reportPhish() { const m = current(); if (!m) return; addEvent('reported_phish', { id: m.id }); alert('Reported for review (demo).'); }
+
+            function current() { return state.inbox.find(x => x.id === state.selected) || null; }
+
+            // ===== Analyzer =====
+            function analyze(m) {
+                const disp = m.disp, from = m.from, domain = domainOf(from);
+                const auth = `${m.headers.spf.toUpperCase()} / ${m.headers.dkim.toUpperCase()} / ${m.headers.dmarc.toUpperCase()}`;
+                const hasShort = hasShortener(m);
+                const hasExe = m.attachments.some(f => /\.exe$/i.test(f.name) || /\.docm$/i.test(f.name) || /\.zip$/i.test(f.name) || /\.pdf\.exe$/i.test(f.name));
+                const homo = looksHomoglyph(domain);
+                const tone = m.urgency ? 'Urgent' : 'Neutral';
+                const linkDoms = linkDomains(m).join(', ') || '—';
+                // score 0..10
+                let score = 0; const notes = [];
+                if (['fail', 'softfail'].includes(m.headers.spf)) { score += 2; notes.push('SPF not OK'); }
+                if (m.headers.dkim === 'fail') { score += 2; notes.push('DKIM fail'); }
+                if (['fail', 'quarantine', 'none'].includes(m.headers.dmarc)) { score += 2; notes.push('DMARC not enforcing'); }
+                if (homo) { score += 2; notes.push('Homoglyph/brand look-alike domain'); }
+                if (hasExe) { score += 2; notes.push('Risky attachment'); }
+                if (hasShort) { score += 1; notes.push('Shortened/obscured links'); }
+                if (m.urgency) { score += 1; notes.push('Urgent tone'); }
+                if (m.cat === 'invoice') { score += 1; notes.push('Financial request'); }
+                score = Math.min(10, score);
+
+                document.getElementById('rk_disp').textContent = disp;
+                document.getElementById('rk_from').textContent = from;
+                document.getElementById('rk_domain').innerHTML = homo ? `<span class="text-danger">Suspicious (${esc(domain)})</span>` : domain;
+                document.getElementById('rk_auth').textContent = auth;
+                document.getElementById('rk_links').textContent = linkDoms;
+                document.getElementById('rk_files').textContent = m.attachments.map(f => f.name).join(', ') || '—';
+                document.getElementById('rk_tone').textContent = tone;
+                document.getElementById('rk_score').innerHTML = score >= 7 ? `<span class="risk-high">${score}/10 (High)</span>` : score >= 4 ? `<span class="risk-med">${score}/10 (Medium)</span>` : `<span class="risk-low">${score}/10 (Low)</span>`;
+                document.getElementById('rk_explain').innerHTML = '<ul class="mb-0">' + notes.map(x => `<li>${esc(x)}</li>`).join('') + '</ul>' || '—';
+            }
+
+            function linkDomains(m) { const urls = []; const L = [...m.links]; if (m.primaryLink) L.unshift(m.primaryLink); for (const l of L) { const u = (l.final || l.url); try { urls.push(new URL(u).hostname); } catch (e) { urls.push(u); } } return Array.from(new Set(urls)); }
+            function hasShortener(m) { const short = ['bit.ly', 'goo.gl', 'tinyurl.com', 'rb.gy', 't.co']; return linkDomains(m).some(h => short.includes(h)); }
+            function looksHomoglyph(domain) {
+                const clean = domain.normalize('NFKD');
+                // Flag if contains non-ascii or looks like brand replacement (very rough)
+                return /[^\x00-\x7F]/.test(clean) || /(paytm|amazon|microsoft|google)/i.test(clean.replace(/[0oοό]/gi, '0')) && /example|support|billing|mail|co/.test(clean);
+            }
+            function domainOf(addr) { const m = /@([^>]+)$/.exec(addr); return (m ? m[1] : addr).toLowerCase(); }
+
+            // ===== Web modal simulations =====
+            function webShow(payload) {
+                const body = document.getElementById('webBody'); const title = document.getElementById('webTitle'); body.innerHTML = '';
+                if (payload.type === 'login') {
+                    title.textContent = 'Login (demo)';
+                    body.innerHTML = `
+          <div class="alert alert-warning small">This is a <strong>fake login</strong> demo. Do not enter real passwords.</div>
+          <div class="mb-2">URL: <span class="mono">${esc(payload.url)}</span></div>
+          <div class="mb-2">Page branding: ${esc((payload.brand || 'generic').toUpperCase())}</div>
+          <div class="d-flex gap-2 align-items-end">
+            <input id="pw" type="password" class="form-control" placeholder="Password (demo)" style="max-width:200px" />
+            <button class="btn btn-danger" id="pwSubmit" type="button">Sign in</button>
+          </div>`;
+                    setTimeout(() => { document.getElementById('pwSubmit').addEventListener('click', () => { const ok = document.getElementById('pw').value.length > 0; addEvent('entered_password', { ok }); alert(ok ? 'Credential phished (demo).' : 'No password entered — safe.'); }); }, 0);
+                } else if (payload.type === 'oauth') {
+                    title.textContent = 'OAuth consent (demo)';
+                    body.innerHTML = `
+          <div class="alert alert-warning small">App is requesting access to your mailbox. Attackers abuse this to persist access <em>without password</em>.</div>
+          <div class="mb-2"><strong>App:</strong> ${esc(payload.oauth.app)}</div>
+          <div class="mb-2"><strong>Requested scopes:</strong><ul class="mb-0">${payload.oauth.scopes.map(s => `<li>${esc(s)}</li>`).join('')}</ul></div>
+          <div class="d-flex gap-2">
+            <button class="btn btn-danger" id="oauthAllow" type="button">Allow</button>
+            <button class="btn btn-outline-secondary" data-bs-dismiss="modal" type="button">Deny</button>
+          </div>`;
+                    setTimeout(() => { document.getElementById('oauthAllow').addEventListener('click', () => { addEvent('oauth_granted', { scopes: payload.oauth.scopes }); alert('Token granted (demo). Revoke access from your account security settings.'); }); }, 0);
+                } else if (payload.type === 'invoice') {
+                    title.textContent = 'Invoice portal (demo)';
+                    body.innerHTML = `
+          <div class="row g-3">
+            <div class="col-lg-6">
+              <div class="p-3 border rounded bg-light">
+                <div class="small text-muted">Beneficiary (as per email)</div>
+                <div class="mono">${esc(payload.invoice.acct)}</div>
+                <div class="mono">IFSC: ${esc(payload.invoice.ifsc)}</div>
+                <div class="mono">Amount: ${esc(payload.invoice.amount)}</div>
+              </div>
+            </div>
+            <div class="col-lg-6">
+              <div class="alert alert-danger small">Always verify bank details <strong>via known channels</strong> (phone number you already have). Email can be forged.</div>
+              <div class="d-flex gap-2">
+                <button class="btn btn-danger" id="payNow" type="button">Send payment</button>
+                <button class="btn btn-outline-secondary" data-bs-dismiss="modal" type="button">Cancel</button>
+              </div>
+            </div>
+          </div>`;
+                    setTimeout(() => { document.getElementById('payNow').addEventListener('click', () => { addEvent('invoice_paid', payload.invoice); alert('Payment sent to fraudster (demo). Always verify first.'); }); }, 0);
+                }
+                new bootstrap.Modal(document.getElementById('webModal')).show();
+            }
+
+            // ===== Event log, export, reset =====
+            function renderEvents() { const t = document.getElementById('eventT'); t.innerHTML = ''; for (const ev of state.events) { const tr = document.createElement('tr'); tr.innerHTML = `<td class="small text-muted">${esc(ev.ts)}</td><td>${esc(ev.type)}</td><td><span class=\"mono\">${esc(JSON.stringify(ev.payload))}</span></td>`; t.appendChild(tr); } }
+            function exportJSON() { const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `email-bec-${state.sessionId}.json`; a.click(); URL.revokeObjectURL(a.href); }
+            function resetAll() { localStorage.removeItem(KEY); state = DEFAULT(); save(); location.reload(); }
+
+            // ===== Language (EN/HI minimal) =====
+            const I18N = {
+                en: { info_head: 'Show, don’t tell:', info_body: 'This page simulates email-based scams: phishing logins, OAuth consent hijack, Business Email Compromise (BEC), fake invoices, attachment traps, and display-name spoofing. It runs fully in your browser; nothing leaves your device.', who_title: 'Participant (demo identity)', who_name: 'Name', who_email: 'Email address', who_role: 'Role (demo)', btn_save: 'Save', inbox_title: 'Inbox (simulated)', block_images: 'Block remote images', trusted_mode: 'Treat sender as trusted', gen_new: 'Generate new inbox', show_headers: 'Show headers', inspect_links: 'Inspect links', report: 'Report phishing', open_link: 'Open primary link', oauth_flow: 'Open OAuth consent', reply: 'Reply with info', pay_invoice: 'Pay invoice (demo)', empty_reader: 'Select an email on the left to preview and simulate actions.', risk_title: 'Risk analyzer (for selected email)' },
+                hi: { info_head: 'दिखाकर समझाएं:', info_body: 'यह पेज ईमेल आधारित ठगी दिखाता है — फ़िशिंग लॉगिन, OAuth सहमति हाइजैक, BEC (बिज़नेस ईमेल कम्प्रोमाइज़), नकली इनवॉइस, अटैचमेंट जाल और डिस्प्ले‑नेम स्पूफिंग। यह पेज ब्राउज़र में ही चलता है — कोई डेटा बाहर नहीं जाता।', who_title: 'प्रतिभागी (डेमो पहचान)', who_name: 'नाम', who_email: 'ईमेल पता', who_role: 'भूमिका (डेमो)', btn_save: 'सेव', inbox_title: 'इनबॉक्स (सिमुलेशन)', block_images: 'रिमोट इमेज ब्लॉक करें', trusted_mode: 'सेंडर को विश्वसनीय मानें', gen_new: 'नया इनबॉक्स बनायें', show_headers: 'हेडर दिखाएँ', inspect_links: 'लिंक जाँचें', report: 'फ़िशिंग रिपोर्ट', open_link: 'प्राइमरी लिंक खोलें', oauth_flow: 'OAuth कन्सेंट खोलें', reply: 'जानकारी भेजकर जवाब दें', pay_invoice: 'इनवॉइस भुगतान (डेमो)', empty_reader: 'बाएँ से ईमेल चुनें और क्रियाएँ सिम्युलेट करें।', risk_title: 'जोखिम विश्लेषक (चुने गये ईमेल के लिए)' }
+            };
+            let lang = localStorage.getItem('DSL_LANG') || (navigator.language.startsWith('hi') ? 'hi' : 'en');
+            function applyLang() { const L = I18N[lang] || I18N.en; document.querySelectorAll('[data-i18n]').forEach(el => { const k = el.getAttribute('data-i18n'); if (L[k]) el.textContent = L[k]; }); document.getElementById('langToggle').textContent = (lang === 'en' ? 'हिंदी' : 'English'); }
+            
+            
+
+            // ===== Init =====
+            function init() {
+                applyLang();
+                // Prefill
+                document.getElementById('name').value = state.user.name;
+                document.getElementById('email').value = state.user.email;
+                document.getElementById('role').value = state.user.role;
+                // Switches
+                document.getElementById('imagesBlocked').checked = !!state.imagesBlocked;
+                document.getElementById('trustedMode').checked = !!state.trusted;
+
+                if (state.inbox.length === 0) { state.inbox = sampleInbox(); save(); }
+                renderInbox(); renderEvents();
+
+                // Listeners
+                document.getElementById('whoForm').addEventListener('submit', (e) => { e.preventDefault(); state.user.name = document.getElementById('name').value.trim(); state.user.email = document.getElementById('email').value.trim(); state.user.role = document.getElementById('role').value.trim(); save(); addEvent('who_saved', { ...state.user }); document.getElementById('whoSaved').textContent = 'Saved.'; setTimeout(() => document.getElementById('whoSaved').textContent = '', 1500); });
+                document.getElementById('btnGenerate').addEventListener('click', () => { state.inbox = sampleInbox(); save(); renderInbox(); addEvent('inbox_generated', { n: state.inbox.length }); });
+                document.getElementById('rd_headers').addEventListener('click', showHeaders);
+                document.getElementById('rd_inspect').addEventListener('click', inspectLinks);
+                document.getElementById('rd_report').addEventListener('click', reportPhish);
+                document.getElementById('rd_open').addEventListener('click', openPrimary);
+                document.getElementById('rd_oauth').addEventListener('click', openOAuth);
+                document.getElementById('rd_reply').addEventListener('click', replyInfo);
+                document.getElementById('rd_pay').addEventListener('click', payInvoice);
+                document.getElementById('imagesBlocked').addEventListener('change', (e) => { state.imagesBlocked = e.target.checked; save(); const m = current(); if (m) openMail(m.id); addEvent('toggle_images', { blocked: state.imagesBlocked }); });
+                document.getElementById('trustedMode').addEventListener('change', (e) => { state.trusted = e.target.checked; save(); addEvent('toggle_trusted', { on: state.trusted }); alert('Demo: Trusted senders reduce warnings in many clients — be careful before trusting.'); });
+                document.getElementById('btnExport').addEventListener('click', exportJSON);
+                document.getElementById('resetBtn').addEventListener('click', resetAll);
+
+                addEvent('demo_loaded', { ua: navigator.userAgent, lang: navigator.language });
+            }
+
+            // ===== Utils =====
+            function rnd(n) { const s = 'abcdefghijklmnopqrstuvwxyz0123456789'; let o = ''; while (o.length < n) o += s[Math.floor(Math.random() * s.length)]; return o; }
+
+            document.addEventListener('DOMContentLoaded', init);
+        </script>
+    </body>
+
+</html>
