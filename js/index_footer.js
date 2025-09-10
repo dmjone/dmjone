@@ -380,6 +380,7 @@ function generateNavbarHTML(coursesBySemester) {
                             <li><a class="dropdown-item" href="/about" data-toggle="tooltip" data-placement="top" title="Visit our Educational Initiative." data-original-title="Visit our Educational Initiative.">Educational</a></li>
                             <li><a class="dropdown-item" href="/binarybattles/" data-toggle="tooltip" data-placement="top" title="An Annual Event Where Bits and Brains Collide" data-original-title="An Annual Event Where Bits and Brains Collide.">Binary Battles</a></li>
                             <li><a class="dropdown-item" href="//medicine.dmj.one/" data-toggle="tooltip" data-placement="top" title="Community Medicine Inventory" data-original-title="Community Medicine Inventory">Medicine Inventory</a></li>
+                            <li><a class="dropdown-item" href="/labs/digital-safety/" data-toggle="tooltip" data-placement="top" title="Digital Safety Labs" data-original-title="Digital Safety Labs">Digital Safety Labs</a></li>
                         </ul>
                     </li>
                         <li class="nav-item"><a class="nav-link" href="#contact-us-button-logical-href">Contact</a></li>
