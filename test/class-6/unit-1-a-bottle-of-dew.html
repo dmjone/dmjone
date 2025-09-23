@@ -1,0 +1,1290 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
+        <title>A Bottle of Dew — Full‑Screen Neon Quiz</title>
+
+        <!-- Fonts tuned for kids: bold, rounded, super-legible -->
+        <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@900&display=swap" rel="stylesheet">
+
+        <!-- GSAP + Draggable (for playful corner orbs) -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/Draggable.min.js" crossorigin="anonymous"></script>
+
+        <!-- tsParticles (animated background + confetti) -->
+        <script src="https://cdn.jsdelivr.net/npm/tsparticles@3.9.1/tsparticles.bundle.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@tsparticles/confetti/tsparticles.confetti.bundle.min.js"></script>
+
+        <style>
+            :root {
+                --bg-1: #090e27;
+                --bg-2: #0b1337;
+                --cyan: #00E5FF;
+                --blue: #4A7BFF;
+                --vio: #A46BFF;
+                --good: #7CFFB2;
+                --bad: #FF8A8A;
+                --text: #F8FCFF;
+                --muted: #CFE8FF;
+            }
+
+            * {
+                box-sizing: border-box
+            }
+
+            html,
+            body {
+                height: 100%
+            }
+
+            body {
+                margin: 0;
+                overflow: hidden;
+                color: var(--text);
+                background:
+                    radial-gradient(1600px 900px at 20% 15%, #14286a 0%, transparent 60%),
+                    linear-gradient(160deg, var(--bg-1), var(--bg-2) 60%);
+                font-family: 'Baloo 2', system-ui, -apple-system, Segoe UI, Roboto, Arial;
+                -webkit-tap-highlight-color: transparent;
+            }
+
+            /* Full-canvas background */
+            #bg {
+                position: fixed;
+                inset: 0;
+                z-index: 0;
+                pointer-events: none;
+            }
+
+            /* Full-bleed stage */
+            .stage {
+                position: relative;
+                z-index: 2;
+                width: 100vw;
+                height: 100svh;
+                display: grid;
+                grid-template-rows: 1fr auto;
+                gap: 0;
+                padding: clamp(12px, 2.5vw, 28px);
+            }
+
+            /* --- TOP (Question & Options) --- */
+            .qwrap {
+                display: grid;
+                align-content: center;
+                justify-items: center;
+                gap: clamp(18px, 3vw, 26px);
+                width: 100%;
+                height: 100%;
+                padding: clamp(6px, 2vw, 14px);
+            }
+
+            /* Glowing frame sits BEHIND text (never on top) */
+            .frame {
+                position: absolute;
+                inset: clamp(10px, 2vw, 22px);
+                pointer-events: none;
+                z-index: 0;
+            }
+
+            .frame svg {
+                width: 100%;
+                height: 100%;
+                display: block
+            }
+
+            .frame rect {
+                fill: transparent;
+                rx: 30;
+                ry: 30;
+                stroke-width: 3;
+                stroke: url(#grad);
+                stroke-linecap: round;
+                stroke-dasharray: 80 18 18 22 60 18 18 22;
+                animation: dash 5s linear infinite;
+                filter: drop-shadow(0 0 6px rgba(0, 229, 255, .65));
+            }
+
+            @keyframes dash {
+                to {
+                    stroke-dashoffset: -238
+                }
+            }
+
+            /* Big, high-contrast question */
+            .qtext {
+                margin: 0;
+                font-weight: 800;
+                letter-spacing: .3px;
+                text-align: center;
+                /* Large text: AA threshold 3:1 applies; we use bright foreground on dark bg */
+                font-size: clamp(28px, 5.6vw, 56px);
+                line-height: 1.06;
+                text-shadow: 0 2px 0 rgba(0, 0, 0, .25), 0 16px 36px rgba(0, 0, 0, .55);
+                z-index: 1;
+                max-width: min(1400px, 92vw);
+            }
+
+            /* Options fill width; decorations around them, never above */
+            .opts {
+                width: min(1400px, 92vw);
+                display: grid;
+                grid-template-columns: repeat(2, minmax(280px, 1fr));
+                gap: clamp(12px, 2.2vw, 20px);
+                z-index: 1;
+            }
+
+            @media (max-width: 780px) {
+                .opts {
+                    grid-template-columns: 1fr;
+                }
+            }
+
+            .opt {
+                position: relative;
+                border-radius: 22px;
+                cursor: pointer;
+                overflow: hidden;
+                border: 1px solid rgba(255, 255, 255, .28);
+                background: linear-gradient(180deg, rgba(12, 14, 28, .98), rgba(22, 24, 42, .88));
+                box-shadow: 0 16px 36px rgba(0, 0, 0, .35), inset 0 0 0 1px rgba(255, 255, 255, .06);
+                min-height: 88px;
+                padding: clamp(16px, 2vw, 22px) clamp(18px, 3vw, 28px) clamp(16px, 2vw, 22px) clamp(72px, 7vw, 98px);
+                text-align: left;
+                color: #fff;
+                transition: transform .08s ease;
+                isolation: isolate;
+            }
+
+            .opt:active {
+                transform: scale(.985);
+            }
+
+            /* Letter badge (left), never overlapping text */
+            .opt em {
+                position: absolute;
+                left: clamp(12px, 2vw, 18px);
+                top: 50%;
+                transform: translateY(-50%);
+                width: clamp(48px, 6.2vw, 64px);
+                height: clamp(48px, 6.2vw, 64px);
+                border-radius: 16px;
+                display: grid;
+                place-items: center;
+                font-style: normal;
+                font-weight: 900;
+                font-size: clamp(22px, 3.4vw, 28px);
+                color: #0b0f22;
+                background: radial-gradient(120% 220% at 20% 20%, #fff, #cde8ff);
+                border: 1px solid rgba(255, 255, 255, .85);
+                box-shadow: 0 10px 22px rgba(0, 0, 0, .35);
+                z-index: 2;
+                user-select: none;
+            }
+
+            .opt span {
+                display: block;
+                font-weight: 800;
+                letter-spacing: .2px;
+                font-size: clamp(22px, 3.2vw, 32px);
+                text-shadow: 0 1px 0 rgba(0, 0, 0, .28), 0 10px 26px rgba(0, 0, 0, .45);
+            }
+
+            /* Subtle animated "scan lines" INSIDE each pill (decoration below text) */
+            .opt::before,
+            .opt::after {
+                content: "";
+                position: absolute;
+                left: 12%;
+                right: 12%;
+                height: 2px;
+                border-radius: 2px;
+                background: linear-gradient(90deg, transparent, rgba(138, 243, 255, .8), transparent);
+                opacity: .6;
+                pointer-events: none;
+                z-index: 0;
+            }
+
+            .opt::before {
+                top: 16px;
+                animation: scan 2.2s linear infinite;
+            }
+
+            .opt::after {
+                bottom: 16px;
+                animation: scan 2.8s linear infinite;
+            }
+
+            @keyframes scan {
+                0% {
+                    background-position: -200% 0;
+                }
+
+                100% {
+                    background-position: 200% 0;
+                }
+            }
+
+            /* States */
+            .opt.correct {
+                outline: 3px solid var(--good);
+                box-shadow: 0 16px 36px rgba(124, 255, 178, .5), inset 0 0 0 2px rgba(255, 255, 255, .08);
+            }
+
+            .opt.wrong {
+                outline: 3px solid var(--bad);
+                box-shadow: 0 16px 36px rgba(255, 138, 138, .45), inset 0 0 0 2px rgba(255, 255, 255, .06);
+            }
+
+            /* Bottom area (decor stays outside text) */
+            .bottom {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                width: 100%;
+            }
+
+            /* Corner controls: tiny, never over text */
+            .hud {
+                position: fixed;
+                z-index: 3;
+                inset: auto 0 0 0;
+                pointer-events: none;
+            }
+
+            .btn {
+                position: fixed;
+                bottom: 14px;
+                width: 50px;
+                height: 50px;
+                border-radius: 50%;
+                display: grid;
+                place-items: center;
+                border: 1px solid rgba(255, 255, 255, .25);
+                background: radial-gradient(140% 180% at 30% 20%, rgba(255, 255, 255, .22), rgba(255, 255, 255, .06));
+                box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .05), 0 8px 26px rgba(0, 0, 0, .35);
+                cursor: pointer;
+                transition: transform .1s ease;
+                pointer-events: auto;
+            }
+
+            .btn:active {
+                transform: scale(.96)
+            }
+
+            .btn svg {
+                width: 24px;
+                height: 24px;
+            }
+
+            #btnSound {
+                left: 14px;
+            }
+
+            #btnTTS {
+                right: 14px;
+            }
+
+            .off {
+                opacity: .6;
+                filter: saturate(.6) brightness(.9);
+            }
+
+            /* Draggable corner orbs (far away from text) */
+            .orb {
+                position: fixed;
+                z-index: 2;
+                width: 90px;
+                height: 90px;
+                border-radius: 22px;
+                background: radial-gradient(140% 200% at 30% 20%, rgba(255, 255, 255, .35), rgba(255, 255, 255, .06));
+                border: 1px solid rgba(255, 255, 255, .2);
+                box-shadow: 0 18px 32px rgba(0, 0, 0, .45), 0 0 28px rgba(0, 229, 255, .18);
+                user-select: none;
+                touch-action: none;
+                cursor: grab;
+            }
+
+            #orb1 {
+                top: 12px;
+                left: 12px;
+            }
+
+            #orb2 {
+                bottom: 12px;
+                right: 12px;
+            }
+
+            .orb::after {
+                content: "⭐";
+                position: absolute;
+                inset: 0;
+                display: grid;
+                place-items: center;
+                font-size: 28px;
+            }
+
+            /* Score overlay */
+            .end {
+                position: fixed;
+                inset: 0;
+                z-index: 4;
+                display: none;
+                place-items: center;
+                background: radial-gradient(1200px 800px at 50% 20%, rgba(10, 15, 30, .75), rgba(10, 15, 30, .92));
+            }
+
+            .end.show {
+                display: grid;
+            }
+
+            .score {
+                text-align: center;
+                max-width: min(1200px, 92vw);
+            }
+
+            .score h2 {
+                margin: 0 0 12px 0;
+                font-size: clamp(32px, 6vw, 64px);
+                font-weight: 900;
+                text-shadow: 0 2px 0 rgba(0, 0, 0, .25), 0 16px 36px rgba(0, 0, 0, .55);
+            }
+
+            .score p {
+                margin: 0;
+                font-size: clamp(18px, 3.2vw, 28px);
+                color: var(--muted);
+            }
+
+            /* Motion sensitivity */
+            @media (prefers-reduced-motion: reduce) {
+                * {
+                    animation: none !important;
+                    transition: none !important;
+                }
+            }
+        </style>
+    </head>
+
+    <body>
+        <canvas id="bg" aria-hidden="true"></canvas>
+
+        <!-- Draggable decorative orbs (outside text) -->
+        <div id="orb1" class="orb" aria-hidden="true"></div>
+        <div id="orb2" class="orb" aria-hidden="true"></div>
+
+        <!-- Corner toggles -->
+        <button id="btnSound" class="btn" aria-pressed="true" title="Sound effects">
+            <svg id="iconSoundOn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M11 5 6 9H3v6h3l5 4z" />
+                <path d="M15 9a4 4 0 0 1 0 6" />
+                <path d="M17.5 5.5a8 8 0 0 1 0 13" />
+            </svg>
+            <svg id="iconSoundOff" style="display:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M11 5 6 9H3v6h3l5 4z" />
+                <path d="M16 8l6 6M22 8l-6 6" />
+            </svg>
+        </button>
+
+        <button id="btnTTS" class="btn" aria-pressed="true" title="Narration">
+            <svg id="iconTTSOn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 3v18" />
+                <path d="M7 8h10" />
+                <path d="M9 16h6" />
+                <path d="M19 9c2 1 2 5 0 6" />
+                <path d="M21 7c3 2 3 8 0 10" />
+            </svg>
+            <svg id="iconTTSOff" style="display:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 3v18" />
+                <path d="M7 8h10" />
+                <path d="M9 16h6" />
+                <path d="M19 9c2 1 2 5 0 6" />
+                <path d="M3 3l18 18" />
+            </svg>
+        </button>
+
+        <!-- QUIZ STAGE -->
+        <div class="stage" id="stage" aria-live="polite" aria-atomic="true">
+            <!-- Decorative frame behind content -->
+            <div class="frame" aria-hidden="true">
+                <svg viewBox="0 0 100 100" preserveAspectRatio="none">
+                    <defs>
+                        <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#00E5FF" />
+                            <stop offset="50%" stop-color="#4A7BFF" />
+                            <stop offset="100%" stop-color="#A46BFF" />
+                        </linearGradient>
+                    </defs>
+                    <rect x="2.5" y="2.5" width="95" height="95" rx="16" ry="16"></rect>
+                </svg>
+            </div>
+
+            <div class="qwrap">
+                <h1 id="qtext" class="qtext">Loading…</h1>
+                <div id="opts" class="opts" role="group" aria-label="Choices"></div>
+            </div>
+
+            <div class="bottom"><!-- reserved for future mini-game footer, left blank intentionally --></div>
+        </div>
+
+        <!-- SCORE / ENDING -->
+        <div id="end" class="end" role="dialog" aria-modal="true">
+            <div class="score">
+                <h2 id="scoreTitle">Great job!</h2>
+                <p id="scoreLine">You scored 0 / 0</p>
+            </div>
+        </div>
+
+        <script>
+            /* ---------------------------
+               Animated full-screen background
+               --------------------------- */
+            tsParticles.load({
+                id: "bg",
+                options: {
+                    fpsLimit: 60, detectRetina: true, fullScreen: { enable: true, zIndex: 0 },
+                    particles: {
+                        number: { value: 60, density: { enable: true, area: 1200 } },
+                        color: { value: ["#fff6a1", "#00e5ff", "#a46bff"] },
+                        size: { value: { min: 1.2, max: 3.4 } },
+                        opacity: { value: 0.55, random: { enable: true, minimumValue: 0.18 } },
+                        move: { enable: true, speed: 0.35, outModes: { default: "out" } },
+                        links: { enable: false }
+                    },
+                    interactivity: {
+                        events: { onHover: { enable: true, mode: "repulse" }, resize: true },
+                        modes: { repulse: { distance: 70, duration: .3 } }
+                    },
+                    background: { color: "transparent" }
+                }
+            }); // tsParticles docs. :contentReference[oaicite:4]{index=4}
+
+            /* ---------------------------
+               Questions (JSON via Blob) — you can swap for /quiz.json later
+               --------------------------- */
+            const quizData = {
+                meta: { title: "A Bottle of Dew", version: 3 },
+                questions: [
+                    {
+                        id: "q1",
+                        prompt: "Which central message best captures the story 'A Bottle of Dew'?",
+                        options: ["Hard work creates real wealth", "Luck decides everything", "Magic can replace effort", "Cheating is a smart shortcut"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q2",
+                        prompt: "Rama Natha was the ____ of a rich landlord.",
+                        options: ["son", "friend", "servant", "neighbour"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q3",
+                        prompt: "What belief kept Rama Natha away from managing his land?",
+                        options: ["A magic potion could turn things into gold", "The land was cursed", "Farming was illegal", "Rain would ruin crops every year"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q4",
+                        prompt: "Name the sage who guided Rama Natha.",
+                        options: ["Mahipati", "Valmiki", "Vashishtha", "Birbal"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q5",
+                        prompt: "Where did the sage hear about the so‑called magic potion?",
+                        options: ["In the Himalayas", "In a desert camp", "On a ship at sea", "In a city market"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q6",
+                        prompt: "According to the sage, which plant must be grown?",
+                        options: ["Banana plant", "Mango tree", "Wheat crop", "Lotus plant"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q7",
+                        prompt: "How was the plant supposed to be watered?",
+                        options: ["With Rama Natha’s own hands", "By hired workers", "By rainwater only", "Using a machine"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q8",
+                        prompt: "When is dew available on the leaves for collection in the story?",
+                        options: ["Winter mornings", "Summer afternoons", "Rainy evenings", "Autumn nights only"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q9",
+                        prompt: "How much dew did the sage ask Rama Natha to collect?",
+                        options: ["Five litres", "One litre", "Ten litres", "Half a litre"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q10",
+                        prompt: "What had to be done after collecting the required dew?",
+                        options: ["Bring it to the sage to chant over it", "Mix it with honey", "Heat it to boiling", "Bury it under the plant"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q11",
+                        prompt: "Why was Rama Natha worried about collecting dew?",
+                        options: ["Winter lasts only a few months", "He disliked waking early", "Leaves were too small", "Banana plants don’t grow near him"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q12",
+                        prompt: "What practical advice did the sage give to speed up dew collection?",
+                        options: ["Plant as many banana plants as possible", "Pray every night", "Buy dew from the market", "Store rainwater instead"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q13",
+                        prompt: "Who supported Rama Natha through the long process?",
+                        options: ["His wife, Madhumati", "His brother", "A neighbour", "The village headman"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q14",
+                        prompt: "What did Madhumati do with the bananas?",
+                        options: ["Sold them in the market", "Kept them at home", "Gave them to the sage", "Threw them away"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q15",
+                        prompt: "What happened to the empty fields before the plan began?",
+                        options: ["They were cleaned and planted", "They were sold off", "They were flooded", "They were turned into a playground"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q16",
+                        prompt: "How long did it finally take Rama Natha to collect the dew?",
+                        options: ["Six years", "Two months", "One year", "Ten years"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q17",
+                        prompt: "On which object did Rama Natha test the 'potion'?",
+                        options: ["A copper vessel", "A silver coin", "An iron key", "A stone"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q18",
+                        prompt: "What was the result when Rama Natha sprinkled the dew on the object?",
+                        options: ["Nothing happened", "It turned to gold", "It cracked", "It disappeared"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q19",
+                        prompt: "Why did Rama Natha accuse the sage of cheating?",
+                        options: ["The test failed after six years of effort", "The sage took his land", "The sage broke the bottle", "The sage forgot his name"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q20",
+                        prompt: "Who brought a big box to the sage at the end?",
+                        options: ["Madhumati", "A servant", "A merchant", "A guard"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q21",
+                        prompt: "What was inside the big box?",
+                        options: ["Stacks of gold coins", "Bananas", "Books", "Clothes"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q22",
+                        prompt: "What truth did the sage finally reveal?",
+                        options: ["There is no magic potion; wealth came from hard work", "Magic works only on silver", "The dew was impure", "The mantra was incomplete"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q23",
+                        prompt: "Why didn’t the sage explain the truth at the beginning?",
+                        options: ["Rama Natha wouldn’t have listened then", "He wanted a reward first", "He didn’t know the truth then", "He was afraid of Rama Natha"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q24",
+                        prompt: "How did Rama Natha change after learning the truth?",
+                        options: ["He worked even harder on the plantation", "He sold the plantation", "He went searching for another potion", "He gave up farming completely"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q25",
+                        prompt: "Which word best describes Rama Natha at the beginning of the story?",
+                        options: ["Gullible", "Brave", "Cruel", "Expert"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q26",
+                        prompt: "Which quality of Madhumati is most evident in the story?",
+                        options: ["Practical and supportive", "Fearful and lazy", "Careless and forgetful", "Jealous and rude"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q27",
+                        prompt: "Which trait best describes the sage Mahipati?",
+                        options: ["Wise guide", "Trickster for money", "Angry ruler", "Silent hermit"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q28",
+                        prompt: "What does the word 'potion' mean in the story?",
+                        options: ["A liquid believed to have magical powers", "A wooden tool", "A kind of fruit", "A type of cloth"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q29",
+                        prompt: "What does 'dew' refer to?",
+                        options: ["Tiny drops of water on leaves formed at night", "Rainfall in the evening", "Water from a well", "Steam from cooking"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q30",
+                        prompt: "What does 'chant' mean in the story?",
+                        options: ["To repeat special words", "To draw a picture", "To plant seeds", "To count money"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q31",
+                        prompt: "The word 'tended' in the line 'He tended them carefully' means:",
+                        options: ["Looked after", "Cut down", "Sold off", "Ignored"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q32",
+                        prompt: "The word 'muttered' means:",
+                        options: ["Spoke in a low voice", "Shouted loudly", "Sang a song", "Wrote a letter"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q33",
+                        prompt: "The word 'wisdom' in the story is closest in meaning to:",
+                        options: ["Deep understanding", "Quick anger", "Great speed", "Loud laughter"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q34",
+                        prompt: "'Large tracts of land' means:",
+                        options: ["Large areas of land", "A small garden", "A single hill", "A river bank"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q35",
+                        prompt: "Choose the correct homophone to complete: “The payment is ___ next week.”",
+                        options: ["due", "dew", "do", "doo"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q36",
+                        prompt: "Choose the correct homophone to complete: “Rama Natha was the ___ of a rich landlord.”",
+                        options: ["son", "sun", "soon", "sown"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q37",
+                        prompt: "Which of these happened FIRST?",
+                        options: ["Rama Natha met the sage", "Rama Natha sprinkled dew on copper", "Madhumati opened the box", "They sold bananas in the market"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q38",
+                        prompt: "Which event happened LAST?",
+                        options: ["Rama Natha decided to work even harder", "Rama Natha cleaned the fields", "The sage told him to plant bananas", "Dew was collected in a bottle"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q39",
+                        prompt: "Cause–effect: Rama Natha planted many banana plants BECAUSE…",
+                        options: ["He could collect dew faster", "He liked shade", "Bananas are rare", "The sage demanded fruits"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q40",
+                        prompt: "Which best explains why the dew plan changed Rama Natha’s life?",
+                        options: ["It forced him to work regularly on his land", "It gave him a new house", "It brought heavy rains", "It taught him to sing"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q41",
+                        prompt: "Which choice shows critical thinking like NEP‑style learning?",
+                        options: ["Understanding that wealth came from effort, not magic", "Memorizing the name of the vessel", "Counting each leaf daily", "Believing every rumour"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q42",
+                        prompt: "Which value does the story promote?",
+                        options: ["Perseverance", "Jealousy", "Dishonesty", "Show‑off"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q43",
+                        prompt: "If Rama Natha had asked workers to collect dew, the sage’s condition would be:",
+                        options: ["Not fulfilled", "Better fulfilled", "Irrelevant", "Instantly successful"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q44",
+                        prompt: "What best shows Madhumati’s financial sense?",
+                        options: ["Selling fruit while the plants grew", "Buying more jewellery", "Hiding coins in the field", "Throwing away ripe fruit"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q45",
+                        prompt: "Identify the FALSE statement.",
+                        options: ["The copper vessel turned to gold", "Rama Natha spent years collecting dew", "The sage smiled and said 'Try it out'", "Gold coins were shown at the end"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q46",
+                        prompt: "Which option is the BEST reason the sage used a 'trick'?",
+                        options: ["To make Rama Natha experience the power of hard work", "To steal his land", "To become famous", "To test copper"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q47",
+                        prompt: "Which habit helped Rama Natha succeed at last?",
+                        options: ["Consistency in tending the plants", "Changing plans every day", "Sleeping late", "Avoiding the fields"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q48",
+                        prompt: "If each winter gave very little dew, what is the most sensible action?",
+                        options: ["Increase the number of plants", "Stop collecting", "Wait for magic", "Break the bottle"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q49",
+                        prompt: "Which scientific idea is closest to how dew forms?",
+                        options: ["Water vapour cools and condenses on leaves", "Leaves create water from nothing", "Rain gets trapped under leaves", "Soil turns to water at night"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q50",
+                        prompt: "Estimate: If 5 litres were collected in 6 winters, the average per winter is about…",
+                        options: ["0.8 litre", "2 litres", "5 litres", "0.1 litre"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q51",
+                        prompt: "Which sentence shows a growth mindset?",
+                        options: ["'I’ll work on my fields and learn by doing.'", "'I can’t do anything without magic.'", "'I will wait and complain.'", "'It’s someone else’s job.'"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q52",
+                        prompt: "What problem did the sage’s plan secretly solve?",
+                        options: ["Rama Natha’s neglect of his land", "Lack of copper vessels", "Shortage of markets", "Absence of roads"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q53",
+                        prompt: "Which part of the story shows teamwork?",
+                        options: ["Madhumati selling bananas while Rama Natha farmed", "Rama Natha travelling alone", "The sage living in a cave", "Rama Natha hiding money"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q54",
+                        prompt: "Complete the inference: If the dew had really turned copper into gold, then…",
+                        options: ["Hard work would not be the moral", "Markets would close", "Bananas would vanish", "Sage would get angry"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q55",
+                        prompt: "Which is the BEST title if the story had to be renamed?",
+                        options: ["The Work That Sparkled", "The Angry Copper", "The Lazy Farmer", "The Real Potion of Rain"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q56",
+                        prompt: "What did Rama Natha do FIRST after meeting the sage?",
+                        options: ["Cleaned the fields and planted bananas", "Sold the land", "Bought gold", "Left the town"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q57",
+                        prompt: "What role did the market play in the story?",
+                        options: ["It turned harvest into income", "It provided free dew", "It gave magic books", "It hid the copper vessel"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q58",
+                        prompt: "Which line shows Rama Natha’s earlier stubbornness?",
+                        options: ["He kept searching for a magic potion despite failures", "He woke up early daily", "He counted coins regularly", "He listened to everyone calmly"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q59",
+                        prompt: "Select the BEST description of the sage’s smile at the end.",
+                        options: ["Kind and knowing", "Mocking and cruel", "Afraid and worried", "Confused and lost"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q60",
+                        prompt: "What is the lesson about money in the story?",
+                        options: ["Wealth grows from steady work and smart use of resources", "Money appears from magic", "Keep money hidden in fields", "Coins grow on trees"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q61",
+                        prompt: "Which step was NOT part of the sage’s instructions?",
+                        options: ["Boiling the dew over fire", "Planting a banana plant", "Collecting winter dew", "Bringing dew to the sage"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q62",
+                        prompt: "Which choice is a cause‑and‑effect pair from the story?",
+                        options: ["Hard work → wealth", "Copper → banana", "Winter → no dew", "Magic words → instant gold"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q63",
+                        prompt: "Why is the story a fable/folk‑tale type?",
+                        options: ["It teaches a moral through a simple narrative", "It is a science textbook", "It is a travel diary", "It is a cooking manual"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q64",
+                        prompt: "Which sentence uses a word from the story correctly?",
+                        options: ["The sage muttered a blessing in a low voice.", "The sage muttered by running fast.", "The sage muttered by painting walls.", "The sage muttered by buying bananas."],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q65",
+                        prompt: "Choose the correct meaning of 'give up' as used in the story.",
+                        options: ["Stop trying", "Give gifts", "Stand up", "Add up"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q66",
+                        prompt: "Which action shows responsible stewardship of land?",
+                        options: ["Cleaning fields and tending plants", "Abandoning fields", "Burning crops", "Waiting for magic"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q67",
+                        prompt: "What would be the MOST ethical reaction after learning the truth?",
+                        options: ["Thanking the sage and continuing honest work", "Demanding more tricks", "Selling fake potion", "Stopping all farming"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q68",
+                        prompt: "Which sentence is TRUE about the dew rule?",
+                        options: ["Rama Natha had to collect it himself", "Anyone could collect it", "It must be rainwater", "It should be seawater"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q69",
+                        prompt: "Which comparison is accurate?",
+                        options: ["Magic potion : shortcut :: Hard work : real progress", "Magic potion : patience :: Hard work : laziness", "Magic potion : truth :: Hard work : lie", "Magic potion : science :: Hard work : cheating"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q70",
+                        prompt: "Why did the sage choose banana plants specifically (most plausible reason within the story’s logic)?",
+                        options: ["They need regular care and yield fruit to sell", "They never need water", "They grow gold leaves", "They can speak"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q71",
+                        prompt: "Rama Natha’s complaint, 'I wasted six precious years,' shows he…",
+                        options: ["Still didn’t see the value of his effort at first", "Earned nothing", "Forgot the sage", "Broke all bottles"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q72",
+                        prompt: "Which event best proves the family’s financial improvement?",
+                        options: ["A box full of gold coins from banana sales", "A new copper vessel", "A bigger bottle", "A winter vacation"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q73",
+                        prompt: "What is the most suitable graphical organizer for this story in class?",
+                        options: ["Cause–effect chain", "Periodic table", "World map", "Family tree of kings"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q74",
+                        prompt: "In the instruction 'water it regularly with your hands', the phrase teaches…",
+                        options: ["Ownership and consistency", "Magic rituals only", "Fear of tools", "Speed over care"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q75",
+                        prompt: "If one winter yields 0.75 L of dew on average, about how many winters to reach 5 L?",
+                        options: ["About 7", "About 3", "About 2", "About 12"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q76",
+                        prompt: "Which option shows a HEALTHY learning attitude from NEP’s perspective?",
+                        options: ["Reflecting on mistakes and improving", "Blaming others for failure", "Copying answers", "Quitting after one try"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q77",
+                        prompt: "What was the immediate reaction of Rama Natha when the test failed?",
+                        options: ["He accused the sage of cheating", "He laughed", "He thanked the sage", "He planted more trees"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q78",
+                        prompt: "Which line below could be PART of the sage’s 'magic words' lesson?",
+                        options: ["'Your hard work is the real spell.'", "'Copper loves dew.'", "'Coins grow on leaves.'", "'Bottles sing at dawn.'"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q79",
+                        prompt: "What does the story suggest about 'shortcuts' to success?",
+                        options: ["They often mislead us", "They always work", "They are faster and safer", "They need more money"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q80",
+                        prompt: "If a class activity reenacts the story, which role shows financial literacy?",
+                        options: ["Madhumati selling produce", "Rama Natha counting stars", "Sage carrying copper", "Neighbour telling jokes"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q81",
+                        prompt: "Which tool of assessment fits this story for competency‑based learning?",
+                        options: ["A real‑life problem task (grow a plant & record care)", "Only a spelling test", "Only a date quiz", "Only copy‑writing practice"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q82",
+                        prompt: "Complete: The sage’s plan turned Rama Natha from a dreamer into a ____.",
+                        options: ["doer", "dancer", "doctor", "driver"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q83",
+                        prompt: "Which sequence is correct?",
+                        options: ["Meet sage → plant bananas → collect dew → test on copper", "Collect dew → meet sage → plant bananas → test", "Test on copper → plant bananas → meet sage → collect dew", "Sell bananas → test copper → collect dew → meet sage"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q84",
+                        prompt: "Which is the best evidence that Rama Natha learned the lesson?",
+                        options: ["He worked even harder on the plantation later", "He bought a bigger bottle", "He travelled to the Himalayas again", "He hid the coins"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q85",
+                        prompt: "Choose the correct synonym for 'precious' as used by Rama Natha ('six precious years').",
+                        options: ["valuable", "angry", "dangerous", "tiring"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q86",
+                        prompt: "Which action MOST shows perseverance?",
+                        options: ["Collecting dew over many winters", "Waiting for a miracle", "Complaining daily", "Changing plans each week"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q87",
+                        prompt: "Why do you think the sage said 'Try it out' after muttering?",
+                        options: ["To let Rama Natha discover the truth himself", "To hide forever", "To scare him", "To waste more dew"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q88",
+                        prompt: "Which role of Madhumati is LEAST likely according to the story?",
+                        options: ["Discouraging sales", "Helping collect dew", "Selling bananas", "Bringing the coin box"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q89",
+                        prompt: "Which is an appropriate civic/ethical learning from the story?",
+                        options: ["Value honest work over magical claims", "Mock others’ beliefs", "Waste natural resources", "Hoard food items"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q90",
+                        prompt: "If you were Rama Natha’s friend, what guidance aligns with the story?",
+                        options: ["'Plan, work daily, and track progress.'", "'Buy magic first.'", "'Quit if it’s slow.'", "'Hide your efforts.'"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q91",
+                        prompt: "Which everyday practice connects to the lesson of the story?",
+                        options: ["Caring for a class plant regularly", "Waiting for marks to rise by luck", "Skipping homework for a charm", "Copying to finish fast"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q92",
+                        prompt: "Which sentence about the sage’s instruction is TRUE?",
+                        options: ["It encouraged self‑reliance and discipline", "It required expensive machines", "It demanded foreign seeds", "It was only about prayers"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q93",
+                        prompt: "Which economic idea fits the story?",
+                        options: ["Earnings come from producing and selling goods", "Money comes from chanting alone", "Markets give free gold", "Prices never change"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q94",
+                        prompt: "Which of these is a correct inference about the couple’s partnership?",
+                        options: ["Shared effort led to shared success", "They worked separately with no plan", "They argued daily about magic", "They closed the farm in winter"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q95",
+                        prompt: "Which sentence BEST sums up the sage’s teaching style?",
+                        options: ["Learning by doing and discovering", "Punishing without reason", "Giving everything ready‑made", "Telling jokes all day"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q96",
+                        prompt: "Identify the MOST suitable emotion Rama Natha felt when the copper did not change.",
+                        options: ["Anger and disappointment", "Joy and relief", "Amusement", "Pride"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q97",
+                        prompt: "What is the most appropriate use of the money earned?",
+                        options: ["Reinvesting in the plantation", "Buying fake potions", "Stopping all work", "Throwing a week‑long party"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q98",
+                        prompt: "Which classroom project mirrors the story’s spirit?",
+                        options: ["Tracking growth of a sapling with a care log", "Memorizing ten magic words", "Drawing gold coins only", "Watching TV shows on magic"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q99",
+                        prompt: "If dew collection averaged 0.5 L per winter, how many winters to reach 5 L?",
+                        options: ["10 winters", "2 winters", "5 winters", "12 winters"],
+                        correctIndex: 0
+                    },
+                    {
+                        id: "q100",
+                        prompt: "Which proverb matches the story’s message?",
+                        options: ["“No gains without pains.”", "“All that glitters is gold.”", "“Two heads are better than one.”", "“Every cloud has a silver lining.”"],
+                        correctIndex: 0
+                    }
+                ]
+            };
+            const blob = new Blob([JSON.stringify(quizData)], { type: "application/json" });
+            const dataURL = URL.createObjectURL(blob);
+            async function loadQuestions() { const r = await fetch(dataURL); return r.json(); }
+
+            /* ---------------------------
+               Elements & State
+               --------------------------- */
+            const $ = s => document.querySelector(s);
+            const stage = $("#stage");
+            const qtextEl = $("#qtext");
+            const optsEl = $("#opts");
+            const endEl = $("#end");
+            const scoreTitle = $("#scoreTitle");
+            const scoreLine = $("#scoreLine");
+
+            const btnSound = $("#btnSound");
+            const btnTTS = $("#btnTTS");
+            const iconSoundOn = $("#iconSoundOn"), iconSoundOff = $("#iconSoundOff");
+            const iconTTSOn = $("#iconTTSOn"), iconTTSOff = $("#iconTTSOff");
+
+            const state = { i: 0, score: 0, total: 0, order: [], ttsOn: true, soundOn: true, questions: [] };
+
+            /* ---------------------------
+               Utilities
+               --------------------------- */
+            /* Fisher–Yates shuffle for unbiased randomization. */ // :contentReference[oaicite:5]{index=5}
+            function shuffle(arr) {
+                for (let i = arr.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [arr[i], arr[j]] = [arr[j], arr[i]];
+                }
+                return arr;
+            }
+
+            function vibrate(ms = 20) { if (navigator.vibrate) navigator.vibrate(ms) }
+
+            /* Tiny synth beeps for feedback (no files) */
+            function blip(freq = 880, dur = 0.08, type = "sine") {
+                if (!state.soundOn) return;
+                const C = blip.ctx || (blip.ctx = new (window.AudioContext || window.webkitAudioContext)());
+                const o = C.createOscillator(), g = C.createGain();
+                o.type = type; o.frequency.value = freq; o.connect(g); g.connect(C.destination);
+                const t = C.currentTime;
+                g.gain.setValueAtTime(0.001, t);
+                g.gain.exponentialRampToValueAtTime(0.14, t + Math.min(dur * 0.35, .06));
+                g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+                o.start(t); o.stop(t + dur + .01);
+            }
+
+            /* Web Speech API narration (ON by default) */ // Web Speech API docs. :contentReference[oaicite:6]{index=6}
+            function speak(text) {
+                if (!state.ttsOn) return;
+                if (!("speechSynthesis" in window)) return;
+                const msg = new SpeechSynthesisUtterance(text);
+                msg.rate = 1.02; msg.pitch = 1.05;
+                try { speechSynthesis.cancel(); } catch (e) { }
+                speechSynthesis.speak(msg);
+            }
+
+            /* Decorative sparkles (outside text areas) */
+            function sparkleBurst(container, x, y, count = 18) {
+                const rect = container.getBoundingClientRect();
+                for (let i = 0; i < count; i++) {
+                    const s = document.createElement("i");
+                    s.className = "sparkle";
+                    s.style.position = "absolute";
+                    s.style.width = "10px"; s.style.height = "10px"; s.style.borderRadius = "50%";
+                    s.style.background = "radial-gradient(circle, #fff 0%, #ffe9a8 45%, rgba(255,255,255,0) 70%)";
+                    s.style.filter = "drop-shadow(0 0 10px #fff) drop-shadow(0 0 18px #ffd36b)";
+                    const dx = (Math.random() * 2 - 1) * 140, dy = (Math.random() * -1) * (60 + Math.random() * 120);
+                    s.style.left = (x - rect.left) + "px"; s.style.top = (y - rect.top) + "px";
+                    s.animate([
+                        { transform: "translate(0,0) scale(.6) rotate(0deg)", opacity: 0 },
+                        { opacity: 1, offset: .2 },
+                        { transform: `translate(${dx}px,${dy}px) scale(0) rotate(220deg)`, opacity: 0 }
+                    ], { duration: 900, easing: "cubic-bezier(.2,.6,.2,1)" });
+                    container.appendChild(s);
+                    setTimeout(() => s.remove(), 900);
+                }
+            }
+
+            /* ---------------------------
+               Quiz Flow
+               --------------------------- */
+            function buildOptions(question) {
+                // Build option objects with a "correct" flag, then shuffle.
+                const opts = question.options.map((t, idx) => ({ text: t, correct: idx === question.correctIndex }));
+                shuffle(opts); // unbiased shuffle for options. :contentReference[oaicite:7]{index=7}
+                optsEl.innerHTML = "";
+                opts.forEach((o, i) => {
+                    const b = document.createElement("button");
+                    b.className = "opt"; b.type = "button";
+                    b.innerHTML = `<em>${String.fromCharCode(65 + i)}</em><span>${o.text}</span>`;
+                    b.addEventListener("click", (ev) => onSelect(b, o.correct, ev));
+                    optsEl.appendChild(b);
+                });
+            }
+
+            function enterQuestion() {
+                const tl = gsap.timeline();
+                tl.fromTo(".qtext", { opacity: 0, y: 18, filter: "blur(10px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: .45, ease: "power2.out" })
+                    .fromTo(".opt", { y: 18, opacity: 0 }, { y: 0, opacity: 1, duration: .28, stagger: .05 }, "<+.05");
+            }
+
+            function showQuestion() {
+                const q = state.questions[state.order[state.i]];
+                qtextEl.textContent = q.prompt;
+                buildOptions(q);
+                enterQuestion();
+                speak(q.prompt);
+            }
+
+            function correctMagic(btn, ev) {
+                const x = (ev && ev.clientX) || (btn.getBoundingClientRect().left + btn.offsetWidth / 2);
+                const y = (ev && ev.clientY) || (btn.getBoundingClientRect().top + btn.offsetHeight / 2);
+                sparkleBurst(document.body, x, y, 24);
+                confetti({ particleCount: 100, spread: 72, scalar: .9, origin: { y: 0.7 } }); // tsParticles confetti
+                const tl = gsap.timeline({ defaults: { ease: "power2.out" } }); // GSAP timeline. :contentReference[oaicite:8]{index=8}
+                tl.to(btn, { scale: 1.04, duration: .18 })
+                    .to(".opt:not(.correct)", { y: 20, opacity: 0, duration: .22 }, "<")
+                    .to(".qtext", { opacity: 0, y: -12, filter: "blur(6px)", duration: .26 }, "<")
+                    .add(() => next(), "+=.02");
+            }
+
+            function onSelect(button, isCorrect, ev) {
+                // prevent double clicks
+                [...document.querySelectorAll(".opt")].forEach(b => b.disabled = true);
+                if (isCorrect) {
+                    state.score++;
+                    button.classList.add("correct");
+                    blip(880, .07, "square"); vibrate(18);
+                    correctMagic(button, ev);
+                } else {
+                    button.classList.add("wrong");
+                    blip(220, .12, "sawtooth"); vibrate(28);
+                    gsap.to(button, { x: 0, keyframes: [{ x: -8 }, { x: 8 }, { x: -6 }, { x: 6 }, { x: 0 }], duration: .42, ease: "sine.inOut" });
+                    setTimeout(next, 900);
+                }
+            }
+
+            function next() {
+                state.i++;
+                if (state.i >= state.total) { finish(); return; }
+                showQuestion();
+            }
+
+            function finish() {
+                // Show total score and auto-close after a moment
+                scoreTitle.textContent = (state.score === state.total) ? "You bottled all the dew! 🌟" : "Nice run! ✨";
+                scoreLine.textContent = `You scored ${state.score} / ${state.total}`;
+                endEl.classList.add("show");
+                speak(scoreLine.textContent);
+                confetti({ particleCount: 220, spread: 88, scalar: 1.05, origin: { y: 0.7 } });
+
+                // Auto‑close the quiz after 3 seconds: fade the whole stage out
+                setTimeout(() => {
+                    gsap.to("#stage", {
+                        opacity: 0, scale: .98, filter: "blur(6px)", duration: .45, ease: "power2.out",
+                        onComplete: () => { document.getElementById("stage").style.display = "none"; }
+                    });
+                }, 3000);
+            }
+
+            /* ---------------------------
+               HUD toggles (corners)
+               --------------------------- */
+            btnSound.addEventListener("click", () => {
+                state.soundOn = !state.soundOn;
+                btnSound.classList.toggle("off", !state.soundOn);
+                btnSound.setAttribute("aria-pressed", String(state.soundOn));
+                iconSoundOn.style.display = state.soundOn ? "" : "none";
+                iconSoundOff.style.display = state.soundOn ? "none" : "";
+                if (state.soundOn) blip(600, .05, "triangle");
+            });
+
+            btnTTS.addEventListener("click", () => {
+                state.ttsOn = !state.ttsOn;
+                btnTTS.classList.toggle("off", !state.ttsOn);
+                btnTTS.setAttribute("aria-pressed", String(state.ttsOn));
+                iconTTSOn.style.display = state.ttsOn ? "" : "none";
+                iconTTSOff.style.display = state.ttsOn ? "none" : "";
+                if (!state.ttsOn && "speechSynthesis" in window) speechSynthesis.cancel();
+            });
+
+            /* ---------------------------
+               Draggable decorative orbs (kept to corners, away from text)
+               --------------------------- */
+            function enableDrags() {
+                if (!window.Draggable) return; // GSAP Draggable plugin. :contentReference[oaicite:9]{index=9}
+                ["#orb1", "#orb2"].forEach(sel => {
+                    const el = document.querySelector(sel);
+                    Draggable.create(el, {
+                        type: "x,y", inertia: false,
+                        bounds: { minX: 0, minY: 0, maxX: window.innerWidth - el.offsetWidth, maxY: window.innerHeight - el.offsetHeight },
+                        onPress() { this.target.style.cursor = "grabbing"; },
+                        onRelease() { this.target.style.cursor = "grab"; blip(600, .05, "triangle"); }
+                    });
+                    // idle float (subtle)
+                    gsap.to(el, { y: -8, rotation: -2, yoyo: true, repeat: -1, duration: 1.8, ease: "sine.inOut" });
+                });
+            }
+
+            /* ---------------------------
+               Start
+               --------------------------- */
+            document.addEventListener("DOMContentLoaded", async () => {
+                enableDrags();
+                const data = await loadQuestions();
+                // Randomize question order (Fisher–Yates) and reset state. :contentReference[oaicite:10]{index=10}
+                state.questions = data.questions;
+                state.total = data.questions.length;
+                state.order = shuffle([...Array(state.total).keys()]);
+                state.i = 0; state.score = 0;
+                showQuestion();
+            });
+        </script>
+    </body>
+
+</html>
