@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no" />
+        <title>SoulCanvas</title>
+        <style>
+            :root {
+                --bg: #0c0c0c;
+                --panel: rgba(255, 255, 255, 0.06);
+                --panel-border: rgba(255, 255, 255, 0.10);
+                --text: #e9e9e9;
+                --muted: #bdbdbd;
+                --focus: #6ee7ff;
+                --btn-hover: rgba(255, 255, 255, 0.14);
+            }
+
+            html,
+            body {
+                height: 100%;
+                margin: 0;
+                background: var(--bg);
+                color: var(--text);
+                font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+            }
+
+            /* Fullscreen drawing surface */
+            canvas#soul {
+                position: fixed;
+                inset: 0;
+                width: 100vw;
+                height: 100vh;
+                /* Keep user gestures from scrolling/zooming while drawing on touch devices */
+                touch-action: none;
+                /* see notes */
+                display: block;
+                background: var(--bg);
+                cursor: crosshair;
+                /* Prevent long-press callouts on iOS */
+                -webkit-touch-callout: none;
+                user-select: none;
+            }
+
+            /* Controls */
+            .ui {
+                position: fixed;
+                top: 12px;
+                left: 12px;
+                display: flex;
+                gap: 8px;
+                z-index: 5;
+                background: var(--panel);
+                border: 1px solid var(--panel-border);
+                border-radius: 12px;
+                padding: 10px;
+                backdrop-filter: blur(8px);
+                -webkit-backdrop-filter: blur(8px);
+            }
+
+            .ui button {
+                appearance: none;
+                border: 1px solid var(--panel-border);
+                background: transparent;
+                color: var(--text);
+                padding: 8px 12px;
+                border-radius: 10px;
+                font-size: 14px;
+                letter-spacing: .2px;
+                transition: background .15s ease, border-color .15s ease;
+            }
+
+            .ui button:hover {
+                background: var(--btn-hover);
+            }
+
+            .ui button:focus-visible {
+                outline: 2px solid var(--focus);
+                outline-offset: 2px;
+            }
+
+            .status {
+                align-self: center;
+                color: var(--muted);
+                font-size: 12px;
+                padding-left: 6px;
+            }
+
+            /* About modal */
+            .modal {
+                position: fixed;
+                inset: 0;
+                display: none;
+                /* toggled via JS */
+                place-items: center;
+                background: rgba(0, 0, 0, 0.40);
+                z-index: 10;
+                padding: 24px;
+            }
+
+            .modal[open] {
+                display: grid;
+            }
+
+            .modal .card {
+                width: min(560px, 92vw);
+                background: var(--panel);
+                border: 1px solid var(--panel-border);
+                border-radius: 16px;
+                padding: 20px 18px;
+                box-shadow: 0 10px 40px rgba(0, 0, 0, .35);
+            }
+
+            .modal h2 {
+                margin: 0 0 6px 0;
+                font-weight: 600;
+            }
+
+            .modal p {
+                margin: 6px 0;
+                color: var(--muted);
+                line-height: 1.5;
+            }
+
+            .modal .row {
+                display: flex;
+                justify-content: space-between;
+                gap: 12px;
+                margin-top: 12px;
+            }
+
+            .modal .row button {
+                flex: 0 0 auto;
+            }
+
+            /* Hide audio controls by default (we control playback via the button) */
+            audio#ambient {
+                display: none;
+            }
+        </style>
+    </head>
+
+    <body>
+        <canvas id="soul" aria-label="SoulCanvas drawing surface"></canvas>
+
+        <div class="ui" role="toolbar" aria-label="SoulCanvas controls">
+            <button id="clearBtn" type="button" title="Clear the canvas (C)">Clear Canvas</button>
+            <button id="musicBtn" type="button" title="Toggle ambient loop (M)">Music: Off</button>
+            <button id="aboutBtn" type="button" title="About SoulCanvas">About</button>
+            <span class="status" id="status" aria-live="polite"></span>
+        </div>
+
+        <dialog class="modal" id="aboutModal" aria-labelledby="aboutTitle">
+            <div class="card">
+                <div class="row">
+                    <h2 id="aboutTitle">About — SoulCanvas</h2>
+                    <button id="closeAbout" type="button">Close</button>
+                </div>
+                <p>Draw feelings as color. Every mark gently fades. Nothing is stored or sent anywhere.</p>
+                <p>Tips: drag slowly for thick, glowing strokes; move quickly for fine wisps. Use “Music” to play a soft loop. “Clear” resets the canvas.</p>
+                <p style="font-size:12px;opacity:.9">Accessibility: the canvas disables default touch gestures while drawing so your strokes aren’t interpreted as scroll/zoom. You can still zoom the page from the browser UI.</p>
+            </div>
+        </dialog>
+
+        <!-- Provide your own small, seamless ambient loop. Controls hidden by default. -->
+        <audio id="ambient" preload="auto" loop src="ambient.mp3" crossorigin="anonymous"></audio>
+
+        <script>
+            (() => {
+                const canvas = document.getElementById('soul');
+                const ctx = canvas.getContext('2d', { alpha: true, desynchronized: true }); // desynchronized hints lower latency when supported
+                const statusEl = document.getElementById('status');
+
+                // --- Sizing for HiDPI/retina displays ---------------------------------
+                function resizeCanvas() {
+                    const dpr = Math.max(1, window.devicePixelRatio || 1);
+                    const cssW = Math.floor(window.innerWidth);
+                    const cssH = Math.floor(window.innerHeight);
+
+                    // Set backing store to DPR-scaled size, then scale the context so all drawing
+                    // continues in CSS pixels. This keeps lines crisp on high‑resolution displays.
+                    canvas.width = Math.floor(cssW * dpr);
+                    canvas.height = Math.floor(cssH * dpr);
+                    canvas.style.width = cssW + 'px';
+                    canvas.style.height = cssH + 'px';
+                    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+                    // Fill to our dark base color (also ensures a clean slate on resize)
+                    ctx.fillStyle = '#0c0c0c';
+                    ctx.fillRect(0, 0, cssW, cssH);
+                }
+                resizeCanvas();
+                window.addEventListener('resize', resizeCanvas);
+
+                // --- Brush + timing parameters -----------------------------------------
+                const MAX_THICK = 8;   // px at slowest speeds
+                const MIN_THICK = 1;   // px at fastest speeds
+                const MAX_SPEED = 1.5; // px/ms -> clamp >= this is MIN_THICK
+
+                // Fade: time (ms) to ~fully disappear (≈1% of original intensity).
+                const DECAY_MS = 8000;
+                const TARGET_REMAINING = 0.01; // after DECAY_MS, intensity ≈ 1%
+                // We compute a per-frame alpha to blend the background over old pixels.
+                // For a frame delta 'dt', we pick 'a' so the remaining fraction equals:
+                //   (1 - a) = TARGET_REMAINING^(dt / DECAY_MS)
+                // => a = 1 - TARGET_REMAINING^(dt / DECAY_MS)
+                function fadeAlphaForDt(dt) {
+                    const a = 1 - Math.pow(TARGET_REMAINING, dt / DECAY_MS);
+                    // Clamp numerically to [0, 1]
+                    return a < 0 ? 0 : a > 1 ? 1 : a;
+                }
+
+                // Map pointer speed (px/ms) to thickness [MIN_THICK .. MAX_THICK]
+                function thicknessForSpeed(speed) {
+                    const t = Math.min(Math.max(speed / MAX_SPEED, 0), 1); // 0..1
+                    return MAX_THICK - (MAX_THICK - MIN_THICK) * t;
+                }
+
+                // Current pointer state (single pointer drawing at a time for simplicity)
+                let isDrawing = false;
+                let pointerId = null;
+                let last = null; // {x, y, t, speed, w}
+                let nextPoint = null; // latest pointer position captured by events
+                let rafId = 0;
+                let lastFrameT = performance.now();
+
+                // --- Main animation loop: handles fading + draws the queued segment ----
+                function tick(now) {
+                    const dt = Math.max(0, now - lastFrameT);
+                    lastFrameT = now;
+
+                    // 1) Fade: alpha blend a translucent background over the whole canvas.
+                    // This is *exponential* decay in time, independent of frame rate.
+                    // The color we blend is the dark base (0c0c0c); per-pixel result is:
+                    //   new = (1 - a) * old + a * bg
+                    // After ~8 seconds, remaining intensity ≈ 1% of original.
+                    const a = fadeAlphaForDt(dt);
+                    ctx.fillStyle = `rgba(12,12,12,${a})`;
+                    ctx.globalCompositeOperation = 'source-over';
+                    ctx.fillRect(0, 0, canvas.clientWidth, canvas.clientHeight);
+
+                    // 2) Draw latest pending segment (pointer events are throttled to RAF)
+                    if (isDrawing && last && nextPoint) {
+                        drawSegment(last, nextPoint, now);
+                        last = nextPoint;
+                        nextPoint = null;
+                    }
+
+                    rafId = requestAnimationFrame(tick);
+                }
+                rafId = requestAnimationFrame(tick);
+
+                // --- Stroke drawing -----------------------------------------------------
+                // We stamp a small radial-gradient "dab" along the segment. The dab radius
+                // comes from speed -> thickness mapping. Dabs overlap for a soft gradient trail.
+                function drawSegment(p0, p1, now) {
+                    const dx = p1.x - p0.x;
+                    const dy = p1.y - p0.y;
+                    const dist = Math.hypot(dx, dy);
+                    if (dist === 0) return;
+
+                    const dt = Math.max(1, p1.t - p0.t);        // ms
+                    const speed0 = p0.speed ?? (dist / dt);     // px/ms (approx for first sample)
+                    const speed1 = p1.speed ?? speed0;
+
+                    const w0 = thicknessForSpeed(speed0);
+                    const w1 = thicknessForSpeed(speed1);
+
+                    // Step size proportional to local thickness so thin strokes use smaller spacing
+                    const avgW = (w0 + w1) * 0.5;
+                    const step = Math.max(0.35, avgW * 0.5); // pixels between dabs
+
+                    const steps = Math.max(1, Math.ceil(dist / step));
+                    const hue = ((now % 10000) / 10000) * 360; // HSL hue rotation every 10s
+
+                    for (let i = 0; i <= steps; i++) {
+                        const t = i / steps;
+                        const x = p0.x + dx * t;
+                        const y = p0.y + dy * t;
+                        // Linear interpolation of thickness across the segment
+                        const w = w0 + (w1 - w0) * t;
+                        const r = w * 0.5;
+
+                        // Build a radial gradient that fades to transparent at the edges.
+                        const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+                        // Center = full color (opaque); Edge = 0 alpha → soft edge.
+                        g.addColorStop(0, `hsla(${hue}, 100%, 60%, 1)`);
+                        g.addColorStop(1, `hsla(${hue}, 100%, 60%, 0)`);
+
+                        ctx.fillStyle = g;
+                        // Fill a small rect around the dab. Using a rect is slightly faster
+                        // than arc+fill for many tiny stamps.
+                        ctx.fillRect(x - r, y - r, r * 2, r * 2);
+                    }
+                }
+
+                // --- Pointer handling (touch, pen, mouse via Pointer Events) -----------
+                function pointerToPoint(e) {
+                    return { x: e.clientX, y: e.clientY, t: performance.now() };
+                }
+
+                canvas.addEventListener('pointerdown', (e) => {
+                    // Prevent browsers from interpreting the drag as scroll/zoom.
+                    e.preventDefault();
+                    isDrawing = true;
+                    pointerId = e.pointerId;
+                    canvas.setPointerCapture(pointerId);
+                    const p = pointerToPoint(e);
+                    // Initialize with zero speed so first segment starts thick; it will taper quickly.
+                    last = { ...p, speed: 0, w: MAX_THICK };
+                    nextPoint = null;
+                }, { passive: false });
+
+                canvas.addEventListener('pointermove', (e) => {
+                    if (!isDrawing || e.pointerId !== pointerId) return;
+                    e.preventDefault();
+                    const p = pointerToPoint(e);
+                    // Estimate speed from last point for thickness tapering
+                    const dx = p.x - last.x;
+                    const dy = p.y - last.y;
+                    const dist = Math.hypot(dx, dy);
+                    const dt = Math.max(1, p.t - last.t);
+                    p.speed = dist / dt;
+                    nextPoint = p; // throttled: the RAF loop will consume the latest point
+                }, { passive: false });
+
+                function endStroke(e) {
+                    if (e && e.pointerId !== pointerId) return;
+                    isDrawing = false;
+                    nextPoint = null;
+                    if (pointerId != null) {
+                        try { canvas.releasePointerCapture(pointerId); } catch { }
+                    }
+                    pointerId = null;
+                }
+                canvas.addEventListener('pointerup', endStroke, { passive: true });
+                canvas.addEventListener('pointercancel', endStroke, { passive: true });
+                canvas.addEventListener('pointerout', endStroke, { passive: true });
+
+                // --- UI wiring ----------------------------------------------------------
+                const clearBtn = document.getElementById('clearBtn');
+                const musicBtn = document.getElementById('musicBtn');
+                const aboutBtn = document.getElementById('aboutBtn');
+                const aboutModal = document.getElementById('aboutModal');
+                const closeAbout = document.getElementById('closeAbout');
+                const audio = document.getElementById('ambient');
+
+                clearBtn.addEventListener('click', () => {
+                    // Immediate clear to base color; also resets any lingering gradient fragments.
+                    ctx.fillStyle = '#0c0c0c';
+                    ctx.fillRect(0, 0, canvas.clientWidth, canvas.clientHeight);
+                    statusEl.textContent = 'Canvas cleared';
+                    setTimeout(() => (statusEl.textContent = ''), 1200);
+                });
+
+                function updateMusicLabel() {
+                    musicBtn.textContent = audio.paused ? 'Music: Off' : 'Music: On';
+                }
+                musicBtn.addEventListener('click', async () => {
+                    try {
+                        if (audio.paused) {
+                            await audio.play(); // requires user gesture (this click)
+                        } else {
+                            audio.pause();
+                        }
+                    } catch (err) {
+                        console.warn('Audio play failed (likely autoplay policy):', err);
+                    } finally {
+                        updateMusicLabel();
+                    }
+                });
+                updateMusicLabel();
+
+                aboutBtn.addEventListener('click', () => aboutModal.setAttribute('open', ''));
+                closeAbout.addEventListener('click', () => aboutModal.removeAttribute('open'));
+                aboutModal.addEventListener('click', (e) => {
+                    if (e.target === aboutModal) aboutModal.removeAttribute('open');
+                });
+
+                // Keyboard shortcuts
+                window.addEventListener('keydown', (e) => {
+                    if (e.key === 'c' || e.key === 'C') clearBtn.click();
+                    if (e.key === 'm' || e.key === 'M') musicBtn.click();
+                    if (e.key === 'Escape') aboutModal.removeAttribute('open');
+                });
+
+                // Cleanups: free audio and cancel RAF on unload to avoid leaks.
+                window.addEventListener('beforeunload', () => {
+                    cancelAnimationFrame(rafId);
+                    audio.pause();
+                    // Optional: release decoder
+                    // audio.src = '';
+                }, { once: true });
+            })();
+        </script>
+    </body>
+
+</html>

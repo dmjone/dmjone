@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Pulse</title>
+        <style>
+            :root {
+                /* Start = calm blue (#3498db ≈ hsl(204 70% 53%)) */
+                --pulse-hue: 204;
+                --pulse-sat: 70%;
+                --pulse-light: 53%;
+                --glow-outer: 40px;
+                --glow-inner: 12px;
+            }
+
+            * {
+                box-sizing: border-box;
+            }
+
+            html,
+            body {
+                height: 100%;
+                margin: 0;
+            }
+
+            body {
+                display: grid;
+                place-items: center;
+                /* centers both axes */
+                font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+                background:
+                    radial-gradient(90vmin 90vmin at 50% 50%,
+                        hsl(var(--pulse-hue) var(--pulse-sat) 92% / .25),
+                        transparent 60%) #0b1020;
+                color: #fff;
+            }
+
+            .container {
+                display: grid;
+                place-items: center;
+                gap: 1rem;
+            }
+
+            /* The pulse “orb” is just a button for accessibility */
+            .pulse {
+                width: min(56vmin, 18rem);
+                aspect-ratio: 1 / 1;
+                border-radius: 50%;
+                border: 0;
+                cursor: pointer;
+                position: relative;
+                isolation: isolate;
+                /* contains ripples */
+                background: hsl(var(--pulse-hue) var(--pulse-sat) var(--pulse-light));
+                box-shadow:
+                    0 0 var(--glow-inner) hsl(var(--pulse-hue) var(--pulse-sat) 70% / .7),
+                    0 0 var(--glow-outer) hsl(var(--pulse-hue) var(--pulse-sat) 55% / .45);
+                transition: box-shadow 240ms ease, transform 100ms ease;
+            }
+
+            .pulse:active {
+                transform: scale(.985);
+            }
+
+            .pulse:focus-visible {
+                outline: 4px solid hsl(var(--pulse-hue) var(--pulse-sat) 95% / .9);
+                outline-offset: 4px;
+            }
+
+            /* Tiny overlay text */
+            .pulse-label {
+                position: absolute;
+                inset: 0;
+                display: grid;
+                place-items: center;
+                font-size: clamp(.75rem, 2.8vmin, 1rem);
+                letter-spacing: .02em;
+                text-transform: lowercase;
+                mix-blend-mode: screen;
+                pointer-events: none;
+                z-index: 2;
+                opacity: .95;
+            }
+
+            /* One ripple per click */
+            .ripple {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 60%;
+                height: 60%;
+                transform: translate(-50%, -50%) scale(1);
+                border-radius: 50%;
+                background:
+                    radial-gradient(circle,
+                        hsl(var(--pulse-hue) var(--pulse-sat) 88% / .35) 0%,
+                        hsl(var(--pulse-hue) var(--pulse-sat) 70% / .20) 40%,
+                        transparent 60%);
+                pointer-events: none;
+                z-index: 1;
+                animation: ripple 1200ms cubic-bezier(.2, .8, .2, 1) forwards;
+            }
+
+            /* Scale + opacity fade */
+            @keyframes ripple {
+                from {
+                    transform: translate(-50%, -50%) scale(1);
+                    opacity: .7;
+                    filter: blur(.5px);
+                }
+
+                to {
+                    transform: translate(-50%, -50%) scale(var(--scale, 2.5));
+                    opacity: 0;
+                    filter: blur(1px);
+                }
+            }
+
+            /* Visually hidden utility (for live region) */
+            .sr-only {
+                position: absolute !important;
+                width: 1px;
+                height: 1px;
+                padding: 0;
+                margin: -1px;
+                overflow: hidden;
+                clip: rect(0, 0, 0, 0);
+                white-space: nowrap;
+                border: 0;
+            }
+
+            /* Respect motion sensitivity */
+            @media (prefers-reduced-motion: reduce) {
+                .ripple {
+                    animation: none;
+                    display: none;
+                }
+
+                .pulse {
+                    transition: none;
+                }
+            }
+
+            .footer-note {
+                font-size: .8rem;
+                opacity: .65;
+            }
+        </style>
+    </head>
+
+    <body>
+        <main class="container">
+            <button class="pulse" id="pulse" aria-describedby="wave-live">
+                <span class="pulse-label" id="label">energy wave # 0</span>
+            </button>
+            <p class="footer-note" id="status"></p>
+            <!-- Announce updates to assistive tech without cluttering the UI -->
+            <span id="wave-live" class="sr-only" aria-live="polite"></span>
+        </main>
+
+        <script>
+            (() => {
+                /* ---------------- Configuration ---------------- */
+                const START = { hue: 204, sat: 70, light: 53 }; // calm blue (#3498db)
+                // Key hue stops for blue → purple → pink → gold
+                const TARGETS = [
+                    { stop: 0.00, hue: 204 }, // blue
+                    { stop: 0.33, hue: 270 }, // purple
+                    { stop: 0.66, hue: 330 }, // pink
+                    { stop: 1.00, hue: 405 }  // gold (45 + 360 so we sweep forward through the wheel)
+                ];
+                const IDLE_MS = 10000; // 10s until passive return begins
+                const RETURN_MS = 2500;  // duration of the “drift back to blue”
+                const STEP = 0.12;  // intensity gain per click (clamped to 1)
+
+                /* ---------------- State (in-memory only) ---------------- */
+                let clickCount = 0;
+                let intensity = 0;      // 0..1
+                let idleTimer = null;
+                let decayRAF = null;
+
+                /* ---------------- Elements ---------------- */
+                const root = document.documentElement;
+                const pulse = document.getElementById('pulse');
+                const label = document.getElementById('label');
+                const live = document.getElementById('wave-live');
+                const status = document.getElementById('status');
+
+                /* ---------------- Utilities ---------------- */
+                function normHue(h) { return ((h % 360) + 360) % 360; }
+                function setHue(h) { root.style.setProperty('--pulse-hue', normHue(h)); }
+
+                function hueAtIntensity(t) {
+                    if (t <= 0) return START.hue;
+                    if (t >= 1) return TARGETS[TARGETS.length - 1].hue;
+                    let i = 0;
+                    while (i < TARGETS.length - 1 && t > TARGETS[i + 1].stop) i++;
+                    const a = TARGETS[i], b = TARGETS[i + 1];
+                    const lt = (t - a.stop) / (b.stop - a.stop);
+                    return a.hue + (b.hue - a.hue) * lt;
+                }
+
+                function updateGlow() {
+                    // glow grows with intensity
+                    const outer = 40 + intensity * 30;
+                    const inner = 12 + intensity * 12;
+                    root.style.setProperty('--glow-outer', `${outer}px`);
+                    root.style.setProperty('--glow-inner', `${inner}px`);
+                    // brighten a touch as intensity rises
+                    root.style.setProperty('--pulse-light', `${START.light + intensity * 10}%`);
+                }
+
+                function emitRipple() {
+                    const span = document.createElement('span');
+                    span.className = 'ripple';
+                    const scale = 2.5 + intensity * 1.5; // stronger ripple each click
+                    span.style.setProperty('--scale', scale);
+                    pulse.appendChild(span);
+                    span.addEventListener('animationend', () => span.remove(), { once: true });
+                }
+
+                function scheduleIdle() {
+                    if (idleTimer) clearTimeout(idleTimer);
+                    idleTimer = setTimeout(beginReturnToBlue, IDLE_MS);
+                }
+
+                function beginReturnToBlue() {
+                    const startIntensity = intensity;
+                    const t0 = performance.now();
+                    if (decayRAF) cancelAnimationFrame(decayRAF);
+
+                    function frame(t) {
+                        const p = Math.min(1, (t - t0) / RETURN_MS);
+                        // easeOutCubic: fast start, gentle landing
+                        const eased = 1 - Math.pow(1 - p, 3);
+                        intensity = startIntensity * (1 - eased);
+                        setHue(hueAtIntensity(intensity));
+                        updateGlow();
+                        if (p < 1) decayRAF = requestAnimationFrame(frame);
+                        else decayRAF = null;
+                    }
+                    decayRAF = requestAnimationFrame(frame);
+                }
+
+                /* ---------------- Interaction ---------------- */
+                function onActivate() {
+                    clickCount++;
+                    intensity = Math.min(1, intensity + STEP);
+                    const hue = hueAtIntensity(intensity);
+                    setHue(hue);
+                    updateGlow();
+                    emitRipple();
+
+                    const text = `energy wave # ${clickCount}`;
+                    label.textContent = text;
+                    live.textContent = text; // announce to AT politely
+
+                    if (decayRAF) cancelAnimationFrame(decayRAF), (decayRAF = null);
+                    scheduleIdle();
+
+                    status.textContent =
+                        `intensity ${intensity.toFixed(2)} • hue ${normHue(hue).toFixed(0)}°`;
+                }
+
+                pulse.addEventListener('click', onActivate);
+                pulse.addEventListener('keydown', (e) => {
+                    if (e.code === 'Space' || e.code === 'Enter') { e.preventDefault(); onActivate(); }
+                });
+
+                /* Init */
+                setHue(START.hue);
+                scheduleIdle();
+
+                /* ---------------- Optional GSAP hook (commented) ----------------
+                // If you ever swap the CSS ripple for GSAP, you'd do something like:
+                // gsap.fromTo(rippleEl, { scale: 1, autoAlpha: 0.7 },
+                //   { scale: scale, autoAlpha: 0, duration: 1.2, ease: "power1.out" });
+                // (GSAP’s default ease is "power1.out", a good UI-friendly ease-out.) 
+                // See GSAP easing docs for options. 
+                ----------------------------------------------------------------- */
+                /* ---------------- Future Web Audio API (commented) ---------------
+                // Goal: ping a short tone per click, mapping frequency to intensity.
+                // let audioCtx;
+                // function pingTone(){
+                //   if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                //   const osc = audioCtx.createOscillator();
+                //   const gain = audioCtx.createGain();
+                //   const freq = 220 + intensity * 660; // 220–880 Hz
+                //   osc.type = 'sine'; osc.frequency.value = freq;
+                //   gain.gain.setValueAtTime(0, audioCtx.currentTime);
+                //   gain.gain.linearRampToValueAtTime(0.2, audioCtx.currentTime + 0.02);
+                //   gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.35);
+                //   osc.connect(gain).connect(audioCtx.destination);
+                //   osc.start(); osc.stop(audioCtx.currentTime + 0.4);
+                // }
+                // Then call pingTone() inside onActivate().
+                ------------------------------------------------------------------ */
+            })();
+        </script>
+    </body>
+
+</html>

@@ -1,0 +1,751 @@
+<!doctype html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+        <title>WaveJar</title>
+        <meta name="description" content="Write an emotion, seal it in a glass jar, and watch it drift into the twilight sea." />
+        <meta name="color-scheme" content="dark light" />
+        <!-- GSAP (pinned version for stability). See GSAP install docs/CDN options. -->
+        <!-- Docs: https://gsap.com/docs/v3/Installation/ ; CDN dir for 3.13.0 on jsDelivr -->
+        <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js" defer></script>
+
+        <style>
+            /* ============ THEME & TOKENS ============ */
+            :root {
+                /* Twilight gradient (top → bottom) */
+                --twilight-top: #1a2a44;
+                --twilight-bottom: #0d1f33;
+
+                /* Soft light accents for highlights and glows */
+                --accent-1: #8fb7ff;
+                --accent-2: #b7e2ff;
+
+                /* Jar tint system — swap hues by changing these.
+         See "Multiple jar colors" notes below. */
+                --jar-glass-tint: 210 46% 76%;
+                /* HSL tint for glass reflection */
+                --jar-lid: #c8d2e5;
+                --jar-stroke: rgba(255, 255, 255, .35);
+
+                /* Typography & layout */
+                --font: system-ui, ui-sans-serif, Segoe UI, Roboto, Helvetica, Arial, Apple Color Emoji, Segoe UI Emoji;
+                --radius: 14px;
+                --text: #eff6ff;
+                --muted: #c7d2fe;
+
+                /* Motion tuning */
+                --float-amplitude: 8px;
+                --float-speed: 2.6s;
+
+                /* Timing (total UX flow ~20s as requested) */
+                --t-drop: 2.2s;
+                /* text → scroll & drop into jar */
+                --t-seal: 1.2s;
+                /* lid closes */
+                --t-drift: 6.0s;
+                /* initial ocean drift */
+                --t-sail: 8.6s;
+                /* sail to horizon & fade */
+                /* (sum ≈ 20s) */
+            }
+
+            @media (prefers-reduced-motion: reduce) {
+                :root {
+                    --float-amplitude: 0px;
+                    /* eliminate bobbing */
+                    --float-speed: 0s;
+                    --t-drop: 0.01s;
+                    --t-seal: 0.01s;
+                    --t-drift: 0.01s;
+                    --t-sail: 0.02s;
+                }
+
+                .reduce-motion-hide {
+                    display: none !important;
+                }
+            }
+
+            /* ============ LAYOUT ============ */
+            * {
+                box-sizing: border-box;
+            }
+
+            html,
+            body {
+                height: 100%;
+                margin: 0;
+                background: linear-gradient(180deg, var(--twilight-top), var(--twilight-bottom));
+                color: var(--text);
+                font-family: var(--font);
+            }
+
+            .app {
+                display: grid;
+                grid-template-rows: auto 1fr;
+                min-height: 100svh;
+                position: relative;
+                overflow: hidden;
+            }
+
+            header {
+                padding: 16px clamp(16px, 4vw, 28px);
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                justify-content: space-between;
+            }
+
+            header h1 {
+                font-size: clamp(1.05rem, 2.2vw, 1.25rem);
+                letter-spacing: 0.12em;
+                text-transform: uppercase;
+                margin: 0;
+                color: var(--muted);
+            }
+
+            /* Scene container (SVG fills it) */
+            .scene {
+                position: relative;
+                isolation: isolate;
+                /* allows stacking contexts for "glass over scroll" effects */
+                width: 100%;
+                height: 100%;
+                min-height: 520px;
+            }
+
+            svg#oceanScene {
+                display: block;
+                width: 100%;
+                height: 100%;
+            }
+
+            /* Controls (mobile-first, bottom overlay) */
+            .controls {
+                position: absolute;
+                inset: auto 0 0 0;
+                padding: 12px clamp(12px, 3vw, 20px) max(12px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom));
+                display: grid;
+                grid-template-columns: 1fr auto auto;
+                gap: 8px;
+                align-items: center;
+                z-index: 10;
+                /* above SVG */
+                background: linear-gradient(180deg, transparent, rgba(4, 8, 14, .46) 30%, rgba(4, 8, 14, .8));
+                backdrop-filter: blur(8px);
+            }
+
+            .field {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                width: 100%;
+            }
+
+            .field input[type="text"] {
+                appearance: none;
+                width: 100%;
+                line-height: 1;
+                font-size: 16px;
+                padding: 14px 12px;
+                color: #e6f0ff;
+                background: rgba(255, 255, 255, .06);
+                border: 1px solid rgba(255, 255, 255, .15);
+                border-radius: var(--radius);
+                outline: none;
+                transition: border-color .2s ease, background .2s ease, box-shadow .2s ease;
+            }
+
+            .field input[type="text"]::placeholder {
+                color: rgba(222, 235, 255, .6);
+            }
+
+            .field input[type="text"]:focus {
+                border-color: rgba(173, 216, 255, .7);
+                box-shadow: 0 0 0 6px rgba(137, 180, 255, .08);
+            }
+
+            .btn {
+                appearance: none;
+                cursor: pointer;
+                border: 0;
+                font-weight: 600;
+                white-space: nowrap;
+                padding: 14px 14px;
+                border-radius: var(--radius);
+                color: #062444;
+                background: linear-gradient(180deg, #aee1ff, #7cc6ff);
+                box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .6), 0 6px 24px rgba(34, 84, 140, .35);
+                transition: transform .12s ease, filter .12s ease, opacity .2s ease;
+            }
+
+            .btn:active {
+                transform: translateY(1px);
+            }
+
+            .btn[disabled] {
+                opacity: .5;
+                cursor: not-allowed;
+            }
+
+            .ghost {
+                background: transparent;
+                color: #d6e6ff;
+                border: 1px solid rgba(255, 255, 255, .2);
+                box-shadow: none;
+            }
+
+            .ghost[aria-pressed="true"] {
+                background: rgba(255, 255, 255, .08);
+            }
+
+            /* Completion toast */
+            .toast {
+                position: absolute;
+                left: 50%;
+                bottom: clamp(76px, 20svh, 36%);
+                translate: -50% 0;
+                z-index: 20;
+                background: radial-gradient(120% 160% at 50% 0%, rgba(148, 197, 255, .16), rgba(8, 14, 24, .78));
+                border: 1px solid rgba(255, 255, 255, .14);
+                backdrop-filter: blur(10px);
+                padding: 14px 16px;
+                border-radius: 999px;
+                display: none;
+                align-items: center;
+                gap: 10px;
+                white-space: nowrap;
+            }
+
+            .toast[data-show="true"] {
+                display: inline-flex;
+            }
+
+            /* ============ SVG: WAVES, JAR, SCROLL ============ */
+            /* Gentle wave shimmer (very light; CPU/GPU friendly) */
+            @keyframes waveLoop {
+                0% {
+                    transform: translateX(0);
+                }
+
+                100% {
+                    transform: translateX(-50%);
+                }
+            }
+
+            .waves use {
+                animation: waveLoop linear infinite;
+                will-change: transform;
+            }
+
+            .waves .l1 use {
+                animation-duration: 22s;
+                opacity: .35;
+            }
+
+            .waves .l2 use {
+                animation-duration: 30s;
+                opacity: .25;
+            }
+
+            .waves .l3 use {
+                animation-duration: 42s;
+                opacity: .18;
+            }
+
+            /* Floating jar gentle bob */
+            @keyframes float {
+
+                0%,
+                100% {
+                    transform: translateY(0px) rotate(-1deg);
+                }
+
+                50% {
+                    transform: translateY(var(--float-amplitude)) rotate(1deg);
+                }
+            }
+
+            /* Scroll (paper) glow */
+            .scroll-glow {
+                filter: drop-shadow(0 0 8px rgba(156, 203, 255, .35)) drop-shadow(0 0 22px rgba(154, 207, 255, .25));
+            }
+
+            /* Hide helpful debug outlines if needed */
+            .debug {
+                outline: 1px dashed rgba(255, 0, 0, .3);
+            }
+
+            /* Accessibility helper for screen readers only */
+            .sr-only {
+                position: absolute !important;
+                width: 1px;
+                height: 1px;
+                padding: 0;
+                margin: -1px;
+                overflow: hidden;
+                clip: rect(0, 0, 1px, 1px);
+                white-space: nowrap;
+                border: 0;
+            }
+        </style>
+    </head>
+
+    <body>
+        <main class="app">
+            <header>
+                <h1>WaveJar</h1>
+                <button id="ambienceBtn" class="btn ghost" aria-pressed="false" title="Toggle ocean ambience (low volume)">🌊 Ambience</button>
+            </header>
+
+            <section class="scene" id="scene">
+                <!-- ******* THE OCEAN & SKY ******* -->
+                <svg id="oceanScene" viewBox="0 0 1000 700" role="img" aria-label="Glass jar drifting on a calm ocean at twilight">
+                    <defs>
+                        <!-- Twilight background gradient -->
+                        <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="var(--twilight-top)" />
+                            <stop offset="100%" stop-color="var(--twilight-bottom)" />
+                        </linearGradient>
+
+                        <!-- Soft horizon glow -->
+                        <radialGradient id="horizonGlow" cx="50%" cy="56%" r="60%">
+                            <stop offset="0%" stop-color="rgba(180,220,255,.20)" />
+                            <stop offset="60%" stop-color="rgba(180,220,255,.08)" />
+                            <stop offset="100%" stop-color="rgba(180,220,255,.00)" />
+                        </radialGradient>
+
+                        <!-- Reusable wave symbol (wide so we can slide it) -->
+                        <!-- You can tweak the d-path to change wave shapes or duplicate layers. -->
+                        <symbol id="waveSymbol" viewBox="0 0 1200 120">
+                            <path d="M0,60 C150,20 300,100 450,60 C600,20 750,100 900,60 C1050,20 1150,80 1200,60 L1200,120 L0,120 Z" fill="rgba(255,255,255,.08)" />
+                        </symbol>
+
+                        <!-- Glass filter: tiny blur + specular lighting for highlight sparkle
+               (cheap and subtle for mobile performance).  -->
+                        <filter id="glassFilter" x="-20%" y="-20%" width="140%" height="140%">
+                            <feGaussianBlur in="SourceGraphic" stdDeviation="0.6" result="blur" />
+                            <feSpecularLighting in="blur" surfaceScale="2" specularConstant=".65" specularExponent="24" lighting-color="#ffffff" result="spec">
+                                <fePointLight x="300" y="80" z="80" />
+                            </feSpecularLighting>
+                            <feComposite in="spec" in2="SourceAlpha" operator="in" result="specOut" />
+                            <feMerge>
+                                <feMergeNode in="blur" />
+                                <feMergeNode in="specOut" />
+                            </feMerge>
+                        </filter>
+
+                        <!-- Tiny watery refraction shimmer overlay using turbulence + displacement.
+               This sits as a faint overlay inside the jar. -->
+                        <filter id="refraction" x="-10%" y="-10%" width="120%" height="120%">
+                            <feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="1" seed="4" result="noise" />
+                            <feDisplacementMap in="SourceGraphic" in2="noise" scale="2" xChannelSelector="R" yChannelSelector="G" />
+                        </filter>
+
+                        <!-- Paper gradient -->
+                        <linearGradient id="paper" x1="0" y1="0" x2="1" y2="0">
+                            <stop offset="0%" stop-color="#fff8e6" />
+                            <stop offset="50%" stop-color="#fff3d2" />
+                            <stop offset="100%" stop-color="#ffe9b8" />
+                        </linearGradient>
+
+                        <!-- Scroll edge shadow -->
+                        <linearGradient id="paperEdge" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="rgba(0,0,0,.15)" />
+                            <stop offset="100%" stop-color="rgba(0,0,0,0)" />
+                        </linearGradient>
+                    </defs>
+
+                    <!-- Background sky & soft horizon -->
+                    <rect x="0" y="0" width="1000" height="700" fill="url(#sky)" />
+                    <ellipse cx="500" cy="390" rx="340" ry="140" fill="url(#horizonGlow)" />
+
+                    <!-- Waves: three layers, each slides at a different speed for parallax. -->
+                    <g class="waves" aria-hidden="true">
+                        <g class="l3" transform="translate(0, 520)">
+                            <use href="#waveSymbol" x="0" y="0"></use>
+                            <use href="#waveSymbol" x="1200" y="0"></use>
+                        </g>
+                        <g class="l2" transform="translate(0, 560)">
+                            <use href="#waveSymbol" x="0" y="0"></use>
+                            <use href="#waveSymbol" x="1200" y="0"></use>
+                        </g>
+                        <g class="l1" transform="translate(0, 600)">
+                            <use href="#waveSymbol" x="0" y="0"></use>
+                            <use href="#waveSymbol" x="1200" y="0"></use>
+                        </g>
+                    </g>
+
+                    <!-- The message scroll (initially off-screen & hidden). We draw it in SVG
+             so we can layer it between jar back and front for a convincing depth. -->
+                    <g id="scroll" class="scroll-glow" opacity="0" transform="translate(500,380) scale(0.9)">
+                        <!-- Paper body -->
+                        <rect x="-80" y="-24" width="160" height="48" rx="10" ry="10" fill="url(#paper)" stroke="rgba(0,0,0,.08)" />
+                        <!-- Left curl -->
+                        <circle cx="-78" cy="0" r="18" fill="url(#paper)" stroke="rgba(0,0,0,.08)" />
+                        <path d="M-96,-18 h12 v36 h-12 z" fill="url(#paperEdge)" opacity=".35" />
+                        <!-- Right curl -->
+                        <circle cx="78" cy="0" r="18" fill="url(#paper)" stroke="rgba(0,0,0,.08)" />
+                        <path d="M86,-18 h12 v36 h-12 z" fill="url(#paperEdge)" opacity=".35" />
+                        <!-- The user's emotion text -->
+                        <text id="scrollText" x="0" y="6" text-anchor="middle" font-size="16" font-weight="700" fill="#3e2a00" style="font-family: var(--font); filter: drop-shadow(0 1px 0 rgba(255,255,255,.6));">
+                            <!-- populated by JS -->
+                        </text>
+                    </g>
+
+                    <!-- The glass jar (composed as back → content area → front highlights).
+             Dimensions are tuned for viewBox=1000x700. -->
+                    <g id="jar" transform="translate(430,340) scale(1.0)" style="transform-origin: 500px 350px;">
+                        <!-- Back glass (slightly darker) -->
+                        <g id="jar-back" opacity=".75" filter="url(#glassFilter)">
+                            <!-- Body -->
+                            <rect x="75" y="-120" width="260" height="300" rx="40" fill="hsla(var(--jar-glass-tint)/.14)" stroke="var(--jar-stroke)" />
+                            <!-- Neck -->
+                            <rect x="120" y="-150" width="170" height="40" rx="10" fill="hsla(var(--jar-glass-tint)/.18)" stroke="var(--jar-stroke)" />
+                        </g>
+
+                        <!-- A barely visible inner refraction shimmer -->
+                        <rect x="85" y="-110" width="240" height="280" rx="34" fill="rgba(255,255,255,.03)" filter="url(#refraction)" opacity=".6"></rect>
+
+                        <!-- Invisible "mouth" target used by JS to align the dropping scroll -->
+                        <rect id="jar-mouth" x="170" y="-144" width="70" height="8" fill="transparent" />
+
+                        <!-- Lid (animated to seal). It rotates down around its left edge. -->
+                        <g id="jar-lid" transform="translate(112,-158) rotate(0)" style="transform-origin: 112px -158px;">
+                            <rect x="0" y="10" width="220" height="16" rx="8" fill="var(--jar-lid)" stroke="rgba(0,0,0,.15)" />
+                            <rect x="12" y="8" width="196" height="6" rx="3" fill="rgba(255,255,255,.7)" />
+                        </g>
+
+                        <!-- Front highlights & edges to sell depth; placed above the scroll. -->
+                        <g id="jar-front" opacity=".75" filter="url(#glassFilter)">
+                            <!-- Front rim/gloss streaks -->
+                            <path d="M100 -115 q100 -28 220 0" stroke="rgba(255,255,255,.6)" stroke-width="2" fill="none" />
+                            <path d="M100 70 q80 34 200 24" stroke="rgba(255,255,255,.45)" stroke-width="2" fill="none" />
+                            <!-- Subtle left highlight sweep -->
+                            <path d="M110,-90 C120,-110 140,-120 150,-80 C160,-40 150,20 130,60 C120,80 110,60 108,40 Z" fill="rgba(255,255,255,.12)" />
+                            <!-- Right faint sparkle -->
+                            <circle cx="295" cy="-30" r="6" fill="rgba(255,255,255,.8)" />
+                        </g>
+                    </g>
+                </svg>
+
+                <!-- Controls overlay -->
+                <div class="controls" id="controls">
+                    <label class="sr-only" for="emotionInput">Type an emotion</label>
+                    <div class="field">
+                        <input id="emotionInput" name="emotion" type="text" maxlength="80" placeholder="Type an emotion (e.g., calm, joyful, worried)…" autocomplete="off" />
+                    </div>
+                    <button id="releaseBtn" class="btn">Seal &amp; Release</button>
+                    <button id="restartBtn" class="btn ghost" hidden>Restart</button>
+                </div>
+
+                <!-- Completion toast -->
+                <div id="toast" class="toast" role="status" aria-live="polite">
+                    <span>✅ Message released into the sea.</span>
+                    <button id="toastRestart" class="btn ghost">Restart</button>
+                </div>
+            </section>
+        </main>
+
+        <script>
+            /* ============================================================
+               WaveJar — Interaction & Animation
+               ------------------------------------------------------------
+               - Orchestrated with GSAP timelines (SVG transforms).
+               - Audio via Web Audio API (synthetic ocean; no media files).
+               - Accessibility: reduced motion, ARIA toasts, focus handling.
+               - No tracking, no external assets beyond GSAP core.
+               ============================================================ */
+
+            // Shortcuts to DOM/SVG elements
+            const $ = (sel, ctx = document) => ctx.querySelector(sel);
+            const scene = $('#scene');
+            const svg = $('#oceanScene');
+            const jar = $('#jar');
+            const jarMouth = $('#jar-mouth');
+            const lid = $('#jar-lid');
+            const scroll = $('#scroll');
+            const scrollText = $('#scrollText');
+
+            const emotionInput = $('#emotionInput');
+            const releaseBtn = $('#releaseBtn');
+            const restartBtn = $('#restartBtn');
+            const ambienceBtn = $('#ambienceBtn');
+            const toast = $('#toast');
+            const toastRestart = $('#toastRestart');
+
+            let masterTL;   // GSAP timeline for the 20s flow
+            let playing = false;
+
+            /* ------------------ Utility: SVG coordinate mapping ------------------ */
+            // Convert a point from page (client) coords to SVG's viewBox coords,
+            // so we can animate the scroll from the input field position.
+            function clientToSVG(clientX, clientY) {
+                const pt = svg.createSVGPoint();
+                pt.x = clientX; pt.y = clientY;
+                const svgP = pt.matrixTransform(svg.getScreenCTM().inverse());
+                return svgP;
+            }
+
+            /* ------------------ Scroll text populating & wrapping ------------------ */
+            // For simplicity we keep text single-line (emotion word/phrase).
+            // If longer, we trim with ellipsis visually.
+            function setScrollText(value) {
+                const txt = value.trim().slice(0, 28);
+                scrollText.textContent = txt || '…';
+            }
+
+            /* ------------------ Focus & Inputs ------------------ */
+            function disableUI() {
+                emotionInput.disabled = true;
+                releaseBtn.disabled = true;
+                restartBtn.hidden = true;
+            }
+            function enableUI() {
+                emotionInput.disabled = false;
+                releaseBtn.disabled = false;
+                restartBtn.hidden = false;
+            }
+            function resetToast() {
+                toast.dataset.show = 'false';
+                toast.removeAttribute('data-show');
+                toast.style.display = 'none';
+            }
+
+            /* ------------------ Ocean Waves motion (parallax) ------------------ */
+            function startWaveLoops() {
+                // Ensure continuous slide on each <use> inside each layer (l1/l2/l3).
+                // We animate via CSS keyframes already; here we also offset layers a bit for depth.
+                gsap.set('.waves .l1 use', { xPercent: 0 });
+                gsap.set('.waves .l2 use', { xPercent: 0 });
+                gsap.set('.waves .l3 use', { xPercent: 0 });
+                // Additional subtle vertical swell
+                gsap.to('.waves .l1', { y: '+=4', yoyo: true, repeat: -1, duration: 4, ease: 'sine.inOut' });
+                gsap.to('.waves .l2', { y: '-=5', yoyo: true, repeat: -1, duration: 6, ease: 'sine.inOut' });
+                gsap.to('.waves .l3', { y: '+=6', yoyo: true, repeat: -1, duration: 8, ease: 'sine.inOut' });
+            }
+
+            /* ------------------ Build the master timeline (≈20s) ------------------ */
+            function buildTimeline() {
+                if (masterTL) { masterTL.kill(); }
+                masterTL = gsap.timeline({
+                    defaults: { ease: 'power2.out' },
+                    onComplete: () => {
+                        // 20s done → show toast + restart
+                        toast.style.display = 'inline-flex';
+                        toast.dataset.show = 'true';
+                        enableUI();
+                        playing = false;
+                        emotionInput.focus();
+                    }
+                });
+
+                // Where is the text input on screen? Start the scroll there.
+                const inputRect = emotionInput.getBoundingClientRect();
+                const startPt = clientToSVG(inputRect.left + inputRect.width * 0.5, inputRect.top);
+                const mouthRect = jarMouth.getBoundingClientRect();
+                const mouthPt = clientToSVG(mouthRect.left + mouthRect.width * 0.5, mouthRect.top + mouthRect.height * 0.5);
+
+                // 1) Text → scroll: appear near the input, glow on, rotate & lift
+                masterTL.set(scroll, { opacity: 0, x: startPt.x, y: startPt.y - 40, scale: 0.9, rotate: -18 }, 0);
+                masterTL.to(scroll, { opacity: 1, y: startPt.y - 80, duration: 0.4 }, 0);
+                masterTL.to(scroll, { rotate: -28, y: startPt.y - 96, scale: 0.95, duration: 0.4 }, 0.15);
+
+                // 2) Fly from input → jar mouth, then drop inside & settle
+                masterTL.to(scroll, {
+                    x: mouthPt.x, y: mouthPt.y - 10, rotate: -10, scale: 0.58, duration: parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--t-drop')) || 2.2,
+                    ease: 'power3.inOut'
+                }, 0.3);
+                masterTL.to(scroll, { y: mouthPt.y + 44, scale: 0.48, rotate: 2, duration: 0.6, ease: 'bounce.out' }, '>-0.2');
+
+                // 3) Seal the jar (lid rotates down); add a quick sparkle
+                masterTL.to(lid, {
+                    rotate: -22, transformOrigin: '112px -158px', duration: parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--t-seal')) || 1.2,
+                    ease: 'power2.inOut'
+                }, '>-0.15');
+                masterTL.fromTo('#jar-front circle', { opacity: 0 }, { opacity: 1, duration: 0.3, yoyo: true, repeat: 1 }, '<');
+
+                // 4) Drift on the ocean (slight bobbing), then sail to horizon & fade
+                masterTL.to(jar, {
+                    y: 110, x: 60, duration: parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--t-drift')) || 6.0,
+                    ease: 'sine.inOut',
+                    onStart: () => { jar.style.animation = `float var(--float-speed) ease-in-out infinite`; }
+                }, '>-0.2');
+
+                masterTL.to(jar, {
+                    x: 500 - 430,  // center it relative to initial translate
+                    y: -90,
+                    scale: 0.35,
+                    duration: parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--t-sail')) || 8.6,
+                    ease: 'power1.in',
+                }, '>-0.1');
+
+                masterTL.to(jar, { opacity: 0, duration: 0.8, ease: 'sine.out' }, '>-0.4');
+                return masterTL;
+            }
+
+            /* ------------------ Interaction Handlers ------------------ */
+            releaseBtn.addEventListener('click', () => {
+                if (playing) return;
+                const value = emotionInput.value.trim();
+                if (!value) {
+                    // Tiny nudge to hint the user
+                    gsap.fromTo(emotionInput, { x: -4 }, { x: 0, duration: 0.2, ease: 'power1.inOut', repeat: 3, yoyo: true });
+                    emotionInput.focus();
+                    return;
+                }
+                playing = true;
+                disableUI();
+                resetToast();
+                setScrollText(value);
+
+                // Reset visuals
+                gsap.set([jar, scroll], { clearProps: 'all' });
+                gsap.set(jar, { opacity: 1, transformOrigin: '500px 350px' });
+                gsap.set(scroll, { opacity: 0 });
+
+                // Kick waves if not already subtly moving
+                startWaveLoops();
+
+                // Build & play ~20s timeline
+                buildTimeline().play();
+            });
+
+            [restartBtn, toastRestart].forEach(btn => btn?.addEventListener('click', () => {
+                // Kill timeline & reset
+                masterTL?.kill();
+                playing = false;
+                emotionInput.value = '';
+                gsap.set([jar, scroll], { clearProps: 'all' });
+                lid.setAttribute('transform', 'translate(112,-158) rotate(0)');
+                resetToast();
+                enableUI();
+                emotionInput.focus();
+            }));
+
+            // Allow Enter key to trigger the flow
+            emotionInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    releaseBtn.click();
+                }
+            });
+
+            /* ------------------ Web Audio API: Ocean ambience (synth) ------------------
+               Design notes:
+               - No audio file → we generate gentle "surf" with filtered noise + slow LFO.
+               - Very low volume by default; user must tap to start (autoplay policy).
+               - See MDN Web Audio overview & best practices. */
+            //  References: MDN Web Audio API (overview + best practices).
+            //  https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API
+            //  https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API/Best_practices
+            let audio = {
+                ctx: null, master: null, noise: null, filter1: null, filter2: null, lfo: null, lfoGain: null, panner: null
+            };
+            function createOcean() {
+                if (audio.ctx) return;
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+
+                // White noise buffer
+                const bufferSize = 2 * ctx.sampleRate; // 2 seconds
+                const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+                const data = noiseBuffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    data[i] = (Math.random() * 2 - 1) * 0.5; // slightly softened white noise
+                }
+
+                const noiseSource = ctx.createBufferSource();
+                noiseSource.buffer = noiseBuffer;
+                noiseSource.loop = true;
+
+                // Filters to mellow the noise into "surf"
+                const lp1 = ctx.createBiquadFilter(); lp1.type = 'lowpass'; lp1.frequency.value = 1000;
+                const lp2 = ctx.createBiquadFilter(); lp2.type = 'lowpass'; lp2.frequency.value = 420;
+
+                // Gentle swell via slow LFO on gain
+                const masterGain = ctx.createGain(); masterGain.gain.value = 0.05; // low volume
+                const lfo = ctx.createOscillator(); lfo.type = 'sine'; lfo.frequency.value = 0.08; // ~12.5s period
+                const lfoGain = ctx.createGain(); lfoGain.gain.value = 0.035; // modulation depth
+
+                // Stereo drift (very subtle)
+                const panner = ctx.createStereoPanner(); panner.pan.value = 0;
+
+                // Connect graph
+                noiseSource.connect(lp1); lp1.connect(lp2); lp2.connect(panner); panner.connect(masterGain); masterGain.connect(ctx.destination);
+                lfo.connect(lfoGain); lfoGain.connect(masterGain.gain);
+
+                audio = { ctx, master: masterGain, noise: noiseSource, filter1: lp1, filter2: lp2, lfo, lfoGain, panner };
+            }
+
+            function startOcean() {
+                createOcean();
+                // Required by autoplay policies: resume context on user gesture
+                if (audio.ctx.state === 'suspended') audio.ctx.resume();
+                audio.noise.start(0);
+                audio.lfo.start(0);
+            }
+
+            function stopOcean() {
+                if (!audio.ctx) return;
+                try { audio.noise.stop(0); } catch (e) { }
+                try { audio.lfo.stop(0); } catch (e) { }
+                audio.ctx.close();
+                audio = { ctx: null };
+            }
+
+            ambienceBtn.addEventListener('click', () => {
+                const pressed = ambienceBtn.getAttribute('aria-pressed') === 'true';
+                if (pressed) {
+                    ambienceBtn.setAttribute('aria-pressed', 'false');
+                    stopOcean();
+                } else {
+                    ambienceBtn.setAttribute('aria-pressed', 'true');
+                    startOcean();
+                }
+            });
+
+            // Make sure focus begins at the text box on load
+            window.addEventListener('load', () => emotionInput.focus());
+
+        </script>
+
+        <!-- ======= NOTES / IMPLEMENTATION DETAILS =======
+  * Glass jar & highlights:
+    - Uses subtle blur + specular lighting (SVG filter) to sell the glass sheen without heavy shaders.
+      See “Making a Realistic Glass Effect with SVG” and “A Look at SVG Light Source Filters”.
+      You can increase "specularExponent" and tweak point-light to accentuate gloss. (CSS-Tricks)  -->
+        <!-- Sources: CSS-Tricks glass and lighting articles; MDN SVG filter references. -->
+        <!--  CSS-Tricks glass: https://css-tricks.com/making-a-realistic-glass-effect-with-svg/
+        CSS-Tricks light sources: https://css-tricks.com/look-svg-light-source-filters/
+        MDN feGaussianBlur: https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Element/feGaussianBlur -->
+
+        <!-- * Parallax waves:
+    - Built with an SVG <symbol> (reusable) and three <use> rows that translate at different rates
+      (CSS keyframes + tiny GSAP vertical oscillation).
+      See “Use and Reuse Everything in SVG… Even Animations!” and parallax powered by CSS custom properties. -->
+
+        <!-- * Reduced motion:
+    - If user sets prefers-reduced-motion=reduce, we collapse motion durations and remove bobbing.  -->
+
+        <!-- * Audio:
+    - Generated at runtime (noise → lowpass filters + slow LFO), extremely small footprint and complies
+      with autoplay restrictions by starting on click. See MDN Web Audio overview & best practices. -->
+
+        <!-- * Multiple JAR COLORS (quick customization):
+      - The jar hue and lid can be themed with CSS variables:
+          :root { --jar-glass-tint: 210 46% 76%; --jar-lid: #c8d2e5; }
+      - Try variants by adding a theme class on <body> or on #jar:
+          .jar--aqua { --jar-glass-tint: 190 60% 70%; --jar-lid: #c7f0ff; }
+          .jar--rose { --jar-glass-tint: 330 36% 78%; --jar-lid: #f3cad7; }
+          .jar--amber { --jar-glass-tint: 38 60% 75%;  --jar-lid: #ffd89a; }
+        Example: <g id="jar" class="jar--rose"> … </g>
+      - For stronger glass, raise body opacity (hsla(.../.18 → /.24)) and the filter’s "specularConstant".  -->
+
+        <!-- * Asset budget:
+      - Single external dependency (GSAP core). All graphics are vector; ambience is synthesized.
+        No images or audio files → comfortably under 100 KB of assets.  -->
+
+    </body>
+
+</html>

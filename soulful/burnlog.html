@@ -1,0 +1,902 @@
+<!doctype html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>BurnLog — Release & Let Go</title>
+        <meta name="description" content="Type what you want to release. Press ‘Burn It’. Watch it turn to embers and ash. Nothing is stored or transmitted." />
+        <style>
+            /* =========================
+       BurnLog — Minimal Styles
+       ========================= */
+            :root {
+                /* Color system */
+                --bg-0: #0f0f0f;
+                --bg-1: #141414;
+                --bg-2: #1a1a1a;
+                --glass: #ffffff10;
+                --glass-border: #ffffff24;
+                --text: #EDEDED;
+                --muted: #bdbdbd;
+                --accent: #ffb23f;
+                /* warm amber */
+                --ember: #ff6a00;
+                /* bright ember edge */
+                --smoke: #9aa0a6;
+                /* subtle smoke */
+                --ok: #9cff9c;
+                --red: #ff4d4d;
+
+                /* Motion/Timing */
+                --t-fade: 320ms;
+                --t-fast: 180ms;
+                --t-glow: 1200ms;
+                /* long warm-up glow */
+                --t-flame: 900ms;
+                /* single glyph burn */
+                --t-smoke: 1200ms;
+                /* post ember smoke fade */
+                --ease-out: cubic-bezier(.22, 1, .36, 1);
+                /* easeOutCubic: snappy start, soft land */
+                --ease-slow: cubic-bezier(.24, .84, .24, 1);
+                /* pleasant slow-in-out for ambient glow */
+
+                /* Layout */
+                --radius: 16px;
+                --shadow: 0 20px 60px rgba(0, 0, 0, .6), 0 2px 12px rgba(0, 0, 0, .35);
+                --maxw: 720px;
+                --card-pad: clamp(16px, 2.5vw, 28px);
+                --field-h: 180px;
+            }
+
+            /* Reset-ish */
+            * {
+                box-sizing: border-box;
+            }
+
+            html,
+            body {
+                height: 100%;
+            }
+
+            body {
+                margin: 0;
+                color: var(--text);
+                font: 400 16px/1.6 system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+                background:
+                    radial-gradient(1200px 800px at 20% 0%, #0a0a0a 0%, transparent 70%),
+                    radial-gradient(1000px 600px at 80% 100%, #0a0a0a 0%, transparent 70%),
+                    linear-gradient(180deg, var(--bg-0), var(--bg-2));
+                overflow: hidden;
+                /* to keep canvas edges clean */
+            }
+
+            /* Subtle full-screen background sparks canvas sits behind everything */
+            #bgCanvas {
+                position: fixed;
+                inset: 0;
+                width: 100vw;
+                height: 100vh;
+                display: block;
+                z-index: 0;
+                pointer-events: none;
+            }
+
+            main {
+                position: relative;
+                z-index: 1;
+                min-height: 100dvh;
+                display: grid;
+                place-items: center;
+                padding: clamp(16px, 3vw, 40px);
+            }
+
+            .wrap {
+                width: min(100%, var(--maxw));
+            }
+
+            .title {
+                margin: 0 0 10px;
+                letter-spacing: .5px;
+                font-size: clamp(22px, 3.3vw, 30px);
+                font-weight: 650;
+                text-align: center;
+                text-shadow: 0 1px 0 #000;
+            }
+
+            .tagline {
+                margin: 0 0 18px;
+                color: var(--muted);
+                text-align: center;
+                font-size: 14px;
+            }
+
+            .card {
+                position: relative;
+                background: linear-gradient(180deg, #ffffff10, #ffffff08);
+                border: 1px solid var(--glass-border);
+                border-radius: var(--radius);
+                backdrop-filter: saturate(140%) blur(10px);
+                -webkit-backdrop-filter: saturate(140%) blur(10px);
+                padding: var(--card-pad);
+                box-shadow: var(--shadow);
+            }
+
+            .field {
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            label {
+                font-size: 14px;
+                color: var(--muted);
+            }
+
+            textarea {
+                resize: vertical;
+                min-height: var(--field-h);
+                max-height: 50dvh;
+                padding: 14px 14px;
+                border-radius: 12px;
+                border: 1px solid #ffffff28;
+                background: linear-gradient(180deg, #0b0b0b, #121212);
+                color: var(--text);
+                outline: none;
+                box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06);
+                transition: border-color var(--t-fast) var(--ease-out), box-shadow var(--t-fast) var(--ease-out);
+            }
+
+            textarea:focus {
+                border-color: #ffffff55;
+                box-shadow: 0 0 0 4px #ffffff18 inset;
+            }
+
+            .controls {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+                align-items: center;
+                justify-content: space-between;
+                margin-top: 14px;
+            }
+
+            .btn {
+                appearance: none;
+                -webkit-appearance: none;
+                border: none;
+                padding: 12px 16px;
+                border-radius: 12px;
+                font-weight: 650;
+                letter-spacing: .3px;
+                cursor: pointer;
+                background:
+                    radial-gradient(120% 220% at 0% 0%, #ff6a00 0%, transparent 40%),
+                    linear-gradient(180deg, #ffb23f, #ff6a00 70%, #e84c00 100%);
+                color: #1a0e00;
+                box-shadow: 0 6px 18px rgba(255, 106, 0, .25), inset 0 1px 0 rgba(255, 255, 255, .4);
+                transition: transform var(--t-fast) var(--ease-out), filter var(--t-fast) var(--ease-out), opacity var(--t-fast) var(--ease-out);
+            }
+
+            .btn:hover {
+                filter: brightness(1.05);
+                transform: translateY(-1px);
+            }
+
+            .btn:active {
+                transform: translateY(0);
+            }
+
+            .btn[disabled] {
+                opacity: .5;
+                cursor: not-allowed;
+            }
+
+            .ghostbtn {
+                background: transparent;
+                color: var(--muted);
+                border: 1px solid #ffffff26;
+                box-shadow: none;
+            }
+
+            .ghostbtn:hover {
+                color: #fff;
+                border-color: #ffffff40;
+            }
+
+            .tog {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                font-size: 13px;
+                color: var(--muted);
+                user-select: none;
+            }
+
+            .tog input {
+                appearance: none;
+                width: 36px;
+                height: 22px;
+                border-radius: 999px;
+                background: #2a2a2a;
+                position: relative;
+                outline: none;
+                cursor: pointer;
+                transition: background var(--t-fast) var(--ease-out);
+            }
+
+            .tog input::after {
+                content: "";
+                position: absolute;
+                left: 3px;
+                top: 3px;
+                width: 16px;
+                height: 16px;
+                border-radius: 50%;
+                background: #bdbdbd;
+                transition: transform var(--t-fast) var(--ease-out), background var(--t-fast) var(--ease-out);
+            }
+
+            .tog input:checked {
+                background: #2f2f2f;
+            }
+
+            .tog input:checked::after {
+                transform: translateX(14px);
+                background: #fff;
+            }
+
+            /* Burn overlay area (appears during animation) */
+            .burn-area {
+                position: relative;
+                margin-top: 16px;
+                border-radius: 12px;
+                background: linear-gradient(180deg, #0c0c0c, #121212);
+                border: 1px dashed #ffffff24;
+                min-height: var(--field-h);
+                display: none;
+                overflow: hidden;
+                isolation: isolate;
+            }
+
+            .burn-area.active {
+                display: block;
+            }
+
+            /* The text to be burned is drawn as per-glyph spans. */
+            .chars {
+                position: absolute;
+                inset: 16px;
+                font: 600 22px/1.6 ui-rounded, system-ui, "SF Pro Rounded", Inter, Segoe UI, Roboto, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+                white-space: pre-wrap;
+                word-break: break-word;
+                color: #f1f1f1;
+                text-shadow: 0 0 0 rgba(0, 0, 0, 0);
+                will-change: filter, opacity, transform, text-shadow, color;
+                pointer-events: none;
+                /* display only */
+                opacity: 0;
+                transform: translateY(6px);
+                transition: opacity var(--t-fade) var(--ease-out), transform var(--t-fade) var(--ease-out);
+            }
+
+            .chars.show {
+                opacity: 1;
+                transform: none;
+            }
+
+            .char {
+                display: inline-block;
+                position: relative;
+                transition: filter var(--t-fast) var(--ease-out), color var(--t-fast) var(--ease-out), opacity var(--t-fast) var(--ease-out), transform var(--t-fast) var(--ease-out), text-shadow var(--t-fast) var(--ease-out);
+            }
+
+            /* Step 2: glow warms in (applied per-char in sequence) */
+            .char.glow {
+                /* text-shadow stack simulates radiant heat halo */
+                text-shadow:
+                    0 0 6px rgba(255, 178, 63, .65),
+                    0 0 16px rgba(255, 106, 0, .45),
+                    0 0 36px rgba(255, 60, 0, .25);
+                color: #fff3e0;
+                filter: saturate(115%);
+            }
+
+            /* Step 3: char catches fire -> embering, slight lift */
+            .char.ember {
+                color: #ffb23f;
+                transform: translateY(-6px);
+                text-shadow:
+                    0 0 4px rgba(255, 106, 0, .85),
+                    0 0 14px rgba(255, 60, 0, .55),
+                    0 0 26px rgba(255, 60, 0, .35);
+                filter: brightness(1.05) contrast(1.05);
+            }
+
+            /* Step 4: disintegrate — fades, cooler color, drift */
+            .char.ash {
+                color: #4c3b2a;
+                opacity: 0;
+                transform: translateY(-12px) scale(.98);
+                filter: blur(.3px);
+                text-shadow: none;
+            }
+
+            /* Smoke veil after embers leave */
+            .smoke-veil {
+                position: absolute;
+                inset: 0;
+                pointer-events: none;
+                opacity: 0;
+                background: radial-gradient(60% 40% at 50% 0%, rgba(180, 185, 190, .06), rgba(150, 155, 160, 0) 70%),
+                    linear-gradient(180deg, rgba(140, 140, 145, .02), transparent 60%);
+                transition: opacity var(--t-smoke) var(--ease-slow);
+            }
+
+            .smoke-veil.show {
+                opacity: 1;
+            }
+
+            /* Foreground particle canvas (embers/ash) */
+            #fxCanvas {
+                position: absolute;
+                inset: 0;
+                width: 100%;
+                height: 100%;
+                pointer-events: none;
+                display: block;
+                z-index: 2;
+                /* above text spans for glowing ash */
+                mix-blend-mode: screen;
+                /* additive feel without over-brightening text */
+            }
+
+            /* "Released." final message */
+            .released {
+                position: absolute;
+                left: 50%;
+                bottom: 18px;
+                transform: translate(-50%, 10px);
+                font-weight: 650;
+                letter-spacing: .4px;
+                color: #b7ffce;
+                opacity: 0;
+                text-shadow: 0 0 8px rgba(137, 255, 180, .25);
+                transition: opacity 600ms var(--ease-out), transform 600ms var(--ease-out);
+            }
+
+            .released.show {
+                opacity: 1;
+                transform: translate(-50%, 0);
+            }
+
+            /* Card shake for empty submit */
+            @keyframes shake {
+                10% {
+                    transform: translateX(-3px)
+                }
+
+                20% {
+                    transform: translateX(3px)
+                }
+
+                30% {
+                    transform: translateX(-2px)
+                }
+
+                40% {
+                    transform: translateX(2px)
+                }
+
+                50% {
+                    transform: translateX(-1px)
+                }
+
+                60% {
+                    transform: translateX(1px)
+                }
+
+                70% {
+                    transform: translateX(0)
+                }
+            }
+
+            .oops {
+                animation: shake 420ms var(--ease-out);
+            }
+
+            footer {
+                margin-top: 16px;
+                text-align: center;
+                color: #8b8b8b;
+                font-size: 12px;
+            }
+
+            /* Accessibility: honor prefers-reduced-motion by softening or skipping big moves */
+            @media (prefers-reduced-motion: reduce) {
+
+                .chars,
+                .char {
+                    transition-duration: 0.01ms;
+                }
+
+                .char.glow,
+                .char.ember,
+                .char.ash {
+                    text-shadow: none;
+                    filter: none;
+                    transform: none;
+                }
+
+                .smoke-veil {
+                    display: none;
+                }
+
+                .btn,
+                textarea {
+                    transition: none;
+                }
+            }
+        </style>
+    </head>
+
+    <body>
+        <canvas id="bgCanvas" aria-hidden="true"></canvas>
+
+        <main>
+            <div class="wrap">
+                <h1 class="title">🔥 BurnLog</h1>
+                <p class="tagline" id="privacyNote" aria-live="polite">Nothing is saved or sent.</p>
+
+                <section class="card" id="card" role="region" aria-labelledby="burnLabel">
+                    <div class="field">
+                        <label id="burnLabel" for="burnInput">What are you ready to release?</label>
+                        <textarea id="burnInput" placeholder="Type it here…"></textarea>
+
+                        <div class="controls">
+                            <div style="display:flex; gap:10px; align-items:center;">
+                                <button class="btn" id="burnBtn">Burn It</button>
+                                <button class="btn ghostbtn" id="againBtn" hidden>Write Another</button>
+                            </div>
+
+                            <div style="display:flex; gap:14px; align-items:center;">
+                                <label class="tog" title="Toggle crackle sound">
+                                    <input type="checkbox" id="audioToggle" aria-label="Toggle crackle sound (requires click)">
+                                    Crackle
+                                </label>
+                                <label class="tog" title="Toggle motion">
+                                    <input type="checkbox" id="motionToggle" aria-label="Toggle motion">
+                                    Motion
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RENDER / ANIMATE AREA -->
+                    <div class="burn-area" id="burnArea" aria-hidden="true">
+                        <div class="chars" id="chars"></div>
+                        <canvas id="fxCanvas"></canvas>
+                        <div class="smoke-veil" id="smoke"></div>
+                        <div class="released" id="released" role="status" aria-live="polite">Released.</div>
+                    </div>
+                </section>
+
+                <footer>Pro tip: you can keep it private—this page never transmits your text.</footer>
+            </div>
+        </main>
+
+        <script>
+            /* =====================================================
+               BurnLog — Animation + Audio Engine (vanilla + Canvas)
+               ===================================================== */
+
+            /* ---------- Utilities ---------- */
+            const clamp = (n, a, b) => Math.min(b, Math.max(a, n));
+            const lerp = (a, b, t) => a + (b - a) * t;
+            const rand = (a = 0, b = 1) => Math.random() * (b - a) + a;
+            const easeOutCubic = t => 1 - Math.pow(1 - t, 3); // mirrors CSS var(--ease-out)
+            const prefersReduced = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches ?? false;
+
+            /* ---------- DOM ---------- */
+            const burnInput = document.getElementById('burnInput');
+            const burnBtn = document.getElementById('burnBtn');
+            const againBtn = document.getElementById('againBtn');
+            const motionToggle = document.getElementById('motionToggle');
+            const audioToggle = document.getElementById('audioToggle');
+
+            const burnArea = document.getElementById('burnArea');
+            const charsEl = document.getElementById('chars');
+            const smokeEl = document.getElementById('smoke');
+            const releasedEl = document.getElementById('released');
+
+            const fxCanvas = document.getElementById('fxCanvas');
+            const fxCtx = fxCanvas.getContext('2d', { alpha: true, desynchronized: true }); /* desync for lower latency (where supported) */
+            const bgCanvas = document.getElementById('bgCanvas');
+            const bgCtx = bgCanvas.getContext('2d', { alpha: false, desynchronized: true }); /* alpha:false helps optimize as backdrop is opaque. MDN suggests this. */
+            // MDN Canvas perf tips, HiDPI scaling & devicePixelRatio handling: :contentReference[oaicite:1]{index=1}
+
+            /* ---------- State ---------- */
+            let running = false;
+            let particles = [];
+            let bgSparks = [];
+            let lastT = performance.now();
+            let fpsEMA = 60;  // smoothed FPS
+            let quality = 1;  // dynamically throttled [0.35..1]
+            let motionEnabled = !prefersReduced;
+            motionToggle.checked = motionEnabled;
+
+            /* ---------- Grapheme-safe splitter ----------
+               Use Intl.Segmenter when available to avoid breaking emoji/complex scripts into incorrect pieces.
+               Fallback to Array.from (codepoint-ish) so we don't split surrogates mid-pair. */
+            const segmenter = (('Intl' in window) && Intl.Segmenter)
+                ? new Intl.Segmenter(undefined, { granularity: 'grapheme' }) : null; // Intl.Segmenter docs: :contentReference[oaicite:2]{index=2}
+
+            function splitGraphemes(str) {
+                if (segmenter) {
+                    return [...segmenter.segment(str)].map(s => s.segment);
+                }
+                return Array.from(str); // decent fallback
+            }
+
+            /* ---------- Background sparks (ambient) ---------- */
+            function resizeBG() {
+                const dpr = window.devicePixelRatio || 1;
+                bgCanvas.width = Math.floor(innerWidth * dpr);
+                bgCanvas.height = Math.floor(innerHeight * dpr);
+                bgCanvas.style.width = innerWidth + 'px';
+                bgCanvas.style.height = innerHeight + 'px';
+                bgCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            }
+
+            function spawnBgSpark() {
+                const x = rand(0, innerWidth);
+                const y = innerHeight + 10;
+                bgSparks.push({
+                    x, y,
+                    vx: rand(-0.15, 0.15),
+                    vy: rand(-0.6, -1.2),
+                    life: rand(1.4, 2.4),
+                    age: 0,
+                    r: rand(0.6, 1.2)
+                });
+            }
+
+            function updateBG(dt) {
+                // soft wind oscillation for subtle variance
+                const wind = Math.sin(performance.now() / 1800) * 0.08;
+                if (Math.random() < 0.02 * quality && motionEnabled) { spawnBgSpark(); }
+
+                // clear with slight fade to create tiny trails
+                bgCtx.globalCompositeOperation = 'source-over';
+                bgCtx.fillStyle = 'rgba(20,20,20,.16)';
+                bgCtx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
+
+                bgCtx.globalCompositeOperation = 'lighter';
+
+                for (let i = bgSparks.length - 1; i >= 0; i--) {
+                    const s = bgSparks[i];
+                    s.age += dt; if (s.age > s.life) { bgSparks.splice(i, 1); continue; }
+                    s.x += s.vx + wind;
+                    s.y += s.vy;
+                    const t = s.age / s.life;
+                    const alpha = (1 - t) * 0.45;
+                    const radius = s.r * (1 + t * 0.8);
+
+                    const g = bgCtx.createRadialGradient(s.x, s.y, 0, s.x, s.y, radius * 8);
+                    g.addColorStop(0, `rgba(255,170,60,${alpha})`);
+                    g.addColorStop(1, `rgba(255,80,0,0)`);
+                    bgCtx.fillStyle = g;
+                    bgCtx.beginPath(); bgCtx.arc(s.x, s.y, radius * 8, 0, Math.PI * 2); bgCtx.fill();
+                }
+            }
+
+            /* ---------- Foreground embers/ash particles ---------- */
+            function resizeFX() {
+                const dpr = window.devicePixelRatio || 1;
+                const rect = burnArea.getBoundingClientRect();
+                fxCanvas.width = Math.floor(rect.width * dpr);
+                fxCanvas.height = Math.floor(rect.height * dpr);
+                fxCanvas.style.width = rect.width + 'px';
+                fxCanvas.style.height = rect.height + 'px';
+                fxCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            }
+
+            function spawnEmbersAt(localX, localY, densityScale = 1) {
+                if (!motionEnabled) return;
+                const count = Math.round(lerp(10, 26, quality) * densityScale);
+                for (let i = 0; i < count; i++) {
+                    const speed = rand(60, 140);
+                    const angle = rand(-Math.PI * 0.75, -Math.PI * 0.25); // upward spread
+                    particles.push({
+                        x: localX + rand(-2, 2),
+                        y: localY + rand(-2, 2),
+                        vx: Math.cos(angle) * speed,
+                        vy: Math.sin(angle) * speed,
+                        g: 22,                 // mild upward-drift counteracted by "negative gravity" via vy<0
+                        life: rand(.6, 1.2),    // seconds
+                        age: 0,
+                        hue: rand(18, 42),      // ember orange-yellow
+                        s: rand(0.8, 1.6),      // size scalar
+                        smoke: Math.random() < 0.28 // some turn into faint smoke puffs later
+                    });
+                }
+            }
+
+            function updateFX(dt) {
+                // Faint canvas fade produces trailing ember streaks
+                fxCtx.globalCompositeOperation = 'source-over';
+                fxCtx.fillStyle = 'rgba(0,0,0,0.14)';
+                fxCtx.fillRect(0, 0, fxCanvas.width, fxCanvas.height);
+                fxCtx.globalCompositeOperation = 'lighter';
+
+                const wind = Math.sin(performance.now() / 900) * 14; // mild oscillation
+
+                for (let i = particles.length - 1; i >= 0; i--) {
+                    const p = particles[i];
+                    p.age += dt;
+                    if (p.age >= p.life) { particles.splice(i, 1); continue; }
+
+                    // motion
+                    p.vx += wind * 0.02;
+                    p.vy -= p.g * dt * 0.2; // updraft
+                    p.x += p.vx * dt;
+                    p.y += p.vy * dt;
+
+                    // visual
+                    const t = p.age / p.life; // 0..1
+                    const heat = 1 - t;       // cools over life
+                    const r = 2.2 * p.s * (1 + heat * 0.6);
+                    const alpha = clamp(0.85 * (1 - t) + 0.15, 0, 1);
+
+                    // ember core + halo
+                    const g = fxCtx.createRadialGradient(p.x, p.y, 0, p.x, p.y, r * 3.5);
+                    g.addColorStop(0, `hsla(${p.hue}, 100%, ${lerp(55, 65, heat)}%, ${alpha})`);
+                    g.addColorStop(.4, `hsla(${p.hue + 10}, 100%, 50%, ${alpha * .66})`);
+                    g.addColorStop(1, `rgba(255,80,0,0)`);
+                    fxCtx.fillStyle = g;
+                    fxCtx.beginPath(); fxCtx.arc(p.x, p.y, r * 3.5, 0, Math.PI * 2); fxCtx.fill();
+
+                    // occasional smoke puff (drawn with darker, larger soft gradient)
+                    if (p.smoke) {
+                        fxCtx.globalCompositeOperation = 'source-over';
+                        const sm = fxCtx.createRadialGradient(p.x - 2, p.y - 6, 0, p.x - 2, p.y - 6, r * 5);
+                        sm.addColorStop(0, `rgba(170,175,180,${alpha * .15})`);
+                        sm.addColorStop(1, `rgba(120,120,125,0)`);
+                        fxCtx.fillStyle = sm;
+                        fxCtx.beginPath(); fxCtx.arc(p.x - 2, p.y - 6, r * 5, 0, Math.PI * 2); fxCtx.fill();
+                        fxCtx.globalCompositeOperation = 'lighter';
+                    }
+                }
+            }
+
+            /* ---------- Animation loop with FPS-based throttling ----------
+               requestAnimationFrame syncs to the browser's refresh and is paused in background tabs. (MDN) :contentReference[oaicite:3]{index=3}
+               We measure a smoothed FPS (EMA) and adapt 'quality' (particle density) to sustain performance. */
+            function loop(now) {
+                const dt = Math.min(1 / 20, (now - lastT) / 1000); // clamp big deltas
+                lastT = now;
+
+                // Exponential moving average for FPS
+                const fps = 1 / Math.max(dt, 1 / 120);
+                fpsEMA = lerp(fpsEMA, fps, 0.05);
+
+                // Auto-throttle density: if fps drops, reduce; if it's strong, gently increase.
+                if (motionEnabled) {
+                    if (fpsEMA < 50) quality = Math.max(0.35, quality - 0.05);
+                    else if (fpsEMA > 58) quality = Math.min(1, quality + 0.02);
+                }
+
+                updateBG(dt);
+                updateFX(dt);
+                requestAnimationFrame(loop);
+            }
+
+            /* ---------- Text burn sequence ---------- */
+            function clearRender() {
+                particles.length = 0;
+                fxCtx.clearRect(0, 0, fxCanvas.width, fxCanvas.height);
+                charsEl.classList.remove('show');
+                charsEl.innerHTML = '';
+                smokeEl.classList.remove('show');
+                releasedEl.classList.remove('show');
+            }
+
+            function startBurnSequence(text) {
+                // Step 1: disable input/controls and show burn area
+                burnInput.disabled = true; burnBtn.disabled = true;
+                againBtn.hidden = true;
+                burnArea.classList.add('active');
+                clearRender();
+                resizeFX();
+
+                // Build per-grapheme spans. Using DOM order yields LTR burn progression lines naturally.
+                const pieces = text.replace(/\r/g, '').split('\n'); // preserve newlines
+                const spans = [];
+                for (const line of pieces) {
+                    const segs = splitGraphemes(line);
+                    for (const g of segs) {
+                        const s = document.createElement('span');
+                        s.className = 'char';
+                        s.textContent = g === ' ' ? '\u00A0' : g;
+                        charsEl.appendChild(s);
+                        spans.push(s);
+                    }
+                    const br = document.createElement('br'); charsEl.appendChild(br);
+                }
+
+                // Warm-in the container
+                charsEl.classList.add('show');
+
+                // Timing strategy:
+                //  - Global warm glow ramp (visual cohesion).
+                //  - Per-char ignition stagger (24–34ms) so fire "catches" across the text.
+                //  - Each char runs glow -> ember (lift) -> ash (fade) with easing matching CSS tokens.
+                const baseStagger = prefersReduced ? 0 : rand(24, 34);
+                let maxDelay = 0;
+
+                // Pre-calc relative positions to emit particles from each glyph center
+                const rectC = fxCanvas.getBoundingClientRect();
+                const toLocal = (el) => {
+                    const r = el.getBoundingClientRect();
+                    return { x: (r.left - rectC.left) + r.width / 2, y: (r.top - rectC.top) + r.height * 0.5 };
+                };
+
+                spans.forEach((sp, i) => {
+                    const delay = i * baseStagger;
+                    maxDelay = Math.max(maxDelay, delay);
+                    setTimeout(() => {
+                        sp.classList.add('glow');
+                        // small pre-heat
+                        setTimeout(() => {
+                            sp.classList.remove('glow');
+                            sp.classList.add('ember');
+
+                            // spawn embers from glyph center (density scaled by char area estimate)
+                            const { x, y } = toLocal(sp);
+                            const areaScale = clamp(sp.offsetWidth * sp.offsetHeight / 300, .6, 1.8);
+                            spawnEmbersAt(x, y, areaScale);
+
+                            // convert to ash (disintegration)
+                            setTimeout(() => sp.classList.add('ash'), prefersReduced ? 0 : 380);
+
+                        }, prefersReduced ? 0 : 160); // slight delay from glow -> ember
+                    }, delay);
+                });
+
+                // After last glyph starts, bring in smoke veil then "Released."
+                const total = maxDelay + (prefersReduced ? 0 : 1200);
+                setTimeout(() => smokeEl.classList.add('show'), total - 400);
+                setTimeout(() => {
+                    releasedEl.classList.add('show');
+                    againBtn.hidden = false;
+                    burnBtn.disabled = false;
+                }, total + 200);
+            }
+
+            /* ---------- UI wiring ---------- */
+            function resetUI() {
+                burnInput.disabled = false;
+                burnInput.value = '';
+                burnInput.focus();
+                clearRender();
+                burnArea.classList.remove('active');
+                releasedEl.classList.remove('show');
+                againBtn.hidden = true;
+            }
+
+            burnBtn.addEventListener('click', () => {
+                const text = burnInput.value.trim();
+                if (!text) {
+                    document.getElementById('card').classList.add('oops');
+                    setTimeout(() => document.getElementById('card').classList.remove('oops'), 480);
+                    return;
+                }
+                startBurnSequence(text);
+            });
+
+            againBtn.addEventListener('click', resetUI);
+
+            // Motion toggle (overrides system pref)
+            motionToggle.addEventListener('change', () => {
+                motionEnabled = motionToggle.checked;
+                if (!motionEnabled) { // clear dynamic visuals
+                    bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+                    fxCtx.clearRect(0, 0, fxCanvas.width, fxCanvas.height);
+                }
+            });
+
+            // React to system preference live (MDN shows media queries can change dynamically) :contentReference[oaicite:4]{index=4}
+            if (window.matchMedia) {
+                const m = window.matchMedia('(prefers-reduced-motion: reduce)');
+                m.addEventListener?.('change', e => {
+                    if (!motionToggle.checked) { // only follow system if user hasn't forced it
+                        motionEnabled = !e.matches;
+                    }
+                });
+            }
+
+            /* ---------- Procedural crackle (Web Audio API) ----------
+               Must be started by a user gesture to comply with autoplay restrictions. (MDN guide) :contentReference[oaicite:5]{index=5} */
+            class Crackle {
+                constructor() {
+                    this.ctx = null;
+                    this.master = null;
+                    this.bp = null;
+                    this.running = false;
+                    this.timer = null;
+                }
+                async ensure() {
+                    if (this.ctx) return;
+                    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                    const master = ctx.createGain(); master.gain.value = 0.18; master.connect(ctx.destination);
+                    // Band-limit so it's not harsh; emulate fire with a band around 2–5k
+                    const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 3200; bp.Q.value = 0.9; bp.connect(master);
+                    this.ctx = ctx; this.master = master; this.bp = bp;
+                }
+                start = async () => {
+                    await this.ensure();
+                    if (this.running) return;
+                    this.running = true;
+                    await this.ctx.resume();
+
+                    const pulse = () => {
+                        if (!this.running) return;
+                        // Create a short white-noise buffer per crackle grain
+                        const dur = rand(0.02, 0.08);
+                        const sr = this.ctx.sampleRate;
+                        const buf = this.ctx.createBuffer(1, Math.floor(sr * dur), sr);
+                        const data = buf.getChannelData(0);
+                        for (let i = 0; i < data.length; i++) { data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / data.length, 1.6); }
+                        const src = this.ctx.createBufferSource(); src.buffer = buf;
+
+                        // Envelope
+                        const g = this.ctx.createGain();
+                        g.gain.value = 0;
+                        const t = this.ctx.currentTime;
+                        g.gain.linearRampToValueAtTime(rand(0.2, 0.6), t + 0.004);
+                        g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+                        src.connect(g).connect(this.bp);
+                        src.start();
+                        src.stop(t + dur);
+
+                        // Schedule next burst with jitter
+                        const gap = rand(40, 240); // ms
+                        this.timer = setTimeout(pulse, gap);
+                    };
+                    pulse();
+                }
+                stop = () => {
+                    this.running = false;
+                    if (this.timer) { clearTimeout(this.timer); this.timer = null; }
+                    if (this.ctx?.state === 'running') { this.ctx.suspend(); }
+                }
+            }
+            const crackle = new Crackle();
+
+            audioToggle.addEventListener('change', async () => {
+                if (audioToggle.checked) { await crackle.start(); }
+                else { crackle.stop(); }
+            });
+
+            /* ---------- Responsive / resize ---------- */
+            function onResize() {
+                resizeBG();
+                resizeFX();
+            }
+            window.addEventListener('resize', onResize, { passive: true });
+            onResize();
+
+            /* ---------- Kick animation loop ---------- */
+            if (!running) {
+                running = true;
+                requestAnimationFrame(loop);
+            }
+
+            /* ---------- Privacy: Never send or store user input ----------
+               (No network calls; no storage. Everything stays in-memory in this tab.) */
+
+        </script>
+    </body>
+
+</html>

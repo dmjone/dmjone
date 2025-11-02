@@ -1,0 +1,676 @@
+<!doctype html>
+<!--
+  Rebirth — Single-file, zero-tracking, Cloudflare Pages ready.
+
+  Key decisions + references
+  - Respects `prefers-reduced-motion`; if set to "reduce", we skip the feather's complex path and run gentle fades only, and default audio to muted. (MDN: prefers-reduced-motion) [https://developer.mozilla.org/...]
+  - Audio plays only after a user gesture; default OFF. (Chrome Autoplay policy) [https://developer.chrome.com/blog/autoplay]
+  - Mobile safe areas handled via CSS env(safe-area-inset-*) (MDN: env()) [https://developer.mozilla.org/...]
+  
+  Size budget: ≤80KB including embedded (base64) audio. The pad loop below is ~19.3KB base64 WAV @ 8kHz/8-bit mono, looped.
+
+  State machine
+    IDLE      -> waiting for first click/Enter; breathing dot runs.
+    REBIRTH   -> gradient warms, radial light expands, feather drifts, caption appears, audio (optional).
+    COMPLETE  -> "Replay" appears; resets cleanly to IDLE.
+
+  Keyboard
+    Enter  -> start sequence (when IDLE)
+    Space  -> pause/resume (during REBIRTH)
+  
+  Accessibility
+    - Visible primary CTA gets initial focus; focus moves to "Replay" at finish.
+    - aria-live region announces "Sequence started."
+  
+  Performance
+    - requestAnimationFrame for feather path; simple FPS sampler reduces visual cost on low FPS (e.g., fewer shadows).
+    - Uses CSS keyframes for long-lived motions so they can be paused via `animation-play-state`.
+
+  Math notes
+  - Breathing curve: scale(t) ≈ 1 + A * sin(2π t / P), opacity follows the same sine, phase-aligned, small amplitude.
+  - Feather drift: cubic Bézier interpolation p(t) = (1−t)^3 P0 + 3(1−t)^2 t P1 + 3(1−t) t^2 P2 + t^3 P3, with t eased (ease-out).
+    Rotation = tangentAngle(p'(t)) + oscillation, where oscillation ≈ R * sin(2π f t). We add a slight "yoyo" amplitude.
+
+  Author: Motion design + FE engineering — single file, paste-to-deploy.
+-->
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+        <title>Rebirth</title>
+        <style>
+            :root {
+                --bg0: #0b1020;
+                /* deep blue start */
+                --bg1: #051019;
+                /* vignette helper */
+                --sunrise1: #f5b88c;
+                /* warm end */
+                --sunrise2: #ffe0b3;
+                --text: #ffffff;
+                --muted: #8aa0b5;
+                --pad: 16px;
+                --anim: running;
+                /* toggled to paused when spacebar */
+                --caption-delay: 4.5s;
+                /* appears around 4.5s */
+                --safe-top: env(safe-area-inset-top, 0px);
+                --safe-right: env(safe-area-inset-right, 0px);
+                --safe-bottom: env(safe-area-inset-bottom, 0px);
+                --safe-left: env(safe-area-inset-left, 0px);
+            }
+
+            * {
+                box-sizing: border-box;
+            }
+
+            html,
+            body {
+                height: 100%;
+            }
+
+            body {
+                margin: 0;
+                font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+                color: var(--text);
+                background: #000;
+                overflow: hidden;
+            }
+
+            .app {
+                position: fixed;
+                inset: 0;
+                min-height: 100svh;
+                /* support small/large dynamic viewport units */
+                padding: max(var(--safe-top), 0) max(var(--safe-right), 0) max(var(--safe-bottom), 0) max(var(--safe-left), 0);
+                display: grid;
+                place-items: center;
+                user-select: none;
+                background: radial-gradient(120vmax 120vmax at 50% 50%, #000 0 50%, #0000 51%), var(--bg0);
+                isolation: isolate;
+            }
+
+            /* warming sky overlay cross-fades in REBIRTH */
+            .app::before {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background:
+                    radial-gradient(120vmax 120vmax at 50% 70%, rgba(255, 170, 120, 0.25), transparent 60%),
+                    linear-gradient(180deg, var(--bg0) 0%, var(--bg1) 40%, #1d2338 60%, #0b1020 100%);
+                opacity: 1;
+                transition: opacity .6s ease;
+                z-index: -2;
+            }
+
+            .app.rebirth::before {
+                animation: sky 7.5s forwards;
+                animation-play-state: var(--anim);
+            }
+
+            @keyframes sky {
+                0% {
+                    background:
+                        radial-gradient(120vmax 120vmax at 50% 70%, rgba(255, 170, 120, 0.0), transparent 60%),
+                        linear-gradient(180deg, var(--bg0) 0%, var(--bg1) 40%, #1d2338 60%, #0b1020 100%);
+                    filter: saturate(1) hue-rotate(0deg);
+                }
+
+                100% {
+                    background:
+                        radial-gradient(140vmax 140vmax at 50% 55%, rgba(255, 196, 150, 0.65), transparent 65%),
+                        linear-gradient(180deg, #1d2340 0%, #3a3f5a 25%, #c07c4e 65%, var(--sunrise1) 100%);
+                    filter: saturate(1.2) hue-rotate(-4deg);
+                }
+            }
+
+            /* Radial rebirth light that expands */
+            .light {
+                position: absolute;
+                inset: 0;
+                background:
+                    radial-gradient(circle at 50% 55%, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.08) 8%, rgba(255, 255, 255, 0.03) 16%, transparent 18%);
+                opacity: .0;
+                z-index: -1;
+                pointer-events: none;
+            }
+
+            .app.rebirth .light {
+                animation: expand 5.8s cubic-bezier(.08, .64, .02, 1) forwards;
+                animation-play-state: var(--anim);
+            }
+
+            /* long ease-out glow */
+            @keyframes expand {
+                0% {
+                    transform: scale(0.8);
+                    opacity: 0.0;
+                    filter: blur(0.5px);
+                }
+
+                10% {
+                    transform: scale(1);
+                    opacity: .25;
+                }
+
+                100% {
+                    transform: scale(9);
+                    opacity: 0;
+                    filter: blur(3px);
+                }
+            }
+
+            /* Breathing seed: sine-ish via in-out timing; subtle scale + opacity */
+            .seed {
+                position: absolute;
+                width: 18px;
+                height: 18px;
+                border-radius: 50%;
+                background: radial-gradient(circle at 60% 35%, rgba(255, 255, 255, .85), rgba(255, 255, 255, .35) 70%, rgba(255, 255, 255, .08) 100%);
+                box-shadow: 0 0 12px rgba(255, 255, 255, .15);
+                transform: translate(-50%, -50%) scale(1);
+                top: 50%;
+                left: 50%;
+                opacity: .45;
+                animation: breathe 3.2s ease-in-out infinite;
+                animation-play-state: var(--anim);
+                will-change: transform, opacity;
+            }
+
+            /* Approx of s(t)=0.5+0.5sin; we keyframe at 0/25/50/75/100 with ease to emulate sinusoid */
+            @keyframes breathe {
+                0% {
+                    transform: translate(-50%, -50%) scale(0.96);
+                    opacity: .36;
+                }
+
+                25% {
+                    transform: translate(-50%, -50%) scale(1.02);
+                    opacity: .52;
+                }
+
+                50% {
+                    transform: translate(-50%, -50%) scale(1.06);
+                    opacity: .58;
+                }
+
+                75% {
+                    transform: translate(-50%, -50%) scale(1.02);
+                    opacity: .52;
+                }
+
+                100% {
+                    transform: translate(-50%, -50%) scale(0.96);
+                    opacity: .36;
+                }
+            }
+
+            /* Caption */
+            .caption {
+                position: absolute;
+                inset: auto var(--pad) calc(12vh + var(--safe-bottom)) var(--pad);
+                text-align: center;
+                width: min(100%, 840px);
+                margin: auto;
+                left: 0;
+                right: 0;
+                font-size: clamp(20px, 3.8vw, 36px);
+                font-weight: 600;
+                letter-spacing: .2px;
+                text-shadow: 0 2px 24px rgba(0, 0, 0, .35);
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            .app.rebirth .caption {
+                animation: say 1.4s ease forwards;
+                animation-delay: var(--caption-delay);
+                animation-play-state: var(--anim);
+            }
+
+            @keyframes say {
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            /* Feather (inline SVG) container transformed by JS */
+            .feather {
+                position: absolute;
+                width: min(14vw, 140px);
+                aspect-ratio: 5 / 2;
+                will-change: transform, opacity;
+                opacity: 0;
+                filter: drop-shadow(0 2px 6px rgba(0, 0, 0, .35));
+                pointer-events: none;
+            }
+
+            .lowfps .feather {
+                filter: none;
+            }
+
+            /* lighter on slow devices */
+
+            /* UI: top bar for sound + hint */
+            .ui {
+                position: fixed;
+                inset: var(--safe-top) var(--safe-right) auto var(--safe-left);
+                display: flex;
+                gap: 10px;
+                align-items: center;
+                justify-content: flex-end;
+                padding: 10px 12px;
+                width: 100%;
+                pointer-events: auto;
+                mix-blend-mode: normal;
+            }
+
+            .hint {
+                color: var(--muted);
+                font-size: 12px;
+                opacity: .85;
+                margin-right: auto;
+                padding-left: 8px;
+                user-select: none;
+            }
+
+            .toggle {
+                -webkit-tap-highlight-color: transparent;
+                background: rgba(255, 255, 255, .08);
+                border: 1px solid rgba(255, 255, 255, .18);
+                border-radius: 999px;
+                padding: 6px 10px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                font-size: 13px;
+                cursor: pointer;
+            }
+
+            .toggle input {
+                appearance: none;
+                width: 34px;
+                height: 18px;
+                border-radius: 999px;
+                background: #555;
+                position: relative;
+                outline: none;
+                cursor: pointer;
+            }
+
+            .toggle input::after {
+                content: "";
+                position: absolute;
+                top: 2px;
+                left: 2px;
+                width: 14px;
+                height: 14px;
+                border-radius: 50%;
+                background: #fff;
+                transition: transform .2s ease;
+            }
+
+            .toggle input:checked {
+                background: #2fbf71;
+            }
+
+            .toggle input:checked::after {
+                transform: translateX(16px);
+            }
+
+            /* CTA + Replay buttons */
+            .controls {
+                position: fixed;
+                inset: auto 0 calc(8vh + var(--safe-bottom)) 0;
+                display: flex;
+                justify-content: center;
+                gap: 12px;
+                pointer-events: auto;
+            }
+
+            button {
+                font: inherit;
+                color: #111;
+                background: #fff;
+                border: 0;
+                border-radius: 999px;
+                padding: 10px 16px;
+                cursor: pointer;
+                transition: transform .15s ease, opacity .2s ease;
+            }
+
+            button:focus-visible {
+                outline: 2px solid #fff;
+                outline-offset: 2px;
+            }
+
+            #startBtn {
+                background: #ffffff;
+                color: #111;
+            }
+
+            #replayBtn {
+                display: none;
+            }
+
+            /* Paused mode: pause CSS animations */
+            .paused,
+            .paused * {
+                animation-play-state: paused !important;
+            }
+
+            /* Reduced motion: keep aesthetics but remove pathing */
+            @media (prefers-reduced-motion: reduce) {
+                .hint [data-dyn] {
+                    display: none;
+                }
+            }
+
+            /* Tiny helper for SR-only live region */
+            .sr {
+                position: absolute !important;
+                width: 1px;
+                height: 1px;
+                margin: -1px;
+                padding: 0;
+                overflow: hidden;
+                clip: rect(0 0 0 0);
+                white-space: nowrap;
+                border: 0;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="app" id="app" aria-label="Rebirth experience">
+            <div class="light" aria-hidden="true"></div>
+            <div class="seed" aria-hidden="true"></div>
+
+            <!-- Feather SVG: light, stylized single path + quill -->
+            <svg id="feather" class="feather" viewBox="0 0 200 80" role="img" aria-label="White feather">
+                <defs>
+                    <linearGradient id="fgrad" x1="0" x2="1">
+                        <stop offset="0" stop-color="#fff" stop-opacity=".95" />
+                        <stop offset="1" stop-color="#fff" stop-opacity=".85" />
+                    </linearGradient>
+                </defs>
+                <!-- vane -->
+                <path d="M14,44
+             C34,20 76,6 124,16
+             C162,24 190,44 194,60
+             C160,58 115,68 84,76
+             C56,76 30,66 18,54
+             C12,48 12,46 14,44Z" fill="url(#fgrad)" />
+                <!-- central quill -->
+                <path d="M22,44 C64,24 118,18 178,50" stroke="#fff" stroke-opacity=".9" stroke-width="3" fill="none" />
+                <!-- little barbs -->
+                <path d="M66,30 58,22 M86,28 78,20 M106,28 100,20 M126,32 121,24 M142,38 138,30" stroke="#fff" stroke-opacity=".8" stroke-width="2" />
+            </svg>
+
+            <div class="caption" id="caption" aria-live="off">You’ve survived your heartbreak. Welcome back.</div>
+
+            <div class="ui" aria-hidden="false">
+                <div class="hint">Click or press <strong>Enter</strong> to begin &nbsp;<span data-dyn>· press <strong>Space</strong> to pause/resume</span></div>
+                <label class="toggle" id="soundLabel" aria-label="Toggle soft pad">
+                    <input id="sound" type="checkbox" aria-pressed="false" />
+                    <span>Sound</span>
+                </label>
+            </div>
+
+            <div class="controls">
+                <button id="startBtn" aria-describedby="startHint">Begin</button>
+                <div id="startHint" class="sr">Press Enter to start. Space will pause or resume.</div>
+                <button id="replayBtn">Replay</button>
+            </div>
+
+            <div id="live" class="sr" aria-live="polite" aria-atomic="true"></div>
+
+            <!-- Soft pad loop (base64 WAV, ~1.8s, 8kHz/8-bit mono). OFF by default. -->
+            <audio id="pad" preload="auto" loop muted src="data:audio/wav;base64,UklGRmQ4AABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YUA4AAB/AAH7AAH2AAB1AAAkAAE1AAD1AAD9AAHkAAB0AAAlAAB2AAH6AAH3AAHfAAB9AAHkAAH7AAHqAABnAAAbAABCAABAAABIAABbAABnAABnAABZAAA2AAAlAAAqAABHAAByAACTAACvAADFAADeAAHqAAH1AAH2AAHkAAB7AAH6AAH/AAD0AACEAABYAAArAAAcAAAuAABRAABwAACOAAClAADFAADSAAHUAAB7AAHjAAH0AAH9AADvAAB/AABdAAAzAAAfAAAcAAAhAAAxAABCAABWAABmAAB1AAB7AAB4AABsAABYAABAAABBAABUAAB3AACIAACgAADBAADUAADlAAH7AAH2AAHfAAB6AAH2AAH+AAD0AAB4AAAsAAAVAAAcAAAzAABQAAB4AACWAACvAADHAADUAADfAAHjAAHqAAH0AAH/AADeAAB/AABaAAAsAAATAAAXAAAuAABFAABXAABjAABqAABtAABpAABfAABPAABEAAAnAAAhAAAzAABYAAB8AACbAAC3AADHAADTAAHYAAB/AAH9AAD2AAHjAAB5AAH0AAH5AADsAABxAAAkAAAPAAAPAAAfAAA5AABWAAByAACKAACiAADDAADSAADYAADZAADYAADQAADCAAB7AABZAABBAAAnAAAcAAArAABFAABXAABmAABzAAB7AAB9AAB4AABtAABdAABRAABKAABLAABTAABgAABxAAB/AACLAACpAADDAADTAADZAADbAADYAADPAAC8AACgAAB/AABqAABYAABPAABOAABSAABbAABoAAB2AAB9AAH/AADzAAHqAAHcAAB0AAB8AAH2AAH/AADzAAB8AAArAAAOAAAMAAAZAAApAAA8AABVAABoAABzAAB8AAH/AAD6AAH0AAHqAAHhAAHcAAHXAAHXAAHdAAHkAAHvAAH6AAH/AAH8AAHvAAHiAAHbAAHWAAB8AABRAAAtAAAZAAAQAAASAAAdAAAwAABFAABUAABgAABpAABvAABzAAB1AAB2AAB2AABxAABqAABiAABgAABiAABqAABxAAB2AAB4AAB4AAB2AABxAABqAABlAABkAABnAABuAAB4AAB/AAHBAAC6AACtAACeAACOAAByAABoAABgAABfAABkAABuAAB8AAH/AAH5AAHsAAHhAAHcAAHYAAB6AABYAABFAAA4AAApAAAcAAAUAAARAAAVAAAdAAAwAABFAABUAABgAABqAABzAAB8AAH/AAH9AAH6AAH0AAHrAAHjAAHeAAHZAAHYAAHZAADtAAB3AABZAABKAAA7AAAoAAAZAAAPAAAQAAAZAAApAAA9AABUAABoAAB2AAH0AAH6AAH8AAH8AAH3AAHqAAHhAAHcAAHWAAHTAAHWAAHcAAHkAAHuAAH6AAH/AAH8AAHqAAHZAAFNAAApAAAPAAAJAAANAAAZAAApAAA8AABTAABlAABxAAB7AAH9AAH8AAH1AAHpAAHjAAHeAAHbAAHZAAHbAAHfAAHqAAH2AAH/AAH9AAHwAAHiAAHdAAHYAAB4AABYAABFAAA4AAApAAAcAAAVAAARAAAVAAAhAAAyAABIAABXAABjAABqAABvAAB1AAB6AAH8AAH/AAH9AAH5AAHxAAHkAAHfAAHcAAHZAAHZAADvAAB9AABbAABIAAA5AAApAAAbAAAPAAANAAAUAAAhAAAxAABIAABYAABnAAB1AAH5AAH9AAH/AAH5AAHuAAHjAAHcAAHWAAHTAAHTAAHUAAHZAAHhAAHuAAH9AAH/AAH1AAHfAAHUAABJAAAnAAAOAAAIAAANAAAZAAApAAA8AABTAABpAAB3AAH4AAH9AAH/AAH7AAHwAAHkAAHfAAHbAAHZAAHYAAD1AAB/AABcAABKAAA5AAApAAAbAAAPAAANAAATAAAgAAAwAABHAABWAABmAABzAAH7AAH/AAH/AAH7AAHxAAHkAAHfAAHcAAHZAAD2AAB/AABdAABKAAA5AAApAAAbAAAPAAANAAATAAAgAAAwAABHAABXAABoAAB3AAH5AAH/AAH/AAH7AAHwAAHkAAHfAAHbAAHaAAHXAAD1AAB/AABdAABKAAA5AAApAAAbAAAPAAANAAATAAAgAAAwAABHAABXAABoAAB3AAH5AAH/AAH/AAH7AAHwAAHkAAHfAAHbAAHaAAHXAAD1AAB/AABdAABKAAA5AAApAAAbAAAPAAANAAATAAAgAAAwAABHAABXAABoAAB3AAH5AAH/AAH/AAH7AAHwAAHkAAHfAAHbAAHaAAHXAAD1AAB/AABdAABKAAA5AAApAAAbAAAPAAANAAATAAAgAAAwAABHAABXAABoAAB3AAH5AAH/AAH/AAH7AAHwAAHkAAHfAAHbAAHaAAHXAAD1AAB/AABdAABKAAA5AAApAAAbAAAPAAANAAATAAAgAAAwAABHAABXAABoAAB3AAH5AAH/AAH/AAH7AAHwAAHkAAHfAAHbAAHaAAHXAAD1AAB/AABdAABKAAA5AAApAAAbAAAPAAANAAATAAAgAAAwAABHAABXAABoAAB3AAH5AAH/AAH/AAH7AAHwAAHkAAHfAAHbAAHaAAHXAAD1AAB/AABdAABKAAA5AAApAAAbAAAPAAANAAATAAAgAAAwAABHAABXAABoAAB3AAH5AAH/AAH/AAH7AAHwAAHkAAHfAAHbAAHaAAHXAAD1AAB/AABdAABKAAA5AAApAAAbAAAPAAANAAATAAAgAAAwAABHAABXAABoAAB3AAH5AAH/AAH/AAH7AAHwAAHkAAHfAAHbAAHaAAHXAAD1AAB/AABdAABKAAA5AAApAAAbAAAPAAANAAATAAAgAAAwAABHAABXAABoAAB3AAH5AAH/AAH/AAH7AAHwAAHkAAHfAAHbAAHaAAHXAAD1AAB/AABdAABKAAA5AAApAAAbAAAPAAANAAATAAAgAAAwAABHAABXAABoAAB3AAH5AAH/AAH/AAH7AAHwAAHkAAHfAAHbAAHaAAHXAAD1AAB/AABdAABKAAA5AAApAAAbAAAPAAANAAATAAAgAAAwAABHAABXAABoAAB3AAH5AAH/AAH/AAH7AAHwAAHkAAHfAAHbAAHaAAHXAAD1AAB/AABdAABKAAA5AAApAAAbAAAPAAANAAAT">
+            </audio>
+        </div>
+
+        <script>
+            /* =========================
+               Timing + Easing constants
+               ========================= */
+            const T = {
+                BG: 7500,                 // sky warm duration
+                LIGHT: 5800,              // radial light expansion
+                FEATHER_START: 300,       // slight delay after click
+                FEATHER_DUR: 7200,        // full drift length
+                CAPTION_TIME: 4500,       // caption reveal
+                BREATH: 3200              // breathing period (CSS mirrors)
+            };
+
+            // Ease-out cubic for natural decel.
+            const easeOutCubic = t => 1 - Math.pow(1 - t, 3);
+
+            // App elements
+            const app = document.getElementById('app');
+            const seed = document.querySelector('.seed');
+            const light = document.querySelector('.light');
+            const feather = document.getElementById('feather');
+            const caption = document.getElementById('caption');
+            const startBtn = document.getElementById('startBtn');
+            const replay = document.getElementById('replayBtn');
+            const sound = document.getElementById('sound');
+            const pad = document.getElementById('pad');
+            const live = document.getElementById('live');
+            const root = document.documentElement;
+
+            // State machine
+            const State = { IDLE: 'IDLE', REBIRTH: 'REBIRTH', COMPLETE: 'COMPLETE' };
+            let state = State.IDLE;
+            let paused = false;
+
+            // Reduced motion
+            const prefersReduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            // If reduced, default sound to OFF and keep muted regardless of checkbox until user explicitly toggles later.
+            if (prefersReduce) {
+                sound.checked = false;
+                pad.muted = true;
+                document.querySelector('.hint').innerHTML = 'Click or press <strong>Enter</strong> to begin';
+            }
+
+            // Focus management
+            startBtn.focus({ preventScroll: true });
+
+            // Keyboard: Enter starts; Space pauses/resumes
+            window.addEventListener('keydown', (e) => {
+                if (e.code === 'Enter' && state === State.IDLE) {
+                    e.preventDefault();
+                    begin();
+                } else if (e.code === 'Space' && state === State.REBIRTH) {
+                    e.preventDefault();
+                    togglePause();
+                }
+            });
+
+            // Click anywhere to start (IDLE)
+            app.addEventListener('click', (e) => {
+                if (state === State.IDLE) begin();
+            });
+
+            // UI controls
+            startBtn.addEventListener('click', begin);
+            replay.addEventListener('click', resetAll);
+            sound.addEventListener('change', () => {
+                sound.setAttribute('aria-pressed', sound.checked ? 'true' : 'false');
+                if (sound.checked && state !== State.IDLE) tryPlay();
+                else pad.pause();
+            });
+
+            /* =========================
+               Sequence Orchestration
+               ========================= */
+            let rafId = null, t0 = 0, lowFps = false, stepSkips = 0;
+            let lastFpsCheck = performance.now(), frames = 0;
+
+            function begin() {
+                if (state !== State.IDLE) return;
+                state = State.REBIRTH;
+                live.textContent = 'Sequence started';
+                app.classList.add('rebirth');
+
+                // Start CSS-driven parts (light + sky) by adding .rebirth; caption via CSS after delay.
+                caption.setAttribute('aria-live', 'polite');
+
+                // Start audio only if user opted in (checkbox) — explicit gesture (click/Enter) just happened.
+                if (sound.checked && !prefersReduce) tryPlay();
+
+                // Kick off feather drift (or simplified fades under reduced motion)
+                if (!prefersReduce) {
+                    setTimeout(startFeather, T.FEATHER_START);
+                } else {
+                    // reduced motion: simple appearance and fade-out timing to match overall feel
+                    feather.style.opacity = '0';
+                    setTimeout(() => { feather.style.opacity = '1'; }, T.FEATHER_START + 200);
+                    setTimeout(() => { feather.style.opacity = '0.0'; }, T.FEATHER_DUR);
+                    // Complete after main durations
+                    setTimeout(complete, Math.max(T.BG, T.FEATHER_DUR) + 600);
+                }
+
+                // Show replay near the end
+                setTimeout(() => {
+                    if (state === State.REBIRTH) {
+                        replay.style.display = 'inline-block';
+                        replay.focus({ preventScroll: true });
+                        state = State.COMPLETE;
+                    }
+                }, Math.max(T.BG, T.FEATHER_DUR) + 1200);
+            }
+
+            function tryPlay() {
+                // Respect modern autoplay policies: must follow a gesture, can still be blocked — then keep muted.
+                pad.muted = false;
+                pad.volume = 0.35;
+                const p = pad.play();
+                if (p && typeof p.catch === 'function') {
+                    p.catch(() => { pad.muted = true; });
+                }
+            }
+
+            function togglePause() {
+                paused = !paused;
+                root.style.setProperty('--anim', paused ? 'paused' : 'running');
+                app.classList.toggle('paused', paused);
+                // Pause audio as well
+                if (paused) pad.pause();
+                else if (sound.checked) tryPlay();
+            }
+
+            /* =========================
+               Feather Path Animation (vanilla GSAP-like)
+               =========================
+               p(t) cubic Bézier from off-screen top-left to off-screen bottom-right:
+               P0(-10%,-10%), P1(30%,10%), P2(65%,60%), P3(110%,110%) in viewport coords.
+               Rotation follows tangent + gentle sinusoidal wobble.
+            */
+            function startFeather() {
+                feather.style.opacity = '1';
+                t0 = performance.now();
+                frames = 0; lastFpsCheck = t0; stepSkips = 0;
+                lowFps = false;
+                loop();
+            }
+            function loop(now) {
+                rafId = requestAnimationFrame(loop);
+                if (paused) return;
+
+                if (!now) now = performance.now();
+                const elapsed = now - t0;
+                const rawt = Math.min(1, elapsed / T.FEATHER_DUR);
+                const t = easeOutCubic(rawt);
+
+                // Viewport size (avoid layout thrash; read once)
+                const vw = window.innerWidth;
+                const vh = window.innerHeight;
+
+                // Bézier points in px
+                const P0 = { x: -0.10 * vw, y: -0.10 * vh };
+                const P1 = { x: 0.30 * vw, y: 0.10 * vh };
+                const P2 = { x: 0.65 * vw, y: 0.60 * vh };
+                const P3 = { x: 1.10 * vw, y: 1.10 * vh };
+
+                // Cubic Bézier position
+                const it = 1 - t;
+                const bx = it * it * it * P0.x + 3 * it * it * t * P1.x + 3 * it * t * t * P2.x + t * t * t * P3.x;
+                const by = it * it * it * P0.y + 3 * it * it * t * P1.y + 3 * it * t * t * P2.y + t * t * t * P3.y;
+
+                // Derivative for tangent (rotation)
+                const dx = 3 * it * it * (P1.x - P0.x) + 6 * it * t * (P2.x - P1.x) + 3 * t * t * (P3.x - P2.x);
+                const dy = 3 * it * it * (P1.y - P0.y) + 6 * it * t * (P2.y - P1.y) + 3 * t * t * (P3.y - P2.y);
+                const baseAngle = Math.atan2(dy, dx) * 180 / Math.PI;
+
+                // Gentle wobble (±10°) with slow frequency; slight yoyo on amplitude
+                const wobble = 10 * Math.sin(2 * Math.PI * (0.25 * t) + 0.5) * (0.6 + 0.4 * Math.sin(Math.PI * t));
+
+                const angle = baseAngle + wobble;
+
+                // Apply transform
+                const translate = `translate(${bx}px, ${by}px)`;
+                const rotate = `rotate(${angle}deg)`;
+                // Scale down slightly as it "falls away"
+                const scale = `scale(${1 - 0.25 * t})`;
+                feather.style.transform = `${translate} ${rotate} ${scale}`;
+                feather.style.opacity = String(1 - 0.1 * t);
+
+                // FPS sampler — if below 28fps, lighten effects
+                frames++;
+                const dt = now - lastFpsCheck;
+                if (dt > 1000) {
+                    const fps = frames * 1000 / dt;
+                    if (fps < 28 && !lowFps) {
+                        lowFps = true;
+                        app.classList.add('lowfps');
+                        stepSkips = 1; // update every 2nd frame if needed
+                    }
+                    frames = 0;
+                    lastFpsCheck = now;
+                }
+                // Optional frame drop to reduce CPU
+                if (stepSkips && (frames % (stepSkips + 1) !== 0)) return;
+
+                // Finish
+                if (rawt >= 1) {
+                    cancelAnimationFrame(rafId);
+                    setTimeout(complete, 600);
+                }
+            }
+
+            function complete() {
+                if (state === State.REBIRTH) {
+                    state = State.COMPLETE;
+                    replay.style.display = 'inline-block';
+                    replay.focus({ preventScroll: true });
+                }
+            }
+
+            function resetAll() {
+                // Stop animations/audio
+                cancelAnimationFrame(rafId);
+                pad.pause(); pad.currentTime = 0;
+                paused = false;
+                root.style.setProperty('--anim', 'running');
+                app.classList.remove('rebirth', 'paused', 'lowfps');
+                feather.style.transform = 'translate(-40px,-40px) rotate(0deg) scale(1)';
+                feather.style.opacity = '0';
+                caption.style.opacity = '0';
+                replay.style.display = 'none';
+                state = State.IDLE;
+                startBtn.focus({ preventScroll: true });
+            }
+
+            /* Resize handling — keep feather off-screen start */
+            window.addEventListener('resize', () => {
+                if (state !== State.REBIRTH) {
+                    feather.style.transform = 'translate(-40px,-40px) rotate(0deg) scale(1)';
+                }
+            });
+        </script>
+    </body>
+
+</html>

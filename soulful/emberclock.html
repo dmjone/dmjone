@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8" />
+        <title>EmberClock — Digital Candle</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <!-- Google Font (allowed external asset) -->
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+        <style>
+            /* ===========================
+       Global + Layout
+       =========================== */
+            :root {
+                --bg-1: #0e0b16;
+                --bg-2: #1b1530;
+                --text: #f3f0ff;
+                --muted: #c9c3e0;
+                --ring: #ae8dfb;
+                --ring-bg: rgba(255, 255, 255, .08);
+                --glass-stroke: rgba(255, 255, 255, .22);
+                --glass-fill: rgba(255, 255, 255, .05);
+                --wax: #f7dfac;
+                --wax-shadow: #e5c98f;
+                --wick: #3b2b2a;
+                --flame-outer: #ffb347;
+                --flame-inner: #fff3a9;
+                --drip: #f5d58a;
+                --smoke: #bfbfbf;
+                --focus: #dac8ff;
+            }
+
+            html,
+            body {
+                height: 100%;
+            }
+
+            body {
+                margin: 0;
+                font-family: 'Outfit', system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+                background: radial-gradient(120% 140% at 70% 0%, var(--bg-2) 0%, var(--bg-1) 50%) fixed,
+                    linear-gradient(180deg, var(--bg-1), var(--bg-2));
+                color: var(--text);
+                display: grid;
+                place-items: center;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+            }
+
+            .app {
+                width: min(92vw, 680px);
+                padding: 20px 18px 28px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 16px;
+                text-align: center;
+            }
+
+            h1 {
+                margin: 0 0 2px 0;
+                font-size: clamp(18px, 3.4vw, 22px);
+                letter-spacing: .35px;
+                font-weight: 600;
+                color: var(--text);
+                opacity: .95;
+            }
+
+            p.lead {
+                margin: 0 0 8px 0;
+                color: var(--muted);
+                font-size: clamp(12px, 2.5vw, 14px);
+            }
+
+            /* ===========================
+       Canvas
+       =========================== */
+            .stage {
+                position: relative;
+                width: min(82vmin, 520px);
+                /* Keep a friendly portrait box; SVG will scale within */
+                aspect-ratio: 1 / 1.2;
+                display: grid;
+                place-items: center;
+                isolation: isolate;
+                /* keep filters tidy */
+            }
+
+            svg {
+                width: 100%;
+                height: 100%;
+                overflow: visible;
+                /* allow glow/smoke to breathe */
+            }
+
+            /* Progress ring */
+            .ring-bg {
+                stroke: var(--ring-bg);
+                stroke-width: 3.5;
+                fill: none;
+            }
+
+            .ring-progress {
+                stroke: var(--ring);
+                stroke-linecap: round;
+                stroke-width: 3.5;
+                fill: none;
+                transition: stroke-dashoffset 0.2s linear;
+            }
+
+            /* Caption + Controls */
+            .caption {
+                position: absolute;
+                inset: auto 0 10% 0;
+                text-align: center;
+                font-size: clamp(14px, 3.4vw, 18px);
+                color: var(--text);
+                opacity: 0;
+                pointer-events: none;
+                transform: translateY(6px);
+                transition: opacity .8s ease, transform .8s ease;
+                text-shadow: 0 1px 8px rgba(0, 0, 0, .35);
+            }
+
+            .caption.show {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            .controls {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                flex-wrap: wrap;
+                justify-content: center;
+                margin-top: 4px;
+            }
+
+            button {
+                appearance: none;
+                border: 1px solid rgba(255, 255, 255, .22);
+                background: linear-gradient(180deg, rgba(255, 255, 255, .08), rgba(255, 255, 255, .02));
+                color: var(--text);
+                padding: 10px 14px;
+                border-radius: 10px;
+                font-weight: 600;
+                letter-spacing: .2px;
+                cursor: pointer;
+                transition: transform .12s ease, border-color .12s ease, background .2s ease;
+            }
+
+            button:hover {
+                transform: translateY(-1px);
+                border-color: rgba(255, 255, 255, .32);
+            }
+
+            button:active {
+                transform: translateY(0);
+            }
+
+            button:focus-visible {
+                outline: 2px solid var(--focus);
+                outline-offset: 2px;
+            }
+
+            .time {
+                min-width: 72px;
+                font-variant-numeric: tabular-nums;
+                letter-spacing: .5px;
+                color: var(--muted);
+                border: 1px dashed rgba(255, 255, 255, .18);
+                border-radius: 10px;
+                padding: 8px 10px;
+                line-height: 1;
+                user-select: none;
+            }
+
+            /* SR-only aria live region */
+            .sr-only {
+                position: absolute !important;
+                width: 1px;
+                height: 1px;
+                padding: 0;
+                margin: -1px;
+                overflow: hidden;
+                clip: rect(0, 0, 0, 0);
+                white-space: nowrap;
+                border: 0;
+            }
+
+            /* Reduced Motion: keep everything calm */
+            @media (prefers-reduced-motion: reduce) {
+                .ring-progress {
+                    transition: none;
+                }
+
+                .caption {
+                    transition: none;
+                }
+
+                button {
+                    transition: none;
+                }
+            }
+        </style>
+    </head>
+
+    <body>
+        <main class="app" role="application" aria-label="EmberClock: a digital candle that burns in real time">
+            <h1>EmberClock</h1>
+            <p class="lead">A gentle 5‑minute candle to get you through this moment.</p>
+
+            <section class="stage" aria-describedby="caption">
+                <!-- Accessible status text appears when finished -->
+                <div id="caption" class="caption" aria-hidden="true">You made it through this moment.</div>
+
+                <!-- SVG Candle -->
+                <svg id="candleSvg" viewBox="0 0 320 420" role="img" aria-labelledby="svgTitle svgDesc">
+                    <title id="svgTitle">Digital candle timer</title>
+                    <desc id="svgDesc">A glass candle with melting wax, a short wick and a flickering flame. A circular arc shows timer progress.</desc>
+                    <defs>
+                        <!-- Glass gradient + subtle highlight -->
+                        <linearGradient id="glassGrad" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="rgba(255,255,255,.10)" />
+                            <stop offset="60%" stop-color="rgba(255,255,255,.04)" />
+                            <stop offset="100%" stop-color="rgba(255,255,255,.02)" />
+                        </linearGradient>
+
+                        <!-- Wax gradient (a little lighter toward the top) -->
+                        <linearGradient id="waxGrad" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="var(--wax)" />
+                            <stop offset="100%" stop-color="var(--wax-shadow)" />
+                        </linearGradient>
+
+                        <!-- Left-side highlight inside wax -->
+                        <linearGradient id="waxHighlight" x1="0" y1="0" x2="1" y2="0">
+                            <stop offset="0%" stop-color="rgba(255,255,255,.35)" />
+                            <stop offset="30%" stop-color="rgba(255,255,255,.15)" />
+                            <stop offset="60%" stop-color="rgba(255,255,255,0)" />
+                        </linearGradient>
+
+                        <!-- Flame glow -->
+                        <filter id="flameGlow" x="-60%" y="-60%" width="220%" height="220%">
+                            <feGaussianBlur in="SourceGraphic" stdDeviation="7" result="blur" />
+                            <feMerge>
+                                <feMergeNode in="blur" />
+                                <feMergeNode in="SourceGraphic" />
+                            </feMerge>
+                        </filter>
+
+                        <!-- Smoke blur -->
+                        <filter id="smokeBlur">
+                            <feGaussianBlur stdDeviation="1.2" />
+                        </filter>
+
+                        <!-- Clip candle interior so wax stays inside glass -->
+                        <clipPath id="jarClip">
+                            <rect id="jarClipRect" x="100" y="120" width="120" height="210" rx="18" ry="18"></rect>
+                        </clipPath>
+                    </defs>
+
+                    <!-- Progress ring (rotated so 0% starts at top) -->
+                    <g transform="rotate(-90 160 210)">
+                        <circle class="ring-bg" cx="160" cy="210" r="150"></circle>
+                        <circle class="ring-progress" id="ringProgress" cx="160" cy="210" r="150"></circle>
+                    </g>
+
+                    <!-- Glass jar -->
+                    <g id="glass">
+                        <rect x="100" y="120" width="120" height="210" rx="18" ry="18" fill="url(#glassGrad)" stroke="var(--glass-stroke)" stroke-width="1.5" />
+                        <!-- Subtle base -->
+                        <ellipse cx="160" cy="332" rx="56" ry="10" fill="rgba(255,255,255,.06)" />
+                    </g>
+
+                    <!-- Wax (clipped to jar) -->
+                    <g id="waxGroup" clip-path="url(#jarClip)">
+                        <rect id="waxRect" x="103" y="140" width="114" height="186" rx="14" fill="url(#waxGrad)" opacity=".95"></rect>
+                        <!-- inner highlight strip -->
+                        <rect x="103" y="120" width="32" height="210" fill="url(#waxHighlight)" opacity=".18"></rect>
+                        <!-- dynamic drips live here -->
+                        <g id="drips"></g>
+                    </g>
+
+                    <!-- Wick (position updated by JS) -->
+                    <rect id="wick" x="158.5" y="180" width="3" height="26" rx="1.5" fill="var(--wick)"></rect>
+
+                    <!-- Flame (drawn around origin; transformed in JS) -->
+                    <g id="flame" filter="url(#flameGlow)" transform="translate(160,160)">
+                        <!-- Base at y=0 so we can rotate around the wick tip -->
+                        <ellipse cx="0" cy="-15" rx="9" ry="14" fill="var(--flame-outer)" opacity=".95"></ellipse>
+                        <ellipse cx="0" cy="-19" rx="5.5" ry="9" fill="var(--flame-inner)"></ellipse>
+                    </g>
+
+                    <!-- Extinguish smoke -->
+                    <g id="smoke" filter="url(#smokeBlur)"></g>
+                </svg>
+            </section>
+
+            <section class="controls" aria-label="Controls">
+                <button id="startBtn" type="button">Start</button>
+                <button id="restartBtn" type="button" hidden>Restart</button>
+                <div class="time" id="timeDisplay" aria-live="polite" aria-atomic="true">5:00</div>
+                <!-- polite live updates each 30s for remaining time -->
+                <div id="ariaAnnouncer" class="sr-only" aria-live="polite"></div>
+            </section>
+        </main>
+
+        <script>
+            /* ========================================================
+               EmberClock — Single controller, no deps
+               --------------------------------------------------------
+               Quick config & extensibility (colors, durations, themes)
+               ======================================================== */
+            const CONFIG = {
+                // Default burn length (5:00). You can change this here or via URL: ?minutes=3
+                DURATION_MS: 5 * 60 * 1000,
+
+                // Palette (tweak to theme)
+                COLORS: {
+                    ring: getComputedStyle(document.documentElement).getPropertyValue('--ring').trim() || '#ae8dfb',
+                    ringBg: getComputedStyle(document.documentElement).getPropertyValue('--ring-bg').trim() || 'rgba(255,255,255,.08)',
+                    wax: getComputedStyle(document.documentElement).getPropertyValue('--wax').trim() || '#f7dfac',
+                    waxShadow: getComputedStyle(document.documentElement).getPropertyValue('--wax-shadow').trim() || '#e5c98f',
+                    wick: getComputedStyle(document.documentElement).getPropertyValue('--wick').trim() || '#3b2b2a',
+                    flameOuter: getComputedStyle(document.documentElement).getPropertyValue('--flame-outer').trim() || '#ffb347',
+                    flameInner: getComputedStyle(document.documentElement).getPropertyValue('--flame-inner').trim() || '#fff3a9',
+                    drip: getComputedStyle(document.documentElement).getPropertyValue('--drip').trim() || '#f5d58a',
+                    smoke: getComputedStyle(document.documentElement).getPropertyValue('--smoke').trim() || '#bfbfbf',
+                },
+
+                // Drip pacing (randomized around this mean). Set higher to reduce drip frequency.
+                DRIP_MEAN_MS: 4000,
+
+                // Flame flicker bounds (used when motion is NOT reduced)
+                FLICKER_ROT_DEG: 2.8,   // ±deg
+                FLICKER_SCALE: 0.035, // ±scale
+
+                // Smoke duration after flame out
+                SMOKE_MS: 1500,
+            };
+
+            /* --------------------------------------------------------
+               Optional extensions (uncomment and plug where needed):
+               - Presets: 1/3/5/10 minutes
+                 const PRESETS = {1:60000,3:180000,5:300000,10:600000};
+                 // set CONFIG.DURATION_MS = PRESETS[desired];
+          
+               - Theme switch:
+                 document.documentElement.dataset.theme = 'midnight';
+                 // Swap CSS custom properties or toggle a class.
+          
+               - Query param override (?minutes=3)
+            --------------------------------------------------------- */
+            const urlParams = new URLSearchParams(location.search);
+            if (urlParams.has('minutes')) {
+                const m = Math.max(1, Math.min(60, parseFloat(urlParams.get('minutes')) || 5));
+                CONFIG.DURATION_MS = Math.round(m * 60 * 1000);
+            }
+
+            // Reduced motion detection
+            const REDUCED_MOTION = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+            /* ========================================================
+               Small math helpers
+               ======================================================== */
+            const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
+            const lerp = (a, b, t) => a + (b - a) * t;
+            const smoothstep = (t) => t * t * (3 - 2 * t); // gentle S-curve for easing
+            const easeInOutCubic = (t) => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+            // Hash-based value noise (Perlin-like feel without lib): smooth random [0,1]
+            function hash(n) { return (Math.sin(n * 12.9898 + 78.233) * 43758.5453) % 1; }
+            function valueNoise(t) {
+                const i0 = Math.floor(t), i1 = i0 + 1, f = t - i0;
+                const u = smoothstep(f);
+                return (1 - u) * (hash(i0) - Math.floor(hash(i0))) + u * (hash(i1) - Math.floor(hash(i1)));
+            }
+            // Multi-osc layer for richer flicker
+            function flickerNoise(t) {
+                return 0.6 * valueNoise(t * 1.2) + 0.3 * valueNoise(t * 2.1) + 0.1 * valueNoise(t * 5.4);
+            }
+
+            // Time formatting (MM:SS)
+            function fmtTime(ms) {
+                ms = Math.max(0, ms | 0);
+                const s = Math.round(ms / 1000);
+                const m = Math.floor(s / 60);
+                const r = s % 60;
+                return `${String(m).padStart(1, '0')}:${String(r).padStart(2, '0')}`;
+            }
+
+            /* ========================================================
+               EmberClock Controller
+               ======================================================== */
+            class EmberClock {
+                constructor() {
+                    // DOM refs
+                    this.svg = document.getElementById('candleSvg');
+                    this.ring = document.getElementById('ringProgress');
+                    this.waxRect = document.getElementById('waxRect');
+                    this.wick = document.getElementById('wick');
+                    this.flame = document.getElementById('flame');
+                    this.dripsLayer = document.getElementById('drips');
+                    this.smokeLayer = document.getElementById('smoke');
+                    this.caption = document.getElementById('caption');
+                    this.timeDisplay = document.getElementById('timeDisplay');
+                    this.announcer = document.getElementById('ariaAnnouncer');
+
+                    // Buttons
+                    this.startBtn = document.getElementById('startBtn');
+                    this.restartBtn = document.getElementById('restartBtn');
+
+                    // Geometry (match SVG values)
+                    this.jar = { x: 100, y: 120, w: 120, h: 210, rx: 18 };
+                    this.cx = 160;              // center x (for wick/flame)
+                    this.ringR = 150;
+                    this.ringLen = 2 * Math.PI * this.ringR;
+                    this.ring.setAttribute('stroke-dasharray', String(this.ringLen));
+                    this.ring.setAttribute('stroke-dashoffset', String(this.ringLen));
+
+                    // State
+                    this.duration = CONFIG.DURATION_MS;
+                    this.elapsed = 0;
+                    this.playing = false;
+                    this.finished = false;
+                    this.lastTs = 0;
+                    this.lastAnnounce = -Infinity;
+
+                    // Wick parameters
+                    this.wickStart = 24;  // px visible above wax at t=0
+                    this.wickEnd = 10;  // px at t=1
+
+                    // Wax movement range (keep a bit at bottom)
+                    this.waxTopStart = this.jar.y + 14;
+                    this.waxTopEnd = this.jar.y + this.jar.h - 26;
+
+                    // Drips + Smoke
+                    this.drips = [];
+                    this.smokes = [];
+                    this.nextDripDue = performance.now() + CONFIG.DRIP_MEAN_MS;
+
+                    // UI
+                    this.updateTimeDisplay();
+
+                    // Events
+                    this.startBtn.addEventListener('click', () => this.start());
+                    this.restartBtn.addEventListener('click', () => this.restart());
+
+                    // Page Visibility: pause when tab hidden, resume when visible
+                    document.addEventListener('visibilitychange', () => {
+                        if (document.hidden) {
+                            this.pause();
+                        } else {
+                            this.resume();
+                        }
+                    });
+
+                    // Render initial static frame (not burning)
+                    this.drawFrame(0);
+                }
+
+                start() {
+                    if (this.playing) return;
+                    this.playing = true;
+                    this.finished = false;
+                    this.caption.classList.remove('show');
+                    this.restartBtn.hidden = true;
+                    this.elapsed = 0;
+                    this.lastTs = performance.now();
+                    this.nextDripDue = this.lastTs + CONFIG.DRIP_MEAN_MS;
+                    this.smokes.length = 0;
+                    this.drips.length = 0;
+                    this.smokeLayer.textContent = '';
+                    this.dripsLayer.textContent = '';
+                    this.loopId = requestAnimationFrame(this.loop.bind(this));
+                    this.updateTimeDisplay();
+                    this.announceRemaining(); // announce start remaining
+                    this.startBtn.setAttribute('aria-disabled', 'true');
+                    this.startBtn.disabled = true;
+                }
+
+                restart() {
+                    this.startBtn.disabled = false;
+                    this.startBtn.removeAttribute('aria-disabled');
+                    this.start(); // restart immediately
+                }
+
+                pause() {
+                    if (!this.playing) return;
+                    this.playing = false;
+                    cancelAnimationFrame(this.loopId);
+                    this.lastTs = 0;
+                }
+
+                resume() {
+                    if (this.finished || this.playing) return;
+                    this.playing = true;
+                    this.lastTs = performance.now();
+                    this.loopId = requestAnimationFrame(this.loop.bind(this));
+                }
+
+                loop(ts) {
+                    if (!this.playing) return;
+                    if (!this.lastTs) this.lastTs = ts;
+                    const dt = ts - this.lastTs;
+                    this.lastTs = ts;
+
+                    // Advance time
+                    this.elapsed = clamp(this.elapsed + dt, 0, this.duration);
+
+                    // Draw frame
+                    this.drawFrame(dt);
+
+                    // Announce every 30s
+                    if (this.elapsed - this.lastAnnounce >= 30000) {
+                        this.announceRemaining();
+                    }
+
+                    // End condition
+                    if (this.elapsed >= this.duration) {
+                        this.endSequence();
+                    } else {
+                        this.loopId = requestAnimationFrame(this.loop.bind(this));
+                    }
+                }
+
+                drawFrame(dt) {
+                    const t = this.elapsed / this.duration;
+                    const eased = 0.85 * easeInOutCubic(t) + 0.15 * t; // mostly eased, slightly linear
+
+                    // Progress ring
+                    const offset = this.ringLen * (1 - t);
+                    this.ring.setAttribute('stroke-dashoffset', String(offset));
+
+                    // Wax level (moves down)
+                    const waxTop = lerp(this.waxTopStart, this.waxTopEnd, eased);
+                    const waxH = (this.jar.y + this.jar.h) - waxTop;
+                    this.waxRect.setAttribute('y', waxTop.toFixed(2));
+                    this.waxRect.setAttribute('height', waxH.toFixed(2));
+
+                    // Wick (shortens)
+                    const wickLen = lerp(this.wickStart, this.wickEnd, t);
+                    const flameBaseY = waxTop - 2; // just above the wax surface
+                    const wickY = flameBaseY - wickLen;
+                    this.wick.setAttribute('y', wickY.toFixed(2));
+                    this.wick.setAttribute('height', wickLen.toFixed(2));
+
+                    // Flame (position + gentle flicker)
+                    const baseX = this.cx;
+                    let scale = 1, rot = 0, opacity = 1;
+
+                    // As candle finishes (last ~5s), start dimming slightly
+                    const timeLeft = this.duration - this.elapsed;
+                    if (timeLeft < 5000) {
+                        opacity = lerp(0.6, 1, timeLeft / 5000);
+                    }
+
+                    // Reduced motion: no flicker/drips/smoke; keep linear transforms only.
+                    if (!REDUCED_MOTION) {
+                        const time = performance.now() / 1000;
+                        const n = flickerNoise(time * 1.5 + 7.3);       // 0..1
+                        const wobble = (n - 0.5) * 2;                 // -1..1
+                        scale = 1 + wobble * CONFIG.FLICKER_SCALE;    // ± few %
+                        rot = wobble * CONFIG.FLICKER_ROT_DEG;        // ± couple deg
+                    }
+
+                    const flameY = (flameBaseY).toFixed(2);
+                    const tf = `translate(${baseX},${flameY}) rotate(${rot}) scale(${scale})`;
+                    this.flame.setAttribute('transform', tf);
+                    this.flame.setAttribute('opacity', opacity.toFixed(2));
+
+                    // Drips (spawn + animate) — disabled in reduced motion
+                    if (!REDUCED_MOTION) {
+                        this.maybeSpawnDrip();
+                        this.updateDrips(dt);
+                    }
+
+                    // Update the visible time
+                    this.updateTimeDisplay();
+                }
+
+                endSequence() {
+                    if (this.finished) return;
+                    this.finished = true;
+                    this.playing = false;
+                    cancelAnimationFrame(this.loopId);
+
+                    // 1) Flame fades out
+                    const fadeStart = performance.now();
+                    const fadeDur = 900;
+                    const fade = () => {
+                        const k = clamp((performance.now() - fadeStart) / fadeDur, 0, 1);
+                        const op = 1 - k;
+                        this.flame.setAttribute('opacity', op.toFixed(3));
+                        // shrink a touch as it fades
+                        const t = `translate(${this.cx},${(parseFloat(this.wick.getAttribute('y'))).toFixed(2)}) scale(${1 - 0.15 * k})`;
+                        this.flame.setAttribute('transform', t);
+                        if (k < 1) requestAnimationFrame(fade);
+                        else this.spawnSmoke();
+                    };
+                    fade();
+
+                    // 3) Caption fade-in and 4) Show Restart
+                    setTimeout(() => {
+                        this.caption.classList.add('show');
+                        this.restartBtn.hidden = false;
+                        this.restartBtn.focus({ preventScroll: true });
+                    }, 550);
+                }
+
+                spawnSmoke() {
+                    if (REDUCED_MOTION) return; // no smoke in reduced motion
+                    // 2) Wick smokes (1.5s) with small gray particles
+                    const count = 10;
+                    const baseY = parseFloat(this.wick.getAttribute('y'));
+                    for (let i = 0; i < count; i++) {
+                        const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                        const dx = (Math.random() * 6 - 3);
+                        const r = 1.5 + Math.random() * 1.4;
+                        c.setAttribute('cx', String(this.cx + dx));
+                        c.setAttribute('cy', String(baseY - 2));
+                        c.setAttribute('r', String(r.toFixed(2)));
+                        c.setAttribute('fill', 'var(--smoke)');
+                        c.setAttribute('opacity', '.7');
+                        this.smokeLayer.appendChild(c);
+                        this.smokes.push({
+                            el: c, x: this.cx + dx, y: baseY - 2, r, t: 0, life: CONFIG.SMOKE_MS * (0.6 + Math.random() * 0.6),
+                            sway: (Math.random() * 8 - 4)
+                        });
+                    }
+                    const start = performance.now();
+                    const step = () => {
+                        const now = performance.now();
+                        const alive = [];
+                        for (const s of this.smokes) {
+                            s.t = now - start;
+                            const k = clamp(s.t / s.life, 0, 1);
+                            const up = lerp(0, 18 + s.r * 8, smoothstep(k));
+                            const side = s.sway * k;
+                            const alpha = (1 - k) * 0.7;
+                            s.el.setAttribute('cx', String(s.x + side));
+                            s.el.setAttribute('cy', String(s.y - up));
+                            s.el.setAttribute('opacity', String(alpha.toFixed(3)));
+                            if (k < 1) alive.push(s); else s.el.remove();
+                        }
+                        this.smokes = alive;
+                        if (alive.length > 0) requestAnimationFrame(step);
+                    };
+                    step();
+                }
+
+                updateDrips(dt) {
+                    const bottom = this.jar.y + this.jar.h - 2;
+                    const alive = [];
+                    for (const d of this.drips) {
+                        d.t += dt;
+                        const k = clamp(d.t / d.life, 0, 1);
+                        const eased = k * k; // ease-in (gravity feel)
+                        const y = d.y0 + eased * d.dy;
+                        const a = 0.85 * (1 - k);
+                        d.el.setAttribute('transform', `translate(${d.x.toFixed(2)},${y.toFixed(2)})`);
+                        d.el.setAttribute('opacity', a.toFixed(3));
+                        if (y < bottom && a > 0.02) alive.push(d);
+                        else d.el.remove();
+                    }
+                    this.drips = alive;
+                }
+
+                maybeSpawnDrip() {
+                    const now = performance.now();
+                    if (now < this.nextDripDue) return;
+                    this.nextDripDue = now + (CONFIG.DRIP_MEAN_MS * (0.6 + Math.random() * 0.9));
+
+                    // Spawn at left OR right side, near the current wax surface
+                    const waxTop = parseFloat(this.waxRect.getAttribute('y'));
+                    const side = Math.random() < 0.5 ? 'L' : 'R';
+                    const x = side === 'L' ? (this.jar.x + 12) : (this.jar.x + this.jar.w - 12);
+                    const drip = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    drip.setAttribute('fill', 'var(--drip)');
+                    // Simple teardrop path around (0,0); we translate it with transform
+                    drip.setAttribute('d', 'M0,0 C-2,-5 -2,-10 0,-12 C2,-10 2,-5 0,0 Z');
+                    drip.setAttribute('opacity', '.85');
+                    this.dripsLayer.appendChild(drip);
+
+                    const life = 1600 + Math.random() * 1800;
+                    const dy = 30 + Math.random() * 60;
+                    const y0 = waxTop + 6;
+
+                    this.drips.push({ el: drip, x, y0, dy, t: 0, life });
+                    drip.setAttribute('transform', `translate(${x},${y0})`);
+                }
+
+                updateTimeDisplay() {
+                    const left = this.duration - this.elapsed;
+                    this.timeDisplay.textContent = fmtTime(left);
+                }
+
+                announceRemaining() {
+                    this.lastAnnounce = this.elapsed;
+                    const left = Math.max(0, this.duration - this.elapsed);
+                    const mins = Math.ceil(left / 60000);
+                    const text = mins > 1 ? `${mins} minutes left` : (mins === 1 ? `1 minute left` : `Less than a minute left`);
+                    this.announcer.textContent = text;
+                }
+            }
+
+            // Initialize controller
+            const app = new EmberClock();
+
+            // On load, keep Start visible; show initial time (based on duration)
+            document.getElementById('timeDisplay').textContent = fmtTime(CONFIG.DURATION_MS);
+
+            /* ========================================================
+               Notes for developers:
+               - requestAnimationFrame drives smooth animation frames
+               - Page Visibility API pauses when tab is hidden
+               - prefers-reduced-motion disables flicker/drips/smoke
+               - SVG filter feGaussianBlur creates the flame glow
+               - Progress ring uses stroke-dasharray/offset
+               ======================================================== */
+        </script>
+    </body>
+
+</html>

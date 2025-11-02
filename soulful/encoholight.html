@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<!--
+EchoLight — single-file web app (paste & deploy)
+Author: You + ChatGPT (GPT-5 Pro)
+Size goals: sub-100KB total. No external requests. No tracking.
+
+AT‑A‑GLANCE TUNING (search "CONFIG" below):
+- Palette: --bg1, --bg2, ripple hues, glow colors
+- Ripple behavior: MAX_RIPPLES, RIPPLE_LIFETIME, RIPPLE_THICKNESS
+- Mic sensitivity: SILENCE_THRESHOLD, SILENCE_TIMEOUT_MS
+- Type effect density: PARTICLE_STEP_BASE, MAX_PARTICLES
+- Performance guard: FPS_MIN_GOOD, FPS_MIN_OK (auto-throttle particles)
+- Accessibility: respects prefers-reduced-motion (particles disabled; fade-only)
+
+References / platform notes:
+- Web Audio + AnalyserNode for RMS amplitude (time-domain). MDN. 
+- Mic permission + user gesture constraints. MDN / Chrome/Safari behaviors.
+- requestAnimationFrame for animation loop. MDN.
+- prefers-reduced-motion. MDN.
+- overscroll-behavior for iOS/Android bounce. MDN.
+-->
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+        <title>EchoLight</title>
+        <meta name="color-scheme" content="dark">
+        <style>
+            :root {
+                /* CONFIG — palette */
+                --bg1: #0b0f14;
+                --bg2: #101826;
+                --card: rgba(255, 255, 255, 0.06);
+                --card-border: rgba(255, 255, 255, 0.12);
+                --text: #e6eefc;
+                --text-dim: #a8b3c7;
+                --accent: #7cc9ff;
+                --accent-2: #47ffe0;
+
+                --shadow-strong: 0 8px 40px rgba(0, 180, 255, 0.12), 0 0 120px rgba(36, 255, 230, 0.08);
+                --shadow-subtle: 0 4px 20px rgba(0, 0, 0, 0.35);
+
+                --radius: 14px;
+                --ring: 2px solid #4cc4ff;
+
+                --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Noto Sans", Arial, "Apple Color Emoji", "Segoe UI Emoji";
+            }
+
+            * {
+                box-sizing: border-box;
+            }
+
+            html,
+            body {
+                height: 100%;
+                min-height: 100%;
+                background: linear-gradient(160deg, var(--bg1), var(--bg2));
+                color: var(--text);
+                font-family: var(--font);
+                letter-spacing: 0.1px;
+                overscroll-behavior: none;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+            }
+
+            body {
+                margin: 0;
+                min-height: 100svh;
+            }
+
+            canvas#bg {
+                position: fixed;
+                inset: 0;
+                width: 100%;
+                height: 100%;
+                display: block;
+                z-index: 0;
+            }
+
+            /* Center card */
+            .card {
+                position: relative;
+                z-index: 1;
+                width: min(680px, 92vw);
+                margin: min(10vh, 12svh) auto 10vh;
+                padding: 20px 18px 16px;
+                background: var(--card);
+                border: 1px solid var(--card-border);
+                border-radius: var(--radius);
+                box-shadow: var(--shadow-subtle), var(--shadow-strong);
+                backdrop-filter: blur(12px);
+            }
+
+            .tabs {
+                display: inline-flex;
+                border: 1px solid var(--card-border);
+                border-radius: 999px;
+                overflow: hidden;
+                margin: 8px auto 14px;
+                background: rgba(255, 255, 255, 0.04);
+            }
+
+            .tabs [role="tab"] {
+                appearance: none;
+                border: 0;
+                background: transparent;
+                padding: 10px 16px;
+                color: var(--text-dim);
+                cursor: pointer;
+                font-weight: 600;
+                font-size: 14px;
+            }
+
+            .tabs [role="tab"].active,
+            .tabs [role="tab"]:hover {
+                color: var(--text);
+            }
+
+            .tabs [role="tab"].active {
+                background: linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.06));
+            }
+
+            .panel {
+                display: none;
+                padding: 8px 8px 4px;
+            }
+
+            .panel.active {
+                display: block;
+            }
+
+            .row {
+                display: grid;
+                grid-template-columns: 1fr auto;
+                gap: 10px;
+                align-items: start;
+            }
+
+            textarea {
+                width: 100%;
+                min-height: 124px;
+                max-height: 48vh;
+                padding: 12px 14px;
+                border-radius: 10px;
+                border: 1px solid var(--card-border);
+                background: rgba(255, 255, 255, 0.05);
+                color: var(--text);
+                resize: vertical;
+                outline: none;
+                box-shadow: inset 0 0 0 0 rgba(76, 196, 255, 0);
+            }
+
+            textarea:focus {
+                outline: var(--ring);
+            }
+
+            .btn {
+                appearance: none;
+                border: 1px solid var(--card-border);
+                background: linear-gradient(180deg, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.03));
+                color: var(--text);
+                font-weight: 700;
+                padding: 12px 16px;
+                border-radius: 12px;
+                cursor: pointer;
+                min-width: 108px;
+                transition: transform .06s ease, box-shadow .2s ease;
+            }
+
+            .btn:hover {
+                transform: translateY(-1px);
+            }
+
+            .btn:active {
+                transform: translateY(0);
+            }
+
+            .btn:focus-visible {
+                outline: var(--ring);
+            }
+
+            .micwrap {
+                display: grid;
+                gap: 14px;
+                justify-items: center;
+                padding: 8px 0 4px;
+            }
+
+            .micBtn {
+                width: 64px;
+                height: 64px;
+                border-radius: 50%;
+                border: 1px solid var(--card-border);
+                background: radial-gradient(100% 100% at 50% 0, rgba(124, 201, 255, 0.28), rgba(124, 201, 255, 0.06));
+                box-shadow: inset 0 0 20px rgba(71, 255, 224, 0.12);
+                font-size: 26px;
+                line-height: 64px;
+            }
+
+            .micBtn.listening {
+                outline: 3px solid rgba(71, 255, 224, 0.35);
+                box-shadow: 0 0 0 8px rgba(71, 255, 224, 0.08), inset 0 0 26px rgba(71, 255, 224, 0.22);
+            }
+
+            .viz {
+                width: 180px;
+                height: 180px;
+                border-radius: 50%;
+                position: relative;
+                box-shadow: 0 0 0 1px rgba(124, 201, 255, 0.2) inset, 0 0 90px rgba(71, 255, 224, 0.08);
+                background: radial-gradient(closest-side, rgba(124, 201, 255, 0.12), rgba(124, 201, 255, 0.02) 60%, transparent 70%);
+            }
+
+            .notice {
+                color: var(--text-dim);
+                font-size: 13px;
+                text-align: center;
+                min-height: 1.2em;
+            }
+
+            .footer {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 12px;
+                margin-top: 14px;
+                font-size: 12.5px;
+                color: var(--text-dim);
+            }
+
+            .sound {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+            }
+
+            .sound .toggle {
+                width: 32px;
+                height: 24px;
+                border-radius: 999px;
+                border: 1px solid var(--card-border);
+                background: rgba(255, 255, 255, 0.04);
+                display: grid;
+                place-items: center;
+                cursor: pointer;
+            }
+
+            .toggle[aria-pressed="true"] {
+                background: rgba(124, 201, 255, 0.15);
+            }
+
+            .toggle:focus-visible {
+                outline: var(--ring);
+            }
+
+            .help {
+                position: relative;
+                display: inline-block;
+                cursor: help;
+                color: var(--accent);
+            }
+
+            .help::after {
+                content: attr(data-tip);
+                position: absolute;
+                left: 50%;
+                bottom: 125%;
+                transform: translateX(-50%) translateY(6px);
+                background: rgba(14, 18, 27, 0.98);
+                color: var(--text);
+                border: 1px solid var(--card-border);
+                border-radius: 8px;
+                padding: 8px 10px;
+                font-size: 12.5px;
+                white-space: nowrap;
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity .2s ease, transform .2s ease;
+                box-shadow: var(--shadow-subtle);
+            }
+
+            .help:hover::after,
+            .help:focus::after {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+
+            .sr-only {
+                position: absolute !important;
+                width: 1px;
+                height: 1px;
+                padding: 0;
+                margin: -1px;
+                overflow: hidden;
+                clip: rect(0, 0, 0, 0);
+                white-space: nowrap;
+                border: 0;
+            }
+
+            @media (max-width: 460px) {
+                .viz {
+                    width: 150px;
+                    height: 150px;
+                }
+
+                .micBtn {
+                    width: 58px;
+                    height: 58px;
+                    line-height: 58px;
+                    font-size: 22px;
+                }
+            }
+
+            @media (prefers-reduced-motion: reduce) {
+                * {
+                    animation-duration: 0.001ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.001ms !important;
+                    scroll-behavior: auto !important;
+                }
+            }
+        </style>
+    </head>
+
+    <body>
+        <canvas id="bg" aria-hidden="true"></canvas>
+
+        <main class="card" role="region" aria-label="EchoLight">
+            <div class="tabs" role="tablist" aria-label="Input mode">
+                <button id="tabSpeak" role="tab" aria-controls="panelSpeak" aria-selected="true" class="active">Speak</button>
+                <button id="tabType" role="tab" aria-controls="panelType" aria-selected="false">Type</button>
+            </div>
+
+            <section id="panelSpeak" class="panel active" role="tabpanel" aria-labelledby="tabSpeak">
+                <div class="micwrap">
+                    <div class="viz" aria-hidden="true"></div>
+                    <button id="micBtn" class="btn micBtn" aria-pressed="false" aria-label="Toggle microphone">🎙️</button>
+                    <div class="notice" id="micNotice" role="status" aria-live="polite"></div>
+                </div>
+            </section>
+
+            <section id="panelType" class="panel" role="tabpanel" aria-labelledby="tabType">
+                <div class="row">
+                    <textarea id="text" maxlength="500" placeholder="Type the words you wish you could say... (500 max)"></textarea>
+                    <button id="releaseBtn" class="btn">Release</button>
+                </div>
+            </section>
+
+            <div id="live" class="sr-only" aria-live="polite"></div>
+
+            <div class="footer">
+                <span>Nothing is saved.</span>
+                <div class="sound">
+                    <span class="help" tabindex="0" data-tip="Speak or type. Your words become light and then fade. The page never uploads audio or text.">?</span>
+                    <button id="soundToggle" class="toggle" aria-label="Ambient sound" aria-pressed="false" title="Ambient sound">🔇</button>
+                </div>
+            </div>
+        </main>
+
+        <script>
+(function(){
+'use strict';
+
+/* =========================
+   CONFIG (see AT‑A‑GLANCE)
+   ========================= */
+const CONFIG = {
+  // Visuals
+  MAX_RIPPLES: 240,
+  RIPPLE_LIFETIME: 2.8,           // seconds
+  RIPPLE_THICKNESS: 2.2,          // px base
+  HUE_START: 210,                  // blue
+  HUE_END: 180,                    // cyan
+  GLOW_ALPHA: 0.8,
+
+  // Mic
+  SILENCE_THRESHOLD: 0.015,        // RMS below this considered "silent"
+  SILENCE_TIMEOUT_MS: 10000,       // 10s -> auto stop
+  MIN_EMIT_INTERVAL_MS: 50,
+
+  // Typing -> particles
+  PARTICLE_STEP_BASE: 6,           // px grid sampling step
+  MAX_PARTICLES: 1800,
+  PARTICLE_LIFE: [1.8, 3.0],       // seconds range
+  PARTICLE_SPEED: [40, 100],       // px/s radial
+  PARTICLE_TANGENTIAL: [0.6, 1.4], // rad/s spiral
+
+  // Performance guard
+  FPS_MIN_GOOD: 50,
+  FPS_MIN_OK: 40,
+
+  // Caption
+  CAPTION_TEXT: 'Some silences are kind.',
+
+  // Audio pad generation (base64 WAV)
+  PAD_SR: 8000,
+  PAD_DUR: 1.1,                    // seconds (keeps total <25KB)
+};
+
+/* =========================
+   DOM
+   ========================= */
+const canvas = document.getElementById('bg');
+const ctx = canvas.getContext('2d');
+const card = document.querySelector('.card');
+const viz = document.querySelector('.viz');
+const micBtn = document.getElementById('micBtn');
+const micNotice = document.getElementById('micNotice');
+const tabSpeak = document.getElementById('tabSpeak');
+const tabType = document.getElementById('tabType');
+const panelSpeak = document.getElementById('panelSpeak');
+const panelType = document.getElementById('panelType');
+const releaseBtn = document.getElementById('releaseBtn');
+const textarea = document.getElementById('text');
+const soundToggle = document.getElementById('soundToggle');
+const live = document.getElementById('live');
+
+/* =========================
+   Canvas sizing (DPI aware)
+   ========================= */
+let dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+function resizeCanvas(){
+  const {clientWidth, clientHeight} = document.documentElement;
+  dpr = Math.max(1, Math.min(2.5, window.devicePixelRatio || 1));
+  canvas.width = Math.floor(clientWidth * dpr);
+  canvas.height = Math.floor(clientHeight * dpr);
+  canvas.style.width = clientWidth + 'px';
+  canvas.style.height = clientHeight + 'px';
+}
+resizeCanvas();
+addEventListener('resize', resizeCanvas, {passive: true});
+addEventListener('orientationchange', ()=>setTimeout(resizeCanvas, 120), {passive: true});
+
+/* =========================
+   Accessibility flags
+   ========================= */
+const prefersReducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* =========================
+   Tab logic (accessible)
+   ========================= */
+function setTab(which){
+  const speak = which === 'speak';
+  tabSpeak.classList.toggle('active', speak);
+  tabType.classList.toggle('active', !speak);
+  tabSpeak.setAttribute('aria-selected', String(speak));
+  tabType.setAttribute('aria-selected', String(!speak));
+  panelSpeak.classList.toggle('active', speak);
+  panelType.classList.toggle('active', !speak);
+}
+tabSpeak.addEventListener('click', () => setTab('speak'));
+tabType.addEventListener('click', () => setTab('type'));
+
+/* =========================
+   EASING — cubic-bezier(0.22,1,0.36,1)
+   ========================= */
+function cubicBezierEase(p1x=0.22, p1y=1, p2x=0.36, p2y=1){
+  // Evaluate y(t) on cubic Bézier with (0,0)->(p1x,p1y)->(p2x,p2y)->(1,1)
+  return function(t){
+    t = Math.min(1, Math.max(0, t));
+    const inv = 1 - t;
+    const y = inv*inv*inv*0
+            + 3*inv*inv*t*p1y
+            + 3*inv*t*t*p2y
+            + t*t*t*1;
+    return y;
+  };
+}
+const easeRipple = cubicBezierEase(0.22,1,0.36,1);
+
+/* =========================
+   RNG helpers
+   ========================= */
+const rand = (a,b) => a + Math.random()*(b-a);
+const irand = (a,b) => Math.floor(rand(a,b));
+const clamp = (x,a,b) => Math.max(a, Math.min(b,x));
+
+/* =========================
+   Ripple class
+   ========================= */
+class Ripple {
+  constructor(x, y, strength){
+    this.x = x; this.y = y;
+    this.birth = performance.now();
+    this.life = CONFIG.RIPPLE_LIFETIME * (0.85 + 0.3*strength);
+    this.baseRadius = 18 + strength*28;
+    this.maxRadius = Math.min(canvas.width, canvas.height) * (0.25 + 0.5*strength);
+    this.alpha0 = 0.25 + 0.5*strength;
+    this.strength = strength;
+  }
+  get age(){ return (performance.now() - this.birth)/1000; }
+  get t(){ return this.age / this.life; }
+  alive(){ return this.t < 1; }
+  draw(ctx){
+    const t = this.t;
+    const e = easeRipple(t);
+    const r = this.baseRadius + e * this.maxRadius;
+    const alpha = (1 - t) * this.alpha0;
+    const hue = CONFIG.HUE_START + (CONFIG.HUE_END - CONFIG.HUE_START) * t;
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, r, 0, Math.PI*2);
+    ctx.lineWidth = (CONFIG.RIPPLE_THICKNESS + this.strength*2) * dpr;
+    ctx.strokeStyle = `hsla(${hue}, 90%, 62%, ${alpha})`;
+    ctx.shadowColor = `hsla(${hue}, 100%, 60%, ${alpha*CONFIG.GLOW_ALPHA})`;
+    ctx.shadowBlur = 28 * dpr;
+    ctx.stroke();
+    ctx.restore();
+  }
+}
+
+/* =========================
+   Particle class (typed text)
+   ========================= */
+class Particle {
+  constructor(cx, cy, x, y){
+    this.cx = cx; this.cy = cy;
+    // Start near text pixel position
+    this.x = x; this.y = y;
+    this.birth = performance.now();
+    this.life = rand(CONFIG.PARTICLE_LIFE[0], CONFIG.PARTICLE_LIFE[1]) * (prefersReducedMotion ? 0.25 : 1);
+    // Convert to polar around center for spiral
+    const dx = x - cx, dy = y - cy;
+    this.r = Math.hypot(dx, dy);
+    this.a = Math.atan2(dy, dx);
+    this.rv = rand(CONFIG.PARTICLE_SPEED[0], CONFIG.PARTICLE_SPEED[1]); // radial speed
+    this.av = rand(CONFIG.PARTICLE_TANGENTIAL[0], CONFIG.PARTICLE_TANGENTIAL[1]) * (Math.random()<0.5? -1:1); // angular speed
+    this.hue0 = CONFIG.HUE_START; this.hue1 = CONFIG.HUE_END;
+  }
+  get t(){ return (performance.now() - this.birth)/1000 / this.life; }
+  alive(){ return this.t < 1; }
+  draw(ctx){
+    const t = this.t;
+    const e = easeRipple(t);
+    // Spiral outward
+    this.a += this.av * (1/60); // approx per frame
+    this.r += this.rv * (1/60);
+    const x = this.cx + Math.cos(this.a) * this.r;
+    const y = this.cy + Math.sin(this.a) * this.r;
+
+    const hue = this.hue0 + (this.hue1 - this.hue0) * t;
+    const alpha = (1 - t) * 0.8;
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.beginPath();
+    ctx.arc(x, y, (1.2 + 1.8*(1-t)) * dpr, 0, Math.PI*2);
+    ctx.fillStyle = `hsla(${hue}, 100%, ${60 - 10*t}%, ${alpha})`;
+    ctx.shadowColor = `hsla(${hue}, 100%, 60%, ${alpha*0.8})`;
+    ctx.shadowBlur = 18 * dpr;
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
+/* =========================
+   State
+   ========================= */
+let ripples = [];
+let particles = [];
+let caption = null; // {text, birth}
+let lastEmit = 0;
+let fpsAvg = 60;
+let fpsSamples = [];
+let particleStep = CONFIG.PARTICLE_STEP_BASE;
+let ambientPad = null; // HTMLAudioElement
+let ambientOn = false;
+
+/* =========================
+   Background gradient pass
+   ========================= */
+function drawBackground(){
+  const w = canvas.width, h = canvas.height;
+  ctx.clearRect(0,0,w,h);
+  // Soft vignette + gradient overlay for depth
+  const grad = ctx.createRadialGradient(w*0.5, h*0.5, Math.min(w,h)*0.1, w*0.5, h*0.5, Math.max(w,h)*0.65);
+  grad.addColorStop(0, 'rgba(16, 24, 38, 0)');
+  grad.addColorStop(1, 'rgba(0, 0, 0, 0.3)');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0,0,w,h);
+}
+
+/* =========================
+   FPS tracking -> particle throttle
+   ========================= */
+let lastFrameTime = performance.now();
+function updateFps(){
+  const now = performance.now();
+  const dt = now - lastFrameTime; lastFrameTime = now;
+  const fps = 1000 / dt;
+  fpsSamples.push(fps);
+  if (fpsSamples.length > 24) fpsSamples.shift();
+  fpsAvg = fpsSamples.reduce((a,b)=>a+b,0) / fpsSamples.length;
+
+  // Throttle particle density (sampling step) based on moving average
+  if (fpsAvg >= CONFIG.FPS_MIN_GOOD) {
+    particleStep = CONFIG.PARTICLE_STEP_BASE;
+  } else if (fpsAvg >= CONFIG.FPS_MIN_OK) {
+    particleStep = CONFIG.PARTICLE_STEP_BASE + 2;
+  } else {
+    particleStep = CONFIG.PARTICLE_STEP_BASE + 4;
+  }
+}
+
+/* =========================
+   MIC / Web Audio
+   ========================= */
+let audioCtx = null, analyser = null, micSource = null, micStream = null;
+let timeData = null;
+let silenceMs = 0;
+let listening = false;
+
+function rmsFromTimeData(){
+  if (!analyser) return 0;
+  if (analyser.getFloatTimeDomainData) {
+    analyser.getFloatTimeDomainData(timeData);
+  } else {
+    // Fallback
+    const tmp = new Uint8Array(analyser.fftSize);
+    analyser.getByteTimeDomainData(tmp);
+    for (let i=0; i<tmp.length; i++) timeData[i] = (tmp[i] - 128)/128;
+  }
+  let sum = 0;
+  for (let i=0; i<timeData.length; i++){
+    const v = timeData[i];
+    sum += v*v;
+  }
+  return Math.sqrt(sum / timeData.length);
+}
+
+async function startMic(){
+  try {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    await audioCtx.resume(); // iOS/Chrome: must be in user gesture
+    micStream = await navigator.mediaDevices.getUserMedia({
+      audio: {
+        echoCancellation: true, noiseSuppression: true, autoGainControl: true
+      }
+    });
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 512;
+    analyser.smoothingTimeConstant = 0.85;
+    timeData = new Float32Array(analyser.fftSize);
+    micSource = audioCtx.createMediaStreamSource(micStream);
+    micSource.connect(analyser);
+    listening = true;
+    micBtn.classList.add('listening');
+    micBtn.setAttribute('aria-pressed', 'true');
+    status('Listening…');
+    micNotice.textContent = '';
+    setTab('speak');
+  } catch (err) {
+    listening = false;
+    stopMic();
+    setTab('type');
+    const msg = (err && err.name === 'NotAllowedError')
+      ? 'Microphone permission denied. You can still type.'
+      : 'Microphone unavailable. You can still type.';
+    micNotice.textContent = msg;
+    status(msg);
+  }
+}
+
+function stopMic(){
+  if (micStream) {
+    micStream.getTracks().forEach(t=>t.stop());
+    micStream = null;
+  }
+  if (micSource) { try{ micSource.disconnect(); }catch{} micSource = null; }
+  if (analyser) { try{ analyser.disconnect(); }catch{} analyser = null; }
+  timeData = null;
+  listening = false;
+  micBtn.classList.remove('listening');
+  micBtn.setAttribute('aria-pressed', 'false');
+}
+
+micBtn.addEventListener('click', () => {
+  if (listening) {
+    stopMic();
+    status('Mic stopped.');
+  } else {
+    startMic();
+  }
+});
+
+/* =========================
+   Ambient pad (base64 WAV) — generated at runtime to keep size small
+   OFF by default; remembers state
+   ========================= */
+function makePadDataURI(sr=CONFIG.PAD_SR, dur=CONFIG.PAD_DUR){
+  const n = Math.floor(sr*dur);
+  const data = new Int16Array(n);
+  for (let i=0;i<n;i++){
+    const t = i/sr;
+    const lfo = 0.5*Math.sin(2*Math.PI*0.45*t);
+    const s =
+      (Math.sin(2*Math.PI*220*t+0.0) +
+       Math.sin(2*Math.PI*277.18*t+0.6) +
+       Math.sin(2*Math.PI*329.63*t+1.2)) / 3;
+    // smooth envelope to avoid clicks
+    const env = Math.sin(Math.PI * (t/dur)) ** 2;
+    const v = s * (0.18 + 0.05*lfo) * env * 0.65; // subtle
+    data[i] = Math.max(-32767, Math.min(32767, (v*32767)|0));
+  }
+  // 16-bit PCM mono WAV header
+  const byteRate = sr * 2; // mono * 16-bit
+  const blockAlign = 2;
+  const subchunk2Size = n*2;
+  const chunkSize = 36 + subchunk2Size;
+
+  const header = new Uint8Array(44);
+  const dv = new DataView(header.buffer);
+  // "RIFF"
+  dv.setUint32(0, 0x52494646, false); // RIFF
+  dv.setUint32(4, chunkSize, true);
+  dv.setUint32(8, 0x57415645, false); // WAVE
+  dv.setUint32(12, 0x666d7420, false); // fmt 
+  dv.setUint32(16, 16, true); // PCM chunk size
+  dv.setUint16(20, 1, true); // PCM
+  dv.setUint16(22, 1, true); // mono
+  dv.setUint32(24, sr, true);
+  dv.setUint32(28, byteRate, true);
+  dv.setUint16(32, blockAlign, true);
+  dv.setUint16(34, 16, true); // bits per sample
+  dv.setUint32(36, 0x64617461, false); // data
+  dv.setUint32(40, subchunk2Size, true);
+
+  const bytes = new Uint8Array(44 + subchunk2Size);
+  bytes.set(header, 0);
+  for (let i=0, o=44; i<n; i++, o+=2){
+    const v = data[i];
+    bytes[o] = v & 0xff;
+    bytes[o+1] = (v>>8) & 0xff;
+  }
+  // base64 encode, chunked to avoid stack overflow
+  let bin = '';
+  const CHUNK = 0x8000;
+  for (let i=0; i<bytes.length; i+=CHUNK){
+    bin += String.fromCharCode.apply(null, bytes.subarray(i, i+CHUNK));
+  }
+  const b64 = btoa(bin);
+  return 'data:audio/wav;base64,' + b64;
+}
+
+function initAmbient(){
+  ambientPad = new Audio();
+  ambientPad.src = makePadDataURI();
+  ambientPad.loop = true;
+  ambientPad.preload = 'auto';
+  ambientPad.volume = 0.18;
+  ambientPad.muted = true; // default off
+  document.body.appendChild(ambientPad);
+  const saved = localStorage.getItem('echo-sound') === 'on';
+  if (saved) {
+    // Only unmute on explicit user click later (autoplay rules)
+    toggleSound(false); // set UI, keep muted until click
+  }
+}
+function toggleSound(userAction=true){
+  ambientOn = !ambientOn;
+  soundToggle.setAttribute('aria-pressed', String(ambientOn));
+  soundToggle.textContent = ambientOn ? '🔊' : '🔇';
+  if (ambientOn) {
+    if (userAction) ambientPad.muted = false;
+    ambientPad.play().catch(()=>{}); // ignore autoplay rejections
+    localStorage.setItem('echo-sound','on');
+  } else {
+    ambientPad.pause();
+    localStorage.setItem('echo-sound','off');
+  }
+}
+soundToggle.addEventListener('click', ()=>toggleSound(true));
+initAmbient();
+
+/* =========================
+   Emit helpers
+   ========================= */
+function emitRippleFromAmplitude(amp){
+  const now = performance.now();
+  if (now - lastEmit < CONFIG.MIN_EMIT_INTERVAL_MS) return;
+  const strength = clamp((amp - CONFIG.SILENCE_THRESHOLD) / (0.5 - CONFIG.SILENCE_THRESHOLD), 0, 1);
+  if (strength <= 0) return;
+  lastEmit = now;
+  // center of canvas
+  const cx = canvas.width/2, cy = canvas.height/2;
+  ripples.push(new Ripple(cx, cy, strength));
+  if (ripples.length > CONFIG.MAX_RIPPLES) ripples.splice(0, ripples.length - CONFIG.MAX_RIPPLES);
+}
+
+/* =========================
+   Viz pulse (soft rings under mic)
+   ========================= */
+let vizPhase = 0;
+function drawViz(amp){
+  const el = viz;
+  const rect = el.getBoundingClientRect();
+  const cx = rect.left + rect.width/2;
+  const cy = rect.top + rect.height/2 + window.scrollY;
+  const r0 = (rect.width/2) * (0.68 + amp*0.45);
+  const r1 = r0 + 10 + amp*28;
+  const rad = (n)=> (n * dpr);
+  ctx.save();
+  ctx.globalCompositeOperation = 'lighter';
+  // Convert DOM CSS px to canvas pixels (already scaled), so we multiply by DPR
+  // Map DOM coords to canvas space
+  const x = cx * dpr, y = cy * dpr;
+
+  // inner pulse
+  ctx.beginPath();
+  ctx.arc(x, y, rad(r0), 0, Math.PI*2);
+  ctx.strokeStyle = `rgba(124,201,255, ${0.20 + amp*0.35})`;
+  ctx.lineWidth = 2*dpr;
+  ctx.shadowColor = `rgba(71,255,224, ${0.25 + amp*0.25})`;
+  ctx.shadowBlur = 24*dpr;
+  ctx.stroke();
+
+  // outer soft ring
+  vizPhase += 0.02;
+  const wobble = Math.sin(vizPhase) * 2;
+  ctx.beginPath();
+  ctx.arc(x, y, rad(r1 + wobble), 0, Math.PI*2);
+  ctx.strokeStyle = `rgba(71,255,224, ${0.12 + amp*0.25})`;
+  ctx.lineWidth = 2.5*dpr;
+  ctx.stroke();
+
+  ctx.restore();
+}
+
+/* =========================
+   Typed release flow
+   ========================= */
+let textFlash = null; // {text, birth, dur}
+function releaseText(text){
+  if (!text.trim()) return;
+  // Flash characters on center
+  textFlash = { text, birth: performance.now(), dur: 1200 };
+  textarea.value = '';
+  status('Released.');
+  // Emit a few ripples tied to text length
+  const n = clamp(text.length/80, 0.2, 1);
+  for (let i=0;i<3;i++) emitRippleFromAmplitude(0.2 + n*0.6);
+
+  if (!prefersReducedMotion) {
+    createTextParticles(text);
+  } else {
+    // Reduced motion: no particles, just a final caption fade
+    setTimeout(()=> showCaption(), 900);
+  }
+}
+
+function createTextParticles(text){
+  const w = Math.min(canvas.width/dpr * 0.78, 800);
+  const h = Math.min(canvas.height/dpr * 0.28, 220);
+  const off = document.createElement('canvas');
+  off.width = Math.ceil(w);
+  off.height = Math.ceil(h);
+  const octx = off.getContext('2d');
+
+  // Draw centered bright text
+  const fontSize = Math.max(28, Math.min(96, w/(text.length*0.55 + 2)));
+  octx.clearRect(0,0,w,h);
+  octx.fillStyle = '#fff';
+  octx.shadowColor = 'rgba(124,201,255,0.8)';
+  octx.shadowBlur = 18;
+  octx.font = `600 ${fontSize}px ${getComputedStyle(document.documentElement).getPropertyValue('--font') || 'system-ui'}`;
+  octx.textAlign = 'center';
+  octx.textBaseline = 'middle';
+  octx.fillText(text, w/2, h/2);
+
+  const img = octx.getImageData(0,0,w,h);
+  const data = img.data;
+
+  const cx = canvas.width/2, cy = canvas.height/2;
+  const step = particleStep;
+  let count = 0;
+
+  for (let y=0; y<h; y+=step) {
+    for (let x=0; x<w; x+=step) {
+      const i = (y*w + x) * 4;
+      const a = data[i+3];
+      if (a > 128) {
+        const px = (canvas.width - w*dpr)/2 + x*dpr;
+        const py = (canvas.height - h*dpr)/2 + y*dpr;
+        particles.push(new Particle(cx, cy, px, py));
+        if (++count >= CONFIG.MAX_PARTICLES) break;
+      }
+    }
+    if (count >= CONFIG.MAX_PARTICLES) break;
+  }
+
+  if (particles.length > CONFIG.MAX_PARTICLES) {
+    particles.splice(0, particles.length - CONFIG.MAX_PARTICLES);
+  }
+  // Caption after particles have a moment to depart
+  setTimeout(()=> showCaption(), 1200);
+}
+
+function showCaption(){
+  caption = { text: CONFIG.CAPTION_TEXT, birth: performance.now(), dur: 2400 };
+}
+
+/* =========================
+   A11y live status helper
+   ========================= */
+function status(msg){ live.textContent = msg; }
+
+/* =========================
+   Main frame loop
+   ========================= */
+function frame(){
+  updateFps();
+  drawBackground();
+
+  // Mic amplitude -> ripples and viz
+  let amp = 0;
+  if (listening && analyser && timeData) {
+    amp = rmsFromTimeData();
+    drawViz(amp);
+    if (amp > CONFIG.SILENCE_THRESHOLD) {
+      silenceMs = 0;
+      emitRippleFromAmplitude(amp);
+    } else {
+      silenceMs += 1000 / clamp(fpsAvg, 10, 120);
+      if (silenceMs >= CONFIG.SILENCE_TIMEOUT_MS) {
+        stopMic();
+        status('Mic auto-stopped after 10s of silence.');
+        micNotice.textContent = 'Auto-stopped after silence.';
+      }
+    }
+  }
+
+  // Update & draw ripples
+  ripples = ripples.filter(r => r.alive());
+  for (let i=0;i<ripples.length;i++) ripples[i].draw(ctx);
+
+  // Draw flashing text (center) with glow (fade in/out)
+  if (textFlash){
+    const t = (performance.now() - textFlash.birth) / textFlash.dur;
+    if (t >= 1) { textFlash = null; }
+    else {
+      const alpha = t < 0.2 ? t/0.2 : (t > 0.7 ? (1 - t)/0.3 : 1);
+      ctx.save();
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      const size = Math.min(96*dpr, Math.max(28*dpr, canvas.width*0.04));
+      ctx.font = `600 ${size}px ${getComputedStyle(document.documentElement).getPropertyValue('--font') || 'system-ui'}`;
+      ctx.shadowColor = 'rgba(124,201,255,0.8)';
+      ctx.shadowBlur = 26*dpr;
+      ctx.fillStyle = `rgba(230,238,252, ${0.88*alpha})`;
+      ctx.fillText(textFlash.text, canvas.width/2, canvas.height/2);
+      ctx.restore();
+    }
+  }
+
+  // Update & draw particles (skip if reduced motion)
+  if (!prefersReducedMotion) {
+    particles = particles.filter(p => p.alive());
+    for (let i=0;i<particles.length;i++) particles[i].draw(ctx);
+  }
+
+  // Draw caption
+  if (caption){
+    const t = (performance.now() - caption.birth)/caption.dur;
+    if (t >= 1) { caption = null; }
+    else {
+      const alpha = t < 0.15 ? t/0.15 : (t > 0.8 ? (1 - t)/0.2 : 1);
+      ctx.save();
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'alphabetic';
+      const size = 16*dpr;
+      ctx.font = `600 ${size}px ${getComputedStyle(document.documentElement).getPropertyValue('--font') || 'system-ui'}`;
+      ctx.fillStyle = `rgba(180, 220, 255, ${0.7*alpha})`;
+      ctx.fillText(CONFIG.CAPTION_TEXT, canvas.width/2, canvas.height * 0.78);
+      ctx.restore();
+    }
+  }
+
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+/* =========================
+   Events (typing)
+   ========================= */
+releaseBtn.addEventListener('click', () => releaseText(textarea.value));
+textarea.addEventListener('keydown', (e)=>{
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'enter') {
+    releaseText(textarea.value);
+  }
+});
+
+/* =========================
+   Graceful mic fallback on load (if not granted)
+   ========================= */
+if (!('mediaDevices' in navigator) || !('getUserMedia' in navigator.mediaDevices)) {
+  micNotice.textContent = 'Microphone not supported in this browser. Try typing.';
+  setTab('type');
+}
+
+/* =========================
+   Keyboard focus visibility
+   ========================= */
+document.addEventListener('keydown', (e)=>{
+  if (e.key === 'Tab') document.body.classList.add('user-tabbing');
+}, {passive:true});
+
+})();
+        </script>
+    </body>
+
+</html>

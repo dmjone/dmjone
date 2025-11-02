@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>MemoryBubble</title>
+        <style>
+            :root {
+                --bg1: #1c2541;
+                --bg2: #3a506b;
+                --ink: #e0e7ff;
+                --glass: rgba(255, 255, 255, .12);
+                --glass-stroke: rgba(255, 255, 255, .45);
+                --ui: rgba(0, 0, 0, .20);
+            }
+
+            html,
+            body {
+                height: 100%;
+                margin: 0
+            }
+
+            body {
+                font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+                color: var(--ink);
+                background: linear-gradient(160deg, var(--bg1), var(--bg2));
+                overflow: hidden;
+            }
+
+            /* Header */
+            .bar {
+                position: fixed;
+                inset: 0 0 auto 0;
+                display: flex;
+                gap: .5rem;
+                align-items: center;
+                padding: .6rem .75rem;
+                z-index: 10;
+                background: linear-gradient(to bottom, rgba(0, 0, 0, .35), rgba(0, 0, 0, .15));
+                backdrop-filter: saturate(120%) blur(4px);
+                -webkit-backdrop-filter: saturate(120%) blur(4px);
+            }
+
+            .bar form {
+                display: flex;
+                gap: .5rem;
+                flex: 1
+            }
+
+            .bar input[type="text"] {
+                flex: 1;
+                min-width: 8rem;
+                padding: .55rem .7rem;
+                background: rgba(255, 255, 255, .08);
+                border: 1px solid rgba(255, 255, 255, .25);
+                color: var(--ink);
+                border-radius: .55rem;
+                outline: none;
+            }
+
+            .bar button {
+                padding: .55rem .8rem;
+                border-radius: .55rem;
+                border: 1px solid rgba(255, 255, 255, .25);
+                background: rgba(255, 255, 255, .08);
+                color: var(--ink);
+                cursor: pointer;
+            }
+
+            .bar button[disabled] {
+                opacity: .5;
+                cursor: not-allowed
+            }
+
+            .bar .subtle {
+                opacity: .8
+            }
+
+            /* Canvas fills all */
+            #stage {
+                position: fixed;
+                inset: 0;
+                display: block;
+                width: 100vw;
+                height: 100vh;
+                background: linear-gradient(160deg, var(--bg1), var(--bg2));
+                touch-action: manipulation;
+                /* helps tap latency */
+            }
+
+            /* Fallback accessible list (hidden by default) */
+            #fallbackWrap {
+                position: fixed;
+                right: .75rem;
+                top: 3.2rem;
+                z-index: 12;
+                max-width: min(90vw, 28rem);
+                max-height: 70vh;
+                overflow: auto;
+                background: rgba(0, 0, 0, .35);
+                border: 1px solid rgba(255, 255, 255, .2);
+                border-radius: .6rem;
+                padding: .6rem;
+                display: none;
+            }
+
+            #fallbackWrap[aria-hidden="false"] {
+                display: block
+            }
+
+            #fallbackList {
+                margin: 0;
+                padding: 0;
+                list-style: none
+            }
+
+            #fallbackList li {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: .5rem;
+                border-bottom: 1px dashed rgba(255, 255, 255, .2);
+                padding: .4rem 0;
+            }
+
+            #fallbackList .text {
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                max-width: 18rem
+            }
+
+            /* Reduced motion: keep subtle transitions only */
+            @media (prefers-reduced-motion: reduce) {
+                * {
+                    animation: none !important;
+                    transition: none !important
+                }
+            }
+
+            /* Visually hidden helper (not used for toggle, but available) */
+            .visually-hidden {
+                position: absolute !important;
+                width: 1px;
+                height: 1px;
+                margin: -1px;
+                border: 0;
+                padding: 0;
+                overflow: hidden;
+                clip: rect(0 0 0 0);
+                clip-path: inset(50%);
+                white-space: nowrap
+            }
+        </style>
+    </head>
+
+    <body>
+        <canvas id="stage" aria-label="Memory bubbles canvas"></canvas>
+
+        <div class="bar" role="banner">
+            <form id="controls" autocomplete="off">
+                <label for="memory" class="visually-hidden">Memory text</label>
+                <input id="memory" name="memory" maxlength="80" placeholder="Type a short memory…" />
+                <button id="createBtn" type="submit" title="Create Bubble (Enter)">Create Bubble</button>
+                <button id="clearBtn" type="button" class="subtle" title="Remove all bubbles">Clear All</button>
+                <button id="toggleListBtn" type="button" class="subtle" aria-expanded="false" aria-controls="fallbackWrap">Toggle List</button>
+            </form>
+        </div>
+
+        <!-- Accessible, keyboard-friendly fallback list -->
+        <aside id="fallbackWrap" aria-hidden="true" aria-live="polite" aria-label="Bubbles list">
+            <ul id="fallbackList"></ul>
+        </aside>
+
+        <script>
+            /* ===========================
+               MemoryBubble — Single-file app
+               ===========================
+               Swap chime or silence it:
+               - To SILENCE: set CHIME_SRC = "" (empty string) or comment it out.
+               - To REPLACE: put your own base64 data URI (data:audio/*;base64,....).
+            */
+            const CHIME_SRC =
+                "data:audio/wav;base64,UklGRo0BAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YRkBAABtAAAAmgAAAIwAAABkAAAAbAAAAGoAAABXAAAATwAAAEIAAABBAAAAPAAAADcAAAAzAAAAMgAAAC8AAAAvAAAALAAAACsAAAAqAAAAKAAAACkAAAAoAAAAJwAAACYAAAAkAAAAIwAAACEAAAAfAAAAGwAAABgAAAAUAAAAEAAAABAAAAAQAAAADwAAAAsAAAAIAAAAAAAAgAAABAAAAAUAAAAHwAAACEAAAAkAAAAMgAAADcAAAA/AAAAQgAAAE8AAABXAAAAbQAAAHgAAACGAAAAkAAAALoAAADGAAAA2AAAAO8AAAD5AAAA+gAAAPoAAAD3AAAA7wAAANsAAADGAAAAtgAAAJcAAAB8AAAAbAAAAF4AAABFAAAAPgAAADcAAAAxAAAAJwAAAB8AAAAUAAAADwAAAAkAAAAGAAAAAwAAAAEAAAAAAAAAAAAAAAMAAAAIAAAADwAAABYAAAAhAAAALwAAADgAAAA/AAAASwAAAFoAAAB0AAAAiAAAALAAAADJAAAA2wAAAOsAAAD2AAAA/AAAAP8AAAD8AAAA+AAAAPAAAADqAAAA2wAAAMMAAAC5AAAAkgAAAHQAAABaAAAASgAAAD0AAAA1AAAAJwAAAB4AAAARAAAADQAAAAcAAAADAAAAAQ==";
+
+            /* ===== Config ===== */
+            const COLORS = {
+                bubbleFill: 'rgba(255,255,255,0.12)',
+                bubbleStroke: 'rgba(255,255,255,0.50)',
+                text: '#e0e7ff',
+                particle: 'rgba(255,255,255,1)'
+            };
+            const MAX_BUBBLES = 5;
+            const POP_DURATION_MS = 400;
+            const PARTICLE_LIFETIME_MS = 1200;
+            const GRAVITY = 900; // px/s^2
+            const STAR_DENSITY = 0.00007; // per px^2
+            const STAR_MIN = 60, STAR_MAX = 220;
+
+            /* ===== Utilities ===== */
+            const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+            const rand = (a, b) => a + Math.random() * (b - a);
+            const now = () => performance.now();
+
+            let reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            if (window.matchMedia) {
+                const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+                mq.addEventListener?.('change', e => { reducedMotion = e.matches; });
+            }
+
+            function playChime() {
+                if (!CHIME_SRC) return; // silent mode
+                // Clone so overlapping pops can play concurrently.
+                const a = new Audio(CHIME_SRC);
+                a.volume = 0.7;
+                a.play().catch(() => { /* ignore autoplay restrictions if any */ });
+            }
+
+            /* ===== Canvas setup (DPR-aware) ===== */
+            const canvas = document.getElementById('stage');
+            const ctx = canvas.getContext('2d', { alpha: true, desynchronized: true });
+
+            // Offscreen star layer
+            let starsCanvas = document.createElement('canvas');
+            let starsCtx = starsCanvas.getContext('2d');
+
+            let dpr = Math.min(window.devicePixelRatio || 1, 2);
+            let vw = 0, vh = 0; // CSS pixels
+
+            function resize() {
+                dpr = Math.min(window.devicePixelRatio || 1, 2);
+                const { clientWidth, clientHeight } = canvas;
+                vw = clientWidth; vh = clientHeight;
+
+                // Main canvas backing pixels
+                canvas.width = Math.max(1, Math.floor(clientWidth * dpr));
+                canvas.height = Math.max(1, Math.floor(clientHeight * dpr));
+                ctx.setTransform(1, 0, 0, 1, 0, 0);
+                ctx.scale(dpr, dpr);
+
+                // Stars layer backing pixels
+                starsCanvas.width = canvas.width;
+                starsCanvas.height = canvas.height;
+                starsCtx.setTransform(1, 0, 0, 1, 0, 0);
+                starsCtx.scale(dpr, dpr);
+
+                generateStars();
+            }
+            window.addEventListener('resize', resize);
+            window.addEventListener('orientationchange', resize);
+
+            /* ===== Star field ===== */
+            let starCount = 0;
+            function generateStars() {
+                // Clear
+                starsCtx.clearRect(0, 0, vw, vh);
+                // Decide count by area
+                const target = clamp(Math.floor(vw * vh * STAR_DENSITY), STAR_MIN, STAR_MAX);
+                starCount = target;
+                for (let i = 0; i < target; i++) {
+                    const x = Math.random() * vw;
+                    const y = Math.random() * vh;
+                    const r = rand(.4, 1.3);
+                    const a = rand(.25, .8);
+                    starsCtx.fillStyle = `rgba(255,255,255,${a.toFixed(3)})`;
+                    starsCtx.beginPath();
+                    starsCtx.arc(x, y, r, 0, Math.PI * 2);
+                    starsCtx.fill();
+                }
+            }
+
+            /* ===== Bubble & Particles ===== */
+            let nextId = 1;
+
+            class Bubble {
+                constructor(text, x, y, r) {
+                    this.id = nextId++;
+                    this.text = text;
+                    this.x = x; this.y = y; this.r = r;
+                    // base velocity (px/s)
+                    const speed = rand(14, 32);
+                    const angle = rand(0, Math.PI * 2);
+                    this.vx = Math.cos(angle) * speed;
+                    this.vy = Math.sin(angle) * speed;
+
+                    // sinusoidal drift
+                    this.amp = rand(8, 16);
+                    this.freq = rand(0.6, 1.2); // Hz
+                    this.phase = rand(0, Math.PI * 2);
+
+                    // animation
+                    this.state = 'alive'; // or 'popping'
+                    this.popT0 = 0; // ms
+                    this.scale = 1;
+
+                    // text metrics cached (font scales with radius)
+                    this.fontPx = Math.max(12, Math.floor(this.r * 0.5));
+                }
+
+                isHit(px, py) {
+                    const dx = px - this.x, dy = py - this.y;
+                    return dx * dx + dy * dy <= this.r * this.r;
+                }
+
+                pop() {
+                    if (this.state !== 'alive') return [];
+                    this.state = 'popping';
+                    this.popT0 = now();
+                    playChime();
+                    if (reducedMotion) return []; // no explosion when reduced motion
+                    return Emitter.fromText(this.text, this.x, this.y, this.fontPx);
+                }
+
+                update(dt, t) {
+                    if (this.state === 'alive') {
+                        const drift = Math.sin(this.phase + t * this.freq * 2 * Math.PI) * this.amp;
+                        // Update position with drift applied to vy
+                        this.x += this.vx * dt;
+                        this.y += (this.vy + drift) * dt;
+
+                        // Edge bounce
+                        if (this.x - this.r < 0 && this.vx < 0) this.vx *= -1;
+                        if (this.x + this.r > vw && this.vx > 0) this.vx *= -1;
+                        if (this.y - this.r < 0 && this.vy < 0) this.vy *= -1;
+                        if (this.y + this.r > vh && this.vy > 0) this.vy *= -1;
+                    } else if (this.state === 'popping') {
+                        const p = clamp((now() - this.popT0) / POP_DURATION_MS, 0, 1);
+                        // Scale up slightly then down to 0 (ease)
+                        const up = p < 0.25 ? (1 + p * 0.4) : (1.1 - (p - 0.25) * 1.466);
+                        this.scale = Math.max(0, up);
+                        if (p >= 1) this.state = 'dead';
+                    }
+                }
+
+                draw(ctx) {
+                    if (this.state === 'dead') return;
+                    ctx.save();
+                    ctx.translate(this.x, this.y);
+                    ctx.scale(this.scale, this.scale);
+
+                    // Bubble circle
+                    ctx.beginPath();
+                    ctx.arc(0, 0, this.r, 0, Math.PI * 2);
+                    ctx.fillStyle = COLORS.bubbleFill;
+                    ctx.fill();
+                    ctx.lineWidth = Math.max(1, this.r * 0.06);
+                    ctx.strokeStyle = COLORS.bubbleStroke;
+                    ctx.stroke();
+
+                    // Text
+                    ctx.fillStyle = COLORS.text;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.font = `600 ${this.fontPx}px system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial`;
+                    // Slight shadow for contrast
+                    ctx.shadowColor = 'rgba(0,0,0,0.35)';
+                    ctx.shadowBlur = 4;
+                    wrapTextCentered(ctx, this.text, 0, 0, this.r * 1.6, this.fontPx * 1.15);
+
+                    ctx.restore();
+                }
+            }
+
+            function wrapTextCentered(ctx, text, x, y, maxWidth, lineHeight) {
+                // Simple single-break wrapper for short strings
+                if (ctx.measureText(text).width <= maxWidth) {
+                    ctx.fillText(text, x, y);
+                } else {
+                    const words = text.split(' ');
+                    const lines = [];
+                    let cur = '';
+                    for (const w of words) {
+                        const test = cur ? cur + ' ' + w : w;
+                        if (ctx.measureText(test).width <= maxWidth) cur = test;
+                        else { if (cur) lines.push(cur); cur = w; }
+                    }
+                    if (cur) lines.push(cur);
+                    const total = lines.length;
+                    for (let i = 0; i < total; i++) {
+                        ctx.fillText(lines[i], x, y + (i - (total - 1) / 2) * lineHeight);
+                    }
+                }
+            }
+
+            class CharParticle {
+                constructor(ch, x, y, fontPx) {
+                    this.ch = ch;
+                    this.x = x; this.y = y;
+                    const theta = rand(0, Math.PI * 2);
+                    const speed = rand(80, 240);
+                    this.vx = Math.cos(theta) * speed;
+                    this.vy = Math.sin(theta) * speed - rand(80, 160); // initial kick upward
+                    this.life = 0; // ms
+                    this.maxLife = PARTICLE_LIFETIME_MS;
+                    this.alpha = 1;
+                    this.size = clamp(fontPx * rand(0.8, 1.1), 10, 42);
+                    this.rot = rand(-Math.PI, Math.PI);
+                    this.vr = rand(-3, 3); // rotation speed
+                }
+                update(dt) {
+                    this.vy += GRAVITY * dt;
+                    this.x += this.vx * dt;
+                    this.y += this.vy * dt;
+                    this.rot += this.vr * dt;
+                    this.life += dt * 1000;
+                    this.alpha = 1 - (this.life / this.maxLife);
+                }
+                draw(ctx) {
+                    if (this.alpha <= 0) return;
+                    ctx.save();
+                    ctx.globalAlpha = Math.max(0, this.alpha);
+                    ctx.translate(this.x, this.y);
+                    ctx.rotate(this.rot);
+                    ctx.fillStyle = COLORS.particle;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.font = `700 ${this.size}px system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial`;
+                    ctx.fillText(this.ch, 0, 0);
+                    ctx.restore();
+                }
+                get done() { return this.life >= this.maxLife; }
+            }
+
+            class Emitter {
+                constructor(parts) { this.parts = parts; }
+                static fromText(text, x, y, fontPx) {
+                    const chars = [...text].filter(c => c.trim().length);
+                    const parts = chars.map(ch => new CharParticle(ch, x + rand(-6, 6), y + rand(-6, 6), fontPx));
+                    return new Emitter(parts);
+                }
+                update(dt) { this.parts.forEach(p => p.update(dt)); }
+                draw(ctx) { this.parts.forEach(p => p.draw(ctx)); }
+                get done() { return this.parts.every(p => p.done); }
+            }
+
+            /* ===== State ===== */
+            const bubbles = [];
+            const emitters = [];
+
+            /* ===== Spawn helpers ===== */
+            function computeRadius(text) {
+                const base = 26 + text.length * 4.2;
+                return clamp(base, 28, 96);
+            }
+
+            function spawnBubble(text) {
+                if (!text || !text.trim()) return;
+                if (bubbles.length >= MAX_BUBBLES) return;
+
+                const r = computeRadius(text.trim());
+                // pick a non-overlapping position
+                let x = rand(r + 8, vw - r - 8);
+                let y = rand(r + 8 + 56, vh - r - 8); // keep clear of header a bit
+                let tries = 0;
+                while (tries++ < 40 && overlapsExisting(x, y, r)) {
+                    const nudgeA = rand(0, Math.PI * 2);
+                    const nudgeD = rand(10, 30);
+                    x = clamp(x + Math.cos(nudgeA) * nudgeD, r + 8, vw - r - 8);
+                    y = clamp(y + Math.sin(nudgeA) * nudgeD, r + 8 + 56, vh - r - 8);
+                }
+                const b = new Bubble(text.trim(), x, y, r);
+                bubbles.push(b);
+                updateUIState();
+                syncFallbackList();
+            }
+
+            function overlapsExisting(x, y, r) {
+                for (const b of bubbles) {
+                    const dx = x - b.x, dy = y - b.y;
+                    const minD = r + b.r + 6; // gap
+                    if (dx * dx + dy * dy < minD * minD) return true;
+                }
+                return false;
+            }
+
+            /* ===== Interaction ===== */
+            const controls = document.getElementById('controls');
+            const memoryInput = document.getElementById('memory');
+            const createBtn = document.getElementById('createBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const toggleListBtn = document.getElementById('toggleListBtn');
+            const fallbackWrap = document.getElementById('fallbackWrap');
+            const fallbackList = document.getElementById('fallbackList');
+
+            controls.addEventListener('submit', e => {
+                e.preventDefault();
+                spawnBubble(memoryInput.value);
+                memoryInput.value = '';
+                memoryInput.focus();
+            });
+
+            clearBtn.addEventListener('click', () => {
+                bubbles.length = 0; emitters.length = 0; updateUIState(); syncFallbackList();
+            });
+
+            toggleListBtn.addEventListener('click', () => {
+                const hidden = fallbackWrap.getAttribute('aria-hidden') === 'true';
+                fallbackWrap.setAttribute('aria-hidden', String(!hidden));
+                toggleListBtn.setAttribute('aria-expanded', String(hidden));
+                if (hidden) syncFallbackList();
+            });
+
+            function popBubbleById(id) {
+                const idx = bubbles.findIndex(b => b.id === id);
+                if (idx >= 0) {
+                    const b = bubbles[idx];
+                    const newEm = b.pop();
+                    if (newEm.length !== undefined) emitters.push(...newEm);
+                    else if (newEm.parts) emitters.push(newEm);
+                    // Remove when animation completes in loop (state -> dead)
+                }
+                syncFallbackList();
+            }
+
+            function syncFallbackList() {
+                fallbackList.innerHTML = '';
+                for (const b of bubbles) {
+                    if (b.state === 'dead') continue;
+                    const li = document.createElement('li');
+                    const span = document.createElement('span');
+                    span.className = 'text';
+                    span.textContent = b.text;
+                    const btn = document.createElement('button');
+                    btn.textContent = 'Pop';
+                    btn.addEventListener('click', () => popBubbleById(b.id));
+                    li.append(span, btn);
+                    fallbackList.appendChild(li);
+                }
+            }
+
+            function updateUIState() {
+                const full = bubbles.filter(b => b.state !== 'dead').length >= MAX_BUBBLES;
+                createBtn.disabled = full;
+                createBtn.title = full ? `Limit reached (${MAX_BUBBLES})` : 'Create Bubble';
+            }
+
+            /* Canvas pointer/touch picking */
+            let lastTouchAt = 0;
+            canvas.addEventListener('pointerdown', (e) => {
+                // If we just handled a touchstart, ignore duplicate pointer
+                if (Date.now() - lastTouchAt < 250) return;
+                const rect = canvas.getBoundingClientRect();
+                const px = e.clientX - rect.left;
+                const py = e.clientY - rect.top;
+                handleTap(px, py);
+            });
+            canvas.addEventListener('touchstart', (e) => {
+                lastTouchAt = Date.now();
+                // passive: true (do not call preventDefault)
+                const rect = canvas.getBoundingClientRect();
+                const t = e.changedTouches[0];
+                if (!t) return;
+                const px = t.clientX - rect.left;
+                const py = t.clientY - rect.top;
+                handleTap(px, py);
+            }, { passive: true });
+
+            function handleTap(px, py) {
+                // topmost first (last in the list)
+                for (let i = bubbles.length - 1; i >= 0; i--) {
+                    const b = bubbles[i];
+                    if (b.state === 'dead') continue;
+                    if (b.isHit(px, py)) {
+                        const emOrArr = b.pop();
+                        if (Array.isArray(emOrArr)) emitters.push(...emOrArr);
+                        else if (emOrArr && emOrArr.parts) emitters.push(emOrArr);
+                        break;
+                    }
+                }
+                syncFallbackList();
+            }
+
+            /* ===== Main loop ===== */
+            let prev = now();
+            let fpsAvg = 60;
+            let starSkip = 0;
+            function frame() {
+                const t = now();
+                const dt = clamp((t - prev) / 1000, 0, 0.05); // s
+                prev = t;
+                // FPS smoothing
+                const fps = 1 / dt;
+                fpsAvg = fpsAvg * 0.9 + fps * 0.1;
+                starSkip = fpsAvg < 28 ? 2 : fpsAvg < 40 ? 1 : 0;
+
+                // Clear (we use canvas bg gradient; clear to transparent)
+                ctx.clearRect(0, 0, vw, vh);
+
+                // Stars: optionally skip blit on slow devices
+                if ((Math.floor(t / 16) % (starSkip + 1)) === 0) {
+                    ctx.drawImage(starsCanvas, 0, 0, vw, vh);
+                }
+
+                // Update + draw bubbles
+                for (const b of bubbles) b.update(dt, t / 1000);
+                // Remove dead bubbles after pop animation
+                for (let i = bubbles.length - 1; i >= 0; i--) {
+                    if (bubbles[i].state === 'dead') bubbles.splice(i, 1);
+                }
+                for (const b of bubbles) b.draw(ctx);
+
+                // Update + draw particles
+                for (const em of emitters) em.update(dt);
+                for (const em of emitters) em.draw(ctx);
+                for (let i = emitters.length - 1; i >= 0; i--) {
+                    if (emitters[i].done) emitters.splice(i, 1);
+                }
+
+                requestAnimationFrame(frame);
+            }
+
+            /* ===== Boot ===== */
+            resize();
+            updateUIState();
+            requestAnimationFrame(frame);
+
+            /* ===== Keyboard niceties ===== */
+            memoryInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    controls.requestSubmit();
+                }
+            });
+        </script>
+    </body>
+
+</html>

@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>WhisperWall</title>
+        <style>
+            :root {
+                --bg-top: #321e52;
+                /* pre-dawn purple */
+                --bg-bot: #ffd7e1;
+                /* pale pink */
+                --ink: #ffffff;
+                --ink-dim: #e8e2ee;
+                --panel: rgba(255, 255, 255, .10);
+                --veil: rgba(255, 255, 255, .08);
+                --radius: 14px;
+                --gap: clamp(14px, 2.4vw, 22px);
+                --maxw: 72ch;
+            }
+
+            /* Sky gradient background */
+            html,
+            body {
+                height: 100%;
+                margin: 0;
+                background:
+                    linear-gradient(180deg, var(--bg-top) 0%, #5b2f6f 35%, #9e63a6 60%, var(--bg-bot) 100%) fixed;
+                color: var(--ink);
+                font: 400 16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Inter, "Helvetica Neue", Arial, sans-serif;
+                -webkit-font-smoothing: antialiased;
+                text-rendering: optimizeLegibility;
+            }
+
+            /* Subtle translucent veil */
+            .veil {
+                position: fixed;
+                inset: 0;
+                pointer-events: none;
+                background:
+                    radial-gradient(1200px 600px at 70% 10%, var(--veil), transparent 60%),
+                    radial-gradient(900px 500px at 20% 80%, rgba(255, 255, 255, .06), transparent 70%);
+                mix-blend-mode: screen;
+            }
+
+            /* Layout */
+            .wrap {
+                position: relative;
+                min-height: 100%;
+                display: grid;
+                grid-template-rows: auto 1fr auto;
+            }
+
+            header {
+                padding: calc(var(--gap) * 1.2) var(--gap) var(--gap);
+                text-align: center;
+            }
+
+            h1 {
+                margin: 0 0 6px;
+                font-weight: 700;
+                letter-spacing: 0.5px;
+                font-size: clamp(28px, 4.5vw, 48px);
+            }
+
+            header p {
+                margin: 0;
+                color: var(--ink-dim);
+                font-size: .95rem;
+            }
+
+            main {
+                display: grid;
+                place-items: start center;
+                padding: var(--gap);
+            }
+
+            .panel {
+                width: min(100%, var(--maxw));
+                background: color-mix(in oklab, var(--panel) 100%, transparent);
+                backdrop-filter: blur(6px) saturate(120%);
+                border: 1px solid rgba(255, 255, 255, .12);
+                border-radius: var(--radius);
+                box-shadow: 0 10px 40px rgba(0, 0, 0, .25);
+                padding: clamp(16px, 3.2vw, 28px);
+                position: relative;
+                z-index: 1;
+            }
+
+            .controls {
+                display: grid;
+                gap: 12px;
+            }
+
+            textarea {
+                width: 100%;
+                min-height: 7.5rem;
+                resize: vertical;
+                border-radius: calc(var(--radius) - 4px);
+                border: 1px solid rgba(255, 255, 255, .18);
+                background: rgba(0, 0, 0, .18);
+                color: var(--ink);
+                padding: 12px 14px;
+                font: inherit;
+                line-height: 1.4;
+                outline: none;
+                transition: border-color .2s ease, background .2s ease;
+                white-space: pre-wrap;
+            }
+
+            textarea::placeholder {
+                color: rgba(255, 255, 255, .55);
+            }
+
+            textarea:focus {
+                border-color: rgba(255, 255, 255, .35);
+                background: rgba(0, 0, 0, .22);
+            }
+
+            .row {
+                display: flex;
+                gap: 10px;
+                flex-wrap: wrap;
+                align-items: center;
+                justify-content: space-between;
+            }
+
+            button {
+                appearance: none;
+                border: none;
+                border-radius: 999px;
+                padding: 12px 18px;
+                font: 600 1rem/1 system-ui, -apple-system, Segoe UI, Roboto, Inter, "Helvetica Neue", Arial, sans-serif;
+                color: #1a1032;
+                background: linear-gradient(180deg, #ffffff, #e9e4ff);
+                cursor: pointer;
+                box-shadow:
+                    0 6px 18px rgba(0, 0, 0, .25),
+                    inset 0 0 0 1px rgba(255, 255, 255, .5);
+                transition: transform .1s ease, box-shadow .2s ease, filter .2s ease;
+            }
+
+            button:hover {
+                transform: translateY(-1px);
+            }
+
+            button:active {
+                transform: translateY(0);
+                box-shadow: 0 3px 12px rgba(0, 0, 0, .24), inset 0 0 0 1px rgba(255, 255, 255, .5);
+            }
+
+            button:focus-visible {
+                outline: 3px solid rgba(255, 255, 255, .6);
+                outline-offset: 2px;
+            }
+
+            .option {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                color: var(--ink-dim);
+                user-select: none;
+            }
+
+            .option input {
+                accent-color: #ffffff;
+            }
+
+            .status {
+                margin-top: 8px;
+                min-height: 1.2em;
+                color: var(--ink-dim);
+                font-size: .95rem;
+                opacity: 0;
+                transform: translateY(4px);
+                transition: opacity .35s ease, transform .35s ease;
+            }
+
+            .status.show {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            footer {
+                text-align: center;
+                padding: var(--gap);
+                color: rgba(255, 255, 255, .7);
+                font-size: .9rem;
+            }
+
+            /* Layer where whispers float */
+            .float-layer {
+                position: fixed;
+                inset: 0;
+                overflow: hidden;
+                pointer-events: none;
+                z-index: 0;
+                /* behind panel */
+            }
+
+            /* Individual floating whisper */
+            .whisper {
+                position: absolute;
+                left: 50%;
+                top: 70vh;
+                /* start near lower area */
+                transform: translate3d(-50%, 0, 0);
+                /* center baseline */
+                color: #fff;
+                text-shadow: 0 2px 20px rgba(255, 255, 255, .15), 0 0 1px rgba(0, 0, 0, .3);
+                filter: blur(0px);
+                opacity: 1;
+                will-change: transform, filter, opacity;
+                /* set on creation; JS removes after */
+                pointer-events: none;
+                white-space: pre-wrap;
+                max-width: min(90vw, 60ch);
+                line-height: 1.35;
+                font-weight: 500;
+                font-size: clamp(16px, 2.2vw, 22px);
+                letter-spacing: .2px;
+                mix-blend-mode: screen;
+            }
+
+            /* Respect reduced motion */
+            @media (prefers-reduced-motion: reduce) {
+                .veil {
+                    display: none;
+                }
+
+                .whisper {
+                    transition: none !important;
+                }
+
+                button,
+                textarea {
+                    transition: none !important;
+                }
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="wrap">
+            <div class="float-layer" id="float-layer" aria-hidden="true"></div>
+            <span class="veil" aria-hidden="true"></span>
+
+            <header>
+                <h1>WhisperWall</h1>
+                <p>Let your words drift upward and dissolve into mist.</p>
+            </header>
+
+            <main>
+                <section class="panel" aria-labelledby="compose-label">
+                    <div class="controls">
+                        <label id="compose-label" for="message" class="visually-hidden" style="position:absolute;left:-10000px;">
+                            Type a message to whisper
+                        </label>
+                        <textarea id="message" placeholder="Type your whisper…"></textarea>
+
+                        <div class="row">
+                            <button id="whisperBtn" type="button" aria-label="Whisper">Whisper</button>
+
+                            <label class="option" for="windToggle" title="Optional ambient wind">
+                                <input id="windToggle" type="checkbox" />
+                                subtle wind
+                            </label>
+                        </div>
+
+                        <div id="status" class="status" role="status" aria-live="polite"></div>
+                    </div>
+                </section>
+            </main>
+
+            <footer>
+                <small>nothing is saved.</small>
+            </footer>
+        </div>
+
+        <!-- Optional ambient audio: place a local file named "wind.wav" next to this HTML -->
+        <audio id="windAudio" src="wind.wav" preload="none" loop></audio>
+
+        <!-- GSAP (CDN). To avoid external requests entirely, download gsap.min.js locally and use the fallback below. -->
+        <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+        <!-- Local fallback (uncomment if you add gsap.min.js to the same folder) -->
+        <!-- <script>if(!window.gsap){document.write('<script src="gsap.min.js"><\/script>')}</script> -->
+
+        <script>
+            (function () {
+                const $ = (sel) => document.querySelector(sel);
+                const input = $('#message');
+                const btn = $('#whisperBtn');
+                const layer = $('#float-layer');
+                const status = $('#status');
+                const windToggle = $('#windToggle');
+                const wind = $('#windAudio');
+                const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                const MAX_FLOATS = 10; // soft cap for mobile performance
+
+                function gentleStatus(msg) {
+                    status.textContent = msg || '';
+                    status.classList.toggle('show', Boolean(msg));
+                }
+
+                function playWindIfDesired() {
+                    if (!windToggle.checked) return;
+                    try {
+                        if (wind.paused) {
+                            wind.volume = 0.22;
+                            // iOS/Android often need a user gesture; the Whisper click counts as one.
+                            wind.play().catch(() => { /* ignore */ });
+                        }
+                    } catch (e) { /* ignore */ }
+                }
+
+                function clamp(n, min, max) { return Math.max(min, Math.min(max, n)); }
+
+                function createWhisper(text) {
+                    // Cap number of floating nodes
+                    while (layer.children.length >= MAX_FLOATS) {
+                        layer.removeChild(layer.firstElementChild);
+                    }
+
+                    const el = document.createElement('div');
+                    el.className = 'whisper';
+                    el.textContent = text;
+                    el.style.willChange = 'transform, filter, opacity';
+
+                    // Randomize starting X around center; small rotation for organic feel
+                    const startOffsetX = (Math.random() * 120 - 60); // -60..60 px
+                    el.style.transform = `translate3d(calc(-50% + ${startOffsetX}px), 0, 0) rotate(${(Math.random() * 2 - 1) * 2}deg)`;
+
+                    layer.appendChild(el);
+
+                    if (reduceMotion || !window.gsap) {
+                        // Reduced motion: brief fade + remove, then clear input and prompt.
+                        el.style.opacity = '0';
+                        el.style.filter = 'blur(8px)';
+                        setTimeout(() => {
+                            el.remove();
+                            input.value = '';
+                            gentleStatus('Your words have joined the wind.');
+                        }, 350);
+                        return;
+                    }
+
+                    // Main upward drift distance and timing
+                    const distY = window.innerHeight * (0.62 + Math.random() * 0.22); // 62–84vh
+                    const dur = 6 + Math.random() * 2.5;                            // 6–8.5s
+                    const blurTo = 8 + Math.random() * 6;                              // 8–14px
+
+                    // Slight horizontal meander while ascending
+                    const wanderAmp = 20 + Math.random() * 24; // 20–44px
+
+                    // Oscillation tween (runs in parallel, killed on complete)
+                    const drift = gsap.to(el, {
+                        x: `+=${wanderAmp}`,
+                        duration: 2.4 + Math.random() * 1.4,
+                        ease: "sine.inOut",
+                        yoyo: true,
+                        repeat: -1
+                    });
+
+                    // Upward float + fade + blur
+                    gsap.to(el, {
+                        y: -distY,
+                        opacity: 0,
+                        filter: `blur(${blurTo}px)`,
+                        duration: dur,
+                        ease: "power1.out",
+                        onStart() {
+                            // Start subtle wind if requested
+                            playWindIfDesired();
+                            gentleStatus(''); // clear any prior message while animating
+                        },
+                        onComplete() {
+                            drift.kill();
+                            el.remove();
+                            // Clear only after the whisper completes (as requested)
+                            input.value = '';
+                            gentleStatus('Your words have joined the wind.');
+                            // Remove will-change to avoid long-lived memory pressure
+                            el.style.willChange = 'auto';
+                        }
+                    });
+                }
+
+                function whisper() {
+                    const text = (input.value || '').trim();
+                    if (!text) {
+                        input.focus();
+                        gentleStatus('Try typing something you’d like to release.');
+                        return;
+                    }
+                    createWhisper(text);
+                }
+
+                // Submit via button
+                btn.addEventListener('click', whisper, { passive: true });
+
+                // Submit via Ctrl/Cmd+Enter
+                input.addEventListener('keydown', (e) => {
+                    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                        e.preventDefault();
+                        whisper();
+                    }
+                });
+
+                // Pause wind when toggle is off
+                windToggle.addEventListener('change', () => {
+                    if (!windToggle.checked) { try { wind.pause(); } catch (e) { } }
+                    else { playWindIfDesired(); }
+                }, { passive: true });
+
+                // Accessibility nicety: focus textarea on load
+                window.addEventListener('load', () => { setTimeout(() => input.focus({ preventScroll: true }), 50); }, { passive: true });
+            })();
+        </script>
+    </body>
+
+</html>

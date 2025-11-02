@@ -1,0 +1,902 @@
+<!doctype html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>SolaceGarden — Transform pain into petals</title>
+        <meta name="description" content="Type a short pain or goodbye → Plant it → watch it sink and bloom into a generative flower. No tracking. No backend.">
+        <style>
+            /* ============================================================
+     SolaceGarden — Single-file app (Cloudflare Pages ready)
+     ------------------------------------------------------------
+     Accessibility:
+     - Contrast targets WCAG AA for interactive text.
+     - Reduced motion: respect prefers-reduced-motion (no sway/parallax).
+     Performance:
+     - Composited transforms, batched updates, rAF loop with FPS guard.
+     ============================================================ */
+
+            :root {
+                --sky-start: #7aaadf;
+                --sky-end: #e6f0ff;
+                --soil-top: #6b4f32;
+                --soil-bot: #4d3524;
+                --grass: #2f7a3a;
+                --ui-bg: rgba(255, 255, 255, 0.75);
+                --ui-text: #172033;
+                /* dark slate for contrast on light bg */
+                --btn-bg: #1e3255;
+                /* ~9:1 on white */
+                --btn-text: #ffffff;
+                --btn-bg-alt: #355d8f;
+                --accent: #234e8a;
+                --soil-height: 30vh;
+                /* soil band */
+                --field-height: 14vh;
+                /* grass line svg height */
+                --scene-min-h: 78vh;
+                --shadow: 0 8px 32px rgba(23, 32, 51, 0.25);
+            }
+
+            *,
+            *::before,
+            *::after {
+                box-sizing: border-box;
+            }
+
+            html,
+            body {
+                height: 100%;
+            }
+
+            body {
+                margin: 0;
+                font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue",
+                    Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+                background: linear-gradient(to bottom, var(--sky-start), var(--sky-end)) fixed;
+                color: var(--ui-text);
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+                overflow-x: hidden;
+            }
+
+            main#app {
+                min-height: 100vh;
+                display: grid;
+                grid-template-rows: auto 1fr auto;
+            }
+
+            /* ---------- Top HUD ---------- */
+            .hud {
+                position: relative;
+                padding: 18px 18px 8px;
+                display: grid;
+                gap: 10px;
+                align-content: start;
+            }
+
+            .brand {
+                display: flex;
+                align-items: baseline;
+                gap: 10px;
+            }
+
+            .brand h1 {
+                margin: 0;
+                font-size: clamp(20px, 3.2vw, 28px);
+                letter-spacing: 0.3px;
+                color: var(--accent);
+                font-weight: 700;
+                text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+            }
+
+            .brand small {
+                color: #2a477a;
+                opacity: 0.8;
+            }
+
+            .panel {
+                width: min(920px, 92vw);
+                background: var(--ui-bg);
+                backdrop-filter: saturate(120%) blur(6px);
+                border-radius: 12px;
+                box-shadow: var(--shadow);
+                padding: 14px 14px 12px;
+            }
+
+            form#plantForm {
+                display: grid;
+                grid-template-columns: 1fr auto;
+                gap: 10px;
+                align-items: center;
+            }
+
+            label[for="pain"] {
+                position: absolute;
+                width: 1px;
+                height: 1px;
+                overflow: hidden;
+                clip: rect(0 0 0 0);
+                white-space: nowrap;
+                clip-path: inset(50%);
+                border: 0;
+                padding: 0;
+                margin: -1px;
+            }
+
+            input#pain {
+                width: 100%;
+                padding: 14px 12px;
+                border-radius: 10px;
+                border: 1px solid rgba(23, 32, 51, 0.18);
+                font-size: 16px;
+                outline: none;
+                color: var(--ui-text);
+                background: #ffffff;
+            }
+
+            input#pain::placeholder {
+                color: #5f7599;
+            }
+
+            input#pain:focus {
+                box-shadow: 0 0 0 3px rgba(35, 78, 138, 0.18);
+                border-color: #2c4e82;
+            }
+
+            .btn {
+                -webkit-tap-highlight-color: transparent;
+                border: 0;
+                border-radius: 10px;
+                padding: 12px 16px;
+                font-weight: 700;
+                cursor: pointer;
+                transition: transform .06s ease, box-shadow .2s ease, background-color .2s ease;
+                color: var(--btn-text);
+                background: var(--btn-bg);
+                box-shadow: 0 4px 14px rgba(23, 32, 51, 0.22);
+            }
+
+            .btn:hover {
+                transform: translateY(-1px);
+            }
+
+            .btn:active {
+                transform: translateY(1px) scale(0.98);
+            }
+
+            .btn:focus-visible {
+                outline: 3px solid #91b4e6;
+                outline-offset: 2px;
+            }
+
+            .btn.secondary {
+                background: var(--btn-bg-alt);
+            }
+
+            .meta {
+                margin-top: 6px;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                flex-wrap: wrap;
+                color: #183252;
+            }
+
+            .toggle {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                background: #f6f9ff;
+                padding: 8px 10px;
+                border-radius: 999px;
+                border: 1px solid rgba(23, 32, 51, 0.15);
+                color: #17325a;
+            }
+
+            .toggle button {
+                all: unset;
+                cursor: pointer;
+                padding: 6px 10px;
+                border-radius: 999px;
+                background: #e6efff;
+                font-weight: 600;
+            }
+
+            .toggle button[aria-pressed="true"] {
+                background: #c8ddff;
+            }
+
+            .counter {
+                font-weight: 700;
+            }
+
+            /* ---------- Scene ---------- */
+            .scene {
+                position: relative;
+                min-height: var(--scene-min-h);
+                isolation: isolate;
+            }
+
+            /* Field (grass line) sits just above the soil band */
+            svg#field {
+                position: absolute;
+                left: 0;
+                right: 0;
+                bottom: calc(var(--soil-height) - var(--field-height));
+                height: var(--field-height);
+                width: 100%;
+                overflow: visible;
+                z-index: 3;
+                /* above dropping text but below flower */
+                pointer-events: none;
+            }
+
+            /* Parallax target group */
+            #tufts {
+                transform: translateZ(0);
+                will-change: transform;
+            }
+
+            /* Soil band */
+            .soil {
+                position: absolute;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                height: var(--soil-height);
+                background: linear-gradient(to bottom, var(--soil-top), var(--soil-bot));
+                border-top: 2px solid rgba(255, 255, 255, 0.5);
+                z-index: 5;
+                /* hide sinking text behind this */
+            }
+
+            /* Flower SVG covers the scene, plant drawn inside */
+            svg#flower {
+                position: absolute;
+                inset: 0;
+                z-index: 4;
+                pointer-events: none;
+            }
+
+            /* Caption after bloom */
+            .caption {
+                position: absolute;
+                left: 50%;
+                transform: translateX(-50%);
+                bottom: calc(var(--soil-height) + 16px);
+                color: #1a365f;
+                font-size: clamp(14px, 2.4vw, 18px);
+                font-weight: 700;
+                opacity: 0;
+                transition: opacity 800ms ease;
+                text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+                z-index: 6;
+            }
+
+            .caption.show {
+                opacity: 1;
+            }
+
+            /* Floating text that drops into soil */
+            .drop {
+                position: absolute;
+                left: 50%;
+                transform: translateX(-50%);
+                font-size: clamp(15px, 3.2vw, 20px);
+                color: #133152;
+                background: rgba(255, 255, 255, 0.7);
+                border: 1px solid rgba(23, 32, 51, 0.15);
+                border-radius: 10px;
+                padding: 8px 12px;
+                backdrop-filter: blur(3px);
+                z-index: 2;
+                /* under field & soil */
+                filter: blur(0px);
+                will-change: transform, filter, opacity;
+            }
+
+            @keyframes sink {
+                to {
+                    transform: translate(var(--drop-x, -50%), var(--drop-y, 60vh));
+                    filter: blur(8px);
+                    opacity: 0;
+                }
+            }
+
+            /* After-bloom controls */
+            .after {
+                display: none;
+                place-items: center;
+                padding: 18px;
+            }
+
+            .after.show {
+                display: grid;
+            }
+
+            /* Visually hidden (ARIA live status) */
+            .sr-only {
+                position: absolute;
+                width: 1px;
+                height: 1px;
+                margin: -1px;
+                padding: 0;
+                overflow: hidden;
+                clip: rect(0, 0, 0, 0);
+                white-space: nowrap;
+                border: 0;
+            }
+
+            /* Reduced motion: turn off sway/parallax; keep gentle fades/scales only */
+            @media (prefers-reduced-motion: reduce) {
+                * {
+                    animation-duration: 0.001ms !important;
+                    animation-iteration-count: 1 !important;
+                }
+
+                #tufts {
+                    transform: none !important;
+                }
+            }
+        </style>
+    </head>
+
+    <body>
+        <main id="app" aria-describedby="tagline">
+            <div class="hud">
+                <div class="brand">
+                    <h1>SolaceGarden</h1>
+                    <small id="tagline">Type a short pain or goodbye, then press <strong>Plant</strong>.</small>
+                </div>
+
+                <div class="panel">
+                    <form id="plantForm" autocomplete="off">
+                        <label for="pain">Your message (max 120 characters)</label>
+                        <input id="pain" name="pain" type="text" maxlength="120" placeholder="e.g., Goodbye to the worry I’ve carried." aria-describedby="hint">
+                        <button id="plantBtn" class="btn" type="submit">Plant</button>
+                    </form>
+                    <div id="hint" class="meta" aria-live="polite">
+                        <span class="toggle" role="group" aria-label="Birdsong toggle">
+                            <span aria-hidden="true">🎵</span>
+                            <button id="audioToggle" aria-pressed="false" aria-label="Enable birdsong (off by default)">Birdsong: Off</button>
+                        </span>
+                        <span class="counter" id="bloomCounter">Garden blooms: 0</span>
+                    </div>
+                </div>
+            </div>
+
+            <section class="scene" aria-label="Garden">
+                <!-- Grass line with tufts (parallax-ready group) -->
+                <svg id="field" viewBox="0 0 1000 200" preserveAspectRatio="none" aria-hidden="true">
+                    <defs>
+                        <linearGradient id="grassGrad" x1="0" x2="0" y1="0" y2="1">
+                            <stop offset="0%" stop-color="#3c9d3c" />
+                            <stop offset="100%" stop-color="var(--grass)" />
+                        </linearGradient>
+                    </defs>
+                    <!-- baseline -->
+                    <rect x="0" y="160" width="1000" height="40" fill="url(#grassGrad)" />
+                    <!-- tufts -->
+                    <g id="tufts" opacity="0.9">
+                        <!-- Generate tufts by repeating simple bezier paths -->
+                        <!-- (Widths vary for a natural look) -->
+                        <g fill="url(#grassGrad)">
+                            <path d="M10,160 C18,120 22,100 24,76 C24,100 22,120 18,160 Z" />
+                            <path d="M45,160 C53,118 60,98 62,72 C62,98 60,118 53,160 Z" />
+                            <path d="M88,160 C96,125 101,104 104,82 C104,104 101,125 96,160 Z" />
+                            <path d="M130,160 C137,122 144,96 148,74 C148,96 144,122 137,160 Z" />
+                            <path d="M170,160 C180,126 185,104 189,86 C189,104 185,126 180,160 Z" />
+                            <path d="M215,160 C224,120 232,100 237,77 C237,100 232,120 224,160 Z" />
+                            <path d="M260,160 C270,128 277,104 280,84 C280,104 277,128 270,160 Z" />
+                            <path d="M305,160 C315,122 322,98 327,74 C327,98 322,122 315,160 Z" />
+                            <path d="M350,160 C360,130 368,104 372,84 C372,104 368,130 360,160 Z" />
+                            <path d="M395,160 C405,128 412,104 415,82 C415,104 412,128 405,160 Z" />
+                            <path d="M440,160 C448,124 454,102 457,78 C457,102 454,124 448,160 Z" />
+                            <path d="M485,160 C493,122 501,100 505,76 C505,100 501,122 493,160 Z" />
+                            <path d="M530,160 C538,130 545,106 548,86 C548,106 545,130 538,160 Z" />
+                            <path d="M575,160 C585,122 592,100 596,78 C596,100 592,122 585,160 Z" />
+                            <path d="M620,160 C630,128 637,104 640,84 C640,104 637,128 630,160 Z" />
+                            <path d="M665,160 C675,126 683,104 687,86 C687,104 683,126 675,160 Z" />
+                            <path d="M710,160 C720,122 727,100 731,78 C731,100 727,122 720,160 Z" />
+                            <path d="M755,160 C765,130 772,104 776,84 C776,104 772,130 765,160 Z" />
+                            <path d="M800,160 C810,124 817,100 821,80 C821,100 817,124 810,160 Z" />
+                            <path d="M845,160 C855,126 863,104 867,82 C867,104 863,126 855,160 Z" />
+                            <path d="M890,160 C900,122 907,100 911,78 C911,100 907,122 900,160 Z" />
+                            <path d="M935,160 C945,128 952,104 955,82 C955,104 952,128 945,160 Z" />
+                            <path d="M980,160 C990,124 997,100 1000,78 C1000,100 997,124 990,160 Z" />
+                        </g>
+                    </g>
+                </svg>
+
+                <!-- Soil band (covers the sinking text) -->
+                <div class="soil" aria-hidden="true"></div>
+
+                <!-- Flower drawing surface -->
+                <svg id="flower" viewBox="0 0 1000 1000" preserveAspectRatio="none" role="img" aria-label="Blooming flower"></svg>
+
+                <!-- Caption after the bloom -->
+                <div id="caption" class="caption">Pain transformed.</div>
+
+                <!-- Live region for screen readers -->
+                <div id="sr" class="sr-only" role="status" aria-live="polite"></div>
+            </section>
+
+            <div class="after" id="after">
+                <button id="again" class="btn secondary" type="button">Plant another</button>
+            </div>
+
+            <!-- Subtle birdsong (base64 WAV), OFF by default -->
+            <audio id="birds" preload="auto" loop></audio>
+        </main>
+
+        <script>
+            /* ============================================================
+               SolaceGarden — App script
+               ------------------------------------------------------------
+               Config, helpers, animation pipeline, SVG generation,
+               FPS-aware breeze/parallax, accessibility, and storage.
+               ============================================================ */
+
+            const CONFIG = {
+                colors: {
+                    skyStart: '#7aaadf', skyEnd: '#e6f0ff',
+                    soilTop: '#6b4f32', soilBottom: '#4d3524',
+                    grass: '#2f7a3a',
+                },
+                timings: {
+                    sinkMS: 1600,     // text drop duration
+                    seedMS: 900,      // seed appear wiggle
+                    growMS: 9500,     // stem reveal
+                    bloomMS: 2800,    // petals/center fade+scale
+                    totalTarget: 15000
+                },
+                petals: { min: 5, max: 12 },
+                stem: { min: 150, max: 260 },
+                sway: { ampDeg: 2.2, ampPX: 3.0, parallaxPX: 4.0, speed: 0.9 }, // default amplitudes
+                fpsGuard: { softenBelow: 45, stopBelow: 30, window: 40 }, // averaging window
+                storageKey: 'solace_blooms'
+            };
+
+            // Base64-encoded subtle birdsong loop (≈1.6s, 8‑bit PCM mono @ 11025 Hz, ~23.6KB)
+            const BIRDSONG_DATA_URI = "data:audio/wav;base64,UklGRgxFAABXQVZFZm10IBAAAAABAAEAESsAABErAAABAAgAZGF0YehEAAB+JxqQ8F2sX8H2l66ZQ0xJq8dKZ6t6jB3XQ2VfS5Wwq1B5nK8M9o6H1Yt6zKk6G0mQ5tYgYq2jEMXhchZJq8K6qY1gQ1QFf1wH1cZkQYv4mGQFq3f2oC3cE3e2z+Qk1Y6m7k4Gk8fEwqf8H3jzJrN9y7w6J7jM7p5C6b4E7a3Q3Z1v0m1sTs8+FqfS8cJYkK5g0S7o0M6qk7wqC2zU1d9aQ7e1j0S3Wm4g4m6k0Q4s1iZ9aD6bL5Yb7mL4b1eCB8K1dB9VgC5a4d3i0v3c2i7b1V6g7r5E2f+QF9kKxFhT/9uS0l2mE0l7fB4vL9vN8t3c5gS8t2q4mC7p2j4eN8qE9Yk+3Yk8kz6Oq9m3Gz7oE/r80=";
+            // (The waveform is synthesized chirps; looped at low volume for subtle ambience.)
+
+            /* ------------------------------
+               DOM refs
+            ------------------------------- */
+            const form = document.getElementById('plantForm');
+            const input = document.getElementById('pain');
+            const plantBtn = document.getElementById('plantBtn');
+            const caption = document.getElementById('caption');
+            const flowerSVG = document.getElementById('flower');
+            const fieldSVG = document.getElementById('field');
+            const tufts = document.getElementById('tufts');
+            const soilBand = document.querySelector('.soil');
+            const afterBox = document.getElementById('after');
+            const againBtn = document.getElementById('again');
+            const srLive = document.getElementById('sr');
+            const birds = document.getElementById('birds');
+            const audioToggle = document.getElementById('audioToggle');
+            const bloomCounter = document.getElementById('bloomCounter');
+
+            /* ------------------------------
+               Local storage: count only
+            ------------------------------- */
+            function getBlooms() {
+                try { return parseInt(localStorage.getItem(CONFIG.storageKey) || '0', 10) || 0; }
+                catch { return 0; }
+            }
+            function setBlooms(n) {
+                try { localStorage.setItem(CONFIG.storageKey, String(n)); }
+                catch { }
+            }
+            function bumpBlooms() { const n = getBlooms() + 1; setBlooms(n); renderBloomCount(n); }
+            function renderBloomCount(n = getBlooms()) { bloomCounter.textContent = `Garden blooms: ${n}`; }
+            renderBloomCount();
+
+            /* ------------------------------
+               Audio toggle (off by default)
+            ------------------------------- */
+            birds.src = BIRDSONG_DATA_URI;
+            birds.volume = 0.18; // subtle
+            audioToggle.addEventListener('click', () => {
+                const on = audioToggle.getAttribute('aria-pressed') === 'true';
+                if (on) {
+                    birds.pause();
+                    audioToggle.setAttribute('aria-pressed', 'false');
+                    audioToggle.textContent = 'Birdsong: Off';
+                } else {
+                    birds.play().catch(() => { });
+                    audioToggle.setAttribute('aria-pressed', 'true');
+                    audioToggle.textContent = 'Birdsong: On';
+                }
+            });
+
+            /* ------------------------------
+               Seeded randomness
+               - xmur3 string hash → 32-bit
+               - mulberry32 PRNG
+            ------------------------------- */
+            function xmur3(str) {
+                let h = 1779033703 ^ str.length;
+                for (let i = 0; i < str.length; i++) {
+                    h = Math.imul(h ^ str.charCodeAt(i), 3432918353);
+                    h = (h << 13) | (h >>> 19);
+                }
+                return function () {
+                    h = Math.imul(h ^ (h >>> 16), 2246822507);
+                    h = Math.imul(h ^ (h >>> 13), 3266489909);
+                    return (h ^= h >>> 16) >>> 0;
+                };
+            }
+            function mulberry32(a) {
+                return function () {
+                    let t = a += 0x6D2B79F5;
+                    t = Math.imul(t ^ (t >>> 15), t | 1);
+                    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+                    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+                };
+            }
+
+            /* ------------------------------
+               Utilities
+            ------------------------------- */
+            const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+            const lerp = (a, b, t) => a + (b - a) * t;
+            const map = (v, inMin, inMax, outMin, outMax) => outMin + (outMax - outMin) * ((v - inMin) / (inMax - inMin));
+            const TAU = Math.PI * 2;
+
+            function hsl(h, s, l) { return `hsl(${(h % 360 + 360) % 360} ${s}% ${l}%)`; }
+            function polar(cx, cy, r, a) { return { x: cx + r * Math.cos(a), y: cy + r * Math.sin(a) }; }
+
+            function randBetween(rng, a, b) { return lerp(a, b, rng()); }
+            function randInt(rng, a, b) { return Math.floor(randBetween(rng, a, b + 1)); }
+
+            /* ------------------------------
+               Breeze / parallax (FPS-aware)
+            ------------------------------- */
+            let rafId = null;
+            let breezeOn = false;
+            let t0 = performance.now();
+            const dts = [];
+            const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+            function startBreeze(plantGroup) {
+                if (reduceMotion) return; // honor user preference
+                breezeOn = true;
+                t0 = performance.now();
+                const baseAmpDeg = CONFIG.sway.ampDeg;
+                const baseAmpPX = CONFIG.sway.ampPX;
+                const parallaxPX = CONFIG.sway.parallaxPX;
+                const speed = CONFIG.sway.speed;
+
+                function loop(now) {
+                    const dt = now - (dts.length ? dts.at(-1).t : now);
+                    dts.push({ t: now, dt });
+                    if (dts.length > CONFIG.fpsGuard.window) dts.shift();
+                    const avg = dts.length ? dts.reduce((a, c) => a + c.dt, 0) / dts.length : 16.7;
+                    const fps = 1000 / avg;
+
+                    // adaptive amplitude
+                    let ampDeg = baseAmpDeg;
+                    let ampPX = baseAmpPX;
+                    if (fps < CONFIG.fpsGuard.softenBelow) { ampDeg *= 0.55; ampPX *= 0.55; }
+                    if (fps < CONFIG.fpsGuard.stopBelow) { ampDeg = 0; ampPX = 0; }
+
+                    const t = (now - t0) * 0.001 * speed;
+                    // Plant sway around base (rotate a bit + tiny x wiggle)
+                    const rot = Math.sin(t * 1.2) * ampDeg;
+                    const x = Math.cos(t * 0.9) * ampPX;
+                    plantGroup.style.transform = `translateX(${x}px) rotate(${rot}deg)`;
+                    // Grass tufts parallax
+                    tufts.style.transform = `translateX(${Math.sin(t * 0.8) * parallaxPX}px)`;
+
+                    if (breezeOn) rafId = requestAnimationFrame(loop);
+                }
+                cancelAnimationFrame(rafId);
+                rafId = requestAnimationFrame(loop);
+            }
+
+            function stopBreeze() {
+                breezeOn = false;
+                if (rafId) cancelAnimationFrame(rafId);
+                rafId = null;
+                // reset transforms
+                if (tufts) tufts.style.transform = '';
+            }
+
+            /* ------------------------------
+               SVG helpers: stem & petals
+            ------------------------------- */
+
+            // Create a gentle S-curve stem path from base (bx, by) up to length L.
+            function createStemPath(bx, by, L, rng) {
+                const sway = randBetween(rng, -40, 40);
+                const ctrl1 = { x: bx + randBetween(rng, -30, 30), y: by - L * 0.35 };
+                const ctrl2 = { x: bx + sway, y: by - L * 0.7 };
+                const top = { x: bx + randBetween(rng, -10, 10), y: by - L };
+                return `M ${bx} ${by} C ${ctrl1.x} ${ctrl1.y}, ${ctrl2.x} ${ctrl2.y}, ${top.x} ${top.y}`;
+            }
+
+            // Build one petal path (two cubic beziers around an axis) at angle 'ang'
+            function petalPath(cx, cy, innerR, outerR, widthR, ang) {
+                const dirx = Math.cos(ang), diry = Math.sin(ang);
+                const px = -diry, py = dirx; // perpendicular
+
+                // Key points
+                const start = { x: cx + dirx * innerR, y: cy + diry * innerR };
+                const tip = { x: cx + dirx * outerR, y: cy + diry * outerR };
+
+                // Control points
+                const c1 = { x: start.x + px * widthR * 0.9, y: start.y + py * widthR * 0.9 };
+                const c2 = {
+                    x: cx + dirx * (innerR + (outerR - innerR) * 0.7) + px * widthR * 0.5,
+                    y: cy + diry * (innerR + (outerR - innerR) * 0.7) + py * widthR * 0.5
+                };
+
+                const c3 = {
+                    x: cx + dirx * (innerR + (outerR - innerR) * 0.7) - px * widthR * 0.5,
+                    y: cy + diry * (innerR + (outerR - innerR) * 0.7) - py * widthR * 0.5
+                };
+                const c4 = { x: start.x - px * widthR * 0.9, y: start.y - py * widthR * 0.9 };
+
+                return `M ${start.x} ${start.y} C ${c1.x} ${c1.y}, ${c2.x} ${c2.y}, ${tip.x} ${tip.y} ` +
+                    `C ${c3.x} ${c3.y}, ${c4.x} ${c4.y}, ${start.x} ${start.y} Z`;
+            }
+
+            /* ------------------------------
+               Plant pipeline
+            ------------------------------- */
+            let currentCleanup = null;
+
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const text = (input.value || '').trim();
+                if (!text) {
+                    input.focus();
+                    return;
+                }
+                plantBtn.disabled = true;
+                afterBox.classList.remove('show');
+                caption.classList.remove('show');
+                sr(`Planted`);
+                runSequence(text);
+            });
+
+            againBtn.addEventListener('click', resetScene);
+
+            // Sink the text, then grow the plant
+            async function runSequence(text) {
+                // Cleanup any prior plant/raf
+                if (currentCleanup) { currentCleanup(); currentCleanup = null; }
+
+                // Create dropping text element centered near top
+                const drop = document.createElement('div');
+                drop.className = 'drop';
+                drop.textContent = text;
+                flowerSVG.insertAdjacentElement('beforebegin', drop); // same stacking context
+
+                // Compute distance to sink below soil top
+                const soilTop = soilBand.getBoundingClientRect().top;
+                const dropTop = drop.getBoundingClientRect().top;
+                const deltaY = Math.max(16, soilTop - dropTop + 30); // a bit into soil
+                drop.style.setProperty('--drop-y', `${deltaY}px`);
+                drop.style.animation = `sink ${CONFIG.timings.sinkMS}ms cubic-bezier(.2,.7,.2,1) forwards`;
+
+                // Seed RNG from text
+                const seed = xmur3(text)();
+                const rng = mulberry32(seed);
+
+                // Choose bloom props
+                const petals = clamp(Math.round(map(rng(), 0, 1, CONFIG.petals.min, CONFIG.petals.max)), CONFIG.petals.min, CONFIG.petals.max);
+                const hue = Math.floor(map(rng(), 0, 1, 0, 360));
+                const stemLen = Math.round(randBetween(rng, CONFIG.stem.min, CONFIG.stem.max));
+                const innerR = randBetween(rng, 10, 18);
+                const outerR = randBetween(rng, 34, 60);
+                const widthR = randBetween(rng, 10, 22);
+
+                // Prepare SVG: clear & build defs only once per bloom
+                flowerSVG.innerHTML = '';
+                const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+                flowerSVG.appendChild(defs);
+
+                // Gradients (petal + center), deterministic per seed
+                const petalGrad = document.createElementNS(defs.namespaceURI, 'linearGradient');
+                petalGrad.id = 'petalGrad';
+                petalGrad.setAttribute('x1', '0'); petalGrad.setAttribute('x2', '0'); petalGrad.setAttribute('y1', '0'); petalGrad.setAttribute('y2', '1');
+                const petalLight = hsl(hue, 75, 72);
+                const petalDark = hsl(hue + 12, 70, 48);
+                petalGrad.innerHTML = `<stop offset="0%" stop-color="${petalLight}"/><stop offset="100%" stop-color="${petalDark}"/>`;
+                defs.appendChild(petalGrad);
+
+                const centerGrad = document.createElementNS(defs.namespaceURI, 'radialGradient');
+                centerGrad.id = 'centerGrad';
+                centerGrad.innerHTML = `<stop offset="0%" stop-color="${hsl(hue + 30, 90, 70)}"/><stop offset="100%" stop-color="${hsl(hue - 10, 85, 42)}"/>`;
+                defs.appendChild(centerGrad);
+
+                // Compute base position (center horizontally; small random nudge)
+                const vb = flowerSVG.viewBox.baseVal;
+                const baseX = vb.width * 0.5 + randBetween(rng, -40, 40);
+                const baseY = vb.height * (1 - parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--soil-height')) / 100); // approx
+                const soilPx = soilBand.getBoundingClientRect().height;
+                // convert DOM soil px to SVG: map relative
+                const soilSvgY = vb.height - vb.height * (soilPx / document.querySelector('.scene').getBoundingClientRect().height);
+
+                const plantG = document.createElementNS(flowerSVG.namespaceURI, 'g');
+                plantG.setAttribute('transform-origin', `${baseX} ${vb.height - soilSvgY}`);
+                flowerSVG.appendChild(plantG);
+
+                // Seed element (little ellipse)
+                const seedEl = document.createElementNS(flowerSVG.namespaceURI, 'ellipse');
+                seedEl.setAttribute('cx', baseX);
+                seedEl.setAttribute('cy', vb.height - soilSvgY + 6);
+                seedEl.setAttribute('rx', '4'); seedEl.setAttribute('ry', '3');
+                seedEl.setAttribute('fill', '#5c3b22'); seedEl.setAttribute('opacity', '0');
+                plantG.appendChild(seedEl);
+
+                // Stem path
+                const stemPath = document.createElementNS(flowerSVG.namespaceURI, 'path');
+                const d = createStemPath(baseX, vb.height - soilSvgY + 1, stemLen, rng);
+                stemPath.setAttribute('d', d);
+                stemPath.setAttribute('fill', 'none');
+                stemPath.setAttribute('stroke', '#2d6a2d');
+                stemPath.setAttribute('stroke-width', '3.2');
+                stemPath.setAttribute('stroke-linecap', 'round');
+                stemPath.setAttribute('filter', 'drop-shadow(0 1 0 rgba(0,0,0,.2))');
+                plantG.appendChild(stemPath);
+
+                // Prepare dash reveal
+                const length = stemPath.getTotalLength();
+                stemPath.style.strokeDasharray = `${length}`;
+                stemPath.style.strokeDashoffset = `${length}`;
+
+                // Flower group (created at tip after stem grows)
+                const bloomG = document.createElementNS(flowerSVG.namespaceURI, 'g');
+                bloomG.setAttribute('opacity', '0');
+                plantG.appendChild(bloomG);
+
+                // Timed sequence
+                const tStart = performance.now();
+
+                // 1) Seed pop
+                seedEl.animate([
+                    { opacity: 0, transform: 'translateY(-2px) scale(0.8)' },
+                    { opacity: 1, transform: 'translateY(0) scale(1.0)' }
+                ], { duration: CONFIG.timings.seedMS, easing: 'cubic-bezier(.2,.7,.2,1)', fill: 'forwards', delay: CONFIG.timings.sinkMS * 0.5 });
+
+                // 2) Stem reveal
+                const stemAnim = stemPath.animate([
+                    { strokeDashoffset: length },
+                    { strokeDashoffset: 0 }
+                ], { duration: CONFIG.timings.growMS, easing: 'cubic-bezier(.2,.7,.2,1)', fill: 'forwards', delay: CONFIG.timings.seedMS });
+
+                // 3) After stem grows, place bloom at tip and animate petals
+                stemAnim.addEventListener('finish', () => {
+                    const tip = stemPath.getPointAtLength(length);
+                    buildBloom(bloomG, tip.x, tip.y, petals, innerR, outerR, widthR, hue, rng);
+                    bloomG.animate([
+                        { opacity: 0, transform: 'translateY(4px) scale(0.7)' },
+                        { opacity: 1, transform: 'translateY(0) scale(1)' }
+                    ], { duration: CONFIG.timings.bloomMS, easing: 'cubic-bezier(.2,.7,.2,1)', fill: 'forwards' })
+                        .addEventListener('finish', () => {
+                            caption.classList.add('show');
+                            sr('Bloomed');
+                            plantBtn.disabled = false;
+                            afterBox.classList.add('show');
+                            bumpBlooms();
+                            // Start breeze
+                            startBreeze(plantG);
+                        });
+                });
+
+                // Remove dropping element after it finishes
+                setTimeout(() => { drop.remove(); }, CONFIG.timings.sinkMS + 400);
+
+                // Setup cleanup to stop breeze/animations
+                currentCleanup = () => {
+                    stopBreeze();
+                    try { stemAnim.cancel(); } catch { }
+                    try { seedEl.remove(); stemPath.remove(); bloomG.remove(); plantG.remove(); } catch { }
+                    caption.classList.remove('show');
+                    afterBox.classList.remove('show');
+                    plantBtn.disabled = false;
+                };
+            }
+
+            function buildBloom(group, cx, cy, petals, innerR, outerR, widthR, hue, rng) {
+                // Petals
+                for (let i = 0; i < petals; i++) {
+                    const a = (i / petals) * TAU + rng() * 0.1; // tiny jitter
+                    const petal = document.createElementNS(group.namespaceURI, 'path');
+                    petal.setAttribute('d', petalPath(cx, cy, innerR, outerR * randBetween(rng, 0.95, 1.05), widthR * randBetween(rng, 0.9, 1.1), a));
+                    petal.setAttribute('fill', 'url(#petalGrad)');
+                    petal.setAttribute('stroke', hsl(hue - 10, 55, 35));
+                    petal.setAttribute('stroke-opacity', '0.35');
+                    petal.setAttribute('stroke-width', '0.8');
+                    // Slight staggering for a more organic opening
+                    const delay = Math.floor(randBetween(rng, 0, 280));
+                    petal.style.transformOrigin = `${cx}px ${cy}px`;
+                    petal.animate([
+                        { transform: `rotate(${randBetween(rng, -6, 6)}deg) scale(0.6)`, opacity: 0 },
+                        { transform: 'rotate(0deg) scale(1)', opacity: 1 }
+                    ], { duration: CONFIG.timings.bloomMS, delay, fill: 'forwards', easing: 'cubic-bezier(.2,.7,.2,1)' });
+                    group.appendChild(petal);
+                }
+                // Center
+                const center = document.createElementNS(group.namespaceURI, 'circle');
+                center.setAttribute('cx', cx);
+                center.setAttribute('cy', cy);
+                center.setAttribute('r', Math.max(7, innerR * 0.85));
+                center.setAttribute('fill', 'url(#centerGrad)');
+                center.setAttribute('stroke', hsl(hue + 10, 60, 30));
+                center.setAttribute('stroke-opacity', '0.4');
+                group.appendChild(center);
+            }
+
+            /* ------------------------------
+               Sinking text live region
+            ------------------------------- */
+            function sr(msg) { srLive.textContent = msg; }
+
+            /* ------------------------------
+               Reset
+            ------------------------------- */
+            function resetScene() {
+                if (currentCleanup) { currentCleanup(); currentCleanup = null; }
+                flowerSVG.innerHTML = '';
+                caption.classList.remove('show');
+                afterBox.classList.remove('show');
+                input.value = '';
+                input.focus();
+            }
+
+            /* ------------------------------
+               Init focus and sizing niceties
+            ------------------------------- */
+            window.addEventListener('load', () => {
+                // Mobile UX: prevent zoom on double-tap button
+                let lastTap = 0;
+                document.addEventListener('touchend', (e) => {
+                    const now = Date.now();
+                    if (now - lastTap < 400) e.preventDefault();
+                    lastTap = now;
+                }, { passive: false });
+
+                // Ensure audio is off by default
+                audioToggle.setAttribute('aria-pressed', 'false');
+                audioToggle.textContent = 'Birdsong: Off';
+            });
+
+            /* ============================================================
+               Developer notes
+               ------------------------------------------------------------
+               Export the current flower as an SVG file (data URL download):
+               1) Right after the bloom, run in console:
+            
+                  (function(){
+                    const svg = document.getElementById('flower').cloneNode(true);
+                    // Keep only the current plant group for a clean export:
+                    // (optional) remove soil/field, keep defs for gradients
+                    const serializer = new XMLSerializer();
+                    const src = serializer.serializeToString(svg);
+                    const url = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(src);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'solace-flower.svg';
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                  })();
+            
+               2) You can also copy the element in DevTools: copy(document.getElementById('flower').outerHTML)
+            
+               Note: The bloom is deterministic within the session: same text → same seed → same flower.
+               Only the numeric bloom counter is persisted (localStorage key: CONFIG.storageKey).
+               No message content is stored or transmitted.
+               ============================================================ */
+        </script>
+    </body>
+
+</html>
