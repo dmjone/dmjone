@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="en" data-bs-theme="auto">
+
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <title>Unified Diff Applier · dmj.one Utilities</title>
+
+        <!-- Bootstrap (cdnjs) -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.8/css/bootstrap.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+        <!-- jsdiff (cdnjs) provides global "Diff" with applyPatch/parsePatch -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jsdiff/8.0.2/diff.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    </head>
+
+    <body class="bg-light">
+        <div class="container py-4">
+            <header class="mb-4">
+                <h1 class="h3 mb-1">Unified Diff Applier</h1>
+                <p class="text-body-secondary mb-0">
+                    Paste your original file and a unified <code>.diff/.patch</code>. This page will apply it locally (no upload).
+                </p>
+            </header>
+
+            <div id="status" class="mb-3"></div>
+
+            <div class="row g-3">
+                <div class="col-12 col-xl-4">
+                    <div class="card h-100">
+                        <div class="card-header">Original file</div>
+                        <div class="card-body">
+                            <textarea id="original" class="form-control font-monospace" rows="20" placeholder="Paste the original file content here..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-xl-4">
+                    <div class="card h-100">
+                        <div class="card-header">Unified diff / patch</div>
+                        <div class="card-body">
+                            <textarea id="patch" class="form-control font-monospace" rows="20" placeholder="Paste a unified diff (starts with --- a/… and +++ b/… or @@)…"></textarea>
+                            <details class="mt-3">
+                                <summary class="small">Sanitized patch preview</summary>
+                                <textarea id="sanitized" class="form-control font-monospace mt-2" rows="10" readonly></textarea>
+                            </details>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-xl-4">
+                    <div class="card h-100">
+                        <div class="card-header d-flex align-items-center justify-content-between">
+                            <span>Patched file (result)</span>
+                            <small class="text-body-secondary" id="fileNameGuess"></small>
+                        </div>
+                        <div class="card-body">
+                            <textarea id="result" class="form-control font-monospace" rows="20" placeholder="Patched output will appear here..." readonly></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-3 mt-2">
+                <div class="col-12 col-xl-8">
+                    <div class="card">
+                        <div class="card-header">Options</div>
+                        <div class="card-body">
+                            <div class="row g-3 align-items-center">
+                                <div class="col-12 col-md-auto">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="autoApply" checked>
+                                        <label class="form-check-label" for="autoApply">Auto‑apply while typing</label>
+                                    </div>
+                                </div>
+
+                                <div class="col-12 col-md-auto">
+                                    <label for="fuzz" class="form-label mb-0">Fuzz factor</label>
+                                    <input type="number" class="form-control" id="fuzz" min="0" max="10" value="0" aria-describedby="fuzzHelp" />
+                                    <div class="form-text" id="fuzzHelp">Allows slightly mismatched context (try 1–2 if a hunk fails).</div>
+                                </div>
+
+                                <div class="col-12 col-md-auto">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="ignoreWs">
+                                        <label class="form-check-label" for="ignoreWs">Ignore whitespace in context</label>
+                                    </div>
+                                </div>
+
+                                <div class="col-12 col-md-auto">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="normalizeEol" checked>
+                                        <label class="form-check-label" for="normalizeEol">Normalize line endings</label>
+                                    </div>
+                                </div>
+
+                                <div class="col-12 col-md-auto">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="repairMode" checked>
+                                        <label class="form-check-label" for="repairMode">Repair malformed hunk lines</label>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="mt-2 small text-body-secondary">
+                                Tip: Prefer copying the **raw** patch from your VCS or from GitHub’s “Raw” view. Inside each <em>@@ hunk</em>, context lines must begin with a single space; added lines with <code>+</code>; removed lines with <code>-</code>. :contentReference[oaicite:1]{index=1}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-xl-4 d-grid d-md-flex gap-2 align-items-stretch">
+                    <button id="btnApply" class="btn btn-primary flex-grow-1">Apply patch</button>
+                    <button id="btnCopy" class="btn btn-outline-secondary" disabled>Copy result</button>
+                    <button id="btnDownload" class="btn btn-success" disabled>Download</button>
+                    <button id="btnReset" class="btn btn-outline-danger">Reset</button>
+                </div>
+            </div>
+
+            <footer class="mt-4 text-center text-body-secondary small">
+                Built with Bootstrap and jsdiff. Runs entirely in your browser.
+            </footer>
+        </div>
+
+        <!-- Bootstrap bundle -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.8/js/bootstrap.bundle.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+        <script>
+            (function () {
+                const $ = (id) => document.getElementById(id);
+                const originalEl = $('original');
+                const patchEl = $('patch');
+                const resultEl = $('result');
+                const statusEl = $('status');
+                const fileNameEl = $('fileNameGuess');
+                const sanitizedEl = $('sanitized');
+
+                function jsdiff() { return (window.Diff || window.JsDiff || {}); }
+
+                function escapeHtml(s) {
+                    return s.replace(/[&<>"']/g, (c) => ({
+                        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+                    }[c]));
+                }
+
+                function setStatus(type, msg) {
+                    statusEl.innerHTML =
+                        '<div class="alert alert-' + type + '" role="alert">' + escapeHtml(msg) + '</div>';
+                }
+
+                function parseOutFileName(patchText) {
+                    const plus = patchText.match(/^\+\+\+\s+(?:[ab]\/)?([^\r\n]+)/m);
+                    if (plus && plus[1]) return plus[1].trim();
+                    const minus = patchText.match(/^---\s+(?:[ab]\/)?([^\r\n]+)/m);
+                    if (minus && minus[1]) return minus[1].trim();
+                    return 'patched.txt';
+                }
+
+                function computeStats(patchText) {
+                    let added = 0, removed = 0, hunks = 0, files = 0;
+                    for (const line of patchText.split(/\r?\n/)) {
+                        if (line.startsWith('@@')) hunks++;
+                        else if (line.startsWith('--- ')) files++;
+                        else if (line.startsWith('+') && !line.startsWith('+++')) added++;
+                        else if (line.startsWith('-') && !line.startsWith('---')) removed++;
+                    }
+                    return { added, removed, hunks, files };
+                }
+
+                // --- Patch sanitation & repair ---
+                function sanitizePatchInput(raw, repair) {
+                    let s = raw || '';
+                    // Strip markdown code fences if present
+                    s = s.replace(/^\s*```(?:diff|patch)?\s*\n?/i, '');
+                    s = s.replace(/\n?```\s*$/i, '');
+                    // Normalize line endings
+                    s = s.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+                    // Replace NBSP and other “weird” spaces with a normal space
+                    s = s.replace(/[\u00A0\u2007\u202F]/g, ' ');
+                    // If the paste contains email/Slack prose before the patch, drop it
+                    const startIdx = (() => {
+                        const idxs = [];
+                        ['\ndiff --git ', '\n--- ', '\nIndex: ', '\n@@ '].forEach(m => {
+                            const i = s.indexOf(m);
+                            if (i >= 0) idxs.push(i + 1);
+                        });
+                        return idxs.length ? Math.min.apply(null, idxs) : -1;
+                    })();
+                    if (startIdx > 0) s = s.slice(startIdx);
+
+                    // If there is a hunk but no file header, synthesize one
+                    if (!/^---\s/m.test(s) && /^@@\s/m.test(s)) {
+                        const guess = 'file.txt';
+                        s = `--- a/${guess}\n+++ b/${guess}\n` + s;
+                    }
+
+                    // Optionally repair lines *inside hunks* that lost their prefix
+                    let repaired = 0;
+                    if (repair) {
+                        let inHunk = false;
+                        const lines = s.split('\n').map((line) => {
+                            if (/^@@\s/.test(line)) { inHunk = true; return line; }
+                            // A new file header / section breaks out of a hunk
+                            if (/^(?:diff --git |--- |\+\+\+ |Index: )/.test(line)) { inHunk = false; return line; }
+                            if (inHunk) {
+                                if (/^(?:\+|-| |\\)/.test(line)) return line; // valid hunk line
+                                // If line doesn't start with one of the markers, treat it as context and prefix a space
+                                repaired++;
+                                return ' ' + line;
+                            }
+                            return line;
+                        });
+                        s = lines.join('\n');
+                    }
+
+                    return { text: s, repaired };
+                }
+
+                function toggleActions(enable) {
+                    $('btnCopy').disabled = !enable;
+                    $('btnDownload').disabled = !enable;
+                }
+
+                function applyPatchNow() {
+                    const lib = jsdiff();
+                    if (typeof lib.applyPatch !== 'function') {
+                        setStatus('danger', 'jsdiff failed to load. Check your network or CSP.');
+                        return;
+                    }
+
+                    let src = originalEl.value;
+                    let rawPatch = patchEl.value;
+
+                    if (!src || !rawPatch) {
+                        resultEl.value = '';
+                        sanitizedEl.value = '';
+                        fileNameEl.textContent = '';
+                        toggleActions(false);
+                        setStatus('secondary', 'Paste both the original file and a unified patch to proceed.');
+                        return;
+                    }
+
+                    const fuzz = Math.max(0, Math.min(10, Number($('fuzz').value || 0)));
+                    const ignoreWs = $('ignoreWs').checked;
+                    const normalizeEol = $('normalizeEol').checked;
+                    const repair = $('repairMode').checked;
+
+                    const hadCRLF = /\r\n/.test(src);
+                    if (normalizeEol) {
+                        src = src.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+                    }
+
+                    const { text: sanitizedPatch, repaired } = sanitizePatchInput(rawPatch, repair);
+                    sanitizedEl.value = sanitizedPatch;
+
+                    const options = { fuzzFactor: fuzz };
+                    if (ignoreWs) {
+                        const normalize = (s) => s.replace(/\s+/g, ' ').trim();
+                        options.compareLine = function (_ln, line, _op, patchContent) {
+                            return normalize(line) === normalize(patchContent);
+                        };
+                    }
+
+                    let out;
+                    try {
+                        out = lib.applyPatch(src, sanitizedPatch, options);
+                    } catch (e) {
+                        resultEl.value = '';
+                        toggleActions(false);
+                        setStatus('danger', 'Patch error: ' + (e && e.message ? e.message : String(e)));
+                        return;
+                    }
+
+                    if (out === false) {
+                        resultEl.value = '';
+                        toggleActions(false);
+                        setStatus('danger', 'Patch failed to apply. Increase fuzz, uncheck “Ignore whitespace”, or review the sanitized preview.');
+                        return;
+                    }
+
+                    if (normalizeEol && hadCRLF) {
+                        out = out.replace(/\n/g, '\r\n');
+                    }
+
+                    resultEl.value = out;
+                    const stats = computeStats(sanitizedPatch);
+                    const fname = parseOutFileName(sanitizedPatch);
+                    const repairedMsg = repaired ? ` • repaired ${repaired} line${repaired === 1 ? '' : 's'}` : '';
+                    fileNameEl.textContent = `${fname} • +${stats.added} / -${stats.removed} • ${stats.hunks} hunk(s)${repairedMsg}`;
+                    toggleActions(true);
+                    setStatus('success', 'Patch applied successfully.' + (repaired ? ` Repaired ${repaired} malformed hunk line(s).` : ''));
+                }
+
+                // Debounced auto-apply
+                let timer = null;
+                function scheduleApply() {
+                    if (!$('autoApply').checked) return;
+                    if (timer) clearTimeout(timer);
+                    timer = setTimeout(applyPatchNow, 300);
+                }
+
+                // Event wiring
+                originalEl.addEventListener('input', scheduleApply);
+                patchEl.addEventListener('input', scheduleApply);
+                ['autoApply', 'fuzz', 'ignoreWs', 'normalizeEol', 'repairMode']
+                    .forEach(id => $(id).addEventListener('change', scheduleApply));
+
+                $('btnApply').addEventListener('click', applyPatchNow);
+                $('btnReset').addEventListener('click', () => {
+                    originalEl.value = '';
+                    patchEl.value = '';
+                    resultEl.value = '';
+                    sanitizedEl.value = '';
+                    fileNameEl.textContent = '';
+                    toggleActions(false);
+                    setStatus('secondary', 'Cleared. Paste your inputs to begin.');
+                });
+
+                $('btnCopy').addEventListener('click', async () => {
+                    try {
+                        await navigator.clipboard.writeText(resultEl.value);
+                        setStatus('success', 'Patched result copied to clipboard.');
+                    } catch {
+                        setStatus('warning', 'Could not copy to clipboard (browser permissions).');
+                    }
+                });
+
+                $('btnDownload').addEventListener('click', () => {
+                    const label = fileNameEl.textContent || 'patched.txt';
+                    const fname = (label.split(' • ')[0] || 'patched.txt').trim();
+                    const blob = new Blob([resultEl.value], { type: 'text/plain;charset=utf-8' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = fname;
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                    URL.revokeObjectURL(url);
+                });
+
+                toggleActions(false);
+                setStatus('secondary', 'Paste the original file and the unified patch. Auto‑apply + repair are enabled by default.');
+            })();
+        </script>
+    </body>
+
+</html>
