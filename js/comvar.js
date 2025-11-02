@@ -613,7 +613,11 @@ const profDetailsBio = {
         bio: "<p class='professorbio header-p-author-description'>Prachi Agarwal is an Assistant Professor at Shoolini University.</p>",
         href: "contact@dmj.one"
     },
-    
+    'Abhinay':
+    {
+        bio: "<p class='professorbio header-p-author-description'>Shri Abhinay is a highly skilled and experienced AI/ML who offers industry-oriented training designed to bridge the gap between academic learning and real-world application.</p>",
+        href: "contact@dmj.one"
+    }
         
 };
 const courseDetailsMap = {
@@ -715,6 +719,15 @@ const courseDetailsMap = {
     'csu1442': { 'default': ["Prateek Daweshar", "CSU1442", "Forensic Psychology"] },    
     'tcsoneim': { 'default': ["Sachin Saroch", "TCSOneIM", "One Identity Manager"] },
     
+    // Semester 7
+    'csu358': {
+        'default': ["Dr. Sonia", "CSU358", "Computer Graphics"],
+        'lab': ["Dr. Sonia", "CSU358P", "Computer Graphics Lab"]
+    },
+    'csu2315': {
+        'default': ["Abhinay", "CSU2315", "Competitive Coding Techniques"],
+        'lab': ["Abhinay", "CSU2315P", "Competitive Coding Techniques Lab"]
+    },
 };
 
 ///////////////// VERSION 2.0

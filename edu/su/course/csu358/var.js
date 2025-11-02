@@ -5,10 +5,11 @@ function get_menu_list(datetogen) {
             {
                 link: "theory/",
                 title: "Theory: Computer Graphics",
-                desc: "",
+                desc: "Explore the fundamentals of Computer Graphics, including CRT displays, raster and random scan techniques, frame buffers, input devices, and line drawing algorithms. This section provides comprehensive notes and resources to help you understand the core concepts of computer graphics and their applications in modern computing.",
                 codetype: "CSU358 | Course",
-                // cardimage: "https://cdn.dmj.one/edu/su/course/csuCODE/img/logo.webp",                
-                // cardimage_dark: "//cdn.dmj.one/img/needhelp.webp",               
+                cardimage: "https://cdn.dmj.one/edu/su/course/csu358/img/logo.webp",
+                cardimage_dark: "https://cdn.dmj.one/edu/su/course/csu358/img/logo_dark.webp",
+                // cardimage_dark: "//cdn.dmj.one/img/needhelp.webp",
                 // continuereading: " Click here to reach out to Faculty directly through email"
             },
             // {
@@ -30,12 +31,12 @@ function get_menu_list(datetogen) {
     function get_class(def_date, def_author) {
         const arr = [
             {
-                title: "Architecture of One Identity Manager [WIP]",
-                desc: "Dive into the architecture of One Identity Manager, a robust solution for identity and access management. This section covers the core components, data models, and workflows that make up the One Identity Manager framework. Understand how these elements work together to provide a comprehensive identity management solution in enterprise environments.",
+                title: "Computer Graphics Notes",
+                desc: "Comprehensive notes on topic including CRT displays, raster and random scan techniques, frame buffers, input devices, and line drawing algorithms.",
                 codetype: "Concepts",
-                readtime: 5,
-                link: "architecture-of-one-identity-manager"
-            },            
+                readtime: 25,
+                link: "computer-graphics-notes"
+            },
         ];
         body_genmenu.processData(arr, def_date, def_author);
     }
