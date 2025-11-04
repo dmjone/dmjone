@@ -800,12 +800,12 @@ git config -e --global
                         <p><strong>Clone a repo, create a feature branch, and push it.</strong></p>
                         <pre><code class="">git clone https://github.com/&lt;user&gt;/repo.git
 cd repo git switch -c featureX # ...edit files... git add . git commit -m "feat: featureX" git push -u origin featureX </code></pre>
-git switch -c featureX
-# ...edit files...
-git add .
-git commit -m "feat: featureX"
-git push -u origin featureX
-</code></pre>
+                        git switch -c featureX
+                        # ...edit files...
+                        git add .
+                        git commit -m "feat: featureX"
+                        git push -u origin featureX
+                        </code></pre>
                     </li>
                     <li>
                         <p><strong>Show concise commit history with a graph.</strong></p>
@@ -859,7 +859,7 @@ docker run --rm myapp:1.0 </code></pre>
                         <p><strong>Create and push an annotated Git tag, then list tags.</strong></p>
                         <pre><code class="">git tag -a v1.0.0 -m "v1.0.0 release"
 git push origin v1.0.0</code></pre>
-git tag --list </code></pre>
+                        git tag --list </code></pre>
                     </li>
                     <li>
                         <p><strong>Rebase a feature branch onto the latest <code>main</code> and update remote.</strong></p>
@@ -995,20 +995,20 @@ const port = 3000;
 http.createServer((req,res)=>{res.end('Hello Web');}).listen(port); </code></pre>
                 <pre><code class="language-dockerfile"># Dockerfile
 FROM node:18 WORKDIR /app COPY . /app CMD ["node", "server.js"] </code></pre>
-WORKDIR /app
-COPY . /app
-CMD ["node", "server.js"]</code></pre>
+                WORKDIR /app
+                COPY . /app
+                CMD ["node", "server.js"]</code></pre>
                 <pre><code class="">docker build -t webjs:1.0 . 
 docker run -d -p 8080:3000 webjs:1.0 </code></pre>
                 <p>Explanation: the image contains Node and the app; port mapping exposes container 3000 on host 8080.</p>
                 <p><strong>D. Full Git workflow: clone, branch, change, push, and open a PR.</strong></p>
                 <pre><code class="">git clone https://github.com/&lt;user&gt;/repo.git
 cd repo git switch -c feature/update-readme echo "Study rule: commit often." &gt;&gt; README.md git add README.md git commit -m "feat: add study rule" git push -u origin feature/update-readme </code></pre>
-git switch -c feature/update-readme
-echo "Study rule: commit often." &gt;&gt; README.md
-git add README.md
-git commit -m "feat: add study rule"
-git push -u origin feature/update-readme </code></pre>
+                git switch -c feature/update-readme
+                echo "Study rule: commit often." &gt;&gt; README.md
+                git add README.md
+                git commit -m "feat: add study rule"
+                git push -u origin feature/update-readme </code></pre>
                 <p>Explanation: push creates the remote branch; open the repository on GitHub and create a Pull Request from the feature branch to <code>main</code>.</p>
                 <p><strong>E. Find error lines in logs, compress, and transfer to a remote server.</strong></p>
                 <pre><code class="">cd /var/log
@@ -1030,6 +1030,76 @@ docker run -it --name demo -v ~/data:/data ubuntu bash -lc 'echo persisted &gt; 
 docker rm demo
 docker run --rm -it -v ~/data:/data ubuntu bash -lc 'cat /data/file.txt' </code></pre>
                 <p>Explanation: the file survives container deletion because it is stored on the host via the mounted path.</p>
+
+                <p><strong>H. Add a minimal GitHub Actions CI to run Node tests on pushes and PRs.</strong></p>
+                <pre><code class=""># .github/workflows/ci.yml 
+name: CI
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - run: npm ci
+      - run: npm test -- --ci
+</code></pre>
+                <pre><code class="">git add .github/workflows/ci.yml
+git commit -m "ci: add node tests"
+git push </code></pre>
+                <p><strong>I. Create a multi-stage Dockerfile (build + runtime) and run it.</strong></p>
+                <pre><code class="language-dockerfile"># Dockerfile
+FROM node:18 AS build
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
+FROM node:18-slim
+WORKDIR /app
+COPY --from=build /app/dist ./dist
+CMD ["node", "dist/index.js"]
+</code></pre>
+
+                <pre><code class="">docker build -t app-ms:1.0 .
+docker run --rm app-ms:1.0 </code></pre>
+                <p><strong>J. Serve a custom static page via Nginx container using a bind mount.</strong></p>
+                <pre><code class="">mkdir -p $(pwd)/site
+echo "Hello from host" &gt; site/index.html
+docker run -d --name static -p 8080:80 -v $(pwd)/site:/usr/share/nginx/html:ro nginx </code></pre>
+                <p>Explanation: the host directory is mounted read-only into Nginx’s web root and served on <code>http://localhost:8080</code>.</p>
+                <p><strong>K. Find files &gt;50MB, archive them, and verify the archive.</strong></p>
+                <pre><code class="">find . -type f -size +50M -print &gt; bigfiles.txt
+tar -czf bigfiles_$(date +%F).tgz -T bigfiles.txt
+tar -tzf bigfiles_$(date +%F).tgz | head </code></pre>
+                <p><strong>L. Free up port 80 and restart the web server.</strong></p>
+                <pre><code class="">sudo ss -tulpen | grep ':80 ' 
+sudo kill &lt;PID&gt;
+sudo systemctl restart nginx </code></pre>
+                <p><strong>M. Recover lost work using <code>git reflog</code> and create a rescue branch.</strong></p>
+                <pre><code class="">git reflog
+git branch rescue &lt;hash-from-reflog&gt;
+git switch rescue </code></pre>
+                <p><strong>N. Squash the last 3 commits into one and update the remote.</strong></p>
+                <pre><code class="">git rebase -i HEAD~3 # mark the last two commits as 'squash' or 's' 
+git push --force-with-lease </code></pre>
+                <p><strong>O. Run a container with CPU and memory limits and view its stats.</strong></p>
+                <pre><code class="">docker run -d --name limited --cpus="1.0" -m 256m nginx
+docker stats --no-stream limited </code></pre>
+                <p><strong>P. Use EC2 user data to install Docker and run an image on port 80.</strong></p>
+                <pre><code class="">#!/bin/bash
+apt update -y
+apt install -y docker.io
+systemctl enable --now docker
+docker run -d --name web -p 80:80 nginx </code></pre>
+                <p><strong>Q. Create a bare Git repository to act as a central remote and push to it.</strong></p>
+                <pre><code class="">mkdir -p /tmp/central.git
+git init --bare /tmp/central.git # in your project:
+git remote add central /tmp/central.git
+git push -u central main </code></pre>
             </article>
 
             <article>
