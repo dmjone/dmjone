@@ -617,6 +617,11 @@ const profDetailsBio = {
     {
         bio: "<p class='professorbio header-p-author-description'>Shri Abhinay is a highly skilled and experienced AI/ML who offers industry-oriented training designed to bridge the gap between academic learning and real-world application.</p>",
         href: "contact@dmj.one"
+    },
+    'Shrey':
+    {
+        bio: "<p class='professorbio header-p-author-description'>Shrey is a highly skilled and experienced SME who offers industry-oriented training designed to bridge the gap between academic learning and real-world application.</p>",
+        href: "contact@dmj.one"
     }
         
 };
@@ -725,8 +730,12 @@ const courseDetailsMap = {
         'lab': ["Dr. Sonia", "CSU358P", "Computer Graphics Lab"]
     },
     'csu2315': {
-        'default': ["Abhinay", "CSU2315", "Competitive Coding Techniques"],
-        'lab': ["Abhinay", "CSU2315P", "Competitive Coding Techniques Lab"]
+        'default': ["Shrey", "CSU2315", "DevOps and Deployment"],
+        'lab': ["Shrey", "CSU2315P", "DevOps and Deployment Lab"]
+    },
+    'csu2316': {
+        'default': ["Abhinay", "CSU2316", "Competitive Coding Techniques"],
+        'lab': ["Abhinay", "CSU2316P", "Competitive Coding Techniques Lab"]
     },
 };
 
