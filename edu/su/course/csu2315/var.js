@@ -30,11 +30,11 @@ function get_menu_list(datetogen) {
     function get_class(def_date, def_author) {
         const arr = [
             {
-                title: "Intro to DevOps, Git, GitHub, Linux, EC2 and Docker",
-                desc: "An introduction to DevOps practices and tools including Git, GitHub, Linux, EC2, and Docker.",
+                title: "All programs done in class",
+                desc: "A comprehensive compilation of programming exercises and algorithmic problem-solving tasks completed during instructional sessions.",
                 codetype: "Concepts",
                 readtime: 5,
-                link: "intro-to-devops-git-github-linux-ec2-and-docker"
+                link: "all-programs-done-in-class"
             },            
         ];
         body_genmenu.processData(arr, def_date, def_author);
