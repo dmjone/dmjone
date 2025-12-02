@@ -4,9 +4,9 @@ function get_menu_list(datetogen) {
         const arr = [
             {
                 link: "theory/",
-                title: "Theory: Competitive Coding Concepts and Principles",
-                desc: "Explore the fundamental concepts of Competitive Coding in this section as you will gain insights into problem solving, logical thinking, common coding patterns, and templates.",
-                codetype: "CSU2315 | Competitive Coding",
+                title: "Theory: DevOps and Deployment",
+                desc: "Explore the fundamental concepts of DevOps and Deployment in this section as you will gain insights into CI/CD, containerization, IaC, VC with Git and GitHub, configuration management with Ansible, monitoring and logging, and cloud deployment and automation.",
+                codetype: "CSU2315 | DevOps",
                 cardimage: "https://cdn.dmj.one/edu/su/course/csu2315/img/logo.webp",                
                 // cardimage_dark: "//cdn.dmj.one/img/needhelp.webp",               
                 // continuereading: " Click here to reach out to Faculty directly through email"

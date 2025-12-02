@@ -729,13 +729,13 @@ const courseDetailsMap = {
         'default': ["Dr. Sonia", "CSU358", "Computer Graphics"],
         'lab': ["Dr. Sonia", "CSU358P", "Computer Graphics Lab"]
     },
-    'csu2315': {
-        'default': ["Shrey", "CSU2315", "DevOps and Deployment"],
-        'lab': ["Shrey", "CSU2315P", "DevOps and Deployment Lab"]
-    },
     'csu2316': {
-        'default': ["Abhinay", "CSU2316", "Competitive Coding Techniques"],
-        'lab': ["Abhinay", "CSU2316P", "Competitive Coding Techniques Lab"]
+        'default': ["Shrey", "CSU2316", "DevOps and Deployment"],
+        'lab': ["Shrey", "CSU2316P", "DevOps and Deployment Lab"]
+    },
+    'csu2315': {
+        'default': ["Abhinay", "CSU2315", "Competitive Coding Techniques"],
+        'lab': ["Abhinay", "CSU2315P", "Competitive Coding Techniques Lab"]
     },
 };
 
