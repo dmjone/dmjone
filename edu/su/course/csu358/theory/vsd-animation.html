@@ -1,0 +1,238 @@
+<!-------------------------- © 2007 - present, dmj.one and contributors. ----------------------------------
+   Part of the dmjone project. Licensed under the GNU AGPL. Provided as-is, without warranty of any kind. 
+-------------------- Redistribution and modifications must retain this notice. --------------------------->
+
+
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+<!--<![endif]-->
+
+<head>
+    <script src="/js/edu_su_common.js"></script>
+    <noscript>
+        <style>
+            html,
+            body {
+                margin: 0;
+                overflow: hidden;
+            }
+        </style>
+        <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+    </noscript>
+
+    <title>Unit 5: VSD & Animation - Computer Graphics Notes - CSU358</title>
+    <meta name="description"
+        content="Unit 5: VSD & Animation. Comprehensive notes on Visible Surface Detection (Z-Buffer, Scan-Line) and Animation techniques.">
+
+    <meta property="og:image" content="/logo.png">
+    <meta property="og:type" content="article">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="@divyamohan1993">
+    <meta name="twitter:creator" content="@divyamohan1993">
+    <meta name="twitter:image" content="/logo.png">
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+    <meta name="author" content="Divya Mohan">
+    <meta name="robots" content="index, follow">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js"
+        integrity="sha512-sHSNLECRJSK+BFs7E8DiFc6pf6n90bLI85Emiw1jhreduZhK3VXgq9l4kAt9eTIHYAcuQBKHL01QKs4/3Xgl8g=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js"
+        integrity="sha512-iWiuBS5nt6r60fCz26Nd0Zqe0nbk1ZTIQbl3Kv7kYsX+yKMUFHzjaH2+AnM6vp2Xs+gNmaBAVWJjSmuPw76Efg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    { left: '$$', right: '$$', display: true },
+                    { left: '$', right: '$', display: false },
+                    { left: '\\(', right: '\\)', display: false },
+                    { left: '\\[', right: '\\]', display: true }
+                ],
+                throwOnError: false
+            });
+        });
+    </script>
+
+
+
+    <!-- JSON-LD Structured Data for SEO -->
+    <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "Course",
+          "name": "Unit 5: VSD & Animation - Computer Graphics Notes",
+          "description": "Comprehensive notes on Visible Surface Detection and Animation techniques for Computer Graphics.",
+          "url": "https://dmj.one/edu/su/course/csu358/theory/unit5_vsd_animation.html",
+          "provider": [
+            { "@type": "EducationalOrganization", "name": "dmj.one", "url": "https://dmj.one" },
+            { "@type": "EducationalOrganization", "name": "Shoolini University", "url": "https://shooliniuniversity.com" }
+          ]
+        }
+    </script>
+</head>
+
+<body>
+    <script> header_author("dm"); </script>
+    <main>
+
+        <article class="agen-tableofcontents">
+            <h2 class="text-center">
+                Unit 5: VSD & Animation
+            </h2>
+            <div class="d-none contentdate">2025, December 14</div>
+        </article>
+
+        <!-- SECTION 1: VISIBLE SURFACE DETECTION -->
+        <article>
+            <h2>5.1 Visible Surface Detection (VSD)</h2>
+            <p>Also called "Hidden Surface Removal". The goal is to draw only what the camera sees.</p>
+
+            <h3>1. Back-Face Detection</h3>
+            <p><strong>Concept:</strong> Check if a polygon is facing away from the camera.</p>
+            <div class="exam-tip">
+                <strong>The Test:</strong> Calculate Dot Product of View Vector ($V$) and Surface Normal ($N$).
+                <br>If $V \cdot N > 0$, it is a Back-Face (Hidden). Don't draw it.
+            </div>
+
+            <h3>2. Z-Buffer Algorithm (Depth Buffer)</h3>
+            <div class="analogy">
+                <strong>Analogy:</strong> The Painter's Canvas.
+                <br>For every dot you paint, you write down its "distance". If you try to paint another dot at the same
+                spot, check the distance.
+                <br>If the new dot is <strong>Closer</strong>, paint over it.
+                <br>If the new dot is <strong>Father</strong>, ignore it.
+            </div>
+            <ul>
+                <li><strong>Pros:</strong> Simple, hardware friendly.</li>
+                <li><strong>Cons:</strong> Uses lots of memory, cannot handle transparency well.</li>
+                <li><strong>Logic:</strong> Test $Z_{new} < Z_{buffer}$.</li>
+            </ul>
+
+            <h3>3. A-Buffer (Accumulation Buffer)</h3>
+            <p><strong>Concept:</strong> An upgrade to Z-Buffer. Instead of storing 1 value per pixel, it stores a
+                <strong>List</strong> of values.
+            </p>
+            <ul>
+                <li><strong>Stores:</strong> Depth, Color, Opacity (Transparency), Coverage.</li>
+                <li><strong>Why?</strong> Allows for Transparent objects (glass) and Anti-Aliasing.</li>
+            </ul>
+
+            <h3>4. Scan-Line Algorithm (Image Space)</h3>
+            <p><strong>Concept:</strong> Process the image line-by-line using Edge Tables to decide what is visible.</p>
+            <div class="recipe">
+                <strong>The 5-Step Logic:</strong>
+                <ol>
+                    <li><strong>Scan Line:</strong> Draw an imaginary horizontal line across the scene.</li>
+                    <li><strong>Intersection:</strong> Find all points where this line cuts polygon edges.</li>
+                    <li><strong>Sort:</strong> Sort these points by X-coordinate.</li>
+                    <li><strong>Fill:</strong> Color pixels between pairs of points (Interval Coherence).</li>
+                    <li><strong>Depth Check:</strong> If polygons overlap, check Z-depth at that interval to see which
+                        wins.
+                    </li>
+                </ol>
+            </div>
+            <p><strong>Key Structures:</strong></p>
+            <ul>
+                <li><strong>Global Edge Table (GET):</strong> Stores all edges sorted by Y-min.</li>
+                <li><strong>Active Edge Table (AET):</strong> Stores edges intersecting the current scan-line.</li>
+            </ul>
+
+            <h3>5. The Plane Equation (For Depth)</h3>
+            <p>How do we find $z$ for a random pixel?</p>
+            <div class="formula-box">
+                $$Ax + By + Cz + D = 0$$
+                $$z = \frac{-(Ax + By + D)}{C}$$
+            </div>
+            <p>This formula allows the Z-Buffer to calculate depth quickly.</p>
+        </article>
+
+        <!-- REVISION: VSD -->
+        <article>
+            <pre class="mermaid text-center">
+mindmap
+  root((Hidden Surfaces))
+    Math Check
+      Back-Face Det
+      Dot Product
+      V dot N > 0
+    Pixel Check
+      Z-Buffer
+      Compare Depth
+      Close wins
+    List Check
+      A-Buffer
+      Transparency
+      Anti-Aliasing
+    Line Check
+      Scan-Line
+      Intervals
+      Edge Tables
+            </pre>
+        </article>
+
+        <!-- SECTION 2: ANIMATION -->
+        <article>
+            <h2>5.2 Animation Concepts</h2>
+            <p><strong>Definition:</strong> Illusion of motion by showing a sequence of frames (>24 FPS).</p>
+
+            <h3>Key Techniques</h3>
+            <ul>
+                <li><strong>Keyframing:</strong> The artist draws the "Key" poses (Start/End). The computer fills in the
+                    rest.</li>
+                <li><strong>Tweening (In-Betweening):</strong> The computer's job. Interpolating position, size,
+                    rotation,
+                    or color between keyframes.</li>
+                <li><strong>Morphing:</strong> Transforming one <strong>shape</strong> into another (e.g., Man $\to$
+                    Wolf).
+                </li>
+                <li><strong>Panning:</strong> Moving the camera horizontally across a scene.</li>
+                <li><strong>Onion Skinning:</strong> Making previous frames translucent so the animator can see the
+                    motion
+                    trail while drawing.</li>
+            </ul>
+
+            <h3>Types of Animation Logic</h3>
+            <ul>
+                <li><strong>Procedural:</strong> Code-driven (Fire, Smoke, Water). Uses math/physics.</li>
+                <li><strong>Behavioral:</strong> Rule-driven (Flocking birds, Traffic). Objects have "brains".</li>
+                <li><strong>Kinematics:</strong> Moving joints/limbs.
+                    <ul>
+                        <li><strong>Inverse Kinematics (IK):</strong> You pull the hand, the elbow and shoulder move
+                            automatically.</li>
+                    </ul>
+                </li>
+                <li><strong>Dynamics:</strong> Physics simulation (Gravity, Collisions, Cloth).</li>
+                <li><strong>Motion Capture (MoCap):</strong> Recording real actors.</li>
+            </ul>
+        </article>
+
+        <!-- REVISION: ANIMATION -->
+        <article>
+            <pre class="mermaid text-center">
+mindmap
+  root((Motion Logic))
+    The Basics
+      Keyframing (Poses)
+      Tweening (In-Between)
+    Techniques
+      Morphing (Shape Change)
+      Onion Skin (Trails)
+    Physics
+      Kinematics (Joints)
+      Dynamics (Gravity)
+            </pre>
+        </article>
+
+        <script> copyright("all"); </script>
+
+    </main>
+</body>
+
+</html>

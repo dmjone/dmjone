@@ -6,8 +6,8 @@ function get_menu_list(datetogen) {
                 link: "theory/",
                 title: "Theory: DevOps and Deployment",
                 desc: "Explore the fundamental concepts of DevOps and Deployment in this section as you will gain insights into CI/CD, containerization, IaC, VC with Git and GitHub, configuration management with Ansible, monitoring and logging, and cloud deployment and automation.",
-                codetype: "CSU2315 | DevOps",
-                cardimage: "https://cdn.dmj.one/edu/su/course/csu2315/img/logo.webp",                
+                codetype: "CSU2316 | DevOps",
+                cardimage: "https://cdn.dmj.one/edu/su/course/csu2316/img/logo.webp",                
                 // cardimage_dark: "//cdn.dmj.one/img/needhelp.webp",               
                 // continuereading: " Click here to reach out to Faculty directly through email"
             },

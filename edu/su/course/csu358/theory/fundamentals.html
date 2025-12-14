@@ -1,0 +1,372 @@
+<!-------------------------- © 2007 - present, dmj.one and contributors. ----------------------------------
+   Part of the dmjone project. Licensed under the GNU AGPL. Provided as-is, without warranty of any kind. 
+-------------------- Redistribution and modifications must retain this notice. --------------------------->
+
+
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+<!--<![endif]-->
+
+<head>
+    <script src="/js/edu_su_common.js"></script>
+    <noscript>
+        <style>
+            html,
+            body {
+                margin: 0;
+                overflow: hidden;
+            }
+        </style>
+        <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+    </noscript>
+
+    <title>Unit 1: Fundamentals - Computer Graphics Notes - CSU358</title>
+    <meta name="description"
+        content="Unit 1: Fundamentals & Hardware. Comprehensive notes on Computer Graphics including Graphics Pipeline, CRT displays, Raster vs Random Scan, Frame Buffers, and Input Devices.">
+
+    <meta property="og:image" content="/logo.png">
+    <meta property="og:type" content="article">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="@divyamohan1993">
+    <meta name="twitter:creator" content="@divyamohan1993">
+    <meta name="twitter:image" content="/logo.png">
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+    <meta name="author" content="Divya Mohan">
+    <meta name="robots" content="index, follow">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js"
+        integrity="sha512-sHSNLECRJSK+BFs7E8DiFc6pf6n90bLI85Emiw1jhreduZhK3VXgq9l4kAt9eTIHYAcuQBKHL01QKs4/3Xgl8g=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js"
+        integrity="sha512-iWiuBS5nt6r60fCz26Nd0Zqe0nbk1ZTIQbl3Kv7kYsX+yKMUFHzjaH2+AnM6vp2Xs+gNmaBAVWJjSmuPw76Efg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            renderMathInElement(document.body, {
+                // customised options
+                // • auto-render specific keys, e.g.:
+                delimiters: [
+                    { left: '$$', right: '$$', display: true },
+                    { left: '$', right: '$', display: false },
+                    { left: '\\(', right: '\\)', display: false },
+                    { left: '\\[', right: '\\]', display: true }
+                ],
+                // • rendering keys, e.g.:
+                throwOnError: false
+            });
+        });
+    </script>
+
+
+
+    <!-- JSON-LD Structured Data for SEO -->
+    <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "Course",
+          "name": "Unit 1: Fundamentals - Computer Graphics Notes",
+          "description": "Comprehensive notes on Computer Graphics Fundamentals including Graphics Pipeline, Hardware, and Display Parameters.",
+          "url": "https://dmj.one/edu/su/course/csu358/theory/unit1_fundamentals.html",
+          "provider": [
+            { "@type": "EducationalOrganization", "name": "dmj.one", "url": "https://dmj.one" },
+            { "@type": "EducationalOrganization", "name": "Shoolini University", "url": "https://shooliniuniversity.com" }
+          ]
+        }
+    </script>
+</head>
+
+<body>
+    <script> header_author("dm"); </script>
+    <main>
+
+        <article class="agen-tableofcontents">
+            <h2 class="text-center">
+                Unit 1: Fundamentals & Hardware
+            </h2>
+            <div class="d-none contentdate">2025, December 14</div>
+        </article>
+
+        <!-- SECTION 1: BASICS -->
+        <article>
+            <h2>1.1 What is Computer Graphics?</h2>
+            <div class="analogy">
+                <strong>The Concept:</strong> Imagine you have a list of numbers (data) and you want to turn them into a
+                painting (image). Computer Graphics is the <strong>Tool</strong> (brush) and <strong>Process</strong>
+                (painting techniques) that makes this happen.
+            </div>
+            <ul>
+                <li><strong>Core Definition:</strong> The art of manipulating visual images using computers. Converting
+                    data
+                    to visual form.</li>
+                <li><strong>Interactive Graphics:</strong> When the user can "talk back" to the image (e.g., clicking,
+                    rotating a 3D model). It's a two-way street: Input $\leftrightarrow$ Image.</li>
+            </ul>
+
+            <h3>Common Input Devices</h3>
+            <p>Tools used to give commands to the computer:</p>
+            <ul>
+                <li><strong>Mouse & Keyboard:</strong> Standard interaction.</li>
+                <li><strong>Light Pen:</strong> Pointing directly on screen.</li>
+                <li><strong>Graphic Tablet (Digitizer):</strong> For precise drawing.</li>
+                <li><strong>Joystick/Trackball:</strong> For gaming and navigation.</li>
+            </ul>
+
+            <h3>The Graphics Pipeline (The Assembly Line)</h3>
+            <p>Before a 3D shape appears on your 2D screen, it goes through a factory process:</p>
+            <ol>
+                <li><strong>Modeling:</strong> Creating the object (wireframe).</li>
+                <li><strong>Transformation:</strong> Moving/Rotating it in the world.</li>
+                <li><strong>Projection:</strong> Squashing 3D to 2D (like a shadow).</li>
+                <li><strong>Clipping:</strong> Cutting off parts outside the camera view.</li>
+                <li><strong>Rasterization:</strong> Turning shapes into pixels.</li>
+            </ol>
+        </article>
+
+        <!-- REVISION: PIPELINE -->
+        <article>
+            <pre class="mermaid text-center">
+mindmap
+  root((The 3D-to-2D Journey))
+    1. Build It
+      Modeling
+      Wireframes
+    2. Place It
+      Transformation
+      Rotate/Move in World
+    3. Flatten It
+      Projection
+      3D to 2D Shadow
+    4. Crop It
+      Clipping
+      Remove parts outside Camera
+    5. Paint It
+      Rasterization
+      Vector Shapes to Pixels
+            </pre>
+        </article>
+
+        <!-- SECTION 2: HARDWARE -->
+        <article>
+            <h2>1.2 Display Hardware: How images are shown</h2>
+
+            <h3>Raster vs. Random Scan</h3>
+            <p>The two main ways to draw on a screen. Think of it as a <strong>Printer</strong> vs. a <strong>Human
+                    Hand</strong>.</p>
+
+            <table class="table table-striped table-bordered">
+                <tr>
+                    <th>Feature</th>
+                    <th>Raster Scan (The TV)</th>
+                    <th>Random Scan (The Plotter)</th>
+                </tr>
+                <tr>
+                    <td><strong>Analogy</strong></td>
+                    <td><strong>"The Paintbrush approach":</strong> It blindly paints the whole wall, row by row, left
+                        to
+                        right, top to bottom. It doesn't care if there's a picture there or not.</td>
+                    <td><strong>"The Pen approach":</strong> It only moves the pen to where lines need to be drawn. If
+                        the
+                        screen is empty, the pen sits still.</td>
+                </tr>
+                <tr>
+                    <td><strong>Image Type</strong></td>
+                    <td>Grid of Pixels (Can look jagged/pixelated).</td>
+                    <td>Smooth mathematical lines (Vectors).</td>
+                </tr>
+                <tr>
+                    <td><strong>Memory</strong></td>
+                    <td>Needs a <strong>Frame Buffer</strong> (stores every single pixel's color).</td>
+                    <td>Needs a <strong>Display List</strong> (stores commands like "Draw Line A to B").</td>
+                </tr>
+                <tr>
+                    <td><strong>Cost</strong></td>
+                    <td>Cheaper (Standard monitors).</td>
+                    <td>Expensive (Specialized engineering tools).</td>
+                </tr>
+            </table>
+
+            <!-- DVST: FROM APPENDED NOTES -->
+            <h3>Special Hardware: DVST (Direct View Storage Tube)</h3>
+            <div class="exam-tip">
+                <strong>Hidden Gem:</strong> Exams ask this as a short note. Think of it as "Permanent Ink".
+            </div>
+            <p><strong>Concept:</strong> An old-school display that stores the picture <em>physically on the screen</em>
+                using a special mesh. It doesn't need to be constantly redrawn.</p>
+            <ul>
+                <li><strong>How it works:</strong>
+                    <ul>
+                        <li><strong>Writing Gun:</strong> Draws the image pattern (like a pencil).</li>
+                        <li><strong>Flood Gun:</strong> Floods the screen with electrons to keep the drawn pattern
+                            glowing.
+                        </li>
+                    </ul>
+                </li>
+                <li><strong>Pros:</strong> No flickering, very high resolution.</li>
+                <li><strong>Cons:</strong> No colors. You can't erase just <em>one</em> line; you have to wipe the whole
+                    screen (like an Etch-A-Sketch).</li>
+            </ul>
+
+            <!-- PERSISTENCE: FROM APPENDED NOTES -->
+            <h3>Phosphor Persistence</h3>
+            <p><strong>Definition:</strong> How long the screen "glows" after the electron beam moves away.</p>
+            <ul>
+                <li><strong>High Persistence:</strong> Glows for a long time. Good for reading text (no flicker). Bad
+                    for
+                    animation (ghosting/blur).</li>
+                <li><strong>Low Persistence:</strong> Fades instantly. Good for fast games. Needs high refresh rate to
+                    avoid
+                    flicker.</li>
+            </ul>
+        </article>
+
+        <!-- REVISION: HARDWARE -->
+        <article>
+            <pre class="mermaid text-center">
+mindmap
+  root((Drawing Engines))
+    Raster Scan
+      The Painter
+      Whole Screen Grid
+      Needs FrameBuffer
+      Good for Photos
+    Random Scan
+      The Pen
+      Draws Lines Only
+      Smooth Curves
+      No Jaggies
+    DVST
+      Permanent Ink
+      Examples: Radar
+      No Refresh Loop
+            </pre>
+        </article>
+
+        <!-- SECTION 3: DISPLAY PARAMETERS -->
+        <article>
+            <h2>1.3 Important Terms & Math</h2>
+            <p>These are guaranteed 2-mark questions.</p>
+
+            <h3>1. Resolution & Aspect Ratio</h3>
+            <ul>
+                <li><strong>Resolution:</strong> The total number of pixels. ($Width \times Height$). E.g., $1920 \times
+                    1080$.</li>
+                <li><strong>Aspect Ratio:</strong> The shape of the screen ($Width : Height$). Standard TV is 16:9; Old
+                    TV
+                    is 4:3.</li>
+                <li><strong>Refresh Rate:</strong> How many times the screen is redrawn per second (Hz). Standard is
+                    60Hz.</li>
+                <li><strong>Frame Time:</strong> Time to scan one complete screen.
+                    <div class="formula-box" style="margin: 5px 0;">$$Frame~Time = \frac{1}{Refresh~Rate}$$</div>
+                </li>
+            </ul>
+
+            <h3>2. Dot Clock Frequency</h3>
+            <div class="analogy">
+                <strong>Analogy:</strong> If the "Refresh Rate" is how many pages you read per minute, "Dot Clock" is
+                how
+                many <strong>words</strong> you read per minute.
+            </div>
+            <div class="formula-box">
+                $$Dot~Clock \approx Total~Pixels \times Refresh~Rate$$
+            </div>
+            <p>It is the speed at which the electron beam must process individual dots.</p>
+
+            <h3>3. Interlacing</h3>
+            <p><strong>Concept:</strong> A technique to reduce flicker and bandwidth.</p>
+            <ul>
+                <li>Instead of drawing all lines (1, 2, 3, 4...) in one go, the screen draws <strong>Odd lines</strong>
+                    (1, 3, 5...) first, then <strong>Even lines</strong> (2, 4, 6...).</li>
+                <li>This cheats the eye into seeing a higher refresh rate.</li>
+            </ul>
+
+            <h3>3. Frame Buffer Calculation (Numerical)</h3>
+            <p><strong>Problem:</strong> How much memory (RAM) do you need to store one image?</p>
+            <div class="formula-box">
+                $$Memory (bits) = Width \times Height \times Bits\_per\_pixel$$
+            </div>
+            <ul>
+                <li><strong>Step 1:</strong> Multiply Width $\times$ Height.</li>
+                <li><strong>Step 2:</strong> Multiply by Color Depth (e.g., 8-bit, 16-bit, 24-bit).</li>
+                <li><strong>Step 3:</strong> Divide by 8 to get <strong>Bytes</strong>. Divide by 1024 to get
+                    <strong>KB</strong>.
+                </li>
+            </ul>
+            <div class="exam-tip">
+                <strong>Example:</strong> $640 \times 480$ image with 8-bit color. <br>
+                $640 \times 480 \times 8 = 2,457,600$ bits. <br>
+                $\div 8 = 307,200$ Bytes $\approx 300$ KB.
+            </div>
+        </article>
+
+        <!-- REVISION: PARAMETERS -->
+        <article>
+            <pre class="mermaid text-center">
+mindmap
+  root((Display Math))
+    Space
+      Resolution (Detail)
+        W x H
+      Aspect Ratio (Shape)
+        W / H
+    Time
+      Refresh Rate (Hz)
+      Frame Time (1/Hz)
+      Dot Clock (Px * Hz)
+    Cost
+      FrameBuffer Memory
+        Res * ColorDepth
+      Bandwidth
+        Dot Clock Speed
+            </pre>
+        </article>
+
+        <!-- SECTION 4: PROBLEMS -->
+        <article>
+            <h2>1.4 Aliasing & Antialiasing</h2>
+            <p><em>(From the "Hard Questions" section)</em></p>
+
+            <h3>The Problem: Aliasing (The "Jaggies")</h3>
+            <p>Because screens are grids of squares (pixels), you can't draw a perfect diagonal line. It looks like a
+                staircase. This stair-step effect is called <strong>Aliasing</strong>.</p>
+
+            <h3>The Solution: Antialiasing</h3>
+            <p>Techniques to trick the eye into seeing a smooth line.</p>
+            <ul>
+                <li><strong>How it works:</strong> Instead of coloring a pixel 100% Black or 100% White, we use
+                    <strong>Greys</strong> on the edges.
+                </li>
+                <li><strong>Result:</strong> The fuzzy edge looks smooth from a distance.</li>
+            </ul>
+        </article>
+
+        <!-- REVISION: ALIASING -->
+        <article>
+            <pre class="mermaid text-center">
+mindmap
+  root((The Jaggies))
+    Cause
+      Square Pixels
+      Diagonal Lines
+      Low Resolution
+    Effect
+      Staircase Look
+      Loss of Detail
+    Cure (Antialiasing)
+      Blur Overlay
+      Grey Edges
+      Super Sampling
+            </pre>
+        </article>
+
+        <script> copyright("all"); </script>
+
+    </main>
+</body>
+
+</html

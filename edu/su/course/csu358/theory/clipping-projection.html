@@ -1,0 +1,293 @@
+<!-------------------------- © 2007 - present, dmj.one and contributors. ----------------------------------
+   Part of the dmjone project. Licensed under the GNU AGPL. Provided as-is, without warranty of any kind. 
+-------------------- Redistribution and modifications must retain this notice. --------------------------->
+
+
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+<!--<![endif]-->
+
+<head>
+    <script src="/js/edu_su_common.js"></script>
+    <noscript>
+        <style>
+            html,
+            body {
+                margin: 0;
+                overflow: hidden;
+            }
+        </style>
+        <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+    </noscript>
+
+    <title>Unit 4: Clipping & Projection - Computer Graphics Notes - CSU358</title>
+    <meta name="description"
+        content="Unit 4: Clipping & Projection. Comprehensive notes on Cohen-Sutherland, Mid-Point Subdivision Clipping, Parallel & Perspective Projections, and 3D Viewing.">
+
+    <meta property="og:image" content="/logo.png">
+    <meta property="og:type" content="article">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="@divyamohan1993">
+    <meta name="twitter:creator" content="@divyamohan1993">
+    <meta name="twitter:image" content="/logo.png">
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+    <meta name="author" content="Divya Mohan">
+    <meta name="robots" content="index, follow">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js"
+        integrity="sha512-sHSNLECRJSK+BFs7E8DiFc6pf6n90bLI85Emiw1jhreduZhK3VXgq9l4kAt9eTIHYAcuQBKHL01QKs4/3Xgl8g=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js"
+        integrity="sha512-iWiuBS5nt6r60fCz26Nd0Zqe0nbk1ZTIQbl3Kv7kYsX+yKMUFHzjaH2+AnM6vp2Xs+gNmaBAVWJjSmuPw76Efg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    { left: '$$', right: '$$', display: true },
+                    { left: '$', right: '$', display: false },
+                    { left: '\\(', right: '\\)', display: false },
+                    { left: '\\[', right: '\\]', display: true }
+                ],
+                throwOnError: false
+            });
+        });
+    </script>
+
+
+
+    <!-- JSON-LD Structured Data for SEO -->
+    <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "Course",
+          "name": "Unit 4: Clipping & Projection - Computer Graphics Notes",
+          "description": "Comprehensive notes on Clipping Algorithms (Cohen-Sutherland, Mid-Point) and Projectons (Parallel, Perspective).",
+          "url": "https://dmj.one/edu/su/course/csu358/theory/unit4_clipping_projection.html",
+          "provider": [
+            { "@type": "EducationalOrganization", "name": "dmj.one", "url": "https://dmj.one" },
+            { "@type": "EducationalOrganization", "name": "Shoolini University", "url": "https://shooliniuniversity.com" }
+          ]
+        }
+    </script>
+</head>
+
+<body>
+    <script> header_author("dm"); </script>
+    <main>
+
+        <article class="agen-tableofcontents">
+            <h2 class="text-center">
+                Unit 4: Clipping & Projection
+            </h2>
+            <div class="d-none contentdate">2025, December 14</div>
+        </article>
+
+
+        <!-- SECTION 1: CLIPPING -->
+        <article>
+            <h2>4.1 Clipping Algorithms</h2>
+            <div class="analogy">
+                <strong>Analogy:</strong> Taking a photo. Anything outside the viewfinder doesn't get recorded.
+            </div>
+
+            <h3>1. Cohen-Sutherland Line Clipping</h3>
+            <p>Uses 4-bit Region Codes (TBRL - Top, Bottom, Right, Left) to quickly accept or reject lines.</p>
+            <div class="recipe">
+                <strong>The Logic:</strong>
+                <ul>
+                    <li><strong>Center (Visible):</strong> 0000</li>
+                    <li><strong>Corners:</strong> e.g., Top-Left = 1001 (Top=1, Left=1).</li>
+                    <li><strong>Rule 1 (Trivial Accept):</strong> If both points are 0000, keep it.</li>
+                    <li><strong>Rule 2 (Trivial Reject):</strong> If (Code1 AND Code2) $\neq$ 0000, throw it away. (Both
+                        are
+                        outside the same edge).</li>
+                    <li><strong>Rule 3 (Clip):</strong> If neither, calculate intersection and chop.</li>
+                </ul>
+            </div>
+
+            <h3>2. Mid-Point Subdivision Clipping</h3>
+            <p><strong>Concept:</strong> A "Binary Search" approach. Instead of calculating complex intersections (slow
+                math), it simply cuts the line in half.</p>
+            <ul>
+                <li>Is the whole line visible? No.</li>
+                <li>Divides into two halves.</li>
+                <li>Is the first half visible? Yes -> Keep. No -> Divide again.</li>
+                <li>Repeat until pixel size is reached.</li>
+            </ul>
+
+            <h3>3. Sutherland-Hodgman Polygon Clipping</h3>
+            <p><strong>Problem:</strong> Clipping a shape is harder than a line because cutting off a corner creates new
+                edges.</p>
+            <div class="recipe">
+                <strong>The Pipeline Approach:</strong>
+                <p>Clip the entire polygon against one boundary at a time.</p>
+                <ol>
+                    <li>Input Polygon $\rightarrow$ <strong>Left Clipper</strong> $\rightarrow$ Output</li>
+                    <li>Input $\rightarrow$ <strong>Right Clipper</strong> $\rightarrow$ Output</li>
+                    <li>Input $\rightarrow$ <strong>Top Clipper</strong> $\rightarrow$ Output</li>
+                    <li>Input $\rightarrow$ <strong>Bottom Clipper</strong> $\rightarrow$ Final Polygon</li>
+                </ol>
+            </div>
+
+            <div class="exam-tip">
+                <strong>Exam Warning (Numericals):</strong>
+                <p>Ensure you can solve a <strong>Liang-Barsky</strong> clipping problem. It is more efficient than
+                    Cohen-Sutherland and frequently carries <strong>10+ marks</strong>.</p>
+            </div>
+        </article>
+
+        <!-- REVISION: CLIPPING -->
+        <article>
+            <pre class="mermaid text-center">
+mindmap
+  root((Clipping Logic))
+    Code Checks
+      Cohen-Sutherland
+      TBRL Codes
+      Accept/Reject
+    Divide Checks
+      Mid-Point Subdiv
+      Binary Search
+      Good for Hardware
+    Shape Checks
+      Sutherland-Hodgman
+      Pipeline Cutters
+      L -> R -> T -> B
+            </pre>
+        </article>
+
+        <!-- SECTION 2: PROJECTION -->
+        <article>
+            <h2>4.2 Projections</h2>
+            <div class="analogy">
+                <strong>Analogy:</strong> Casting a shadow.
+                <ul>
+                    <li><strong>Parallel:</strong> Sun is far away. Shadows are same size as object.</li>
+                    <li><strong>Perspective:</strong> Flashlight is close. Shadows get bigger; objects look smaller.
+                    </li>
+                </ul>
+            </div>
+
+            <table class="table table-striped table-bordered">
+                <tr>
+                    <th>Feature</th>
+                    <th>Parallel Projection</th>
+                    <th>Perspective Projection</th>
+                </tr>
+                <tr>
+                    <td><strong>Visual</strong></td>
+                    <td>Parallel lines stay parallel. No vanishing point.</td>
+                    <td>Parallel lines meet at a "Vanishing Point".</td>
+                </tr>
+                <tr>
+                    <td><strong>Size</strong></td>
+                    <td>True to size (Measurements are accurate).</td>
+                    <td>Distant objects look smaller (Realistic).</td>
+                </tr>
+                <tr>
+                    <td><strong>Use Case</strong></td>
+                    <td>Architects, Engineers, CAD.</td>
+                    <td>Games, Movies, Human Vision.</td>
+                </tr>
+            </table>
+
+            <h3>Sub-Types</h3>
+            <ul>
+                <li><strong>Parallel Values:</strong>
+                    <ul>
+                        <li><strong>Orthographic:</strong> Top, Front, Side views.</li>
+                        <li><strong>Oblique:</strong> Slanted view (Cavalier, Cabinet).</li>
+                    </ul>
+                </li>
+                <li><strong>Perspective Values:</strong> 1-point, 2-point, 3-point.</li>
+            </ul>
+        </article>
+
+        <!-- REVISION: PROJECTION -->
+        <article>
+            <pre class="mermaid text-center">
+mindmap
+  root((View Types))
+    Parallel
+      CAD / Architect
+      True Size
+      No Vanishing Point
+    Perspective
+      Human Eye / Game
+      Shrink with Dist
+      Vanishing Points
+            </pre>
+        </article>
+
+        <!-- SECTION 3: THE MATH (DEEP DIVE) -->
+        <article>
+            <h2>4.3 The Math (Deep Dive)</h2>
+            <p>Formulas often asked in "Hard" sections.</p>
+
+            <h3>1. Perspective Formula (Similar Triangles)</h3>
+            <p><strong>Concept:</strong> Divide by depth ($z$).</p>
+            <div class="exam-tip">
+                If simple camera at Origin and Screen at distance $d$:
+                $$x' = x \cdot \frac{d}{z}$$
+                $$y' = y \cdot \frac{d}{z}$$
+                <br><em>(As $z$ increases, $x'$ gets smaller).</em>
+            </div>
+
+            <h3>2. Oblique Projection Math</h3>
+            <p>The front face is flat ($z=0$), but sides go back at angle $\phi$.</p>
+            <ul>
+                <li>$x' = x + L \cdot z \cdot \cos\phi$</li>
+                <li>$y' = y + L \cdot z \cdot \sin\phi$</li>
+            </ul>
+            <div class="exam-tip">
+                <strong>Variations:</strong>
+                <ul>
+                    <li><strong>Cavalier:</strong> Angle $45^\circ$, Length $L=1$. (Looks long).</li>
+                    <li><strong>Cabinet:</strong> Angle $63.4^\circ$, Length $L=0.5$. (Looks realistic).</li>
+                </ul>
+            </div>
+
+            <h3>3. Vanishing Points Logic</h3>
+            <p><strong>Tricky Question:</strong> What makes it 1, 2, or 3 point perspective?</p>
+            <p><strong>Answer:</strong> It depends on how many axes ($x,y,z$) intersect/cut the Projection Plane.</p>
+            <ul>
+                <li><strong>1-Point:</strong> Plane cuts <strong>1 axis</strong> ($z$). (e.g., Tunnel view).</li>
+                <li><strong>2-Point:</strong> Plane cuts <strong>2 axes</strong> ($x, z$). (e.g., Street corner).</li>
+                <li><strong>3-Point:</strong> Plane cuts <strong>3 axes</strong> ($x,y,z$). (e.g., Bird's eye view from
+                    skyscraper).</li>
+            </ul>
+        </article>
+
+        <!-- REVISION: PROJ MATH -->
+        <article>
+            <pre class="mermaid text-center">
+mindmap
+  root((Projection Math))
+    Perspective
+      Divide by Z
+      x' = x (d/z)
+    Oblique
+      Add Offset
+      x' = x + LzCos
+      Cavalier vs Cabinet
+    Vanishing Pts
+      Axes Intersected
+      1-Pt (Z only)
+      2-Pt (X, Z)
+      3-Pt (X, Y, Z)
+            </pre>
+        </article>
+
+        <script> copyright("all"); </script>
+
+    </main>
+</body>
+
+</html>
