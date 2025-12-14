@@ -37,6 +37,62 @@ function get_menu_list(datetogen) {
                 readtime: 25,
                 link: "computer-graphics-notes"
             },
+            {
+                title: "Computer Graphics Notes ESM",
+                desc: "Comprehensive ESM notes on Computer Graphics including CRT displays, raster and random scan techniques, frame buffers, input devices, and line drawing algorithms.",
+                codetype: "Notes",
+                readtime: 30,
+                link: "notes-end-semester"
+            },
+            {
+                title: "Unit 1: Fundamentals & Hardware",
+                desc: "Introduction to Computer Graphics, Graphics Pipeline, Raster vs Random Scan, and Display Hardware.",
+                codetype: "Fundamentals",
+                readtime: 15,
+                link: "fundamentals"
+            },
+            {
+                title: "Unit 2: Drawing Algorithms",
+                desc: "Line Drawing (DDA, Bresenham), Circle Drawing (Mid-Point), and Polygon Filling algorithms.",
+                codetype: "Algorithms",
+                readtime: 20,
+                link: "drawing-algorithms"
+            },
+            {
+                title: "Unit 3: Transformations",
+                desc: "2D & 3D Transformations, Homogeneous Coordinates, Composite Matrix Logic, Reflection, and Shear.",
+                codetype: "Math",
+                readtime: 25,
+                link: "transformations"
+            },
+            {
+                title: "Unit 4: Clipping & Projection",
+                desc: "Clipping (Cohen-Sutherland, Mid-Point) and Projections (Parallel, Perspective, Vanishing Points).",
+                codetype: "Algorithms",
+                readtime: 20,
+                link: "clipping-projection"
+            },
+            {
+                title: "Unit 5: VSD & Animation",
+                desc: "Visible Surface Detection (Z-Buffer, Scan-Line) and Animation techniques (Keyframing, Morphing).",
+                codetype: "Advanced",
+                readtime: 20,
+                link: "vsd-animation"
+            },
+            {
+                title: "Unit 6: Formula Sheet",
+                desc: "Consolidated list of scalar formulas for independent revision. No Matrices.",
+                codetype: "Review",
+                readtime: 10,
+                link: "formulas"
+            },
+            {
+                title: "Solved Numericals",
+                desc: "Step-by-step solutions for DDA, Bresenham, Circle, and Transformations.",
+                codetype: "Practice",
+                readtime: 15,
+                link: "numericals"
+            }
         ];
         body_genmenu.processData(arr, def_date, def_author);
     }
@@ -55,8 +111,8 @@ function get_menu_list(datetogen) {
                 codetype: "Installation",
                 readtime: 2,
                 date: "Wed February 07, 2024",
-                link: "installing-virtualbox"              
-            },            
+                link: "installing-virtualbox"
+            },
         ];
         body_genmenu.processData(arr, def_date, def_author);
     }
