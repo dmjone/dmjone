@@ -1,0 +1,599 @@
+<!doctype html>
+<html lang="en" data-bs-theme="dark">
+
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>dmj.one — Document Authenticator & Verification (PAdES LTV/LTA)</title>
+
+        <!-- Bootstrap + Icons (cdnjs as requested) -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.8/css/bootstrap.min.css" referrerpolicy="no-referrer">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.13.1/font/bootstrap-icons.min.css" referrerpolicy="no-referrer">
+
+        <!-- Optional: classy system fonts (fast, no external font download) -->
+        <style>
+            :root {
+                --brand: #3b82f6;
+                /* royal blue */
+                --brand-2: #22c55e;
+                /* emerald */
+                --ink: #0b1020;
+                --muted: #6b7280;
+                --card: #0f172a;
+                --bg: #0b1220;
+                --ring: 24, 160, 251;
+            }
+
+            html,
+            body {
+                height: 100%
+            }
+
+            body {
+                background:
+                    radial-gradient(1200px 600px at 10% -10%, rgba(59, 130, 246, .08), transparent 60%),
+                    radial-gradient(1200px 600px at 90% -10%, rgba(34, 197, 94, .06), transparent 60%),
+                    linear-gradient(180deg, #0a0f1c, #0b1220);
+                color: #e8eefc;
+                font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji";
+                -webkit-font-smoothing: antialiased;
+                text-rendering: optimizeLegibility;
+            }
+
+            .hero {
+                padding: 6rem 0 4rem;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .hero .glow {
+                position: absolute;
+                inset: -30% -10% auto -10%;
+                height: 50vh;
+                filter: blur(80px);
+                pointer-events: none;
+                opacity: .55;
+                background:
+                    radial-gradient(closest-side, rgba(34, 197, 94, .15), transparent 70%),
+                    radial-gradient(closest-side, rgba(59, 130, 246, .18), transparent 70%) 60% 0/60% 60% no-repeat;
+            }
+
+            .badge-soft {
+                background: rgba(255, 255, 255, .08);
+                border: 1px solid rgba(255, 255, 255, .12);
+                color: #c9d8ff;
+            }
+
+            .card-luxe {
+                background: rgba(15, 23, 42, .72);
+                border: 1px solid rgba(255, 255, 255, .12);
+                backdrop-filter: blur(6px);
+                box-shadow: 0 10px 40px rgba(0, 0, 0, .25);
+            }
+
+            .section-head {
+                font-weight: 700;
+                letter-spacing: .2px;
+            }
+
+            .lead-hero {
+                font-size: 1.2rem;
+                color: #c6d2f7;
+            }
+
+            .check {
+                color: #86efac;
+            }
+
+            .xmark {
+                color: #fda4af;
+            }
+
+            .mono {
+                font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+            }
+
+            .ring {
+                box-shadow: 0 0 0 .25rem rgba(var(--ring), .15);
+            }
+
+            .table-dark td,
+            .table-dark th {
+                border-color: rgba(255, 255, 255, .08)
+            }
+
+            .small-muted {
+                color: #9fb0d8
+            }
+
+            .price-lg {
+                font-size: 2.2rem;
+                line-height: 1.1
+            }
+
+            .strike-muted {
+                text-decoration: line-through;
+                color: #93a2c6
+            }
+
+            a.link-ghost {
+                color: #cfe2ff;
+                text-decoration: none
+            }
+
+            a.link-ghost:hover {
+                text-decoration: underline
+            }
+
+            .list-dot li {
+                margin: .35rem 0
+            }
+
+            .list-dot .bi {
+                opacity: .85
+            }
+
+            .pill {
+                display: inline-block;
+                padding: .35rem .6rem;
+                border: 1px solid rgba(255, 255, 255, .12);
+                border-radius: 9999px;
+                background: rgba(255, 255, 255, .06);
+                color: #cfe2ff;
+                font-size: .85rem
+            }
+
+            .soft {
+                color: #cfe2ff
+            }
+
+            .gradient-text {
+                background: linear-gradient(92deg, #93c5fd, #86efac);
+                -webkit-background-clip: text;
+                background-clip: text;
+                color: transparent;
+            }
+
+            .muted {
+                color: #9fb0d8
+            }
+
+            .callout {
+                border-left: 3px solid rgba(147, 197, 253, .35);
+                padding-left: 1rem;
+            }
+
+            .shadow-line {
+                box-shadow:
+                    inset 0 1px 0 rgba(255, 255, 255, .06),
+                    0 24px 80px rgba(59, 130, 246, .08);
+            }
+
+            footer a {
+                color: #bcd5ff
+            }
+        </style>
+    </head>
+
+    <body>
+
+        <!-- ======================= HERO ======================= -->
+        <header class="hero text-center">
+            <div class="glow"></div>
+            <div class="container position-relative">
+                <span class="badge rounded-pill badge-soft mb-3">
+                    <i class="bi-shield-check me-1"></i> PAdES (CAdES-detached) · RFC 3161 Timestamp · LTV/LTA-ready
+                </span>
+                <h1 class="display-5 fw-bold mb-3">
+                    Cryptographically <span class="gradient-text">seal</span> your PDFs.
+                    Verify anywhere. Instantly.
+                </h1>
+                <p class="lead-hero mb-4">
+                    dmj.one’s Document Authenticator issues <strong>organization‑sealed</strong> PDFs with embedded
+                    signatures, long‑term validation data, and an online verification portal.
+                </p>
+
+                <div class="d-flex flex-wrap gap-3 justify-content-center">
+                    <a href="#pricing" class="btn btn-primary btn-lg px-4 ring"><i class="bi-cart-check me-2"></i>See Pricing</a>
+                    <a href="#how-it-works" class="btn btn-outline-light btn-lg px-4"><i class="bi-lightning-charge me-2"></i>How it works</a>
+                </div>
+
+                <div class="row g-3 mt-5 justify-content-center">
+                    <div class="col-10 col-lg-9">
+                        <div class="card card-luxe shadow-line">
+                            <div class="card-body p-4 p-lg-5">
+                                <div class="row g-4 text-start">
+                                    <div class="col-md-4">
+                                        <h3 class="h5"><i class="bi-patch-check text-success me-2"></i>Authenticity</h3>
+                                        <p class="small-muted mb-0">Every PDF is signed with your org’s key and can be verified offline in standard PDF readers. A one‑click <em>Trust Kit</em> makes Acrobat/Reader show “signature is valid.”</p>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <h3 class="h5"><i class="bi-clock-history text-info me-2"></i>LTV / Timestamp</h3>
+                                        <p class="small-muted mb-0">We embed DSS (Certs/CRLs/OCSP) and RFC 3161 time‑stamps for <span class="mono">B‑LT</span>/<span class="mono">B‑LTA</span> profiles so documents remain verifiable for years.</p>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <h3 class="h5"><i class="bi-rocket-takeoff text-warning me-2"></i>Edge‑fast</h3>
+                                        <p class="small-muted mb-0">Cloudflare Worker front end + a hardened Java signer back end. Low latency, high availability, audit‑friendly.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div><!-- col -->
+                </div>
+            </div>
+        </header>
+
+        <!-- ======================= WHAT / WHY ======================= -->
+        <section class="py-5">
+            <div class="container">
+                <div class="row g-4">
+                    <div class="col-lg-7">
+                        <h2 class="section-head h3 mb-3">What this product does (in one minute)</h2>
+                        <ul class="list-unstyled list-dot">
+                            <li><i class="bi bi-check-circle check me-2"></i>Seals a PDF with a <strong>CAdES‑detached</strong> signature (shown as PAdES in PDF readers).</li>
+                            <li><i class="bi bi-check-circle check me-2"></i>Adds <strong>DSS</strong> (certs/CRLs/optional OCSP) so it can be validated offline (PAdES <span class="mono">B‑LT</span>).</li>
+                            <li><i class="bi bi-check-circle check me-2"></i>Optionally appends an RFC 3161 <strong>DocTimeStamp</strong> (PAdES <span class="mono">B‑LTA</span>).</li>
+                            <li><i class="bi bi-check-circle check me-2"></i>Publishes a one‑time download bundle (signed PDF + Trust Kit) and stores verification facts for audit.</li>
+                            <li><i class="bi bi-check-circle check me-2"></i>Provides a public verification page: “Issued by us? Unchanged? Revoked?”</li>
+                        </ul>
+                        <div class="callout small-muted mt-3">
+                            <strong>Perfect for</strong>: marksheets, invoices, payslips, offer letters, certificates, statements, and any PDF that
+                            must remain trustworthy without proprietary viewers or internet access.
+                        </div>
+                    </div>
+                    <div class="col-lg-5">
+                        <h2 class="section-head h3 mb-3">Why teams buy this</h2>
+                        <div class="card card-luxe mb-3">
+                            <div class="card-body">
+                                <div class="d-flex align-items-start">
+                                    <i class="bi-shield-lock me-3 fs-4 text-success"></i>
+                                    <div>
+                                        <div class="fw-semibold">Verification made obvious</div>
+                                        <div class="small-muted">“Green check” in Acrobat/Reader after installing the Trust Kit. No training required.</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card card-luxe mb-3">
+                            <div class="card-body">
+                                <div class="d-flex align-items-start">
+                                    <i class="bi-diagram-3 me-3 fs-4 text-info"></i>
+                                    <div>
+                                        <div class="fw-semibold">Private trust network</div>
+                                        <div class="small-muted">Your own issuing CA, OCSP, CRLs, and TSA. Immediate revocation; no third‑party queue.</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card card-luxe">
+                            <div class="card-body">
+                                <div class="d-flex align-items-start">
+                                    <i class="bi-clock me-3 fs-4 text-warning"></i>
+                                    <div>
+                                        <div class="fw-semibold">Zero‑drama scaling</div>
+                                        <div class="small-muted">Edge worker + stateless signer. Add cores, not headcount.</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div><!-- col -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ======================= HOW IT WORKS ======================= -->
+        <section id="how-it-works" class="py-5">
+            <div class="container">
+                <h2 class="section-head h3 mb-4">How it works</h2>
+                <div class="row g-4">
+                    <div class="col-md-6 col-xl-3">
+                        <div class="card card-luxe h-100">
+                            <div class="card-body">
+                                <div class="pill mb-2"><i class="bi-upload me-1"></i> Step 1</div>
+                                <h3 class="h5">Upload</h3>
+                                <p class="small-muted mb-0">Admin uploads PDF (or API). Worker calculates SHA‑256 and records an audit seed.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-xl-3">
+                        <div class="card card-luxe h-100">
+                            <div class="card-body">
+                                <div class="pill mb-2"><i class="bi-pencil-square me-1"></i> Step 2</div>
+                                <h3 class="h5">Seal</h3>
+                                <p class="small-muted mb-0">Java signer (PDFBox 3.0.6 + BouncyCastle 1.82) applies a CAdES signature and embeds DSS (certs/CRLs/OCSP).</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-xl-3">
+                        <div class="card card-luxe h-100">
+                            <div class="card-body">
+                                <div class="pill mb-2"><i class="bi-clock-history me-1"></i> Step 3</div>
+                                <h3 class="h5">Timestamp</h3>
+                                <p class="small-muted mb-0">Optional RFC 3161 timestamp for <span class="mono">B‑LTA</span> longevity, via our TSA.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-xl-3">
+                        <div class="card card-luxe h-100">
+                            <div class="card-body">
+                                <div class="pill mb-2"><i class="bi-check2-circle me-1"></i> Step 4</div>
+                                <h3 class="h5">Verify</h3>
+                                <p class="small-muted mb-0">Anyone can verify online. PDF readers validate offline. Revocations take effect immediately.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4 small-muted">
+                    <strong>Stack (from your code)</strong>: Java 21 (Javalin 6.7.0), Apache PDFBox 3.0.6, BouncyCastle 1.82,
+                    OpenSSL CA/OCSP/TSA (RFC 3161), Cloudflare Worker + D1, NGINX reverse proxy.
+                </div>
+            </div>
+        </section>
+
+        <!-- ======================= INDUSTRY COMPARISON & PRICING ======================= -->
+        <section id="pricing" class="py-5">
+            <div class="container">
+                <h2 class="section-head h3 mb-4">Where this stands vs the market — and dynamic pricing</h2>
+
+                <!-- Industry table -->
+                <div class="row g-4">
+                    <div class="col-lg-7">
+                        <div class="card card-luxe">
+                            <div class="card-header bg-transparent border-0">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div class="fw-semibold">Typical public SaaS e‑signature pricing (USD, annual billing)</div>
+                                    <span class="small-muted">As of <span class="mono">Oct 30, 2025</span>. Sources linked below.</span>
+                                </div>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-dark align-middle mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>Vendor / Plan</th>
+                                                <th class="text-end">$/user/mo</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>DocuSign — Standard</td>
+                                                <td class="text-end mono" data-vendor="docusign">$25.00</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Dropbox Sign — Standard</td>
+                                                <td class="text-end mono" data-vendor="dropbox">$25.00</td>
+                                            </tr>
+                                            <tr>
+                                                <td>PandaDoc — Starter</td>
+                                                <td class="text-end mono" data-vendor="pandadoc">$19.00</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Adobe Acrobat Pro for Teams <span class="small-muted">(includes e‑sign)</span></td>
+                                                <td class="text-end mono" data-vendor="adobe">$23.99</td>
+                                            </tr>
+                                            <tr class="table-active">
+                                                <th>Industry average (these plans)</th>
+                                                <th class="text-end mono" id="avgCell">$—</th>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="card-footer small-muted">
+                                Notes: These are mainstream “business” tiers, not enterprise quotes. Competitors focus on <em>workflows</em> (multi‑party signing, templates, integrations).
+                                Our product focuses on <strong>document sealing & verification</strong> with LTV/LTA.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic calculator -->
+                    <div class="col-lg-5">
+                        <div class="card card-luxe ring">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center justify-content-between mb-2">
+                                    <div class="fw-semibold">Dynamic price (value‑based)</div>
+                                    <span class="small-muted">Toggles adjust price vs industry avg</span>
+                                </div>
+                                <div class="small-muted mb-3">We discount relative to the average when we intentionally omit “heavy” workflow features.</div>
+
+                                <!-- Features switches -->
+                                <div class="row g-2">
+                                    <div class="col-12"><label class="form-check small">
+                                            <input class="form-check-input feature-gap" type="checkbox" data-weight="1" checked>
+                                            <span class="form-check-label">No multi‑party e‑signature workflows&nbsp;(routing, reminders)</span>
+                                        </label></div>
+                                    <div class="col-12"><label class="form-check small">
+                                            <input class="form-check-input feature-gap" type="checkbox" data-weight="1" checked>
+                                            <span class="form-check-label">Not AATL/EUTL by default (uses one‑click Trust Kit instead)</span>
+                                        </label></div>
+                                    <div class="col-12"><label class="form-check small">
+                                            <input class="form-check-input feature-gap" type="checkbox" data-weight="1">
+                                            <span class="form-check-label">ID verification/KBA/SMS built‑ins</span>
+                                        </label></div>
+                                    <div class="col-12"><label class="form-check small">
+                                            <input class="form-check-input feature-gap" type="checkbox" data-weight="1" checked>
+                                            <span class="form-check-label">Dozens of out‑of‑the‑box integrations (Salesforce/HubSpot/Drive)</span>
+                                        </label></div>
+                                    <div class="col-12"><label class="form-check small">
+                                            <input class="form-check-input feature-gap" type="checkbox" data-weight="1">
+                                            <span class="form-check-label">Template/Forms designer & bulk send</span>
+                                        </label></div>
+                                </div>
+
+                                <hr class="my-3">
+
+                                <div class="d-flex align-items-baseline justify-content-between">
+                                    <div>
+                                        <div class="small-muted">Dynamic price (per admin seat)</div>
+                                        <div class="price-lg fw-bold" id="ourPrice">$—</div>
+                                    </div>
+                                    <div class="text-end">
+                                        <div class="small-muted">vs industry average</div>
+                                        <div class="fw-semibold"><span id="discountPercent">—</span> cheaper</div>
+                                    </div>
+                                </div>
+
+                                <div class="mt-3 small-muted">
+                                    <strong>Formula</strong>: Price = Avg × (1 − 0.08 × gaps), min 40% of Avg.
+                                    (Each missing major workflow feature lowers price ~8%.)
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Per-document option -->
+                        <div class="card card-luxe mt-3">
+                            <div class="card-body">
+                                <div class="fw-semibold mb-1">Prefer usage‑based?</div>
+                                <div class="small-muted mb-2">Public TSA tokens often cost ≈ <span class="mono">$0.40</span> each. We can price LTV‑sealed PDFs at <strong>$0.15 / document</strong> (62.5% lower) while maintaining healthy margins.</div>
+                                <div class="small text-secondary">Great for high‑volume sealing with a tiny admin surface.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="small-muted mt-3">
+                    <strong>Reality check</strong>: If you later add AATL/EUTL or workflow features, raise the toggles—your price automatically moves closer to the market.
+                </div>
+            </div>
+        </section>
+
+        <!-- ======================= VALUE FOR EACH AUDIENCE ======================= -->
+        <section class="py-5">
+            <div class="container">
+                <div class="row g-4">
+                    <div class="col-lg-6">
+                        <div class="card card-luxe h-100">
+                            <div class="card-body">
+                                <h3 class="h5 mb-3"><i class="bi-briefcase me-2 text-info"></i>For executives & buyers</h3>
+                                <ul class="list-unstyled list-dot">
+                                    <li><i class="bi bi-check2-circle check me-2"></i><strong>Lower dispute risk</strong>: recipients can prove authenticity independently (offline).</li>
+                                    <li><i class="bi bi-check2-circle check me-2"></i><strong>Immediate revocation</strong>: stop misuse in minutes, not days.</li>
+                                    <li><i class="bi bi-check2-circle check me-2"></i><strong>Sane TCO</strong>: one light admin surface; scale with documents, not headcount.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="card card-luxe h-100">
+                            <div class="card-body">
+                                <h3 class="h5 mb-3"><i class="bi-code-slash me-2 text-success"></i>For developers</h3>
+                                <ul class="list-unstyled list-dot">
+                                    <li><i class="bi bi-check2-circle check me-2"></i>Simple HTTP API, HMAC‑gated; returns a ready‑to‑ship bundle (PDF + Trust Kit).</li>
+                                    <li><i class="bi bi-check2-circle check me-2"></i>Standards all the way: PAdES (CAdES), RFC 3161, OCSP/CRL, DSS/VRI.</li>
+                                    <li><i class="bi bi-check2-circle check me-2"></i>Edge‑fronted Worker, Java signer with PDFBox 3.x + BouncyCastle.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6">
+                        <div class="card card-luxe h-100">
+                            <div class="card-body">
+                                <h3 class="h5 mb-3"><i class="bi-shield-lock me-2 text-warning"></i>For security & compliance</h3>
+                                <ul class="list-unstyled list-dot">
+                                    <li><i class="bi bi-check2-circle check me-2"></i>Full chain control (Root/ICA/OCSP/TSA). Audit‑ready logs & hashes.</li>
+                                    <li><i class="bi bi-check2-circle check me-2"></i>Long‑term validation (B‑LT/B‑LTA) so signatures outlive certificates.</li>
+                                    <li><i class="bi bi-check2-circle check me-2"></i>Hardened service unit; least‑privilege; no passwords in code.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6">
+                        <div class="card card-luxe h-100">
+                            <div class="card-body">
+                                <h3 class="h5 mb-3"><i class="bi-graph-up-arrow me-2 text-primary"></i>For VCs</h3>
+                                <ul class="list-unstyled list-dot">
+                                    <li><i class="bi bi-check2-circle check me-2"></i><strong>Defensible angle</strong>: verifiable PDFs anywhere (no proprietary viewer), with private revocation.</li>
+                                    <li><i class="bi bi-check2-circle check me-2"></i><strong>Lean unit economics</strong>: TSA & OCSP run in‑house; margin improves with scale.</li>
+                                    <li><i class="bi bi-check2-circle check me-2"></i><strong>Adjacent upsells</strong>: trust kit deployment, attestation, notarization, APIs.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- "One more thing" -->
+                <div class="mt-5 text-center">
+                    <div class="pill mb-2">One more thing</div>
+                    <h3 class="h4 mb-2">“It just shows as <span class="text-success">Valid</span>.”</h3>
+                    <p class="small-muted mx-auto" style="max-width:720px">
+                        After installing the Trust Kit, recipients open your PDF and see a green check in Acrobat/Reader. That’s it.
+                        No portals, no accounts, no friction. That’s how trust should feel.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ======================= FAQ ======================= -->
+        <section class="py-5">
+            <div class="container">
+                <h2 class="section-head h3 mb-3">FAQ</h2>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="card card-luxe h-100">
+                            <div class="card-body">
+                                <div class="fw-semibold mb-2">Is this an e‑signature platform like DocuSign?</div>
+                                <div class="small-muted">No. This is a <strong>document sealing & verification</strong> system. It signs documents with your organization’s certificate and lets anyone verify authenticity. If you need multi‑party workflows, templates, or bulk signer routing, use an e‑signature platform; we price accordingly lower when those features are out of scope.</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card card-luxe h-100">
+                            <div class="card-body">
+                                <div class="fw-semibold mb-2">Will my PDFs show as trusted by default in Adobe?</div>
+                                <div class="small-muted">By design this uses a <em>private trust</em> model (your Root/ICA). That means recipients should install your Trust Kit to get default green checks. If you require public trust (AATL/EUTL), that’s a different product & price point.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="small-muted mt-3">Standards: ETSI PAdES LTV/LTA (DSS/VRI), RFC 3161 timestamp, OCSP/CRLs.</div>
+            </div>
+        </section>
+
+        <footer class="py-4 border-top border-light-subtle">
+            <div class="container small d-flex flex-wrap gap-2 justify-content-between align-items-center">
+                <div>© <span id="yr"></span> dmj.one Trust Services</div>
+                <div class="text-end">
+                    <a class="link-ghost me-3" href="#pricing">Pricing</a>
+                    <a class="link-ghost" href="#how-it-works">How it works</a>
+                </div>
+            </div>
+        </footer>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.8/js/bootstrap.bundle.min.js" referrerpolicy="no-referrer"></script>
+        <script>
+            // --- Industry average (editable numbers reflect linked sources) ---
+            const prices = {
+                docusign: 25.00,     // DocuSign Standard
+                dropbox: 25.00,     // Dropbox Sign Standard
+                pandadoc: 19.00,     // PandaDoc Starter
+                adobe: 23.99      // Acrobat Pro for Teams (includes e-sign)
+            };
+            const avg = (prices.docusign + prices.dropbox + prices.pandadoc + prices.adobe) / 4;
+            document.querySelector('#avgCell').textContent = '$' + avg.toFixed(2);
+
+            // --- Dynamic pricing: each major missing workflow feature discounts ~8%, min 40% of avg ---
+            function recalc() {
+                const gaps = Array.from(document.querySelectorAll('.feature-gap')).filter(x => x.checked);
+                const discount = 0.08 * gaps.length;
+                const minFactor = 0.40;
+                const factor = Math.max(1 - discount, minFactor);
+                const our = avg * factor;
+
+                // round to sensible SaaS numbers
+                const rounded = Math.round(our * 4) / 4; // nearest $0.25
+
+                document.querySelector('#ourPrice').textContent = '$' + rounded.toFixed(2) + ' / user / mo';
+                const pct = ((avg - rounded) / avg) * 100;
+                document.querySelector('#discountPercent').textContent = pct.toFixed(0) + '%';
+            }
+            document.querySelectorAll('.feature-gap').forEach(cb => cb.addEventListener('change', recalc));
+            recalc();
+            document.querySelector('#yr').textContent = new Date().getFullYear();
+        </script>
+
+    </body>
+
+</html>

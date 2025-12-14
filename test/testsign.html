@@ -1,0 +1,536 @@
+<!doctype html>
+<html lang="en" data-bs-theme="dark">
+
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <meta name="color-scheme" content="dark light" />
+        <title>dmj.one Trust Services — Document Verification</title>
+
+        <link rel="shortcut icon" href="//dmj.one/logo.png">
+        <link rel="fluid-icon" href="//dmj.one//logo.png">
+        <link rel="apple-touch-icon" href="//dmj.one//logo.png">
+
+        <!-- Core CSS -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
+
+        <!-- Animations (cdnjs as requested) -->
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet" />
+        <script nonce="__CSP_NONCE__" src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js" crossorigin="anonymous"></script>
+
+        <style>
+            :root {
+                --brand: #60a5fa;
+                /* soft azure accent on dark */
+                --bg: #0b0f14;
+                /* rich black-blue */
+                --panel: rgba(255, 255, 255, .05);
+                --panel-border: rgba(255, 255, 255, .08);
+                --muted: #a1aab7;
+                --ok: #17b26a;
+                --bad: #ef4343;
+            }
+
+            /* Page baseline */
+            html,
+            body {
+                height: 100%;
+            }
+
+            body {
+                margin: 0;
+                background: var(--bg);
+                color: #e7ebf2;
+                overflow-x: hidden;
+            }
+
+            /* Subtle techy animated background (particles.js canvas sits behind content) */
+            #particles-js {
+                position: fixed;
+                inset: 0;
+                z-index: 0;
+            }
+
+            .bg-gradient-overlay {
+                position: fixed;
+                inset: 0;
+                z-index: 0;
+                pointer-events: none;
+                background:
+                    radial-gradient(800px 400px at 20% -10%, rgba(96, 165, 250, .08), transparent 60%),
+                    radial-gradient(900px 500px at 80% -10%, rgba(34, 197, 94, .06), transparent 60%);
+            }
+
+            /* Centered stage */
+            .stage {
+                position: relative;
+                z-index: 1;
+                min-height: 100dvh;
+                display: grid;
+                place-items: center;
+                padding: 2rem 1rem;
+            }
+
+            .hero {
+                width: min(920px, 100%);
+                backdrop-filter: saturate(140%) blur(10px);
+                background: var(--panel);
+                border: 1px solid var(--panel-border);
+                border-radius: 1rem;
+                box-shadow: 0 10px 40px rgba(0, 0, 0, .45);
+                padding: clamp(1.25rem, 3vw, 2rem);
+            }
+
+            .brand-head {
+                display: grid;
+                justify-items: center;
+                gap: .75rem;
+                text-align: center;
+            }
+
+            .brand-head img {
+                height: clamp(44px, 8vw, 64px);
+                width: auto;
+                filter: drop-shadow(0 6px 18px rgba(0, 0, 0, .45));
+            }
+
+            .brand-head h1 {
+                font-size: clamp(1.25rem, 3.2vw, 1.75rem);
+                margin: 0;
+                letter-spacing: .2px;
+            }
+
+            .brand-sub {
+                color: var(--muted);
+                font-size: clamp(.95rem, 2.2vw, 1rem);
+            }
+
+            /* Upload box */
+            .upload-wrap {
+                display: grid;
+                gap: 1rem;
+                margin-top: 1.25rem;
+            }
+
+            .dropzone {
+                border: 1px dashed rgba(255, 255, 255, .18);
+                background: linear-gradient(180deg, rgba(255, 255, 255, .04), rgba(255, 255, 255, .02));
+                border-radius: .9rem;
+                padding: clamp(1rem, 5vw, 2rem);
+                text-align: center;
+                transition: border-color .2s ease, background-color .2s ease, transform .08s ease;
+                cursor: pointer;
+                outline: none;
+                user-select: none;
+            }
+
+            .dropzone:hover,
+            .dropzone.dragover {
+                border-color: rgba(96, 165, 250, .6);
+                background: linear-gradient(180deg, rgba(96, 165, 250, .08), rgba(255, 255, 255, .03));
+            }
+
+            .dropzone:active {
+                transform: scale(.998);
+            }
+
+            .dropzone .icon {
+                font-size: clamp(1.75rem, 5.4vw, 2.25rem);
+                color: var(--brand);
+            }
+
+            .dropzone .title {
+                margin-top: .5rem;
+                font-weight: 600;
+                font-size: clamp(1rem, 2.6vw, 1.15rem);
+            }
+
+            .dropzone .hint {
+                color: var(--muted);
+                font-size: .95rem;
+            }
+
+            /* Subtle Trust Kit line */
+            .trust-kit {
+                text-align: center;
+                color: var(--muted);
+                font-size: .95rem;
+            }
+
+            .trust-kit a {
+                text-decoration: none;
+            }
+
+            .trust-kit a .bi {
+                vertical-align: -2px;
+            }
+
+            /* Live state & verdict panels */
+            .live,
+            .verdict {
+                margin-top: 1rem;
+                border: 1px solid var(--panel-border);
+                background: rgba(255, 255, 255, .03);
+                border-radius: .8rem;
+                padding: 1rem;
+            }
+
+            .progress {
+                background-color: rgba(255, 255, 255, .08);
+            }
+
+            .progress-bar {
+                background-image: linear-gradient(90deg, var(--brand), #34d399);
+            }
+
+            .verdict-badge {
+                font-size: clamp(28px, 4.2vw, 48px);
+                line-height: 1.1;
+            }
+
+            .hash-chip {
+                font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;
+                font-size: .9rem;
+                background: rgba(255, 255, 255, .06);
+                border: 1px solid rgba(255, 255, 255, .12);
+                padding: .35rem .55rem;
+                border-radius: .5rem;
+            }
+
+            .stat-dot {
+                width: .6rem;
+                height: .6rem;
+                border-radius: 50%;
+                display: inline-block;
+                margin-right: .4rem;
+            }
+
+            .stat-yes {
+                background: var(--ok);
+            }
+
+            .stat-no {
+                background: var(--bad);
+            }
+
+            .fade-slow {
+                animation-duration: .8s;
+            }
+
+            /* Footer */
+            footer.site-footer {
+                position: relative;
+                z-index: 1;
+                border-top: 1px solid var(--panel-border);
+                background: rgba(255, 255, 255, .02);
+            }
+
+            footer .inner {
+                max-width: 1100px;
+                margin: 0 auto;
+                padding: 1rem 1rem;
+                display: flex;
+                flex-wrap: wrap;
+                gap: .75rem;
+                align-items: center;
+                justify-content: center;
+                color: var(--muted);
+                font-size: .95rem;
+            }
+
+            footer a {
+                color: #c8d1df;
+                text-decoration: none;
+            }
+
+            footer a:hover {
+                color: #ffffff;
+                text-decoration: underline;
+            }
+
+            /* Keep the 'single button' rule from your original */
+            .only-one-btn .btn:not(.upload-btn) {
+                display: none !important;
+            }
+
+            /* Small screens polish */
+            @media (max-width: 420px) {
+                .hash-chip {
+                    display: inline-block;
+                    max-width: 100%;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+            }
+        </style>
+    </head>
+
+    <body class="only-one-btn">
+        <!-- animated tech background -->
+        <div id="particles-js" aria-hidden="true"></div>
+        <div class="bg-gradient-overlay" aria-hidden="true"></div>
+
+        <!-- Centered content -->
+        <main class="stage">
+            <section class="hero animate__animated animate__fadeInDown fade-slow">
+                <div class="brand-head">
+                    <img src="https://dmj.one/logo.png" alt="dmj.one logo" width="128" height="128" />
+                    <h1 class="mb-1">dmj.one Trust Services</h1>
+                    <div class="brand-sub">
+                        Official Document Authenticity Verifier — Upload a PDF to check if it is issued by <span class="fw-semibold">${issuerDomain}</span> and unaltered.
+                    </div>
+                </div>
+
+                <!-- Upload -->
+                <div class="upload-wrap">
+                    <input id="fileInput" class="d-none" type="file" name="file" accept="application/pdf" />
+                    <label for="fileInput" class="dropzone" id="dropzone" role="button" tabindex="0" aria-controls="fileInput">
+                        <div class="icon"><i class="bi-upload"></i></div>
+                        <div class="title">Drop your PDF here or click to upload</div>
+                        <div class="hint">We’ll verify the embedded signature and registry entries.</div>
+                    </label>
+
+                    <!-- subtle trust kit -->
+                    <div class="trust-kit">
+                        <i class="bi-shield-check me-1"></i>
+                        <a href="${pkiZip}" download class="link-light">
+                            Install the Trust&nbsp;Kit (Root &amp; Issuing CA)
+                        </a>
+                        <span class="ms-1">to see “valid signature” in Acrobat/Reader automatically.</span>
+                    </div>
+
+                    <!-- live state -->
+                    <div id="liveState" class="live animate__animated animate__fadeIn" hidden>
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="spinner-border" role="status" aria-hidden="true"></div>
+                            <div>
+                                <div class="fw-semibold" id="stateLine">Starting verification…</div>
+                                <div class="small text-secondary" id="fileName"></div>
+                            </div>
+                        </div>
+                        <div class="progress mt-3" role="progressbar" aria-label="Verifying">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 100%"></div>
+                        </div>
+                    </div>
+
+                    <!-- verdict -->
+                    <div id="verdictWrap" class="verdict animate__animated animate__fadeInUp fade-slow" hidden>
+                        <div id="verdictCard">
+                            <div class="d-flex align-items-center">
+                                <i id="verdictIcon" class="bi me-3" style="font-size:2.25rem"></i>
+                                <div>
+                                    <div id="verdictText" class="verdict-badge fw-bold"></div>
+                                    <div class="mt-2">
+                                        <span class="hash-chip" id="shaChip" title="SHA‑256"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Advanced report link (not a button) -->
+                            <a href="#" id="toggleAdvanced" class="d-inline-flex align-items-center mt-3 text-decoration-none">
+                                <i class="bi-caret-right-fill me-1"></i><span>View advanced report</span>
+                            </a>
+
+                            <!-- Advanced panel -->
+                            <div id="advancedPanel" class="mt-3" hidden>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="p-3 rounded-3 border" style="border-color: var(--panel-border); background: rgba(255,255,255,.02);">
+                                            <div class="mb-2 fw-semibold">Signature &amp; Document</div>
+                                            <ul class="list-unstyled mb-0 small">
+                                                <li><span class="stat-dot stat-yes" id="sigObjDot"></span>Signature object present</li>
+                                                <li><span class="stat-dot stat-yes" id="cryptoDot"></span>Embedded signature is cryptographically valid</li>
+                                                <li><span class="stat-dot stat-yes" id="coverDot"></span>Signature covers the whole document</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="p-3 rounded-3 border" style="border-color: var(--panel-border); background: rgba(255,255,255,.02);">
+                                            <div class="mb-2 fw-semibold">Issuer &amp; Registry</div>
+                                            <ul class="list-unstyled mb-0 small">
+                                                <li><span class="stat-dot stat-yes" id="oursDot"></span>Signed by dmj.one key</li>
+                                                <li><span class="stat-dot stat-yes" id="regDot"></span>Registered by dmj.one</li>
+                                                <li><span class="stat-dot stat-yes" id="revokedDot"></span>Revocation check</li>
+                                                <li class="mt-2 text-break"><span class="text-secondary">Issuer DN:</span> <code id="issuerDn"></code></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mt-3 small text-secondary">Tip: Install the Trust Kit so Acrobat/Reader shows “signature is valid” automatically.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Distinct footer -->
+        <footer class="site-footer">
+            <div class="inner">
+                <span class="opacity-75">© dmj.one Trust Services</span>
+                <span class="mx-2">•</span>
+                <a href="//dmj.one/privacy">Privacy</a>
+                <span class="mx-2">•</span>
+                <a href="//dmj.one/tos">Terms &amp; Conditions</a>
+            </div>
+        </footer>
+
+        <script nonce="__CSP_NONCE__">
+            // particles.js init (disabled if user prefers reduced motion)
+            (function () {
+                var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                if (reduce) { document.getElementById('particles-js').style.display = 'none'; return; }
+                if (window.particlesJS) {
+                    particlesJS('particles-js', {
+                        "particles": {
+                            "number": { "value": 70, "density": { "enable": true, "value_area": 1000 } },
+                            "color": { "value": ["#60a5fa", "#34d399", "#93c5fd"] },
+                            "shape": { "type": "circle" },
+                            "opacity": { "value": 0.35, "random": false },
+                            "size": { "value": 2.5, "random": true },
+                            "line_linked": { "enable": true, "distance": 130, "color": "#60a5fa", "opacity": 0.25, "width": 1 },
+                            "move": { "enable": true, "speed": 1.2, "direction": "none", "out_mode": "out" }
+                        },
+                        "interactivity": {
+                            "detect_on": "canvas",
+                            "events": {
+                                "onhover": { "enable": true, "mode": "grab" },
+                                "onclick": { "enable": false },
+                                "resize": true
+                            },
+                            "modes": { "grab": { "distance": 140, "line_linked": { "opacity": 0.35 } } }
+                        },
+                        "retina_detect": true
+                    });
+                }
+            })();
+        </script>
+
+        <script nonce="__CSP_NONCE__">
+            (function () {
+                const fileInput = document.getElementById('fileInput');
+                const dropzone = document.getElementById('dropzone');
+                const liveState = document.getElementById('liveState');
+                const stateLine = document.getElementById('stateLine');
+                const fileNameEl = document.getElementById('fileName');
+                const verdictWrap = document.getElementById('verdictWrap');
+                const verdictCard = document.getElementById('verdictCard');
+                const verdictIcon = document.getElementById('verdictIcon');
+                const verdictText = document.getElementById('verdictText');
+                const shaChip = document.getElementById('shaChip');
+
+                const toggleAdvanced = document.getElementById('toggleAdvanced');
+                const advancedPanel = document.getElementById('advancedPanel');
+
+                const dots = {
+                    sigObjDot: document.getElementById('sigObjDot'),
+                    cryptoDot: document.getElementById('cryptoDot'),
+                    coverDot: document.getElementById('coverDot'),
+                    oursDot: document.getElementById('oursDot'),
+                    regDot: document.getElementById('regDot'),
+                    revokedDot: document.getElementById('revokedDot'),
+                };
+                const issuerDn = document.getElementById('issuerDn');
+
+                function setDot(el, ok) {
+                    el.classList.toggle('stat-yes', !!ok);
+                    el.classList.toggle('stat-no', !ok);
+                }
+
+                function show(state) {
+                    if (state === 'busy') {
+                        verdictWrap.hidden = true;
+                        liveState.hidden = false;
+                    } else if (state === 'done') {
+                        liveState.hidden = true;
+                        verdictWrap.hidden = false;
+                        verdictCard.classList.remove('animate__fadeInUp');
+                        void verdictCard.offsetWidth; // reflow
+                        verdictCard.classList.add('animate__fadeInUp');
+                    }
+                }
+
+                toggleAdvanced.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const open = advancedPanel.hidden;
+                    advancedPanel.hidden = !open;
+                    this.querySelector('i').className = open ? 'bi-caret-down-fill me-1' : 'bi-caret-right-fill me-1';
+                    this.querySelector('span').textContent = open ? 'Hide advanced report' : 'View advanced report';
+                });
+
+                async function startVerification(f) {
+                    if (!f) return;
+                    stateLine.textContent = 'Uploading & verifying…';
+                    dropzone.classList.add('d-none');
+                    fileNameEl.textContent = f.name;
+                    show('busy');
+                    try {
+                        const fd = new FormData();
+                        fd.set('file', f, f.name);
+
+                        const res = await fetch('/verify?json=1', { method: 'POST', body: fd, headers: { 'Accept': 'application/json' } });
+                        if (!res.ok) { throw new Error('Server returned ' + res.status); }
+                        const r = await res.json();
+
+                        const isValid = (r && r.verdict === 'valid');
+                        verdictIcon.className = isValid ? 'bi-shield-check text-success me-3' : 'bi-shield-x text-danger me-3';
+                        verdictText.className = 'verdict-badge fw-bold ' + (isValid ? 'text-success' : 'text-danger');
+                        verdictText.textContent = isValid ? 'VALID' : 'TAMPERED';
+                        shaChip.textContent = (r.sha256 || '').slice(0, 16) + '…' + (r.sha256 || '').slice(-16);
+
+                        setDot(dots.sigObjDot, !!r.hasSignature);
+                        setDot(dots.cryptoDot, !!r.isValid);
+                        setDot(dots.coverDot, !!r.coversDocument);
+                        setDot(dots.oursDot, !!r.issuedByUs);
+                        setDot(dots.regDot, !!r.issued);
+                        setDot(dots.revokedDot, !r.revoked);
+                        issuerDn.textContent = r.issuer || '';
+
+                        show('done');
+                    } catch (err) {
+                        verdictIcon.className = 'bi-exclamation-triangle text-danger me-3';
+                        verdictText.className = 'verdict-badge fw-bold text-danger';
+                        verdictText.textContent = 'TAMPERED';
+                        shaChip.textContent = 'n/a';
+                        setDot(dots.sigObjDot, false);
+                        setDot(dots.cryptoDot, false);
+                        setDot(dots.coverDot, false);
+                        setDot(dots.oursDot, false);
+                        setDot(dots.regDot, false);
+                        setDot(dots.revokedDot, false);
+                        issuerDn.textContent = 'Error: ' + (err && err.message ? err.message : 'Unknown error');
+                        show('done');
+                    } finally {
+                        fileInput.value = ''; // reset input so same file again triggers 'change'
+                    }
+                }
+
+                // Keyboard activation only (let the <label for=...> handle pointer clicks)
+                dropzone.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); }
+                });
+
+                // Ensure selecting the *same* file fires 'change' next time
+                fileInput.addEventListener('click', () => { fileInput.value = ''; });
+
+                // Drag & drop support
+                ['dragenter', 'dragover'].forEach(evt => dropzone.addEventListener(evt, (e) => { e.preventDefault(); e.stopPropagation(); dropzone.classList.add('dragover'); }));
+                ['dragleave', 'drop'].forEach(evt => dropzone.addEventListener(evt, (e) => { e.preventDefault(); e.stopPropagation(); dropzone.classList.remove('dragover'); }));
+                dropzone.addEventListener('drop', (e) => {
+                    const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+                    if (f && f.type === 'application/pdf') { startVerification(f); }
+                    else if (f) { alert('Please drop a PDF file.'); }
+                });
+
+                // Traditional file picker
+                fileInput.addEventListener('change', function () {
+                    const f = this.files && this.files[0];
+                    if (!f) return;
+                    startVerification(f);
+                });
+            })();
+        </script>
+    </body>
+
+</html>

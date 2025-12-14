@@ -1,0 +1,790 @@
+<!doctype html>
+<html lang="en" data-bs-theme="dark">
+
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <meta name="color-scheme" content="dark light" />
+        <title>dmj.one Trust Services — Document Verification</title>
+
+        <link rel="shortcut icon" href="//dmj.one/logo.png">
+        <link rel="fluid-icon" href="//dmj.one//logo.png">
+        <link rel="apple-touch-icon" href="//dmj.one//logo.png">
+
+        <!-- Core CSS -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
+
+        <!-- Animations (cdnjs as requested) -->
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet" />
+        <script nonce="__CSP_NONCE__" src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js" crossorigin="anonymous"></script>
+
+        <style>
+            /* Keep tiny essentials only */
+            :root {
+                --brand: #60a5fa;
+            }
+
+            html,
+            body {
+                height: 100%
+            }
+
+            body {
+                background: #0b0f14;
+                color: #e7ebf2;
+                overflow-x: hidden
+            }
+
+            /* particles canvas behind content */
+            #particles-js {
+                position: fixed;
+                inset: 0;
+                z-index: 0
+            }
+
+            /* subtle gradient overlay (optional) */
+            .bg-gradient-overlay {
+                position: fixed;
+                inset: 0;
+                z-index: 0;
+                pointer-events: none;
+                background: radial-gradient(800px 400px at 20% -10%, rgba(96, 165, 250, .08), transparent 60%),
+                    radial-gradient(900px 500px at 80% -10%, rgba(34, 197, 94, .06), transparent 60%);
+            }
+
+            /* dashed helper (Bootstrap lacks a dashed utility) */
+            .border-dashed {
+                border-style: dashed !important
+            }
+
+            /* tiny dot for advanced stats; color comes from Bootstrap classes */
+            .dot {
+                width: .6rem;
+                height: .6rem;
+                border-radius: 50%;
+                display: inline-block;
+                margin-right: .4rem
+            }
+
+            /* === Check/Cross animations (derived from Codeconvey) === */
+            /* Source pattern: circle spins; on completion, border freezes and mark draws. */
+            /* Namespaced to avoid conflicts and keep everything else untouched. */
+
+            .cc-circle-loader {
+                /* 7em geometry from Codeconvey, scaled by font-size for ~42px circle */
+                font-size: 6px;
+                margin: 0;
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                border-left-color: var(--bs-success, #5cb85c);
+                animation: cc-loader-spin 1.2s infinite linear;
+                position: relative;
+                display: inline-block;
+                vertical-align: middle;
+                border-radius: 50%;
+                width: 7em;
+                height: 7em;
+            }
+
+            .cc-circle-loader.cc-fail {
+                border-left-color: var(--bs-danger, #dc3545);
+            }
+
+            /* optional accent when we know it's a fail */
+
+            .cc-circle-loader.cc-complete {
+                animation: none;
+                border-color: currentColor;
+                /* turn circle to the final color */
+                transition: border 500ms ease-out;
+            }
+
+            .cc-circle-loader .cc-mark {
+                display: none;
+            }
+
+            .cc-circle-loader.cc-complete .cc-mark {
+                display: block;
+            }
+
+            /* Checkmark (geometry + timing adapted from Codeconvey) */
+            .cc-circle-loader.cc-success .cc-mark::after,
+            .cc-verdict.cc-check::after {
+                opacity: 1;
+                height: 3.5em;
+                width: 1.75em;
+                transform-origin: left top;
+                border-right: 3px solid currentColor;
+                border-top: 3px solid currentColor;
+                content: "";
+                left: 1.75em;
+                top: 3.5em;
+                position: absolute;
+            }
+
+            .cc-circle-loader.cc-success .cc-mark::after {
+                animation-duration: 800ms;
+                animation-timing-function: ease;
+                animation-name: cc-checkmark;
+                /* Codeconvey checkmark timing */
+                transform: scaleX(-1) rotate(135deg);
+            }
+
+            /* Cross (two strokes that draw in sequence) */
+            .cc-circle-loader.cc-fail .cc-mark::before,
+            .cc-circle-loader.cc-fail .cc-mark::after,
+            .cc-verdict.cc-cross::before,
+            .cc-verdict.cc-cross::after {
+                content: "";
+                position: absolute;
+                left: 3.2em;
+                /* tuned to center inside 7em circle */
+                top: 2.1em;
+                width: 0;
+                height: 3.5em;
+                border-right: 3px solid currentColor;
+                transform-origin: left top;
+                opacity: 1;
+            }
+
+            .cc-circle-loader.cc-fail .cc-mark::before,
+            .cc-verdict.cc-cross::before {
+                transform: rotate(45deg);
+                animation: cc-stroke 650ms ease forwards;
+            }
+
+            .cc-circle-loader.cc-fail .cc-mark::after,
+            .cc-verdict.cc-cross::after {
+                transform: rotate(-45deg);
+                animation: cc-stroke 650ms ease 150ms forwards;
+            }
+
+            /* Verdict icon (static ring that can draw the mark when shown) */
+            .cc-verdict {
+                font-size: 6px;
+                /* same scale (~42px total) */
+                display: inline-block;
+                vertical-align: middle;
+                position: relative;
+                width: 7em;
+                height: 7em;
+                border-radius: 50%;
+                border: 1px solid currentColor;
+            }
+
+            .cc-verdict.cc-check::after {
+                animation: cc-checkmark 800ms ease 50ms both;
+                transform: scaleX(-1) rotate(135deg);
+            }
+
+            /* Color helpers aligned with Bootstrap palette */
+            .cc-success {
+                color: var(--bs-success, #198754);
+            }
+
+            .cc-fail {
+                color: var(--bs-danger, #dc3545);
+            }
+
+            /* Keyframes (renamed from Codeconvey to avoid collisions) */
+            @keyframes cc-loader-spin {
+                0% {
+                    transform: rotate(0deg);
+                }
+
+                100% {
+                    transform: rotate(360deg);
+                }
+            }
+
+            @keyframes cc-checkmark {
+                0% {
+                    height: 0;
+                    width: 0;
+                    opacity: 1;
+                }
+
+                20% {
+                    height: 0;
+                    width: 1.75em;
+                    opacity: 1;
+                }
+
+                40% {
+                    height: 3.5em;
+                    width: 1.75em;
+                    opacity: 1;
+                }
+
+                100% {
+                    height: 3.5em;
+                    width: 1.75em;
+                    opacity: 1;
+                }
+            }
+
+            @keyframes cc-stroke {
+                0% {
+                    height: 0;
+                }
+
+                100% {
+                    height: 3.5em;
+                }
+            }
+
+            /* =========================
+   LAYOUT TWEAKS (center & 3× size)
+   ========================= */
+
+            /* Center the uploading row content */
+            #liveState .d-flex.align-items-center {
+                flex-direction: column;
+                align-items: center !important;
+                text-align: center;
+                gap: 1rem;
+            }
+
+            /* Center verdict row; put SHA under icon */
+            #verdictCard .d-flex.align-items-center {
+                flex-direction: column;
+                align-items: center !important;
+                text-align: center;
+                gap: 1rem;
+            }
+
+            /* Hide VALID/TAMPERED text completely */
+            #verdictText {
+                display: none !important;
+            }
+
+            /* Make both the waiting loader and the final verdict icon 3× */
+            #uploadAnim,
+            #verdictIcon.cc-verdict {
+                font-size: 18px !important;
+                /* default geometry is 6px -> 3× */
+            }
+
+            /* Ensure the ring blocks center themselves in their containers */
+            .cc-circle-loader,
+            .cc-verdict {
+                display: inline-block;
+                margin-inline: auto;
+            }
+
+            /* Nicer spacing for the SHA badge under the icon */
+            #shaChip {
+                display: inline-block;
+                margin-top: .25rem;
+            }
+
+            /* =========================
+   ANIMATION (Codeconvey-derived)
+   ========================= */
+            /* Circle loader & checkmark derived from Codeconvey:
+   - spinning bordered circle
+   - on completion freezes and draws a tick using :after height/width anim
+   Ref: .circle-loader, .load-complete, .checkmark:after, @keyframes loader-spin/checkmark. :contentReference[oaicite:1]{index=1}
+*/
+
+            .cc-circle-loader {
+                /* 7em geometry from Codeconvey, scaled by font-size for ~42px base (3× -> ~126px) */
+                font-size: 6px;
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                border-left-color: var(--bs-success, #198754);
+                animation: cc-loader-spin 1.2s infinite linear;
+                position: relative;
+                border-radius: 50%;
+                width: 7em;
+                height: 7em;
+            }
+
+            .cc-circle-loader.cc-fail {
+                border-left-color: var(--bs-danger, #dc3545);
+            }
+
+            .cc-circle-loader.cc-complete {
+                animation: none;
+                border-color: currentColor;
+                transition: border 500ms ease-out;
+            }
+
+            .cc-circle-loader .cc-mark {
+                display: none;
+            }
+
+            .cc-circle-loader.cc-complete .cc-mark {
+                display: block;
+            }
+
+            /* Checkmark (same geometry/timing pattern as Codeconvey) */
+            .cc-circle-loader.cc-success .cc-mark::after,
+            .cc-verdict.cc-check::after {
+                opacity: 1;
+                height: 3.5em;
+                width: 1.75em;
+                transform-origin: left top;
+                border-right: 3px solid currentColor;
+                border-top: 3px solid currentColor;
+                content: "";
+                left: 1.75em;
+                top: 3.5em;
+                position: absolute;
+            }
+
+            /* animate the check path */
+            .cc-circle-loader.cc-success .cc-mark::after,
+            .cc-verdict.cc-check::after {
+                animation: cc-checkmark 800ms ease 50ms both;
+                transform: scaleX(-1) rotate(135deg);
+            }
+
+            /* =========================
+   FIXED CROSS ("X") — two centered strokes that draw
+   ========================= */
+            .cc-circle-loader.cc-fail .cc-mark::before,
+            .cc-circle-loader.cc-fail .cc-mark::after,
+            .cc-verdict.cc-cross::before,
+            .cc-verdict.cc-cross::after {
+                content: "";
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                width: 0;
+                /* animate width from 0 -> full length */
+                height: 3px;
+                background: currentColor;
+                transform-origin: center;
+                opacity: 1;
+            }
+
+            .cc-circle-loader.cc-fail .cc-mark::before,
+            .cc-verdict.cc-cross::before {
+                transform: translate(-50%, -50%) rotate(45deg);
+                animation: cc-stroke-w 450ms ease forwards;
+            }
+
+            .cc-circle-loader.cc-fail .cc-mark::after,
+            .cc-verdict.cc-cross::after {
+                transform: translate(-50%, -50%) rotate(-45deg);
+                animation: cc-stroke-w 450ms ease 120ms forwards;
+            }
+
+            /* Verdict ring (static) that can draw check/cross */
+            .cc-verdict {
+                font-size: 6px;
+                /* base; bumped to 18px via rule above */
+                position: relative;
+                width: 7em;
+                height: 7em;
+                border-radius: 50%;
+                border: 1px solid currentColor;
+            }
+
+            /* Palette helpers */
+            .cc-success {
+                color: var(--bs-success, #198754);
+            }
+
+            .cc-fail {
+                color: var(--bs-danger, #dc3545);
+            }
+
+            /* Keyframes (renamed from Codeconvey to avoid collisions) */
+            @keyframes cc-loader-spin {
+                0% {
+                    transform: rotate(0deg);
+                }
+
+                100% {
+                    transform: rotate(360deg);
+                }
+            }
+
+            @keyframes cc-checkmark {
+                0% {
+                    height: 0;
+                    width: 0;
+                    opacity: 1;
+                }
+
+                20% {
+                    height: 0;
+                    width: 1.75em;
+                    opacity: 1;
+                }
+
+                40% {
+                    height: 3.5em;
+                    width: 1.75em;
+                    opacity: 1;
+                }
+
+                100% {
+                    height: 3.5em;
+                    width: 1.75em;
+                    opacity: 1;
+                }
+            }
+
+            @keyframes cc-stroke-w {
+                from {
+                    width: 0;
+                }
+
+                to {
+                    width: 4.6em;
+                }
+
+                /* tuned to span the ring */
+            }
+        </style>
+
+    </head>
+
+    <body class="only-one-btn">
+        <!-- animated tech background -->
+        <div id="particles-js" aria-hidden="true"></div>
+        <div class="bg-gradient-overlay" aria-hidden="true"></div>
+
+        <!-- Centered content -->
+        <main class="min-vh-100 d-flex align-items-center justify-content-center position-relative">
+            <section class="container" style="max-width: 920px;">
+                <div class="card bg-body border-0 shadow-lg rounded-4 bg-opacity-10 backdrop-blur animate__animated animate__fadeInDown">
+                    <div class="card-body p-4 p-md-5">
+
+                        <section class="hero animate__animated animate__fadeInDown fade-slow">
+                            <div class="text-center d-grid gap-2">
+                                <img src="https://dmj.one/logo.png" alt="dmj.one logo" class="mx-auto d-block" style="height:64px" />
+                                <h1 class="h4 mb-0">dmj.one Trust Services</h1>
+                                <p class="text-secondary mb-0">
+                                    Official Document Authenticity Verifier — Upload a PDF to check if it is issued by
+                                    <span class="fw-semibold">${issuerDomain}</span> and unaltered.
+                                </p>
+                            </div>
+
+
+                            <!-- Upload -->
+                            <div class="upload-wrap">
+                                <input id="fileInput" class="d-none" type="file" name="file" accept="application/pdf" />
+                                <label for="fileInput" id="dropzone" class="mt-3 w-100 text-center border border-secondary-subtle border-dashed rounded-3 p-4 p-md-5
+                                              bg-body-tertiary bg-opacity-10 user-select-none" role="button" tabindex="0" aria-controls="fileInput">
+                                    <div class="display-6 mb-2 text-primary"><i class="bi-upload"></i></div>
+                                    <div class="fw-semibold">Drop your PDF here or click to upload</div>
+                                    <div class="text-secondary small">We’ll verify the embedded signature and registry entries.</div>
+                                </label>
+
+
+
+                                <!-- subtle trust kit -->
+                                <p class="text-center text-secondary small mt-2 mb-0">
+                                    <i class="bi-shield-check me-1"></i>
+                                    <a href="${pkiZip}" download class="link-light text-decoration-none">Install the Trust&nbsp;Kit (Root &amp; Issuing CA)</a>
+                                    <span class="ms-1">to see “valid signature” in Acrobat/Reader automatically.</span>
+                                </p>
+
+
+                                <!-- live state -->
+                                <div id="liveState" class="mt-3 border rounded-3 p-3 bg-body-tertiary bg-opacity-10 animate__animated animate__fadeIn" hidden>
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div id="uploadAnim" class="cc-circle-loader cc-success" aria-hidden="true">
+                                            <div class="cc-mark"></div>
+                                        </div>
+
+                                        <div>
+                                            <div class="fw-semibold" id="stateLine">Starting verification…</div>
+                                            <div class="small text-secondary" id="fileName"></div>
+                                        </div>
+                                    </div>
+                                    <div class="progress mt-3" role="progressbar" aria-label="Verifying">
+                                        <div class="progress-bar progress-bar-striped progress-bar-animated" style="width:100%"></div>
+                                    </div>
+                                </div>
+
+
+                                <!-- verdict -->
+                                <div id="verdictWrap" class="mt-3 border rounded-3 p-3 bg-body-tertiary bg-opacity-10 animate__animated animate__fadeInUp" hidden>
+                                    <div id="verdictCard">
+                                        <div class="d-flex align-items-center">
+                                            <i id="verdictIcon" class="bi me-3 fs-1"></i>
+                                            <div>
+                                                <div id="verdictText" class="fw-bold fs-2 lh-1"></div>
+                                                <div class="mt-2">
+                                                    <span id="shaChip" class="badge text-bg-secondary rounded-pill"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <a href="#" id="toggleAdvanced" class="d-inline-flex align-items-center mt-3 text-decoration-none">
+                                            <i class="bi-caret-right-fill me-1"></i><span>View advanced report</span>
+                                        </a>
+
+                                        <div id="advancedPanel" class="mt-3" hidden>
+                                            <div class="row g-3">
+                                                <div class="col-md-6">
+                                                    <div class="p-3 rounded-3 border bg-body-tertiary bg-opacity-10">
+                                                        <div class="mb-2 fw-semibold">Signature &amp; Document</div>
+                                                        <ul class="list-unstyled mb-0 small">
+                                                            <li><span class="dot bg-success me-1" id="sigObjDot"></span>Signature object present</li>
+                                                            <li><span class="dot bg-success me-1" id="cryptoDot"></span>Embedded signature is cryptographically valid</li>
+                                                            <li><span class="dot bg-success me-1" id="coverDot"></span>Signature covers the whole document</li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="p-3 rounded-3 border bg-body-tertiary bg-opacity-10">
+                                                        <div class="mb-2 fw-semibold">Issuer &amp; Registry</div>
+                                                        <ul class="list-unstyled mb-0 small">
+                                                            <li><span class="dot bg-success me-1" id="oursDot"></span>Signed by dmj.one key</li>
+                                                            <li><span class="dot bg-success me-1" id="regDot"></span>Registered by dmj.one</li>
+                                                            <li><span class="dot bg-success me-1" id="revokedDot"></span>Revocation check</li>
+                                                            <li class="mt-2 text-break"><span class="text-secondary">Issuer DN:</span> <code id="issuerDn"></code></li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="mt-3 small text-secondary">Tip: Install the Trust Kit so Acrobat/Reader shows “signature is valid” automatically.</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+
+        <!-- Distinct footer -->
+        <footer class="position-relative z-1 border-top bg-body bg-opacity-10">
+            <div class="container py-3 text-center text-secondary small">
+                © dmj.one Trust Services <span class="mx-2">•</span>
+                <a href="//dmj.one/privacy" class="link-light text-decoration-none">Privacy</a>
+                <span class="mx-2">•</span>
+                <a href="//dmj.one/tos" class="link-light text-decoration-none">Terms &amp; Conditions</a>
+            </div>
+        </footer>
+
+
+        <script nonce="__CSP_NONCE__">
+            // particles.js init (disabled if user prefers reduced motion)
+            (function () {
+                var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                if (reduce) { document.getElementById('particles-js').style.display = 'none'; return; }
+                if (window.particlesJS) {
+                    particlesJS('particles-js', {
+                        "particles": {
+                            "number": { "value": 70, "density": { "enable": true, "value_area": 1000 } },
+                            "color": { "value": ["#60a5fa", "#34d399", "#93c5fd"] },
+                            "shape": { "type": "circle" },
+                            "opacity": { "value": 0.35, "random": false },
+                            "size": { "value": 2.5, "random": true },
+                            "line_linked": { "enable": true, "distance": 130, "color": "#60a5fa", "opacity": 0.25, "width": 1 },
+                            "move": { "enable": true, "speed": 1.2, "direction": "none", "out_mode": "out" }
+                        },
+                        "interactivity": {
+                            "detect_on": "canvas",
+                            "events": {
+                                "onhover": { "enable": true, "mode": "grab" },
+                                "onclick": { "enable": false },
+                                "resize": true
+                            },
+                            "modes": { "grab": { "distance": 140, "line_linked": { "opacity": 0.35 } } }
+                        },
+                        "retina_detect": true
+                    });
+                }
+            })();
+        </script>
+
+        <script nonce="__CSP_NONCE__">
+            (function () {
+                const fileInput = document.getElementById('fileInput');
+                const dropzone = document.getElementById('dropzone');
+                const liveState = document.getElementById('liveState');
+                const stateLine = document.getElementById('stateLine');
+                const fileNameEl = document.getElementById('fileName');
+                const verdictWrap = document.getElementById('verdictWrap');
+                const verdictCard = document.getElementById('verdictCard');
+                const verdictIcon = document.getElementById('verdictIcon');
+                const verdictText = document.getElementById('verdictText');
+                const shaChip = document.getElementById('shaChip');
+
+                const uploadAnim = document.getElementById('uploadAnim');
+
+
+                const toggleAdvanced = document.getElementById('toggleAdvanced');
+                const advancedPanel = document.getElementById('advancedPanel');
+
+                const dots = {
+                    sigObjDot: document.getElementById('sigObjDot'),
+                    cryptoDot: document.getElementById('cryptoDot'),
+                    coverDot: document.getElementById('coverDot'),
+                    oursDot: document.getElementById('oursDot'),
+                    regDot: document.getElementById('regDot'),
+                    revokedDot: document.getElementById('revokedDot'),
+                };
+                const issuerDn = document.getElementById('issuerDn');
+
+                // function setDot(el, ok) {
+                //     el.classList.toggle('stat-yes', !!ok);
+                //     el.classList.toggle('stat-no', !ok);
+                // }
+                function setDot(el, ok) {
+                    el.classList.toggle('bg-success', !!ok);
+                    el.classList.toggle('bg-danger', !ok);
+                }
+
+                // Put near your other functions:
+                function setShaDisplay(fullSha) {
+                    const mql = window.matchMedia('(min-width: 992px)'); // treat as "laptop"
+                    const apply = () => {
+                        if (!shaChip) return;
+                        if (!fullSha) { shaChip.textContent = 'n/a'; return; }
+                        shaChip.textContent = mql.matches
+                            ? fullSha
+                            : (fullSha.slice(0, 12) + '…' + fullSha.slice(-12)); // mobile-friendly
+                    };
+                    apply();
+                    // bind once
+                    if (!setShaDisplay._bound) {
+                        mql.addEventListener('change', apply);
+                        setShaDisplay._bound = true;
+                    }
+                }
+
+
+
+                function show(state) {
+                    if (state === 'busy') {
+                        verdictWrap.hidden = true;
+                        liveState.hidden = false;
+                    } else if (state === 'done') {
+                        liveState.hidden = true;
+                        verdictWrap.hidden = false;
+                        verdictCard.classList.remove('animate__fadeInUp');
+                        void verdictCard.offsetWidth; // reflow
+                        verdictCard.classList.add('animate__fadeInUp');
+                    }
+                }
+
+                toggleAdvanced.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const open = advancedPanel.hidden;
+                    advancedPanel.hidden = !open;
+                    this.querySelector('i').className = open ? 'bi-caret-down-fill me-1' : 'bi-caret-right-fill me-1';
+                    this.querySelector('span').textContent = open ? 'Hide advanced report' : 'View advanced report';
+                });
+
+                async function startVerification(f) {
+                    if (!f) return;
+                    stateLine.textContent = 'Uploading & verifying…';
+                    dropzone.classList.add('d-none');
+                    fileNameEl.textContent = f.name;
+                    show('busy');
+                    // uploadAnim.className = 'cc-circle-loader cc-success'; // spin in green by default
+                    uploadAnim.className = 'cc-circle-loader';
+                    try {
+                        const fd = new FormData();
+                        fd.set('file', f, f.name);
+
+                        const res = await fetch('/verify?json=1', { method: 'POST', body: fd, headers: { 'Accept': 'application/json' } });
+                        if (!res.ok) { throw new Error('Server returned ' + res.status); }
+                        const r = await res.json();
+
+                        //const isValid = (r && r.verdict === 'valid');
+                        //// Convert the waiting circle to a green tick OR red cross
+                        //uploadAnim.classList.add('cc-complete', isValid ? 'cc-success' : 'cc-fail');
+//
+                        //// Final verdict icon: animated ring + check/cross
+                        //verdictIcon.className = isValid
+                        //    ? 'cc-verdict cc-success cc-check me-3'
+                        //    : 'cc-verdict cc-fail cc-cross me-3';
+//
+                        //// verdictIcon.className = isValid ? 'bi-shield-check text-success me-3' : 'bi-shield-x text-danger me-3';
+                        //verdictText.className = 'verdict-badge fw-bold ' + (isValid ? 'text-success' : 'text-danger');
+                        //verdictText.textContent = isValid ? 'VALID' : 'TAMPERED';
+
+                        const isValid = (r && r.verdict === 'valid');
+
+                        // Convert waiting circle to tick or cross
+                        uploadAnim.classList.add('cc-complete', isValid ? 'cc-success' : 'cc-fail');
+
+                        // Final verdict icon (centered ring that draws mark)
+                        verdictIcon.className = isValid
+                            ? 'cc-verdict cc-success cc-check'
+                            : 'cc-verdict cc-fail cc-cross';
+
+                        // Remove the text labels entirely
+                        // verdictText.textContent = '';
+                        // verdictText.hidden = true;
+                        verdictText.className = 'verdict-badge fw-bold ' + (isValid ? 'text-success' : 'text-danger');
+                        verdictText.textContent = isValid ? 'VALID' : 'TAMPERED';
+
+                        // SHA under the icon: full on laptop, truncated on mobile
+                        setShaDisplay(r.sha256 || '');
+                        // shaChip.textContent = (r.sha256 || '').slice(0, 16) + '…' + (r.sha256 || '').slice(-16);
+
+                        setDot(dots.sigObjDot, !!r.hasSignature);
+                        setDot(dots.cryptoDot, !!r.isValid);
+                        setDot(dots.coverDot, !!r.coversDocument);
+                        setDot(dots.oursDot, !!r.issuedByUs);
+                        setDot(dots.regDot, !!r.issued);
+                        setDot(dots.revokedDot, !r.revoked);
+                        issuerDn.textContent = r.issuer || '';
+
+                        show('done');
+                    } catch (err) {
+                        // uploadAnim.classList.add('cc-complete', 'cc-fail');
+                        // verdictIcon.className = 'cc-verdict cc-fail cc-cross me-3';
+                        // // verdictIcon.className = 'bi-exclamation-triangle text-danger me-3';
+                        // verdictText.className = 'verdict-badge fw-bold text-danger';
+                        // verdictText.textContent = 'TAMPERED';
+                        // shaChip.textContent = 'n/a';
+                        uploadAnim.classList.add('cc-complete', 'cc-fail');
+                        verdictIcon.className = 'cc-verdict cc-fail cc-cross';
+                        verdictText.textContent = '';
+                        verdictText.hidden = true;
+                        setShaDisplay('');
+                        setDot(dots.sigObjDot, false);
+                        setDot(dots.cryptoDot, false);
+                        setDot(dots.coverDot, false);
+                        setDot(dots.oursDot, false);
+                        setDot(dots.regDot, false);
+                        setDot(dots.revokedDot, false);
+                        issuerDn.textContent = 'Error: ' + (err && err.message ? err.message : 'Unknown error');
+                        show('done');
+                    } finally {
+                        fileInput.value = ''; // reset input so same file again triggers 'change'
+                    }
+                }
+
+                // Keyboard activation only (let the <label for=...> handle pointer clicks)
+                dropzone.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); }
+                });
+
+                // Ensure selecting the *same* file fires 'change' next time
+                fileInput.addEventListener('click', () => { fileInput.value = ''; });
+
+                // Drag & drop support
+                ['dragenter', 'dragover'].forEach(evt => dropzone.addEventListener(evt, (e) => { e.preventDefault(); e.stopPropagation(); dropzone.classList.add('dragover'); }));
+                ['dragleave', 'drop'].forEach(evt => dropzone.addEventListener(evt, (e) => { e.preventDefault(); e.stopPropagation(); dropzone.classList.remove('dragover'); }));
+                dropzone.addEventListener('drop', (e) => {
+                    const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+                    if (f && f.type === 'application/pdf') { startVerification(f); }
+                    else if (f) { alert('Please drop a PDF file.'); }
+                });
+
+                // Traditional file picker
+                fileInput.addEventListener('change', function () {
+                    const f = this.files && this.files[0];
+                    if (!f) return;
+                    startVerification(f);
+                });
+            })();
+        </script>
+    </body>
+
+</html>
