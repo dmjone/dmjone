@@ -45,53 +45,60 @@ function get_menu_list(datetogen) {
                 link: "notes-end-semester"
             },
             {
-                title: "Unit 1: Fundamentals & Hardware",
-                desc: "Introduction to Computer Graphics, Graphics Pipeline, Raster vs Random Scan, and Display Hardware.",
+                title: "Unit 1: Introduction to Graphics",
+                desc: "Definition, Applications, and Graphics Pipeline.",
                 codetype: "Fundamentals",
                 readtime: 15,
-                link: "fundamentals"
+                link: "introduction-to-computer-graphics"
             },
             {
-                title: "Unit 2: Drawing Algorithms",
-                desc: "Line Drawing (DDA, Bresenham), Circle Drawing (Mid-Point), and Polygon Filling algorithms.",
-                codetype: "Algorithms",
+                title: "Unit 2: Graphics Hardware",
+                desc: "Input/Output Devices, CRT, LCD, and Display Techniques.",
+                codetype: "Hardware",
                 readtime: 20,
-                link: "drawing-algorithms"
+                link: "graphics-hardware-and-display-technologies"
             },
             {
-                title: "Unit 3: Transformations",
-                desc: "2D & 3D Transformations, Homogeneous Coordinates, Composite Matrix Logic, Reflection, and Shear.",
+                title: "Unit 3: Scan Conversion",
+                desc: "DDA, Bresenham Line & Circle, Polygon Filling.",
+                codetype: "Algorithms",
+                readtime: 25,
+                link: "scan-conversion-drawing-algorithms"
+            },
+            {
+                title: "Unit 4: Transformations",
+                desc: "2D & 3D Translation, Rotation, Scaling, Reflection.",
                 codetype: "Math",
                 readtime: 25,
-                link: "transformations"
+                link: "transformations-2d-and-3d"
             },
             {
-                title: "Unit 4: Clipping & Projection",
-                desc: "Clipping (Cohen-Sutherland, Mid-Point) and Projections (Parallel, Perspective, Vanishing Points).",
+                title: "Unit 5: Projections",
+                desc: "Parallel (Orthographic) and Perspective Projections.",
+                codetype: "Math",
+                readtime: 20,
+                link: "projections"
+            },
+            {
+                title: "Unit 6: Clipping",
+                desc: "Cohen-Sutherland Line Clipping, Polygon Clipping.",
                 codetype: "Algorithms",
                 readtime: 20,
-                link: "clipping-projection"
+                link: "clipping-windowing"
             },
             {
-                title: "Unit 5: VSD & Animation",
-                desc: "Visible Surface Detection (Z-Buffer, Scan-Line) and Animation techniques (Keyframing, Morphing).",
+                title: "Unit 7: VSD & Hidden Surfaces",
+                desc: "Z-Buffer, Back-Face Detection, Scan-Line Algo.",
+                codetype: "Advanced",
+                readtime: 25,
+                link: "visible-surface-detection-hidden-surface-removal"
+            },
+            {
+                title: "Unit 8: Animation",
+                desc: "Keyframing, Morphing, Procedural Animation.",
                 codetype: "Advanced",
                 readtime: 20,
-                link: "vsd-animation"
-            },
-            {
-                title: "Unit 6: Formula Sheet",
-                desc: "Consolidated list of scalar formulas for independent revision. No Matrices.",
-                codetype: "Review",
-                readtime: 10,
-                link: "formulas"
-            },
-            {
-                title: "Solved Numericals",
-                desc: "Step-by-step solutions for DDA, Bresenham, Circle, and Transformations.",
-                codetype: "Practice",
-                readtime: 15,
-                link: "numericals"
+                link: "animation"
             }
         ];
         body_genmenu.processData(arr, def_date, def_author);
