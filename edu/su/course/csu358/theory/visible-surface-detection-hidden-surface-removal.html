@@ -1,0 +1,313 @@
+<!-------------------------- © 2007 - present, dmj.one and contributors. ----------------------------------
+   Part of the dmjone project. Licensed under the GNU AGPL. Provided as-is, without warranty of any kind. 
+-------------------- Redistribution and modifications must retain this notice. --------------------------->
+
+
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+<!--<![endif]-->
+
+<head>
+    <script src="/js/edu_su_common.js"></script>
+    <noscript>
+        <style>
+            html,
+            body {
+                margin: 0;
+                overflow: hidden;
+            }
+        </style>
+        <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+    </noscript>
+
+    <title>Visible Surface Detection (VSD) & Hidden Surface Removal - CSUCODE - Shoolini U</title>
+    <meta name="description" content="Learn about Visible Surface Detection (VSD) in Computer Graphics (Unit 7), including Back-Face Detection, Z-Buffer, A-Buffer, and Scan-Line algorithms.">
+
+    <meta property="og:image" content="/logo.png">
+    <meta property="og:type" content="article">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="@divyamohan1993">
+    <meta name="twitter:creator" content="@divyamohan1993">
+    <meta name="twitter:image" content="/logo.png">
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+    <meta name="author" content="Divya Mohan">
+    <meta name="robots" content="index, follow">
+
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js" integrity="sha512-sHSNLECRJSK+BFs7E8DiFc6pf6n90bLI85Emiw1jhreduZhK3VXgq9l4kAt9eTIHYAcuQBKHL01QKs4/3Xgl8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js" integrity="sha512-iWiuBS5nt6r60fCz26Nd0Zqe0nbk1ZTIQbl3Kv7kYsX+yKMUFHzjaH2+AnM6vp2Xs+gNmaBAVWJjSmuPw76Efg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                renderMathInElement(document.body, {
+                    // customised options
+                    // • auto-render specific keys, e.g.:
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false },
+                        { left: '\\(', right: '\\)', display: false },
+                        { left: '\\[', right: '\\]', display: true }
+                    ],
+                    // • rendering keys, e.g.:
+                    throwOnError: false
+                });
+            });
+        </script> -->
+
+    <!-- <style>
+            main ul {
+                list-style-type: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            main ul li {
+                margin: 0;
+                padding: 0;
+            }
+        </style> -->
+
+    <!-- JSON-LD Structured Data for SEO -->
+    <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "Course",
+          "name": "Visible Surface Detection (VSD)",
+          "description": "Learn about Visible Surface Detection (VSD) in Computer Graphics (Unit 7), including Back-Face Detection, Z-Buffer, A-Buffer, and Scan-Line algorithms.",
+          "url": "https://dmj.one/edu/su/course/csu358/theory/visible-surface-detection-hidden-surface-removal",
+          "dateModified": "2025-12-14",
+          "provider": [
+            {
+              "@type": "EducationalOrganization",
+              "name": "dmj.one",
+              "url": "https://dmj.one"
+            },
+            {
+              "@type": "EducationalOrganization",
+              "name": "Shoolini University",
+              "url": "https://shooliniuniversity.com"
+            }
+          ],
+          "offers": {
+              "@type": "Offer",
+              "category": "Education",
+              "price": "0",
+              "priceCurrency": "USD",
+              "availability": "https://schema.org/InStock",
+              "url": "https://dmj.one/edu/su/course/csu358/theory/visible-surface-detection-hidden-surface-removal"
+          },
+          "hasCourseInstance": {
+              "@type": "CourseInstance",
+              "name": "Course - CSUCODE",
+              "description": "Computer Graphics (CSU358). Regularly updated and provided free through the educational initiative of dmj.one and Shoolini University.",
+              "courseMode": "online",
+              "startDate": "2025-08-01",
+              "courseWorkload": "PT4H",               
+              "instructor": [
+                {
+                  "@type": "Person",
+                  "name": "Kritika Rana",
+                  "url": "https://shooliniuniversity.com/faculty/profile/Kritika-Rana"
+                },
+                {
+                  "@type": "Person",
+                  "name": "Divya Mohan",                                      
+                  "url": "https://dmj.one/resume/",
+                    "sameAs": [
+                        "https://www.credly.com/users/divyamohan1993",
+                        "https://www.linkedin.com/in/divyamohan1993/",
+                        "https://hackerrank.com/divyamohan1993",
+                        "https://www.coursera.org/learner/divyamohan1993"
+                    ]
+                }
+              ],
+              "url": "https://dmj.one/edu/su/course/csu1296/"
+            }
+        }
+        </script>
+
+
+</head>
+
+<body>
+
+    <script> header_author("dm"); </script>
+
+    <main>
+        <article class="agen-tableofcontents">
+            <h2 class="text-center">
+                Main Topic
+            </h2>
+            <div class="d-none contentdate">2024, August 30</div>
+        </article>
+
+        <article>
+            <h3>7. Visible Surface Detection (Hidden Surface Removal)</h3>
+            <p>Visible Surface Detection (VSD) is the process of determining which surfaces of 3D objects are visible to the viewer and which are hidden behind others. A display device can show only one color per pixel, but multiple surfaces may project onto the same pixel. VSD resolves this conflict by selecting the surface closest to the viewer.</p>
+        </article>
+
+        <article>
+            <h4>7.1 Need for Visible Surface Detection</h4>
+            <p>In a 3D scene, objects overlap in depth. Without VSD, the final image would show incorrect surfaces, breaking realism and spatial correctness.</p>
+            <ul>
+                <li><strong>Correct perception</strong>: Ensures nearer objects block farther ones.</li>
+                <li><strong>Realism</strong>: Essential for solid object rendering.</li>
+                <li><strong>Efficiency</strong>: Prevents unnecessary shading of invisible surfaces.</li>
+                <li><strong>Foundation</strong>: Required before lighting, shading, and texturing.</li>
+            </ul>
+        </article>
+
+        <article>
+            <h4>7.2 Classification of VSD Algorithms</h4>
+            <p>VSD algorithms are broadly classified based on where the visibility decision is made.</p>
+            <ul>
+                <li><strong>Object-space methods</strong>: Compare objects or polygons before rasterization.</li>
+                <li><strong>Image-space methods</strong>: Decide visibility at pixel level after projection.</li>
+            </ul>
+        </article>
+
+        <article>
+            <h4>7.3 Back-Face Detection (Object Space)</h4>
+            <p>Back-face detection removes polygon faces that are oriented away from the viewer. Such faces can never be visible in a closed solid object.</p>
+        </article>
+
+        <article>
+            <h5>7.3.1 Core Idea</h5>
+            <p>If the normal vector of a polygon points away from the viewer, the polygon is a back face and can be discarded.</p>
+            <p>Condition using dot product:</p>
+            <p>$$\vec{N} \cdot \vec{V} \ge 0 \Rightarrow \text{Back Face}$$</p>
+            <ul>
+                <li><strong>N</strong>: Polygon normal vector</li>
+                <li><strong>V</strong>: Viewing direction vector</li>
+            </ul>
+        </article>
+
+        <article>
+            <h5>7.3.2 Characteristics</h5>
+            <ul>
+                <li>Very fast and simple</li>
+                <li>Works only for closed, opaque objects</li>
+                <li>Does not resolve overlaps between front faces</li>
+            </ul>
+        </article>
+
+        <article>
+            <h4>7.4 Z-Buffer Algorithm (Depth Buffer)</h4>
+            <p>The Z-buffer algorithm is an image-space method that resolves visibility on a per-pixel basis using depth comparison.</p>
+        </article>
+
+        <article>
+            <h5>7.4.1 Frame Buffer and Depth Buffer</h5>
+            <p>The algorithm uses two buffers of screen resolution:</p>
+            <ul>
+                <li><strong>Frame Buffer</strong>: Stores final pixel color values.</li>
+                <li><strong>Depth (Z) Buffer</strong>: Stores the depth value (z-coordinate) of the closest surface at each pixel.</li>
+            </ul>
+        </article>
+
+        <article>
+            <h5>7.4.2 Plane Equation for Depth Calculation</h5>
+            <p>For a polygon surface, depth at a pixel is computed using the plane equation:</p>
+            <p>$$Ax + By + Cz + D = 0$$</p>
+            <p>Solving for depth:</p>
+            <p>$$z = \frac{-(Ax + By + D)}{C}$$</p>
+        </article>
+
+        <article>
+            <h5>7.4.3 Algorithm Steps</h5>
+            <ul>
+                <li><strong>Initialize</strong>: Set all Z-buffer values to maximum depth, frame buffer to background color.</li>
+                <li><strong>Calculate Z</strong>: For each pixel covered by a polygon, compute its depth.</li>
+                <li><strong>Compare</strong>: If the new depth is closer than stored depth, update both buffers.</li>
+            </ul>
+        </article>
+
+        <article>
+            <h5>7.4.4 Pros and Cons</h5>
+            <ul>
+                <li><strong>Advantages</strong>:
+                    <ul>
+                        <li>Simple and robust</li>
+                        <li>Handles complex scenes</li>
+                        <li>Hardware supported</li>
+                    </ul>
+                </li>
+                <li><strong>Disadvantages</strong>:
+                    <ul>
+                        <li>High memory usage</li>
+                        <li>No inherent transparency handling</li>
+                        <li>Precision errors (Z-fighting)</li>
+                    </ul>
+                </li>
+            </ul>
+        </article>
+
+        <article>
+            <h4>7.5 A-Buffer Algorithm (Accumulation Buffer)</h4>
+            <p>The A-buffer algorithm is an extension of the Z-buffer that supports transparency and anti-aliasing.</p>
+        </article>
+
+        <article>
+            <h5>7.5.1 Core Concept</h5>
+            <p>Instead of storing a single depth value per pixel, the A-buffer stores multiple fragments representing different surfaces contributing to that pixel.</p>
+        </article>
+
+        <article>
+            <h5>7.5.2 Linked List of Fragments</h5>
+            <p>Each pixel maintains a linked list of fragments:</p>
+            <ul>
+                <li>Depth value</li>
+                <li>Color</li>
+                <li>Opacity (α)</li>
+                <li>Coverage information</li>
+            </ul>
+            <p>Fragments are sorted by depth and composited using transparency rules.</p>
+        </article>
+
+        <article>
+            <h5>7.5.3 Features</h5>
+            <ul>
+                <li>Supports transparency</li>
+                <li>Supports anti-aliasing</li>
+                <li>Higher memory and computation cost</li>
+            </ul>
+        </article>
+
+        <article>
+            <h4>7.6 Scan-Line Algorithm (Image Space)</h4>
+            <p>The scan-line algorithm processes the image one horizontal scan line at a time, resolving visibility by maintaining active edges and active surfaces.</p>
+        </article>
+
+        <article>
+            <h5>7.6.1 Working Principle</h5>
+            <ul>
+                <li>Determine intersections of polygons with the current scan line</li>
+                <li>Sort intersections by x-coordinate</li>
+                <li>Use depth comparison to find the visible surface segment</li>
+            </ul>
+        </article>
+
+        <article>
+            <h5>7.6.2 Characteristics</h5>
+            <ul>
+                <li>Efficient for polygon-heavy scenes</li>
+                <li>Reduces redundant depth calculations</li>
+                <li>Complex to implement</li>
+                <li>Less suitable for dynamic scenes</li>
+            </ul>
+        </article>
+
+
+
+
+    </main>
+
+    <script> copyright("all"); </script>
+
+</body>
+
+</html>

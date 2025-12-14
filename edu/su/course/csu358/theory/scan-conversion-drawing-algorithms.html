@@ -1,0 +1,368 @@
+<!-------------------------- © 2007 - present, dmj.one and contributors. ----------------------------------
+   Part of the dmjone project. Licensed under the GNU AGPL. Provided as-is, without warranty of any kind. 
+-------------------- Redistribution and modifications must retain this notice. --------------------------->
+
+
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+<!--<![endif]-->
+
+<head>
+    <script src="/js/edu_su_common.js"></script>
+    <noscript>
+        <style>
+            html,
+            body {
+                margin: 0;
+                overflow: hidden;
+            }
+        </style>
+        <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+    </noscript>
+
+    <title>Scan Conversion & Drawing Algorithms - DDA, Bresenham - CSUCODE - Shoolini U</title>
+    <meta name="description" content="Understand Scan Conversion and Drawing Algorithms (Unit 3). Detailed notes on DDA, Bresenham's Line & Circle algorithms, and Polygon Filling.">
+
+    <meta property="og:image" content="/logo.png">
+    <meta property="og:type" content="article">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="@divyamohan1993">
+    <meta name="twitter:creator" content="@divyamohan1993">
+    <meta name="twitter:image" content="/logo.png">
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+    <meta name="author" content="Divya Mohan">
+    <meta name="robots" content="index, follow">
+
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js" integrity="sha512-sHSNLECRJSK+BFs7E8DiFc6pf6n90bLI85Emiw1jhreduZhK3VXgq9l4kAt9eTIHYAcuQBKHL01QKs4/3Xgl8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js" integrity="sha512-iWiuBS5nt6r60fCz26Nd0Zqe0nbk1ZTIQbl3Kv7kYsX+yKMUFHzjaH2+AnM6vp2Xs+gNmaBAVWJjSmuPw76Efg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                renderMathInElement(document.body, {
+                    // customised options
+                    // • auto-render specific keys, e.g.:
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false },
+                        { left: '\\(', right: '\\)', display: false },
+                        { left: '\\[', right: '\\]', display: true }
+                    ],
+                    // • rendering keys, e.g.:
+                    throwOnError: false
+                });
+            });
+        </script> -->
+
+    <!-- <style>
+            main ul {
+                list-style-type: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            main ul li {
+                margin: 0;
+                padding: 0;
+            }
+        </style> -->
+
+    <!-- JSON-LD Structured Data for SEO -->
+    <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "Course",
+          "name": "Scan Conversion & Drawing Algorithms",
+          "description": "Understand Scan Conversion and Drawing Algorithms (Unit 3). Detailed notes on DDA, Bresenham's Line & Circle algorithms, and Polygon Filling.",
+          "url": "https://dmj.one/edu/su/course/csu358/theory/scan-conversion-drawing-algorithms",
+          "dateModified": "2025-12-14",
+          "provider": [
+            {
+              "@type": "EducationalOrganization",
+              "name": "dmj.one",
+              "url": "https://dmj.one"
+            },
+            {
+              "@type": "EducationalOrganization",
+              "name": "Shoolini University",
+              "url": "https://shooliniuniversity.com"
+            }
+          ],
+          "offers": {
+              "@type": "Offer",
+              "category": "Education",
+              "price": "0",
+              "priceCurrency": "USD",
+              "availability": "https://schema.org/InStock",
+              "url": "https://dmj.one/edu/su/course/csu358/theory/scan-conversion-drawing-algorithms"
+          },
+          "hasCourseInstance": {
+              "@type": "CourseInstance",
+              "name": "Course - CSUCODE",
+              "description": "Computer Graphics (CSU358). Regularly updated and provided free through the educational initiative of dmj.one and Shoolini University.",
+              "courseMode": "online",
+              "startDate": "2025-08-01",
+              "courseWorkload": "PT4H",               
+              "instructor": [
+                {
+                  "@type": "Person",
+                  "name": "Kritika Rana",
+                  "url": "https://shooliniuniversity.com/faculty/profile/Kritika-Rana"
+                },
+                {
+                  "@type": "Person",
+                  "name": "Divya Mohan",                                      
+                  "url": "https://dmj.one/resume/",
+                    "sameAs": [
+                        "https://www.credly.com/users/divyamohan1993",
+                        "https://www.linkedin.com/in/divyamohan1993/",
+                        "https://hackerrank.com/divyamohan1993",
+                        "https://www.coursera.org/learner/divyamohan1993"
+                    ]
+                }
+              ],
+              "url": "https://dmj.one/edu/su/course/csu358/"
+            }
+        }
+        </script>
+
+
+</head>
+
+<body>
+
+    <script> header_author("dm"); </script>
+
+    <main>
+        <article class="agen-tableofcontents">
+            <h2 class="text-center">
+                Main Topic
+            </h2>
+            <div class="d-none contentdate">2024, August 30</div>
+        </article>
+
+        <article>
+            <h3>3. Scan Conversion / Drawing Algorithms</h3>
+            <p>Scan conversion is the process of converting ideal geometric primitives (lines, circles, polygons defined in continuous mathematical space) into discrete pixels on a raster display. The core challenge is deciding <em>which pixels</em> best approximate the mathematical object while minimizing computation and visual error.</p>
+            <p>Every drawing algorithm is a trade-off between accuracy, speed, and hardware efficiency. Raster graphics demand integer, incremental decisions rather than continuous equations.</p>
+        </article>
+
+        <article>
+            <h4>3.1 Line Drawing Algorithms</h4>
+            <p>A line is mathematically infinite and continuous, but a screen is a finite grid of pixels. Line drawing algorithms decide pixel-by-pixel placement to approximate the ideal line between two endpoints.</p>
+        </article>
+
+        <article>
+            <h5>3.1.1 DDA Algorithm (Digital Differential Analyzer)</h5>
+            <p>DDA is a simple incremental line-generation algorithm based on the slope of the line. It works by sampling intermediate points between two endpoints using floating-point arithmetic.</p>
+
+            <p><strong>Core idea</strong>: Move in small steps along the dominant axis and compute the corresponding coordinate using the line equation.</p>
+
+            <p>Given two endpoints:</p>
+            <p>$$ (x_1, y_1), (x_2, y_2) $$</p>
+
+            <p>Compute differences:</p>
+            <p>$$ \Delta x = x_2 - x_1 $$</p>
+            <p>$$ \Delta y = y_2 - y_1 $$</p>
+
+            <p>Slope:</p>
+            <p>$$ m = \frac{\Delta y}{\Delta x} $$</p>
+
+            <ul>
+                <li><strong>Dominant axis</strong>: The axis along which movement is uniform.</li>
+                <li><strong>Incremental nature</strong>: Each step depends on the previous one.</li>
+            </ul>
+        </article>
+
+        <article>
+            <h5>3.1.1.1 Case: |m| &lt; 1</h5>
+            <p>When the slope magnitude is less than 1, the line is more horizontal than vertical.</p>
+            <p>Strategy:</p>
+            <ul>
+                <li>Increment x by 1 unit</li>
+                <li>Increment y by m</li>
+            </ul>
+
+            <p>Recurrence relation:</p>
+            <p>$$ x_{k+1} = x_k + 1 $$</p>
+            <p>$$ y_{k+1} = y_k + m $$</p>
+
+            <p>Each computed y is rounded to the nearest integer pixel.</p>
+        </article>
+
+        <article>
+            <h5>3.1.1.2 Case: |m| &gt; 1</h5>
+            <p>When the slope magnitude is greater than 1, the line is steeper.</p>
+            <p>Strategy:</p>
+            <ul>
+                <li>Increment y by 1 unit</li>
+                <li>Increment x by $1/m$</li>
+            </ul>
+
+            <p>Recurrence relation:</p>
+            <p>$$ y_{k+1} = y_k + 1 $$</p>
+            <p>$$ x_{k+1} = x_k + \frac{1}{m} $$</p>
+        </article>
+
+        <article>
+            <h5>3.1.1.3 Drawbacks of DDA</h5>
+            <ul>
+                <li>Uses floating-point arithmetic → slow on early hardware</li>
+                <li>Rounding errors accumulate</li>
+                <li>Less efficient compared to integer-based algorithms</li>
+            </ul>
+            <p>DDA is conceptually important but rarely used in performance-critical systems.</p>
+        </article>
+
+        <article>
+            <h5>3.1.2 Bresenham’s Line Algorithm</h5>
+            <p>Bresenham’s algorithm improves upon DDA by eliminating floating-point arithmetic entirely. It uses integer calculations and a decision parameter to choose between candidate pixels.</p>
+
+            <p><strong>Key insight</strong>: At each step, choose the pixel whose center is closest to the ideal line.</p>
+
+            <p>Assume:</p>
+            <ul>
+                <li>$0 \le m \le 1$</li>
+                <li>Line drawn left to right</li>
+            </ul>
+
+            <p>Compute:</p>
+            <p>$$ \Delta x = x_2 - x_1 $$</p>
+            <p>$$ \Delta y = y_2 - y_1 $$</p>
+        </article>
+
+        <article>
+            <h5>3.1.2.1 Decision Parameter</h5>
+            <p>The decision parameter $P_k$ determines whether the next pixel is chosen directly east (E) or north-east (NE).</p>
+
+            <p>Initial decision parameter:</p>
+            <p>$$ P_0 = 2\Delta y - \Delta x $$</p>
+
+            <p>Decision rule:</p>
+            <ul>
+                <li>If $P_k &lt; 0$: choose E</li>
+                <li>If $P_k \ge 0$: choose NE</li>
+            </ul>
+        </article>
+
+        <article>
+            <h5>3.1.2.2 Update Equations</h5>
+            <p>If E is chosen:</p>
+            <p>$$ P_{k+1} = P_k + 2\Delta y $$</p>
+
+            <p>If NE is chosen:</p>
+            <p>$$ P_{k+1} = P_k + 2(\Delta y - \Delta x) $$</p>
+
+            <p>All operations are integer-based, making the algorithm fast and precise.</p>
+        </article>
+
+        <article>
+            <h4>3.2 Circle Drawing Algorithms</h4>
+            <p>Circles are symmetric geometric shapes, which allows optimization by computing points in one region and reflecting them across axes.</p>
+        </article>
+
+        <article>
+            <h5>3.2.1 Mid-Point Circle Algorithm</h5>
+            <p>This algorithm determines the points of a circle using incremental integer calculations and exploits 8-way symmetry.</p>
+
+            <p>Circle equation:</p>
+            <p>$$ x^2 + y^2 = r^2 $$</p>
+
+            <p>Only the first octant is computed:</p>
+            <ul>
+                <li>$x \ge 0$</li>
+                <li>$y \ge x$</li>
+            </ul>
+        </article>
+
+        <article>
+            <h5>3.2.1.1 Decision Parameter</h5>
+            <p>Initial decision parameter:</p>
+            <p>$$ P_0 = 1 - r $$</p>
+
+            <p>This determines whether the midpoint lies inside or outside the circle.</p>
+        </article>
+
+        <article>
+            <h5>3.2.1.2 Update Rules</h5>
+            <p>If $P_k &lt; 0$ (midpoint inside circle):</p>
+            <p>$$ P_{k+1} = P_k + 2x + 3 $$</p>
+
+            <p>If $P_k \ge 0$ (midpoint outside circle):</p>
+            <p>$$ P_{k+1} = P_k + 2(x - y) + 5 $$</p>
+
+            <p>After computing one octant, reflect points to obtain the full circle.</p>
+        </article>
+
+        <article>
+            <h4>3.3 Polygon Filling</h4>
+            <p>Polygon filling determines which pixels lie inside a closed boundary. It is essential for rendering solid objects.</p>
+        </article>
+
+        <article>
+            <h5>3.3.1 Scan-Line Fill Algorithm</h5>
+            <p>The scan-line algorithm processes the polygon one horizontal scan line at a time.</p>
+
+            <p>Procedure:</p>
+            <ul>
+                <li>Intersect scan line with polygon edges</li>
+                <li>Sort intersection points by x-coordinate</li>
+                <li>Fill pixels between pairs of intersections</li>
+            </ul>
+        </article>
+
+        <article>
+            <h5>3.3.1.1 Odd-Even Rule (Parity Rule)</h5>
+            <p>Count intersections from left to right:</p>
+            <ul>
+                <li>Odd count → inside</li>
+                <li>Even count → outside</li>
+            </ul>
+            <p>This rule is simple and widely used.</p>
+        </article>
+
+        <article>
+            <h5>3.3.1.2 Non-Zero Winding Rule</h5>
+            <p>Each edge contributes a direction:</p>
+            <ul>
+                <li>Upward crossing: +1</li>
+                <li>Downward crossing: −1</li>
+            </ul>
+            <p>If total winding number ≠ 0, the point lies inside the polygon.</p>
+            <p>This handles complex and self-intersecting polygons accurately.</p>
+        </article>
+
+        <article>
+            <h4>3.4 Aliasing and Antialiasing</h4>
+            <p><strong>Aliasing</strong> occurs when a continuous signal is sampled too coarsely, producing jagged edges (jaggies).</p>
+
+            <p>Cause:</p>
+            <ul>
+                <li>Insufficient sampling resolution</li>
+                <li>High-frequency detail mapped to low-resolution grids</li>
+            </ul>
+
+            <p><strong>Antialiasing</strong> reduces these artifacts by smoothing intensity transitions.</p>
+
+            <ul>
+                <li>Supersampling: sample at higher resolution</li>
+                <li>Area sampling: weight pixel coverage</li>
+                <li>Filtering: remove high-frequency components</li>
+            </ul>
+
+            <p>Antialiasing trades computational cost for visual quality.</p>
+        </article>
+
+
+
+    </main>
+
+    <script> copyright("all"); </script>
+
+</body>
+
+</html>

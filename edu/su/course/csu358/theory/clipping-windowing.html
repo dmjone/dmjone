@@ -1,0 +1,261 @@
+<!-------------------------- © 2007 - present, dmj.one and contributors. ----------------------------------
+   Part of the dmjone project. Licensed under the GNU AGPL. Provided as-is, without warranty of any kind. 
+-------------------- Redistribution and modifications must retain this notice. --------------------------->
+
+
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+<!--<![endif]-->
+
+<head>
+    <script src="/js/edu_su_common.js"></script>
+    <noscript>
+        <style>
+            html,
+            body {
+                margin: 0;
+                overflow: hidden;
+            }
+        </style>
+        <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+    </noscript>
+
+    <title>Clipping & Windowing Algorithms - Cohen-Sutherland - CSUCODE - Shoolini U</title>
+    <meta name="description" content="Study Clipping and Windowing (Unit 6) in Computer Graphics. Includes Cohen-Sutherland Line Clipping and Sutherland-Hodgman Polygon Clipping algorithms.">
+
+    <meta property="og:image" content="/logo.png">
+    <meta property="og:type" content="article">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="@divyamohan1993">
+    <meta name="twitter:creator" content="@divyamohan1993">
+    <meta name="twitter:image" content="/logo.png">
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+    <meta name="author" content="Divya Mohan">
+    <meta name="robots" content="index, follow">
+
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js" integrity="sha512-sHSNLECRJSK+BFs7E8DiFc6pf6n90bLI85Emiw1jhreduZhK3VXgq9l4kAt9eTIHYAcuQBKHL01QKs4/3Xgl8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js" integrity="sha512-iWiuBS5nt6r60fCz26Nd0Zqe0nbk1ZTIQbl3Kv7kYsX+yKMUFHzjaH2+AnM6vp2Xs+gNmaBAVWJjSmuPw76Efg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                renderMathInElement(document.body, {
+                    // customised options
+                    // • auto-render specific keys, e.g.:
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false },
+                        { left: '\\(', right: '\\)', display: false },
+                        { left: '\\[', right: '\\]', display: true }
+                    ],
+                    // • rendering keys, e.g.:
+                    throwOnError: false
+                });
+            });
+        </script> -->
+
+    <!-- <style>
+            main ul {
+                list-style-type: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            main ul li {
+                margin: 0;
+                padding: 0;
+            }
+        </style> -->
+
+    <!-- JSON-LD Structured Data for SEO -->
+    <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "Course",
+          "name": "Clipping & Windowing Algorithms",
+          "description": "Study Clipping and Windowing (Unit 6) in Computer Graphics. Includes Cohen-Sutherland Line Clipping and Sutherland-Hodgman Polygon Clipping algorithms.",
+          "url": "https://dmj.one/edu/su/course/csu358/theory/clipping-windowing",
+          "dateModified": "2025-12-14",
+          "provider": [
+            {
+              "@type": "EducationalOrganization",
+              "name": "dmj.one",
+              "url": "https://dmj.one"
+            },
+            {
+              "@type": "EducationalOrganization",
+              "name": "Shoolini University",
+              "url": "https://shooliniuniversity.com"
+            }
+          ],
+          "offers": {
+              "@type": "Offer",
+              "category": "Education",
+              "price": "0",
+              "priceCurrency": "USD",
+              "availability": "https://schema.org/InStock",
+              "url": "https://dmj.one/edu/su/course/csu358/theory/clipping-windowing"
+          },
+          "hasCourseInstance": {
+              "@type": "CourseInstance",
+              "name": "Course - CSUCODE",
+              "description": "Computer Graphics (CSU358). Regularly updated and provided free through the educational initiative of dmj.one and Shoolini University.",
+              "courseMode": "online",
+              "startDate": "2025-08-01",
+              "courseWorkload": "PT4H",               
+              "instructor": [
+                {
+                  "@type": "Person",
+                  "name": "Kritika Rana",
+                  "url": "https://shooliniuniversity.com/faculty/profile/Kritika-Rana"
+                },
+                {
+                  "@type": "Person",
+                  "name": "Divya Mohan",                                      
+                  "url": "https://dmj.one/resume/",
+                    "sameAs": [
+                        "https://www.credly.com/users/divyamohan1993",
+                        "https://www.linkedin.com/in/divyamohan1993/",
+                        "https://hackerrank.com/divyamohan1993",
+                        "https://www.coursera.org/learner/divyamohan1993"
+                    ]
+                }
+              ],
+              "url": "https://dmj.one/edu/su/course/csu358/"
+            }
+        }
+        </script>
+
+
+</head>
+
+<body>
+
+    <script> header_author("dm"); </script>
+
+    <main>
+        <article class="agen-tableofcontents">
+            <h2 class="text-center">
+                Main Topic
+            </h2>
+            <div class="d-none contentdate">2024, August 30</div>
+        </article>
+
+        <article>
+            <h3>6. Clipping (Windowing)</h3>
+            <p>Clipping is the process of removing parts of graphical objects that lie outside a specified visible region. This visible region is called the <strong>clipping window</strong>. Only the portion of objects inside the window is sent further in the graphics pipeline.</p>
+            <p>Conceptually, clipping answers one question: <em>Which part of the object can the viewer actually see?</em></p>
+        </article>
+
+        <article>
+            <h4>6.1 Definition: Windowing</h4>
+            <p><strong>Windowing</strong> defines a rectangular region in world or viewing coordinates that represents the visible area. Anything outside this window is invisible and must be discarded.</p>
+            <ul>
+                <li><strong>Window</strong>: Region in world/view coordinates.</li>
+                <li><strong>Viewport</strong>: Corresponding region on the display device.</li>
+            </ul>
+            <p>Clipping is performed <em>before</em> mapping the window to the viewport to avoid unnecessary computation.</p>
+        </article>
+
+        <article>
+            <h3>6.2 Cohen–Sutherland Line Clipping Algorithm</h3>
+            <p>This is an efficient, region-code–based algorithm for clipping a line against a rectangular window. It avoids unnecessary intersection calculations by quickly classifying lines.</p>
+        </article>
+
+        <article>
+            <h4>6.2.1 Region Codes (TBRL – 4 bits)</h4>
+            <p>The 2D plane around the window is divided into 9 regions. Each endpoint of the line is assigned a 4-bit code indicating its position relative to the window.</p>
+            <ul>
+                <li><strong>Top (T)</strong>: 1000 → y &gt; ymax</li>
+                <li><strong>Bottom (B)</strong>: 0100 → y &lt; ymin</li>
+                <li><strong>Right (R)</strong>: 0010 → x &gt; xmax</li>
+                <li><strong>Left (L)</strong>: 0001 → x &lt; xmin</li>
+            </ul>
+            <p>Inside the window: <strong>0000</strong></p>
+        </article>
+
+        <article>
+            <h4>6.2.2 Trivial Accept and Trivial Reject</h4>
+            <p>These tests eliminate most lines without intersection computation.</p>
+            <ul>
+                <li><strong>Trivial Accept</strong>: If both endpoints have code 0000 → line is fully inside.</li>
+                <li><strong>Trivial Reject</strong>: If bitwise AND of endpoint codes ≠ 0 → line lies completely outside in the same region.</li>
+            </ul>
+            <p>Only lines that are neither trivially accepted nor rejected require intersection calculation.</p>
+        </article>
+
+        <article>
+            <h4>6.2.3 Intersection Calculations</h4>
+            <p>For partially visible lines, intersections are computed with window boundaries using the parametric form of a line.</p>
+            <p>Line equation:</p>
+            <p>$$x = x_1 + t(x_2 - x_1), \quad y = y_1 + t(y_2 - y_1)$$</p>
+            <p>For example, intersection with left boundary $x = xmin$:</p>
+            <p>$$t = \frac{x_{min} - x_1}{x_2 - x_1}$$</p>
+            <p>The endpoint outside the window is replaced by the intersection point, and the process repeats until accepted or rejected.</p>
+        </article>
+
+        <article>
+            <h3>6.3 Mid-Point Subdivision Line Clipping Algorithm</h3>
+            <p>This algorithm repeatedly subdivides a line until visible and invisible segments are separated.</p>
+            <p>Core idea: If one endpoint is inside and the other outside, split the line at its midpoint and test each half.</p>
+        </article>
+
+        <article>
+            <h4>6.3.1 Algorithm Logic</h4>
+            <ul>
+                <li>If both endpoints are inside → accept.</li>
+                <li>If both endpoints are outside in same region → reject.</li>
+                <li>Otherwise, subdivide at midpoint and recurse.</li>
+            </ul>
+            <p>This method is conceptually simple and useful for non-rectangular clipping regions, but computationally slower than Cohen–Sutherland.</p>
+        </article>
+
+        <article>
+            <h3>6.4 Polygon Clipping (Sutherland–Hodgman Algorithm)</h3>
+            <p>This algorithm clips a polygon against a convex clipping window by processing one window edge at a time.</p>
+            <p>Instead of clipping the entire polygon at once, the polygon is clipped sequentially against each boundary.</p>
+        </article>
+
+        <article>
+            <h4>6.4.1 Inside–Outside Test</h4>
+            <p>For each polygon edge and window boundary, vertices are classified as:</p>
+            <ul>
+                <li><strong>Inside</strong>: Vertex lies within the boundary.</li>
+                <li><strong>Outside</strong>: Vertex lies outside the boundary.</li>
+            </ul>
+        </article>
+
+        <article>
+            <h4>6.4.2 Vertex Processing Rules</h4>
+            <p>For each polygon edge from S (start) to E (end):</p>
+            <ul>
+                <li><strong>S inside, E inside</strong>: Output E</li>
+                <li><strong>S inside, E outside</strong>: Output intersection</li>
+                <li><strong>S outside, E inside</strong>: Output intersection and E</li>
+                <li><strong>S outside, E outside</strong>: Output nothing</li>
+            </ul>
+            <p>The output list becomes the input for clipping against the next boundary.</p>
+        </article>
+
+        <article>
+            <h4>6.4.3 Key Properties</h4>
+            <ul>
+                <li>Works only for <strong>convex</strong> clipping windows.</li>
+                <li>Efficient and widely used in raster graphics.</li>
+                <li>Preserves polygon shape order.</li>
+            </ul>
+        </article>
+
+
+
+    </main>
+
+    <script> copyright("all"); </script>
+
+</body>
+
+</html>
