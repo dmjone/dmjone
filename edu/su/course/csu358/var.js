@@ -29,21 +29,7 @@ function get_menu_list(datetogen) {
         body_genmenu.processData(arr, def_date, def_author, { isMainCategory: true });
     }
     function get_class(def_date, def_author) {
-        const arr = [
-            {
-                title: "Computer Graphics Notes",
-                desc: "Comprehensive notes on topic including CRT displays, raster and random scan techniques, frame buffers, input devices, and line drawing algorithms.",
-                codetype: "Concepts",
-                readtime: 25,
-                link: "computer-graphics-notes"
-            },
-            {
-                title: "Computer Graphics Notes ESM",
-                desc: "Comprehensive ESM notes on Computer Graphics including CRT displays, raster and random scan techniques, frame buffers, input devices, and line drawing algorithms.",
-                codetype: "Notes",
-                readtime: 30,
-                link: "notes-end-semester"
-            },
+        const arr = [            
             {
                 title: "Unit 1: Introduction to Graphics",
                 desc: "Definition, Applications, and Graphics Pipeline.",
@@ -99,6 +85,20 @@ function get_menu_list(datetogen) {
                 codetype: "Advanced",
                 readtime: 20,
                 link: "animation"
+            },
+            {
+                title: "Computer Graphics Notes",
+                desc: "Comprehensive notes on topic including CRT displays, raster and random scan techniques, frame buffers, input devices, and line drawing algorithms.",
+                codetype: "Concepts",
+                readtime: 25,
+                link: "computer-graphics-notes"
+            },
+            {
+                title: "Computer Graphics Notes ESM",
+                desc: "Comprehensive ESM notes on Computer Graphics including CRT displays, raster and random scan techniques, frame buffers, input devices, and line drawing algorithms.",
+                codetype: "Notes",
+                readtime: 30,
+                link: "notes-end-semester"
             }
         ];
         body_genmenu.processData(arr, def_date, def_author);
@@ -112,14 +112,14 @@ function get_menu_list(datetogen) {
             //     link: "https://colab.research.google.com/drive/1goYusw-6vB2d2qZtxo4V1kt4mmLBrN11?usp=sharing",
             //     // cardimage: "_url_"
             // },
-            {
-                title: "Practical 1: Procedure for VirtualBox Installation and Configuration",
-                desc: "Learn to set up your operating system lab environment with VirtualBox, a powerful virtualization tool for creating and managing virtual machines. This practical exercise will guide you through the installation and configuration of VirtualBox, enabling you to create a virtualized environment for hands-on learning and experimentation.",
-                codetype: "Installation",
-                readtime: 2,
-                date: "Wed February 07, 2024",
-                link: "installing-virtualbox"
-            },
+            // {
+            //     title: "Practical 1: Procedure for VirtualBox Installation and Configuration",
+            //     desc: "Learn to set up your operating system lab environment with VirtualBox, a powerful virtualization tool for creating and managing virtual machines. This practical exercise will guide you through the installation and configuration of VirtualBox, enabling you to create a virtualized environment for hands-on learning and experimentation.",
+            //     codetype: "Installation",
+            //     readtime: 2,
+            //     date: "Wed February 07, 2024",
+            //     link: "installing-virtualbox"
+            // },
         ];
         body_genmenu.processData(arr, def_date, def_author);
     }
@@ -129,7 +129,7 @@ function get_menu_list(datetogen) {
     let title, link, date, desc, codetype, readtime, author = 1, semester, cardimage, continuereading;
     const functions = {
         theory: get_class,
-        lab: get_lab,
+        // lab: get_lab,
         default: get_main
     };
     (functions[window.urlpart5] || functions.default)(datetogen, author);
