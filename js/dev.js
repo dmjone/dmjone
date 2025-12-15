@@ -8578,6 +8578,189 @@ messageUsButtonCaller();
 
 })();
 
+/********** Functionality: Active Recall Animated cards **********/
+(function () {
+    try {
+        "use strict";
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const CARD_CLASS = 'interactive-active-recall-card-dmj-su';
+            const TOGGLE_ID = 'dmj-review-toggle';
+
+            // Global State
+            window.dmjActiveRecallReviewMode = false;
+            const timers = new WeakMap();
+
+            /* =========================================
+               1. CORE LOGIC
+               ========================================= */
+            const clearCardTimer = (card) => {
+                const t = timers.get(card);
+                if (t) { clearTimeout(t); timers.delete(card); }
+            };
+
+            const scheduleAutoClose = (card) => {
+                if (window.dmjActiveRecallReviewMode === true) {
+                    clearCardTimer(card);
+                    return;
+                }
+                clearCardTimer(card);
+                if (card.open) {
+                    const t = setTimeout(() => {
+                        if (window.dmjActiveRecallReviewMode !== true && card.open) {
+                            card.open = false;
+                        }
+                    }, 5000);
+                    timers.set(card, t);
+                }
+            };
+
+            const toggleReviewMode = () => {
+                window.dmjActiveRecallReviewMode = !window.dmjActiveRecallReviewMode;
+                const isReviewMode = window.dmjActiveRecallReviewMode;
+                const btn = document.getElementById(TOGGLE_ID);
+                const cards = document.getElementsByClassName(CARD_CLASS);
+
+                // Update UI Icon
+                if (btn) {
+                    if (isReviewMode) {
+                        btn.innerHTML = '<i class="bi bi-eye-fill text-danger" style="font-size: 1.3rem;"></i>';
+                        btn.classList.add('active-mode');
+                        btn.title = "Review Mode: ON";
+                    } else {
+                        btn.innerHTML = '<i class="bi bi-eye" style="font-size: 1.3rem;"></i>';
+                        btn.classList.remove('active-mode');
+                        btn.title = "Review Mode: OFF";
+                    }
+                }
+
+                // Batch Action
+                requestAnimationFrame(() => {
+                    for (let i = 0; i < cards.length; i++) {
+                        const card = cards[i];
+                        if (isReviewMode) {
+                            clearCardTimer(card);
+                            card.open = true;
+                        } else {
+                            card.open = false;
+                        }
+                    }
+                });
+            };
+
+            /* =========================================
+               2. STYLE INJECTION (Side Dock Style)
+               ========================================= */
+            const injectStyles = () => {
+                if (document.getElementById('dmj-review-styles')) return;
+
+                const css = `
+                    #${TOGGLE_ID} {
+                        position: fixed;
+                        top: 80%; /* Center vertically to be near other controls */
+                        right: -15px; /* Hide most of the button */
+                        transform: translateY(-50%); /* True vertical center */
+                        
+                        width: 40px;
+                        height: 40px;
+                        z-index: 9999;
+                        
+                        /* Match the "Tab" look of the other buttons */
+                        border-top-left-radius: 8px;
+                        border-bottom-left-radius: 8px;
+                        border-top-right-radius: 0;
+                        border-bottom-right-radius: 0;
+                        
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        cursor: pointer;
+                        
+                        /* Smooth Slide Animation */
+                        transition: right 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+                        
+                        /* Visual Styling (Matching the clean look) */
+                        background-color: transparent;
+                        border: 2px solid #2902d8ff;
+                        border-right: none; /* Remove right border since it touches edge */
+                        color: #2902d8ff;                        
+                        padding: 0;
+                    }
+
+                    /* Hover: Slide out to be fully visible */
+                    #${TOGGLE_ID}:hover {
+                        right: 0px; 
+                        background-color: #f8f9fa;
+                    }
+
+                    /* Active Mode: Filled Color */
+                    #${TOGGLE_ID}.active-mode {                        
+                        color: white;
+                        box-shadow: -2px 0 8px rgba(13, 110, 253, 0.4);
+                    }
+                `;
+
+                const styleSheet = document.createElement('style');
+                styleSheet.id = 'dmj-review-styles';
+                styleSheet.innerText = css;
+                document.head.appendChild(styleSheet);
+            };
+
+            /* =========================================
+               3. BUTTON CREATION
+               ========================================= */
+            const ensureButton = () => {
+                if (document.getElementById(TOGGLE_ID)) return;
+                if (document.getElementsByClassName(CARD_CLASS).length === 0) return;
+
+                injectStyles();
+
+                const btn = document.createElement('button');
+                btn.id = TOGGLE_ID;
+                btn.className = 'd-print-none';
+                btn.title = "Review Mode";
+                btn.innerHTML = '<i class="bi bi-eye fw-bold" style="font-size: 1.3rem;"></i> ';
+                btn.onclick = toggleReviewMode;
+
+                document.body.appendChild(btn);
+            };
+
+            /* =========================================
+               4. EVENT DELEGATION
+               ========================================= */
+            document.addEventListener('toggle', (e) => {
+                if (e.target.classList && e.target.classList.contains(CARD_CLASS)) {
+                    ensureButton();
+                    if (window.dmjActiveRecallReviewMode === true) {
+                        clearCardTimer(e.target);
+                    } else {
+                        e.target.open ? scheduleAutoClose(e.target) : clearCardTimer(e.target);
+                    }
+                }
+            }, true);
+
+            document.body.addEventListener('mouseover', (e) => {
+                const card = e.target.closest('.' + CARD_CLASS);
+                if (card) {
+                    ensureButton();
+                    if (card.open) clearCardTimer(card);
+                }
+            }, { passive: true });
+
+            document.body.addEventListener('mouseout', (e) => {
+                if (window.dmjActiveRecallReviewMode === true) return;
+                const card = e.target.closest('.' + CARD_CLASS);
+                if (card && card.open && !card.contains(e.relatedTarget)) scheduleAutoClose(card);
+            }, { passive: true });
+
+            ensureButton();
+        });
+
+    } catch (err) {
+        console.error('An unexpected error occurred in the Active Recall setup:', err);
+    }
+})();
+
 /********** Functionality: Markdown Renderer **********/
 (function () {
     document.addEventListener('DOMContentLoaded', () => {
