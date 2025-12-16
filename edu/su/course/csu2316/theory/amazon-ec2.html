@@ -487,7 +487,80 @@ systemctl start nginx</code></pre>
                 <li>Pure container workloads → ECS/EKS</li>
                 <li>Short-lived background jobs → Spot + batch</li>
             </ul>
-            <p>Correct architecture is as important as knowing the service.</p>
+            <div class="active-recall-custom-block">
+                <details class="interactive-active-recall-card-dmj-su">
+                    <summary class="alert-heading list-unstyled">
+                        <i class="bi bi-mouse-fill"></i> Why is "Re-architecting" important?
+                    </summary>
+                    <hr>
+                    <p class="mb-0 small"><strong>A:</strong> Simply lifting and shifting applications to EC2 might not yield cost or performance benefits. Choosing the right architecture (like Serverless or Containers) is crucial.</p>
+                </details>
+            </div>
+        </article>
+
+        <article>
+            <h4>7.26 AWS IAM (Identity and Access Management) Basics</h4>
+            <p>IAM is the security gatekeeper of AWS. It controls <strong>who</strong> can access AWS resources (Authentication) and <strong>what</strong> they can do (Authorization). It is global (not region-specific).</p>
+            <ul>
+                <li><strong>Users</strong>: Specific people or services (long-term credentials).</li>
+                <li><strong>Groups</strong>: Collections of users. Permissions applied to a group apply to all members.</li>
+                <li><strong>Roles</strong>: Temporary identities with specific permissions. Defined for services (like EC2) or federated users. <strong>This is the secure way for EC2 to access other services.</strong></li>
+                <li><strong>Policies</strong>: JSON documents that define permissions (Allow/Deny actions on Resources).</li>
+            </ul>
+        </article>
+
+        <article>
+            <h4>7.27 Amazon S3 (Simple Storage Service) Basics</h4>
+            <p>Start managing storage without worrying about servers. S3 is object storage designed to store and retrieve any amount of data from anywhere.</p>
+            <ul>
+                <li><strong>Buckets</strong>: Logical containers for objects (files). Names must be <strong>globally unique</strong> across all AWS accounts.</li>
+                <li><strong>Objects</strong>: The actual files stored. Each object is identified by a unique "Key" (path).</li>
+                <li><strong>Durability</strong>: Designed for 99.999999999% (11 9s) durability.</li>
+                <li><strong>Scalability</strong>: Unlimited storage capacity.</li>
+            </ul>
+        </article>
+
+        <article>
+            <h4>7.28 Hands-On: Integrating EC2 with S3 using IAM</h4>
+            <p>A common enterprise requirement is for an application on EC2 to read/write data to S3. <strong>Never manage this by hardcoding Access Keys and Secret Keys in your code.</strong></p>
+            <p><strong>Step 1: Create an IAM Role</strong></p>
+            <ol>
+                <li>Go to the <strong>IAM Console</strong> → <strong>Roles</strong> → <strong>Create role</strong>.</li>
+                <li>Select Verified Entity: <strong>AWS Service</strong>.</li>
+                <li>Choose the Use Case: <strong>EC2</strong>.</li>
+                <li>Add Permissions: Search for and select <code>AmazonS3FullAccess</code> (For production, use a more restrictive custom policy).</li>
+                <li>Name the role (e.g., <code>EC2-S3-Integration-Role</code>) and Create.</li>
+            </ol>
+            <p><strong>Step 2: Launch EC2 with the Role</strong></p>
+            <ol>
+                <li>Go to <strong>EC2 Console</strong> → <strong>Launch Instance</strong>.</li>
+                <li>Configure your OS (AMI) and Instance Type as usual.</li>
+                <li>In <strong>Advanced Details</strong>, locate <strong>IAM Instance Profile</strong>.</li>
+                <li>Select the role you created: <code>EC2-S3-Integration-Role</code>.</li>
+                <li>Launch the instance.</li>
+            </ol>
+            <p><em>(Tip: If the instance is already running, go to Actions → Security → Modify IAM Role to attach it.)</em></p>
+            <p><strong>Step 3: Verify Integration</strong></p>
+            <ol>
+                <li>SSH into your EC2 instance.</li>
+                <li>Use the AWS CLI (pre-installed on Amazon Linux) to list your buckets:</li>
+            </ol>
+            <pre><code class="language-bash">aws s3 ls</code></pre>
+            <p>If successful, you will see a list of your S3 buckets. The EC2 instance securely "assumed" the role to get temporary credentials.</p>
+            <pre class="mermaid text-center">
+            sequenceDiagram
+                participant App as EC2 App
+                participant Meta as Instance Metadata
+                participant IAM as AWS IAM STS
+                participant S3 as Amazon S3
+                
+                App->>Meta: Request Credentials
+                Meta->>IAM: Assume Role (EC2-S3-Integration-Role)
+                IAM-->>Meta: Return Temporary Creds (Access/Secret/Token)
+                Meta-->>App: Pass Creds to App/CLI
+                App->>S3: API Call (ListBuckets) signed with Temp Creds
+                S3-->>App: Return Bucket List
+            </pre>
         </article>
 
 
