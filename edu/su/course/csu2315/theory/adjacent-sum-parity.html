@@ -146,64 +146,103 @@
         </article>
         <div class="text-center mb-4" style="position:relative;width:100%;height:250px;overflow:hidden"><img src="../img/adjacent-sum-parity.png" alt="Adjacent Sum Parity" style="position:absolute;top:50%;left:50%;width:100%;height:100%;object-fit:cover;transform:translate(-50%,-50%)"></div>
         <article>
-            <h3>1. Problem Statement & Logic</h3>
-            <p>
-                <strong>Problem:</strong> Determine if there exists a binary array $A$ of size $N$ such that a given binary array $B$ represents the parity ($sum \% 2$) of adjacent elements of $A$. Specifically, $B_i = (A_i + A_{i+1}) \% 2$ for $1 \le i < N$, and $B_N=(A_N + A_1) \% 2$. </p>
-                    <p>
-                        <strong>Logic:</strong> Summing all elements of $B$ gives the sum of all adjacent pairs in $A$. Since each $A_i$ appears exactly twice in this sum (once as $A_i + A_{i+1}$ and once as $A_{i-1} + A_i$), the total sum is $2 \cdot \sum A_i$. In modulo 2 arithmetic, any number multiplied by 2 is 0 (even). Therefore, a solution exists if and only if the sum of elements in $B$ is even.
-                    </p>
-                    <ul>
-                        <li><strong>Input/Output Relation:</strong> If $\sum B_i$ is even $\rightarrow$ Output "YES". If $\sum B_i$ is odd $\rightarrow$ Output "NO".</li>
-                    </ul>
-        </article>
+    <h3>1. Problem Statement & Logic</h3>
+    <p>
+        <strong>Problem:</strong> Given a binary array <span>$B$</span> of size <span>$N$</span>, determine whether there
+        exists an integer array <span>$A$</span> such that:
+        <ul>
+            <li><span>$B_i = (A_i + A_{i+1}) \% 2$</span> for <span>$1 \le i < N$</span></li>
+            <li><span>$B_N = (A_N + A_1) \% 2$</span></li>
+        </ul>
+    </p>
 
-        <article>
-            <h4>1.1 Dry Run</h4>
-            <p>
-                Consider $N=2$.
-            </p>
+    <p>
+        <strong>Logic:</strong>
+    <ul>
+        <li>Only the <strong>parity</strong> (even or odd) of elements of <span>$A$</span> matters.</li>
+        <li>Let us add all values of <span>$B$</span>:
+            <p>$$\sum_{i=1}^{N} B_i = \sum_{i=1}^{N} (A_i + A_{i+1}) \% 2$$</p>
+        </li>
+        <li>Each element <span>$A_i$</span> appears in exactly <strong>two adjacent sums</strong>:
             <ul>
-                <li><strong>Case 1 (B = [1, 1]):</strong> Sum = $1+1=2$ (Even). Output: YES.
-                    <ul>
-                        <li>Verification: Let $A=[1, 0]$. $B_1 = (1+0)\%2 = 1$, $B_2 = (0+1)\%2 = 1$. Matches.</li>
-                    </ul>
-                </li>
-                <li><strong>Case 2 (B = [1, 0]):</strong> Sum = $1+0=1$ (Odd). Output: NO.
-                    <ul>
-                        <li>Verification: Impossible. $A_1+A_2$ is odd and $A_2+A_1$ is even, which is a contradiction.</li>
-                    </ul>
-                </li>
+                <li>Once in <span>$(A_{i-1} + A_i)$</span></li>
+                <li>Once in <span>$(A_i + A_{i+1})$</span></li>
             </ul>
-        </article>
+        </li>
+        <li>So, when all adjacent sums are added together, we get:
+            <p>$$\sum (A_i + A_{i+1}) = 2 \cdot \sum A_i$$</p>
+        </li>
+        <li>Since this value is multiplied by 2, it is always <strong>even</strong>.</li>
+        <li>Therefore, the sum of all values in <span>$B$</span> must be even.</li>
+        <li>If <span>$\sum B_i$</span> is even, such an array <span>$A$</span> can be constructed.</li>
+        <li>If <span>$\sum B_i$</span> is odd, it is impossible.</li>
+    </ul>
+    </p>
 
-        <article>
-            <h4>1.2 Pseudocode Solution</h4>
-            <pre class=""><code>
-# Read number of test cases
+    <ul>
+        <li><strong>Final Condition:</strong>
+            <ul>
+                <li>If <span>$\sum B_i$</span> is even → print <strong>YES</strong></li>
+                <li>If <span>$\sum B_i$</span> is odd → print <strong>NO</strong></li>
+            </ul>
+        </li>
+    </ul>
+</article>
+
+<article>
+    <h4>1.1 Dry Run</h4>
+    <p>
+        <strong>Example 1:</strong> <span>$N = 2$, $B = [0, 0]$</span>
+    </p>
+    <ul>
+        <li>Sum of B = 0 + 0 = 0 (even)</li>
+        <li>Valid array exists</li>
+        <li><strong>Output = YES</strong></li>
+    </ul>
+
+    <p>
+        <strong>Example 2:</strong> <span>$N = 2$, $B = [1, 0]$</span>
+    </p>
+    <ul>
+        <li>Sum of B = 1 + 0 = 1 (odd)</li>
+        <li>Impossible to form array A</li>
+        <li><strong>Output = NO</strong></li>
+    </ul>
+
+    <p>
+        <strong>Example 3:</strong> <span>$N = 4$, $B = [1, 0, 1, 0]$</span>
+    </p>
+    <ul>
+        <li>Sum of B = 1 + 0 + 1 + 0 = 2 (even)</li>
+        <li>Valid array exists</li>
+        <li><strong>Output = YES</strong></li>
+    </ul>
+</article>
+
+<article>
+    <h4>1.2 Pseudocode Solution</h4>
+    <pre><code>
 READ T
-
-FOR i FROM 1 TO T:
-    # Read size of array
+FOR each test case:
     READ N
-    
-    # Read binary array B
-    READ B of size N
-    
-    # Calculate sum of elements in B
-    SUM = 0
-    FOR j FROM 0 TO N-1:
-        SUM = SUM + B[j]
-    
-    # Check if sum is even or odd
-    IF SUM % 2 == 0:
+    READ array B of size N
+
+    sum = 0
+    FOR i FROM 1 TO N:
+        sum = sum + B[i]
+
+    IF sum % 2 == 0:
         PRINT "YES"
     ELSE:
-        PRINT "NO"</code></pre>
-            <ul>
-                <li><strong>Time Complexity:</strong> $O(N)$ - we iterate through the array once.</li>
-                <li><strong>Space Complexity:</strong> $O(1)$ - if we compute sum on the fly.</li>
-            </ul>
-        </article>
+        PRINT "NO"
+    </code></pre>
+
+    <ul>
+        <li><strong>Time Complexity:</strong> $O(N)$ per test case.</li>
+        <li><strong>Space Complexity:</strong> $O(1)$.</li>
+    </ul>
+</article>
+
 
         <div class="active-recall-custom-block">
             <details class="interactive-active-recall-card-dmj-su">
