@@ -1,0 +1,564 @@
+<!-------------------------- © 2007 - present, dmj.one and contributors. ----------------------------------
+   Part of the dmjone project. Licensed under the GNU AGPL. Provided as-is, without warranty of any kind. 
+-------------------- Redistribution and modifications must retain this notice. --------------------------->
+
+
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+<!--<![endif]-->
+
+<head>
+    <script src="/js/edu_su_common.js"></script>
+    <noscript>
+        <style>
+            html,
+            body {
+                margin: 0;
+                overflow: hidden;
+            }
+        </style>
+        <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+    </noscript>
+
+    <title>Kubernetes (K8s) Architecture - CSU2316 - Shoolini U</title>
+    <meta name="description" content="An in-depth guide to Kubernetes architecture, covering the Control Plane, Worker Nodes, Pods, Deployments, and Services.">
+
+    <meta property="og:image" content="/logo.png">
+    <meta property="og:type" content="article">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="@divyamohan1993">
+    <meta name="twitter:creator" content="@divyamohan1993">
+    <meta name="twitter:image" content="/logo.png">
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+    <meta name="author" content="Divya Mohan">
+    <meta name="robots" content="index, follow">
+
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js" integrity="sha512-sHSNLECRJSK+BFs7E8DiFc6pf6n90bLI85Emiw1jhreduZhK3VXgq9l4kAt9eTIHYAcuQBKHL01QKs4/3Xgl8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js" integrity="sha512-iWiuBS5nt6r60fCz26Nd0Zqe0nbk1ZTIQbl3Kv7kYsX+yKMUFHzjaH2+AnM6vp2Xs+gNmaBAVWJjSmuPw76Efg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                renderMathInElement(document.body, {
+                    // customised options
+                    // • auto-render specific keys, e.g.:
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false },
+                        { left: '\\(', right: '\\)', display: false },
+                        { left: '\\[', right: '\\]', display: true }
+                    ],
+                    // • rendering keys, e.g.:
+                    throwOnError: false
+                });
+            });
+        </script> -->
+
+    <!-- <style>
+            main ul {
+                list-style-type: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            main ul li {
+                margin: 0;
+                padding: 0;
+            }
+        </style> -->
+
+    <!-- JSON-LD Structured Data for SEO -->
+    <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "Course",
+          "name": "Kubernetes (K8s) Architecture",
+          "description": "An in-depth guide to Kubernetes architecture, covering the Control Plane, Worker Nodes, Pods, Deployments, and Services.",
+          "url": "https://dmj.one/edu/su/course/csu2316/theory/topic.html",
+          "dateModified": "2025-12-16",
+          "provider": [
+            {
+              "@type": "EducationalOrganization",
+              "name": "dmj.one",
+              "url": "https://dmj.one"
+            },
+            {
+              "@type": "EducationalOrganization",
+              "name": "Shoolini University",
+              "url": "https://shooliniuniversity.com"
+            }
+          ],
+          "offers": {
+              "@type": "Offer",
+              "category": "Education",
+              "price": "0",
+              "priceCurrency": "USD",
+              "availability": "https://schema.org/InStock",
+              "url": "https://dmj.one/edu/su/course/csu2316/theory/topic.html"
+          },
+          "hasCourseInstance": {
+              "@type": "CourseInstance",
+              "name": "Kubernetes (K8s) Architecture",
+              "description": "An in-depth guide to Kubernetes architecture, covering the Control Plane, Worker Nodes, Pods, Deployments, and Services.",
+              "courseMode": "online",
+              "startDate": "2025-12-16",
+              "courseWorkload": "PT4H",               
+              "instructor": [                
+                {
+                  "@type": "Person",
+                  "name": "Divya Mohan",                                      
+                  "url": "https://dmj.one/resume/",
+                    "sameAs": [
+                        "https://www.credly.com/users/divyamohan1993",
+                        "https://www.linkedin.com/in/divyamohan1993/",
+                        "https://hackerrank.com/divyamohan1993",
+                        "https://www.coursera.org/learner/divyamohan1993"
+                    ]
+                }
+              ],
+              "url": "https://dmj.one/edu/su/course/csu2316/"
+            }
+        }
+        </script>
+
+
+</head>
+
+<body>
+
+    <script> header_author("dm"); </script>
+
+    <main>
+        <article class="agen-tableofcontents">
+            <h2 class="text-center">
+                Kubernetes (K8s) Architecture
+            </h2>
+            <div class="d-none contentdate">2025, Dec 16</div>
+        </article>
+        <div class="text-center mb-4" style="position:relative;width:100%;height:250px;overflow:hidden"><img src="../img/kubernetes_architecture.webp" alt="Kubernetes Control Plane and Workers" style="position:absolute;top:50%;left:50%;width:100%;height:100%;object-fit:cover;transform:translate(-50%,-50%)"></div>
+
+        <article>
+            <h3>10. Kubernetes (K8s)</h3>
+            <p>Kubernetes is a <strong>container orchestration system</strong> that automatically manages the deployment, scaling, networking, and healing of containerized applications. If Docker answers <em>how to run a container</em>, Kubernetes answers <em>how to run thousands of containers reliably in production</em>.</p>
+            <p>Core idea: treat applications as <strong>desired state systems</strong>. You declare <em>what you want</em>, Kubernetes continuously works to <em>make reality match that state</em>.</p>
+        </article>
+
+        <article>
+            <h4>10.1 Why Kubernetes is Needed</h4>
+            <p>Containers fail, servers crash, traffic spikes, and updates must happen without downtime. Manual handling does not scale.</p>
+            <ul>
+                <li><strong>Auto-healing</strong>: Restarts failed containers automatically</li>
+                <li><strong>Auto-scaling</strong>: Adds/removes replicas based on load</li>
+                <li><strong>Service discovery</strong>: Finds pods dynamically without hardcoded IPs</li>
+                <li><strong>Zero-downtime deployments</strong>: Rolling updates and rollbacks</li>
+                <li><strong>Cloud-agnostic</strong>: Same model on AWS, Azure, GCP, on-prem</li>
+            </ul>
+            <p>Real-world analogy: Kubernetes is an <strong>airport control system</strong>. Planes (containers) come and go, but passengers (users) always reach destinations safely.</p>
+            <div class="active-recall-custom-block">
+                <details class="interactive-active-recall-card-dmj-su">
+                    <summary class="alert-heading list-unstyled">
+                        <i class="bi bi-mouse-fill"></i> What is the main problem Kubernetes solves?
+                    </summary>
+                    <hr>
+                    <p class="mb-0 small"><strong>A:</strong> It solves the <strong>orchestration problem</strong>: automating the deployment, scaling, healing, and networking of thousands of containers in production.</p>
+                </details>
+            </div>
+        </article>
+
+        <article>
+            <h4>10.2 Kubernetes Architecture</h4>
+            <pre class="mermaid text-center">
+            graph TD
+                subgraph Master [Control Plane]
+                API[API Server]
+                Etcd[etcd]
+                Sched[Scheduler]
+                CM[Controller Mgr]
+                API <--> Etcd
+                API --> Sched
+                API --> CM
+                end
+                subgraph Node [Worker Node]
+                Kubelet
+                Proxy[Kube-Proxy]
+                Pod1[Pod]
+                Pod2[Pod]
+                Kubelet --> API
+                Proxy --> API
+                end
+                style Master fill:#e1f5fe
+                style Node fill:#fff3e0
+            </pre>
+            <p>Kubernetes follows a <strong>master–worker (control–execute)</strong> architecture.</p>
+        </article>
+
+        <article>
+            <h5>10.2.1 Control Plane (Brain of the Cluster)</h5>
+            <p>The control plane decides <em>what should run where</em> and <em>ensures correctness</em>.</p>
+            <ul>
+                <li><strong>API Server</strong>: Entry point. All commands (kubectl, CI/CD) talk here</li>
+                <li><strong>etcd</strong>: Distributed key–value store holding the cluster’s entire state</li>
+                <li><strong>Scheduler</strong>: Selects the best worker node for new pods</li>
+                <li><strong>Controller Manager</strong>: Watches state and fixes deviations (replicas, nodes)</li>
+            </ul>
+            <p>Concept: <strong>etcd is the source of truth</strong>. If it knows it, Kubernetes enforces it.</p>
+            <div class="active-recall-custom-block">
+                <details class="interactive-active-recall-card-dmj-su">
+                    <summary class="alert-heading list-unstyled">
+                        <i class="bi bi-mouse-fill"></i> What is the role of the Control Plane?
+                    </summary>
+                    <hr>
+                    <p class="mb-0 small"><strong>A:</strong> It acts as the <strong>"Brain"</strong> of the cluster. It constantly compares the <strong>Actual State</strong> (reported by nodes) with the <strong>Desired State</strong> (in etcd) and issues commands to fix any differences.</p>
+                </details>
+            </div>
+        </article>
+
+        <article>
+            <h5>10.2.2 Worker Node (Execution Layer)</h5>
+            <p>Worker nodes actually run applications.</p>
+            <ul>
+                <li><strong>Kubelet</strong>: Node agent that talks to API Server and manages pods</li>
+                <li><strong>Container Runtime</strong>: Runs containers (containerd, CRI-O)</li>
+                <li><strong>Kube-proxy</strong>: Handles networking and load balancing rules</li>
+            </ul>
+            <p>Each worker node is <strong>replaceable</strong>. Kubernetes assumes nodes are unreliable by design.</p>
+        </article>
+
+        <article>
+            <h4>10.3 Core Kubernetes Objects</h4>
+            <p>Kubernetes works entirely using <strong>objects</strong>. Objects define desired state.</p>
+        </article>
+
+        <article>
+            <h5>10.3.1 Pod</h5>
+            <p>The <strong>smallest deployable unit</strong>. A pod groups one or more tightly coupled containers sharing network and storage.</p>
+            <p>Rule: Pods are <strong>ephemeral</strong>. Never assume a pod will live forever.</p>
+            <div class="active-recall-custom-block">
+                <details class="interactive-active-recall-card-dmj-su">
+                    <summary class="alert-heading list-unstyled">
+                        <i class="bi bi-mouse-fill"></i> Can you run a container without a Pod in Kubernetes?
+                    </summary>
+                    <hr>
+                    <p class="mb-0 small"><strong>A:</strong> <strong>No</strong>. The Pod is the <strong>smallest atomic unit</strong> in Kubernetes. You wrap your container(s) inside a Pod to run them.</p>
+                </details>
+            </div>
+        </article>
+
+        <article>
+            <h5>10.3.2 Deployment & ReplicaSet</h5>
+            <p><strong>Deployment</strong> defines how many replicas of a pod should exist and how updates happen.</p>
+            <ul>
+                <li>Deployment creates and manages <strong>ReplicaSets</strong></li>
+                <li>ReplicaSet ensures exact replica count</li>
+                <li>Deployment handles rolling updates & rollback</li>
+            </ul>
+            <p>Think: Deployment = policy, ReplicaSet = enforcement.</p>
+        </article>
+
+        <article>
+            <h5>10.3.3 Service</h5>
+            <p>A Service provides a <strong>stable network identity</strong> for dynamic pods.</p>
+            <ul>
+                <li><strong>ClusterIP</strong>: Internal-only communication (default)</li>
+                <li><strong>NodePort</strong>: Exposes service via node IP + port</li>
+                <li><strong>LoadBalancer</strong>: Cloud-managed external load balancer</li>
+            </ul>
+            <p>Key idea: users talk to services, <strong>never directly to pods</strong>.</p>
+            <div class="active-recall-custom-block">
+                <details class="interactive-active-recall-card-dmj-su">
+                    <summary class="alert-heading list-unstyled">
+                        <i class="bi bi-mouse-fill"></i> Why do we need "Services" if Pods have IP addresses?
+                    </summary>
+                    <hr>
+                    <p class="mb-0 small"><strong>A:</strong> Because Pod IPs are <strong>dynamic and change</strong> whenever a Pod dies and restarts. A Service provides a <strong>stable IP/DNS name</strong> to route traffic effectively.</p>
+                </details>
+            </div>
+        </article>
+
+        <article>
+            <h5>10.3.4 Namespace</h5>
+            <p>Logical isolation inside a cluster.</p>
+            <ul>
+                <li>Used for environments (dev, test, prod)</li>
+                <li>Separates resources and access control</li>
+            </ul>
+        </article>
+
+        <article>
+            <h5>10.3.5 ConfigMap & Secret</h5>
+            <p>Externalize configuration from containers.</p>
+            <ul>
+                <li><strong>ConfigMap</strong>: Non-sensitive data (URLs, flags)</li>
+                <li><strong>Secret</strong>: Sensitive data (passwords, tokens) — base64 encoded</li>
+            </ul>
+            <p>Principle: <strong>immutable containers, mutable configuration</strong>.</p>
+        </article>
+
+        <article>
+            <h4>10.4 Kubernetes Declarative Workflow</h4>
+            <p>Kubernetes uses a <strong>declarative model</strong>. You describe the desired end state.</p>
+            <p>Flow:</p>
+            <ul>
+                <li>Write YAML manifest</li>
+                <li>Send to API Server</li>
+                <li>Stored in etcd</li>
+                <li>Scheduler assigns node</li>
+                <li>Kubelet creates pod</li>
+                <li>Controllers continuously reconcile state</li>
+            </ul>
+            <p>Mathematically, Kubernetes enforces:</p>
+            <p>$$Actual\ State \xrightarrow{Controllers} Desired\ State$$</p>
+            <div class="active-recall-custom-block">
+                <details class="interactive-active-recall-card-dmj-su">
+                    <summary class="alert-heading list-unstyled">
+                        <i class="bi bi-mouse-fill"></i> What does "Declarative" mean in Kubernetes?
+                    </summary>
+                    <hr>
+                    <p class="mb-0 small"><strong>A:</strong> You declare <strong>WHAT</strong> you want the final state to be (e.g., "3 replicas"), and Kubernetes figures out <strong>HOW</strong> to achieve it (e.g., creating 3 pods).</p>
+                </details>
+            </div>
+        </article>
+
+        <article>
+            <h4>10.5 YAML Example (Minimal Deployment)</h4>
+            <pre><code class="language-yaml">
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+</code></pre>
+            <p>This single file defines <strong>replicas, identity, scheduling, and runtime behavior</strong>.</p>
+        </article>
+
+        <article>
+            <h4>10.6 Kubernetes Mental Model</h4>
+            <ul>
+                <li>Kubernetes is <strong>state-driven</strong>, not command-driven</li>
+                <li>Everything is an API object</li>
+                <li>Controllers continuously reconcile reality</li>
+                <li>Pods are disposable; services are permanent</li>
+                <li>Infrastructure is assumed to fail</li>
+            </ul>
+        </article>
+
+        <article>
+            <h4>10.7 Scheduling & Resource Management</h4>
+            <p>Kubernetes schedules pods based on <strong>resource requests</strong>, not limits. This is essential for production stability.</p>
+            <ul>
+                <li><strong>Requests</strong>: Minimum guaranteed CPU/RAM for scheduling</li>
+                <li><strong>Limits</strong>: Maximum allowed usage</li>
+            </ul>
+            <p>Scheduler principle: a pod is placed only on a node that can <strong>guarantee its requests</strong>.</p>
+        </article>
+
+        <article>
+            <h5>10.7.1 Resource Specification Example</h5>
+            <pre><code class="language-yaml">
+resources:
+  requests:
+    cpu: "250m"
+    memory: "256Mi"
+  limits:
+    cpu: "500m"
+    memory: "512Mi"
+</code></pre>
+            <p>CPU is measured in millicores (1000m = 1 core).</p>
+        </article>
+
+        <article>
+            <h4>10.8 Health Checks</h4>
+            <p>Kubernetes determines application health using probes.</p>
+            <ul>
+                <li><strong>Liveness Probe</strong>: Is the app alive?</li>
+                <li><strong>Readiness Probe</strong>: Can it receive traffic?</li>
+                <li><strong>Startup Probe</strong>: Has it finished booting?</li>
+            </ul>
+            <p>Only <strong>ready pods receive traffic</strong>. Failed liveness restarts containers.</p>
+        </article>
+
+        <article>
+            <h5>10.8.1 Probe Example</h5>
+            <pre><code class="language-yaml">
+livenessProbe:
+  httpGet:
+    path: /health
+    port: 80
+  initialDelaySeconds: 10
+  periodSeconds: 5
+</code></pre>
+        </article>
+
+        <article>
+            <h4>10.9 Scaling Mechanisms</h4>
+            <p>Kubernetes scales at multiple layers.</p>
+            <ul>
+                <li><strong>Horizontal Pod Autoscaler (HPA)</strong>: Scales pod replicas</li>
+                <li><strong>Vertical Pod Autoscaler (VPA)</strong>: Adjusts resource requests</li>
+                <li><strong>Cluster Autoscaler</strong>: Adds/removes nodes</li>
+            </ul>
+            <p>HPA is most commonly used in enterprises.</p>
+        </article>
+
+        <article>
+            <h5>10.9.1 HPA Formula</h5>
+            <p>$$Desired\ Replicas = Current\ Replicas \times \frac{Current\ Metric}{Target\ Metric}$$</p>
+        </article>
+
+        <article>
+            <h4>10.10 Networking Model</h4>
+            <p>Kubernetes networking follows strict rules:</p>
+            <ul>
+                <li>Every pod gets its own IP</li>
+                <li>Pods can talk to each other without NAT</li>
+                <li>Services provide stable access points</li>
+            </ul>
+            <p>This flat network model simplifies microservices design.</p>
+        </article>
+
+        <article>
+            <h4>10.11 Storage Basics</h4>
+            <p>Kubernetes separates <strong>compute from storage</strong>.</p>
+            <ul>
+                <li><strong>Volume</strong>: Pod-level storage</li>
+                <li><strong>PersistentVolume (PV)</strong>: Cluster-level storage</li>
+                <li><strong>PersistentVolumeClaim (PVC)</strong>: Storage request</li>
+            </ul>
+            <p>Pods are ephemeral, <strong>PVC-backed data survives restarts</strong>.</p>
+        </article>
+
+        <article>
+            <h4>10.12 Security Fundamentals</h4>
+            <ul>
+                <li><strong>RBAC</strong>: Role-Based Access Control</li>
+                <li><strong>Service Accounts</strong>: Pod identity</li>
+                <li><strong>Secrets</strong>: Credential management</li>
+                <li><strong>Namespace isolation</strong>: Soft multi-tenancy</li>
+            </ul>
+            <p>Security in Kubernetes is <strong>API-first</strong>, not OS-first.</p>
+        </article>
+
+        <article>
+            <h4>10.13 Kubernetes vs Docker</h4>
+            <ul>
+                <li>Docker runs containers</li>
+                <li>Kubernetes manages containers at scale</li>
+                <li>Kubernetes uses container runtimes, not Docker itself</li>
+            </ul>
+            <p>Docker is a <strong>tool</strong>; Kubernetes is a <strong>platform</strong>.</p>
+        </article>
+
+        <article>
+            <h4>10.14 Labels, Selectors & Metadata</h4>
+            <p>Kubernetes does not use names to connect components. It uses <strong>labels</strong>.</p>
+            <ul>
+                <li><strong>Labels</strong>: Key–value pairs attached to objects</li>
+                <li><strong>Selectors</strong>: Queries used by Services, Deployments, HPA</li>
+            </ul>
+            <p>Core rule: <strong>Services select pods by labels, not by pod names</strong>.</p>
+        </article>
+
+        <article>
+            <h5>10.14.1 Selector Example</h5>
+            <pre><code class="language-yaml">
+selector:
+  matchLabels:
+    app: web
+    tier: frontend
+</code></pre>
+        </article>
+
+        <article>
+            <h4>10.15 Ingress</h4>
+            <p>Ingress manages <strong>HTTP/HTTPS routing</strong> into the cluster.</p>
+            <ul>
+                <li>Works at Layer 7 (URL, host-based routing)</li>
+                <li>Requires an <strong>Ingress Controller</strong> (NGINX, Traefik)</li>
+                <li>Preferred over NodePort in production</li>
+            </ul>
+            <p>Ingress = <strong>reverse proxy inside Kubernetes</strong>.</p>
+        </article>
+
+        <article>
+            <h4>10.16 Deployment Strategies</h4>
+            <p>Kubernetes supports safe application updates.</p>
+            <ul>
+                <li><strong>RollingUpdate</strong>: Gradual replacement (default)</li>
+                <li><strong>Recreate</strong>: Stop all, then start new</li>
+            </ul>
+            <p>Rolling updates ensure availability while upgrading.</p>
+        </article>
+
+        <article>
+            <h5>10.16.1 Rolling Update Controls</h5>
+            <pre><code class="language-yaml">
+strategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxUnavailable: 1
+    maxSurge: 1
+</code></pre>
+        </article>
+
+        <article>
+            <h4>10.17 kubectl</h4>
+            <p><code>kubectl</code> is the CLI used to interact with the API Server.</p>
+            <ul>
+                <li><strong>kubectl apply</strong>: Create/update resources declaratively</li>
+                <li><strong>kubectl get</strong>: Inspect cluster state</li>
+                <li><strong>kubectl describe</strong>: Debug resource details</li>
+                <li><strong>kubectl logs</strong>: View container logs</li>
+                <li><strong>kubectl exec</strong>: Access running containers</li>
+            </ul>
+        </article>
+
+        <article>
+            <h4>10.18 Control Loop Principle</h4>
+            <p>Kubernetes is built entirely on <strong>control loops</strong>.</p>
+            <p>Pattern:</p>
+            <ul>
+                <li>Observe current state</li>
+                <li>Compare with desired state</li>
+                <li>Take corrective action</li>
+                <li>Repeat continuously</li>
+            </ul>
+            <p>This makes Kubernetes <strong>self-healing by design</strong>.</p>
+        </article>
+
+        <article>
+            <h4>10.19 Kubernetes in DevOps Pipeline</h4>
+            <ul>
+                <li>CI builds container images</li>
+                <li>Images pushed to registry</li>
+                <li>CD updates Kubernetes YAML</li>
+                <li>Kubernetes performs rollout</li>
+            </ul>
+            <p>Kubernetes is the <strong>runtime backbone</strong> of modern DevOps.</p>
+        </article>
+
+
+    </main>
+
+    <script> copyright("all"); </script>
+
+</body>
+
+</html>

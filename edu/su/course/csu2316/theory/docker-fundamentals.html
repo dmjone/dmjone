@@ -1,0 +1,580 @@
+<!-------------------------- © 2007 - present, dmj.one and contributors. ----------------------------------
+   Part of the dmjone project. Licensed under the GNU AGPL. Provided as-is, without warranty of any kind. 
+-------------------- Redistribution and modifications must retain this notice. --------------------------->
+
+
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+<!--<![endif]-->
+
+<head>
+    <script src="/js/edu_su_common.js"></script>
+    <noscript>
+        <style>
+            html,
+            body {
+                margin: 0;
+                overflow: hidden;
+            }
+        </style>
+        <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+    </noscript>
+
+    <title>Docker Fundamentals - CSU2316 - Shoolini U</title>
+    <meta name="description" content="A detailed guide to Docker fundamentals, covering container architecture, Dockerfiles, images, networking, and best practices.">
+
+    <meta property="og:image" content="/logo.png">
+    <meta property="og:type" content="article">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="@divyamohan1993">
+    <meta name="twitter:creator" content="@divyamohan1993">
+    <meta name="twitter:image" content="/logo.png">
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+    <meta name="author" content="Divya Mohan">
+    <meta name="robots" content="index, follow">
+
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js" integrity="sha512-sHSNLECRJSK+BFs7E8DiFc6pf6n90bLI85Emiw1jhreduZhK3VXgq9l4kAt9eTIHYAcuQBKHL01QKs4/3Xgl8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js" integrity="sha512-iWiuBS5nt6r60fCz26Nd0Zqe0nbk1ZTIQbl3Kv7kYsX+yKMUFHzjaH2+AnM6vp2Xs+gNmaBAVWJjSmuPw76Efg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                renderMathInElement(document.body, {
+                    // customised options
+                    // • auto-render specific keys, e.g.:
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false },
+                        { left: '\\(', right: '\\)', display: false },
+                        { left: '\\[', right: '\\]', display: true }
+                    ],
+                    // • rendering keys, e.g.:
+                    throwOnError: false
+                });
+            });
+        </script> -->
+
+    <!-- <style>
+            main ul {
+                list-style-type: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            main ul li {
+                margin: 0;
+                padding: 0;
+            }
+        </style> -->
+
+    <!-- JSON-LD Structured Data for SEO -->
+    <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "Course",
+          "name": "Docker Fundamentals",
+          "description": "A detailed guide to Docker fundamentals, covering container architecture, Dockerfiles, images, networking, and best practices.",
+          "url": "https://dmj.one/edu/su/course/csu2316/theory/topic.html",
+          "dateModified": "2025-12-16",
+          "provider": [
+            {
+              "@type": "EducationalOrganization",
+              "name": "dmj.one",
+              "url": "https://dmj.one"
+            },
+            {
+              "@type": "EducationalOrganization",
+              "name": "Shoolini University",
+              "url": "https://shooliniuniversity.com"
+            }
+          ],
+          "offers": {
+              "@type": "Offer",
+              "category": "Education",
+              "price": "0",
+              "priceCurrency": "USD",
+              "availability": "https://schema.org/InStock",
+              "url": "https://dmj.one/edu/su/course/csu2316/theory/topic.html"
+          },
+          "hasCourseInstance": {
+              "@type": "CourseInstance",
+              "name": "Docker Fundamentals",
+              "description": "A detailed guide to Docker fundamentals, covering container architecture, Dockerfiles, images, networking, and best practices.",
+              "courseMode": "online",
+              "startDate": "2025-12-16",
+              "courseWorkload": "PT4H",               
+              "instructor": [                
+                {
+                  "@type": "Person",
+                  "name": "Divya Mohan",                                      
+                  "url": "https://dmj.one/resume/",
+                    "sameAs": [
+                        "https://www.credly.com/users/divyamohan1993",
+                        "https://www.linkedin.com/in/divyamohan1993/",
+                        "https://hackerrank.com/divyamohan1993",
+                        "https://www.coursera.org/learner/divyamohan1993"
+                    ]
+                }
+              ],
+              "url": "https://dmj.one/edu/su/course/csu2316/"
+            }
+        }
+        </script>
+
+
+</head>
+
+<body>
+
+    <script> header_author("dm"); </script>
+
+    <main>
+        <article class="agen-tableofcontents">
+            <h2 class="text-center">
+                Docker Fundamentals
+            </h2>
+            <div class="d-none contentdate">2025, Dec 16</div>
+        </article>
+        <div class="text-center mb-4" style="position:relative;width:100%;height:250px;overflow:hidden"><img src="../img/docker_whale.webp" alt="Docker Whale Container" style="position:absolute;top:50%;left:50%;width:100%;height:100%;object-fit:cover;transform:translate(-50%,-50%)"></div>
+
+        <article>
+            <h3>8. Docker</h3>
+            <p><strong>Docker</strong> is an OS-level virtualization platform that packages an application and everything it needs (libraries, runtime, configs) into a single portable unit called a <strong>container</strong>. Think of Docker as a standardized shipping container for software: once packed, it runs the same everywhere.</p>
+        </article>
+
+        <article>
+            <h4>8.1 Where Docker Is Used</h4>
+            <p>Docker is used wherever consistency, speed, and portability matter.</p>
+            <ul>
+                <li><strong>Development</strong>: Same environment for all developers (no “works on my machine”).</li>
+                <li><strong>Testing</strong>: Spin up identical test environments on demand.</li>
+                <li><strong>CI/CD pipelines</strong>: Build, test, and package applications automatically.</li>
+                <li><strong>Microservices</strong>: Each service runs in its own isolated container.</li>
+                <li><strong>Cloud & On-Prem</strong>: Same container runs on laptop, data center, or cloud.</li>
+            </ul>
+            <div class="active-recall-custom-block">
+                <details class="interactive-active-recall-card-dmj-su">
+                    <summary class="alert-heading list-unstyled">
+                        <i class="bi bi-mouse-fill"></i> Does Docker solve the "It works on my machine" problem?
+                    </summary>
+                    <hr>
+                    <p class="mb-0 small"><strong>A:</strong> <strong>Yes</strong>, because it packages the <strong>exact same environment</strong> (libraries, runtime, configs) that runs identically on development, testing, and production servers.</p>
+                </details>
+            </div>
+        </article>
+
+        <article>
+            <h4>8.2 Why Docker Is Used</h4>
+            <p>Docker solves environment inconsistency and deployment friction.</p>
+            <ul>
+                <li><strong>Consistency</strong>: Same app behavior across dev, test, prod.</li>
+                <li><strong>Speed</strong>: Containers start in seconds (no full OS boot).</li>
+                <li><strong>Resource efficiency</strong>: Shares host OS kernel.</li>
+                <li><strong>Portability</strong>: Build once, run anywhere.</li>
+                <li><strong>Scalability</strong>: Easy horizontal scaling.</li>
+            </ul>
+        </article>
+
+        <article>
+            <h4>8.3 Core Components</h4>
+            <ul>
+                <li><strong>Docker Engine</strong>: Core runtime that builds and runs containers.</li>
+                <li><strong>Docker Image</strong>: Read-only template with app + dependencies.</li>
+                <li><strong>Docker Container</strong>: Running instance of an image.</li>
+                <li><strong>Dockerfile</strong>: Text file defining how to build an image.</li>
+                <li><strong>Docker Hub</strong>: Cloud registry for storing and sharing images.</li>
+            </ul>
+        </article>
+
+        <article>
+            <h4>8.4 Docker Architecture</h4>
+            <pre class="mermaid text-center">
+            graph LR
+                Client[Client CLI] -->|Rest API| Daemon[Docker Daemon]
+                Daemon -->|Pull| Reg[Registry]
+                Daemon -->|Run| Cont[Container]
+                style Client fill:#f96
+                style Daemon fill:#69f
+            </pre>
+            <p>Docker follows a client–server model.</p>
+            <ul>
+                <li><strong>Client</strong>: CLI (`docker` command).</li>
+                <li><strong>Engine (Daemon)</strong>: Builds images, runs containers.</li>
+                <li><strong>Registry</strong>: Stores images (Docker Hub or private).</li>
+            </ul>
+            <p><strong>Flow</strong>: Client → Engine → Registry → Engine → Container</p>
+        </article>
+
+        <article>
+            <h4>8.5 Dockerfile</h4>
+            <p>A <strong>Dockerfile</strong> is a reproducible blueprint for creating images. Each instruction creates a new image layer.</p>
+        </article>
+
+        <article>
+            <h5>8.5.1 Common Dockerfile Instructions</h5>
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>Instruction</th>
+                            <th>Purpose</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>FROM</td>
+                            <td>Base image</td>
+                        </tr>
+                        <tr>
+                            <td>RUN</td>
+                            <td>Execute commands during build</td>
+                        </tr>
+                        <tr>
+                            <td>COPY</td>
+                            <td>Copy files from host</td>
+                        </tr>
+                        <tr>
+                            <td>ADD</td>
+                            <td>Copy + extract archives / URLs</td>
+                        </tr>
+                        <tr>
+                            <td>WORKDIR</td>
+                            <td>Set working directory</td>
+                        </tr>
+                        <tr>
+                            <td>CMD</td>
+                            <td>Default command</td>
+                        </tr>
+                        <tr>
+                            <td>ENTRYPOINT</td>
+                            <td>Fixed executable</td>
+                        </tr>
+                        <tr>
+                            <td>EXPOSE</td>
+                            <td>Document port usage</td>
+                        </tr>
+                        <tr>
+                            <td>ENV</td>
+                            <td>Set environment variables</td>
+                        </tr>
+                        <tr>
+                            <td>USER</td>
+                            <td>Run container as specific user</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="active-recall-custom-block">
+                <details class="interactive-active-recall-card-dmj-su">
+                    <summary class="alert-heading list-unstyled">
+                        <i class="bi bi-mouse-fill"></i> What is the purpose of the <code>FROM</code> instruction in a Dockerfile?
+                    </summary>
+                    <hr>
+                    <p class="mb-0 small"><strong>A:</strong> It specifies the <strong>Base Image</strong> (e.g., <code>FROM python:3.9</code>) that your container starts with. It is essentially the "parent" of your image.</p>
+                </details>
+            </div>
+        </article>
+
+        <article>
+            <h5>8.5.2 CMD vs ENTRYPOINT</h5>
+            <p><strong>CMD</strong> provides a default command that can be overridden.</p>
+            <p><strong>ENTRYPOINT</strong> defines a fixed executable.</p>
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>Aspect</th>
+                            <th>CMD</th>
+                            <th>ENTRYPOINT</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Nature</td>
+                            <td>Default</td>
+                            <td>Fixed</td>
+                        </tr>
+                        <tr>
+                            <td>Override</td>
+                            <td>Easy</td>
+                            <td>Difficult</td>
+                        </tr>
+                        <tr>
+                            <td>Use case</td>
+                            <td>Flexible behavior</td>
+                            <td>Executable containers</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <pre><code class="">ENTRYPOINT ["python"]
+CMD ["app.py"]</code></pre>
+            <div class="active-recall-custom-block">
+                <details class="interactive-active-recall-card-dmj-su">
+                    <summary class="alert-heading list-unstyled">
+                        <i class="bi bi-mouse-fill"></i> When should you use <code>ENTRYPOINT</code> instead of <code>CMD</code>?
+                    </summary>
+                    <hr>
+                    <p class="mb-0 small"><strong>A:</strong> When you want your container to run as a <strong>fixed executable</strong> that receives arguments (e.g., a CLI tool), rather than a general-purpose shell.</p>
+                </details>
+            </div>
+        </article>
+
+        <article>
+            <h5>8.5.3 COPY vs ADD</h5>
+            <p><strong>COPY</strong> is simple and predictable.</p>
+            <p><strong>ADD</strong> adds extra features.</p>
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>Aspect</th>
+                            <th>COPY</th>
+                            <th>ADD</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Function</td>
+                            <td>File copy</td>
+                            <td>Copy + extract + URL</td>
+                        </tr>
+                        <tr>
+                            <td>Best practice</td>
+                            <td>Preferred</td>
+                            <td>Use only if needed</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </article>
+
+        <article>
+            <h5>8.5.4 Example: Node.js Hello World Workflow</h5>
+            <p>Let's create a simple Node.js application, containerize it, and run it. Follow these steps:</p>
+
+            <h6>Step 1: Create the Application</h6>
+            <p>Create a file named <code>app.js</code> with a simple HTTP server:</p>
+            <pre><code class="language-javascript">const http = require('http');
+
+const hostname = '0.0.0.0';
+const port = 3000;
+
+const server = http.createServer((req, res) => {
+  res.statusCode = 200;
+  res.setHeader('Content-Type', 'text/plain');
+  res.end('Hello form Docker Container!\n');
+});
+
+server.listen(port, hostname, () => {
+  console.log(`Server running at http://${hostname}:${port}/`);
+});</code></pre>
+
+            <h6>Step 2: Create the Dockerfile</h6>
+            <p>Create a file named <code>Dockerfile</code> (no extension) in the same directory:</p>
+            <pre><code class="language-dockerfile"># Use the official Node.js image.
+FROM node:14
+
+# Set the working directory inside the container.
+WORKDIR /usr/src/app
+
+# Copy the rest of the application code.
+COPY . .
+
+# Expose the port the app runs on.
+EXPOSE 3000
+
+# Define the command to run the app.
+CMD [ "node", "app.js" ]</code></pre>
+
+            <h6>Step 3: Build the Image</h6>
+            <p>Run the build command in your terminal. We tag it as <code>node-hello</code>. The <code>.</code> tells Docker to look for the Dockerfile in the current directory.</p>
+            <pre class="terminal">docker build -t node-hello .</pre>
+
+            <h6>Step 4: Run the Container</h6>
+            <p>Run the container, mapping host port 3000 to container port 3000.</p>
+            <pre class="terminal">docker run -p 3000:3000 node-hello</pre>
+
+            <h6>Step 5: Interact</h6>
+            <p>Open your browser to <code>http://localhost:3000</code> or use curl:</p>
+            <pre class="terminal">curl localhost:3000</pre>
+            <p>You should see: <strong>Hello from Docker Container!</strong></p>
+        </article>
+
+        <article>
+            <h4>8.6 Common Docker Commands</h4>
+            <ul>
+                <li><strong>docker build</strong>: Build image from Dockerfile.</li>
+                <li><strong>docker run</strong>: Create and start a container.</li>
+                <li><strong>docker ps</strong>: List running containers.</li>
+                <li><strong>docker images</strong>: List images.</li>
+                <li><strong>docker stop</strong>: Stop a running container.</li>
+            </ul>
+            <pre><code class="">docker build -t myapp .
+docker run -d -p 8080:80 myapp
+docker ps
+docker images
+docker stop container_id</code></pre>
+            <div class="active-recall-custom-block">
+                <details class="interactive-active-recall-card-dmj-su">
+                    <summary class="alert-heading list-unstyled">
+                        <i class="bi bi-mouse-fill"></i> Which command lists only the <strong>running</strong> containers?
+                    </summary>
+                    <hr>
+                    <p class="mb-0 small"><strong>A:</strong> <code>docker ps</code>. use <code>docker ps -a</code> to see stopped containers as well.</p>
+                </details>
+            </div>
+        </article>
+
+        <article>
+            <h4>8.7 Docker Hub</h4>
+            <p><strong>Docker Hub</strong> is a centralized cloud registry.</p>
+            <ul>
+                <li><strong>Public & Private images</strong></li>
+                <li><strong>Official images</strong> (nginx, node, python)</li>
+                <li><strong>Versioned tags</strong></li>
+                <li><strong>Easy sharing & reuse</strong></li>
+            </ul>
+        </article>
+
+        <article>
+            <h4>8.8 Enterprise-Relevant Additions</h4>
+            <ul>
+                <li><strong>Image Layers & Caching</strong>: Faster rebuilds.</li>
+                <li><strong>Volumes</strong>: Persist data outside containers.</li>
+                <li><strong>Networking</strong>: Bridge, host, overlay.</li>
+                <li><strong>Security</strong>: Non-root USER, minimal base images.</li>
+                <li><strong>Docker vs Kubernetes</strong>: Docker builds containers; Kubernetes orchestrates them.</li>
+            </ul>
+        </article>
+
+        <article>
+            <h4>8.9 Container Lifecycle</h4>
+            <p>Understanding the container lifecycle is critical for operating Docker in real systems.</p>
+            <ul>
+                <li><strong>Created</strong>: Container object exists but not running.</li>
+                <li><strong>Running</strong>: Process inside container is executing.</li>
+                <li><strong>Paused</strong>: Execution temporarily suspended.</li>
+                <li><strong>Stopped</strong>: Process exited, container still exists.</li>
+                <li><strong>Removed</strong>: Container metadata deleted.</li>
+            </ul>
+            <div class="container-fluid col-md-8 mt-4 mb-4">
+                <figure class="figure w-100 text-center">
+                    <img src="../img/docker_container_lifecycle.webp" class="figure-img img-fluid rounded shadow-lg" alt="Docker Container Lifecycle Diagram">
+                    <figcaption class="figure-caption">The Docker Container Lifecycle: From Creation to Deletion.</figcaption>
+                </figure>
+            </div>
+            <p>Real-world mapping: CI creates → CD runs → Ops stops/removes.</p>
+        </article>
+
+        <article>
+            <h4>8.10 Docker Volumes vs Bind Mounts</h4>
+            <p>State management is essential in production.</p>
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>Aspect</th>
+                            <th>Volume</th>
+                            <th>Bind Mount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Managed by Docker</td>
+                            <td>Yes</td>
+                            <td>No</td>
+                        </tr>
+                        <tr>
+                            <td>Portability</td>
+                            <td>High</td>
+                            <td>Low</td>
+                        </tr>
+                        <tr>
+                            <td>Production use</td>
+                            <td>Preferred</td>
+                            <td>Mainly dev</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <pre><code class="">docker volume create data_vol
+docker run -v data_vol:/app/data myapp</code></pre>
+            <div class="active-recall-custom-block">
+                <details class="interactive-active-recall-card-dmj-su">
+                    <summary class="alert-heading list-unstyled">
+                        <i class="bi bi-mouse-fill"></i> Why is using a Volume better than saving data inside the container layer?
+                    </summary>
+                    <hr>
+                    <p class="mb-0 small"><strong>A:</strong> Volumes are <strong>persistent</strong> (survive container deletion) and offer better performance. Data written to the container's writable layer is lost when the container is removed.</p>
+                </details>
+            </div>
+        </article>
+
+        <article>
+            <h4>8.11 Docker Networking Basics</h4>
+            <p>Containers communicate using virtual networks.</p>
+            <ul>
+                <li><strong>Bridge</strong>: Default, container-to-container on same host.</li>
+                <li><strong>Host</strong>: No network isolation (performance use-case).</li>
+                <li><strong>Overlay</strong>: Multi-host communication (Swarm/K8s).</li>
+            </ul>
+            <p>Enterprise insight: Microservices rely on bridge/overlay networking.</p>
+        </article>
+
+        <article>
+            <h4>8.12 Image Tagging & Versioning</h4>
+            <p>Tags are deployment contracts.</p>
+            <ul>
+                <li><strong>latest</strong>: Unsafe for production.</li>
+                <li><strong>Semantic tags</strong>: v1.0, v1.1</li>
+                <li><strong>Immutable images</strong>: New build = new tag.</li>
+            </ul>
+            <pre><code class="">docker tag myapp:1.0 myrepo/myapp:1.0
+docker push myrepo/myapp:1.0</code></pre>
+        </article>
+
+        <article>
+            <h4>8.13 Docker Security Essentials</h4>
+            <p>Security failures usually come from defaults.</p>
+            <ul>
+                <li><strong>Run as non-root</strong> using USER.</li>
+                <li><strong>Minimal base images</strong> (alpine, distroless).</li>
+                <li><strong>No secrets in images</strong>.</li>
+                <li><strong>Read-only containers</strong> when possible.</li>
+            </ul>
+        </article>
+
+        <article>
+            <h4>8.14 Docker vs VM</h4>
+            <p>This distinction matters in architecture decisions.</p>
+            <ul>
+                <li><strong>VM</strong>: Infrastructure isolation.</li>
+                <li><strong>Docker</strong>: Application isolation.</li>
+                <li><strong>Reality</strong>: Docker runs inside VMs in cloud.</li>
+            </ul>
+        </article>
+
+        <article>
+            <h4>8.15 Docker in DevOps Pipeline</h4>
+            <p>Docker is not a replacement for CI/CD — it is a building block.</p>
+            <ul>
+                <li>CI builds Docker image.</li>
+                <li>Image pushed to registry.</li>
+                <li>CD deploys container.</li>
+                <li>Orchestrator manages runtime.</li>
+            </ul>
+            <p>This directly connects Docker → Kubernetes → Cloud.</p>
+        </article>
+
+    </main>
+
+    <script> copyright("all"); </script>
+
+</body>
+
+</html>
