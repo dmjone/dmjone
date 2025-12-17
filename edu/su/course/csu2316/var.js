@@ -41,7 +41,7 @@ function get_menu_list(datetogen) {
                 desc: "An in-depth look at DevOps principles, the infinite lifecycle loop, CI/CD pipelines, and the cultural shift required for modern software engineering.",
                 codetype: "Theory",
                 readtime: 12,
-                date: "2025-12-16",
+                date: "Tue December 16, 2025",
                 link: "devops-principles-architecture-lifecycle"
             },
             {
@@ -49,7 +49,7 @@ function get_menu_list(datetogen) {
                 desc: "A detailed guide on Version Control Systems (VCS), explaining their necessity, types, core functions like branching and merging, and their critical role in DevOps.",
                 codetype: "Theory",
                 readtime: 10,
-                date: "2025-12-16",
+                date: "Tue December 16, 2025",
                 link: "version-control-system"
             },            
             {
@@ -57,7 +57,7 @@ function get_menu_list(datetogen) {
                 desc: "Mastering Git: Understanding its distributed architecture, core commands, branching strategies, and how it powers modern collaboration.",
                 codetype: "Theory",
                 readtime: 15,
-                date: "2025-12-16",
+                date: "Tue December 16, 2025",
                 link: "git-version-control"
             },
             {
@@ -65,7 +65,7 @@ function get_menu_list(datetogen) {
                 desc: "Comprehensive guide to using GitHub for collaboration, repositories, pull requests, issues, and workflow management.",
                 codetype: "Theory",
                 readtime: 10,
-                date: "2025-12-16",
+                date: "Tue December 16, 2025",
                 link: "github-collaboration-platform"
             },
             {
@@ -73,7 +73,7 @@ function get_menu_list(datetogen) {
                 desc: "Learn the fundamentals of GitHub Actions, automation workflows, runners, triggers, and building CI/CD pipelines.",
                 codetype: "Theory",
                 readtime: 10,
-                date: "2025-12-16",
+                date: "Tue December 16, 2025",
                 link: "github-actions-cicd"
             },
             {
@@ -81,7 +81,7 @@ function get_menu_list(datetogen) {
                 desc: "Understanding Virtualization: how it abstracts hardware, enables cloud computing, and differs from containerization.",
                 codetype: "Theory",
                 readtime: 8,
-                date: "2025-12-16",
+                date: "Tue December 16, 2025",
                 link: "virtualization"
             },
             {
@@ -89,7 +89,7 @@ function get_menu_list(datetogen) {
                 desc: "An in-depth guide to Containerization, explaining how it works, its advantages over virtualization, and its role in modern DevOps and microservices.",
                 codetype: "Theory",
                 readtime: 10,
-                date: "2025-12-16",
+                date: "Tue December 16, 2025",
                 link: "containerization"
             },
             {
@@ -97,7 +97,7 @@ function get_menu_list(datetogen) {
                 desc: "Master Amazon EC2, the core compute service of AWS. Learn about instances, AMIs, storage volumes, networking, and scaling.",
                 codetype: "Theory",
                 readtime: 12,
-                date: "2025-12-16",
+                date: "Tue December 16, 2025",
                 link: "amazon-ec2"
             },
             {
@@ -105,7 +105,7 @@ function get_menu_list(datetogen) {
                 desc: "A detailed guide to Docker fundamentals, covering container architecture, Dockerfiles, images, networking, and best practices.",
                 codetype: "Theory",
                 readtime: 15,
-                date: "2025-12-16",
+                date: "Tue December 16, 2025",
                 link: "docker-fundamentals"
             },
             {
@@ -113,7 +113,7 @@ function get_menu_list(datetogen) {
                 desc: "Learn how to define and run multi-container Docker applications using Docker Compose and YAML configuration files.",
                 codetype: "Theory",
                 readtime: 8,
-                date: "2025-12-16",
+                date: "Tue December 16, 2025",
                 link: "docker-compose"
             },
             {
@@ -121,7 +121,7 @@ function get_menu_list(datetogen) {
                 desc: "An in-depth guide to Kubernetes architecture, covering the Control Plane, Worker Nodes, Pods, Deployments, and Services.",
                 codetype: "Theory",
                 readtime: 15,
-                date: "2025-12-16",
+                date: "Tue December 16, 2025",
                 link: "kubernetes-architecture"
             },
             {
@@ -129,9 +129,17 @@ function get_menu_list(datetogen) {
                 desc: "Master Kubernetes Manifest Files and Kubectl commands. Learn to define declarative infrastructure using YAML.",
                 codetype: "Theory",
                 readtime: 12,
-                date: "2025-12-16",
+                date: "Tue December 16, 2025",
                 link: "kubernetes-manifests-commands"
             },
+            {
+                title: "Revision of Concepts",
+                desc: "Comprehensive revision of key DevOps concepts including Git, GitHub, GitHub Actions, Amazon EC2, Amazon S3, IAM, Docker, and Kubernetes.",
+                codetype: "Revision",
+                readtime: 20,
+                date: "Tue December 16, 2025",
+                link: "revision-of-concepts"
+            }
         ];
         body_genmenu.processData(arr, def_date, def_author);
     }
