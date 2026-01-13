@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Handout 3: Academic Register Upgrade</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+            body {
+                font-family: 'Inter', sans-serif;
+                background-color: #f8fafc;
+                color: #0f172a;
+                -webkit-print-color-adjust: exact;
+            }
+
+            .a4-container {
+                width: 210mm;
+                min-height: 297mm;
+                margin: 20px auto;
+                background: white;
+                padding: 15mm;
+                box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+                position: relative;
+            }
+
+            .chart-container {
+                position: relative;
+                width: 100%;
+                height: 200px;
+                max-height: 250px;
+            }
+
+            @media print {
+                body {
+                    background: white;
+                    margin: 0;
+                    padding: 0;
+                }
+
+                .a4-container {
+                    margin: 0;
+                    box-shadow: none;
+                    width: 100%;
+                    height: 100%;
+                    padding: 10mm;
+                }
+
+                .no-print {
+                    display: none;
+                }
+
+                .print-break {
+                    page-break-after: always;
+                }
+            }
+
+            .vocab-row:nth-child(even) {
+                background-color: #f1f5f9;
+            }
+
+            .test-hidden {
+                background-color: #1e293b !important;
+                color: #1e293b !important;
+                cursor: pointer;
+                border-radius: 4px;
+            }
+
+            .test-hidden:hover {
+                background-color: #334155 !important;
+            }
+        </style>
+        <!-- Chosen Palette: Slate & Indigo. Clean, academic, high-contrast for readability and printing. -->
+        <!-- Application Structure Plan: 
+         1. Header: Traditional Handout Header with Name/Place inputs.
+         2. Section A: The 'Regular to Formal' Matrix. Uses a dense 2-column table layout to maximize A4 space.
+         3. Section B: Interactive Lexical Analysis. A chart showing the functional distribution of these words.
+         4. Section C: 'Self-Test' Interaction. Digital-only feature to hide advanced words for active recall.
+         5. Footer: Pedagogical notes and print action.
+    -->
+        <!-- Visualization & Content Choices:
+         1. Bar Chart (Chart.js): Visualizes the categories of vocabulary (Process, Action, Communication).
+         2. Two-Column Grid: Splits the 26 items into two side-by-side lists to prevent vertical whitespace waste.
+         3. Interaction: 'Hide Advanced' toggle for the digital SPA version.
+         4. NO SVG/Mermaid: Icons replaced with Unicode or CSS boundaries.
+    -->
+        <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    </head>
+
+    <body class="py-4">
+
+        <div class="no-print max-w-5xl mx-auto mb-6 px-4 flex justify-between items-center">
+            <div class="bg-indigo-100 text-indigo-800 px-4 py-2 rounded-lg text-sm font-bold">
+                Interactive Teacher Workshop Mode
+            </div>
+            <div class="flex gap-4">
+                <button onclick="toggleTestMode()" id="testModeBtn" class="bg-slate-800 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-slate-700 transition">
+                    Enable Self-Test Mode
+                </button>
+                <button onclick="window.print()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-indigo-500 transition">
+                    Print A4 Handout
+                </button>
+            </div>
+        </div>
+
+        <!-- MAIN A4 PAGE -->
+        <div class="a4-container flex flex-col">
+
+            <!-- Header -->
+            <div class="border-b-2 border-slate-900 pb-4 mb-6">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h1 class="text-2xl font-extrabold tracking-tight text-slate-900 uppercase">Handout 3: Level Up Your English</h1>
+                        <p class="text-slate-500 font-medium">Topic: Approaches to teaching English — Register & Nuance</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-xs font-bold text-slate-400">TRAINER</p>
+                        <p class="font-bold text-slate-800">Preeti Kumari, PGT English</p>
+                    </div>
+                </div>
+
+                <div class="mt-6 flex flex-wrap gap-8">
+                    <div class="flex-grow">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase">Name</span>
+                        <div class="border-b border-slate-300 w-full pt-1">&nbsp;</div>
+                    </div>
+                    <div class="flex-grow">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase">Place of School</span>
+                        <div class="border-b border-slate-300 w-full pt-1">&nbsp;</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 1: The Matrix -->
+            <div class="flex-grow">
+                <h2 class="text-sm font-black bg-slate-900 text-white px-3 py-1 w-fit mb-4 uppercase tracking-widest">The Lexical Upgrade Matrix</h2>
+                <p class="text-[11px] text-slate-600 mb-4 italic">Instruction: Transition from conversational register to academic/formal register using the replacements below.</p>
+
+                <div class="grid grid-cols-2 gap-x-8">
+                    <!-- Column 1 -->
+                    <div class="border rounded overflow-hidden">
+                        <table class="w-full text-[12px] text-left">
+                            <thead class="bg-slate-100 border-b">
+                                <tr>
+                                    <th class="p-2 border-r">Regular English</th>
+                                    <th class="p-2">Academic/Formal</th>
+                                </tr>
+                            </thead>
+                            <tbody id="matrix-body-1">
+                                <!-- Items 1-13 injected here -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Column 2 -->
+                    <div class="border rounded overflow-hidden">
+                        <table class="w-full text-[12px] text-left">
+                            <thead class="bg-slate-100 border-b">
+                                <tr>
+                                    <th class="p-2 border-r">Regular English</th>
+                                    <th class="p-2">Academic/Formal</th>
+                                </tr>
+                            </thead>
+                            <tbody id="matrix-body-2">
+                                <!-- Items 14-26 injected here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 2: Analysis & Chart -->
+            <div class="mt-8 pt-6 border-t border-slate-100">
+                <div class="grid grid-cols-5 gap-6 items-start">
+                    <div class="col-span-3">
+                        <h3 class="text-sm font-bold text-slate-800 mb-2">Pedagogical Analysis</h3>
+                        <p class="text-[11px] text-slate-600 leading-relaxed">
+                            In Senior Secondary levels (Class XI-XII), lexical resource is a critical assessment criterion. This list focuses on **Process Verbs** and **Reporting Verbs**. The chart below illustrates the functional distribution of this vocabulary set.
+                        </p>
+                        <div class="mt-4 grid grid-cols-3 gap-2">
+                            <div class="bg-indigo-50 p-2 rounded text-center border border-indigo-100">
+                                <p class="text-[9px] font-bold text-indigo-400 uppercase">Process</p>
+                                <p class="text-lg font-bold text-indigo-900" id="stat-process">0</p>
+                            </div>
+                            <div class="bg-slate-50 p-2 rounded text-center border border-slate-200">
+                                <p class="text-[9px] font-bold text-slate-400 uppercase">Comm.</p>
+                                <p class="text-lg font-bold text-slate-900" id="stat-comm">0</p>
+                            </div>
+                            <div class="bg-amber-50 p-2 rounded text-center border border-amber-100">
+                                <p class="text-[9px] font-bold text-amber-400 uppercase">Action</p>
+                                <p class="text-lg font-bold text-amber-900" id="stat-action">0</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-span-2">
+                        <div class="chart-container">
+                            <canvas id="vocabChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="mt-auto pt-6 flex justify-between items-end border-t border-slate-900 border-dotted">
+                <div class="text-[10px] text-slate-400 max-w-md">
+                    <strong>Trainer's Note:</strong> Use these for "Formal Letter Writing" and "Analytical Summaries" in the Class XII English Board Exam.
+                </div>
+                <div class="text-[10px] font-bold text-slate-900">
+                    P.K. | HANDOUT 3 | WORKSHOP 2025
+                </div>
+            </div>
+        </div>
+
+        <script>
+            const vocabulary = [
+                { r: "Start", a: "Initiate", cat: "Process" },
+                { r: "Finish", a: "Finalize", cat: "Action" },
+                { r: "Go on", a: "Continue", cat: "Action" },
+                { r: "Break", a: "Disrupt", cat: "Action" },
+                { r: "Think of", a: "Devise", cat: "Process" },
+                { r: "Make", a: "Manufacture", cat: "Action" },
+                { r: "Show", a: "Exhibit", cat: "Comm" },
+                { r: "Help", a: "Facilitate", cat: "Action" },
+                { r: "Get rid", a: "Eliminate", cat: "Process" },
+                { r: "Say again", a: "Reiterate", cat: "Comm" },
+                { r: "Use again", a: "Reuse", cat: "Process" },
+                { r: "Talk", a: "Converse", cat: "Comm" },
+                { r: "Begin", a: "Commence", cat: "Process" },
+                { r: "Choose", a: "Select", cat: "Action" },
+                { r: "Speed up", a: "Accelerate", cat: "Process" },
+                { r: "Help (2)", a: "Assist", cat: "Action" },
+                { r: "Need", a: "Require", cat: "Action" },
+                { r: "Start (2)", a: "Begin", cat: "Process" },
+                { r: "End", a: "Conclude", cat: "Process" },
+                { r: "Tell", a: "Inform", cat: "Comm" },
+                { r: "Say", a: "Declare", cat: "Comm" },
+                { r: "Answer", a: "Respond", cat: "Comm" },
+                { r: "Job", a: "Occupation", cat: "Action" },
+                { r: "House", a: "Residence", cat: "Action" },
+                { r: "Fix", r: "Repair", a: "Repair", cat: "Action" },
+                { r: "Buy", a: "Purchase", cat: "Action" }
+            ];
+
+            let testMode = false;
+
+            function renderMatrix() {
+                const body1 = document.getElementById('matrix-body-1');
+                const body2 = document.getElementById('matrix-body-2');
+                body1.innerHTML = "";
+                body2.innerHTML = "";
+
+                vocabulary.forEach((item, idx) => {
+                    const tr = document.createElement('tr');
+                    tr.className = "vocab-row border-b last:border-0";
+                    tr.innerHTML = `
+                    <td class="p-2 border-r font-medium text-slate-500">${item.r}</td>
+                    <td class="p-2 font-bold text-indigo-700 ${testMode ? 'test-hidden' : ''}" 
+                        onclick="this.classList.remove('test-hidden')">
+                        ${item.a}
+                    </td>
+                `;
+                    if (idx < 13) body1.appendChild(tr);
+                    else body2.appendChild(tr);
+                });
+
+                // Update Stats
+                const counts = vocabulary.reduce((acc, curr) => {
+                    acc[curr.cat] = (acc[curr.cat] || 0) + 1;
+                    return acc;
+                }, {});
+
+                document.getElementById('stat-process').innerText = counts.Process || 0;
+                document.getElementById('stat-comm').innerText = counts.Comm || 0;
+                document.getElementById('stat-action').innerText = counts.Action || 0;
+
+                initChart(counts);
+            }
+
+            function toggleTestMode() {
+                testMode = !testMode;
+                const btn = document.getElementById('testModeBtn');
+                btn.innerText = testMode ? "Disable Test Mode" : "Enable Self-Test Mode";
+                renderMatrix();
+            }
+
+            function initChart(counts) {
+                const ctx = document.getElementById('vocabChart').getContext('2d');
+
+                if (window.vChart) window.vChart.destroy();
+
+                window.vChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Process', 'Comm', 'Action'],
+                        datasets: [{
+                            label: 'Word Count',
+                            data: [counts.Process, counts.Comm, counts.Action],
+                            backgroundColor: ['#6366f1', '#1e293b', '#f59e0b'],
+                            borderRadius: 4
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        maintainAspectRatio: false,
+                        responsive: true,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { grid: { display: false }, ticks: { font: { size: 10, weight: 'bold' } } }
+                        }
+                    }
+                });
+            }
+
+            window.onload = renderMatrix;
+        </script>
+    </body>
+
+</html>

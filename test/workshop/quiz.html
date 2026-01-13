@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Interactive Workshop: English Pedagogy</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+            body {
+                font-family: 'Inter', sans-serif;
+                background-color: #f5f5f4;
+                /* stone-100 */
+                color: #292524;
+                /* stone-800 */
+            }
+
+            .fade-in {
+                animation: fadeIn 0.5s ease-in-out;
+            }
+
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(10px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .chart-container {
+                position: relative;
+                width: 100%;
+                max-width: 400px;
+                margin: 0 auto;
+                height: 300px;
+            }
+
+            /* Custom scrollbar for better aesthetics */
+            ::-webkit-scrollbar {
+                width: 8px;
+            }
+
+            ::-webkit-scrollbar-track {
+                background: #e7e5e4;
+            }
+
+            ::-webkit-scrollbar-thumb {
+                background: #a8a29e;
+                border-radius: 4px;
+            }
+
+            ::-webkit-scrollbar-thumb:hover {
+                background: #78716c;
+            }
+        </style>
+        <!-- Chosen Palette: Warm Neutrals (Stone/Warm Gray) with Teal and Rose Accents for feedback. Minimalist and professional. -->
+        <!-- Application Structure Plan: 
+         1. Landing/Context: Simulates the physical handout header (Name/School).
+         2. Dashboard: Overview of the two modules (Spelling & Collocations).
+         3. Module 1 (Spelling): Interactive quiz cards. Immediate feedback mechanism.
+         4. Module 2 (Collocations): Sentence builder interface. Select the correct preposition/article.
+         5. Reflection/Results: "Trainer's Notes" integration and a visual score summary using Chart.js.
+         WHY: This transforms static paper exercises into active recall tasks, providing instant validation which is crucial for language learning.
+    -->
+        <!-- Visualization & Content Choices:
+         1. Spelling: Multiple Choice Cards -> Goal: Identification -> Interaction: Click to select -> Justification: Mimics the multiple-choice format but gives instant correction.
+         2. Collocations: Dynamic "Complete the Sentence" -> Goal: Usage precision -> Interaction: Button array selection -> Justification: Reinforces the specific "Go + X" structure.
+         3. Results: Doughnut Chart -> Goal: Performance Overview -> Interaction: View score breakdown -> Justification: Chart.js provides a clean, professional summary of accuracy.
+         4. NO SVG/Mermaid: All icons are Unicode or CSS-styled elements. All charts are Chart.js.
+    -->
+        <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    </head>
+
+    <body class="min-h-screen flex flex-col">
+
+        <!-- Header -->
+        <header class="bg-white shadow-sm border-b border-stone-200 sticky top-0 z-10">
+            <div class="max-w-5xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center">
+                <div>
+                    <h1 class="text-xl font-bold text-stone-800">English Pedagogy Workshop</h1>
+                    <p class="text-sm text-stone-500">Trainer: Preeti Kumari, PGT English</p>
+                </div>
+                <div id="user-info-display" class="hidden text-sm font-medium text-teal-700 bg-teal-50 px-3 py-1 rounded-full mt-2 md:mt-0">
+                    <!-- User name inserted here -->
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="flex-grow p-4 md:p-8">
+            <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden min-h-[600px] flex flex-col relative transition-all duration-300" id="app-container">
+
+                <!-- VIEW: Welcome / Registration -->
+                <div id="view-welcome" class="p-8 md:p-12 flex flex-col justify-center items-center text-center h-full fade-in">
+                    <div class="text-6xl mb-6">📝</div>
+                    <h2 class="text-3xl font-bold text-stone-800 mb-4">Workshop Activity Hub</h2>
+                    <p class="text-stone-600 mb-8 max-w-md">
+                        Welcome to the digital companion for the "Approaches to Teaching English" workshop.
+                        Please enter your details to begin the exercises.
+                    </p>
+
+                    <div class="w-full max-w-sm space-y-4">
+                        <div>
+                            <label class="block text-left text-xs font-semibold text-stone-500 uppercase tracking-wider mb-1">Name</label>
+                            <input type="text" id="input-name" class="w-full px-4 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition" placeholder="Enter your name">
+                        </div>
+                        <div>
+                            <label class="block text-left text-xs font-semibold text-stone-500 uppercase tracking-wider mb-1">Place of School</label>
+                            <input type="text" id="input-school" class="w-full px-4 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition" placeholder="Enter school location">
+                        </div>
+                        <button onclick="app.startWorkshop()" class="w-full bg-stone-800 hover:bg-stone-700 text-white font-semibold py-3 rounded-lg transition-colors mt-4 shadow-md">
+                            Start Session
+                        </button>
+                    </div>
+                </div>
+
+                <!-- VIEW: Dashboard -->
+                <div id="view-dashboard" class="hidden p-6 md:p-10 fade-in flex-col h-full">
+                    <div class="mb-8 border-b border-stone-100 pb-4">
+                        <h2 class="text-2xl font-bold text-stone-800">Select a Module</h2>
+                        <p class="text-stone-500 mt-1">Choose an activity to practice your skills.</p>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-6 flex-grow">
+                        <!-- Card 1: Spelling -->
+                        <div onclick="app.loadModule('spelling')" class="group cursor-pointer bg-stone-50 border border-stone-200 rounded-xl p-6 hover:border-teal-400 hover:shadow-md transition-all relative overflow-hidden">
+                            <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity text-6xl">Abc</div>
+                            <h3 class="text-xl font-bold text-stone-800 mb-2 group-hover:text-teal-700">1. Orthography Check</h3>
+                            <p class="text-stone-600 text-sm mb-4">Identify the correct spelling of high-frequency academic words.</p>
+                            <div class="flex items-center text-xs font-medium text-stone-400">
+                                <span class="bg-stone-200 px-2 py-1 rounded mr-2">10 Questions</span>
+                                <span id="status-spelling" class="text-stone-500">Not Started</span>
+                            </div>
+                        </div>
+
+                        <!-- Card 2: Collocations -->
+                        <div onclick="app.loadModule('collocations')" class="group cursor-pointer bg-stone-50 border border-stone-200 rounded-xl p-6 hover:border-teal-400 hover:shadow-md transition-all relative overflow-hidden">
+                            <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity text-6xl">Go</div>
+                            <h3 class="text-xl font-bold text-stone-800 mb-2 group-hover:text-teal-700">2. "Go" Collocations</h3>
+                            <p class="text-stone-600 text-sm mb-4">Master the nuances of the verb "Go" in professional contexts.</p>
+                            <div class="flex items-center text-xs font-medium text-stone-400">
+                                <span class="bg-stone-200 px-2 py-1 rounded mr-2">10 Questions</span>
+                                <span id="status-collocations" class="text-stone-500">Not Started</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 pt-6 border-t border-stone-100 flex justify-between items-center">
+                        <div class="text-sm text-stone-500 italic">
+                            "Mastering these ensures better written communication."
+                        </div>
+                        <button id="btn-results" onclick="app.showResults()" class="hidden px-6 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition shadow-sm font-medium">
+                            View Final Report
+                        </button>
+                    </div>
+                </div>
+
+                <!-- VIEW: Spelling Module -->
+                <div id="view-spelling" class="hidden flex flex-col h-full fade-in">
+                    <div class="bg-stone-50 p-4 border-b border-stone-200 flex justify-between items-center">
+                        <button onclick="app.goHome()" class="text-sm text-stone-500 hover:text-stone-800 flex items-center">
+                            &#8592; Back to Dashboard
+                        </button>
+                        <div class="text-sm font-bold text-stone-700">Spelling Challenge <span id="spelling-progress" class="font-normal text-stone-500 ml-2">1/10</span></div>
+                    </div>
+
+                    <div class="flex-grow flex flex-col justify-center items-center p-6 md:p-12 relative">
+                        <div class="w-full max-w-2xl">
+                            <div class="mb-8 text-center">
+                                <h3 class="text-lg text-stone-500 mb-2 uppercase tracking-wide">Select the correct spelling</h3>
+                                <div class="h-1 w-24 bg-teal-500 mx-auto rounded"></div>
+                            </div>
+
+                            <div id="spelling-options" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <!-- Options injected here -->
+                            </div>
+
+                            <div id="spelling-feedback" class="mt-8 hidden p-4 rounded-lg bg-stone-100 border border-stone-200 text-center animate-pulse">
+                                <!-- Feedback injected here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-4 border-t border-stone-200 bg-white flex justify-end">
+                        <button id="btn-next-spelling" onclick="app.nextSpelling()" class="px-6 py-2 bg-stone-800 text-white rounded-lg opacity-50 cursor-not-allowed" disabled>
+                            Next Question
+                        </button>
+                    </div>
+                </div>
+
+                <!-- VIEW: Collocations Module -->
+                <div id="view-collocations" class="hidden flex flex-col h-full fade-in">
+                    <div class="bg-stone-50 p-4 border-b border-stone-200 flex justify-between items-center">
+                        <button onclick="app.goHome()" class="text-sm text-stone-500 hover:text-stone-800 flex items-center">
+                            &#8592; Back to Dashboard
+                        </button>
+                        <div class="text-sm font-bold text-stone-700">Collocations Master <span id="collo-progress" class="font-normal text-stone-500 ml-2">1/10</span></div>
+                    </div>
+
+                    <div class="flex-grow flex flex-col items-center p-6 md:p-12">
+                        <div class="w-full max-w-3xl text-center">
+                            <p class="text-stone-400 text-sm mb-8 uppercase tracking-widest">Complete the phrase</p>
+
+                            <div class="flex flex-col md:flex-row items-center justify-center gap-4 text-2xl md:text-3xl font-serif text-stone-800 mb-12">
+                                <div id="collo-blank" class="border-b-2 border-stone-300 min-w-[100px] text-teal-600 font-bold px-2 py-1 transition-all">?</div>
+                                <span id="collo-prompt" class="leading-relaxed">...a hunger strike</span>
+                            </div>
+
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-3 max-w-2xl mx-auto">
+                                <button onclick="app.checkCollo('Go')" class="collo-btn p-3 border border-stone-300 rounded hover:bg-stone-50 text-stone-600 font-medium transition">Go</button>
+                                <button onclick="app.checkCollo('Go for')" class="collo-btn p-3 border border-stone-300 rounded hover:bg-stone-50 text-stone-600 font-medium transition">Go for</button>
+                                <button onclick="app.checkCollo('Go on')" class="collo-btn p-3 border border-stone-300 rounded hover:bg-stone-50 text-stone-600 font-medium transition">Go on</button>
+                                <button onclick="app.checkCollo('Go to')" class="collo-btn p-3 border border-stone-300 rounded hover:bg-stone-50 text-stone-600 font-medium transition">Go to</button>
+                                <button onclick="app.checkCollo('Go to a')" class="collo-btn p-3 border border-stone-300 rounded hover:bg-stone-50 text-stone-600 font-medium transition">Go to a</button>
+                                <button onclick="app.checkCollo('Go to the')" class="collo-btn p-3 border border-stone-300 rounded hover:bg-stone-50 text-stone-600 font-medium transition">Go to the</button>
+                            </div>
+
+                            <div id="collo-feedback" class="mt-6 h-8 text-sm font-medium"></div>
+                        </div>
+                    </div>
+
+                    <div class="p-4 border-t border-stone-200 bg-white flex justify-between items-center">
+                        <div class="text-xs text-stone-400 hidden md:block">Tip: Think about the destination vs. the activity.</div>
+                        <button id="btn-next-collo" onclick="app.nextCollo()" class="px-6 py-2 bg-stone-800 text-white rounded-lg opacity-50 cursor-not-allowed" disabled>
+                            Next Item
+                        </button>
+                    </div>
+                </div>
+
+                <!-- VIEW: Results -->
+                <div id="view-results" class="hidden p-6 md:p-10 fade-in flex-col h-full overflow-y-auto">
+                    <div class="text-center mb-8">
+                        <h2 class="text-3xl font-bold text-stone-800">Workshop Summary</h2>
+                        <p class="text-stone-500">Approaches to Teaching English</p>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-8 mb-8">
+                        <!-- Chart Section -->
+                        <div class="bg-stone-50 p-6 rounded-xl shadow-inner flex flex-col items-center justify-center">
+                            <h3 class="text-lg font-bold text-stone-700 mb-4">Performance Overview</h3>
+                            <div class="chart-container">
+                                <canvas id="resultsChart"></canvas>
+                            </div>
+                            <p id="final-score-text" class="mt-4 text-xl font-bold text-teal-700">Total Score: 0/20</p>
+                        </div>
+
+                        <!-- Reflection Section -->
+                        <div class="flex flex-col gap-6">
+                            <div class="bg-white border border-stone-200 p-6 rounded-xl shadow-sm">
+                                <h3 class="text-lg font-bold text-stone-800 mb-2">Instructional Reflection</h3>
+                                <p class="text-sm text-stone-600 mb-4 italic">
+                                    "How would you introduce these nuances to Class XI or XII students to prevent L1 interference?"
+                                </p>
+                                <textarea id="reflection-input" class="w-full p-3 border border-stone-300 rounded-lg text-sm bg-stone-50 focus:bg-white focus:ring-2 focus:ring-teal-500 outline-none h-32" placeholder="Type your teaching strategy here..."></textarea>
+                            </div>
+
+                            <div class="bg-teal-50 border border-teal-100 p-6 rounded-xl">
+                                <h3 class="text-md font-bold text-teal-800 mb-2">&#10024; Trainer's Note</h3>
+                                <p class="text-sm text-teal-700">
+                                    These words are selected based on common orthographic errors. Mastering collocations like 'Go on a strike' vs 'Go for a walk' is vital for natural fluency.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center pb-8">
+                        <button onclick="window.print()" class="px-6 py-2 bg-stone-200 hover:bg-stone-300 text-stone-700 rounded-lg font-medium transition mr-4">
+                            Print Handout / Report
+                        </button>
+                        <button onclick="location.reload()" class="px-6 py-2 bg-stone-800 hover:bg-stone-700 text-white rounded-lg font-medium transition">
+                            Restart Workshop
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+
+        <footer class="bg-white border-t border-stone-200 mt-auto py-6">
+            <div class="max-w-4xl mx-auto px-4 text-center text-xs text-stone-400">
+                &copy; English Pedagogy Workshop Material. Content adapted from Handout 1 & 2.
+            </div>
+        </footer>
+
+        <script>
+            // Data Store
+            const spellingData = [
+                { id: 1, options: ['Occurrene', 'Accurrence', 'Occurrence', 'Ocurrence'], correct: 'Occurrence' },
+                { id: 2, options: ['Complementary', 'Comlinetary', 'Complamentary', 'Complimontary'], correct: 'Complementary' },
+                { id: 3, options: ['Committee', 'Committe', 'Comiittee', 'Commiitee'], correct: 'Committee' },
+                { id: 4, options: ['Definitely', 'Definately', 'Definetely', 'Definetly'], correct: 'Definitely' },
+                { id: 5, options: ['Embarras', 'Embarrass', 'Embarras', 'Embaras'], correct: 'Embarrass' },
+                { id: 6, options: ['Millonaire', 'Millionaire', 'Millonare', 'Millionare'], correct: 'Millionaire' },
+                { id: 7, options: ['Pedagogy', 'Pedagogy', 'Pedagogy', 'Padagogy'], correct: 'Pedagogy' }, // Note: Handout had dupes, fixing for logic
+                { id: 8, options: ['Curriculum', 'Curricullum', 'Curriculum', 'Curiculum'], correct: 'Curriculum' },
+                { id: 9, options: ['Fluency', 'Fluency', 'Fluancy', 'Flovency'], correct: 'Fluency' },
+                { id: 10, options: ['Assessment', 'Assesment', 'Assement', 'Assesement'], correct: 'Assessment' }
+            ];
+
+            // Fixing unique options for Q7 and Q9 from source data manually to ensure logic works
+            spellingData[6].options = ['Pedagogy', 'Pedegogy', 'Pedogogy', 'Padagogy'];
+            spellingData[8].options = ['Fluency', 'Fluancy', 'Flovency', 'Fluencsy'];
+
+            const collocationsData = [
+                { prompt: "...a hunger strike", answer: "Go on" },
+                { prompt: "...the Principal's office", answer: "Go to the" },
+                { prompt: "...missing during the event", answer: "Go" },
+                { prompt: "...a strict keto diet", answer: "Go on" },
+                { prompt: "...the airport to receive guests", answer: "Go to the" },
+                { prompt: "...abroad for a sabbatical", answer: "Go" },
+                { prompt: "...a brisk morning jog", answer: "Go for" },
+                { prompt: "...a professional conference", answer: "Go to a" },
+                { prompt: "...university for higher studies", answer: "Go to" },
+                { prompt: "...work early on Mondays", answer: "Go to" }
+            ];
+
+            // App State
+            const state = {
+                user: { name: '', school: '' },
+                scores: { spelling: 0, collocations: 0 },
+                progress: { spelling: 0, collocations: 0 }, // current index
+                completed: { spelling: false, collocations: false },
+                answers: { spelling: [], collocations: [] } // track correct/incorrect per q
+            };
+
+            const app = {
+                init: () => {
+                    // Initial renders if needed
+                },
+
+                startWorkshop: () => {
+                    const name = document.getElementById('input-name').value.trim();
+                    const school = document.getElementById('input-school').value.trim();
+
+                    if (!name || !school) {
+                        alert("Please enter both Name and School to proceed.");
+                        return;
+                    }
+
+                    state.user.name = name;
+                    state.user.school = school;
+
+                    document.getElementById('user-info-display').innerText = `${name} | ${school}`;
+                    document.getElementById('user-info-display').classList.remove('hidden');
+
+                    app.switchView('view-dashboard');
+                },
+
+                switchView: (viewId) => {
+                    ['view-welcome', 'view-dashboard', 'view-spelling', 'view-collocations', 'view-results'].forEach(id => {
+                        document.getElementById(id).classList.add('hidden');
+                    });
+                    document.getElementById(viewId).classList.remove('hidden');
+                },
+
+                goHome: () => {
+                    app.updateDashboardStatus();
+                    app.switchView('view-dashboard');
+                },
+
+                updateDashboardStatus: () => {
+                    const sStatus = document.getElementById('status-spelling');
+                    const cStatus = document.getElementById('status-collocations');
+                    const resBtn = document.getElementById('btn-results');
+
+                    if (state.completed.spelling) {
+                        sStatus.innerHTML = `<span class="text-teal-600 font-bold">Completed (${state.scores.spelling}/10)</span>`;
+                    } else if (state.progress.spelling > 0) {
+                        sStatus.innerHTML = `<span class="text-amber-600">In Progress</span>`;
+                    }
+
+                    if (state.completed.collocations) {
+                        cStatus.innerHTML = `<span class="text-teal-600 font-bold">Completed (${state.scores.collocations}/10)</span>`;
+                    } else if (state.progress.collocations > 0) {
+                        cStatus.innerHTML = `<span class="text-amber-600">In Progress</span>`;
+                    }
+
+                    if (state.completed.spelling && state.completed.collocations) {
+                        resBtn.classList.remove('hidden');
+                    }
+                },
+
+                loadModule: (moduleName) => {
+                    if (state.completed[moduleName]) {
+                        alert("You have already completed this module!");
+                        return;
+                    }
+
+                    if (moduleName === 'spelling') {
+                        app.renderSpellingQuestion();
+                        app.switchView('view-spelling');
+                    } else {
+                        app.renderColloQuestion();
+                        app.switchView('view-collocations');
+                    }
+                },
+
+                // --- SPELLING LOGIC ---
+
+                renderSpellingQuestion: () => {
+                    const idx = state.progress.spelling;
+                    const data = spellingData[idx];
+
+                    document.getElementById('spelling-progress').innerText = `${idx + 1} / 10`;
+
+                    const container = document.getElementById('spelling-options');
+                    container.innerHTML = '';
+
+                    // Shuffle options for randomness if desired, but sticking to logic
+                    // Just map them to buttons
+                    data.options.forEach(opt => {
+                        const btn = document.createElement('button');
+                        btn.className = `w-full p-4 bg-white border border-stone-200 rounded-lg shadow-sm hover:bg-stone-50 transition text-lg font-medium text-stone-700 text-left spelling-opt-btn`;
+                        btn.innerText = opt;
+                        btn.onclick = () => app.checkSpelling(btn, opt, data.correct);
+                        container.appendChild(btn);
+                    });
+
+                    document.getElementById('spelling-feedback').classList.add('hidden');
+                    const nextBtn = document.getElementById('btn-next-spelling');
+                    nextBtn.disabled = true;
+                    nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                    nextBtn.innerText = idx === 9 ? "Finish Module" : "Next Question";
+                },
+
+                checkSpelling: (btn, selected, correct) => {
+                    // Disable all buttons
+                    const allBtns = document.querySelectorAll('.spelling-opt-btn');
+                    allBtns.forEach(b => b.disabled = true);
+
+                    const feedback = document.getElementById('spelling-feedback');
+                    feedback.classList.remove('hidden', 'bg-stone-100', 'bg-teal-50', 'bg-rose-50');
+
+                    const isCorrect = selected === correct;
+
+                    if (isCorrect) {
+                        btn.classList.add('bg-teal-600', 'text-white', 'border-teal-600');
+                        btn.classList.remove('bg-white', 'text-stone-700');
+                        feedback.classList.add('bg-teal-50', 'text-teal-800');
+                        feedback.innerHTML = `<strong>Correct!</strong> <span class="block text-sm mt-1">'${correct}' is the right spelling.</span>`;
+                        state.scores.spelling++;
+                    } else {
+                        btn.classList.add('bg-rose-500', 'text-white', 'border-rose-500');
+                        btn.classList.remove('bg-white', 'text-stone-700');
+
+                        // Highlight correct one
+                        allBtns.forEach(b => {
+                            if (b.innerText === correct) {
+                                b.classList.add('bg-teal-100', 'border-teal-400', 'text-teal-800');
+                            }
+                        });
+
+                        feedback.classList.add('bg-rose-50', 'text-rose-800');
+                        feedback.innerHTML = `<strong>Incorrect.</strong> <span class="block text-sm mt-1">The correct spelling is <strong>${correct}</strong>.</span>`;
+                    }
+
+                    const nextBtn = document.getElementById('btn-next-spelling');
+                    nextBtn.disabled = false;
+                    nextBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                },
+
+                nextSpelling: () => {
+                    state.progress.spelling++;
+                    if (state.progress.spelling < spellingData.length) {
+                        app.renderSpellingQuestion();
+                    } else {
+                        state.completed.spelling = true;
+                        app.goHome();
+                    }
+                },
+
+                // --- COLLOCATIONS LOGIC ---
+
+                renderColloQuestion: () => {
+                    const idx = state.progress.collocations;
+                    const data = collocationsData[idx];
+
+                    document.getElementById('collo-progress').innerText = `${idx + 1} / 10`;
+                    document.getElementById('collo-prompt').innerText = data.prompt;
+                    document.getElementById('collo-blank').innerText = "?";
+                    document.getElementById('collo-blank').className = "border-b-2 border-stone-300 min-w-[100px] text-teal-600 font-bold px-2 py-1 transition-all";
+
+                    const feedback = document.getElementById('collo-feedback');
+                    feedback.innerText = '';
+                    feedback.className = "mt-6 h-8 text-sm font-medium";
+
+                    // Enable buttons
+                    document.querySelectorAll('.collo-btn').forEach(b => {
+                        b.disabled = false;
+                        b.className = "collo-btn p-3 border border-stone-300 rounded hover:bg-stone-50 text-stone-600 font-medium transition bg-white";
+                    });
+
+                    const nextBtn = document.getElementById('btn-next-collo');
+                    nextBtn.disabled = true;
+                    nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                    nextBtn.innerText = idx === 9 ? "Finish Module" : "Next Item";
+                },
+
+                checkCollo: (selectedAnswer) => {
+                    const idx = state.progress.collocations;
+                    const correct = collocationsData[idx].answer;
+
+                    // Disable buttons
+                    const allBtns = document.querySelectorAll('.collo-btn');
+                    let selectedBtn = null;
+
+                    allBtns.forEach(b => {
+                        b.disabled = true;
+                        if (b.innerText === selectedAnswer) selectedBtn = b;
+                    });
+
+                    const isCorrect = selectedAnswer === correct;
+                    const feedback = document.getElementById('collo-feedback');
+                    const blank = document.getElementById('collo-blank');
+
+                    blank.innerText = selectedAnswer;
+
+                    if (isCorrect) {
+                        selectedBtn.classList.remove('bg-white', 'text-stone-600', 'border-stone-300');
+                        selectedBtn.classList.add('bg-teal-600', 'text-white', 'border-teal-600');
+                        feedback.innerText = "Correct! This phrasing is standard usage.";
+                        feedback.classList.add('text-teal-600');
+                        blank.classList.add('border-teal-500', 'text-teal-700');
+                        blank.classList.remove('border-stone-300');
+                        state.scores.collocations++;
+                    } else {
+                        selectedBtn.classList.remove('bg-white', 'text-stone-600', 'border-stone-300');
+                        selectedBtn.classList.add('bg-rose-500', 'text-white', 'border-rose-500');
+
+                        // Show correct
+                        allBtns.forEach(b => {
+                            if (b.innerText === correct) {
+                                b.classList.remove('bg-white', 'border-stone-300');
+                                b.classList.add('bg-teal-100', 'border-teal-400', 'text-teal-900');
+                            }
+                        });
+
+                        feedback.innerText = `Incorrect. We usually say "${correct} ${collocationsData[idx].prompt.trim()}"`;
+                        feedback.classList.add('text-rose-600');
+                        blank.innerText = selectedAnswer; // keep their error visible in blank? Or correct it? Let's keep error.
+                        blank.classList.add('border-rose-500', 'text-rose-600');
+                    }
+
+                    const nextBtn = document.getElementById('btn-next-collo');
+                    nextBtn.disabled = false;
+                    nextBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                },
+
+                nextCollo: () => {
+                    state.progress.collocations++;
+                    if (state.progress.collocations < collocationsData.length) {
+                        app.renderColloQuestion();
+                    } else {
+                        state.completed.collocations = true;
+                        app.goHome();
+                    }
+                },
+
+                // --- RESULTS ---
+
+                showResults: () => {
+                    app.switchView('view-results');
+
+                    const totalScore = state.scores.spelling + state.scores.collocations;
+                    document.getElementById('final-score-text').innerText = `Total Score: ${totalScore} / 20`;
+
+                    // Render Chart
+                    const ctx = document.getElementById('resultsChart').getContext('2d');
+
+                    // Destroy old chart if exists
+                    if (window.myChart) window.myChart.destroy();
+
+                    window.myChart = new Chart(ctx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Spelling Correct', 'Spelling Incorrect', 'Collocations Correct', 'Collocations Incorrect'],
+                            datasets: [{
+                                data: [
+                                    state.scores.spelling,
+                                    10 - state.scores.spelling,
+                                    state.scores.collocations,
+                                    10 - state.scores.collocations
+                                ],
+                                backgroundColor: [
+                                    '#0d9488', // Teal 600
+                                    '#ccfbf1', // Teal 100
+                                    '#292524', // Stone 800
+                                    '#e7e5e4'  // Stone 200
+                                ],
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                    labels: {
+                                        boxWidth: 12,
+                                        font: { size: 10 }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+            };
+
+            // Initialize empty state logic if needed
+        </script>
+    </body>
+
+</html>
