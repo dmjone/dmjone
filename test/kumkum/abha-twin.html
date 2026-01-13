@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>NBCSC 2026: Project HALE | Interactive Briefing</title>
+        <!-- Tailwind CSS -->
+        <script src="https://cdn.tailwindcss.com"></script>
+        <!-- Chart.js -->
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <!-- Google Fonts -->
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+
+        <!-- Chosen Palette: "Teal & Amber Professional" -->
+        <!-- Background: #F3F4F6 (Gray-100), Primary: #0F766E (Teal-700), Secondary: #D97706 (Amber-600), Text: #1F2937 (Gray-800) -->
+
+        <!-- Application Structure Plan:
+         1. Hero Section: Immediate hook. Visualizes the core metric (HALE 58.1 vs Target 68).
+         2. Data Narrative (The Diagnosis): A tabbed interface allowing users to switch between the three major crisis areas defined in the booklet:
+            - Mental Health (The Silent Crisis)
+            - NCDs & Lifestyle (The Physical Crisis)
+            - Economic Impact (The Financial Crisis)
+         3. The Strategic Framework: An interactive implementation of the "Transformation Model" (Booklet Page 35). Users click Determinants to reveal Interventions.
+         4. Institutional Toolkit: Cards displaying existing government enablers (ABDM, Fit India).
+         Why this structure? It follows the logical flow of a Case Study: Problem ID -> Data Analysis -> Framework Application -> Resource Assessment.
+    -->
+
+        <!-- Visualization & Content Choices:
+         - HALE Gap: Chart.js Bar Chart. Compares Current HALE, Life Expectancy, and Target. Goal: Compare.
+         - Mental Health Stats: Chart.js Bar Chart. Shows morbidity across demographics. Goal: Inform.
+         - NCD Burden: Chart.js Doughnut. Shows % of NCD deaths vs others. Goal: Compare.
+         - Economic Loss: Chart.js Line Chart. Visualizes the $6.2T loss trend. Goal: Change.
+         - Framework: Interactive HTML Grid. Replaces a static diagram with clickable elements to show relationships. Goal: Organize.
+         - Justification: Chart.js provides robust, responsive canvases without SVG. HTML interactivity engages the user in the logic of the case.
+    -->
+
+        <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+        <style>
+            body {
+                font-family: 'Inter', sans-serif;
+                background-color: #F3F4F6;
+                color: #1F2937;
+            }
+
+            h1,
+            h2,
+            h3 {
+                font-family: 'Playfair Display', serif;
+            }
+
+            /* Chart Container Styling - Mandatory Requirements */
+            .chart-container {
+                position: relative;
+                width: 100%;
+                max-width: 100%;
+                /* Constraints managed by grid columns */
+                height: 300px;
+                max-height: 400px;
+                margin: 0 auto;
+            }
+
+            @media (min-width: 768px) {
+                .chart-container {
+                    height: 350px;
+                }
+            }
+
+            /* Custom Scrollbar */
+            ::-webkit-scrollbar {
+                width: 8px;
+            }
+
+            ::-webkit-scrollbar-track {
+                background: #f1f1f1;
+            }
+
+            ::-webkit-scrollbar-thumb {
+                background: #0F766E;
+                border-radius: 4px;
+            }
+
+            ::-webkit-scrollbar-thumb:hover {
+                background: #115E59;
+            }
+
+            /* Animation Utilities */
+            .fade-in {
+                animation: fadeIn 0.5s ease-in-out;
+            }
+
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(10px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+        </style>
+    </head>
+
+    <body class="antialiased">
+
+        <!-- Navigation -->
+        <nav class="sticky top-0 z-50 bg-white shadow-md border-b border-gray-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between h-16">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0 flex items-center">
+                            <span class="text-2xl font-bold text-teal-800">NBCSC<span class="text-amber-600">2026</span></span>
+                        </div>
+                    </div>
+                    <div class="hidden md:flex items-center space-x-8">
+                        <button onclick="scrollToSection('hero')" class="text-gray-600 hover:text-teal-700 font-medium transition">The Mission</button>
+                        <button onclick="scrollToSection('diagnosis')" class="text-gray-600 hover:text-teal-700 font-medium transition">Data Diagnosis</button>
+                        <button onclick="scrollToSection('framework')" class="text-gray-600 hover:text-teal-700 font-medium transition">Strategy Framework</button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Hero Section: The Problem Statement -->
+        <section id="hero" class="relative bg-teal-900 text-white pt-20 pb-24 overflow-hidden">
+            <!-- Abstract Background Pattern using CSS Gradients (No Images) -->
+            <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#ffffff 1px, transparent 1px); background-size: 30px 30px;"></div>
+
+            <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center gap-12">
+                <div class="md:w-1/2 space-y-6">
+                    <div class="inline-block px-3 py-1 bg-amber-500 text-white text-xs font-bold tracking-wider uppercase rounded-full">Nation Building Case Study</div>
+                    <h1 class="text-4xl md:text-6xl font-bold leading-tight">
+                        The 10-Year Gap: <br>
+                        <span class="text-teal-300">Project HALE</span>
+                    </h1>
+                    <p class="text-teal-100 text-lg md:text-xl max-w-lg">
+                        India's Health-Adjusted Life Expectancy (HALE) stands at <strong>58.1 years</strong>.
+                        The mission: Enable the next generation to gain an extra decade of healthy living.
+                    </p>
+                    <div class="flex flex-wrap gap-4 pt-4">
+                        <div class="bg-white/10 backdrop-blur-sm border border-white/20 p-4 rounded-lg">
+                            <div class="text-3xl font-bold text-white">58.1</div>
+                            <div class="text-xs text-teal-200 uppercase">Current HALE</div>
+                        </div>
+                        <div class="bg-amber-600/90 backdrop-blur-sm border border-amber-500/20 p-4 rounded-lg">
+                            <div class="text-3xl font-bold text-white">~68.0</div>
+                            <div class="text-xs text-white/90 uppercase">Target HALE</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hero Chart: The Gap -->
+                <div class="md:w-1/2 w-full bg-white rounded-xl shadow-2xl p-6 text-gray-800">
+                    <h3 class="text-lg font-bold mb-2 border-b pb-2">Life Expectancy vs. Healthy Life</h3>
+                    <p class="text-xs text-gray-500 mb-4">The difference between "Living" and "Living Healthy" is the gap we must close.</p>
+                    <div class="chart-container">
+                        <canvas id="haleChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: The Diagnosis (Interactive Data Narrative) -->
+        <section id="diagnosis" class="py-20 bg-gray-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl font-bold text-gray-900">The Diagnosis: What Drains India's Vitality?</h2>
+                    <p class="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">
+                        To increase HALE, we must attack the root causes of disability. The report identifies three critical "Drainers" affecting the youth.
+                    </p>
+                </div>
+
+                <!-- Tab Navigation -->
+                <div class="flex justify-center mb-10">
+                    <div class="bg-white p-1 rounded-lg shadow-sm border border-gray-200 inline-flex">
+                        <button onclick="switchTab('mental')" id="tab-mental" class="px-6 py-2 rounded-md text-sm font-medium transition-all bg-teal-600 text-white shadow-sm">
+                            Mental Health
+                        </button>
+                        <button onclick="switchTab('ncd')" id="tab-ncd" class="px-6 py-2 rounded-md text-sm font-medium text-gray-500 hover:text-gray-900 transition-all">
+                            NCDs & Lifestyle
+                        </button>
+                        <button onclick="switchTab('economic')" id="tab-economic" class="px-6 py-2 rounded-md text-sm font-medium text-gray-500 hover:text-gray-900 transition-all">
+                            Economic Impact
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Content Container -->
+                <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 min-h-[500px]">
+
+                    <!-- View 1: Mental Health -->
+                    <div id="view-mental" class="p-8 md:p-12 fade-in">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                            <div>
+                                <div class="inline-flex items-center gap-2 mb-4">
+                                    <span class="w-2 h-8 bg-purple-600 rounded-full"></span>
+                                    <h3 class="text-2xl font-bold text-gray-900">The Silent Epidemic</h3>
+                                </div>
+                                <p class="text-gray-600 mb-6 leading-relaxed">
+                                    <strong>10.6% of Indian adults</strong> suffer from mental morbidity. The crisis is particularly acute in urban metros (13.5%). For youth, anxiety and stress are major contributors to "Years Lost to Disability" (YLD), yet the treatment gap remains approx 85%.
+                                </p>
+                                <ul class="space-y-3 mb-8">
+                                    <li class="flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center text-purple-700 font-bold">1</div>
+                                        <span class="text-gray-700">Highest prevalence in <strong>15-29 age group</strong>.</span>
+                                    </li>
+                                    <li class="flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center text-purple-700 font-bold">2</div>
+                                        <span class="text-gray-700">Driven by exam stress, jobs, and rapid urbanization.</span>
+                                    </li>
+                                </ul>
+                                <div class="bg-purple-50 border-l-4 border-purple-500 p-4">
+                                    <p class="text-sm text-purple-800 font-medium">"Mental health is a gatekeeper. If it fails, physical health follows."</p>
+                                </div>
+                            </div>
+                            <div class="bg-gray-50 rounded-xl p-6 border border-gray-100">
+                                <h4 class="text-sm font-semibold text-gray-500 uppercase mb-4 text-center">Mental Disorder Prevalence (%)</h4>
+                                <div class="chart-container">
+                                    <canvas id="mentalChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- View 2: NCDs -->
+                    <div id="view-ncd" class="p-8 md:p-12 fade-in hidden">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                            <div class="order-2 md:order-1 bg-gray-50 rounded-xl p-6 border border-gray-100">
+                                <h4 class="text-sm font-semibold text-gray-500 uppercase mb-4 text-center">Composition of Disease Burden</h4>
+                                <div class="chart-container">
+                                    <canvas id="ncdChart"></canvas>
+                                </div>
+                            </div>
+                            <div class="order-1 md:order-2">
+                                <div class="inline-flex items-center gap-2 mb-4">
+                                    <span class="w-2 h-8 bg-red-600 rounded-full"></span>
+                                    <h3 class="text-2xl font-bold text-gray-900">The Lifestyle Crisis</h3>
+                                </div>
+                                <p class="text-gray-600 mb-6 leading-relaxed">
+                                    Non-Communicable Diseases (NCDs) like Diabetes and Hypertension now account for over <strong>60% of all deaths</strong> in India. This is no longer an "old person's problem."
+                                </p>
+                                <div class="grid grid-cols-2 gap-4 mb-6">
+                                    <div class="bg-red-50 p-4 rounded-lg text-center">
+                                        <div class="text-2xl font-bold text-red-700">49.4%</div>
+                                        <div class="text-xs text-red-600 font-medium mt-1">Physically Inactive Adults</div>
+                                    </div>
+                                    <div class="bg-orange-50 p-4 rounded-lg text-center">
+                                        <div class="text-2xl font-bold text-orange-700">Top 3</div>
+                                        <div class="text-xs text-orange-600 font-medium mt-1">Global Diabetes Rank</div>
+                                    </div>
+                                </div>
+                                <p class="text-sm text-gray-500 italic">
+                                    *Data Source: ICMR & Booklet Stats. Inactivity is the primary risk factor for early onset NCDs.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- View 3: Economic -->
+                    <div id="view-economic" class="p-8 md:p-12 fade-in hidden">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                            <div>
+                                <div class="inline-flex items-center gap-2 mb-4">
+                                    <span class="w-2 h-8 bg-green-600 rounded-full"></span>
+                                    <h3 class="text-2xl font-bold text-gray-900">The $6.2 Trillion Cost</h3>
+                                </div>
+                                <p class="text-gray-600 mb-6 leading-relaxed">
+                                    Health is Wealth, literally. The projected economic loss for India due to NCDs and mental health conditions between 2012 and 2030 is astronomical.
+                                </p>
+                                <div class="space-y-4">
+                                    <div class="flex justify-between items-center p-3 bg-gray-50 rounded border border-gray-100">
+                                        <span class="font-medium text-gray-700">Mental Health Conditions</span>
+                                        <span class="font-bold text-red-600">$1.03 Trillion</span>
+                                    </div>
+                                    <div class="flex justify-between items-center p-3 bg-gray-50 rounded border border-gray-100">
+                                        <span class="font-medium text-gray-700">Cardiovascular Diseases</span>
+                                        <span class="font-bold text-red-600">$2.17 Trillion</span>
+                                    </div>
+                                    <div class="flex justify-between items-center p-3 bg-teal-50 rounded border border-teal-100">
+                                        <span class="font-bold text-teal-800">Total NCD Loss (2012-2030)</span>
+                                        <span class="font-bold text-teal-800">$6.20 Trillion</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-gray-50 rounded-xl p-6 border border-gray-100">
+                                <h4 class="text-sm font-semibold text-gray-500 uppercase mb-4 text-center">Cumulative Economic Loss Projection</h4>
+                                <div class="chart-container">
+                                    <canvas id="econChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: The Framework (Transformation Model) -->
+        <section id="framework" class="py-20 bg-teal-900 text-white relative">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="mb-12">
+                    <span class="text-teal-300 font-bold tracking-wider uppercase text-sm">Strategic Tool</span>
+                    <h2 class="text-3xl font-bold mt-2">The Transformation Model</h2>
+                    <p class="text-teal-100 mt-4 max-w-3xl">
+                        As per Page 35 of the booklet, any proposed solution must map to this framework.
+                        <strong>Click on a Determinant</strong> below to see how we can intervene.
+                    </p>
+                </div>
+
+                <!-- Interactive Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+                    <!-- Left: Determinants (Inputs) -->
+                    <div class="lg:col-span-4 space-y-4">
+                        <h3 class="text-xl font-bold text-teal-200 mb-4 border-b border-teal-700 pb-2">1. Determinants (Causes)</h3>
+
+                        <div onclick="showFramework('self')" class="framework-card cursor-pointer bg-teal-800 hover:bg-teal-700 p-4 rounded-lg border border-teal-600 transition-all transform hover:-translate-y-1 group">
+                            <div class="flex justify-between items-center">
+                                <span class="font-bold text-lg">Self-Determined</span>
+                                <span class="text-teal-400 group-hover:text-white">→</span>
+                            </div>
+                            <p class="text-sm text-teal-300 mt-2">Individual choices: Diet, Exercise, Sleep.</p>
+                        </div>
+
+                        <div onclick="showFramework('social')" class="framework-card cursor-pointer bg-teal-800 hover:bg-teal-700 p-4 rounded-lg border border-teal-600 transition-all transform hover:-translate-y-1 group">
+                            <div class="flex justify-between items-center">
+                                <span class="font-bold text-lg">Social</span>
+                                <span class="text-teal-400 group-hover:text-white">→</span>
+                            </div>
+                            <p class="text-sm text-teal-300 mt-2">Community norms, peer pressure, family.</p>
+                        </div>
+
+                        <div onclick="showFramework('environ')" class="framework-card cursor-pointer bg-teal-800 hover:bg-teal-700 p-4 rounded-lg border border-teal-600 transition-all transform hover:-translate-y-1 group">
+                            <div class="flex justify-between items-center">
+                                <span class="font-bold text-lg">Environmental</span>
+                                <span class="text-teal-400 group-hover:text-white">→</span>
+                            </div>
+                            <p class="text-sm text-teal-300 mt-2">Workplace culture, pollution, urban design.</p>
+                        </div>
+                    </div>
+
+                    <!-- Center: Connection Visual -->
+                    <div class="hidden lg:flex lg:col-span-1 items-center justify-center">
+                        <div class="h-full w-px bg-teal-700 relative">
+                            <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-teal-900 border border-teal-500 p-2 rounded-full">
+                                <span class="text-xl">➔</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Interventions & Levers (Outputs) -->
+                    <div class="lg:col-span-7 bg-teal-800/50 rounded-xl p-8 border border-teal-700">
+                        <div id="framework-content" class="h-full flex flex-col justify-center">
+                            <div class="text-center opacity-50">
+                                <div class="text-6xl mb-4">👆</div>
+                                <p class="text-xl">Select a Determinant on the left to reveal the Strategy.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: The Toolkit (Existing Enablers) -->
+        <section class="py-20 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-3xl font-bold text-gray-900 mb-10 text-center">Institutional Enablers (The Toolkit)</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+                    <!-- Card 1 -->
+                    <div class="bg-white rounded-xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-shadow">
+                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+                            <span class="text-2xl">🆔</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">ABHA & ABDM</h3>
+                        <p class="text-gray-600 text-sm">Ayushman Bharat Digital Mission. Provides the tech backbone (Health IDs) to track longitudinal health data for every citizen.</p>
+                    </div>
+
+                    <!-- Card 2 -->
+                    <div class="bg-white rounded-xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-shadow">
+                        <div class="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center mb-4">
+                            <span class="text-2xl">🏃</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">Fit India Movement</h3>
+                        <p class="text-gray-600 text-sm">A behavioral change campaign focused on physical fitness. Key lever for the "Self-Determined" determinant.</p>
+                    </div>
+
+                    <!-- Card 3 -->
+                    <div class="bg-white rounded-xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-shadow">
+                        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
+                            <span class="text-2xl">🧘</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">NMHP</h3>
+                        <p class="text-gray-600 text-sm">National Mental Health Program. Focuses on community-based interventions to address the rising mental morbidity.</p>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="bg-gray-900 text-gray-400 py-12">
+            <div class="max-w-7xl mx-auto px-4 text-center">
+                <p class="font-serif italic text-lg text-gray-300 mb-4">"Health is not just the absence of disease, but the foundation of a nation."</p>
+                <div class="w-12 h-1 bg-teal-600 mx-auto mb-6"></div>
+                <p class="text-sm">Generated for NBCSC 2026 Round 2 Analysis.</p>
+                <p class="text-xs mt-2 text-gray-600">Data Source: Nation Building Case Study Booklet.</p>
+            </div>
+        </footer>
+
+        <!-- Script -->
+        <script>
+            // --- 1. Global Config & Utils ---
+            Chart.defaults.font.family = "'Inter', sans-serif";
+            Chart.defaults.color = '#4B5563';
+
+            // Tooltip Callback for Multi-line Labels (Mandatory)
+            const tooltipConfig = {
+                callbacks: {
+                    title: function (tooltipItems) {
+                        const item = tooltipItems[0];
+                        let label = item.chart.data.labels[item.dataIndex];
+                        if (Array.isArray(label)) {
+                            return label.join(' ');
+                        } else {
+                            return label;
+                        }
+                    }
+                }
+            };
+
+            // Label Wrapping Helper
+            function wrapLabel(str, maxLen = 16) {
+                if (str.length <= maxLen) return str;
+                const words = str.split(' ');
+                const lines = [];
+                let currentLine = words[0];
+
+                for (let i = 1; i < words.length; i++) {
+                    if (currentLine.length + 1 + words[i].length <= maxLen) {
+                        currentLine += " " + words[i];
+                    } else {
+                        lines.push(currentLine);
+                        currentLine = words[i];
+                    }
+                }
+                lines.push(currentLine);
+                return lines;
+            }
+
+            // --- 2. Chart Renderers ---
+
+            // Hero Chart: HALE Comparison
+            const ctxHale = document.getElementById('haleChart').getContext('2d');
+            new Chart(ctxHale, {
+                type: 'bar',
+                data: {
+                    labels: ['Current HALE', 'Life Expectancy', 'Target HALE'],
+                    datasets: [{
+                        label: 'Years',
+                        data: [58.1, 70.8, 68.0],
+                        backgroundColor: ['#0F766E', '#E5E7EB', '#D97706'], // Teal, Gray, Amber
+                        borderRadius: 6,
+                        barPercentage: 0.6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y', // Horizontal bar for comparison
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: tooltipConfig
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: false,
+                            min: 40,
+                            grid: { display: false }
+                        },
+                        y: {
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+
+            // Mental Health Chart
+            const ctxMental = document.getElementById('mentalChart').getContext('2d');
+            const mentalLabels = ['Common Disorders', 'Severe Disorders', 'Urban Morbidity', 'Rural Morbidity'].map(l => wrapLabel(l));
+            new Chart(ctxMental, {
+                type: 'bar',
+                data: {
+                    labels: mentalLabels,
+                    datasets: [{
+                        label: 'Prevalence (%)',
+                        data: [10.0, 1.9, 13.5, 6.9],
+                        backgroundColor: 'rgba(147, 51, 234, 0.7)',
+                        borderColor: 'rgb(147, 51, 234)',
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: tooltipConfig
+                    },
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+
+            // NCD Chart (Doughnut)
+            const ctxNcd = document.getElementById('ncdChart').getContext('2d');
+            const ncdLabels = ['NCD Deaths', 'Communicable/Other'].map(l => wrapLabel(l));
+            new Chart(ctxNcd, {
+                type: 'doughnut',
+                data: {
+                    labels: ncdLabels,
+                    datasets: [{
+                        data: [61.8, 38.2],
+                        backgroundColor: ['#DC2626', '#E5E7EB'],
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        tooltip: tooltipConfig
+                    }
+                }
+            });
+
+            // Economic Chart (Line)
+            const ctxEcon = document.getElementById('econChart').getContext('2d');
+            new Chart(ctxEcon, {
+                type: 'line',
+                data: {
+                    labels: ['2012', '2015', '2020', '2025', '2030'],
+                    datasets: [{
+                        label: 'Cumulative Loss ($ Trillion)',
+                        data: [0.5, 1.2, 2.8, 4.5, 6.2],
+                        borderColor: '#0F766E',
+                        backgroundColor: 'rgba(15, 118, 110, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        tooltip: tooltipConfig,
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Trillion USD' }
+                        }
+                    }
+                }
+            });
+
+
+            // --- 3. Interaction Logic ---
+
+            // Tab Switcher
+            function switchTab(tabId) {
+                // Hide all views
+                ['mental', 'ncd', 'economic'].forEach(id => {
+                    document.getElementById(`view-${id}`).classList.add('hidden');
+
+                    // Reset Button Styles
+                    const btn = document.getElementById(`tab-${id}`);
+                    btn.classList.remove('bg-teal-600', 'text-white', 'shadow-sm');
+                    btn.classList.add('text-gray-500', 'hover:text-gray-900');
+                });
+
+                // Show selected view
+                document.getElementById(`view-${tabId}`).classList.remove('hidden');
+
+                // Set Active Button Style
+                const activeBtn = document.getElementById(`tab-${tabId}`);
+                activeBtn.classList.remove('text-gray-500', 'hover:text-gray-900');
+                activeBtn.classList.add('bg-teal-600', 'text-white', 'shadow-sm');
+            }
+
+            // Framework Interaction
+            const frameworkData = {
+                self: {
+                    title: "Interventions: Self-Determined",
+                    color: "text-amber-400",
+                    points: [
+                        { type: "Behavioral", desc: "Gamification of daily movement (Steps/Sleep)." },
+                        { type: "Preventive", desc: "Routine health checkups using ABHA ID." },
+                        { type: "Dietary", desc: "Adoption of 'Nutri-Score' based food choices." }
+                    ]
+                },
+                social: {
+                    title: "Interventions: Social",
+                    color: "text-purple-400",
+                    points: [
+                        { type: "Community", desc: "Peer-led fitness clubs in Universities." },
+                        { type: "Cultural", desc: "Destigmatizing mental health counseling." },
+                        { type: "Family", desc: "Family-integrated activity weekends." }
+                    ]
+                },
+                environ: {
+                    title: "Interventions: Environmental",
+                    color: "text-green-400",
+                    points: [
+                        { type: "Workplace", desc: "'Bio-Ops' policies: Mandatory rest intervals." },
+                        { type: "Urban", desc: "Access to safe parks and walking tracks." },
+                        { type: "Digital", desc: "Right to Disconnect laws to reduce burnout." }
+                    ]
+                }
+            };
+
+            function showFramework(key) {
+                const data = frameworkData[key];
+                const contentDiv = document.getElementById('framework-content');
+
+                let html = `
+                <div class="fade-in">
+                    <h3 class="text-2xl font-bold ${data.color} mb-6 border-b border-teal-600 pb-2">${data.title}</h3>
+                    <div class="space-y-4">
+            `;
+
+                data.points.forEach(p => {
+                    html += `
+                    <div class="bg-teal-900/50 p-4 rounded-lg border-l-4 border-amber-500">
+                        <span class="text-xs font-bold text-teal-300 uppercase tracking-wide">${p.type}</span>
+                        <p class="text-white mt-1">${p.desc}</p>
+                    </div>
+                `;
+                });
+
+                html += `</div></div>`;
+                contentDiv.innerHTML = html;
+            }
+
+            // Navigation Scroll
+            function scrollToSection(id) {
+                document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+            }
+
+        </script>
+    </body>
+
+</html>
