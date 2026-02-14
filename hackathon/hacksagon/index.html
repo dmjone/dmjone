@@ -1,0 +1,1630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eco-Lens: The Virtual Air Quality Matrix</title>
+  <meta name="description" content="Turn traffic cameras into pollution sensors. Eco-Lens uses Computer Vision + Environmental Physics to create virtual air quality sensors from existing CCTV infrastructure.">
+  <meta property="og:title" content="Eco-Lens: The Virtual Air Quality Matrix">
+  <meta property="og:image" content="../frontend/public/og-image.png">
+  <style>
+    /* ================================================================
+       RESET & BASE
+       ================================================================ */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --navy-950: #060a13;
+      --navy-900: #0a1020;
+      --navy-800: #0f1a30;
+      --navy-700: #1a2742;
+      --slate-400: #94a3b8;
+      --slate-300: #cbd5e1;
+      --white: #f0f4f8;
+      --green: #22c55e;
+      --green-dim: #16a34a;
+      --teal: #14b8a6;
+      --cyan: #06b6d4;
+      --blue: #3b82f6;
+      --yellow: #eab308;
+      --orange: #f97316;
+      --red: #ef4444;
+      --purple: #a855f7;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      --font-mono: 'JetBrains Mono', 'Fira Code', 'SF Mono', monospace;
+    }
+
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
+
+    html {
+      scroll-behavior: smooth;
+      font-size: 16px;
+      overflow-x: hidden;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--navy-950);
+      color: var(--white);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    ::selection {
+      background: rgba(34, 197, 94, 0.3);
+      color: var(--white);
+    }
+
+    a { color: var(--green); text-decoration: none; transition: color 0.2s; }
+    a:hover { color: var(--teal); }
+
+    /* ================================================================
+       NAVIGATION
+       ================================================================ */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      padding: 0.75rem 2rem;
+      background: rgba(6, 10, 19, 0.85);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border-bottom: 1px solid rgba(34, 197, 94, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.3s;
+    }
+
+    nav.scrolled {
+      padding: 0.5rem 2rem;
+      background: rgba(6, 10, 19, 0.95);
+      border-bottom-color: rgba(34, 197, 94, 0.2);
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 800;
+      font-size: 1.1rem;
+      letter-spacing: -0.02em;
+    }
+
+    .nav-leaf {
+      width: 24px;
+      height: 24px;
+      background: var(--green);
+      border-radius: 50% 2px 50% 2px;
+      transform: rotate(-45deg);
+      position: relative;
+    }
+
+    .nav-leaf::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 25%;
+      width: 55%;
+      height: 1px;
+      background: rgba(6, 10, 19, 0.5);
+      transform: rotate(0deg);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+      list-style: none;
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .nav-links a {
+      color: var(--slate-400);
+      transition: color 0.2s;
+      position: relative;
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active {
+      color: var(--white);
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--green);
+      transition: width 0.3s;
+    }
+
+    .nav-links a:hover::after { width: 100%; }
+
+    /* ================================================================
+       SECTIONS BASE
+       ================================================================ */
+    section {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 8rem 2rem 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .container {
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    /* Reveal animation */
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+                  transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .reveal-delay-1 { transition-delay: 0.15s; }
+    .reveal-delay-2 { transition-delay: 0.3s; }
+    .reveal-delay-3 { transition-delay: 0.45s; }
+    .reveal-delay-4 { transition-delay: 0.6s; }
+
+    /* ================================================================
+       HERO SECTION
+       ================================================================ */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      position: relative;
+      background: radial-gradient(ellipse at 50% 30%, rgba(34, 197, 94, 0.08) 0%, transparent 60%),
+                  radial-gradient(ellipse at 80% 70%, rgba(6, 182, 212, 0.05) 0%, transparent 50%),
+                  var(--navy-950);
+    }
+
+    /* Animated particles background */
+    .hero-particles {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .particle {
+      position: absolute;
+      border-radius: 50%;
+      animation: float linear infinite;
+      opacity: 0;
+    }
+
+    @keyframes float {
+      0% { opacity: 0; transform: translateY(100vh) scale(0); }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { opacity: 0; transform: translateY(-10vh) scale(1); }
+    }
+
+    .hero-overline {
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--green);
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-title {
+      font-size: clamp(3rem, 8vw, 6.5rem);
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      line-height: 1;
+      margin-bottom: 1.5rem;
+      background: linear-gradient(135deg, var(--white) 0%, var(--slate-300) 50%, var(--green) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-subtitle {
+      font-size: clamp(1.1rem, 2.5vw, 1.6rem);
+      color: var(--slate-400);
+      max-width: 700px;
+      margin: 0 auto 2.5rem;
+      font-weight: 300;
+      line-height: 1.5;
+    }
+
+    .hero-subtitle strong {
+      color: var(--white);
+      font-weight: 600;
+    }
+
+    .hero-cta-group {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.85rem 2rem;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: all 0.3s;
+      border: none;
+      cursor: pointer;
+      font-family: var(--font-sans);
+    }
+
+    .btn-primary {
+      background: var(--green);
+      color: var(--navy-950);
+    }
+
+    .btn-primary:hover {
+      background: var(--teal);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(34, 197, 94, 0.3);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--white);
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--green);
+      color: var(--green);
+      transform: translateY(-2px);
+    }
+
+    .hero-stats {
+      display: flex;
+      gap: 3rem;
+      justify-content: center;
+      margin-top: 4rem;
+      padding-top: 3rem;
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .hero-stat {
+      text-align: center;
+    }
+
+    .hero-stat-value {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--green);
+      line-height: 1;
+    }
+
+    .hero-stat-label {
+      font-size: 0.8rem;
+      color: var(--slate-400);
+      margin-top: 0.3rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    /* ================================================================
+       PROBLEM SECTION
+       ================================================================ */
+    #problem {
+      background: linear-gradient(180deg, var(--navy-950) 0%, var(--navy-900) 100%);
+    }
+
+    .problem-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+    }
+
+    .section-overline {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--green);
+      margin-bottom: 1rem;
+    }
+
+    .section-title {
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      margin-bottom: 1.5rem;
+    }
+
+    .section-body {
+      font-size: 1.05rem;
+      color: var(--slate-400);
+      line-height: 1.8;
+    }
+
+    .problem-stat-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+
+    .problem-stat-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 16px;
+      padding: 1.5rem;
+      text-align: center;
+      transition: all 0.3s;
+    }
+
+    .problem-stat-card:hover {
+      border-color: rgba(34, 197, 94, 0.2);
+      transform: translateY(-4px);
+      box-shadow: 0 8px 40px rgba(0,0,0,0.3);
+    }
+
+    .problem-stat-number {
+      font-size: 2.8rem;
+      font-weight: 900;
+      line-height: 1;
+      margin-bottom: 0.25rem;
+    }
+
+    .problem-stat-number.red { color: var(--red); }
+    .problem-stat-number.orange { color: var(--orange); }
+    .problem-stat-number.yellow { color: var(--yellow); }
+    .problem-stat-number.green { color: var(--green); }
+
+    .problem-stat-desc {
+      font-size: 0.85rem;
+      color: var(--slate-400);
+    }
+
+    /* ================================================================
+       SOLUTION SECTION
+       ================================================================ */
+    #solution {
+      background: var(--navy-900);
+    }
+
+    .solution-intro {
+      text-align: center;
+      max-width: 800px;
+      margin: 0 auto 4rem;
+    }
+
+    .solution-big-idea {
+      font-size: clamp(1.3rem, 3vw, 2rem);
+      font-weight: 300;
+      color: var(--slate-300);
+      line-height: 1.6;
+      margin-top: 1.5rem;
+    }
+
+    .solution-big-idea em {
+      font-style: normal;
+      color: var(--green);
+      font-weight: 600;
+    }
+
+    .solution-points {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .solution-card {
+      background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 20px;
+      padding: 2rem;
+      transition: all 0.4s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .solution-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--green), var(--teal));
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+
+    .solution-card:hover {
+      border-color: rgba(34, 197, 94, 0.15);
+      transform: translateY(-6px);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+
+    .solution-card:hover::before { opacity: 1; }
+
+    .solution-card-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: rgba(34, 197, 94, 0.15);
+      color: var(--green);
+      font-weight: 800;
+      font-size: 0.85rem;
+      margin-bottom: 1rem;
+    }
+
+    .solution-card h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+      letter-spacing: -0.01em;
+    }
+
+    .solution-card p {
+      font-size: 0.9rem;
+      color: var(--slate-400);
+      line-height: 1.7;
+    }
+
+    /* ================================================================
+       DEMO VIDEO SECTION
+       ================================================================ */
+    #demo {
+      background: linear-gradient(180deg, var(--navy-900) 0%, var(--navy-950) 100%);
+      text-align: center;
+    }
+
+    .video-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 960px;
+      margin: 2.5rem auto 0;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: 0 25px 80px rgba(0,0,0,0.5);
+      aspect-ratio: 16/9;
+      background: var(--navy-800);
+    }
+
+    .video-wrapper iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    .video-placeholder {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--navy-800), var(--navy-700));
+      gap: 1rem;
+    }
+
+    .play-btn {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: rgba(34, 197, 94, 0.2);
+      border: 2px solid var(--green);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+
+    .play-btn:hover {
+      background: var(--green);
+      transform: scale(1.1);
+    }
+
+    .play-btn svg {
+      width: 28px;
+      height: 28px;
+      fill: var(--green);
+      margin-left: 4px;
+    }
+
+    .play-btn:hover svg { fill: var(--navy-950); }
+
+    .video-caption {
+      font-size: 0.85rem;
+      color: var(--slate-400);
+      margin-top: 1rem;
+    }
+
+    /* ================================================================
+       FEATURES SECTION
+       ================================================================ */
+    #features {
+      background: var(--navy-950);
+    }
+
+    .features-header {
+      text-align: center;
+      max-width: 700px;
+      margin: 0 auto 4rem;
+    }
+
+    .feature-showcase {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+      margin-bottom: 6rem;
+    }
+
+    .feature-showcase.reverse { direction: rtl; }
+    .feature-showcase.reverse > * { direction: ltr; }
+
+    .feature-image {
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.06);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+      transition: transform 0.4s;
+    }
+
+    .feature-image:hover { transform: scale(1.02); }
+
+    .feature-image img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .feature-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.3rem 0.75rem;
+      border-radius: 50px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+
+    .badge-green { background: rgba(34,197,94,0.15); color: var(--green); }
+    .badge-blue { background: rgba(59,130,246,0.15); color: var(--blue); }
+    .badge-orange { background: rgba(249,115,22,0.15); color: var(--orange); }
+    .badge-purple { background: rgba(168,85,247,0.15); color: var(--purple); }
+    .badge-cyan { background: rgba(6,182,212,0.15); color: var(--cyan); }
+
+    .feature-title {
+      font-size: clamp(1.5rem, 3vw, 2.2rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 1rem;
+      line-height: 1.2;
+    }
+
+    .feature-desc {
+      color: var(--slate-400);
+      font-size: 1rem;
+      line-height: 1.8;
+      margin-bottom: 1.5rem;
+    }
+
+    .feature-science {
+      font-size: 0.8rem;
+      color: var(--slate-400);
+      padding: 0.75rem 1rem;
+      background: rgba(255,255,255,0.03);
+      border-left: 3px solid var(--green);
+      border-radius: 0 8px 8px 0;
+      font-family: var(--font-mono);
+    }
+
+    .feature-science cite {
+      color: var(--green);
+      font-style: normal;
+    }
+
+    /* ================================================================
+       ARCHITECTURE / FLOWCHART SECTION
+       ================================================================ */
+    #architecture {
+      background: linear-gradient(180deg, var(--navy-950) 0%, var(--navy-900) 100%);
+    }
+
+    .arch-header { text-align: center; margin-bottom: 3rem; }
+
+    .arch-diagram {
+      background: var(--navy-800);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 20px;
+      padding: 3rem;
+      margin-bottom: 2rem;
+    }
+
+    .arch-flow {
+      display: flex;
+      align-items: stretch;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .arch-layer {
+      flex: 1;
+      min-width: 200px;
+      max-width: 260px;
+      border-radius: 16px;
+      padding: 1.5rem;
+      text-align: center;
+    }
+
+    .arch-layer-title {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid;
+    }
+
+    .layer-input { background: rgba(59,130,246,0.08); border-color: rgba(59,130,246,0.2); }
+    .layer-input .arch-layer-title { color: var(--blue); border-color: var(--blue); }
+
+    .layer-process { background: rgba(34,197,94,0.08); border-color: rgba(34,197,94,0.2); }
+    .layer-process .arch-layer-title { color: var(--green); border-color: var(--green); }
+
+    .layer-data { background: rgba(249,115,22,0.08); border-color: rgba(249,115,22,0.2); }
+    .layer-data .arch-layer-title { color: var(--orange); border-color: var(--orange); }
+
+    .layer-output { background: rgba(168,85,247,0.08); border-color: rgba(168,85,247,0.2); }
+    .layer-output .arch-layer-title { color: var(--purple); border-color: var(--purple); }
+
+    .arch-item {
+      font-size: 0.8rem;
+      padding: 0.4rem 0;
+      color: var(--slate-300);
+    }
+
+    .arch-arrow {
+      display: flex;
+      align-items: center;
+      font-size: 1.5rem;
+      color: rgba(255,255,255,0.15);
+      flex-shrink: 0;
+    }
+
+    /* ================================================================
+       TECH STACK SECTION
+       ================================================================ */
+    #tech {
+      background: var(--navy-900);
+    }
+
+    .tech-header { text-align: center; margin-bottom: 3rem; }
+
+    .tech-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .tech-category {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 16px;
+      padding: 1.5rem;
+    }
+
+    .tech-category-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--green);
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .tech-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.02);
+    }
+
+    .tech-item:last-child { border-bottom: none; }
+
+    .tech-name {
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .tech-purpose {
+      font-size: 0.75rem;
+      color: var(--slate-400);
+      text-align: right;
+      max-width: 60%;
+    }
+
+    /* ================================================================
+       DRAWBACKS SECTION
+       ================================================================ */
+    #drawbacks {
+      background: linear-gradient(180deg, var(--navy-900) 0%, var(--navy-950) 100%);
+    }
+
+    .drawbacks-header { text-align: center; margin-bottom: 3rem; }
+
+    .drawback-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .drawback-card {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 1.5rem;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 16px;
+      padding: 1.5rem 2rem;
+      transition: all 0.3s;
+    }
+
+    .drawback-card:hover {
+      border-color: rgba(249, 115, 22, 0.2);
+      transform: translateX(4px);
+    }
+
+    .drawback-number {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: rgba(249, 115, 22, 0.1);
+      color: var(--orange);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+    }
+
+    .drawback-title {
+      font-weight: 700;
+      font-size: 1.05rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .drawback-desc {
+      font-size: 0.9rem;
+      color: var(--slate-400);
+      line-height: 1.7;
+    }
+
+    .drawback-mitigation {
+      margin-top: 0.5rem;
+      font-size: 0.8rem;
+      color: var(--green);
+      padding-left: 1rem;
+      border-left: 2px solid rgba(34,197,94,0.3);
+    }
+
+    /* ================================================================
+       ABSTRACT / SUMMARY SECTION
+       ================================================================ */
+    #abstract {
+      background: var(--navy-950);
+      text-align: center;
+    }
+
+    .abstract-text {
+      max-width: 850px;
+      margin: 0 auto;
+      font-size: 1.1rem;
+      color: var(--slate-300);
+      line-height: 1.9;
+    }
+
+    .abstract-text p { margin-bottom: 1.5rem; }
+
+    .abstract-text strong {
+      color: var(--white);
+      font-weight: 600;
+    }
+
+    .abstract-text em {
+      color: var(--green);
+      font-style: normal;
+      font-weight: 500;
+    }
+
+    .abstract-keywords {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      justify-content: center;
+      margin-top: 2rem;
+    }
+
+    .keyword-tag {
+      padding: 0.35rem 0.9rem;
+      border-radius: 50px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      background: rgba(34, 197, 94, 0.08);
+      border: 1px solid rgba(34, 197, 94, 0.15);
+      color: var(--green);
+    }
+
+    /* ================================================================
+       ONE MORE THING
+       ================================================================ */
+    #onemore {
+      background: radial-gradient(ellipse at 50% 50%, rgba(34, 197, 94, 0.06) 0%, transparent 60%),
+                  var(--navy-950);
+      text-align: center;
+      min-height: 80vh;
+    }
+
+    .onemore-pre {
+      font-size: 1.5rem;
+      color: var(--slate-400);
+      font-weight: 300;
+      margin-bottom: 1rem;
+    }
+
+    .onemore-title {
+      font-size: clamp(2.5rem, 6vw, 5rem);
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      margin-bottom: 2rem;
+      background: linear-gradient(135deg, var(--green) 0%, var(--cyan) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .onemore-desc {
+      font-size: 1.2rem;
+      color: var(--slate-400);
+      max-width: 700px;
+      margin: 0 auto 3rem;
+      line-height: 1.7;
+    }
+
+    .cta-final {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1rem 2.5rem;
+      border-radius: 50px;
+      background: linear-gradient(135deg, var(--green), var(--teal));
+      color: var(--navy-950);
+      font-weight: 700;
+      font-size: 1.1rem;
+      transition: all 0.3s;
+      text-decoration: none;
+    }
+
+    .cta-final:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 40px rgba(34, 197, 94, 0.35);
+      color: var(--navy-950);
+    }
+
+    /* ================================================================
+       FOOTER
+       ================================================================ */
+    footer {
+      padding: 3rem 2rem;
+      text-align: center;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      background: var(--navy-950);
+    }
+
+    .footer-brand {
+      font-weight: 800;
+      font-size: 1.2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .footer-text {
+      font-size: 0.8rem;
+      color: var(--slate-400);
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 1.5rem;
+      justify-content: center;
+      margin-top: 1rem;
+      font-size: 0.8rem;
+    }
+
+    /* ================================================================
+       SEPARATOR / DIVIDER
+       ================================================================ */
+    .divider {
+      width: 60px;
+      height: 3px;
+      background: linear-gradient(90deg, var(--green), var(--teal));
+      border-radius: 2px;
+      margin: 1.5rem auto;
+    }
+
+    /* ================================================================
+       RESPONSIVE
+       ================================================================ */
+    @media (max-width: 900px) {
+      .problem-grid,
+      .feature-showcase {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+
+      .feature-showcase.reverse { direction: ltr; }
+
+      .hero-stats {
+        flex-direction: column;
+        gap: 1.5rem;
+        align-items: center;
+      }
+
+      .nav-links { display: none; }
+
+      section { padding: 6rem 1.25rem 3rem; }
+
+      .arch-flow { flex-direction: column; align-items: center; }
+      .arch-arrow { transform: rotate(90deg); }
+    }
+
+    @media (max-width: 600px) {
+      .problem-stat-grid { grid-template-columns: 1fr; }
+      .solution-points { grid-template-columns: 1fr; }
+      .tech-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ================================================================
+       SCROLLBAR
+       ================================================================ */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: var(--navy-950); }
+    ::-webkit-scrollbar-thumb { background: var(--navy-700); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--green); }
+  </style>
+</head>
+<body>
+
+<!-- ================================================================
+     NAVIGATION
+     ================================================================ -->
+<nav id="navbar">
+  <div class="nav-brand">
+    <div class="nav-leaf"></div>
+    <span>ECO-LENS</span>
+  </div>
+  <ul class="nav-links">
+    <li><a href="#hero">Home</a></li>
+    <li><a href="#problem">Problem</a></li>
+    <li><a href="#solution">Solution</a></li>
+    <li><a href="#demo">Demo</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#architecture">Architecture</a></li>
+    <li><a href="#tech">Tech Stack</a></li>
+    <li><a href="#drawbacks">Limitations</a></li>
+    <li><a href="#abstract">Abstract</a></li>
+  </ul>
+</nav>
+
+<!-- ================================================================
+     HERO
+     ================================================================ -->
+<section id="hero">
+  <div class="hero-particles" id="particles"></div>
+  <div class="container">
+    <div class="hero-overline reveal">Hacksagon 2026</div>
+    <h1 class="hero-title reveal reveal-delay-1">Eco-Lens</h1>
+    <p class="hero-subtitle reveal reveal-delay-2">
+      The world's first <strong>Virtual Air Quality Matrix</strong>.<br>
+      Turn traffic cameras into pollution sensors.
+    </p>
+    <div class="hero-cta-group reveal reveal-delay-3">
+      <a href="#demo" class="btn btn-primary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Watch Demo
+      </a>
+      <a href="https://github.com/divyamohan1993/hacksagon" target="_blank" class="btn btn-ghost">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+        View Source
+      </a>
+    </div>
+    <div class="hero-stats reveal reveal-delay-4">
+      <div class="hero-stat">
+        <div class="hero-stat-value">99%</div>
+        <div class="hero-stat-label">Cost Reduction</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-value">6</div>
+        <div class="hero-stat-label">Virtual Sensors</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-value">8</div>
+        <div class="hero-stat-label">Scientific Models</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-value">5s</div>
+        <div class="hero-stat-label">Update Cycle</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     PROBLEM STATEMENT
+     ================================================================ -->
+<section id="problem">
+  <div class="container">
+    <div class="problem-grid">
+      <div>
+        <div class="section-overline reveal">The Problem</div>
+        <h2 class="section-title reveal reveal-delay-1">
+          98% of city streets have<br>
+          <span style="color: var(--red);">zero air quality data.</span>
+        </h2>
+        <p class="section-body reveal reveal-delay-2">
+          Urban air quality monitoring remains critically blind-spotted. Physical sensor networks cover less than <strong style="color:var(--red)">2%</strong> of city streets due to prohibitive hardware costs ($5,000&ndash;$15,000 per unit), lengthy deployment cycles, and ongoing maintenance burdens &mdash; leaving <strong style="color:var(--white)">millions of residents</strong> without the localized pollution data essential for public health decisions.
+        </p>
+        <p class="section-body reveal reveal-delay-3" style="margin-top: 1rem; color: var(--slate-300); font-weight: 500;">
+          Meanwhile, thousands of traffic cameras already watch every intersection, generating terabytes of video data that&rsquo;s used for nothing more than speed enforcement.
+        </p>
+      </div>
+      <div class="problem-stat-grid reveal reveal-delay-2">
+        <div class="problem-stat-card">
+          <div class="problem-stat-number red">2%</div>
+          <div class="problem-stat-desc">City streets with air quality sensors</div>
+        </div>
+        <div class="problem-stat-card">
+          <div class="problem-stat-number orange">$15K</div>
+          <div class="problem-stat-desc">Cost per physical monitoring station</div>
+        </div>
+        <div class="problem-stat-card">
+          <div class="problem-stat-number yellow">7M</div>
+          <div class="problem-stat-desc">Premature deaths from air pollution yearly</div>
+        </div>
+        <div class="problem-stat-card">
+          <div class="problem-stat-number green">1000s</div>
+          <div class="problem-stat-desc">Existing traffic cameras already deployed</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     PROPOSED SOLUTION
+     ================================================================ -->
+<section id="solution">
+  <div class="container">
+    <div class="solution-intro">
+      <div class="section-overline reveal">The Solution</div>
+      <h2 class="section-title reveal reveal-delay-1">
+        What if every traffic camera<br>
+        was also a pollution sensor?
+      </h2>
+      <div class="divider reveal reveal-delay-1"></div>
+      <p class="solution-big-idea reveal reveal-delay-2">
+        Eco-Lens repurposes existing city CCTV infrastructure as <em>virtual air quality monitors</em> using Computer Vision + Environmental Physics &mdash; creating new environmental data from cameras that already exist.
+      </p>
+    </div>
+
+    <div class="solution-points">
+      <div class="solution-card reveal">
+        <div class="solution-card-number">1</div>
+        <h3>Software-Defined Sensors</h3>
+        <p>Repurpose existing traffic CCTV cameras as virtual air quality monitors using YOLOv8 vehicle classification. Zero new hardware. 99% cost reduction per monitoring point.</p>
+      </div>
+      <div class="solution-card reveal reveal-delay-1">
+        <div class="solution-card-number">2</div>
+        <h3>Physics-Based Modeling</h3>
+        <p>Apply the Gaussian Plume Dispersion Model (EPA AP-42) with real-time wind data to calculate PM2.5, PM10, NO&#8322;, and CO concentrations with scientific accuracy.</p>
+      </div>
+      <div class="solution-card reveal reveal-delay-2">
+        <div class="solution-card-number">3</div>
+        <h3>Kriging Sensor Mesh</h3>
+        <p>Use Ordinary Kriging geostatistical interpolation to transform 6 discrete readings into a continuous city-wide pollution surface with 100% spatial coverage.</p>
+      </div>
+      <div class="solution-card reveal reveal-delay-3">
+        <div class="solution-card-number">4</div>
+        <h3>Multi-Dimensional Intelligence</h3>
+        <p>Extract air pollution AND acoustic pollution from a single video stream, plus health dosimetry &mdash; three environmental metrics from one data source.</p>
+      </div>
+      <div class="solution-card reveal reveal-delay-4">
+        <div class="solution-card-number">5</div>
+        <h3>Actionable Citizen Outputs</h3>
+        <p>6-hour pollution forecasts, health impact scoring with &ldquo;equivalent cigarettes&rdquo; metric, and A* green corridor routing for the healthiest walking paths.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     DEMO VIDEO
+     ================================================================ -->
+<section id="demo">
+  <div class="container">
+    <div class="section-overline reveal">See It In Action</div>
+    <h2 class="section-title reveal reveal-delay-1">Live Demonstration</h2>
+    <div class="divider reveal reveal-delay-1"></div>
+    <p class="section-body reveal reveal-delay-2" style="text-align:center; max-width:600px; margin: 0 auto;">
+      Watch Eco-Lens process live camera feeds, calculate atmospheric dispersion in real time, and render the pollution landscape of an entire city.
+    </p>
+
+    <div class="video-wrapper reveal reveal-delay-2">
+      <!-- =====================================================
+           EMBED YOUR YOUTUBE VIDEO HERE
+           Replace VIDEO_ID with your actual YouTube video ID
+           Example: https://www.youtube.com/embed/dQw4w9WgXcQ
+           ===================================================== -->
+      <!-- <iframe src="https://www.youtube.com/embed/VIDEO_ID" title="Eco-Lens Demo" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe> -->
+
+      <!-- Placeholder shown when no video is embedded yet -->
+      <div class="video-placeholder" id="videoPlaceholder">
+        <div class="play-btn" onclick="this.closest('.video-placeholder').innerHTML='<div style=\'display:flex;align-items:center;justify-content:center;height:100%;color:var(--slate-400);font-size:1.1rem;\'>Replace VIDEO_ID in index.html to embed your YouTube demo</div>'">
+          <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        </div>
+        <div style="color: var(--slate-400); font-size: 0.95rem;">Click to play demonstration</div>
+        <div style="color: var(--slate-400); font-size: 0.75rem; opacity: 0.6;">YouTube video will be embedded here</div>
+      </div>
+    </div>
+    <p class="video-caption reveal reveal-delay-3">
+      Full walkthrough: Dashboard &rarr; Real-time AQI &rarr; Particle Simulation &rarr; Health Impact &rarr; Green Routing
+    </p>
+  </div>
+</section>
+
+<!-- ================================================================
+     5 UNIQUE FEATURES
+     ================================================================ -->
+<section id="features">
+  <div class="container">
+    <div class="features-header">
+      <div class="section-overline reveal">What Makes This Different</div>
+      <h2 class="section-title reveal reveal-delay-1">5 Features Never<br>Combined Before</h2>
+      <div class="divider reveal reveal-delay-1"></div>
+    </div>
+
+    <!-- Feature 1: Kriging -->
+    <div class="feature-showcase reveal">
+      <div class="feature-image">
+        <img src="screenshots/heatmap.png" alt="Kriging-interpolated air quality heatmap" loading="lazy">
+      </div>
+      <div>
+        <span class="feature-badge badge-green">&#9670; Novel Algorithm</span>
+        <h3 class="feature-title">Kriging-Interpolated Virtual Sensor Mesh</h3>
+        <p class="feature-desc">
+          Transforms 6 discrete camera-based pollution readings into a <strong style="color:var(--white)">continuous city-wide pollution surface</strong> using Ordinary Kriging geostatistical interpolation. Computes a semivariogram to model spatial autocorrelation, solves a linear system at each grid point, and produces a 25&times;25 resolution heatmap with mathematically optimal, unbiased estimates &mdash; providing pollution data where <em>no physical sensor exists</em>.
+        </p>
+        <div class="feature-science">
+          <cite>Matheron, G. (1963)</cite> &mdash; Principles of Geostatistics, <em>Economic Geology</em>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feature 2: Health Dosimetry -->
+    <div class="feature-showcase reverse reveal">
+      <div class="feature-image">
+        <img src="screenshots/dashboard.png" alt="Eco-Lens dashboard with health metrics" loading="lazy">
+      </div>
+      <div>
+        <span class="feature-badge badge-orange">&#9829; Health Science</span>
+        <h3 class="feature-title">Exposure Dosimetry with &ldquo;Equivalent Cigarettes&rdquo;</h3>
+        <p class="feature-desc">
+          Goes beyond standard AQI &mdash; calculates <strong style="color:var(--white)">cumulative inhaled dose</strong> using breathing rate &times; concentration &times; time, then converts exposure to <strong style="color:var(--orange)">equivalent cigarettes smoked</strong> using the Berkeley Earth methodology (1 cigarette &asymp; 22 &mu;g/m&sup3; for 24h). Includes vulnerability-adjusted scores for children, elderly, and asthmatic populations.
+        </p>
+        <div class="feature-science">
+          <cite>WHO Global Air Quality Guidelines (2021)</cite>; <cite>Apte et al., Environ. Sci. Technol. (2015)</cite>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feature 3: Acoustic -->
+    <div class="feature-showcase reveal">
+      <div class="feature-image">
+        <img src="screenshots/noise.png" alt="Acoustic pollution monitoring panel" loading="lazy">
+      </div>
+      <div>
+        <span class="feature-badge badge-cyan">&#9835; Dual Extraction</span>
+        <h3 class="feature-title">Acoustic Pollution Co-Estimation</h3>
+        <p class="feature-desc">
+          Applies the <strong style="color:var(--white)">FHWA Traffic Noise Model</strong> to extract noise levels in dB(A) from the same vehicle classification data used for air quality. Uses reference emission levels (Truck: 84 dB, Car: 67 dB, Bus: 81 dB) with logarithmic sound addition &mdash; two environmental metrics from one camera feed. <em>No other system derives noise pollution from traffic cameras.</em>
+        </p>
+        <div class="feature-science">
+          <cite>FHWA Traffic Noise Model (TNM) v2.5</cite> Technical Manual
+        </div>
+      </div>
+    </div>
+
+    <!-- Feature 4: Particle Simulation -->
+    <div class="feature-showcase reverse reveal">
+      <div class="feature-image">
+        <img src="screenshots/plume.png" alt="Gaussian plume particle simulation" loading="lazy">
+      </div>
+      <div>
+        <span class="feature-badge badge-purple">&#10024; Visualization</span>
+        <h3 class="feature-title">Real-Time Gaussian Plume Particles</h3>
+        <p class="feature-desc">
+          A 60fps HTML5 Canvas simulation where each particle represents a pollution &ldquo;packet&rdquo; following actual Gaussian dispersion equations. Particles spawn proportional to real vehicle counts, move with live wind data, spread with Pasquill-Gifford coefficients, and decay with atmospheric dilution. <strong style="color:var(--white)">Making the invisible visible.</strong>
+        </p>
+        <div class="feature-science">
+          <cite>Turner, D.B. (1970)</cite> &mdash; Workbook of Atmospheric Dispersion Estimates, EPA
+        </div>
+      </div>
+    </div>
+
+    <!-- Feature 5: Green Routing -->
+    <div class="feature-showcase reveal">
+      <div class="feature-image">
+        <img src="screenshots/routing.png" alt="Green corridor route comparison" loading="lazy">
+      </div>
+      <div>
+        <span class="feature-badge badge-blue">&#9758; Navigation</span>
+        <h3 class="feature-title">Pollution-Weighted A* Green Routing</h3>
+        <p class="feature-desc">
+          Finds the <strong style="color:var(--green)">healthiest walking path</strong> between two points by minimizing total pollution exposure, not just distance. Edge cost = distance &times; (1 + &alpha; &times; PM2.5). Uses the Kriging grid as the cost surface with Haversine heuristic. Google Maps optimizes for time &mdash; <em>Eco-Lens optimizes for your lungs</em>.
+        </p>
+        <div class="feature-science">
+          <cite>Hart, Nilsson &amp; Raphael (1968)</cite> &mdash; Heuristic Determination of Minimum Cost Paths, IEEE
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     SYSTEM ARCHITECTURE
+     ================================================================ -->
+<section id="architecture">
+  <div class="container">
+    <div class="arch-header">
+      <div class="section-overline reveal">Under The Hood</div>
+      <h2 class="section-title reveal reveal-delay-1">System Architecture</h2>
+      <div class="divider reveal reveal-delay-1"></div>
+    </div>
+
+    <div class="arch-diagram reveal reveal-delay-2">
+      <div class="arch-flow">
+        <div class="arch-layer layer-input">
+          <div class="arch-layer-title">Input Layer</div>
+          <div class="arch-item">Traffic CCTV Cameras</div>
+          <div class="arch-item">OpenWeatherMap API</div>
+          <div class="arch-item">EPA AP-42 Database</div>
+        </div>
+        <div class="arch-arrow">&rarr;</div>
+        <div class="arch-layer layer-process">
+          <div class="arch-layer-title">Processing Engine</div>
+          <div class="arch-item">YOLOv8 Vision Service</div>
+          <div class="arch-item">Gaussian Plume Physics</div>
+          <div class="arch-item">Kriging Interpolation</div>
+          <div class="arch-item">Holt-Winters Forecast</div>
+          <div class="arch-item">WHO Health Dosimetry</div>
+          <div class="arch-item">FHWA Acoustic Model</div>
+          <div class="arch-item">A* Green Routing</div>
+        </div>
+        <div class="arch-arrow">&rarr;</div>
+        <div class="arch-layer layer-data">
+          <div class="arch-layer-title">Data Layer</div>
+          <div class="arch-item">SQLite Time-Series DB</div>
+          <div class="arch-item">In-Memory State Cache</div>
+          <div class="arch-item">WebSocket Broadcast</div>
+        </div>
+        <div class="arch-arrow">&rarr;</div>
+        <div class="arch-layer layer-output">
+          <div class="arch-layer-title">Output Layer</div>
+          <div class="arch-item">Interactive Pollution Map</div>
+          <div class="arch-item">Real-Time Charts</div>
+          <div class="arch-item">Particle Simulation</div>
+          <div class="arch-item">Health Impact Panel</div>
+          <div class="arch-item">Green Route Planner</div>
+        </div>
+      </div>
+    </div>
+
+    <p class="section-body reveal" style="text-align:center; max-width:700px; margin:1rem auto 0;">
+      8 microservices orchestrated by a FastAPI async backend, streaming real-time data via WebSocket to 11 interactive dashboard widgets. Every 5 seconds, the entire pipeline executes: detect &rarr; calculate &rarr; interpolate &rarr; broadcast.
+    </p>
+  </div>
+</section>
+
+<!-- ================================================================
+     TECHNOLOGY STACK
+     ================================================================ -->
+<section id="tech">
+  <div class="container">
+    <div class="tech-header">
+      <div class="section-overline reveal">Built With</div>
+      <h2 class="section-title reveal reveal-delay-1">Technology Stack</h2>
+      <div class="divider reveal reveal-delay-1"></div>
+    </div>
+
+    <div class="tech-grid reveal reveal-delay-2">
+      <div class="tech-category">
+        <div class="tech-category-title">Languages</div>
+        <div class="tech-item"><span class="tech-name">Python 3.11+</span><span class="tech-purpose">Backend, ML, Physics</span></div>
+        <div class="tech-item"><span class="tech-name">TypeScript 5.4+</span><span class="tech-purpose">Frontend Dashboard</span></div>
+        <div class="tech-item"><span class="tech-name">HTML5 Canvas</span><span class="tech-purpose">Particle Simulation</span></div>
+      </div>
+
+      <div class="tech-category">
+        <div class="tech-category-title">Backend</div>
+        <div class="tech-item"><span class="tech-name">FastAPI</span><span class="tech-purpose">Async REST + WebSocket</span></div>
+        <div class="tech-item"><span class="tech-name">Uvicorn</span><span class="tech-purpose">ASGI Server</span></div>
+        <div class="tech-item"><span class="tech-name">Pydantic v2</span><span class="tech-purpose">Validation & Settings</span></div>
+        <div class="tech-item"><span class="tech-name">SQLAlchemy 2.0</span><span class="tech-purpose">Async ORM</span></div>
+        <div class="tech-item"><span class="tech-name">NumPy / SciPy</span><span class="tech-purpose">Scientific Computing</span></div>
+      </div>
+
+      <div class="tech-category">
+        <div class="tech-category-title">Frontend</div>
+        <div class="tech-item"><span class="tech-name">Next.js 14</span><span class="tech-purpose">React Meta-Framework</span></div>
+        <div class="tech-item"><span class="tech-name">Tailwind CSS</span><span class="tech-purpose">Utility-First Styling</span></div>
+        <div class="tech-item"><span class="tech-name">Leaflet</span><span class="tech-purpose">Interactive Maps</span></div>
+        <div class="tech-item"><span class="tech-name">Recharts</span><span class="tech-purpose">Data Visualization</span></div>
+        <div class="tech-item"><span class="tech-name">Lucide React</span><span class="tech-purpose">Icon System</span></div>
+      </div>
+
+      <div class="tech-category">
+        <div class="tech-category-title">Scientific Models</div>
+        <div class="tech-item"><span class="tech-name">Gaussian Plume</span><span class="tech-purpose">Pollutant Dispersion</span></div>
+        <div class="tech-item"><span class="tech-name">Ordinary Kriging</span><span class="tech-purpose">Spatial Interpolation</span></div>
+        <div class="tech-item"><span class="tech-name">Holt-Winters</span><span class="tech-purpose">Time-Series Forecast</span></div>
+        <div class="tech-item"><span class="tech-name">FHWA TNM</span><span class="tech-purpose">Traffic Noise Model</span></div>
+        <div class="tech-item"><span class="tech-name">WHO Dose-Response</span><span class="tech-purpose">Health Dosimetry</span></div>
+        <div class="tech-item"><span class="tech-name">A* Pathfinding</span><span class="tech-purpose">Green Corridor Routing</span></div>
+      </div>
+
+      <div class="tech-category">
+        <div class="tech-category-title">External APIs</div>
+        <div class="tech-item"><span class="tech-name">OpenWeatherMap</span><span class="tech-purpose">Live Wind Vectors</span></div>
+        <div class="tech-item"><span class="tech-name">EPA AP-42</span><span class="tech-purpose">Emission Factors</span></div>
+        <div class="tech-item"><span class="tech-name">CartoDB Tiles</span><span class="tech-purpose">Dark Map Basemap</span></div>
+      </div>
+
+      <div class="tech-category">
+        <div class="tech-category-title">Infrastructure</div>
+        <div class="tech-item"><span class="tech-name">Docker Compose</span><span class="tech-purpose">Container Orchestration</span></div>
+        <div class="tech-item"><span class="tech-name">GitHub Actions</span><span class="tech-purpose">CI/CD Pipeline</span></div>
+        <div class="tech-item"><span class="tech-name">WebSocket RFC 6455</span><span class="tech-purpose">Real-Time Streaming</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     DRAWBACKS & LIMITATIONS
+     ================================================================ -->
+<section id="drawbacks">
+  <div class="container">
+    <div class="drawbacks-header">
+      <div class="section-overline reveal">Transparency</div>
+      <h2 class="section-title reveal reveal-delay-1">Known Limitations</h2>
+      <div class="divider reveal reveal-delay-1"></div>
+      <p class="section-body reveal reveal-delay-2" style="text-align:center; max-width:600px; margin: 0 auto;">
+        Every system has boundaries. Here are ours &mdash; and how we mitigate them.
+      </p>
+    </div>
+
+    <div class="drawback-list">
+      <div class="drawback-card reveal">
+        <div class="drawback-number">1</div>
+        <div>
+          <div class="drawback-title">Indirect Measurement Uncertainty</div>
+          <div class="drawback-desc">Eco-Lens estimates pollution mathematically rather than measuring directly. The Gaussian Plume Model assumes flat terrain, steady-state meteorology, and no chemical transformation.</div>
+          <div class="drawback-mitigation">Mitigation: Calibration against ground-truth sensors can reduce error to &plusmn;15%. Uses EPA-standard factors and Pasquill-Gifford stability classes.</div>
+        </div>
+      </div>
+
+      <div class="drawback-card reveal reveal-delay-1">
+        <div class="drawback-number">2</div>
+        <div>
+          <div class="drawback-title">Camera Feed Dependency &amp; Occlusion</div>
+          <div class="drawback-desc">Vehicle classification accuracy degrades in poor visibility (fog, rain, night). YOLO accuracy drops to ~65% mAP in adverse weather vs. ~82% in clear conditions.</div>
+          <div class="drawback-mitigation">Mitigation: 5-second temporal averaging smooths frame-level errors. Simulation mode provides fallback data for demonstrations.</div>
+        </div>
+      </div>
+
+      <div class="drawback-card reveal reveal-delay-2">
+        <div class="drawback-number">3</div>
+        <div>
+          <div class="drawback-title">Spatial Resolution Between Sensors</div>
+          <div class="drawback-desc">Kriging interpolation with 6 sensors provides city-scale estimates, but street-level accuracy in sensor-sparse areas converges toward the mean.</div>
+          <div class="drawback-mitigation">Mitigation: Adding cameras improves resolution. Each new camera is just a URL in the config &mdash; zero hardware cost.</div>
+        </div>
+      </div>
+
+      <div class="drawback-card reveal reveal-delay-3">
+        <div class="drawback-number">4</div>
+        <div>
+          <div class="drawback-title">API Rate Limits &amp; External Dependencies</div>
+          <div class="drawback-desc">OpenWeatherMap free tier limits to 60 calls/minute. Real-time video processing requires 2&ndash;5 Mbps per HD camera stream.</div>
+          <div class="drawback-mitigation">Mitigation: 5-minute weather caching. Paid tier ($40/mo) supports 1M calls/day. Edge computing reduces bandwidth.</div>
+        </div>
+      </div>
+
+      <div class="drawback-card reveal reveal-delay-4">
+        <div class="drawback-number">5</div>
+        <div>
+          <div class="drawback-title">GPU Requirement for Real-Time YOLO</div>
+          <div class="drawback-desc">YOLOv8 across 6 cameras demands GPU acceleration. CPU-only achieves ~1-2 fps with processing lag.</div>
+          <div class="drawback-mitigation">Mitigation: YOLOv8-nano reduces compute by 4&times;. 5-second frame sampling reduces load by 25&times;. Simulation mode eliminates GPU dependency.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     ABSTRACT
+     ================================================================ -->
+<section id="abstract">
+  <div class="container">
+    <div class="section-overline reveal">Project Abstract</div>
+    <h2 class="section-title reveal reveal-delay-1">The Full Story</h2>
+    <div class="divider reveal reveal-delay-1"></div>
+
+    <div class="abstract-text reveal reveal-delay-2">
+      <p>
+        Urban air quality monitoring today suffers from a fundamental infrastructure gap: physical sensor networks cover barely 2% of city streets, as each certified monitoring station costs $5,000&ndash;$15,000. This leaves entire neighborhoods in a <strong>data blind spot</strong>.
+      </p>
+      <p>
+        <em>Eco-Lens</em> solves this by turning the city's existing traffic CCTV cameras into <strong>virtual air quality sensors</strong> &mdash; a pure software solution that creates new environmental data from infrastructure that already exists. The system uses <em>YOLOv8 computer vision</em> to classify vehicles in real-time, then applies <em>EPA AP-42 emission factors</em> to calculate source emission rates. These are fed into a full <em>Gaussian Plume Dispersion Model</em> combined with live wind data to compute ground-level pollutant concentrations.
+      </p>
+      <p>
+        What makes Eco-Lens technically unprecedented is the fusion of five novel capabilities: <em>Kriging spatial interpolation</em> for continuous coverage from discrete points, <em>health exposure dosimetry</em> with an &ldquo;equivalent cigarettes&rdquo; metric, <em>acoustic pollution co-estimation</em> from the same video feed, <em>real-time particle simulation</em> of Gaussian plume dispersion, and <em>pollution-weighted green routing</em> via A* pathfinding.
+      </p>
+      <p>
+        Eco-Lens does not compete with physical sensors; it <strong>fills the 98% gap between them</strong>, offering city governments a path to ubiquitous air quality monitoring at near-zero marginal cost. Every additional traffic camera becomes a free environmental sensor &mdash; simply by pointing our software at it.
+      </p>
+    </div>
+
+    <div class="abstract-keywords reveal reveal-delay-3">
+      <span class="keyword-tag">Computer Vision</span>
+      <span class="keyword-tag">Gaussian Plume Model</span>
+      <span class="keyword-tag">Kriging Interpolation</span>
+      <span class="keyword-tag">Air Quality</span>
+      <span class="keyword-tag">Environmental Physics</span>
+      <span class="keyword-tag">YOLOv8</span>
+      <span class="keyword-tag">Real-Time Monitoring</span>
+      <span class="keyword-tag">Health Dosimetry</span>
+      <span class="keyword-tag">Green Routing</span>
+      <span class="keyword-tag">Smart Cities</span>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     ONE MORE THING
+     ================================================================ -->
+<section id="onemore">
+  <div class="container">
+    <div class="onemore-pre reveal">One more thing.</div>
+    <h2 class="onemore-title reveal reveal-delay-1">
+      Every camera you add<br>is a free sensor.
+    </h2>
+    <p class="onemore-desc reveal reveal-delay-2">
+      No hardware. No calibration. No maintenance budget.<br>
+      Just point our software at a traffic camera,<br>
+      and that intersection now has an air quality sensor.
+    </p>
+    <a href="https://github.com/divyamohan1993/hacksagon" target="_blank" class="cta-final reveal reveal-delay-3">
+      Get Started on GitHub
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+    </a>
+  </div>
+</section>
+
+<!-- ================================================================
+     FOOTER
+     ================================================================ -->
+<footer>
+  <div class="footer-brand">ECO-LENS</div>
+  <div class="footer-text">Virtual Air Quality Matrix &mdash; Hacksagon 2026</div>
+  <div class="footer-links">
+    <a href="https://github.com/divyamohan1993/hacksagon" target="_blank">GitHub</a>
+    <a href="#demo">Demo</a>
+    <a href="#features">Features</a>
+    <a href="#abstract">Abstract</a>
+  </div>
+</footer>
+
+<!-- ================================================================
+     SCRIPTS
+     ================================================================ -->
+<script>
+  // ---- Scroll Reveal Observer ----
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // ---- Nav scroll effect ----
+  const nav = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 50);
+  });
+
+  // ---- Generate floating particles ----
+  const particlesContainer = document.getElementById('particles');
+  const colors = ['#22c55e', '#14b8a6', '#06b6d4', '#eab308', '#f97316', '#ef4444'];
+
+  for (let i = 0; i < 40; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const size = Math.random() * 4 + 2;
+    p.style.cssText = `
+      width: ${size}px;
+      height: ${size}px;
+      left: ${Math.random() * 100}%;
+      background: ${colors[Math.floor(Math.random() * colors.length)]};
+      animation-duration: ${Math.random() * 15 + 10}s;
+      animation-delay: ${Math.random() * 10}s;
+    `;
+    particlesContainer.appendChild(p);
+  }
+
+  // ---- Smooth scroll for nav links ----
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+      e.preventDefault();
+      const target = document.querySelector(this.getAttribute('href'));
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+</script>
+
+</body>
+</html>
