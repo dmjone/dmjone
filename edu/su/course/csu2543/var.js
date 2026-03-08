@@ -28,14 +28,7 @@ function get_menu_list(datetogen) {
         body_genmenu.processData(arr, def_date, def_author, { isMainCategory: true });
     }
     function get_class(def_date, def_author) {
-        const arr = [
-            {
-                title: "Assignment 1: Digital Image Generation Across the Electromagnetic Spectrum",
-                desc: "Assignment on digital image generation across the electromagnetic spectrum. Covers gamma ray, X-ray, UV, visible, infrared, microwave, and radio wave imaging — instruments, physical principles, and DIP techniques for each spectral band.",
-                codetype: "Assignment",
-                readtime: 10,
-                link: "assignment"
-            },
+        const arr = [            
             {
                 title: "Digital Image Processing",
                 desc: "Lecture notes and key concepts for Digital Image Processing, part of the CSU2543 Software Engineering course at Shoolini University. Covers image representation, processing pipeline, sampling, quantization, and practical effects. Free educational resource by dmj.one.",
@@ -49,7 +42,14 @@ function get_menu_list(datetogen) {
                 codetype: "Concepts",
                 readtime: 5,
                 link: "basic-mathematical-operations-and-intensity-transformations"
-            },            
+            }, 
+            {
+                title: "Assignment 1: Digital Image Generation Across the Electromagnetic Spectrum",
+                desc: "Assignment on digital image generation across the electromagnetic spectrum. Covers gamma ray, X-ray, UV, visible, infrared, microwave, and radio wave imaging — instruments, physical principles, and DIP techniques for each spectral band.",
+                codetype: "Assignment",
+                readtime: 10,
+                link: "assignment"
+            },
         ];
         body_genmenu.processData(arr, def_date, def_author);
     }
