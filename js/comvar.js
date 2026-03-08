@@ -622,8 +622,12 @@ const profDetailsBio = {
     {
         bio: "<p class='professorbio header-p-author-description'>Shrey is a highly skilled and experienced SME who offers industry-oriented training designed to bridge the gap between academic learning and real-world application.</p>",
         href: "contact@dmj.one"
+    },
+    'Ms. Ishani Sharma':
+    {
+        bio: "<p class='professorbio header-p-author-description'>Ms. Ishani Sharma is an Assistant Professor at Shoolini University.</p>",
+        href: "contact@dmj.one"
     }
-        
 };
 const courseDetailsMap = {
     // Semester 1
@@ -737,6 +741,7 @@ const courseDetailsMap = {
         'default': ["Abhinay", "CSU2315", "Competitive Coding Techniques"],
         'lab': ["Abhinay", "CSU2315P", "Competitive Coding Techniques Lab"]
     },
+    'csu2543': { 'default': ["Ms. Ishani Sharma", "CSU2543", "Digital Image Processing"] },
 };
 
 ///////////////// VERSION 2.0
