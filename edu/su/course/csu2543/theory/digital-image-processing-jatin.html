@@ -1,0 +1,340 @@
+<!-------------------------- © 2007 - present, dmj.one and contributors. ----------------------------------
+   Part of the dmjone project. Licensed under the GNU AGPL. Provided as-is, without warranty of any kind. 
+-------------------- Redistribution and modifications must retain this notice. --------------------------->
+
+
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+    <!--<![endif]-->
+
+    <head>
+        <script src="/js/edu_su_common.js"></script>
+        <noscript>
+            <style>
+                html,
+                body {
+                    margin: 0;
+                    overflow: hidden;
+                }
+            </style>
+            <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+        </noscript>
+
+        <title>Digital Image Processing - CSU2543 - Shoolini University</title>
+        <meta name="description" content="Lecture notes and key concepts for Digital Image Processing, part of the CSU2543 Software Engineering course at Shoolini University. Covers image representation, processing pipeline, sampling, quantization, and practical effects. Free educational resource by dmj.one.">
+
+        <meta property="og:image" content="/logo.png">
+        <meta property="og:type" content="article">
+
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:site" content="@divyamohan1993">
+        <meta name="twitter:creator" content="@divyamohan1993">
+        <meta name="twitter:image" content="/logo.png">
+
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+        <meta name="author" content="Divya Mohan">
+        <meta name="robots" content="index, follow">
+
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/katex.min.js" integrity="sha512-sHSNLECRJSK+BFs7E8DiFc6pf6n90bLI85Emiw1jhreduZhK3VXgq9l4kAt9eTIHYAcuQBKHL01QKs4/3Xgl8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.4/contrib/auto-render.min.js" integrity="sha512-iWiuBS5nt6r60fCz26Nd0Zqe0nbk1ZTIQbl3Kv7kYsX+yKMUFHzjaH2+AnM6vp2Xs+gNmaBAVWJjSmuPw76Efg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                renderMathInElement(document.body, {
+                    // customised options
+                    // • auto-render specific keys, e.g.:
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false },
+                        { left: '\\(', right: '\\)', display: false },
+                        { left: '\\[', right: '\\]', display: true }
+                    ],
+                    // • rendering keys, e.g.:
+                    throwOnError: false
+                });
+            });
+        </script> -->
+
+        <!-- <style>
+            main ul {
+                list-style-type: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            main ul li {
+                margin: 0;
+                padding: 0;
+            }
+        </style> -->
+
+        <!-- JSON-LD Structured Data for SEO -->
+        <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "Course",
+          "name": "Digital Image Processing",
+          "description": "Digital Image Processing course, part of the csu2543 Software Engineering series, is a free initiative by dmj.one to provide quality education for all. Master Digital Image Processing, covering core principles, image representation, processing pipeline, sampling, quantization, and practical effects.",
+          "url": "https://dmj.one/edu/su/course/csu2543/theory/digital-image-processing",
+          "dateModified": "2025-02-10",
+          "provider": [
+            {
+              "@type": "EducationalOrganization",
+              "name": "dmj.one",
+              "url": "https://dmj.one"
+            },
+            {
+              "@type": "EducationalOrganization",
+              "name": "Shoolini University",
+              "url": "https://shooliniuniversity.com"
+            }
+          ],
+          "offers": {
+              "@type": "Offer",
+              "category": "Education",
+              "price": "0",
+              "priceCurrency": "USD",
+              "availability": "https://schema.org/InStock",
+              "url": "https://dmj.one/edu/su/course/csu2543/theory/agile-software-development"
+          },
+          "hasCourseInstance": {
+              "@type": "CourseInstance",
+              "name": "Course - CSU2543",
+              "description": "Digital Image Processing course, part of the csu2543 Software Engineering series, is a free initiative by dmj.one to provide quality education for all. Master Digital Image Processing, covering core principles, image representation, processing pipeline, sampling, quantization, and practical effects.",
+              "courseMode": "online",
+              "startDate": "2025-01-27",
+              "courseWorkload": "PT4H",               
+              "instructor": [
+                {
+                  "@type": "Person",
+                  "name": "Ishani Sharma",
+                  "url": "https://shooliniuniversity.com/faculty/profile/ishani-sharma"
+                },
+                {
+                  "@type": "Person",
+                  "name": "Divya Mohan",                                      
+                  "url": "https://dmj.one/resume/",
+                    "sameAs": [
+                        "https://www.credly.com/users/divyamohan1993",
+                        "https://www.linkedin.com/in/divyamohan1993/",
+                        "https://hackerrank.com/divyamohan1993",
+                        "https://www.coursera.org/learner/divyamohan1993"
+                    ]
+                }
+              ],
+              "url": "https://dmj.one/edu/su/course/csu2543/"
+            }
+        }
+        </script>
+
+    </head>
+
+    <body>
+
+        <script> header_author("jatin"); </script>
+
+        <main>
+            <article class="agen-tableofcontents">
+                <h2 class="text-center">
+                    Digital Image Processing by Jatin Sharma
+                </h2>
+                <div class="d-none contentdate">2026, March 8</div>
+            </article>
+
+            <div class="mb-3 d-flex justify-content-center align-items-center">
+                <a href="digital-image-processing" class="btn btn-lg btn-outline-primary d-print-none">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i> Main Article
+                </a>
+            </div>
+
+
+            <article>
+                <h3>1. Digital Image Processing (Very Simple Understanding)</h3>
+                <h4>What is an Image?</h4>
+                <p>An image is basically a function: $f(x,y)$</p>
+                <p>$x, y$ → position of pixel</p>
+                <p>$f(x,y)$ → brightness or intensity at that point</p>
+                <p>Example: A photo on your phone — each small dot = pixel. Image = collection of pixels. Each pixel stores an intensity value.</p>
+            </article>
+            
+            <article>
+                <h3>2. What is Digital Image Processing (DIP)?</h3>
+                <p>Definition</p>
+                <p>Digital Image Processing means using computers to process and analyze digital images.</p>
+                <p>Examples: remove noise, increase brightness, detect objects, medical scanning.</p>
+            </article>
+            
+            <article>
+                <h3>3. Pixel</h3>
+                <p>A pixel is the smallest unit of an image.</p>
+                <p>Example: A photo: 1000 × 1000 pixels → Total pixels = 1,000,000</p>
+                <p>Each pixel has: location and intensity value.</p>
+            </article>
+            
+            <article>
+                <h3>4. Levels of Image Processing (VERY IMPORTANT FOR EXAM)</h3>
+                <p>There are three levels:</p>
+                <ul>
+                    <li><strong>Low-Level Processing</strong><br />
+                        <p>Input → Image, Output → Image. Examples: noise removal, image sharpening, contrast enhancement. Example: Blurry image → Clear image.</p>
+                    </li>
+                    <li><strong>Mid-Level Processing</strong><br />
+                        <p>Input → Image, Output → Features. Examples: edge detection, object segmentation. Example: Detect car boundaries in a photo.</p>
+                    </li>
+                    <li><strong>High-Level Processing</strong><br />
+                        <p>Input → Features, Output → Understanding. Examples: scene understanding, object recognition, autonomous cars. Example: Computer understands "THIS IS A CAR".</p>
+                    </li>
+                </ul>
+            </article>
+            
+            <article>
+                <h3>5. History of Digital Image Processing</h3>
+                <p>1920s — Newspapers transmitted images using early systems; transmission time reduced drastically.</p>
+                <p>1960s — Space race: space probes sent distorted images; scientists used computers to restore images.</p>
+                <p>1970s — Medical imaging revolution: CT scan, MRI; computers reconstruct body images.</p>
+            </article>
+            
+            <article>
+                <h3>6. Sources of Digital Images</h3>
+                <p>Images can come from different parts of the electromagnetic spectrum and other energy sources:</p>
+                <ul>
+                    <li><strong>Gamma Rays</strong> — used for nuclear medicine and astronomy.</li>
+                    <li><strong>X-Rays</strong> — medical imaging, airport security (bone X-ray).</li>
+                    <li><strong>Ultraviolet</strong> — astronomy and scientific imaging.</li>
+                    <li><strong>Visible Light</strong> — normal cameras use visible spectrum (≈400 nm–700 nm). Colors: Red, Green, Blue.</li>
+                    <li><strong>Infrared</strong> — detects heat (thermal cameras, night vision).</li>
+                    <li><strong>Microwaves</strong> — radar imaging, satellite imaging.</li>
+                    <li><strong>Radio Waves</strong> — MRI scans.</li>
+                    <li><strong>Ultrasound</strong> — uses sound waves (e.g., pregnancy scans).</li>
+                </ul>
+            </article>
+            
+            <article>
+                <h3>7. Image Processing Pipeline (EXTREMELY IMPORTANT)</h3>
+                <p>Every image processing system follows these steps:</p>
+                <ol>
+                    <li><strong>Image Acquisition</strong><br />
+                        <p>Capture image using camera or sensor, then convert to a digital image.</p>
+                    </li>
+                    <li><strong>Enhancement</strong><br />
+                        <p>Improve image quality — brightness correction, sharpening, noise removal. Purpose: make image look better (subjective).</p>
+                    </li>
+                    <li><strong>Restoration</strong><br />
+                        <p>Recover original image using mathematics — e.g., remove motion blur. Difference: restoration is mathematical, enhancement is subjective.</p>
+                    </li>
+                    <li><strong>Morphological Processing</strong><br />
+                        <p>Deals with shape of objects — boundary extraction, skeleton detection.</p>
+                    </li>
+                    <li><strong>Segmentation (MOST IMPORTANT)</strong><br />
+                        <p>Divide image into parts (e.g., car, road, sky). This step is the most difficult.</p>
+                    </li>
+                    <li><strong>Recognition</strong><br />
+                        <p>Final step: computer identifies objects (e.g., "this is a tumor", "this is a vehicle").</p>
+                    </li>
+                </ol>
+            </article>
+            
+            <article>
+                <h3>8. Components of Image Processing System</h3>
+                <p>Main parts:</p>
+                <ul>
+                    <li>Image sensors</li>
+                    <li>Special hardware</li>
+                    <li>Computer</li>
+                    <li>Image processing software</li>
+                    <li>Mass storage</li>
+                    <li>Network / cloud</li>
+                </ul>
+            </article>
+            
+            <article>
+                <h3>9. Human Eye (Visual Perception)</h3>
+                <p>Parts of the eye: cornea, iris, lens, retina.</p>
+                <p>Retina contains receptors:</p>
+                <ul>
+                    <li><strong>Cones</strong>: 6–7 million — detect color, work in bright light.</li>
+                    <li><strong>Rods</strong>: 75–150 million — detect low light, no color detection.</li>
+                </ul>
+            </article>
+            
+            <article>
+                <h3>10. Image Formation Model (VERY IMPORTANT)</h3>
+                <p>Image formation equation:</p>
+                <p>$$f(x,y) = i(x,y) \times r(x,y)$$</p>
+                <p>Where:</p>
+                <ul>
+                    <li><strong>f(x,y)</strong>: image intensity</li>
+                    <li><strong>i(x,y)</strong>: illumination — amount of light hitting the object</li>
+                    <li><strong>r(x,y)</strong>: reflectance — amount of light reflected by the object</li>
+                </ul>
+                <p>Reflectance range: $0 \\le r(x,y) \\le 1$ (white wall → high reflectance; black cloth → low reflectance).</p>
+            </article>
+            
+            <article>
+                <h3>11. Image Sampling and Quantization</h3>
+                <p>Converts continuous image → digital image. Two steps:</p>
+                <ul>
+                    <li><strong>Sampling</strong>: convert spatial coordinates to pixels (e.g., image = 512 × 512 pixels). Determines spatial resolution.</li>
+                    <li><strong>Quantization</strong>: convert intensity values (e.g., 8-bit image → $2^8 = 256$ intensity levels, range 0 → 255).</li>
+                </ul>
+            </article>
+            
+            <article>
+                <h3>12. Spatial Resolution</h3>
+                <p>Definition: ability to distinguish small details. Measured by pixels per unit area. Example: 4K image → high spatial resolution.</p>
+            </article>
+            
+            <article>
+                <h3>13. Intensity Resolution</h3>
+                <p>Definition: ability to distinguish small brightness differences. Measured by number of bits. Example: 8-bit → 256 levels; 10-bit → 1024 levels.</p>
+            </article>
+            
+            <article>
+                <h3>14. Effects of Low Resolution</h3>
+                <p>Low Spatial Resolution → jagged edges, blurry shapes.</p>
+                <p>Low Intensity Resolution → false contouring, banding.</p>
+            </article>
+            
+            <article>
+                <h3>MOST IMPORTANT TOPICS FOR EXAM</h3>
+                <p>Study these FIRST (VERY IMPORTANT):</p>
+                <ul>
+                    <li>Definition of Digital Image</li>
+                    <li>Pixel</li>
+                    <li>Levels of Image Processing</li>
+                    <li>Image Processing Pipeline</li>
+                    <li>Image Formation Model</li>
+                    <li>Sampling and Quantization</li>
+                    <li>Spatial Resolution</li>
+                    <li>Intensity Resolution</li>
+                </ul>
+                <p>MODERATE:</p>
+                <ul>
+                    <li>EM Spectrum sources</li>
+                    <li>History of DIP</li>
+                    <li>Human eye</li>
+                </ul>
+            </article>
+            
+            <article>
+                <h3>20-Minute Ultra Fast Revision</h3>
+                <p>Memorize this:</p>
+                <ul>
+                    <li>Image = $f(x,y)$</li>
+                    <li>Pixel = smallest unit</li>
+                    <li>Levels of processing: 1. Low level 2. Mid level 3. High level</li>
+                    <li>Pipeline: Acquisition → Enhancement → Restoration → Morphology → Segmentation → Recognition</li>
+                    <li>Formula: $$f(x,y) = i(x,y) \times r(x,y)$$</li>
+                    <li>Resolution: Spatial → pixels; Intensity → bits</li>
+                </ul>
+            </article>
+        </main>
+
+        <script> copyright("all"); </script>
+
+    </body>
+
+</html>

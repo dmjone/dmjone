@@ -59,8 +59,12 @@ const arr_author = {
         name: "Anshuman Mohanty",
         bio: "<p class='studentauthorbio header-p-author-description'>Anshuman Mohanty is a B.Tech Computer Science student at Shoolini University, India. Passionate about technology and learning, he is a contributor to dmj.one, supporting the platform's goal of providing quality education for all. Anshuman is constantly expanding his skills and exploring new opportunities in the tech world.</p>",
         href: "anshumanmohanty@shooliniuniversity.com"
-    }
-
+    },
+    jatin: {
+        name: "Jatin",
+        bio: "<p class='studentauthorbio header-p-author-description'>Jatin is a computer science student from India pursuing his B.Tech degree. He has a strong interest in technology and problem-solving, and enjoys learning new concepts in computer science. As a contributor to dmj.one, Jatin focuses on simplifying technical topics so that students can understand them easily. He is dedicated to continuously improving his technical skills while contributing to educational initiatives that make learning more accessible.</p>",
+        href: "contact@dmj.one"
+    },
 };
 
 function processAuthors(args) {
