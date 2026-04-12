@@ -50,6 +50,20 @@ function get_menu_list(datetogen) {
                 readtime: 10,
                 link: "assignment"
             },
+            {
+                title: "Intensity Transformations",
+                desc: "Intensity transformations in digital image processing, including linear, logarithmic, power-law, and piecewise linear transformations. Key formulas and concepts for enhancing image contrast and brightness.",
+                codetype: "Concepts",
+                readtime: 5,
+                link: "intensity-transformations"
+            },
+            {
+                title: "Histogram Processing",
+                desc: "Histogram processing in digital image processing, including histogram equalization, histogram matching, and other techniques for enhancing image contrast and brightness.",
+                codetype: "Concepts",
+                readtime: 5,
+                link: "histogram-processing"
+            }
         ];
         body_genmenu.processData(arr, def_date, def_author);
     }
