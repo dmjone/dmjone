@@ -383,6 +383,7 @@ function generateNavbarHTML(coursesBySemester) {
                             <li><a class="dropdown-item" href="/labs/digital-safety/" data-toggle="tooltip" data-placement="top" title="Digital Safety Labs" data-original-title="Digital Safety Labs">Digital Safety Labs</a></li>
                         </ul>
                     </li>
+                        <li class="nav-item"><a class="nav-link" href="#catalogue-of-projects">Catalogue</a></li>
                         <li class="nav-item"><a class="nav-link" href="#contact-us-button-logical-href">Contact</a></li>
                         <div id="userMenu">
                             <li class="nav-item">
