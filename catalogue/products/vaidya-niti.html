@@ -1,0 +1,843 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#d8631a">
+<meta name="color-scheme" content="light">
+
+<title>Vaidya-Niti · Sovereign AI for Indian healthcare claims · dmj.one</title>
+<meta name="description" content="A pre-adjudication engine for India's hospitals. Indigenous AI first: Sarvam, Bhashini, Krutrim. FHIR R4. DPDP-compliant. 71 tests passing. Built for ET Gen AI Hackathon 2026.">
+<meta property="og:title" content="Vaidya-Niti · Where clinical truth meets digital trust.">
+<meta property="og:description" content="Sovereign AI healthcare adjudication for India. Indigenous-first, DPDP-compliant, FHIR R4, 22 Indian languages.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,30..100&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;500;600;700&family=Tiro+Devanagari+Hindi&display=swap">
+<link rel="stylesheet" href="../assets/core.css">
+
+<style>
+:root { --accent: var(--c-bharat); --accent-deep: #a14710; --chart: #fbf6ea; --chart-line: #c9bfa5; }
+body { background: var(--paper); }
+
+.devanagari { font-family: 'Tiro Devanagari Hindi', 'Fraunces', serif; }
+
+/* ===== Shared bits ===== */
+.crumbs {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink-mute);
+  margin: 0 0 2rem;
+  display: flex; gap: 0.5rem; flex-wrap: wrap;
+}
+.crumbs a { border-bottom: 1px solid var(--ink-mute); padding-bottom: 1px; }
+.crumbs a:hover { color: var(--accent); border-color: var(--accent); }
+.crumbs span { color: var(--accent); }
+
+.btn {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.7rem 1.1rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.14em; font-weight: 700;
+  border: 1px solid var(--ink);
+  transition: transform .15s, box-shadow .15s;
+}
+.btn:hover { transform: translate(-2px,-2px); box-shadow: 4px 4px 0 var(--ink); }
+.btn-primary { background: var(--accent); color: white; border-color: var(--accent); }
+.btn-ghost { background: transparent; color: var(--ink); }
+
+/* ===== HERO · case file motif ===== */
+.case {
+  position: relative;
+  padding-block: clamp(3rem, 5vw, 5.5rem) clamp(2.5rem, 4vw, 4rem);
+  border-bottom: var(--hair);
+  background:
+    repeating-linear-gradient(0deg, transparent 0 36px, color-mix(in srgb, var(--ink) 5%, transparent) 36px 37px),
+    var(--chart);
+  overflow: hidden;
+}
+.case::before {
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0;
+  width: 5px; background: var(--accent);
+}
+.case .frame { position: relative; }
+
+.case-tag {
+  display: inline-flex; align-items: center; gap: 0.7rem;
+  padding: 0.45rem 0.9rem;
+  border: 1px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  color: var(--accent-deep);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.16em;
+  margin-bottom: 1.5rem;
+}
+.case-tag::before {
+  content: ""; width: 8px; height: 8px;
+  background: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+.case-grid {
+  display: grid; gap: 2.5rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 980px) { .case-grid { grid-template-columns: 1.45fr 1fr; gap: 3rem; align-items: start; } }
+
+.case h1 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 30, "WONK" 1;
+  letter-spacing: -0.025em;
+  line-height: 0.98;
+  margin: 0;
+  max-width: 16ch;
+}
+.case h1 em {
+  font-style: italic; color: var(--accent);
+  font-variation-settings: "opsz" 144, "SOFT" 100, "WONK" 1;
+}
+.case h1 .deva {
+  display: block;
+  font-family: 'Tiro Devanagari Hindi', serif;
+  font-size: 0.42em;
+  color: var(--accent-deep);
+  font-style: normal;
+  margin-top: 0.5rem;
+  letter-spacing: 0;
+  line-height: 1.1;
+}
+
+.case .lede {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md);
+  font-weight: 300;
+  line-height: 1.45;
+  color: var(--ink-soft);
+  margin: 1.75rem 0 0;
+  max-width: 56ch;
+}
+.case .lede strong {
+  font-weight: 600;
+  background: linear-gradient(180deg, transparent 60%, color-mix(in srgb, var(--accent) 28%, transparent) 60%);
+  padding: 0 0.1em;
+  color: var(--ink);
+}
+
+.case .actions {
+  display: flex; gap: 0.75rem; flex-wrap: wrap;
+  margin-top: 2rem;
+}
+
+/* "Patient chart" card */
+.chart {
+  border: 1px solid var(--ink);
+  background: white;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-sm);
+  position: relative;
+}
+.chart::after {
+  content: "FILE No. 2026-PS-04";
+  position: absolute; right: -0.5rem; top: 1.2rem;
+  background: var(--ink); color: var(--paper);
+  padding: 0.25rem 0.7rem;
+  font-size: var(--t-xs);
+  letter-spacing: 0.16em;
+}
+.chart-row {
+  display: grid; grid-template-columns: 11ch 1fr;
+  gap: 1rem;
+  padding: 0.85rem 1.2rem;
+  border-bottom: 1px dashed var(--chart-line);
+  align-items: baseline;
+}
+.chart-row:last-child { border-bottom: 0; }
+.chart-row .k {
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--ink-mute);
+  font-weight: 600;
+  font-size: var(--t-xs);
+}
+.chart-row .v { color: var(--ink); font-weight: 500; }
+.chart-row .v em { color: var(--accent-deep); font-style: normal; font-weight: 700; }
+
+/* ===== STATS RIBBON ===== */
+.ribbon {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  background: var(--ink);
+  color: var(--paper);
+  border-block: 2px solid var(--ink);
+}
+.ribbon .stat {
+  padding: 1.5rem clamp(1rem, 2vw, 1.5rem);
+  border-right: 1px solid color-mix(in srgb, var(--paper) 18%, transparent);
+}
+.ribbon .stat:last-child { border-right: 0; }
+.ribbon .num {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  font-variation-settings: "opsz" 144, "SOFT" 30;
+  display: block;
+  line-height: 1;
+  color: var(--accent);
+}
+.ribbon .lbl {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  margin-top: 0.6rem;
+  display: block;
+  color: color-mix(in srgb, var(--paper) 75%, transparent);
+}
+
+/* ===== ACTS ===== */
+.act {
+  padding-block: clamp(3rem, 5vw, 5rem);
+  border-bottom: var(--hair);
+}
+.act-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 700;
+  margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 1rem;
+}
+.act-num::before {
+  content: ""; width: 2.5rem; height: 1px; background: var(--accent);
+}
+.act h2 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 50, "WONK" 1;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+  margin: 0 0 1.5rem;
+  max-width: 22ch;
+}
+.act h2 em { font-style: italic; color: var(--accent); }
+.act .blurb {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md);
+  color: var(--ink-soft);
+  max-width: 55ch;
+  margin: 0;
+}
+
+/* Act I · three crisis columns */
+.crisis-grid {
+  display: grid; gap: 1.25rem; margin-top: 2rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { .crisis-grid { grid-template-columns: repeat(3, 1fr); } }
+.crisis {
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  padding: 1.5rem;
+  position: relative;
+}
+.crisis .pct {
+  font-family: 'Fraunces', serif;
+  font-size: 3rem;
+  font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 30, "WONK" 1;
+  color: var(--accent);
+  line-height: 1;
+  letter-spacing: -0.04em;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+.crisis h3 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md);
+  margin: 0 0 0.5rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.crisis p { margin: 0; font-size: var(--t-sm); color: var(--ink-soft); }
+
+/* Act II · before/after compare */
+.compare {
+  background: linear-gradient(180deg, var(--paper-soft), var(--paper));
+}
+.compare-grid {
+  display: grid; gap: 0;
+  grid-template-columns: 1fr;
+  margin-top: 2rem;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+}
+@media (min-width: 880px) { .compare-grid { grid-template-columns: 1fr 1fr; } }
+.col {
+  padding: 1.75rem;
+  position: relative;
+}
+.col + .col { border-top: 1px solid var(--ink); }
+@media (min-width: 880px) {
+  .col + .col { border-top: 0; border-left: 1px solid var(--ink); }
+}
+.col .stamp {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  display: inline-block;
+  padding: 0.3rem 0.6rem;
+  margin-bottom: 1rem;
+  border: 1px solid var(--ink);
+}
+.col.before .stamp { color: var(--ink); background: var(--paper); }
+.col.after .stamp { color: white; background: var(--accent); border-color: var(--accent); }
+.col h4 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md);
+  margin: 0 0 1rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.col ul { display: grid; gap: 0.6rem; margin: 0; padding: 0; list-style: none; }
+.col li {
+  font-size: var(--t-sm);
+  display: grid; grid-template-columns: 1.4rem 1fr; gap: 0.5rem;
+  color: var(--ink-soft);
+}
+.col li::before {
+  content: ""; width: 0.85rem; height: 0.85rem;
+  margin-top: 0.35rem;
+  border: 1.5px solid var(--ink);
+  display: inline-block;
+}
+.col.after li::before {
+  background: var(--accent); border-color: var(--accent);
+}
+
+/* Act III · vertical scribe pipeline (numbered) */
+.scribe {
+  display: grid; gap: 0; margin-top: 2rem;
+  border-left: 2px solid var(--accent);
+  margin-left: 1rem;
+}
+.scribe-step {
+  display: grid;
+  grid-template-columns: 3rem 1fr;
+  gap: 1.25rem;
+  padding: 1.25rem 0 1.25rem 1.5rem;
+  position: relative;
+  border-bottom: var(--hair-soft);
+}
+.scribe-step:last-child { border-bottom: 0; }
+.scribe-step::before {
+  content: ""; position: absolute;
+  left: -8px; top: 1.6rem;
+  width: 14px; height: 14px;
+  background: var(--accent);
+  border: 3px solid var(--paper);
+}
+.scribe-step .pn {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-md);
+  font-weight: 700;
+  color: var(--accent-deep);
+  letter-spacing: -0.02em;
+}
+.scribe-step h3 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md);
+  margin: 0 0 0.4rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.scribe-step p { margin: 0; font-size: var(--t-sm); color: var(--ink-soft); }
+
+/* Act IV · sovereign cascade (horizontal) */
+.cascade {
+  display: grid; gap: 0;
+  margin-top: 2rem;
+  grid-template-columns: 1fr;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+}
+@media (min-width: 880px) { .cascade { grid-template-columns: repeat(4, 1fr); } }
+.tier {
+  padding: 1.5rem 1.25rem;
+  border-right: 1px solid var(--paper-edge);
+  position: relative;
+}
+@media (max-width: 879px) {
+  .tier { border-right: 0; border-bottom: 1px solid var(--paper-edge); }
+}
+.tier:last-child { border-right: 0; border-bottom: 0; }
+.tier .pri {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.tier .pri b {
+  display: inline-block; min-width: 1.4rem; height: 1.4rem;
+  background: var(--accent); color: white;
+  text-align: center; line-height: 1.4rem;
+  font-weight: 700;
+}
+.tier h4 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.2rem;
+  margin: 0 0 0.4rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.tier .who {
+  font-size: var(--t-xs);
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--ink-mute);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin: 0 0 0.6rem;
+}
+.tier p { margin: 0; font-size: var(--t-sm); color: var(--ink-soft); }
+.tier.fallback h4 { color: var(--ink-mute); }
+.tier.fallback .pri b { background: var(--ink-mute); }
+
+/* ===== PROOF · test report ===== */
+.proof {
+  background: var(--ink);
+  color: var(--paper);
+  padding-block: clamp(3rem, 5vw, 5rem);
+  position: relative;
+  overflow: hidden;
+}
+.proof::before {
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 80% 20%, color-mix(in srgb, var(--accent) 30%, transparent), transparent 60%);
+  pointer-events: none;
+}
+.proof .frame { position: relative; }
+.proof h2 { color: var(--paper); }
+.proof h2 em { color: var(--accent); }
+.report {
+  margin-top: 2rem;
+  border: 1px solid color-mix(in srgb, var(--paper) 30%, transparent);
+  background: color-mix(in srgb, var(--paper) 4%, transparent);
+}
+.report-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  border-bottom: 1px solid color-mix(in srgb, var(--paper) 18%, transparent);
+}
+@media (min-width: 760px) {
+  .report-row { grid-template-columns: 18ch 1fr 12ch; align-items: center; }
+}
+.report-row:last-child { border-bottom: 0; }
+.report-row .label {
+  padding: 1rem 1.25rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.18em;
+  font-weight: 700;
+  color: color-mix(in srgb, var(--paper) 70%, transparent);
+  border-right: 1px solid color-mix(in srgb, var(--paper) 14%, transparent);
+}
+.report-row .desc {
+  padding: 1rem 1.25rem;
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md);
+  font-weight: 400;
+}
+.report-row .pass {
+  padding: 1rem 1.25rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  font-weight: 700;
+  color: var(--accent);
+  text-align: right;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+/* Stack + endcta */
+.stack {
+  padding-block: clamp(3rem, 5vw, 5rem);
+  border-bottom: var(--hair);
+}
+.stack-list {
+  display: flex; flex-wrap: wrap; gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+.stack-tag {
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--ink);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 600;
+}
+.endcta {
+  padding-block: clamp(3rem, 5vw, 5rem);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 10%, transparent), var(--paper));
+}
+.endcta .frame { display: grid; gap: 2rem; grid-template-columns: 1fr; }
+@media (min-width: 760px) { .endcta .frame { grid-template-columns: 2fr 1fr; align-items: end; } }
+.endcta h2 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 300;
+  font-variation-settings: "opsz" 144, "SOFT" 100;
+  margin: 0 0 1rem;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+}
+.endcta h2 em {
+  font-style: italic; color: var(--accent);
+  background: linear-gradient(180deg, transparent 70%, color-mix(in srgb, var(--accent) 25%, transparent) 70%);
+}
+.endcta p { color: var(--ink-soft); margin: 0; max-width: 50ch; }
+.endcta .actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+
+.foot { background: var(--ink); color: var(--paper); }
+.foot .dot { color: var(--accent); }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topnav">
+  <div class="frame">
+    <div class="brand"><a href="../index.html">dmj<span class="dot">.</span>one</a></div>
+    <nav aria-label="Primary">
+      <ul>
+        <li><a href="../index.html#catalogue">Catalogue</a></li>
+        <li><a href="../index.html#manifesto">Manifesto</a></li>
+        <li><a href="../index.html#hire">Hire</a></li>
+        <li><a href="https://github.com/divyamohan1993/vaidya-niti" rel="noopener">GitHub</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ============ HERO · CASE FILE ============ -->
+<section class="case">
+  <div class="frame">
+    <p class="crumbs">
+      <a href="../index.html">Catalogue</a> /
+      <a href="../index.html#cat-bharat">Bharat-First</a> /
+      <span>Vaidya-Niti</span>
+    </p>
+
+    <span class="case-tag">No. 12 · Bharat-First · Healthcare</span>
+
+    <div class="case-grid">
+      <div>
+        <h1>
+          Where clinical truth<br>
+          meets <em>digital trust.</em>
+          <span class="deva">वैद्य-नीति · Vaidya-Niti</span>
+        </h1>
+
+        <p class="lede">
+          Indian hospitals lose <strong>15 to 20% of revenue</strong> to claim rejections caused by clerical errors. Vaidya-Niti reads the chart, reasons over the policy and tells the clinician what is missing, in seconds. <strong>Indigenous AI first. DPDP-compliant. Mumbai-resident. Sovereign by design.</strong>
+        </p>
+
+        <div class="actions">
+          <a class="btn btn-primary" href="https://github.com/divyamohan1993/vaidya-niti" rel="noopener">View source</a>
+          <a class="btn btn-ghost" href="#how">How it works</a>
+          <a class="btn btn-ghost" href="#proof">Proof</a>
+        </div>
+      </div>
+
+      <aside class="chart" aria-label="Case file">
+        <div class="chart-row"><span class="k">Patient</span><span class="v">India's MSME hospitals</span></div>
+        <div class="chart-row"><span class="k">Complaint</span><span class="v">Claims rejected. Revenue bleeds.</span></div>
+        <div class="chart-row"><span class="k">History</span><span class="v">80% of records trapped in voice notes &amp; handwriting</span></div>
+        <div class="chart-row"><span class="k">Allergy</span><span class="v">Foreign data egress. <em>DPDP non-compliant.</em></span></div>
+        <div class="chart-row"><span class="k">Region</span><span class="v">asia-south1 (Mumbai). No exceptions.</span></div>
+        <div class="chart-row"><span class="k">Rx</span><span class="v"><em>Pre-adjudicate before submit.</em></span></div>
+        <div class="chart-row"><span class="k">Vaidya</span><span class="v">Sarvam → Bhashini → Krutrim → Gemini</span></div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATS RIBBON ============ -->
+<section class="ribbon" aria-label="At a glance">
+  <div class="stat"><span class="num">71</span><span class="lbl">Tests passing</span></div>
+  <div class="stat"><span class="num">22</span><span class="lbl">Indian languages</span></div>
+  <div class="stat"><span class="num">80+</span><span class="lbl">Slang terms mapped to ICD-10</span></div>
+  <div class="stat"><span class="num">20+</span><span class="lbl">AYUSH-allopathic interactions</span></div>
+  <div class="stat"><span class="num">4</span><span class="lbl">Indigenous AI providers, in priority</span></div>
+</section>
+
+<!-- ============ ACT I · THE PROBLEM ============ -->
+<section class="act" aria-labelledby="prob-h">
+  <div class="frame">
+    <p class="act-num">Act I · The Diagnosis</p>
+    <h2 id="prob-h">India's hospitals are <em>bleeding</em> in three places.</h2>
+    <p class="blurb">Existing systems are filing cabinets. They store data. They do not reason over it. They are not multilingual. They are not sovereign. They are not affordable for the half-million small clinics that hold the country up.</p>
+
+    <div class="crisis-grid">
+      <article class="crisis">
+        <span class="pct">80%</span>
+        <h3>Dark data</h3>
+        <p>Clinical history is locked inside voice notes, handwritten prescriptions and unstructured discharge summaries. None of it queryable.</p>
+      </article>
+      <article class="crisis">
+        <span class="pct">15-20%</span>
+        <h3>Revenue loss</h3>
+        <p>Small hospitals lose this much of every claim cycle to clerical rejections. The patient pays out of pocket. Trust dies.</p>
+      </article>
+      <article class="crisis">
+        <span class="pct">DPDP</span>
+        <h3>Privacy paralysis</h3>
+        <p>The DPDP Act 2023 mandates strict handling of patient data. No affordable, India-resident tooling exists for clinics that need it most.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ACT II · BEFORE / AFTER ============ -->
+<section class="act compare" aria-labelledby="cmp-h">
+  <div class="frame">
+    <p class="act-num">Act II · The Promise</p>
+    <h2 id="cmp-h">Catch the rejection <em>before</em> the rejection.</h2>
+    <p class="blurb">Insurers reject claims weeks after submission. The patient is already discharged, the bill already disputed. Vaidya-Niti adjudicates the claim against the policy at the moment it is written, returning a Claim Confidence Score with the exact gaps to fix.</p>
+
+    <div class="compare-grid">
+      <div class="col before">
+        <span class="stamp">Without Vaidya-Niti</span>
+        <h4>The 21-day rejection loop</h4>
+        <ul>
+          <li>Bill clerk submits claim. Files leave the hospital.</li>
+          <li>Insurer reviews on day 7 to 21. Spots a missing pre-auth note.</li>
+          <li>Claim returns rejected. Patient is asked to pay in cash.</li>
+          <li>Hospital appeals. Two more weeks. 40% never recovered.</li>
+        </ul>
+      </div>
+      <div class="col after">
+        <span class="stamp">With Vaidya-Niti</span>
+        <h4>The 8-second loop</h4>
+        <ul>
+          <li>Clinician dictates in any of 22 Indian languages. Scribe agent writes a FHIR R4 record.</li>
+          <li>Adjudicator reads the record against the patient's exact policy and the standard treatment guideline.</li>
+          <li>Claim Confidence Score returns with named gaps: missing ECG, sublimit on stent, pre-auth not raised.</li>
+          <li>Clinician fixes the gaps. Submits clean. First-pass approval.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ACT III · HOW IT WORKS ============ -->
+<section class="act" id="how" aria-labelledby="how-h">
+  <div class="frame">
+    <p class="act-num">Act III · The Scribe</p>
+    <h2 id="how-h">Voice in. Structured medical record <em>out.</em></h2>
+    <p class="blurb">A six-step pipeline turns a clinician's spoken note into a FHIR R4-compliant record, then reads the structured record back hands-free for confirmation. No keyboard. No retyping.</p>
+
+    <ol class="scribe">
+      <li class="scribe-step">
+        <span class="pn">01</span>
+        <div>
+          <h3>Ingest</h3>
+          <p>Audio captured from microphone, phone or upload. Encrypted at rest with AES-256-GCM the moment it lands.</p>
+        </div>
+      </li>
+      <li class="scribe-step">
+        <span class="pn">02</span>
+        <div>
+          <h3>Speech-to-text, indigenous-first</h3>
+          <p>Sarvam Bulbul tries first. Bhashini next. Krutrim after that. Gemini 3 Flash only as a backstop.</p>
+        </div>
+      </li>
+      <li class="scribe-step">
+        <span class="pn">03</span>
+        <div>
+          <h3>Transliterate to medical English</h3>
+          <p>"Sugar ki bimari" becomes E11. 80+ regional colloquialisms across Hindi, Tamil, Telugu, Bengali, Marathi and Gujarati map to ICD-10 codes.</p>
+        </div>
+      </li>
+      <li class="scribe-step">
+        <span class="pn">04</span>
+        <div>
+          <h3>Extract clinical entities</h3>
+          <p>Diagnosis, line of treatment, procedure, medication, dose. AYUSH-allopathic interactions checked against 20+ known severities.</p>
+        </div>
+      </li>
+      <li class="scribe-step">
+        <span class="pn">05</span>
+        <div>
+          <h3>Build the FHIR R4 resource</h3>
+          <p>Pydantic v2 + fhir.resources validates the structure. Adjudicator agent tests it against the patient's exact insurance policy.</p>
+        </div>
+      </li>
+      <li class="scribe-step">
+        <span class="pn">06</span>
+        <div>
+          <h3>Speak the record back</h3>
+          <p>TTS reads the structured note in the clinician's own language. They confirm or correct, hands-free, eyes on the patient.</p>
+        </div>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============ ACT IV · SOVEREIGN CASCADE ============ -->
+<section class="act" aria-labelledby="cascade-h">
+  <div class="frame">
+    <p class="act-num">Act IV · The Cascade</p>
+    <h2 id="cascade-h">Indian AI first. <em>Always.</em></h2>
+    <p class="blurb">Every capability · speech, translation, vision, reasoning · has its own ordered provider list. The cascade only advances when an indigenous provider is unavailable, returns an error or has no key configured. Foreign infrastructure is the backstop, never the default.</p>
+
+    <div class="cascade">
+      <article class="tier">
+        <p class="pri"><b>1</b>Primary</p>
+        <h4>Sarvam AI</h4>
+        <p class="who">Bharat · IndiaAI Mission partner</p>
+        <p>Bulbul v3 for TTS. Sarvam Vision 3B for OCR. Sarvam-M for chat. Built for Indian accents and scripts.</p>
+      </article>
+      <article class="tier">
+        <p class="pri"><b>2</b>Secondary</p>
+        <h4>Bhashini</h4>
+        <p class="who">Govt. of India · ULCA</p>
+        <p>National language platform. ASR, NMT and TTS across all 22 scheduled Indian languages. Free, government-backed.</p>
+      </article>
+      <article class="tier">
+        <p class="pri"><b>3</b>Tertiary</p>
+        <h4>Krutrim</h4>
+        <p class="who">Ola · India's first AI unicorn</p>
+        <p>Indigenous LLM and translation. OpenAI-compatible interface. Strong Indic coverage with sovereign hosting.</p>
+      </article>
+      <article class="tier fallback">
+        <p class="pri"><b>4</b>Backstop</p>
+        <h4>Gemini 3 Flash</h4>
+        <p class="who">Vertex AI · asia-south1 only</p>
+        <p>Activated only when all three indigenous providers fail. Geo-fenced to Mumbai. Pay-per-token, by exception.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PROOF ============ -->
+<section class="proof act" id="proof" aria-labelledby="proof-h">
+  <div class="frame">
+    <p class="act-num">Act V · Proof</p>
+    <h2 id="proof-h">It already <em>passes.</em></h2>
+
+    <div class="report">
+      <div class="report-row">
+        <div class="label">Test Suite</div>
+        <div class="desc">71 tests across adjudicator, API, AYUSH interactions, medical slang, security and vector store.</div>
+        <div class="pass">All pass</div>
+      </div>
+      <div class="report-row">
+        <div class="label">Region</div>
+        <div class="desc">Geo-fenced to GCP asia-south1 (Mumbai). No data egress. DPDP Act 2023 honored end-to-end.</div>
+        <div class="pass">Mumbai</div>
+      </div>
+      <div class="report-row">
+        <div class="label">Encryption</div>
+        <div class="desc">AES-256-GCM for PHI at rest. TLS 1.3 in transit. PII masking at the logging boundary.</div>
+        <div class="pass">256-bit</div>
+      </div>
+      <div class="report-row">
+        <div class="label">FHIR</div>
+        <div class="desc">Every clinical record validated against fhir.resources R4 schema. Pydantic v2 strict.</div>
+        <div class="pass">R4</div>
+      </div>
+      <div class="report-row">
+        <div class="label">Hackathon</div>
+        <div class="desc">Built for the Economic Times Gen AI Hackathon 2026. Full architecture, pitch deck and seven live API endpoints.</div>
+        <div class="pass">2026</div>
+      </div>
+      <div class="report-row">
+        <div class="label">Roadmap</div>
+        <div class="desc">Production target: Yotta Shakti Cloud Confidential VMs (AMD SEV-SNP). Even the cloud provider cannot read PHI in use.</div>
+        <div class="pass">SEV-SNP</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TECH STACK ============ -->
+<section class="stack" aria-labelledby="tech-h">
+  <div class="frame">
+    <p class="act-num">The Stack</p>
+    <h2 id="tech-h" style="font-size:var(--t-xl);font-weight:400;font-family:'Fraunces',serif;font-variation-settings:'opsz' 144,'SOFT' 50;margin:0;letter-spacing:-0.02em;">Production-grade. Sovereign-hosted. <em>Indian by default.</em></h2>
+    <ul class="stack-list">
+      <li class="stack-tag">Python 3.12+</li>
+      <li class="stack-tag">FastAPI</li>
+      <li class="stack-tag">Pydantic v2</li>
+      <li class="stack-tag">httpx async</li>
+      <li class="stack-tag">Sarvam AI</li>
+      <li class="stack-tag">Bhashini</li>
+      <li class="stack-tag">Krutrim AI</li>
+      <li class="stack-tag">Gemini 3 Flash</li>
+      <li class="stack-tag">FHIR R4 (fhir.resources)</li>
+      <li class="stack-tag">aiosqlite</li>
+      <li class="stack-tag">ChromaDB</li>
+      <li class="stack-tag">AES-256-GCM</li>
+      <li class="stack-tag">Bandit + ruff</li>
+      <li class="stack-tag">CycloneDX SBOM</li>
+      <li class="stack-tag">GCP asia-south1</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ END CTA ============ -->
+<section class="endcta" aria-labelledby="cta-h">
+  <div class="frame">
+    <div>
+      <h2 id="cta-h">If a clinic in Bilaspur can run it, <em>your hospital chain can too.</em></h2>
+      <p>I build sovereign, multilingual, FHIR-native AI for Indian healthcare. If you run a hospital chain, an insurer or a public-health programme, this is the engineer to call.</p>
+    </div>
+    <div class="actions">
+      <a class="btn btn-primary" href="../index.html#hire">Hire me</a>
+      <a class="btn btn-ghost" href="../index.html">Back to catalogue</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="frame">
+    <div>
+      <h2 style="font-family:'Fraunces',serif;font-size:var(--t-xl);margin:0 0 1rem;">dmj<span class="dot">.</span>one</h2>
+      <p>Dream, Manifest and Journey, Together as One.</p>
+      <p class="meta">© 2026 Divya Mohan. Vaidya-Niti built for the Economic Times Gen AI Hackathon 2026.</p>
+    </div>
+    <div>
+      <p class="meta">Catalogue</p>
+      <p><a href="../index.html#catalogue">All 47 products</a></p>
+      <p><a href="../index.html#cat-bharat">Bharat-First</a></p>
+      <p><a href="../index.html#hire">Hire</a></p>
+    </div>
+    <div>
+      <p class="meta">Vaidya-Niti</p>
+      <p><a href="https://github.com/divyamohan1993/vaidya-niti" rel="noopener">Source</a></p>
+      <p><a href="mailto:contact@dmj.one">contact@dmj.one</a></p>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

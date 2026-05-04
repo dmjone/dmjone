@@ -1,0 +1,648 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#7a2c5e">
+<meta name="color-scheme" content="light">
+
+<title>APAC GenAI Academy · Three production AI solutions on one Google Cloud stack · dmj.one</title>
+<meta name="description" content="FirstResponse AI for 911 triage, AgroAdvisor for smart farming, EduPulse for student analytics. Three production AI solutions, one ADK + Gemini + MCP + AlloyDB stack. Built for Google Gen AI Academy APAC Edition.">
+<meta property="og:title" content="APAC GenAI Academy · Three AI solutions, one stack">
+<meta property="og:description" content="Three Google Cloud production AI solutions in one repo: emergency triage, smart farming, student analytics. 44 tests passing.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,30..100&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="../assets/core.css">
+
+<style>
+:root {
+  --accent: var(--c-ai);
+  --accent-deep: #4f1a3d;
+  --t1: #b03b3b;       /* triage red */
+  --t2: #2f7a47;       /* farm green */
+  --t3: #4b3e8e;       /* edu indigo */
+}
+body { background: var(--paper); }
+
+/* ====== HERO · TRIPLE COLUMN ======================== */
+.ag-hero {
+  position: relative;
+  padding-block: clamp(3rem, 5vw, 5rem) 0;
+  border-bottom: var(--hair);
+  background: var(--paper);
+}
+.crumbs {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink-mute);
+  margin: 0 0 2rem;
+  display: flex; gap: 0.5rem; flex-wrap: wrap;
+}
+.crumbs a { border-bottom: 1px solid var(--ink-mute); padding-bottom: 1px; }
+.crumbs a:hover { color: var(--accent); border-color: var(--accent); }
+.crumbs span { color: var(--accent); }
+
+.ag-eyebrow {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  padding: 0.4rem 0.85rem;
+  border: 1px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  color: var(--accent-deep);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  margin-bottom: 1.5rem;
+}
+.ag-eyebrow::before {
+  content: ""; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+.ag-hero h1 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-3xl);
+  font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 30, "WONK" 1;
+  letter-spacing: -0.03em;
+  line-height: 0.94;
+  margin: 0;
+  max-width: 18ch;
+}
+.ag-hero h1 em {
+  font-style: italic;
+  color: var(--accent);
+  font-variation-settings: "opsz" 144, "SOFT" 100, "WONK" 1;
+}
+.ag-hero .lede {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md);
+  font-weight: 300;
+  line-height: 1.45;
+  color: var(--ink-soft);
+  margin: 1.75rem 0 0;
+  max-width: 60ch;
+}
+.ag-hero .lede strong {
+  font-weight: 600;
+  background: linear-gradient(180deg, transparent 60%, color-mix(in srgb, var(--accent) 30%, transparent) 60%);
+  padding: 0 0.1em;
+  color: var(--ink);
+}
+
+.cta-row {
+  margin-top: 2rem;
+  display: flex; gap: 0.75rem; flex-wrap: wrap;
+}
+.btn {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.7rem 1.1rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 700;
+  border: 1px solid var(--ink);
+  transition: background .15s, color .15s, transform .15s, box-shadow .15s;
+}
+.btn:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--ink); }
+.btn-primary { background: var(--accent); color: white; border-color: var(--accent); }
+.btn-ghost { background: transparent; color: var(--ink); }
+
+/* ====== TRIPLE BILLBOARD ============================ */
+.tribar {
+  display: grid;
+  grid-template-columns: 1fr;
+  margin-top: 3.5rem;
+  border-top: 2px solid var(--ink);
+  border-bottom: 2px solid var(--ink);
+}
+@media (min-width: 880px) {
+  .tribar { grid-template-columns: repeat(3, 1fr); }
+}
+.tri-card {
+  padding: 2rem clamp(1.25rem, 2.5vw, 2rem);
+  border-right: 1px solid var(--ink);
+  position: relative;
+  background: var(--paper);
+}
+.tri-card:last-child { border-right: 0; }
+@media (max-width: 879px) {
+  .tri-card { border-right: 0; border-bottom: 1px solid var(--ink); }
+  .tri-card:last-child { border-bottom: 0; }
+}
+.tri-card[data-track="1"] { --tone: var(--t1); }
+.tri-card[data-track="2"] { --tone: var(--t2); }
+.tri-card[data-track="3"] { --tone: var(--t3); }
+
+.tri-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--tone);
+  font-weight: 700;
+  display: flex; align-items: center; gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+.tri-num::before {
+  content: ""; width: 14px; height: 14px;
+  background: var(--tone);
+  border-radius: 50%;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--tone) 18%, transparent);
+}
+.tri-card h2 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-lg);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  margin: 0 0 0.6rem;
+  line-height: 1.05;
+}
+.tri-card h2 .tag {
+  display: block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--ink-mute);
+  font-weight: 600;
+  margin-top: 0.4rem;
+}
+.tri-card .pull {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-size: var(--t-md);
+  color: var(--tone);
+  margin: 1rem 0;
+  line-height: 1.3;
+  padding-left: 0.9rem;
+  border-left: 3px solid var(--tone);
+}
+.tri-card .body {
+  font-size: var(--t-sm);
+  color: var(--ink-soft);
+  margin: 0 0 1.25rem;
+  line-height: 1.5;
+}
+.tri-card .scale {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--ink);
+  border-top: 1px solid var(--paper-edge);
+  padding-top: 0.75rem;
+  display: grid; gap: 0.35rem;
+}
+.tri-card .scale b { color: var(--tone); font-weight: 700; }
+.tri-card .links {
+  margin-top: 1rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+}
+.tri-card .links a {
+  border-bottom: 1px solid var(--tone);
+  color: var(--tone);
+  font-weight: 700;
+}
+
+/* ====== UNIFIER ===================================== */
+.unifier {
+  padding-block: clamp(3rem, 5vw, 5rem);
+  border-bottom: var(--hair);
+  background: var(--paper-soft);
+}
+.act-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 700;
+  margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 1rem;
+}
+.act-num::before { content: ""; width: 2.5rem; height: 1px; background: var(--accent); }
+.unifier h2 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 50, "WONK" 1;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+  margin: 0 0 1.5rem;
+  max-width: 22ch;
+}
+.unifier h2 em { font-style: italic; color: var(--accent); }
+
+.merge-svg {
+  margin: 2.5rem 0 1rem;
+  width: 100%;
+  height: auto;
+  max-width: 880px;
+}
+.stack-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+  margin-top: 2rem;
+  border: 1px solid var(--ink);
+}
+@media (min-width: 760px) { .stack-row { grid-template-columns: repeat(4, 1fr); } }
+.stack-cell {
+  padding: 1rem 1.25rem;
+  border-right: 1px solid var(--paper-edge);
+  background: var(--paper);
+}
+.stack-cell:last-child { border-right: 0; }
+.stack-cell .lbl {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+}
+.stack-cell .val {
+  font-family: 'Fraunces', serif;
+  font-size: 1.2rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+/* ====== STATS DARK ================================== */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  background: var(--ink);
+  color: var(--paper);
+  border-block: 2px solid var(--ink);
+}
+.stat {
+  padding: 1.5rem clamp(1rem, 2vw, 1.5rem);
+  border-right: 1px solid color-mix(in srgb, var(--paper) 20%, transparent);
+}
+.stat:last-child { border-right: 0; }
+.stat .num {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  font-variation-settings: "opsz" 144, "SOFT" 30;
+  display: block;
+  line-height: 1;
+  color: var(--accent);
+}
+.stat .lbl {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  margin-top: 0.6rem;
+  display: block;
+  color: color-mix(in srgb, var(--paper) 75%, transparent);
+}
+
+/* ====== PROOF ====================================== */
+.proof {
+  background: var(--ink);
+  color: var(--paper);
+  padding-block: clamp(3rem, 5vw, 5rem);
+  position: relative;
+  overflow: hidden;
+}
+.proof::before {
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 80% 20%, color-mix(in srgb, var(--accent) 30%, transparent), transparent 60%);
+  pointer-events: none;
+}
+.proof .frame { position: relative; }
+.proof h2 {
+  color: var(--paper);
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 50;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+  margin: 0 0 1.5rem;
+}
+.proof h2 em { color: var(--accent); font-style: italic; }
+.proof-grid {
+  display: grid; gap: 0.6rem; margin-top: 2rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { .proof-grid { grid-template-columns: 1fr 1fr; } }
+.proof-item {
+  border: 1px solid color-mix(in srgb, var(--paper) 30%, transparent);
+  padding: 1.25rem 1.5rem;
+  background: color-mix(in srgb, var(--paper) 5%, transparent);
+  display: grid; gap: 0.4rem;
+}
+.proof-item .url {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: lowercase;
+  color: var(--accent);
+  font-weight: 600;
+  word-break: break-all;
+  letter-spacing: 0;
+}
+.proof-item h3 {
+  font-family: 'Fraunces', serif;
+  margin: 0;
+  font-size: var(--t-md);
+  color: var(--paper);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.proof-item p {
+  margin: 0;
+  color: color-mix(in srgb, var(--paper) 80%, transparent);
+  font-size: var(--t-sm);
+}
+
+/* ====== END CTA ===================================== */
+.endcta {
+  padding-block: clamp(3rem, 5vw, 5rem);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 10%, transparent), var(--paper));
+}
+.endcta .frame { display: grid; gap: 2rem; grid-template-columns: 1fr; }
+@media (min-width: 760px) { .endcta .frame { grid-template-columns: 2fr 1fr; align-items: end; } }
+.endcta h2 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 300;
+  font-variation-settings: "opsz" 144, "SOFT" 100;
+  margin: 0 0 1rem;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+}
+.endcta h2 em {
+  font-style: italic;
+  color: var(--accent);
+  background: linear-gradient(180deg, transparent 70%, color-mix(in srgb, var(--accent) 25%, transparent) 70%);
+}
+.endcta p { color: var(--ink-soft); margin: 0; max-width: 50ch; }
+.endcta .actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+
+.foot { background: var(--ink); color: var(--paper); }
+.foot .dot { color: var(--accent); }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topnav">
+  <div class="frame">
+    <div class="brand"><a href="../index.html">dmj<span class="dot">.</span>one</a></div>
+    <nav aria-label="Primary">
+      <ul>
+        <li><a href="../index.html#catalogue">Catalogue</a></li>
+        <li><a href="../index.html#manifesto">Manifesto</a></li>
+        <li><a href="../index.html#hire">Hire</a></li>
+        <li><a href="https://github.com/divyamohan1993/apac-genaiacademy" rel="noopener">GitHub</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ============ HERO ============ -->
+<section class="ag-hero">
+  <div class="frame">
+    <p class="crumbs">
+      <a href="../index.html">Catalogue</a> /
+      <a href="../index.html#cat-ai">AI · Agents</a> /
+      <span>APAC GenAI Academy</span>
+    </p>
+
+    <span class="ag-eyebrow">No. 16 · AI · Google APAC Cohort 1</span>
+
+    <h1>
+      Three of APAC's <em>hardest</em> AI problems.<br>
+      One stack. <em>Forty-four tests.</em>
+    </h1>
+
+    <p class="lede">
+      <strong>Emergency triage. Smart farming. Student analytics.</strong> Three different teams across the region were reinventing the same plumbing for the same kinds of problems. So I built one stack that handles all three, deployed each as its own Cloud Run service, and proved it with 44 passing tests.
+    </p>
+
+    <div class="cta-row">
+      <a class="btn btn-primary" href="https://firstresponse-ai-409924770511.asia-south1.run.app" rel="noopener">Open FirstResponse</a>
+      <a class="btn btn-ghost" href="https://agroadvisor-409924770511.asia-south1.run.app" rel="noopener">Open AgroAdvisor</a>
+      <a class="btn btn-ghost" href="https://edupulse-409924770511.asia-south1.run.app" rel="noopener">Open EduPulse</a>
+      <a class="btn btn-ghost" href="https://github.com/divyamohan1993/apac-genaiacademy" rel="noopener">View source</a>
+    </div>
+
+    <!-- Triple Billboard -->
+    <div class="tribar" role="list" aria-label="The three solutions">
+      <article class="tri-card" data-track="1" role="listitem">
+        <p class="tri-num">Track 01 · Triage</p>
+        <h2>FirstResponse AI <span class="tag">911 emergency triage</span></h2>
+        <p class="pull">"Male, 40s, found under rubble, not breathing." Reply in under 2 seconds.</p>
+        <p class="body">An ADK agent on Cloud Run that applies the START triage protocol to free-form emergency descriptions. Returns severity, immediate actions, transport priority, resource estimates. Built for non-medical volunteers in mass casualty events.</p>
+        <div class="scale">
+          <span><b>150,000+</b> die yearly from delayed triage</span>
+          <span><b>4-tier</b> START classification (RED · YELLOW · GREEN · BLACK)</span>
+          <span><b>10/10</b> tests passing</span>
+        </div>
+        <p class="links"><a href="https://firstresponse-ai-409924770511.asia-south1.run.app" rel="noopener">Open the live service</a></p>
+      </article>
+
+      <article class="tri-card" data-track="2" role="listitem">
+        <p class="tri-num">Track 02 · Farming</p>
+        <h2>AgroAdvisor <span class="tag">Smart farming advisory</span></h2>
+        <p class="pull">"Brown spots on my rice." Diagnosed with a confidence score and the next dry spraying window.</p>
+        <p class="body">An ADK agent using Model Context Protocol to talk to OpenWeatherMap. Correlates real-time weather with crop symptoms to produce a diagnosis, treatment plan, and the optimal 2-3 day dry window for spraying. 20 crops, 6 growth stages, 35+ APAC locations pre-mapped.</p>
+        <div class="scale">
+          <span><b>$50B</b> annual crop loss to preventable disease</span>
+          <span><b>500M</b> smallholder farmers worldwide</span>
+          <span><b>16/16</b> tests passing</span>
+        </div>
+        <p class="links"><a href="https://agroadvisor-409924770511.asia-south1.run.app" rel="noopener">Open the live service</a></p>
+      </article>
+
+      <article class="tri-card" data-track="3" role="listitem">
+        <p class="tri-num">Track 03 · Education</p>
+        <h2>EduPulse <span class="tag">Student analytics in plain English</span></h2>
+        <p class="pull">"Which students have attendance below 60% and are failing?" SQL writes itself, summary explains itself.</p>
+        <p class="body">AlloyDB stores 200 students, 15 subjects, 2,388 enrollments. Teachers ask English questions. Gemini converts to SQL, AlloyDB executes, Gemini summarises. Zero SQL knowledge needed. Connection pooling, 12 indexes, regex-based DELETE/DROP/UPDATE blocking.</p>
+        <div class="scale">
+          <span><b>1.2M</b> Indian students drop out yearly</span>
+          <span><b>5+ hours</b> teacher time saved weekly</span>
+          <span><b>18/18</b> tests passing</span>
+        </div>
+        <p class="links"><a href="https://edupulse-409924770511.asia-south1.run.app" rel="noopener">Open the live service</a></p>
+      </article>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ STATS ============ -->
+<section class="stats" aria-label="Programme at a glance">
+  <div class="stat"><span class="num">3</span><span class="lbl">Cloud Run services in production</span></div>
+  <div class="stat"><span class="num">44</span><span class="lbl">Automated tests passing</span></div>
+  <div class="stat"><span class="num">1</span><span class="lbl">Shared ADK + Gemini stack</span></div>
+  <div class="stat"><span class="num">2.5</span><span class="lbl">Gemini Flash, model</span></div>
+  <div class="stat"><span class="num">0</span><span class="lbl">Frontend dependencies</span></div>
+</section>
+
+
+<!-- ============ ACT · UNIFIER ============ -->
+<section class="unifier" aria-labelledby="unify-h">
+  <div class="frame">
+    <p class="act-num">The unifying idea</p>
+    <h2 id="unify-h">Three problems.<br>One <em>shared spine.</em></h2>
+    <p style="font-family:'Fraunces',serif;font-size:var(--t-md);color:var(--ink-soft);max-width:60ch;margin:0;">
+      Each track has its own UI, its own dataset, its own agent prompt. But the bones are the same: ADK orchestrates, Gemini reasons, Cloud Run serves, MCP wires up tools. Build one well, ship three.
+    </p>
+
+    <svg class="merge-svg" viewBox="0 0 880 200" role="img" aria-label="Three input tracks merging into one shared Google Cloud stack">
+      <!-- triage -->
+      <g>
+        <rect x="0" y="20" width="180" height="50" fill="none" stroke="#b03b3b" stroke-width="1.5"/>
+        <text x="90" y="40" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#b03b3b" letter-spacing="2">TRACK 01</text>
+        <text x="90" y="58" text-anchor="middle" font-family="Fraunces, serif" font-size="14" fill="#161310">FirstResponse</text>
+        <path d="M 180 45 L 360 100" stroke="#b03b3b" stroke-width="1.5" fill="none"/>
+      </g>
+      <!-- farm -->
+      <g>
+        <rect x="0" y="80" width="180" height="50" fill="none" stroke="#2f7a47" stroke-width="1.5"/>
+        <text x="90" y="100" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#2f7a47" letter-spacing="2">TRACK 02</text>
+        <text x="90" y="118" text-anchor="middle" font-family="Fraunces, serif" font-size="14" fill="#161310">AgroAdvisor</text>
+        <path d="M 180 105 L 360 105" stroke="#2f7a47" stroke-width="1.5" fill="none"/>
+      </g>
+      <!-- edu -->
+      <g>
+        <rect x="0" y="140" width="180" height="50" fill="none" stroke="#4b3e8e" stroke-width="1.5"/>
+        <text x="90" y="160" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#4b3e8e" letter-spacing="2">TRACK 03</text>
+        <text x="90" y="178" text-anchor="middle" font-family="Fraunces, serif" font-size="14" fill="#161310">EduPulse</text>
+        <path d="M 180 165 L 360 110" stroke="#4b3e8e" stroke-width="1.5" fill="none"/>
+      </g>
+      <!-- shared spine -->
+      <g>
+        <rect x="360" y="60" width="220" height="90" fill="#7a2c5e" stroke="#161310" stroke-width="1.5"/>
+        <text x="470" y="92" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#fff" letter-spacing="2">SHARED STACK</text>
+        <text x="470" y="115" text-anchor="middle" font-family="Fraunces, serif" font-size="15" fill="#fff">ADK · Gemini 2.5</text>
+        <text x="470" y="135" text-anchor="middle" font-family="Fraunces, serif" font-size="15" fill="#fff">MCP · AlloyDB · Run</text>
+        <path d="M 580 105 L 720 105" stroke="#161310" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+      </g>
+      <!-- production -->
+      <g>
+        <rect x="720" y="80" width="160" height="50" fill="none" stroke="#161310" stroke-width="1.5"/>
+        <text x="800" y="100" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#161310" letter-spacing="2">asia-south1</text>
+        <text x="800" y="118" text-anchor="middle" font-family="Fraunces, serif" font-size="14" fill="#161310">Production</text>
+      </g>
+      <defs>
+        <marker id="arr" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+          <path d="M0,0 L0,6 L9,3 z" fill="#161310"/>
+        </marker>
+      </defs>
+    </svg>
+
+    <div class="stack-row">
+      <div class="stack-cell">
+        <p class="lbl">Reasoning</p>
+        <p class="val">Gemini 2.5 Flash</p>
+      </div>
+      <div class="stack-cell">
+        <p class="lbl">Agent runtime</p>
+        <p class="val">Google ADK</p>
+      </div>
+      <div class="stack-cell">
+        <p class="lbl">Tools</p>
+        <p class="val">Model Context Protocol</p>
+      </div>
+      <div class="stack-cell">
+        <p class="lbl">Hosting</p>
+        <p class="val">Cloud Run · asia-south1</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ PROOF ============ -->
+<section class="proof" aria-labelledby="proof-h">
+  <div class="frame">
+    <p class="act-num" style="color:var(--accent);">Proof · Live deployments</p>
+    <h2 id="proof-h">Not a slide deck.<br>Three <em>live URLs.</em></h2>
+
+    <div class="proof-grid">
+      <div class="proof-item">
+        <span class="url">firstresponse-ai-409924770511.asia-south1.run.app</span>
+        <h3>FirstResponse AI · Cloud Run</h3>
+        <p>Dark ops command center, animated radar sweep, four preset emergency scenarios, structured triage in under 2 seconds.</p>
+      </div>
+      <div class="proof-item">
+        <span class="url">agroadvisor-409924770511.asia-south1.run.app</span>
+        <h3>AgroAdvisor · Cloud Run</h3>
+        <p>Botanical field guide UI, weather-aware spraying timeline, confidence meters, leaf-shaped tags. MCP weather tool live.</p>
+      </div>
+      <div class="proof-item">
+        <span class="url">edupulse-409924770511.asia-south1.run.app</span>
+        <h3>EduPulse · Cloud Run + AlloyDB</h3>
+        <p>Constellation dashboard, syntax-highlighted SQL, dual-AI pipeline, 200 students seeded for instant exploration.</p>
+      </div>
+      <div class="proof-item">
+        <span class="url">github.com/divyamohan1993/apac-genaiacademy</span>
+        <h3>Source · Open repo</h3>
+        <p>Full code, three Dockerfiles, three Cloud Build configs, 44 pytest tests, three submission decks. Apache-style organisation.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ END CTA ============ -->
+<section class="endcta" aria-labelledby="cta-h">
+  <div class="frame">
+    <div>
+      <h2 id="cta-h">Three production AI systems in one cohort. <em>Hire the engineer who shipped them.</em></h2>
+      <p>I design and ship multi-agent systems on Google Cloud. ADK, Gemini, MCP, AlloyDB, Cloud Run, full CI. Same stack works for your hardest problem.</p>
+    </div>
+    <div class="actions">
+      <a class="btn btn-primary" href="../index.html#hire">Hire me</a>
+      <a class="btn btn-ghost" href="../index.html">Back to catalogue</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="frame">
+    <div>
+      <h2 style="font-family:'Fraunces',serif;font-size:var(--t-xl);margin:0 0 1rem;">dmj<span class="dot">.</span>one</h2>
+      <p>Dream, Manifest and Journey, Together as One.</p>
+      <p class="meta">© 2026 Divya Mohan. APAC GenAI Academy built for Google Gen AI Academy APAC Edition, Cohort 1.</p>
+    </div>
+    <div>
+      <p class="meta">Catalogue</p>
+      <p><a href="../index.html#catalogue">All 47 products</a></p>
+      <p><a href="../index.html#cat-ai">AI · Agents</a></p>
+      <p><a href="../index.html#hire">Hire</a></p>
+    </div>
+    <div>
+      <p class="meta">APAC GenAI Academy</p>
+      <p><a href="https://firstresponse-ai-409924770511.asia-south1.run.app" rel="noopener">FirstResponse AI</a></p>
+      <p><a href="https://agroadvisor-409924770511.asia-south1.run.app" rel="noopener">AgroAdvisor</a></p>
+      <p><a href="https://edupulse-409924770511.asia-south1.run.app" rel="noopener">EduPulse</a></p>
+      <p><a href="https://github.com/divyamohan1993/apac-genaiacademy" rel="noopener">Source</a></p>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

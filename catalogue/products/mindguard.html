@@ -1,0 +1,740 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#d8631a">
+<meta name="color-scheme" content="light">
+
+<title>MindGuard · Zero PII. Triage in under sixty seconds. · dmj.one</title>
+<meta name="description" content="Half of Indian college students live with anxiety or depression. Most never tell anyone. MindGuard is an end-to-end encrypted, anonymous mental health check-in. Sentiment analysis runs on ciphertext. The crisis hotline gets a re-encrypted alert without ever seeing the journal.">
+<meta property="og:title" content="MindGuard · Crisis triage on encrypted text">
+<meta property="og:description" content="Anonymous, end-to-end encrypted mental health check-in with homomorphic sentiment analysis and proxy re-encryption to crisis hotlines. Zero plaintext, ever.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,30..100&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="../assets/core.css">
+
+<style>
+:root { --accent: var(--c-bharat); --accent-deep: #a14710; --vault: #1a1612; --signal: #b03030; --safe: #355c3c; }
+body { background: var(--paper); }
+
+/* ==== HERO · fullscreen number, security/mono aesthetic ==== */
+.mg-hero {
+  position: relative;
+  background: var(--vault); color: var(--paper);
+  padding-block: clamp(3rem, 5vw + 1rem, 6rem) clamp(2.5rem, 5vw, 5rem);
+  border-bottom: 2px solid var(--ink);
+  overflow: hidden;
+}
+.mg-hero::before {
+  content: ""; position: absolute; inset: 0;
+  background-image:
+    linear-gradient(0deg, color-mix(in srgb, var(--accent) 8%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--accent) 8%, transparent) 1px, transparent 1px);
+  background-size: 32px 32px;
+  mask: linear-gradient(135deg, black 0%, transparent 70%);
+  -webkit-mask: linear-gradient(135deg, black 0%, transparent 70%);
+  pointer-events: none;
+}
+.mg-hero::after {
+  content: ""; position: absolute; right: -10%; top: -20%;
+  width: 60%; height: 140%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--accent) 25%, transparent), transparent 70%);
+  pointer-events: none;
+  filter: blur(20px);
+}
+.mg-hero .frame { position: relative; z-index: 2; }
+
+.crumbs {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: color-mix(in srgb, var(--paper) 60%, transparent);
+  margin: 0 0 2rem;
+  display: flex; gap: 0.5rem; flex-wrap: wrap;
+}
+.crumbs a {
+  border-bottom: 1px solid color-mix(in srgb, var(--paper) 35%, transparent);
+  padding-bottom: 1px;
+  color: color-mix(in srgb, var(--paper) 70%, transparent);
+}
+.crumbs a:hover { color: var(--accent); border-color: var(--accent); }
+.crumbs span { color: var(--accent); }
+
+.mg-eyebrow {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  padding: 0.4rem 0.85rem;
+  border: 1px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+  color: var(--accent);
+  font-family: 'JetBrains Mono', monospace; font-size: var(--t-xs);
+  font-weight: 700; text-transform: uppercase; letter-spacing: 0.16em;
+  margin-bottom: 2.25rem;
+}
+.mg-eyebrow::before {
+  content: ""; width: 8px; height: 8px;
+  background: var(--accent); border-radius: 50%;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+.mg-fullnum {
+  display: grid; gap: 2rem;
+  grid-template-columns: 1fr;
+  align-items: end;
+}
+@media (min-width: 980px) {
+  .mg-fullnum { grid-template-columns: 1.05fr 1fr; gap: 3rem; align-items: end; }
+}
+
+.megazero {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(8rem, 22vw, 18rem);
+  font-weight: 300;
+  font-variation-settings: "opsz" 144, "SOFT" 100, "WONK" 1;
+  line-height: 0.85; letter-spacing: -0.06em;
+  color: var(--accent);
+  margin: 0;
+  display: block;
+  text-shadow: 0 0 60px color-mix(in srgb, var(--accent) 40%, transparent);
+}
+.megazero-sub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-md); letter-spacing: 0.2em;
+  text-transform: uppercase; font-weight: 700;
+  color: var(--paper); margin: 0.5rem 0 0;
+}
+.megazero-sub strong { color: var(--accent); font-weight: 700; }
+
+.mg-hero h1 {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(2.2rem, 4vw, 3.4rem);
+  font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 50, "WONK" 1;
+  letter-spacing: -0.025em; line-height: 1.05;
+  margin: 0; max-width: 22ch; color: var(--paper);
+}
+.mg-hero h1 em { font-style: italic; color: var(--accent); }
+
+.mg-hero .lede {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md); font-weight: 300;
+  line-height: 1.5; color: color-mix(in srgb, var(--paper) 80%, transparent);
+  margin: 1.5rem 0 0; max-width: 50ch;
+}
+.mg-hero .lede strong {
+  font-weight: 600; color: var(--paper);
+  background: linear-gradient(180deg, transparent 60%, color-mix(in srgb, var(--accent) 35%, transparent) 60%);
+  padding: 0 0.1em;
+}
+
+.mg-cta-row {
+  margin-top: 2.25rem;
+  display: flex; gap: 0.75rem; flex-wrap: wrap;
+}
+.btn {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.7rem 1.1rem;
+  font-family: 'JetBrains Mono', monospace; font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.14em; font-weight: 700;
+  border: 1px solid currentColor;
+  transition: background .15s, color .15s, transform .15s, box-shadow .15s;
+}
+.btn-primary { background: var(--accent); color: white; border-color: var(--accent); }
+.btn-primary:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--ink); }
+.btn-ghost-dark { background: transparent; color: var(--paper); border-color: var(--paper); }
+.btn-ghost-dark:hover { background: var(--paper); color: var(--vault); transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--accent); }
+.btn-ghost { background: transparent; color: var(--ink); border-color: var(--ink); }
+.btn-ghost:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--ink); }
+
+/* ==== STATS ribbon · light against dark hero ==== */
+.mg-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  background: var(--paper); color: var(--ink);
+  border-block: 2px solid var(--ink);
+}
+.mg-stat {
+  padding: 1.5rem clamp(1rem, 2vw, 1.5rem);
+  border-right: 1px solid var(--paper-edge);
+}
+.mg-stat:last-child { border-right: 0; }
+.mg-stat .num {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl); font-weight: 400;
+  letter-spacing: -0.04em; display: block; line-height: 1;
+  font-variation-settings: "opsz" 144, "SOFT" 30;
+  color: var(--accent);
+}
+.mg-stat .lbl {
+  font-family: 'JetBrains Mono', monospace; font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.14em;
+  margin-top: 0.6rem; display: block;
+  color: var(--ink-soft);
+}
+
+/* ==== ACT ==== */
+.act { padding-block: clamp(3rem, 5vw, 5rem); border-bottom: var(--hair); position: relative; }
+.act-num {
+  font-family: 'JetBrains Mono', monospace; font-size: var(--t-xs);
+  letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--accent); font-weight: 700;
+  margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 1rem;
+}
+.act-num::before { content: ""; width: 2.5rem; height: 1px; background: var(--accent); }
+.act h2 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl); font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 50, "WONK" 1;
+  letter-spacing: -0.025em; line-height: 1.05;
+  margin: 0 0 1.5rem; max-width: 22ch;
+}
+.act h2 em { font-style: italic; color: var(--accent); }
+
+/* ==== ACT I · PROBLEM ==== */
+.problem-grid { display: grid; gap: 2.5rem; grid-template-columns: 1fr; }
+@media (min-width: 880px) { .problem-grid { grid-template-columns: 1.1fr 1fr; gap: 4rem; align-items: start; } }
+.gap-list {
+  border: 1px solid var(--ink);
+  background: var(--paper);
+}
+.gap-list dt {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs); text-transform: uppercase;
+  letter-spacing: 0.16em; color: var(--accent); font-weight: 700;
+  padding: 1rem 1.25rem 0.25rem;
+}
+.gap-list dd {
+  margin: 0; padding: 0 1.25rem 1rem;
+  font-family: 'Fraunces', serif; font-style: italic;
+  font-size: 1.05rem; line-height: 1.4; color: var(--ink);
+  border-bottom: var(--hair-soft);
+}
+.gap-list dd:last-of-type { border-bottom: 0; }
+
+.pain-text p {
+  font-family: 'Fraunces', serif; font-size: var(--t-md);
+  line-height: 1.55; color: var(--ink-soft); margin: 0 0 1.25rem;
+}
+.pain-text p strong { color: var(--ink); font-weight: 600; }
+
+/* ==== ACT II · THE PROMISE (single big bold quote) ==== */
+.act-promise {
+  background: var(--vault); color: var(--paper);
+}
+.act-promise .act-num { color: var(--accent); }
+.act-promise .act-num::before { background: var(--accent); }
+.act-promise h2 { color: var(--paper); }
+.act-promise h2 em { color: var(--accent); }
+
+.guarantee {
+  margin-top: 2rem;
+  display: grid; gap: 1.5rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { .guarantee { grid-template-columns: repeat(3, 1fr); } }
+.guarantee-card {
+  border: 1px solid color-mix(in srgb, var(--paper) 30%, transparent);
+  padding: 1.5rem;
+  background: color-mix(in srgb, var(--paper) 4%, transparent);
+}
+.guarantee-card .gnum {
+  font-family: 'Fraunces', serif; font-size: 2.4rem;
+  font-style: italic; color: var(--accent); line-height: 1;
+  font-variation-settings: "opsz" 144, "SOFT" 100;
+  margin: 0 0 0.5rem;
+}
+.guarantee-card h3 {
+  font-family: 'Fraunces', serif; font-weight: 500;
+  font-size: var(--t-md); margin: 0 0 0.5rem;
+  color: var(--paper); letter-spacing: -0.01em;
+}
+.guarantee-card p {
+  margin: 0; font-size: var(--t-sm);
+  color: color-mix(in srgb, var(--paper) 80%, transparent);
+  line-height: 1.55;
+}
+
+/* ==== ACT III · CRYPTO FLOW (stepped diagram) ==== */
+.flow {
+  margin-top: 2rem;
+  display: grid; gap: 0.5rem;
+  grid-template-columns: 1fr;
+}
+.flow-step {
+  display: grid; gap: 1.5rem;
+  grid-template-columns: 1fr;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  padding: 1.5rem 1.75rem;
+  position: relative;
+}
+@media (min-width: 760px) {
+  .flow-step { grid-template-columns: 1.5fr 2fr 1.5fr; gap: 2rem; align-items: center; }
+}
+.flow-step + .flow-step::before {
+  content: "↓";
+  position: absolute; top: -1.4rem; left: 1.75rem;
+  width: 2rem; height: 2rem;
+  background: var(--accent); color: white;
+  font-family: 'JetBrains Mono', monospace; font-size: 1rem;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700;
+}
+.flow-step .actor {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs); text-transform: uppercase;
+  letter-spacing: 0.16em; color: var(--accent);
+  font-weight: 700; margin-bottom: 0.5rem;
+}
+.flow-step .actor + h3 {
+  font-family: 'Fraunces', serif; font-weight: 500;
+  font-size: var(--t-md); margin: 0; letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+.flow-step .does {
+  font-family: 'Fraunces', serif; font-size: 1.05rem;
+  margin: 0; line-height: 1.45; color: var(--ink-soft);
+}
+.flow-step .does strong { color: var(--ink); font-weight: 600; }
+.flow-step .cipher {
+  font-family: 'JetBrains Mono', monospace; font-size: var(--t-xs);
+  background: var(--vault); color: var(--accent);
+  padding: 0.6rem 0.85rem;
+  word-break: break-all; line-height: 1.45;
+  border-left: 3px solid var(--accent);
+  letter-spacing: 0.02em;
+}
+.flow-step .cipher .label {
+  display: block; color: color-mix(in srgb, var(--paper) 60%, transparent);
+  text-transform: uppercase; letter-spacing: 0.18em;
+  font-weight: 700; margin-bottom: 0.4rem; font-size: 0.7rem;
+}
+
+.zero-callout {
+  margin-top: 2.5rem; padding: 1.5rem;
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  border: 1px dashed var(--accent);
+  font-family: 'Fraunces', serif; font-style: italic;
+  font-size: var(--t-md); line-height: 1.4;
+  color: var(--ink); text-align: left;
+}
+.zero-callout strong { color: var(--accent-deep); font-style: normal; font-weight: 700; }
+
+/* ==== ACT IV · ROLES ==== */
+.roles {
+  display: grid; gap: 0;
+  grid-template-columns: 1fr;
+  margin-top: 2rem;
+  background: var(--paper);
+  border: 1px solid var(--ink);
+}
+@media (min-width: 880px) { .roles { grid-template-columns: repeat(4, 1fr); } }
+.role {
+  padding: 1.25rem 1.4rem;
+  border-bottom: 1px solid var(--paper-edge);
+}
+@media (min-width: 880px) {
+  .role { border-bottom: 0; border-right: 1px solid var(--paper-edge); }
+  .role:last-child { border-right: 0; }
+}
+.role:last-child { border-bottom: 0; }
+.role .rtag {
+  font-family: 'JetBrains Mono', monospace; font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.16em;
+  color: var(--accent); font-weight: 700; margin-bottom: 0.5rem;
+}
+.role h4 {
+  font-family: 'Fraunces', serif; font-weight: 500;
+  font-size: 1.1rem; margin: 0 0 0.4rem; letter-spacing: -0.01em;
+}
+.role p { margin: 0; font-size: var(--t-sm); color: var(--ink-soft); line-height: 1.5; }
+.role .sees {
+  margin-top: 0.5rem; padding-top: 0.5rem;
+  border-top: var(--hair-soft);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs); color: var(--accent-deep);
+  font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em;
+}
+
+/* ==== PROOF ==== */
+.proof {
+  background: var(--vault); color: var(--paper);
+  padding-block: clamp(3rem, 5vw, 5rem);
+  position: relative; overflow: hidden;
+}
+.proof::before {
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 0% 0%, color-mix(in srgb, var(--accent) 30%, transparent), transparent 60%);
+  pointer-events: none;
+}
+.proof .frame { position: relative; }
+.proof h2 { color: var(--paper); }
+.proof h2 em { color: var(--accent); }
+.proof .act-num { color: var(--accent); }
+.proof .act-num::before { background: var(--accent); }
+.proof-grid {
+  display: grid; gap: 1rem; margin-top: 2rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { .proof-grid { grid-template-columns: repeat(2, 1fr); } }
+.proof-item {
+  border: 1px solid color-mix(in srgb, var(--paper) 30%, transparent);
+  padding: 1.5rem;
+  background: color-mix(in srgb, var(--paper) 5%, transparent);
+}
+.proof-item h3 {
+  font-family: 'Fraunces', serif; margin: 0 0 0.5rem;
+  font-size: var(--t-md); color: var(--accent);
+  font-weight: 500; letter-spacing: -0.01em;
+}
+.proof-item p { margin: 0; color: color-mix(in srgb, var(--paper) 80%, transparent); font-size: var(--t-sm); line-height: 1.55; }
+.proof-item code {
+  font-family: 'JetBrains Mono', monospace; font-size: 0.85em;
+  background: color-mix(in srgb, var(--paper) 10%, transparent);
+  padding: 0.05em 0.35em;
+  color: color-mix(in srgb, var(--paper) 95%, transparent);
+}
+
+/* ==== STACK ==== */
+.stack { padding-block: clamp(3rem, 5vw, 5rem); border-bottom: var(--hair); }
+.stack-list { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.5rem; }
+.stack-tag {
+  padding: 0.5rem 0.9rem; border: 1px solid var(--ink);
+  font-family: 'JetBrains Mono', monospace; font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.14em; font-weight: 600;
+}
+
+/* ==== END CTA ==== */
+.endcta {
+  padding-block: clamp(3rem, 5vw, 5rem);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 10%, transparent), var(--paper));
+}
+.endcta .frame { display: grid; gap: 2rem; grid-template-columns: 1fr; }
+@media (min-width: 760px) { .endcta .frame { grid-template-columns: 2fr 1fr; align-items: end; } }
+.endcta h2 {
+  font-family: 'Fraunces', serif; font-size: var(--t-2xl); font-weight: 300;
+  font-variation-settings: "opsz" 144, "SOFT" 100;
+  margin: 0 0 1rem; letter-spacing: -0.025em; line-height: 1.05;
+}
+.endcta h2 em {
+  font-style: italic; color: var(--accent);
+  background: linear-gradient(180deg, transparent 70%, color-mix(in srgb, var(--accent) 25%, transparent) 70%);
+}
+.endcta p { color: var(--ink-soft); margin: 0; max-width: 50ch; }
+.endcta .actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+
+.foot { background: var(--vault); color: var(--paper); }
+.foot .dot { color: var(--accent); }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topnav">
+  <div class="frame">
+    <div class="brand"><a href="../index.html">dmj<span class="dot">.</span>one</a></div>
+    <nav aria-label="Primary">
+      <ul>
+        <li><a href="../index.html#catalogue">Catalogue</a></li>
+        <li><a href="../index.html#manifesto">Manifesto</a></li>
+        <li><a href="../index.html#hire">Hire</a></li>
+        <li><a href="https://github.com/divyamohan1993/mindguard" rel="noopener">GitHub</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ============ HERO · fullscreen ZERO ============ -->
+<section class="mg-hero">
+  <div class="frame">
+    <p class="crumbs">
+      <a href="../index.html">Catalogue</a> /
+      <a href="../index.html#cat-bharat">Bharat-First</a> /
+      <span>MindGuard</span>
+    </p>
+
+    <span class="mg-eyebrow">No. 07 · Bharat-First · Mental Health</span>
+
+    <div class="mg-fullnum">
+      <div>
+        <span class="megazero">0</span>
+        <p class="megazero-sub"><strong>plaintext journal entries</strong> ever leave your phone</p>
+      </div>
+
+      <div>
+        <h1>The stigma is the disease. <em>Encryption is the cure.</em></h1>
+        <p class="lede">
+          <strong>Half of Indian college students live with anxiety or depression.</strong> Most never tell anyone · not because help doesn't exist, but because they don't trust where the words will end up. MindGuard is an end-to-end encrypted journal that runs sentiment analysis <strong>on the ciphertext itself.</strong> Crisis triage in under sixty seconds. Hotline alerted. Words never read.
+        </p>
+        <div class="mg-cta-row">
+          <a class="btn btn-primary" href="https://github.com/divyamohan1993/mindguard" rel="noopener">View source</a>
+          <a class="btn btn-ghost-dark" href="#flow">The crypto flow</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATS ============ -->
+<section class="mg-stats" aria-label="At a glance">
+  <div class="mg-stat"><span class="num">0</span><span class="lbl">PII collected, ever</span></div>
+  <div class="mg-stat"><span class="num">&lt; 60s</span><span class="lbl">Crisis triage to hotline</span></div>
+  <div class="mg-stat"><span class="num">CKKS</span><span class="lbl">Homomorphic scheme used</span></div>
+  <div class="mg-stat"><span class="num">PRE</span><span class="lbl">Proxy re-encryption to hotline</span></div>
+  <div class="mg-stat"><span class="num">100%</span><span class="lbl">Computation on ciphertext</span></div>
+</section>
+
+<!-- ============ ACT I · THE PROBLEM ============ -->
+<section class="act" aria-labelledby="prob-h">
+  <div class="frame">
+    <p class="act-num">Act I · The Problem</p>
+    <h2 id="prob-h">Mental health apps already exist. <em>Trust is what doesn't.</em></h2>
+
+    <div class="problem-grid">
+      <div class="pain-text">
+        <p>According to the WHO, depression is the leading cause of disability globally and suicide is among the top twenty causes of death. The intervention exists. The barrier is the user's reasonable suspicion that what they type today might appear in a court order, an employer's background check, or a marketing dataset tomorrow.</p>
+        <p><strong>Standard journaling apps store plaintext.</strong> Their privacy policies say "encrypted at rest", which only means the server holds the key. The moment they need to run a mood report, they decrypt your words. If the backend is compromised, subpoenaed, or sold, every sentence you wrote is in the open.</p>
+        <p><strong>"Encrypted" apps that do analytics decrypt server-side</strong> the moment they need the data. That is not encryption. That is a delay.</p>
+        <p>And almost none of them route you to a real human when the words on the page indicate a real crisis. If they do, they reveal everything to do it.</p>
+      </div>
+
+      <dl class="gap-list">
+        <dt>Gap · 01</dt>
+        <dd>Plain-text storage masquerading as "encrypted at rest".</dd>
+        <dt>Gap · 02</dt>
+        <dd>Encrypted apps that decrypt server-side to compute anything.</dd>
+        <dt>Gap · 03</dt>
+        <dd>No automated crisis triage that respects the user's privacy.</dd>
+        <dt>Gap · 04</dt>
+        <dd>No auditable proof that the platform never read the user's words.</dd>
+        <dt>Gap · 05</dt>
+        <dd>No working pipeline from anonymous user to verified hotline without leaking the journal in between.</dd>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ACT II · THE PROMISE (three guarantees on dark) ============ -->
+<section class="act act-promise" aria-labelledby="prom-h">
+  <div class="frame">
+    <p class="act-num">Act II · The Promise</p>
+    <h2 id="prom-h">Three guarantees. <em>Cryptographic, not contractual.</em></h2>
+    <p style="font-family:'Fraunces',serif;font-size:var(--t-md);color:color-mix(in srgb, var(--paper) 80%, transparent);max-width:60ch;margin:0;">
+      Privacy promises are easy. Privacy proofs are not. MindGuard is built so that each guarantee is enforced by the math, not the team.
+    </p>
+
+    <div class="guarantee">
+      <div class="guarantee-card">
+        <p class="gnum">i.</p>
+        <h3>The server cannot read.</h3>
+        <p>Microsoft SEAL compiled to WebAssembly runs in the browser. Your journal is encrypted under your public key before it leaves the page. The Node API stores ciphertext blobs in PostgreSQL. The plaintext exists only in your browser's memory, ever.</p>
+      </div>
+      <div class="guarantee-card">
+        <p class="gnum">ii.</p>
+        <h3>The analytics run on ciphertext.</h3>
+        <p>Django uses the FHE engine to homomorphically sum encrypted sentiment vectors over a sliding window, multiply by encrypted weights, and produce an encrypted risk score. No decryption. No "just for the report" exception.</p>
+      </div>
+      <div class="guarantee-card">
+        <p class="gnum">iii.</p>
+        <h3>The hotline is told only what it must know.</h3>
+        <p>If the encrypted threshold check trips, a proxy re-encryption microservice transforms an "encrypted under user's key" alert into "encrypted under hotline's key" without ever decrypting. The hotline learns "anonymous user X in city Y is at risk." Nothing else.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ACT III · CRYPTO FLOW (stepped) ============ -->
+<section class="act" id="flow" aria-labelledby="flow-h">
+  <div class="frame">
+    <p class="act-num">Act III · The Product</p>
+    <h2 id="flow-h">From journal to triage. <em>Without ever decrypting.</em></h2>
+    <p style="font-family:'Fraunces',serif;font-size:var(--t-md);color:var(--ink-soft);max-width:60ch;margin:0;">
+      Five stages. Each one operates on ciphertext. Read the actor, read the action, read the artefact that moves to the next stage.
+    </p>
+
+    <ol class="flow">
+      <li class="flow-step">
+        <div>
+          <p class="actor">Stage · 01</p>
+          <h3>Browser · key generation</h3>
+        </div>
+        <p class="does">A homomorphic key pair is generated on signup. The <strong>private key never leaves localStorage.</strong> Only the public key is sent to the server, alongside a salted password hash.</p>
+        <div class="cipher"><span class="label">Sent</span>HE_PUB · sha256(salt || pwd)</div>
+      </li>
+
+      <li class="flow-step">
+        <div>
+          <p class="actor">Stage · 02</p>
+          <h3>Browser · encrypted entry</h3>
+        </div>
+        <p class="does">User writes a journal entry and ticks tags ("hopeless", "anxious"). The browser <strong>encrypts the text and the sentiment vector</strong> under the public key (CKKS batching) and uploads only ciphertext.</p>
+        <div class="cipher"><span class="label">Uploaded</span>CT_text · CT_vec[10]</div>
+      </li>
+
+      <li class="flow-step">
+        <div>
+          <p class="actor">Stage · 03</p>
+          <h3>Django · homomorphic aggregation</h3>
+        </div>
+        <p class="does">Django fetches the last seven days of encrypted vectors and <strong>sums them homomorphically</strong>, then computes a weighted dot product against a public weight set. The result is one encrypted risk score.</p>
+        <div class="cipher"><span class="label">Computed</span>CT_risk = Σ (CT_vec ⊗ weights)</div>
+      </li>
+
+      <li class="flow-step">
+        <div>
+          <p class="actor">Stage · 04</p>
+          <h3>Django · encrypted threshold</h3>
+        </div>
+        <p class="does">A homomorphic comparator runs <strong>CT_risk against a known threshold T</strong>, producing a single encrypted bit. Django still cannot tell whether it is zero or one. It only knows it has a comparison result.</p>
+        <div class="cipher"><span class="label">Stored</span>CT_bit · audit_log_id</div>
+      </li>
+
+      <li class="flow-step">
+        <div>
+          <p class="actor">Stage · 05</p>
+          <h3>PRE · re-encrypted alert</h3>
+        </div>
+        <p class="does">The encrypted bit is sent through a <strong>proxy re-encryption</strong> microservice. The transformation key (set up at signup with the user's consent) re-keys the alert from "encrypted under user" to "encrypted under hotline" · without exposing plaintext.</p>
+        <div class="cipher"><span class="label">Dispatched</span>Enc_hotline(at_risk · city)</div>
+      </li>
+    </ol>
+
+    <p class="zero-callout"><strong>Audit log discipline.</strong> Every operation · encrypt, aggregate, threshold, re-encrypt, dispatch · is logged with ciphertext-only inputs and outputs. The audit trail proves the platform behaved correctly without ever revealing what the user wrote. A "proof of non-disclosure" by construction.</p>
+  </div>
+</section>
+
+<!-- ============ ACT IV · WHO SEES WHAT ============ -->
+<section class="act" aria-labelledby="roles-h">
+  <div class="frame">
+    <p class="act-num">Act IV · The Trust Model</p>
+    <h2 id="roles-h">Four parties. <em>Each sees the minimum.</em></h2>
+
+    <div class="roles">
+      <div class="role">
+        <p class="rtag">Party · 01</p>
+        <h4>The user</h4>
+        <p>Holds the private homomorphic key. Sees their own entries decrypted in their browser only.</p>
+        <p class="sees">Sees: everything theirs.</p>
+      </div>
+      <div class="role">
+        <p class="rtag">Party · 02</p>
+        <h4>Node.js API</h4>
+        <p>Stores ciphertext blobs in PostgreSQL. Routes signup, login and journal upload. Holds no decryption keys.</p>
+        <p class="sees">Sees: ciphertext only.</p>
+      </div>
+      <div class="role">
+        <p class="rtag">Party · 03</p>
+        <h4>Django FHE engine</h4>
+        <p>Aggregates encrypted vectors, computes encrypted risk and threshold bits. Cannot decrypt. Only operates.</p>
+        <p class="sees">Sees: ciphertext only.</p>
+      </div>
+      <div class="role">
+        <p class="rtag">Party · 04</p>
+        <h4>Crisis hotline</h4>
+        <p>Receives a re-encrypted "user X in city Y is at risk" alert. Decrypts only with their own private key.</p>
+        <p class="sees">Sees: anonymised crisis flag + city.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PROOF ============ -->
+<section class="proof act" aria-labelledby="proof-h">
+  <div class="frame">
+    <p class="act-num">Act V · Proof</p>
+    <h2 id="proof-h">Why this is <em>patentable.</em></h2>
+
+    <div class="proof-grid">
+      <div class="proof-item">
+        <h3>In-browser FHE on commodity hardware</h3>
+        <p>Microsoft SEAL CKKS compiled to WebAssembly runs on every modern browser, no specialised hardware. The platform is accessible to anyone with a phone, not only to people on workstations.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Homomorphic threshold comparison</h3>
+        <p>Risk classification happens through an encrypted comparator circuit producing an encrypted boolean. The platform behaves correctly without learning whether the user crossed the line.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Proxy re-encryption for crisis alerts</h3>
+        <p>Umbral-style PRE rewrites the encryption from user's key to hotline's key with no plaintext intermediate. The chain of custody from journal to triage never goes through the clear.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Encrypted audit trail</h3>
+        <p>Every input, every transformation, every dispatch logged as ciphertext. The audit table is a "proof of non-disclosure" usable for compliance reviews and legal challenges alike.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Anonymous registration · zero PII</h3>
+        <p>Username plus password. No email, no phone, no name, no demographics. The system cannot leak what it does not collect · by design and by audit.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Threshold under sixty seconds</h3>
+        <p>Each new entry triggers a re-evaluation. A user crossing the encrypted threshold reaches the hotline's queue in under <code>60s</code>, with the user's original consent, in their pre-chosen language.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STACK ============ -->
+<section class="stack" aria-labelledby="tech-h">
+  <div class="frame">
+    <p class="act-num">The Stack</p>
+    <h2 id="tech-h" style="font-size:var(--t-xl);font-weight:400;font-family:'Fraunces',serif;font-variation-settings:'opsz' 144,'SOFT' 50;margin:0;letter-spacing:-0.02em;">Three runtimes. <em>One cryptographic boundary.</em></h2>
+    <ul class="stack-list">
+      <li class="stack-tag">React.js</li>
+      <li class="stack-tag">Bootstrap</li>
+      <li class="stack-tag">Microsoft SEAL (WASM)</li>
+      <li class="stack-tag">CKKS · BFV</li>
+      <li class="stack-tag">Web Crypto API</li>
+      <li class="stack-tag">Node.js · Express</li>
+      <li class="stack-tag">PostgreSQL (BLOB)</li>
+      <li class="stack-tag">Django · Python</li>
+      <li class="stack-tag">PySEAL · PALISADE</li>
+      <li class="stack-tag">Umbral PRE</li>
+      <li class="stack-tag">TLS 1.3 · HTTPS-only</li>
+      <li class="stack-tag">AES-256-GCM (text envelope)</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ END CTA ============ -->
+<section class="endcta" aria-labelledby="cta-h">
+  <div class="frame">
+    <div>
+      <h2 id="cta-h">If a teenager in crisis can trust this, <em>your patients can too.</em></h2>
+      <p>I build privacy-first products where the privacy is enforced by mathematics, not policy. Healthcare, mental health, finance, civic data. If you are working in a domain where the user has a real reason to fear disclosure, let's talk.</p>
+    </div>
+    <div class="actions">
+      <a class="btn btn-primary" href="../index.html#hire">Hire me</a>
+      <a class="btn btn-ghost" href="../index.html">Back to catalogue</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="frame">
+    <div>
+      <h2 style="font-family:'Fraunces',serif;font-size:var(--t-xl);margin:0 0 1rem;">dmj<span class="dot">.</span>one</h2>
+      <p>Dream, Manifest and Journey, Together as One.</p>
+      <p class="meta">© 2026 Divya Mohan. MindGuard is a research-grade prototype demonstrating end-to-end encrypted mental health triage. Crisis hotlines integrated under signed partnership only; user consent recorded on signup.</p>
+    </div>
+    <div>
+      <p class="meta">Catalogue</p>
+      <p><a href="../index.html#catalogue">All 47 products</a></p>
+      <p><a href="../index.html#cat-bharat">Bharat-First</a></p>
+      <p><a href="../index.html#hire">Hire</a></p>
+    </div>
+    <div>
+      <p class="meta">MindGuard</p>
+      <p><a href="https://github.com/divyamohan1993/mindguard" rel="noopener">Source</a></p>
+      <p><a href="mailto:contact@dmj.one">contact@dmj.one</a></p>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

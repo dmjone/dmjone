@@ -1,0 +1,772 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#d8631a">
+<meta name="color-scheme" content="light">
+
+<title>VerifiedTutor · A local AI tutor that cites the page or refuses · dmj.one</title>
+<meta name="description" content="Faithfulness-verified, pedagogy-aware local academic tutor for Class 12 Computer Science. Qwen2.5-1.5B retrieves from prescribed PDFs, DeBERTa-v3 NLI verifies every claim, citations point to the page.">
+<meta property="og:title" content="VerifiedTutor · The AI tutor that cites the page · or refuses to answer">
+<meta property="og:description" content="Local LLM. RAG over prescribed lectures. NLI verification per claim. Calibrated confidence band. Page citations on every sentence. No outbound calls.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,30..100&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="../assets/core.css">
+
+<style>
+:root { --accent: var(--c-bharat); --accent-deep: #a14710; --margin-rule: #b34e0e; --hi: #fae9c0; --lo: #f5d2bf; --med: #fce0a8; }
+body { background: var(--paper); }
+
+/* ====== HERO · open textbook ===================================== */
+.vt-hero {
+  position: relative;
+  padding-block: clamp(3rem, 5vw + 1rem, 6rem) clamp(2rem, 4vw, 4rem);
+  border-bottom: var(--hair);
+  overflow: hidden;
+  background: var(--paper);
+}
+.vt-hero::before {
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0;
+  width: 4px; background: var(--margin-rule);
+  opacity: 0.4;
+}
+.vt-hero::after {
+  content: ""; position: absolute; left: 36px; top: 0; bottom: 0;
+  width: 1px; background: var(--ink-mute);
+  opacity: 0.2;
+}
+.vt-hero .frame { position: relative; z-index: 2; }
+
+.crumbs {
+  font-family: 'JetBrains Mono', monospace; font-size: var(--t-xs);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink-mute); margin: 0 0 1.5rem;
+  display: flex; gap: 0.5rem; flex-wrap: wrap;
+}
+.crumbs a { border-bottom: 1px solid var(--ink-mute); padding-bottom: 1px; }
+.crumbs a:hover { color: var(--accent); border-color: var(--accent); }
+.crumbs span { color: var(--accent); }
+
+.vt-eyebrow {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  padding: 0.4rem 0.85rem;
+  border: 1px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  color: var(--accent-deep);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs); font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.16em;
+  margin-bottom: 1.5rem;
+}
+.vt-eyebrow::before {
+  content: ""; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+.vt-hero-grid {
+  display: grid; gap: 2.5rem; grid-template-columns: 1fr;
+  align-items: start;
+}
+@media (min-width: 980px) { .vt-hero-grid { grid-template-columns: 1.15fr 1fr; gap: 4rem; } }
+
+.vt-hero h1 {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(2.4rem, 5.5vw, 4.4rem);
+  font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 30, "WONK" 1;
+  letter-spacing: -0.03em; line-height: 0.96;
+  margin: 0; max-width: 16ch;
+}
+.vt-hero h1 em {
+  font-style: italic; color: var(--accent);
+  font-variation-settings: "opsz" 144, "SOFT" 100, "WONK" 1;
+}
+.vt-hero h1 .dropcap {
+  float: left; font-style: italic;
+  font-size: 4.6em; line-height: 0.85;
+  font-family: 'Fraunces', serif; font-weight: 500;
+  font-variation-settings: "opsz" 144, "SOFT" 100;
+  color: var(--accent-deep);
+  margin: 0.06em 0.12em 0 0;
+  padding-right: 0.06em;
+}
+
+.vt-hero .lede {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md); font-weight: 300;
+  line-height: 1.5; color: var(--ink-soft);
+  margin: 1.75rem 0 0; max-width: 56ch;
+}
+.vt-hero .lede strong {
+  font-weight: 600; color: var(--ink);
+  background: linear-gradient(180deg, transparent 60%, color-mix(in srgb, var(--accent) 30%, transparent) 60%);
+  padding: 0 0.1em;
+}
+
+/* ===== Sample answer card · textbook style ===== */
+.qa-card {
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  position: relative;
+  font-family: 'Fraunces', serif;
+}
+.qa-head {
+  padding: 0.85rem 1.1rem;
+  background: var(--ink); color: var(--paper);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs); text-transform: uppercase;
+  letter-spacing: 0.16em; font-weight: 700;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.qa-head .conf {
+  display: inline-flex; align-items: center; gap: 0.35rem;
+  font-size: 0.65rem;
+  padding: 0.15rem 0.5rem;
+  background: #2a5a3a; color: white;
+  letter-spacing: 0.08em;
+}
+.qa-head .conf::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: #5cdb8a; }
+
+.qa-body { padding: 1.25rem 1.4rem 1rem; }
+.qa-q {
+  font-style: italic; font-size: 1rem;
+  margin: 0 0 0.85rem; padding-bottom: 0.85rem;
+  border-bottom: 1px dashed color-mix(in srgb, var(--ink) 25%, transparent);
+  color: var(--ink-soft);
+}
+.qa-a {
+  font-size: 1.05rem; line-height: 1.5;
+  color: var(--ink); margin: 0;
+}
+.qa-a .cite {
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  vertical-align: super;
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+  border: 1px solid var(--accent);
+  color: var(--accent-deep);
+  padding: 0.05rem 0.3rem;
+  margin-left: 0.15rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-weight: 700;
+  text-decoration: none;
+}
+.qa-a .nli {
+  background: color-mix(in srgb, #2a5a3a 15%, transparent);
+  border-bottom: 1px dotted #2a5a3a;
+}
+.qa-band {
+  display: grid; grid-template-columns: 6rem 1fr 4rem;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.85rem 1.4rem;
+  border-top: 1px dashed color-mix(in srgb, var(--ink) 25%, transparent);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.74rem;
+  text-transform: uppercase; letter-spacing: 0.12em;
+  color: var(--ink-mute);
+}
+.qa-band .meter {
+  height: 8px; background: color-mix(in srgb, var(--ink) 8%, transparent);
+  position: relative;
+  overflow: hidden;
+}
+.qa-band .meter::before {
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0;
+  width: 84%;
+  background: linear-gradient(90deg, var(--lo) 0, var(--med) 50%, #5cdb8a 100%);
+}
+.qa-band .pct { color: #1f4429; font-weight: 700; text-align: right; }
+.qa-foot {
+  padding: 0.7rem 1.4rem;
+  border-top: 1px solid color-mix(in srgb, var(--ink) 15%, transparent);
+  background: var(--paper-soft);
+  font-family: 'JetBrains Mono', monospace; font-size: 0.7rem;
+  color: var(--ink-mute);
+  text-transform: uppercase; letter-spacing: 0.12em;
+  display: flex; gap: 0.85rem; flex-wrap: wrap;
+}
+.qa-foot .scaffold strong { color: var(--accent-deep); }
+
+.vt-cta-row { margin-top: 2.25rem; display: flex; gap: 0.75rem; flex-wrap: wrap; }
+.btn {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.7rem 1.1rem;
+  font-family: 'JetBrains Mono', monospace; font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.14em; font-weight: 700;
+  border: 1px solid var(--ink);
+  transition: background .15s, color .15s, transform .15s, box-shadow .15s;
+}
+.btn:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--ink); }
+.btn-primary { background: var(--accent); color: white; border-color: var(--accent); }
+.btn-ghost { background: transparent; color: var(--ink); }
+
+/* ====== STATS ============================================ */
+.vt-stats {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  background: var(--ink); color: var(--paper);
+  border-block: 2px solid var(--ink);
+}
+.vt-stat { padding: 1.5rem clamp(1rem, 2vw, 1.5rem); border-right: 1px solid color-mix(in srgb, var(--paper) 18%, transparent); }
+.vt-stat:last-child { border-right: 0; }
+.vt-stat .num {
+  font-family: 'Fraunces', serif; font-size: var(--t-2xl);
+  font-weight: 400; letter-spacing: -0.04em;
+  font-variation-settings: "opsz" 144, "SOFT" 30;
+  display: block; line-height: 1; color: var(--accent);
+}
+.vt-stat .lbl {
+  font-family: 'JetBrains Mono', monospace; font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.14em;
+  margin-top: 0.6rem; display: block;
+  color: color-mix(in srgb, var(--paper) 75%, transparent);
+}
+
+/* ====== ACT ============================================== */
+.act { padding-block: clamp(3rem, 5vw, 5rem); border-bottom: var(--hair); position: relative; }
+.act-num {
+  font-family: 'JetBrains Mono', monospace; font-size: var(--t-xs);
+  letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--accent); font-weight: 700;
+  margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 1rem;
+}
+.act-num::before { content: ""; width: 2.5rem; height: 1px; background: var(--accent); }
+.act h2 {
+  font-family: 'Fraunces', serif; font-size: var(--t-2xl);
+  font-weight: 400; font-variation-settings: "opsz" 144, "SOFT" 50, "WONK" 1;
+  letter-spacing: -0.025em; line-height: 1.05;
+  margin: 0 0 1.5rem; max-width: 24ch;
+}
+.act h2 em { font-style: italic; color: var(--accent); }
+
+/* === ACT 1 · the LLM problem === */
+.gap-grid { display: grid; gap: 2.5rem; grid-template-columns: 1fr; }
+@media (min-width: 880px) { .gap-grid { grid-template-columns: 1.1fr 1fr; gap: 4rem; align-items: start; } }
+.gap-stack { display: grid; gap: 0; }
+.gap-row {
+  display: grid; grid-template-columns: 5rem 1fr; gap: 1.25rem;
+  padding: 1.4rem 0; border-bottom: var(--hair-soft);
+}
+.gap-row:first-child { padding-top: 0; }
+.gap-row:last-child { border-bottom: 0; }
+.gap-row .pn {
+  font-family: 'JetBrains Mono', monospace; font-size: 0.78rem;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--accent); font-weight: 700; padding-top: 0.3rem;
+}
+.gap-row h3 {
+  font-family: 'Fraunces', serif; font-weight: 500;
+  font-size: var(--t-md); margin: 0 0 0.4rem; letter-spacing: -0.01em;
+}
+.gap-row p { margin: 0; color: var(--ink-soft); font-size: var(--t-sm); line-height: 1.55; }
+
+/* mentor / capstone block */
+.capstone-side {
+  border: 1px solid var(--ink);
+  padding: 1.5rem 1.5rem 1.5rem 1.75rem;
+  background: color-mix(in srgb, var(--accent) 6%, var(--paper));
+  position: relative;
+}
+.capstone-side::before {
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0;
+  width: 4px; background: var(--accent);
+}
+.capstone-side .label {
+  font-family: 'JetBrains Mono', monospace; font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.16em;
+  color: var(--accent-deep); font-weight: 700;
+  margin: 0 0 0.75rem;
+}
+.capstone-side h4 {
+  font-family: 'Fraunces', serif; font-weight: 500;
+  font-size: 1.15rem; margin: 0 0 0.5rem; letter-spacing: -0.01em;
+}
+.capstone-side p { font-size: var(--t-sm); color: var(--ink-soft); margin: 0 0 0.5rem; line-height: 1.5; }
+.capstone-side .seal {
+  margin-top: 0.85rem; padding-top: 0.85rem;
+  border-top: var(--hair-soft);
+  font-family: 'JetBrains Mono', monospace; font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.14em;
+  color: var(--ink-mute);
+}
+.capstone-side .seal strong { color: var(--accent-deep); }
+
+/* === ACT 2 · pipeline as horizontal flow === */
+.pipeline {
+  display: grid; gap: 0;
+  margin-top: 2rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 1080px) { .pipeline { grid-template-columns: repeat(5, 1fr); border: 1px solid var(--ink); background: var(--ink); gap: 1px; } }
+.pipe-step {
+  background: var(--paper);
+  padding: 1.4rem 1.4rem 1.6rem;
+  border: 1px solid var(--ink);
+  position: relative;
+  margin-bottom: -1px;
+}
+@media (min-width: 1080px) { .pipe-step { border: 0; margin-bottom: 0; } }
+.pipe-step .num {
+  font-family: 'JetBrains Mono', monospace; font-size: 0.78rem;
+  text-transform: uppercase; letter-spacing: 0.18em;
+  color: var(--accent); font-weight: 700;
+  margin-bottom: 0.6rem;
+}
+.pipe-step h3 {
+  font-family: 'Fraunces', serif; font-weight: 500;
+  font-size: 1.05rem; margin: 0 0 0.5rem;
+  letter-spacing: -0.01em; line-height: 1.15;
+}
+.pipe-step h3 em { font-style: italic; color: var(--accent); }
+.pipe-step p { margin: 0; font-size: 0.86rem; color: var(--ink-soft); line-height: 1.5; }
+.pipe-step .meta {
+  font-family: 'JetBrains Mono', monospace; font-size: 0.7rem;
+  margin-top: 0.6rem;
+  color: var(--ink-mute);
+  text-transform: uppercase; letter-spacing: 0.1em;
+}
+
+/* === ACT 3 · gaps closed (citations grid) === */
+.gaps {
+  background: var(--paper-soft);
+}
+.gaps-grid {
+  margin-top: 2rem;
+  border: 1px solid var(--ink);
+  background: var(--ink);
+  display: grid; gap: 1px;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { .gaps-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1080px) { .gaps-grid { grid-template-columns: repeat(3, 1fr); } }
+.gap-cell {
+  background: var(--paper);
+  padding: 1.25rem 1.4rem;
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  gap: 0.4rem;
+}
+.gap-cell .gid {
+  font-family: 'JetBrains Mono', monospace; font-size: 0.7rem;
+  text-transform: uppercase; letter-spacing: 0.18em;
+  color: var(--accent); font-weight: 700;
+}
+.gap-cell h4 {
+  font-family: 'Fraunces', serif; font-weight: 500;
+  font-size: 1.05rem; margin: 0; letter-spacing: -0.01em;
+}
+.gap-cell p { margin: 0; font-size: 0.85rem; color: var(--ink-soft); line-height: 1.5; }
+.gap-cell .src {
+  font-family: 'JetBrains Mono', monospace; font-size: 0.7rem;
+  color: var(--ink-mute);
+  border-top: 1px dashed color-mix(in srgb, var(--ink) 25%, transparent);
+  padding-top: 0.5rem;
+  letter-spacing: 0.05em;
+}
+
+/* === PROOF === */
+.proof { background: var(--ink); color: var(--paper); padding-block: clamp(3rem, 5vw, 5rem); position: relative; overflow: hidden; }
+.proof::before {
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 90% 10%, color-mix(in srgb, var(--accent) 30%, transparent), transparent 60%);
+  pointer-events: none;
+}
+.proof .frame { position: relative; }
+.proof h2 { color: var(--paper); }
+.proof h2 em { color: var(--accent); }
+.proof-grid {
+  display: grid; gap: 1rem; margin-top: 2rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { .proof-grid { grid-template-columns: repeat(2, 1fr); } }
+.proof-item {
+  border: 1px solid color-mix(in srgb, var(--paper) 30%, transparent);
+  padding: 1.5rem;
+  background: color-mix(in srgb, var(--paper) 5%, transparent);
+}
+.proof-item h3 {
+  font-family: 'Fraunces', serif; margin: 0 0 0.5rem;
+  font-size: var(--t-md); color: var(--accent);
+  font-weight: 500; letter-spacing: -0.01em;
+}
+.proof-item code {
+  font-family: 'JetBrains Mono', monospace; font-size: var(--t-xs);
+  color: color-mix(in srgb, var(--paper) 90%, transparent);
+  background: color-mix(in srgb, var(--paper) 8%, transparent);
+  padding: 0.15rem 0.4rem;
+}
+.proof-item p { margin: 0.5rem 0 0; color: color-mix(in srgb, var(--paper) 80%, transparent); font-size: var(--t-sm); }
+
+/* === STACK === */
+.stack { padding-block: clamp(3rem, 5vw, 5rem); border-bottom: var(--hair); }
+.stack-list { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.5rem; }
+.stack-tag {
+  padding: 0.5rem 0.9rem; border: 1px solid var(--ink);
+  font-family: 'JetBrains Mono', monospace; font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.14em; font-weight: 600;
+}
+
+/* === END CTA === */
+.endcta {
+  padding-block: clamp(3rem, 5vw, 5rem);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 10%, transparent), var(--paper));
+}
+.endcta .frame { display: grid; gap: 2rem; grid-template-columns: 1fr; }
+@media (min-width: 760px) { .endcta .frame { grid-template-columns: 2fr 1fr; align-items: end; } }
+.endcta h2 {
+  font-family: 'Fraunces', serif; font-size: var(--t-2xl);
+  font-weight: 300; font-variation-settings: "opsz" 144, "SOFT" 100;
+  margin: 0 0 1rem; letter-spacing: -0.025em; line-height: 1.05;
+}
+.endcta h2 em {
+  font-style: italic; color: var(--accent);
+  background: linear-gradient(180deg, transparent 70%, color-mix(in srgb, var(--accent) 25%, transparent) 70%);
+}
+.endcta p { color: var(--ink-soft); margin: 0; max-width: 52ch; }
+.endcta .actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+
+.foot { background: var(--ink); color: var(--paper); }
+.foot .dot { color: var(--accent); }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topnav">
+  <div class="frame">
+    <div class="brand"><a href="../index.html">dmj<span class="dot">.</span>one</a></div>
+    <nav aria-label="Primary">
+      <ul>
+        <li><a href="../index.html#catalogue">Catalogue</a></li>
+        <li><a href="../index.html#manifesto">Manifesto</a></li>
+        <li><a href="../index.html#hire">Hire</a></li>
+        <li><a href="https://github.com/kaustuvsharma/verifiedtutor-capstone" rel="noopener">GitHub</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ============ HERO ============ -->
+<section class="vt-hero">
+  <div class="frame">
+    <p class="crumbs">
+      <a href="../index.html">Catalogue</a> /
+      <a href="../index.html#cat-bharat">Bharat-First</a> /
+      <span>VerifiedTutor</span>
+    </p>
+
+    <span class="vt-eyebrow">Capstone · Bharat-First · Educational AI</span>
+
+    <div class="vt-hero-grid">
+      <div>
+        <h1>
+          <span class="dropcap">A</span>
+          tutor that <em>cites the page</em>, or refuses to answer.
+        </h1>
+        <p class="lede">
+          Most "AI tutors" hallucinate confidently and cite nothing. VerifiedTutor is the opposite. <strong>Every answer is retrieved from the prescribed lecture PDFs,</strong> generated by a local LLM, then verified claim-by-claim by an NLI model and shown with a calibrated confidence band, page citations, and a self-explanation prompt.
+        </p>
+        <div class="vt-cta-row">
+          <a class="btn btn-primary" href="https://verifiedtutor.dmj.one" rel="noopener">Open the live tutor</a>
+          <a class="btn btn-ghost" href="https://github.com/kaustuvsharma/verifiedtutor-capstone" rel="noopener">View source</a>
+          <a class="btn btn-ghost" href="https://verifiedtutor.dmj.one/pitch" rel="noopener">Defense slides</a>
+        </div>
+      </div>
+
+      <aside class="qa-card" aria-label="Sample answer with citations and confidence band">
+        <header class="qa-head">
+          <span>Class 12 CS · Q sample</span>
+          <span class="conf">High confidence</span>
+        </header>
+        <div class="qa-body">
+          <p class="qa-q">"Explain how SQL JOIN combines rows from two tables."</p>
+          <p class="qa-a">
+            <span class="nli">An SQL <em>JOIN</em> clause combines rows from two or more tables based on a related column between them.</span><a class="cite" href="#">p.42</a>
+            The most common type is the <span class="nli">INNER JOIN, which returns only the rows where the join condition is satisfied in both tables.</span><a class="cite" href="#">p.43</a>
+            A LEFT JOIN, by contrast, <span class="nli">returns all rows from the left table and the matched rows from the right; unmatched right-side rows appear as NULL.</span><a class="cite" href="#">p.44</a>
+          </p>
+        </div>
+        <div class="qa-band" aria-label="Confidence band">
+          <span>Faithfulness</span>
+          <span class="meter" role="img" aria-label="Eighty-four percent"></span>
+          <span class="pct">0.84</span>
+        </div>
+        <div class="qa-foot">
+          <span class="scaffold"><strong>Self-explain →</strong> What is the difference between INNER and LEFT JOIN in your own words?</span>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATS ============ -->
+<section class="vt-stats" aria-label="At a glance">
+  <div class="vt-stat"><span class="num">3</span><span class="lbl">Models · all local · no cloud</span></div>
+  <div class="vt-stat"><span class="num">304</span><span class="lbl">Chunks · 384-dim index</span></div>
+  <div class="vt-stat"><span class="num">12</span><span class="lbl">Reproducible test queries</span></div>
+  <div class="vt-stat"><span class="num">5</span><span class="lbl">Research gaps closed in one pipeline</span></div>
+  <div class="vt-stat"><span class="num">0</span><span class="lbl">Outbound calls during inference</span></div>
+</section>
+
+<!-- ============ ACT I · THE LLM PROBLEM ============ -->
+<section class="act act-problem" aria-labelledby="prob-h">
+  <div class="frame">
+    <p class="act-num">Act I · The Problem</p>
+    <h2 id="prob-h">A confident wrong answer is <em>worse</em><br>than no answer at all.</h2>
+
+    <div class="gap-grid">
+      <ol class="gap-stack">
+        <li class="gap-row">
+          <span class="pn">Pain · 01</span>
+          <div>
+            <h3>Faithfulness has no meter.</h3>
+            <p>Manakul 2023 and Es 2024 measured RAG hallucination rates that the systems themselves never surface. The user reads a fluent paragraph and assumes the citation supports it. Often it does not.</p>
+          </div>
+        </li>
+        <li class="gap-row">
+          <span class="pn">Pain · 02</span>
+          <div>
+            <h3>"Lost in the middle" eats the right answer.</h3>
+            <p>Liu 2024 showed long contexts collapse around middle chunks. A retriever that returns five passages and lets the LLM swallow them whole quietly drops the one that actually matters.</p>
+          </div>
+        </li>
+        <li class="gap-row">
+          <span class="pn">Pain · 03</span>
+          <div>
+            <h3>Confidence is not calibrated.</h3>
+            <p>Kadavath 2022 demonstrated that LLM confidence scores correlate poorly with correctness. "I am sure" and "I am wrong" travel together more often than the model knows.</p>
+          </div>
+        </li>
+        <li class="gap-row">
+          <span class="pn">Pain · 04</span>
+          <div>
+            <h3>An answer is not a lesson.</h3>
+            <p>Chi 1989 showed self-explanation outperforms passive reading. A tutor that hands the student the answer and walks away is a search engine, not a teacher.</p>
+          </div>
+        </li>
+        <li class="gap-row">
+          <span class="pn">Pain · 05</span>
+          <div>
+            <h3>Privacy in education is not optional.</h3>
+            <p>Khosravi 2022 made the case plainly: student data leaving the laptop is a regulatory and ethical liability. A tutor that calls a third-party endpoint is a vendor lock-in dressed as pedagogy.</p>
+          </div>
+        </li>
+      </ol>
+
+      <aside class="capstone-side">
+        <p class="label">Capstone · Final Semester</p>
+        <h4>Built by Kaustuv Sharma</h4>
+        <p>Reg. No. <strong>GF202218455</strong>. B.Tech CSE (AI), Yogananda School of AI, Computers and Data Sciences, Shoolini University, Solan, H.P.</p>
+        <p>Five research gaps from the recent literature, closed in one local pipeline that runs on a 6 GB consumer GPU. Twelve-query test battery, fully reproducible.</p>
+        <p class="seal">Engineering and deploy partnership: <strong>dmj.one</strong></p>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ACT II · PIPELINE ============ -->
+<section class="act" aria-labelledby="pipe-h">
+  <div class="frame">
+    <p class="act-num">Act II · The Promise</p>
+    <h2 id="pipe-h">Retrieve. Generate. <em>Verify.</em> Calibrate. Teach.</h2>
+    <p style="font-family:'Fraunces',serif;font-size:var(--t-md);color:var(--ink-soft);max-width:62ch;margin:0;">
+      The hardest line in the pipeline is the one that says: refuse if the maximum similarity is below 0.30. The tutor is allowed to say "I do not know." That is the line a search engine cannot draw.
+    </p>
+
+    <ol class="pipeline">
+      <li class="pipe-step">
+        <p class="num">Step 01</p>
+        <h3>Hybrid <em>retrieval.</em></h3>
+        <p>Semantic 0.7 plus lexical 0.3, k=5 over 304 chunks. Refuses if the maximum similarity falls below 0.30.</p>
+        <p class="meta">MiniLM L6-v2 + TF-IDF</p>
+      </li>
+      <li class="pipe-step">
+        <p class="num">Step 02</p>
+        <h3>Strict-grounded <em>generation.</em></h3>
+        <p>Qwen 2.5 1.5B Instruct streams the answer over Server-Sent Events into the browser. Strict grounding to the retrieved context.</p>
+        <p class="meta">Qwen2.5-1.5B-Instruct</p>
+      </li>
+      <li class="pipe-step">
+        <p class="num">Step 03</p>
+        <h3>Per-claim <em>NLI verification.</em></h3>
+        <p>DeBERTa-v3 NLI cross-encoder runs against each retrieved chunk individually, defeating "lost in the middle" inside the verifier.</p>
+        <p class="meta">cross-encoder/nli-deberta-v3-base</p>
+      </li>
+      <li class="pipe-step">
+        <p class="num">Step 04</p>
+        <h3>Composite <em>confidence band.</em></h3>
+        <p>Per-claim entailment plus embedding similarity fuse into a HIGH / MED / LOW band. Calibration cell in GAPS_CLOSED.md backs the threshold.</p>
+        <p class="meta">HIGH · MED · LOW</p>
+      </li>
+      <li class="pipe-step">
+        <p class="num">Step 05</p>
+        <h3>Active-learning <em>scaffold.</em></h3>
+        <p>Every answer ships with a self-explanation prompt and a probing question. The tutor wants the student to think, not to copy.</p>
+        <p class="meta">Self-explain · probe</p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============ ACT III · RESEARCH GAPS ============ -->
+<section class="act gaps" aria-labelledby="g-h">
+  <div class="frame">
+    <p class="act-num">Act III · The Evidence</p>
+    <h2 id="g-h">Five published gaps. <em>One local pipeline.</em></h2>
+    <p style="font-family:'Fraunces',serif;font-size:var(--t-md);color:var(--ink-soft);max-width:62ch;margin:0;">
+      Every gap maps to a citation. Every closure maps to a measurement in the test battery. Reviewers re-run the battery and see the same numbers.
+    </p>
+
+    <div class="gaps-grid">
+      <div class="gap-cell">
+        <p class="gid">Gap · G1</p>
+        <h4>Faithfulness in RAG</h4>
+        <p>Per-claim NLI plus embedding similarity, surfaced to the user as a confidence band, not buried in a log file.</p>
+        <p class="src">Manakul EMNLP 2023 · Es EACL 2024</p>
+      </div>
+      <div class="gap-cell">
+        <p class="gid">Gap · G2</p>
+        <h4>Lost in the middle</h4>
+        <p>Hybrid retrieval k=5; per-claim NLI runs against each retrieved chunk, never against a fused blob.</p>
+        <p class="src">Liu TACL 2024</p>
+      </div>
+      <div class="gap-cell">
+        <p class="gid">Gap · G3</p>
+        <h4>Calibration</h4>
+        <p>Composite confidence (HIGH / MED / LOW) measured against the test battery and tuned for refusal correctness.</p>
+        <p class="src">Kadavath 2022</p>
+      </div>
+      <div class="gap-cell">
+        <p class="gid">Gap · G4</p>
+        <h4>Pedagogical scaffolding</h4>
+        <p>Self-explanation and probing question generated for every answer. Tutoring, not search.</p>
+        <p class="src">Chi 1989</p>
+      </div>
+      <div class="gap-cell">
+        <p class="gid">Gap · G5</p>
+        <h4>Educational AI privacy</h4>
+        <p>Fully local. The 3.6 GB of models live in <code>~/.cache/huggingface</code>. Zero outbound calls during inference.</p>
+        <p class="src">Khosravi 2022</p>
+      </div>
+      <div class="gap-cell">
+        <p class="gid">Gap · 0</p>
+        <h4>Refusal correctness</h4>
+        <p>The tutor refuses when retrieval is weak. The test battery measures refusal alongside answer accuracy. Both are first-class metrics.</p>
+        <p class="src">work/test_battery.py · 12 queries · 5 rounds</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PROOF ============ -->
+<section class="proof act" aria-labelledby="proof-h">
+  <div class="frame">
+    <p class="act-num">Act IV · Proof</p>
+    <h2 id="proof-h">It already <em>runs.</em> CPU image. Free tier.</h2>
+
+    <div class="proof-grid">
+      <div class="proof-item">
+        <h3>Live · Cloud Run · us-central1</h3>
+        <code>verifiedtutor.dmj.one</code>
+        <p>CPU image baked with all three models, sized for the Cloud Run free tier. SSE streaming, no GPU at runtime, no third-party API key required to demo.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Reproducible test battery</h3>
+        <code>python work/test_battery.py</code>
+        <p>Twelve queries, five rounds. Reports per-claim entailment, confidence bands, and refusal correctness. Every gap-closure cell in GAPS_CLOSED.md is reproducible.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Three-model local stack</h3>
+        <code>~/.cache/huggingface/</code>
+        <p>Qwen 2.5 1.5B Instruct (generator) · MiniLM L6-v2 (retriever) · DeBERTa-v3 NLI (verifier). 3.6 GB total. First-start download, instant after.</p>
+      </div>
+      <div class="proof-item">
+        <h3>RAG index from prescribed corpus</h3>
+        <code>work/rag_index.pkl</code>
+        <p>304 chunks, 384-dim embeddings, built from the Class 12 CS lecture PDFs by <code>work/build_rag_index.py</code>. Reproducible from <code>work/pdf_to_md.py</code> upward.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Defense slides + report</h3>
+        <code>/pitch · /report</code>
+        <p>Capstone defense deck (←/→/↑/↓ navigation) and the DOCX report served from the same Flask app. One container, every artifact.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Open-source pipeline</h3>
+        <code>gcr.io/dmjone/verifiedtutor:v2</code>
+        <p>Container image published. The recipe (PDF → corpus → index → app) is reproducible from the README on a 6 GB consumer GPU.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STACK ============ -->
+<section class="stack" aria-labelledby="tech-h">
+  <div class="frame">
+    <p class="act-num">The Stack</p>
+    <h2 id="tech-h" style="font-size:var(--t-xl);font-weight:400;font-family:'Fraunces',serif;font-variation-settings:'opsz' 144,'SOFT' 50;margin:0;letter-spacing:-0.02em;">Local-first. <em>Citation-first.</em></h2>
+    <ul class="stack-list">
+      <li class="stack-tag">Python 3.11</li>
+      <li class="stack-tag">Flask</li>
+      <li class="stack-tag">PyTorch 2.6</li>
+      <li class="stack-tag">Qwen2.5-1.5B-Instruct</li>
+      <li class="stack-tag">MiniLM L6-v2</li>
+      <li class="stack-tag">DeBERTa-v3 NLI</li>
+      <li class="stack-tag">Sentence-Transformers</li>
+      <li class="stack-tag">scikit TF-IDF</li>
+      <li class="stack-tag">pypdf</li>
+      <li class="stack-tag">SSE streaming</li>
+      <li class="stack-tag">Cloud Run · us-central1</li>
+      <li class="stack-tag">Docker · CPU image</li>
+      <li class="stack-tag">Hugging Face Datasets</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ END CTA ============ -->
+<section class="endcta" aria-labelledby="cta-h">
+  <div class="frame">
+    <div>
+      <h2 id="cta-h">Need a partner who can ship · or a mentor who can guide a team to <em>ship the same way?</em></h2>
+      <p>If your application looks like an LLM that has to cite a primary source, refuse when it does not know, and protect privacy from line one, the conversation starts the same way.</p>
+    </div>
+    <div class="actions">
+      <a class="btn btn-primary" href="../index.html#hire">Get in touch</a>
+      <a class="btn btn-ghost" href="../index.html">Back to catalogue</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="frame">
+    <div>
+      <h2 style="font-family:'Fraunces',serif;font-size:var(--t-xl);margin:0 0 1rem;">dmj<span class="dot">.</span>one</h2>
+      <p>Dream, Manifest and Journey, Together as One.</p>
+      <p class="meta">© 2026 Divya Mohan · VerifiedTutor was built by Kaustuv Sharma as his B.Tech CSE (AI) capstone at Shoolini University. Engineering and deploy partnership with dmj.one. Repository transferred to the author. The lecture corpus dataset is private to the author.</p>
+    </div>
+    <div>
+      <p class="meta">Catalogue</p>
+      <p><a href="../index.html#catalogue">All 47 products</a></p>
+      <p><a href="../index.html#cat-bharat">Bharat-First</a></p>
+      <p><a href="../index.html#hire">Hire</a></p>
+    </div>
+    <div>
+      <p class="meta">VerifiedTutor</p>
+      <p><a href="https://verifiedtutor.dmj.one" rel="noopener">Live tutor</a></p>
+      <p><a href="https://verifiedtutor.dmj.one/pitch" rel="noopener">Defense slides</a></p>
+      <p><a href="https://github.com/kaustuvsharma/verifiedtutor-capstone" rel="noopener">Source</a></p>
+      <p><a href="mailto:contact@dmj.one">contact@dmj.one</a></p>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

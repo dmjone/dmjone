@@ -1,0 +1,818 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#d8631a">
+<meta name="color-scheme" content="light">
+
+<title>LocalPulse · A dashboard the panchayat actually uses · dmj.one</title>
+<meta name="description" content="When a flood, a fire, a riot hits a small Indian town, the panchayat is the first responder. LocalPulse is the dashboard they did not have. AI summary, multilingual voice helpline, server-sent live feed. Capstone, B.Tech CSE Cloud Computing, Shoolini.">
+<meta property="og:title" content="LocalPulse · AI crisis management for small Indian towns">
+<meta property="og:description" content="Resident dashboard, responder console, voice helpline. Five Indian languages out of the box. Cloud Run scale-to-zero. Live at localpulse.dmj.one.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,30..100&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="../assets/core.css">
+
+<style>
+:root { --accent: var(--c-bharat); --accent-deep: #a14710; --grid: #c9bfa8; --pulse: #b03030; }
+body { background: var(--paper); }
+
+/* ==== HERO · blueprint-grid, dashboard-led, mono-heavy ==== */
+.lp-hero {
+  position: relative;
+  padding-block: clamp(2.5rem, 5vw + 1rem, 5rem) clamp(2rem, 4vw, 4rem);
+  border-bottom: var(--hair);
+  overflow: hidden;
+  background: var(--paper);
+}
+.lp-hero::before {
+  content: ""; position: absolute; inset: 0;
+  background-image:
+    linear-gradient(0deg, color-mix(in srgb, var(--ink) 8%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--ink) 8%, transparent) 1px, transparent 1px);
+  background-size: 24px 24px;
+  background-position: 0 0;
+  mask: linear-gradient(180deg, black 30%, transparent 100%);
+  -webkit-mask: linear-gradient(180deg, black 30%, transparent 100%);
+  pointer-events: none;
+}
+.lp-hero .frame { position: relative; z-index: 2; }
+
+.crumbs {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink-mute); margin: 0 0 1.5rem;
+  display: flex; gap: 0.5rem; flex-wrap: wrap;
+}
+.crumbs a { border-bottom: 1px solid var(--ink-mute); padding-bottom: 1px; }
+.crumbs a:hover { color: var(--accent); border-color: var(--accent); }
+.crumbs span { color: var(--accent); }
+
+.lp-eyebrow {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  padding: 0.4rem 0.85rem;
+  border: 1px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  color: var(--accent-deep);
+  font-family: 'JetBrains Mono', monospace; font-size: var(--t-xs);
+  font-weight: 700; text-transform: uppercase; letter-spacing: 0.16em;
+  margin-bottom: 1.5rem;
+}
+.lp-eyebrow::before {
+  content: ""; width: 8px; height: 8px;
+  background: var(--pulse); border-radius: 50%;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--pulse) 25%, transparent);
+}
+
+.lp-hero-grid {
+  display: grid; gap: 2.5rem;
+  grid-template-columns: 1fr;
+  align-items: stretch;
+}
+@media (min-width: 980px) { .lp-hero-grid { grid-template-columns: 1.15fr 1fr; gap: 3rem; } }
+
+.lp-hero h1 {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(2.4rem, 5.4vw, 4.2rem);
+  font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 30, "WONK" 1;
+  letter-spacing: -0.03em; line-height: 0.96;
+  margin: 0; max-width: 16ch;
+}
+.lp-hero h1 em { font-style: italic; color: var(--accent); }
+.lp-hero h1 strong {
+  font-weight: 600; color: var(--accent-deep);
+  font-style: italic;
+}
+
+.lp-hero .lede {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md); font-weight: 300;
+  line-height: 1.5; color: var(--ink-soft);
+  margin: 1.75rem 0 0; max-width: 50ch;
+}
+.lp-hero .lede strong {
+  font-weight: 600; color: var(--ink);
+  background: linear-gradient(180deg, transparent 60%, color-mix(in srgb, var(--accent) 30%, transparent) 60%);
+  padding: 0 0.1em;
+}
+
+.lp-cta-row {
+  margin-top: 2rem;
+  display: flex; gap: 0.75rem; flex-wrap: wrap;
+}
+.btn {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.7rem 1.1rem;
+  font-family: 'JetBrains Mono', monospace; font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.14em; font-weight: 700;
+  border: 1px solid var(--ink);
+  transition: background .15s, color .15s, transform .15s, box-shadow .15s;
+}
+.btn:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--ink); }
+.btn-primary { background: var(--accent); color: white; border-color: var(--accent); }
+.btn-ghost { background: transparent; color: var(--ink); }
+
+/* ==== HERO RIGHT: dashboard-preview card ==== */
+.dashboard-preview {
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  box-shadow: 8px 8px 0 var(--ink);
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-height: 380px;
+}
+.dash-bar {
+  background: var(--ink); color: var(--paper);
+  padding: 0.6rem 1rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem; letter-spacing: 0.16em;
+  text-transform: uppercase; font-weight: 700;
+  display: flex; align-items: center; gap: 0.6rem;
+  border-bottom: 1px solid var(--ink);
+}
+.dash-bar .dots {
+  display: inline-flex; gap: 0.3rem;
+}
+.dash-bar .dots span {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: color-mix(in srgb, var(--paper) 30%, transparent);
+}
+.dash-bar .url {
+  margin-left: auto;
+  color: var(--accent);
+  text-transform: lowercase;
+  letter-spacing: 0.04em;
+  font-weight: 600;
+}
+.dash-body {
+  padding: 1.25rem;
+  display: grid; gap: 0.85rem;
+  grid-template-columns: 1fr;
+}
+.dash-tile {
+  border: 1px solid var(--paper-edge);
+  padding: 0.85rem 1rem;
+  background: var(--paper);
+}
+.dash-tile .tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--accent);
+  font-weight: 700; margin-bottom: 0.3rem;
+}
+.dash-tile .val {
+  font-family: 'Fraunces', serif; font-size: 1.4rem;
+  margin: 0; color: var(--ink); font-weight: 500;
+  letter-spacing: -0.015em;
+}
+.dash-tile .val strong { color: var(--accent-deep); font-style: italic; font-weight: 600; }
+.dash-tile .meta {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem; color: var(--ink-mute);
+  letter-spacing: 0.08em; margin-top: 0.25rem;
+}
+.dash-feed {
+  border: 1px solid var(--paper-edge);
+  background: color-mix(in srgb, var(--ink) 4%, var(--paper));
+  padding: 0.85rem 1rem;
+}
+.dash-feed .feed-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--accent);
+  font-weight: 700; margin: 0 0 0.5rem;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.pulse-dot {
+  width: 8px; height: 8px;
+  background: var(--pulse); border-radius: 50%;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--pulse) 25%, transparent);
+}
+.dash-feed ul { display: grid; gap: 0.4rem; }
+.dash-feed li {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem; color: var(--ink-soft);
+  display: grid; grid-template-columns: 4.5rem 1fr; gap: 0.7rem;
+}
+.dash-feed li .ts { color: var(--accent-deep); font-weight: 700; }
+
+.dash-foot {
+  background: var(--ink); color: color-mix(in srgb, var(--paper) 80%, transparent);
+  padding: 0.5rem 1rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem; letter-spacing: 0.14em;
+  text-transform: uppercase;
+  display: flex; gap: 1rem; flex-wrap: wrap;
+  border-top: 1px solid var(--ink);
+}
+.dash-foot .ok { color: #6cb86c; font-weight: 700; }
+.dash-foot span strong { color: var(--accent); font-weight: 700; }
+
+/* ==== STATS ==== */
+.lp-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  background: var(--ink); color: var(--paper);
+  border-block: 2px solid var(--ink);
+}
+.lp-stat {
+  padding: 1.5rem clamp(1rem, 2vw, 1.5rem);
+  border-right: 1px solid color-mix(in srgb, var(--paper) 18%, transparent);
+}
+.lp-stat:last-child { border-right: 0; }
+.lp-stat .num {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl); font-weight: 400;
+  letter-spacing: -0.04em; display: block; line-height: 1;
+  font-variation-settings: "opsz" 144, "SOFT" 30;
+  color: var(--accent);
+}
+.lp-stat .lbl {
+  font-family: 'JetBrains Mono', monospace; font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.14em;
+  margin-top: 0.6rem; display: block;
+  color: color-mix(in srgb, var(--paper) 75%, transparent);
+}
+
+/* ==== ACT ==== */
+.act { padding-block: clamp(3rem, 5vw, 5rem); border-bottom: var(--hair); position: relative; }
+.act-num {
+  font-family: 'JetBrains Mono', monospace; font-size: var(--t-xs);
+  letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--accent); font-weight: 700;
+  margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 1rem;
+}
+.act-num::before { content: ""; width: 2.5rem; height: 1px; background: var(--accent); }
+.act h2 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl); font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 50, "WONK" 1;
+  letter-spacing: -0.025em; line-height: 1.05;
+  margin: 0 0 1.5rem; max-width: 22ch;
+}
+.act h2 em { font-style: italic; color: var(--accent); }
+
+/* ==== ACT I · PROBLEM (panchayat scene) ==== */
+.scene {
+  margin-top: 2rem;
+  display: grid; gap: 2.5rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 880px) { .scene { grid-template-columns: 1.2fr 1fr; gap: 4rem; } }
+.scene-text p {
+  font-family: 'Fraunces', serif; font-size: var(--t-md);
+  line-height: 1.55; color: var(--ink-soft); margin: 0 0 1.25rem;
+}
+.scene-text p strong { color: var(--ink); font-weight: 600; }
+
+.what-they-have {
+  border: 1px solid var(--ink);
+  background: var(--paper);
+}
+.what-they-have h3 {
+  background: var(--ink); color: var(--paper);
+  margin: 0; padding: 0.85rem 1.25rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs); text-transform: uppercase;
+  letter-spacing: 0.16em; font-weight: 700;
+}
+.what-they-have ul { display: grid; }
+.what-they-have li {
+  display: grid; grid-template-columns: 2.5rem 1fr;
+  gap: 0.85rem;
+  padding: 0.95rem 1.25rem;
+  border-bottom: var(--hair-soft);
+  font-family: 'Fraunces', serif;
+  font-size: 1.05rem; color: var(--ink); line-height: 1.4;
+}
+.what-they-have li:last-child { border-bottom: 0; }
+.what-they-have li::before {
+  content: "✕";
+  font-family: 'JetBrains Mono', monospace; color: var(--pulse);
+  font-weight: 700; padding-top: 0.15rem;
+}
+.what-they-have li.have::before {
+  content: "✓"; color: var(--accent-deep);
+}
+
+/* ==== ACT II · TWO AI FEATURES ==== */
+.features {
+  display: grid; gap: 1.25rem;
+  margin-top: 2rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 880px) { .features { grid-template-columns: repeat(2, 1fr); } }
+.feature {
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  padding: 1.75rem;
+  position: relative;
+}
+.feature .fnum {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs); letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--accent);
+  font-weight: 700; margin-bottom: 0.6rem;
+}
+.feature h3 {
+  font-family: 'Fraunces', serif; font-weight: 500;
+  font-size: var(--t-lg); margin: 0 0 0.75rem;
+  letter-spacing: -0.015em; line-height: 1.1;
+}
+.feature h3 em { font-style: italic; color: var(--accent); }
+.feature > p {
+  font-size: var(--t-sm); color: var(--ink-soft);
+  line-height: 1.55; margin: 0 0 1rem;
+}
+.feature .pipe {
+  display: grid; gap: 0.4rem;
+  margin-top: 1rem; padding: 1rem;
+  background: color-mix(in srgb, var(--ink) 5%, transparent);
+  border-left: 3px solid var(--accent);
+}
+.feature .pipe-step {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs); color: var(--ink-soft);
+  display: grid; grid-template-columns: 1.5rem 1fr; gap: 0.4rem;
+}
+.feature .pipe-step::before {
+  content: counter(pstep, decimal-leading-zero);
+  counter-increment: pstep;
+  color: var(--accent); font-weight: 700;
+}
+.feature .pipe { counter-reset: pstep; }
+.feature .pipe-step strong { color: var(--ink); font-weight: 700; }
+
+/* ==== ACT III · THE FIVE LANGUAGES STRIP ==== */
+.languages {
+  margin-top: 2rem;
+  display: grid; gap: 0;
+  grid-template-columns: 1fr;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+}
+@media (min-width: 720px) { .languages { grid-template-columns: repeat(5, 1fr); } }
+.lang {
+  padding: 1.25rem 1.25rem;
+  border-bottom: 1px solid var(--paper-edge);
+  text-align: left;
+}
+@media (min-width: 720px) {
+  .lang { border-bottom: 0; border-right: 1px solid var(--paper-edge); }
+  .lang:last-child { border-right: 0; }
+}
+.lang:last-child { border-bottom: 0; }
+.lang .lcode {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--accent);
+  font-weight: 700; margin-bottom: 0.4rem;
+}
+.lang .lname {
+  font-family: 'Fraunces', serif; font-style: italic;
+  font-size: 1rem; color: var(--ink-soft);
+  font-variation-settings: "opsz" 144, "SOFT" 100;
+  margin: 0 0 0.4rem;
+}
+.lang .native {
+  font-family: 'Fraunces', serif;
+  font-size: 1.5rem; color: var(--ink); margin: 0;
+  letter-spacing: -0.01em;
+  font-variation-settings: "opsz" 144, "SOFT" 50;
+}
+
+/* ==== ACT IV · ROUTES TABLE ==== */
+.routes {
+  margin-top: 2rem;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-sm);
+}
+.route-row {
+  display: grid; gap: 1rem;
+  grid-template-columns: 1fr;
+  padding: 0.85rem 1.25rem;
+  border-bottom: 1px solid var(--paper-edge);
+}
+@media (min-width: 760px) {
+  .route-row { grid-template-columns: 9rem 1fr 2fr; gap: 1.5rem; align-items: baseline; }
+}
+.route-row:last-child { border-bottom: 0; }
+.route-row.head {
+  background: var(--ink); color: var(--paper);
+  font-size: var(--t-xs); text-transform: uppercase;
+  letter-spacing: 0.16em; font-weight: 700;
+}
+.route-row .meth {
+  color: var(--accent); font-weight: 700;
+  letter-spacing: 0.04em;
+}
+.route-row.head .meth { color: var(--accent); }
+.route-row .pth { color: var(--ink); font-weight: 600; }
+.route-row .desc {
+  font-family: 'Atkinson Hyperlegible', sans-serif;
+  font-size: var(--t-sm); color: var(--ink-soft); line-height: 1.5;
+}
+.route-row.head .desc { font-family: 'JetBrains Mono', monospace; color: var(--accent); }
+
+/* ==== PROOF ==== */
+.proof {
+  background: var(--ink); color: var(--paper);
+  padding-block: clamp(3rem, 5vw, 5rem);
+  position: relative; overflow: hidden;
+}
+.proof::before {
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 100% 0%, color-mix(in srgb, var(--accent) 30%, transparent), transparent 60%);
+  pointer-events: none;
+}
+.proof .frame { position: relative; }
+.proof h2 { color: var(--paper); }
+.proof h2 em { color: var(--accent); }
+.proof-grid {
+  display: grid; gap: 1rem; margin-top: 2rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { .proof-grid { grid-template-columns: repeat(2, 1fr); } }
+.proof-item {
+  border: 1px solid color-mix(in srgb, var(--paper) 30%, transparent);
+  padding: 1.5rem;
+  background: color-mix(in srgb, var(--paper) 5%, transparent);
+}
+.proof-item h3 {
+  font-family: 'Fraunces', serif; margin: 0 0 0.5rem;
+  font-size: var(--t-md); color: var(--accent);
+  font-weight: 500; letter-spacing: -0.01em;
+}
+.proof-item code {
+  font-family: 'JetBrains Mono', monospace; font-size: var(--t-xs);
+  background: color-mix(in srgb, var(--paper) 8%, transparent);
+  padding: 0.15rem 0.4rem;
+  color: color-mix(in srgb, var(--paper) 90%, transparent);
+}
+.proof-item p { margin: 0.5rem 0 0; color: color-mix(in srgb, var(--paper) 80%, transparent); font-size: var(--t-sm); line-height: 1.55; }
+
+/* ==== STACK ==== */
+.stack { padding-block: clamp(3rem, 5vw, 5rem); border-bottom: var(--hair); }
+.stack-list { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.5rem; }
+.stack-tag {
+  padding: 0.5rem 0.9rem; border: 1px solid var(--ink);
+  font-family: 'JetBrains Mono', monospace; font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.14em; font-weight: 600;
+}
+
+/* ==== END CTA ==== */
+.endcta {
+  padding-block: clamp(3rem, 5vw, 5rem);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 10%, transparent), var(--paper));
+}
+.endcta .frame { display: grid; gap: 2rem; grid-template-columns: 1fr; }
+@media (min-width: 760px) { .endcta .frame { grid-template-columns: 2fr 1fr; align-items: end; } }
+.endcta h2 {
+  font-family: 'Fraunces', serif; font-size: var(--t-2xl); font-weight: 300;
+  font-variation-settings: "opsz" 144, "SOFT" 100;
+  margin: 0 0 1rem; letter-spacing: -0.025em; line-height: 1.05;
+}
+.endcta h2 em {
+  font-style: italic; color: var(--accent);
+  background: linear-gradient(180deg, transparent 70%, color-mix(in srgb, var(--accent) 25%, transparent) 70%);
+}
+.endcta p { color: var(--ink-soft); margin: 0; max-width: 50ch; }
+.endcta .actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+
+.foot { background: var(--ink); color: var(--paper); }
+.foot .dot { color: var(--accent); }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topnav">
+  <div class="frame">
+    <div class="brand"><a href="../index.html">dmj<span class="dot">.</span>one</a></div>
+    <nav aria-label="Primary">
+      <ul>
+        <li><a href="../index.html#catalogue">Catalogue</a></li>
+        <li><a href="../index.html#manifesto">Manifesto</a></li>
+        <li><a href="../index.html#hire">Hire</a></li>
+        <li><a href="https://github.com/divyamohan1993/localpulse" rel="noopener">GitHub</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ============ HERO · dashboard preview ============ -->
+<section class="lp-hero">
+  <div class="frame">
+    <p class="crumbs">
+      <a href="../index.html">Catalogue</a> /
+      <a href="../index.html#cat-bharat">Bharat-First</a> /
+      <span>LocalPulse</span>
+    </p>
+
+    <span class="lp-eyebrow">No. 08 · Bharat-First · Civic AI</span>
+
+    <div class="lp-hero-grid">
+      <div>
+        <h1>The phone <em>does not stop ringing.</em><br>This is the dashboard <strong>they did not have.</strong></h1>
+        <p class="lede">
+          When a flood, a fire, a riot hits a small Indian town, the <strong>panchayat is the first responder.</strong> They have no smart-city budget. They have a phone that does not stop ringing and a WhatsApp group that becomes chaos in two hours. <strong>LocalPulse is what fits between them.</strong>
+        </p>
+        <div class="lp-cta-row">
+          <a class="btn btn-primary" href="https://localpulse.dmj.one" rel="noopener">Open the live dashboard</a>
+          <a class="btn btn-ghost" href="https://github.com/divyamohan1993/localpulse" rel="noopener">View source</a>
+          <a class="btn btn-ghost" href="https://localpulse.dmj.one/pitch" rel="noopener">Pitch deck</a>
+        </div>
+      </div>
+
+      <aside class="dashboard-preview" aria-label="LocalPulse dashboard preview">
+        <div class="dash-bar">
+          <span class="dots"><span></span><span></span><span></span></span>
+          <span>localpulse.dmj.one</span>
+          <span class="url">/responder</span>
+        </div>
+        <div class="dash-body">
+          <div class="dash-tile">
+            <p class="tag">AI Status Summary · Asia-East1</p>
+            <p class="val"><strong>3</strong> active incidents · <strong>2</strong> shelters online</p>
+            <p class="meta">Updated 14:32 IST · NLP confidence 0.87</p>
+          </div>
+          <div class="dash-feed">
+            <p class="feed-title"><span class="pulse-dot"></span>Pulse · live</p>
+            <ul>
+              <li><span class="ts">14:32</span><span>Power restored · Sector 4 (verified · 3 sources)</span></li>
+              <li><span class="ts">14:28</span><span>Flood watch lifted · Khad nallah</span></li>
+              <li><span class="ts">14:21</span><span>Shelter at GHS School · 47 / 80 capacity</span></li>
+              <li><span class="ts">14:15</span><span>Voice call · Punjabi · road blocked report</span></li>
+            </ul>
+          </div>
+        </div>
+        <div class="dash-foot">
+          <span><span class="ok">●</span> healthz: ok</span>
+          <span>p95: <strong>147 ms</strong></span>
+          <span>cold-start: <strong>1.8 s</strong></span>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATS ============ -->
+<section class="lp-stats" aria-label="At a glance">
+  <div class="lp-stat"><span class="num">5</span><span class="lbl">Indian languages out of the box</span></div>
+  <div class="lp-stat"><span class="num">~80 KB</span><span class="lbl">JS dependencies after gzip</span></div>
+  <div class="lp-stat"><span class="num">&lt;200 ms</span><span class="lbl">p95 latency target</span></div>
+  <div class="lp-stat"><span class="num">&lt;2 s</span><span class="lbl">Cloud Run cold-start</span></div>
+  <div class="lp-stat"><span class="num">512 MiB</span><span class="lbl">Container footprint</span></div>
+</section>
+
+<!-- ============ ACT I · THE PANCHAYAT SCENE ============ -->
+<section class="act" aria-labelledby="prob-h">
+  <div class="frame">
+    <p class="act-num">Act I · The Problem</p>
+    <h2 id="prob-h">A flood arrives. <em>So does the noise.</em></h2>
+
+    <div class="scene">
+      <div class="scene-text">
+        <p>Imagine a town of forty thousand people in the Himalayan foothills. Power is out across two sectors. A culvert is damaged on the highway. Three families are trapped on the wrong side of a swollen nallah. The panchayat office has one telephone and three volunteers.</p>
+        <p>Within an hour, social media has eight hundred posts about it · half of them rumours, a quarter of them duplicates, a few of them genuinely useful. The Twitter / X timeline is a fire hose. The local Reddit thread reads like every other Reddit thread. The WhatsApp group is forwarding videos from a different flood, in a different state, three years ago.</p>
+        <p><strong>Smart-city dashboards exist.</strong> They cost crores. They take a year to deploy. They are not for a town of forty thousand. <strong>LocalPulse is.</strong></p>
+      </div>
+
+      <aside class="what-they-have">
+        <h3>What the panchayat actually has</h3>
+        <ul>
+          <li class="have">A telephone that nobody is putting down</li>
+          <li class="have">Three volunteers and a register</li>
+          <li class="have">A list of shelters on a piece of paper</li>
+          <li>A smart-city budget</li>
+          <li>An IT team to operate one</li>
+          <li>A way to tell rumour from report</li>
+          <li>A dashboard a non-technical sarpanch can read</li>
+        </ul>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ACT II · TWO AI FEATURES ============ -->
+<section class="act" aria-labelledby="feat-h">
+  <div class="frame">
+    <p class="act-num">Act II · The Promise</p>
+    <h2 id="feat-h">Two AI features. <em>A whole town's situational awareness.</em></h2>
+    <p style="font-family:'Fraunces',serif;font-size:var(--t-md);color:var(--ink-soft);max-width:60ch;margin:0;">
+      The MLP ships with mock data and zero persistence so the panchayat can try it without procurement. The production target swaps mocks for live ingest, Twilio Voice, GPT-4o, Firestore and Pub/Sub.
+    </p>
+
+    <div class="features">
+      <article class="feature">
+        <p class="fnum">Feature · 01</p>
+        <h3>AI <em>social-media summary</em></h3>
+        <p>An NLP agent reads local Twitter / X and Reddit threads. Filters noise. Classifies posts into roads, shelters, power, water, medical. Clusters duplicates. Scores trust. Returns a one-glance Status Summary the sarpanch can read in five seconds.</p>
+        <div class="pipe">
+          <div class="pipe-step"><span><strong>Ingest</strong> · X + Reddit local search · last hour</span></div>
+          <div class="pipe-step"><span><strong>Filter</strong> · noise + spam removal</span></div>
+          <div class="pipe-step"><span><strong>Classify</strong> · 5 categories</span></div>
+          <div class="pipe-step"><span><strong>Cluster</strong> · de-duplicate near-identical reports</span></div>
+          <div class="pipe-step"><span><strong>Trust score</strong> · multi-source verification</span></div>
+          <div class="pipe-step"><span><strong>Summarise</strong> · GPT-4o · 5-second read</span></div>
+        </div>
+      </article>
+
+      <article class="feature">
+        <p class="fnum">Feature · 02</p>
+        <h3>Multilingual <em>voice helpline</em></h3>
+        <p>Twilio plus Whisper plus an intent classifier. Elderly residents without smartphones call in their own language · Hindi, Punjabi, Tamil, Bengali, English. They report an incident or get an update. The browser demo at <code style="font-family:'JetBrains Mono',monospace;font-size:0.95em;background:color-mix(in srgb, var(--ink) 8%, transparent);padding:0.05em 0.3em;">/voice</code> uses the Web Speech API.</p>
+        <div class="pipe">
+          <div class="pipe-step"><span><strong>Twilio</strong> picks up the call</span></div>
+          <div class="pipe-step"><span><strong>Whisper</strong> transcribes in the caller's language</span></div>
+          <div class="pipe-step"><span><strong>Intent classifier</strong> tags the request</span></div>
+          <div class="pipe-step"><span><strong>Response</strong> generated in the same language</span></div>
+          <div class="pipe-step"><span><strong>Pulse stream</strong> · push to responder console</span></div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ACT III · FIVE LANGUAGES ============ -->
+<section class="act" aria-labelledby="lang-h">
+  <div class="frame">
+    <p class="act-num">Act III · The Languages</p>
+    <h2 id="lang-h">Five Indian languages. <em>Native script, not transliteration.</em></h2>
+    <p style="font-family:'Fraunces',serif;font-size:var(--t-md);color:var(--ink-soft);max-width:60ch;margin:0;">
+      The dictionary lives server-side and ships with the container. New languages are a JSON file. The voice intent classifier extends the same way.
+    </p>
+
+    <div class="languages">
+      <div class="lang">
+        <p class="lcode">en</p>
+        <p class="lname">English</p>
+        <p class="native">English</p>
+      </div>
+      <div class="lang">
+        <p class="lcode">hi</p>
+        <p class="lname">Hindi</p>
+        <p class="native">हिन्दी</p>
+      </div>
+      <div class="lang">
+        <p class="lcode">pa</p>
+        <p class="lname">Punjabi</p>
+        <p class="native">ਪੰਜਾਬੀ</p>
+      </div>
+      <div class="lang">
+        <p class="lcode">ta</p>
+        <p class="lname">Tamil</p>
+        <p class="native">தமிழ்</p>
+      </div>
+      <div class="lang">
+        <p class="lcode">bn</p>
+        <p class="lname">Bengali</p>
+        <p class="native">বাংলা</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ACT IV · ROUTES TABLE ============ -->
+<section class="act" aria-labelledby="route-h">
+  <div class="frame">
+    <p class="act-num">Act IV · The API</p>
+    <h2 id="route-h">Eleven routes. <em>One Express server. One container.</em></h2>
+    <p style="font-family:'Fraunces',serif;font-size:var(--t-md);color:var(--ink-soft);max-width:60ch;margin:0;">
+      Single Node 20 process, single Express app, single Dockerfile. Server-Sent Events stream the live pulse to every responder console. No queue infrastructure required for the MLP.
+    </p>
+
+    <div class="routes" role="table">
+      <div class="route-row head" role="row">
+        <span class="meth" role="columnheader">Method</span>
+        <span class="pth" role="columnheader">Path</span>
+        <span class="desc" role="columnheader">What it does</span>
+      </div>
+      <div class="route-row" role="row"><span class="meth">GET</span><span class="pth">/</span><span class="desc">Resident dashboard. Map, AI summary, incidents, shelters, report-an-issue form.</span></div>
+      <div class="route-row" role="row"><span class="meth">GET</span><span class="pth">/responder</span><span class="desc">Emergency-responder console with operational map, feed, and SSE pulse stream.</span></div>
+      <div class="route-row" role="row"><span class="meth">GET</span><span class="pth">/voice</span><span class="desc">Voice helpline demo using the browser Web Speech API. Production runs on Twilio + Whisper.</span></div>
+      <div class="route-row" role="row"><span class="meth">GET</span><span class="pth">/pitch</span><span class="desc">Web slide deck. Arrow keys, space, PgUp / PgDn, F for fullscreen, ? for help.</span></div>
+      <div class="route-row" role="row"><span class="meth">GET</span><span class="pth">/report</span><span class="desc">Full capstone project report rendered in print-friendly HTML.</span></div>
+      <div class="route-row" role="row"><span class="meth">GET</span><span class="pth">/api/incidents</span><span class="desc">JSON. Accepts <code>?lang=</code> and <code>?category=</code>.</span></div>
+      <div class="route-row" role="row"><span class="meth">GET</span><span class="pth">/api/shelters</span><span class="desc">JSON list of shelters with capacity and live occupancy.</span></div>
+      <div class="route-row" role="row"><span class="meth">GET</span><span class="pth">/api/summary</span><span class="desc">AI status summary. Accepts <code>?lang=</code> for native-script output.</span></div>
+      <div class="route-row" role="row"><span class="meth">POST</span><span class="pth">/api/voice/intent</span><span class="desc">Body: <code>{text, lang}</code>. Returns <code>{intent, response}</code>.</span></div>
+      <div class="route-row" role="row"><span class="meth">GET</span><span class="pth">/api/pulse</span><span class="desc">Server-Sent Events stream. Live incident pulse to responder consoles.</span></div>
+      <div class="route-row" role="row"><span class="meth">GET</span><span class="pth">/healthz · /readyz · /version</span><span class="desc">Operational health, readiness probe and build version for Cloud Run.</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PROOF ============ -->
+<section class="proof act" aria-labelledby="proof-h">
+  <div class="frame">
+    <p class="act-num">Act V · Proof</p>
+    <h2 id="proof-h">Live. Already <em>asia-east1.</em></h2>
+
+    <div class="proof-grid">
+      <div class="proof-item">
+        <h3>Live · Cloud Run · asia-east1</h3>
+        <code>localpulse.dmj.one</code>
+        <p>Single container, 512 MiB / 1 vCPU, min instances zero, max two. Public unauthenticated. Custom domain mapped via gcloud beta. Scale-to-zero so a panchayat budget can run it.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Capstone · B.Tech CSE Cloud</h3>
+        <p>Anshuman Mohanty (GF202217744), Yogananda School of AI, Computers and Data Sciences, Shoolini University. Mentor: Mr. Ashish. Full project report at <code>/report</code>.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Strict CSP · HSTS · X-Frame-Options DENY</h3>
+        <p>No PII in logs. AES-256-GCM at rest and TLS 1.3 in transit on production. Structured JSON logs to stdout, picked up by Cloud Logging. Correlation ID per request.</p>
+      </div>
+      <div class="proof-item">
+        <h3>WCAG 2.2 AAA targets</h3>
+        <p>Skip link, focus rings, semantic landmarks, full keyboard nav, prefers-reduced-motion respected, screen-reader labels everywhere. Designed for slow phone, bad internet, small town.</p>
+      </div>
+      <div class="proof-item">
+        <h3>p95 &lt; 200 ms · cold-start &lt; 2 s</h3>
+        <p>~80 KB of JS dependencies after compression. Vanilla JS, Tailwind via CDN, Leaflet for maps. No build step. Deploy is one <code>gcloud run deploy</code> command.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Production-target swap</h3>
+        <p>The MLP ships with mock data in <code>data/*.js</code>. Production swaps in Firestore + Pub/Sub + BigQuery, Twilio Voice, GPT-4o for the summariser. Same routes. Same responder console.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STACK ============ -->
+<section class="stack" aria-labelledby="tech-h">
+  <div class="frame">
+    <p class="act-num">The Stack</p>
+    <h2 id="tech-h" style="font-size:var(--t-xl);font-weight:400;font-family:'Fraunces',serif;font-variation-settings:'opsz' 144,'SOFT' 50;margin:0;letter-spacing:-0.02em;">One Node process. <em>One Cloud Run service.</em> One panchayat.</h2>
+    <ul class="stack-list">
+      <li class="stack-tag">Node.js 20</li>
+      <li class="stack-tag">Express 4</li>
+      <li class="stack-tag">Vanilla JS</li>
+      <li class="stack-tag">Tailwind (CDN)</li>
+      <li class="stack-tag">Leaflet</li>
+      <li class="stack-tag">Web Speech API</li>
+      <li class="stack-tag">Server-Sent Events</li>
+      <li class="stack-tag">Twilio Voice (prod)</li>
+      <li class="stack-tag">Whisper (prod)</li>
+      <li class="stack-tag">GPT-4o (prod)</li>
+      <li class="stack-tag">Firestore (prod)</li>
+      <li class="stack-tag">Pub/Sub (prod)</li>
+      <li class="stack-tag">BigQuery (prod)</li>
+      <li class="stack-tag">Cloud Run · asia-east1</li>
+      <li class="stack-tag">Cloud Logging</li>
+      <li class="stack-tag">MIT License</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ END CTA ============ -->
+<section class="endcta" aria-labelledby="cta-h">
+  <div class="frame">
+    <div>
+      <h2 id="cta-h">If a town of forty thousand can run on it, <em>your civic platform should too.</em></h2>
+      <p>I build civic AI that fits the actual budget, the actual phone, the actual person picking up the receiver. Capstone-grade today, production-grade tomorrow with a one-line config swap. If your town, ward or college needs the same, let's talk.</p>
+    </div>
+    <div class="actions">
+      <a class="btn btn-primary" href="../index.html#hire">Hire me</a>
+      <a class="btn btn-ghost" href="../index.html">Back to catalogue</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="frame">
+    <div>
+      <h2 style="font-family:'Fraunces',serif;font-size:var(--t-xl);margin:0 0 1rem;">dmj<span class="dot">.</span>one</h2>
+      <p>Dream, Manifest and Journey, Together as One.</p>
+      <p class="meta">© 2026 Divya Mohan. LocalPulse is a capstone project by Anshuman Mohanty (GF202217744), B.Tech CSE Cloud Computing, Shoolini University. Mentor: Mr. Ashish. Built for the slow phone, the bad internet, the small town. #AatmanirbharBharat @India2047. MIT License.</p>
+    </div>
+    <div>
+      <p class="meta">Catalogue</p>
+      <p><a href="../index.html#catalogue">All 47 products</a></p>
+      <p><a href="../index.html#cat-bharat">Bharat-First</a></p>
+      <p><a href="../index.html#hire">Hire</a></p>
+    </div>
+    <div>
+      <p class="meta">LocalPulse</p>
+      <p><a href="https://localpulse.dmj.one" rel="noopener">Live dashboard</a></p>
+      <p><a href="https://localpulse.dmj.one/pitch" rel="noopener">Pitch deck</a></p>
+      <p><a href="https://localpulse.dmj.one/report" rel="noopener">Project report</a></p>
+      <p><a href="https://github.com/divyamohan1993/localpulse" rel="noopener">Source</a></p>
+      <p><a href="mailto:contact@dmj.one">contact@dmj.one</a></p>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,721 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1c5d63">
+<meta name="color-scheme" content="light">
+
+<title>WSL Enterprise Manager · Onboard a Windows engineer in fifteen minutes · dmj.one</title>
+<meta name="description" content="A complete WSL management suite for Windows 10/11. One-click install, GUI desktop environments, backup, security hardening, forensic dumps. Onboard a Windows engineer to Linux in fifteen minutes.">
+<meta property="og:title" content="WSL Enterprise Manager · Onboard a Windows engineer in 15 minutes">
+<meta property="og:description" content="One-click WSL with GUI, security hardening, forensic dumps, and dev presets. Aatmanirbhar Bharat initiative.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,30..100&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="../assets/core.css">
+
+<style>
+:root {
+  --accent: var(--c-cloud);
+  --accent-deep: #0e3d42;
+  --winblue: #0078d4;
+  --tux: #1a1d1f;
+}
+body { background: var(--paper); }
+
+/* ====== HERO · split-OS ================================== */
+.wsl-hero {
+  position: relative;
+  padding-block: clamp(3rem, 5vw + 1rem, 6rem) clamp(2rem, 4vw, 4rem);
+  border-bottom: var(--hair);
+  background: var(--paper);
+  overflow: hidden;
+}
+.wsl-hero .frame { position: relative; z-index: 2; }
+
+.crumbs {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs); letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink-mute); margin: 0 0 2rem;
+  display: flex; gap: 0.5rem; flex-wrap: wrap;
+}
+.crumbs a { border-bottom: 1px solid var(--ink-mute); padding-bottom: 1px; }
+.crumbs a:hover { color: var(--accent); border-color: var(--accent); }
+.crumbs span { color: var(--accent); }
+
+.wsl-eyebrow {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  padding: 0.4rem 0.85rem;
+  border: 1px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  color: var(--accent-deep);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs); font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.16em;
+  margin-bottom: 1.5rem;
+}
+.wsl-eyebrow::before {
+  content: ""; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+.wsl-hero h1 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-3xl); font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 30;
+  letter-spacing: -0.03em; line-height: 0.96;
+  margin: 0; max-width: 16ch;
+}
+.wsl-hero h1 em {
+  font-style: italic; color: var(--accent);
+  font-variation-settings: "opsz" 144, "SOFT" 100;
+}
+.wsl-hero .lede {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md); font-weight: 300;
+  line-height: 1.45; color: var(--ink-soft);
+  margin: 1.5rem 0 0; max-width: 56ch;
+}
+.wsl-hero .lede strong {
+  font-weight: 600; color: var(--ink);
+  background: linear-gradient(180deg, transparent 60%, color-mix(in srgb, var(--accent) 25%, transparent) 60%);
+  padding: 0 0.1em;
+}
+
+/* alpha banner */
+.alpha-banner {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  padding: 0.4rem 0.85rem;
+  background: var(--paper-soft);
+  border: 1px dashed var(--signal);
+  color: var(--signal);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs); font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.14em;
+  margin-bottom: 1.5rem;
+}
+.alpha-banner::before {
+  content: "!"; width: 1.2rem; height: 1.2rem;
+  background: var(--signal); color: white;
+  display: inline-grid; place-items: center;
+  border-radius: 50%; font-weight: 700;
+  font-size: 0.75rem; line-height: 1;
+}
+
+/* split mockup window */
+.split-window {
+  margin-top: 2.5rem;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  box-shadow: 8px 8px 0 var(--ink);
+  overflow: hidden;
+}
+.win-bar {
+  background: var(--winblue);
+  color: white;
+  padding: 0.5rem 0.85rem;
+  font-family: 'Atkinson Hyperlegible', sans-serif;
+  font-size: 0.78rem;
+  display: flex; align-items: center; justify-content: space-between;
+  letter-spacing: 0.04em;
+}
+.win-bar .ttl { font-weight: 700; }
+.win-bar .ctrls {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  letter-spacing: 0.2em;
+  opacity: 0.85;
+}
+.win-body {
+  display: grid;
+  grid-template-columns: 1fr;
+  min-height: 220px;
+}
+@media (min-width: 720px) {
+  .win-body { grid-template-columns: 1fr 1fr; }
+}
+.win-pane {
+  padding: 1.25rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  line-height: 1.55;
+  position: relative;
+}
+.win-pane.windows {
+  background: linear-gradient(180deg, #f5f7fa, #eaeef3);
+  color: #1a1d1f;
+  border-right: 1px solid var(--ink);
+}
+.win-pane.linux {
+  background: #0f1112;
+  color: #d0e8e9;
+}
+.win-pane .pane-label {
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.win-pane .pane-label .dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  display: inline-block;
+}
+.win-pane.windows .pane-label { color: var(--winblue); }
+.win-pane.windows .pane-label .dot { background: var(--winblue); }
+.win-pane.linux .pane-label { color: #6fb6ba; }
+.win-pane.linux .pane-label .dot { background: #6fb6ba; }
+.win-pane .row { padding: 0.15rem 0; }
+.win-pane.windows .arrow { color: var(--winblue); font-weight: 700; }
+.win-pane.windows .ok { color: #2d7a47; font-weight: 700; }
+.win-pane.linux .prompt { color: #6fb6ba; }
+.win-pane.linux .ok { color: #87d3a2; }
+.win-pane.linux .mute { color: #6d8788; }
+.win-pane.linux .accent { color: #ffd06f; }
+
+.bridge {
+  text-align: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  padding: 0.5rem;
+  background: var(--paper-soft);
+  border-top: 1px solid var(--ink);
+  border-bottom: 1px solid var(--ink);
+}
+
+.wsl-cta-row {
+  margin-top: 2.5rem;
+  display: flex; gap: 0.75rem; flex-wrap: wrap;
+}
+.btn {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.7rem 1.1rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs); text-transform: uppercase;
+  letter-spacing: 0.14em; font-weight: 700;
+  border: 1px solid var(--ink);
+  transition: background .15s, color .15s, transform .15s, box-shadow .15s;
+}
+.btn:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--ink); }
+.btn-primary { background: var(--accent); color: white; border-color: var(--accent); }
+.btn-primary:hover { box-shadow: 4px 4px 0 var(--ink); }
+.btn-ghost { background: transparent; color: var(--ink); }
+
+/* ====== STATS ============================================ */
+.wsl-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  background: var(--ink); color: var(--paper);
+  border-block: 2px solid var(--ink);
+}
+.wsl-stat {
+  padding: 1.5rem clamp(1rem, 2vw, 1.5rem);
+  border-right: 1px solid color-mix(in srgb, var(--paper) 20%, transparent);
+}
+.wsl-stat:last-child { border-right: 0; }
+.wsl-stat .num {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl); font-weight: 400;
+  letter-spacing: -0.04em;
+  font-variation-settings: "opsz" 144, "SOFT" 30;
+  display: block; line-height: 1;
+  color: var(--accent);
+}
+.wsl-stat .lbl {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.14em;
+  margin-top: 0.6rem; display: block;
+  color: color-mix(in srgb, var(--paper) 75%, transparent);
+}
+
+/* ====== ACTS ============================================= */
+.act {
+  padding-block: clamp(3rem, 5vw, 5rem);
+  border-bottom: var(--hair);
+}
+.act-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs); letter-spacing: 0.22em;
+  text-transform: uppercase; color: var(--accent);
+  font-weight: 700; margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 1rem;
+}
+.act-num::before { content: ""; width: 2.5rem; height: 1px; background: var(--accent); }
+.act h2 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl); font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 50;
+  letter-spacing: -0.025em; line-height: 1.05;
+  margin: 0 0 1.5rem; max-width: 22ch;
+}
+.act h2 em { font-style: italic; color: var(--accent); }
+.act-lede {
+  font-family: 'Fraunces', serif; font-size: var(--t-md);
+  color: var(--ink-soft); max-width: 60ch; margin: 0 0 2rem;
+}
+
+/* problem */
+.pains {
+  display: grid; gap: 0;
+  margin-top: 2rem;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { .pains { grid-template-columns: repeat(2, 1fr); } }
+.pain {
+  padding: 1.5rem;
+  border-right: 1px solid var(--paper-edge);
+  border-bottom: 1px solid var(--paper-edge);
+}
+@media (min-width: 760px) {
+  .pain:nth-child(2n) { border-right: 0; }
+  .pain:nth-last-child(-n+2) { border-bottom: 0; }
+}
+.pain .axis {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.16em;
+  color: var(--signal); font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+.pain h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.15rem; font-weight: 500;
+  margin: 0 0 0.5rem; letter-spacing: -0.01em;
+}
+.pain p { margin: 0; color: var(--ink-soft); font-size: var(--t-sm); }
+
+/* menu numbered list */
+.menu-tbl {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 2rem;
+  background: var(--paper);
+  border: 1px solid var(--ink);
+}
+.menu-tbl td {
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid var(--paper-edge);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.82rem;
+  vertical-align: top;
+}
+.menu-tbl tr:last-child td { border-bottom: 0; }
+.menu-tbl .opt {
+  background: var(--accent);
+  color: white;
+  font-weight: 700;
+  width: 3.5rem;
+  text-align: center;
+  letter-spacing: 0.04em;
+}
+.menu-tbl .name {
+  font-weight: 700;
+  color: var(--ink);
+  width: 18rem;
+}
+.menu-tbl .desc {
+  color: var(--ink-soft);
+}
+
+/* presets */
+.presets {
+  display: grid; gap: 0;
+  margin-top: 2rem;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { .presets { grid-template-columns: repeat(3, 1fr); } }
+.preset {
+  padding: 1.25rem 1.5rem;
+  border-right: 1px solid var(--paper-edge);
+  border-bottom: 1px solid var(--paper-edge);
+}
+@media (min-width: 760px) {
+  .preset:nth-child(3n) { border-right: 0; }
+}
+.preset .pn {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--accent); font-weight: 700;
+  margin-bottom: 0.4rem;
+}
+.preset h4 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.1rem; font-weight: 500;
+  margin: 0 0 0.4rem;
+}
+.preset p { margin: 0; color: var(--ink-soft); font-size: var(--t-sm); }
+
+/* forensics list */
+.forensics {
+  margin-top: 2rem;
+  border-top: 2px solid var(--accent);
+  border-bottom: 2px solid var(--accent);
+  background: var(--paper);
+}
+.f-row {
+  display: grid;
+  grid-template-columns: 12rem 1fr;
+  gap: 1.5rem;
+  padding: 0.85rem 0;
+  border-bottom: var(--hair-soft);
+  align-items: baseline;
+}
+.f-row:last-child { border-bottom: 0; }
+.f-row .cat {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--accent-deep); font-weight: 700;
+}
+.f-row .what { font-size: var(--t-sm); color: var(--ink-soft); }
+@media (max-width: 600px) {
+  .f-row { grid-template-columns: 1fr; gap: 0.4rem; }
+}
+
+/* proof */
+.proof-act {
+  background: var(--ink); color: var(--paper);
+  position: relative; overflow: hidden;
+}
+.proof-act::before {
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 80% 20%, color-mix(in srgb, var(--accent) 30%, transparent), transparent 60%);
+  pointer-events: none;
+}
+.proof-act .frame { position: relative; }
+.proof-act h2 { color: var(--paper); }
+.proof-act h2 em { color: var(--accent); }
+.proof-grid {
+  display: grid; gap: 1rem; margin-top: 2rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { .proof-grid { grid-template-columns: repeat(2, 1fr); } }
+.proof-item {
+  border: 1px solid color-mix(in srgb, var(--paper) 30%, transparent);
+  padding: 1.5rem;
+  background: color-mix(in srgb, var(--paper) 5%, transparent);
+}
+.proof-item h3 {
+  font-family: 'Fraunces', serif;
+  margin: 0 0 0.5rem; font-size: var(--t-md);
+  color: var(--accent); font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.proof-item p { margin: 0; color: color-mix(in srgb, var(--paper) 80%, transparent); font-size: var(--t-sm); }
+
+/* stack */
+.stack-list {
+  display: flex; flex-wrap: wrap; gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+.stack-tag {
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--ink);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.14em;
+  font-weight: 600;
+}
+
+/* end cta */
+.endcta {
+  padding-block: clamp(3rem, 5vw, 5rem);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 10%, transparent), var(--paper));
+}
+.endcta .frame { display: grid; gap: 2rem; grid-template-columns: 1fr; }
+@media (min-width: 760px) { .endcta .frame { grid-template-columns: 2fr 1fr; align-items: end; } }
+.endcta h2 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl); font-weight: 300;
+  font-variation-settings: "opsz" 144, "SOFT" 100;
+  margin: 0 0 1rem; letter-spacing: -0.025em; line-height: 1.05;
+}
+.endcta h2 em {
+  font-style: italic; color: var(--accent);
+  background: linear-gradient(180deg, transparent 70%, color-mix(in srgb, var(--accent) 25%, transparent) 70%);
+}
+.endcta p { color: var(--ink-soft); margin: 0; max-width: 50ch; }
+.endcta .actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+
+.foot { background: var(--ink); color: var(--paper); }
+.foot .dot { color: var(--accent); }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topnav">
+  <div class="frame">
+    <div class="brand"><a href="../index.html">dmj<span class="dot">.</span>one</a></div>
+    <nav aria-label="Primary">
+      <ul>
+        <li><a href="../index.html#catalogue">Catalogue</a></li>
+        <li><a href="../index.html#manifesto">Manifesto</a></li>
+        <li><a href="../index.html#hire">Hire</a></li>
+        <li><a href="https://github.com/divyamohan1993/wsl-enterprise-manager" rel="noopener">GitHub</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ======= HERO ======= -->
+<section class="wsl-hero">
+  <div class="frame">
+    <p class="crumbs">
+      <a href="../index.html">Catalogue</a> /
+      <a href="../index.html#cat-cloud">Cloud and Infra</a> /
+      <span>WSL Enterprise Manager</span>
+    </p>
+
+    <span class="wsl-eyebrow">Aatmanirbhar Bharat · Public welfare</span>
+    <span class="alpha-banner" role="status">Status: alpha · v2.0 · in active development</span>
+
+    <h1>Onboard a Windows engineer to <em>Linux</em>, in fifteen minutes.</h1>
+
+    <p class="lede">
+      Enterprise IT bans Linux laptops. Engineers fight WSL setup for a week. Most give up and ship Windows-flavoured bugs from the wrong shell. <strong>WSL Enterprise Manager</strong> is the suite that gets a fresh Windows machine to a working Ubuntu, with a desktop environment if needed, a hardened SSH, a Docker setup and a backup plan, before the new engineer's first stand-up ends.
+    </p>
+
+    <!-- split window mockup -->
+    <div class="split-window" role="img" aria-label="Mockup: a single Windows window split into a Windows pane on the left and a Linux pane on the right, demonstrating WSL bridging the two">
+      <div class="win-bar">
+        <span class="ttl">wsl-manager.bat · WSL Enterprise Manager v2.0</span>
+        <span class="ctrls">_ □ ✕</span>
+      </div>
+      <div class="win-body">
+        <div class="win-pane windows">
+          <p class="pane-label"><span class="dot"></span>Windows · cmd · admin</p>
+          <p class="row"><span class="arrow">&gt;</span> wsl-manager.bat</p>
+          <p class="row">&nbsp;</p>
+          <p class="row">[1] Quick Install (GUI / Headless)</p>
+          <p class="row">[2] List All Installations</p>
+          <p class="row">[9] GUI Environments</p>
+          <p class="row">[11] Security Hardening</p>
+          <p class="row">[12] Resource Monitor</p>
+          <p class="row">&nbsp;</p>
+          <p class="row"><span class="arrow">&gt;</span> 1 <span class="ok">// quick install</span></p>
+          <p class="row">Enabling WSL feature... <span class="ok">ok</span></p>
+          <p class="row">Enabling VM Platform... <span class="ok">ok</span></p>
+          <p class="row">Setting WSL 2 default... <span class="ok">ok</span></p>
+          <p class="row">Installing Ubuntu... <span class="ok">ok</span></p>
+        </div>
+        <div class="win-pane linux">
+          <p class="pane-label"><span class="dot"></span>Ubuntu via WSL · /home/eng</p>
+          <p class="row"><span class="prompt">eng@dev:~$</span> uname -a</p>
+          <p class="row"><span class="mute">Linux dev 5.15 ... GNU/Linux</span></p>
+          <p class="row"><span class="prompt">eng@dev:~$</span> bash gui-setup.sh xfce</p>
+          <p class="row"><span class="ok">+ XFCE installed</span></p>
+          <p class="row"><span class="ok">+ x11 / wayland ready</span></p>
+          <p class="row"><span class="prompt">eng@dev:~$</span> bash devops-setup.sh</p>
+          <p class="row"><span class="ok">+ docker, kubectl, helm</span></p>
+          <p class="row"><span class="ok">+ terraform, ansible</span></p>
+          <p class="row"><span class="prompt">eng@dev:~$</span> bash server-setup.sh harden</p>
+          <p class="row"><span class="ok">+ ufw, fail2ban, ssh-hardened</span></p>
+          <p class="row"><span class="prompt">eng@dev:~$</span> <span class="accent">ready in 14m 22s</span></p>
+        </div>
+      </div>
+      <p class="bridge">· WSL bridge ·</p>
+    </div>
+
+    <div class="wsl-cta-row">
+      <a class="btn btn-primary" href="https://github.com/divyamohan1993/wsl-enterprise-manager" rel="noopener">View source</a>
+      <a class="btn btn-ghost" href="#menu">The menu</a>
+      <a class="btn btn-ghost" href="#forensics">Forensic dump</a>
+    </div>
+  </div>
+</section>
+
+<!-- ======= STATS ======= -->
+<section class="wsl-stats" aria-label="At a glance">
+  <div class="wsl-stat"><span class="num">~15m</span><span class="lbl">Windows engineer onboarded to Linux</span></div>
+  <div class="wsl-stat"><span class="num">7+</span><span class="lbl">Distros · Ubuntu, Debian, Kali, Fedora, Alpine, Arch...</span></div>
+  <div class="wsl-stat"><span class="num">6</span><span class="lbl">Desktops · GNOME, KDE, XFCE, LXQt, MATE, Cinnamon</span></div>
+  <div class="wsl-stat"><span class="num">5</span><span class="lbl">Dev presets · web, data, devops, sys, java</span></div>
+  <div class="wsl-stat"><span class="num">11</span><span class="lbl">Forensic categories on uninstall</span></div>
+</section>
+
+<!-- ======= ACT I · PROBLEM ======= -->
+<section class="act" aria-labelledby="prob-h">
+  <div class="frame">
+    <p class="act-num">Act I · The Problem</p>
+    <h2 id="prob-h">The shell is Windows. <em>The world is Linux.</em></h2>
+    <p class="act-lede">Most production runs Linux. Most engineers in Indian enterprises are issued Windows laptops. WSL is the bridge. WSL setup is the pothole. New engineers spend their first week fighting it instead of writing code.</p>
+
+    <div class="pains">
+      <div class="pain"><p class="axis">Pain 01</p><h3>Setup-by-screenshot.</h3><p>Enable feature, enable VM platform, set WSL 2, install distro, restart, restart again. Eight steps. One missed flag and the whole thing silently breaks.</p></div>
+      <div class="pain"><p class="axis">Pain 02</p><h3>"GUI in WSL" is folklore.</h3><p>WSLg, X server, VcXsrv, GWSL, DISPLAY, Wayland. Most engineers settle for headless because the desktop story is opaque. They never get a real Linux experience.</p></div>
+      <div class="pain"><p class="axis">Pain 03</p><h3>Backup, security, networking are nobody's job.</h3><p>WSL ships without UFW configuration, without scheduled exports, without port-forwarding scripts, without VHD compaction. The engineer hits each problem alone, the night before a release.</p></div>
+      <div class="pain"><p class="axis">Pain 04</p><h3>Uninstall leaves no record.</h3><p>An engineer leaves, a distro is destroyed, the auditor asks what was in it. Nobody knows. WSL has no native forensic dump.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ======= ACT II · MENU ======= -->
+<section class="act" id="menu" style="background: linear-gradient(180deg, var(--paper-soft), var(--paper));" aria-labelledby="menu-h">
+  <div class="frame">
+    <p class="act-num">Act II · The Manager</p>
+    <h2 id="menu-h">One menu. <em>Sixteen options.</em></h2>
+    <p class="act-lede">Every WSL operation an enterprise IT team needs is one number away. The same script that quick-installs Ubuntu also configures global <code>.wslconfig</code>, sets up SSH, compacts the VHD, schedules backups and runs a forensic dump before destruction.</p>
+
+    <table class="menu-tbl" aria-label="WSL Enterprise Manager main menu">
+      <tbody>
+        <tr><td class="opt">[1]</td><td class="name">Quick Install</td><td class="desc">GUI or headless · pick OS and installation type</td></tr>
+        <tr><td class="opt">[2]</td><td class="name">List Installations</td><td class="desc">Installed and available distributions</td></tr>
+        <tr><td class="opt">[3]</td><td class="name">Advanced Install</td><td class="desc">Custom paths, cloning, presets</td></tr>
+        <tr><td class="opt">[4]</td><td class="name">Manage Existing</td><td class="desc">Start, stop, configure distributions</td></tr>
+        <tr><td class="opt">[5]</td><td class="name">Backup &amp; Export</td><td class="desc">Single distro or all-at-once, scheduled</td></tr>
+        <tr><td class="opt">[6]</td><td class="name">Import &amp; Restore</td><td class="desc">Restore a backup as a fresh distro</td></tr>
+        <tr><td class="opt">[7]</td><td class="name">Uninstall &amp; Cleanup</td><td class="desc">Forensic dump first, then destroy</td></tr>
+        <tr><td class="opt">[8]</td><td class="name">Update All</td><td class="desc">Update every installed distribution</td></tr>
+        <tr><td class="opt">[9]</td><td class="name">GUI Environments</td><td class="desc">GNOME · KDE · XFCE · LXQt · MATE · Cinnamon</td></tr>
+        <tr><td class="opt">[10]</td><td class="name">Docker Integration</td><td class="desc">Container setup, Desktop integration</td></tr>
+        <tr><td class="opt">[11]</td><td class="name">Security Hardening</td><td class="desc">UFW, Fail2Ban, SSH hardening, audit tools</td></tr>
+        <tr><td class="opt">[12]</td><td class="name">Resource Monitor</td><td class="desc">Real-time CPU, memory, disk</td></tr>
+        <tr><td class="opt">[13]</td><td class="name">Global Settings</td><td class="desc">Edit <code>.wslconfig</code> safely</td></tr>
+        <tr><td class="opt">[14]</td><td class="name">Network</td><td class="desc">Port forwarding, DNS, SSH access</td></tr>
+        <tr><td class="opt">[15]</td><td class="name">Storage</td><td class="desc">VHD compact, resize, relocation</td></tr>
+        <tr><td class="opt">[16]</td><td class="name">View Logs</td><td class="desc">Operation history, timestamped</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ======= ACT III · PRESETS ======= -->
+<section class="act" aria-labelledby="preset-h">
+  <div class="frame">
+    <p class="act-num">Act III · The Presets</p>
+    <h2 id="preset-h">Five days of <em>"sudo apt install"</em>, prepacked.</h2>
+    <p class="act-lede">Pick the kind of engineer. The preset installs the entire toolchain. Engineer is at <em>day-2</em> productivity by lunch.</p>
+
+    <div class="presets">
+      <div class="preset"><p class="pn">Preset 01</p><h4>Full Stack Web</h4><p>Node.js, npm, Python, Docker, PostgreSQL, Redis.</p></div>
+      <div class="preset"><p class="pn">Preset 02</p><h4>Python &amp; Data Science</h4><p>Python, pip, Jupyter, NumPy, Pandas, Matplotlib.</p></div>
+      <div class="preset"><p class="pn">Preset 03</p><h4>DevOps &amp; SRE</h4><p>Docker, kubectl, Helm, Terraform, Ansible, AWS / Azure CLIs.</p></div>
+      <div class="preset"><p class="pn">Preset 04</p><h4>System Programming</h4><p>GCC, G++, CMake, Rust, Go, GDB.</p></div>
+      <div class="preset"><p class="pn">Preset 05</p><h4>Java Enterprise</h4><p>OpenJDK 17, Maven, Gradle.</p></div>
+      <div class="preset"><p class="pn">Preset 06</p><h4>Server Hardening</h4><p>UFW, Fail2Ban, SSH key-only, automatic security updates.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ======= ACT IV · FORENSICS ======= -->
+<section class="act" id="forensics" aria-labelledby="forensic-h">
+  <div class="frame">
+    <p class="act-num">Act IV · Audit-grade exit</p>
+    <h2 id="forensic-h">Before the distro <em>dies,</em> it tells you everything.</h2>
+    <p class="act-lede">When the destructor runs, it dumps eleven categories of forensic data into <code>forensics/{distro}_forensic_{YYYYMMDD_HHMMSS}.txt</code> first. Then deletes. Auditor never has to ask.</p>
+
+    <div class="forensics">
+      <div class="f-row"><span class="cat">Host system</span><span class="what">Computer name, Windows version, system specs, user info.</span></div>
+      <div class="f-row"><span class="cat">WSL environment</span><span class="what">WSL version, all distributions, status.</span></div>
+      <div class="f-row"><span class="cat">Users</span><span class="what">/etc/passwd, /etc/group, sudo users, login history.</span></div>
+      <div class="f-row"><span class="cat">Shell history</span><span class="what">Bash and Zsh history for root and regular users.</span></div>
+      <div class="f-row"><span class="cat">Packages</span><span class="what">APT, RPM, Snap, Pip, NPM packages.</span></div>
+      <div class="f-row"><span class="cat">Network</span><span class="what">Interfaces, routes, DNS, hosts, open ports, connections.</span></div>
+      <div class="f-row"><span class="cat">Filesystem</span><span class="what">Disk usage, mounts, recent files.</span></div>
+      <div class="f-row"><span class="cat">Security</span><span class="what">SSH config, authorized keys, firewall rules, SUID files.</span></div>
+      <div class="f-row"><span class="cat">Docker</span><span class="what">Containers, images.</span></div>
+      <div class="f-row"><span class="cat">Services</span><span class="what">Enabled and running systemd services.</span></div>
+      <div class="f-row"><span class="cat">Logs</span><span class="what">Auth logs (last 100 lines), syslog (last 50 lines).</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ======= ACT V · STACK ======= -->
+<section class="act" aria-labelledby="stack-h">
+  <div class="frame">
+    <p class="act-num">Act V · The Stack</p>
+    <h2 id="stack-h">What is inside.</h2>
+    <ul class="stack-list">
+      <li class="stack-tag">Windows Batch</li>
+      <li class="stack-tag">PowerShell</li>
+      <li class="stack-tag">Bash</li>
+      <li class="stack-tag">WSL 2</li>
+      <li class="stack-tag">WSLg</li>
+      <li class="stack-tag">Ubuntu / Debian / Kali / Fedora / Alpine / Arch</li>
+      <li class="stack-tag">GNOME / KDE / XFCE / LXQt / MATE / Cinnamon</li>
+      <li class="stack-tag">UFW + Fail2Ban</li>
+      <li class="stack-tag">Docker</li>
+      <li class="stack-tag">systemd</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ======= PROOF ======= -->
+<section class="proof-act act" aria-labelledby="proof-h">
+  <div class="frame">
+    <p class="act-num">Act VI · Proof &amp; Honesty</p>
+    <h2 id="proof-h">Open source. <em>Honest about alpha.</em></h2>
+    <div class="proof-grid">
+      <div class="proof-item">
+        <h3>Source · divyamohan1993/wsl-enterprise-manager</h3>
+        <p>Public source. Sixteen menu options, six desktop environments, six dev presets. README walks through every script and every wslconfig knob.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Aatmanirbhar Bharat initiative</h3>
+        <p>Built and maintained as a public-welfare effort by dmj.one. MIT licensed. Free to use inside any Indian enterprise that has banned Linux laptops but cannot ban Linux engineering.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Reads as 11 forensic categories on exit</h3>
+        <p>Every uninstall produces a timestamped forensic dump in <code>forensics/</code> before deleting. Auditor-ready, attacker-uncomfortable.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Status: alpha · 80%+ functions failing today</h3>
+        <p>The README opens with a clear ALPHA banner. This is the honest state of v2.0. The architecture, scripts and onboarding flow are real and worth showing. Expect rough edges. File issues.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======= END CTA ======= -->
+<section class="endcta" aria-labelledby="cta-h">
+  <div class="frame">
+    <div>
+      <h2 id="cta-h">Want to onboard a Windows team to Linux <em>without losing the week?</em></h2>
+      <p>I build internal-developer-platform tooling for Indian enterprises. Honest about state, friendly to IT, kind to the new engineer on day one.</p>
+    </div>
+    <div class="actions">
+      <a class="btn btn-primary" href="../index.html#hire">Hire me</a>
+      <a class="btn btn-ghost" href="../index.html">Back to catalogue</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="frame">
+    <div>
+      <h2 style="font-family:'Fraunces',serif;font-size:var(--t-xl);margin:0 0 1rem;">dmj<span class="dot">.</span>one</h2>
+      <p>Dream, Manifest and Journey, Together as One.</p>
+      <p class="meta">© 2026 Divya Mohan. WSL Enterprise Manager v2.0 · an Aatmanirbhar Bharat public-welfare initiative by dmj.one. MIT licensed. Status: alpha. Read the README before relying on this in production.</p>
+    </div>
+    <div>
+      <p class="meta">Catalogue</p>
+      <p><a href="../index.html#catalogue">All 47 products</a></p>
+      <p><a href="../index.html#cat-cloud">Cloud and Infra</a></p>
+      <p><a href="../index.html#hire">Hire</a></p>
+    </div>
+    <div>
+      <p class="meta">WSL Enterprise Manager</p>
+      <p><a href="https://github.com/divyamohan1993/wsl-enterprise-manager" rel="noopener">Source</a></p>
+      <p><a href="mailto:contact@dmj.one">contact@dmj.one</a></p>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

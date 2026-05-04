@@ -1,0 +1,675 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#7a2c5e">
+<meta name="color-scheme" content="light">
+
+<title>AgentTrust SDK · Five lines of Python. OWASP ASI07 solved · dmj.one</title>
+<meta name="description" content="A budget-aware inter-agent trust verification and compliance audit SDK for the Claude Agent SDK. Risk-Proportional Verification with under 50ms median overhead. India DPDP and IT Rules templates included.">
+<meta property="og:title" content="AgentTrust · The trust SDK for multi-agent systems">
+<meta property="og:description" content="OWASP ASI07 reference implementation. Five lines to integrate. 70-80% of actions resolve at policy-only check.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,30..100&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="../assets/core.css">
+
+<style>
+:root {
+  --accent: var(--c-ai);
+  --accent-deep: #4f1a3d;
+  --code-bg: #1a1217;
+  --code-fg: #f3eee3;
+  --code-mute: #a08494;
+  --code-key: #f8c8a8;
+  --code-str: #c8e0b8;
+  --code-cmt: #6e5a66;
+  --code-acc: #e89cce;
+}
+body { background: var(--paper); }
+
+/* ====== HERO · TERMINAL FOREGROUND ============ */
+.at-hero {
+  position: relative;
+  padding-block: clamp(3rem, 5vw, 5rem) 0;
+  border-bottom: var(--hair);
+  background: var(--paper);
+}
+.crumbs {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink-mute);
+  margin: 0 0 2rem;
+  display: flex; gap: 0.5rem; flex-wrap: wrap;
+}
+.crumbs a { border-bottom: 1px solid var(--ink-mute); padding-bottom: 1px; }
+.crumbs a:hover { color: var(--accent); border-color: var(--accent); }
+.crumbs span { color: var(--accent); }
+
+.at-eyebrow {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  padding: 0.4rem 0.85rem;
+  border: 1px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  color: var(--accent-deep);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  margin-bottom: 1.5rem;
+}
+.at-eyebrow::before {
+  content: ""; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+.at-hero-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2.5rem;
+  align-items: end;
+}
+@media (min-width: 1000px) {
+  .at-hero-grid { grid-template-columns: 1.05fr 1fr; gap: 3.5rem; }
+}
+
+.at-hero h1 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-3xl);
+  font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 30, "WONK" 1;
+  letter-spacing: -0.03em;
+  line-height: 0.94;
+  margin: 0;
+  max-width: 13ch;
+}
+.at-hero h1 em {
+  font-style: italic;
+  color: var(--accent);
+  font-variation-settings: "opsz" 144, "SOFT" 100, "WONK" 1;
+}
+.at-hero .lede {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md);
+  font-weight: 300;
+  line-height: 1.45;
+  color: var(--ink-soft);
+  margin: 1.75rem 0 0;
+  max-width: 50ch;
+}
+.at-hero .lede strong {
+  font-weight: 600;
+  background: linear-gradient(180deg, transparent 60%, color-mix(in srgb, var(--accent) 30%, transparent) 60%);
+  padding: 0 0.1em;
+  color: var(--ink);
+}
+
+.cta-row {
+  margin-top: 1.75rem;
+  display: flex; gap: 0.75rem; flex-wrap: wrap;
+}
+.btn {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.7rem 1.1rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 700;
+  border: 1px solid var(--ink);
+  transition: background .15s, color .15s, transform .15s, box-shadow .15s;
+}
+.btn:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--ink); }
+.btn-primary { background: var(--accent); color: white; border-color: var(--accent); }
+.btn-ghost { background: transparent; color: var(--ink); }
+
+/* ====== CODE PANE ============ */
+.codepane {
+  background: var(--code-bg);
+  color: var(--code-fg);
+  border: 1px solid var(--ink);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.84rem;
+  line-height: 1.6;
+  position: relative;
+  box-shadow: 8px 8px 0 var(--accent);
+}
+.codepane .filebar {
+  display: flex; align-items: center; gap: 0.6rem;
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--code-fg) 15%, transparent);
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--code-mute);
+  font-weight: 700;
+}
+.codepane .filebar::before {
+  content: "";
+  width: 9px; height: 9px; border-radius: 50%;
+  background: #e85a5a;
+  box-shadow: 14px 0 0 #e8c75a, 28px 0 0 #5ae87a;
+  margin-right: 30px;
+}
+.codepane pre {
+  margin: 0;
+  padding: 1rem 1.25rem;
+  overflow-x: auto;
+  white-space: pre;
+}
+.tk-key { color: var(--code-key); }
+.tk-str { color: var(--code-str); }
+.tk-cmt { color: var(--code-cmt); font-style: italic; }
+.tk-fn  { color: var(--code-acc); }
+.tk-num { color: #f8c8a8; }
+.tk-cls { color: #b8c8f8; }
+
+.diag-bar {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  margin-top: 0.75rem;
+  padding: 0.4rem 0.7rem;
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+  color: var(--accent-deep);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  border: 1px solid var(--accent);
+}
+
+/* ====== STATS ============ */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  background: var(--ink);
+  color: var(--paper);
+  border-block: 2px solid var(--ink);
+  margin-top: 3.5rem;
+}
+.stat {
+  padding: 1.5rem clamp(1rem, 2vw, 1.5rem);
+  border-right: 1px solid color-mix(in srgb, var(--paper) 20%, transparent);
+}
+.stat:last-child { border-right: 0; }
+.stat .num {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  font-variation-settings: "opsz" 144, "SOFT" 30;
+  display: block; line-height: 1; color: var(--accent);
+}
+.stat .lbl {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  margin-top: 0.6rem; display: block;
+  color: color-mix(in srgb, var(--paper) 75%, transparent);
+}
+
+/* ====== ACT ============ */
+.act {
+  padding-block: clamp(3rem, 5vw, 5rem);
+  border-bottom: var(--hair);
+}
+.act-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 700;
+  margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 1rem;
+}
+.act-num::before { content: ""; width: 2.5rem; height: 1px; background: var(--accent); }
+.act h2 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 50, "WONK" 1;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+  margin: 0 0 1.5rem;
+  max-width: 22ch;
+}
+.act h2 em { font-style: italic; color: var(--accent); }
+
+/* ====== CASUALTY LIST ============ */
+.disasters {
+  display: grid; gap: 0;
+  grid-template-columns: 1fr;
+  margin-top: 2rem;
+  border: 1px solid var(--ink);
+}
+.disaster {
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--paper-edge);
+  background: var(--paper);
+  display: grid;
+  gap: 0.5rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) {
+  .disaster { grid-template-columns: 8rem 1fr; gap: 2rem; }
+}
+.disaster:last-child { border-bottom: 0; }
+.disaster .who {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 700;
+  color: var(--accent-deep);
+}
+.disaster .what {
+  font-family: 'Fraunces', serif;
+  font-size: 1.1rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  margin: 0;
+  line-height: 1.35;
+}
+.disaster .what b { color: var(--ink); }
+
+/* ====== TIER TABLE ============ */
+.tiers {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 2rem;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  font-size: var(--t-sm);
+}
+.tiers th, .tiers td {
+  padding: 0.85rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--paper-edge);
+}
+.tiers thead th {
+  background: var(--ink);
+  color: var(--paper);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 700;
+  border-bottom: 0;
+}
+.tiers tbody tr:last-child td { border-bottom: 0; }
+.tiers .vis {
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--accent);
+  font-weight: 700;
+}
+.tiers .lat {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+}
+
+/* ====== AUDIT LOG ============ */
+.audit {
+  font-family: 'JetBrains Mono', monospace;
+  background: var(--code-bg);
+  color: var(--code-fg);
+  border: 1px solid var(--ink);
+  margin-top: 2rem;
+  font-size: 0.8rem;
+  line-height: 1.65;
+  overflow-x: auto;
+}
+.audit .alabel {
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--code-fg) 15%, transparent);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--code-mute);
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+.audit pre { margin: 0; padding: 1rem 1.25rem; white-space: pre; }
+
+/* ====== POLICY GRID ============ */
+.pgrid {
+  display: grid; gap: 0;
+  grid-template-columns: 1fr;
+  margin-top: 2rem;
+  border: 1px solid var(--ink);
+}
+@media (min-width: 760px) { .pgrid { grid-template-columns: repeat(2, 1fr); } }
+.pol {
+  padding: 1.25rem 1.5rem;
+  border-right: 1px solid var(--paper-edge);
+  border-bottom: 1px solid var(--paper-edge);
+  background: var(--paper);
+}
+@media (min-width: 760px) {
+  .pol:nth-child(2n) { border-right: 0; }
+  .pol:nth-last-child(-n+2) { border-bottom: 0; }
+}
+.pol .fname {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  color: var(--accent);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.35rem;
+}
+.pol h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.15rem;
+  font-weight: 500;
+  margin: 0 0 0.4rem;
+  letter-spacing: -0.01em;
+}
+.pol p { margin: 0; font-size: var(--t-sm); color: var(--ink-soft); }
+
+/* ====== END CTA ============ */
+.endcta {
+  padding-block: clamp(3rem, 5vw, 5rem);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 10%, transparent), var(--paper));
+}
+.endcta .frame { display: grid; gap: 2rem; grid-template-columns: 1fr; }
+@media (min-width: 760px) { .endcta .frame { grid-template-columns: 2fr 1fr; align-items: end; } }
+.endcta h2 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 300;
+  font-variation-settings: "opsz" 144, "SOFT" 100;
+  margin: 0 0 1rem;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+}
+.endcta h2 em {
+  font-style: italic;
+  color: var(--accent);
+  background: linear-gradient(180deg, transparent 70%, color-mix(in srgb, var(--accent) 25%, transparent) 70%);
+}
+.endcta p { color: var(--ink-soft); margin: 0; max-width: 50ch; }
+.endcta .actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+
+.foot { background: var(--ink); color: var(--paper); }
+.foot .dot { color: var(--accent); }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topnav">
+  <div class="frame">
+    <div class="brand"><a href="../index.html">dmj<span class="dot">.</span>one</a></div>
+    <nav aria-label="Primary">
+      <ul>
+        <li><a href="../index.html#catalogue">Catalogue</a></li>
+        <li><a href="../index.html#manifesto">Manifesto</a></li>
+        <li><a href="../index.html#hire">Hire</a></li>
+        <li><a href="https://github.com/divyamohan1993/agent-trust" rel="noopener">GitHub</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ============ HERO ============ -->
+<section class="at-hero">
+  <div class="frame">
+    <p class="crumbs">
+      <a href="../index.html">Catalogue</a> /
+      <a href="../index.html#cat-ai">AI · Agents</a> /
+      <span>AgentTrust SDK</span>
+    </p>
+
+    <span class="at-eyebrow">No. 18 · OWASP ASI07 reference</span>
+
+    <div class="at-hero-grid">
+      <div>
+        <h1>
+          Five lines.<br>
+          <em>OWASP ASI07</em><br>
+          solved.
+        </h1>
+        <p class="lede">
+          A single compromised agent can poison <strong>87% of downstream decisions within hours</strong>. Existing guardrails protect individual agents. None verify that Agent A's output to Agent B is safe to act upon. AgentTrust is the SDK that does.
+        </p>
+        <div class="cta-row">
+          <a class="btn btn-primary" href="https://pypi.org/project/agenttrust/" rel="noopener">pip install agenttrust</a>
+          <a class="btn btn-ghost" href="https://github.com/divyamohan1993/agent-trust" rel="noopener">View source</a>
+          <a class="btn btn-ghost" href="#how">How VIS works</a>
+        </div>
+      </div>
+
+      <figure style="margin:0;">
+        <div class="codepane" aria-label="Five-line integration sample">
+          <div class="filebar">main.py</div>
+<pre><span class="tk-key">from</span> agenttrust <span class="tk-key">import</span> TrustHooks
+
+hooks = <span class="tk-fn">TrustHooks</span>(
+    policy=<span class="tk-str">"policies/india-dpdp.yaml"</span>,
+    verification_budget=<span class="tk-num">1000</span>,
+    audit_path=<span class="tk-str">"./audit/"</span>,
+    judge_model=<span class="tk-str">"claude-haiku-4-5"</span>,
+)
+
+result = hooks.<span class="tk-fn">pre_tool_use</span>(
+    <span class="tk-str">"Bash"</span>, <span class="tk-str">"rm -rf /"</span>,
+    agent_id=<span class="tk-str">"code_writer"</span>,
+)
+
+<span class="tk-fn">print</span>(result.decision)    <span class="tk-cmt"># "escalate"</span>
+<span class="tk-fn">print</span>(result.vis_score)   <span class="tk-cmt"># 1.4 (high risk)</span>
+</pre>
+        </div>
+        <figcaption class="diag-bar">VIS &gt; 0.9 · Tier 4 · Human escalation</figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <!-- ============ STATS ============ -->
+  <section class="stats" aria-label="At a glance">
+    <div class="stat"><span class="num">5</span><span class="lbl">Lines of Python to integrate</span></div>
+    <div class="stat"><span class="num">&lt;50ms</span><span class="lbl">Median verification overhead</span></div>
+    <div class="stat"><span class="num">70-80%</span><span class="lbl">Actions resolved at policy-only</span></div>
+    <div class="stat"><span class="num">87%</span><span class="lbl">Harmful actions reduction (TrustBench)</span></div>
+    <div class="stat"><span class="num">4</span><span class="lbl">Policy templates included</span></div>
+  </section>
+</section>
+
+
+<!-- ============ ACT I · REAL DISASTERS ============ -->
+<section class="act" aria-labelledby="dis-h">
+  <div class="frame">
+    <p class="act-num">Act I · This already happened</p>
+    <h2 id="dis-h">Three rogue agents.<br><em>Three real outages.</em></h2>
+    <p style="font-family:'Fraunces',serif;font-size:var(--t-md);color:var(--ink-soft);max-width:60ch;margin:0;">
+      Multi-agent systems are failing catastrophically. OWASP ranks this as <b>ASI07 Insecure Inter-Agent Communication</b> in the 2026 Top 10 for Agentic Applications. These are not hypothetical.
+    </p>
+
+    <div class="disasters">
+      <div class="disaster">
+        <span class="who">Amazon Kiro</span>
+        <p class="what">An agent <b>deleted an entire AWS environment</b>, causing a 13-hour outage.</p>
+      </div>
+      <div class="disaster">
+        <span class="who">Replit</span>
+        <p class="what">An agent <b>wiped 1,206 executive records</b> during a code freeze, then lied about rollback capabilities.</p>
+      </div>
+      <div class="disaster">
+        <span class="who">Meta · Sev-1</span>
+        <p class="what">A rogue agent <b>autonomously posted unauthorised content</b>, exposing sensitive internal data.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ ACT II · HOW VIS WORKS ============ -->
+<section class="act" id="how" style="background:var(--paper-soft);" aria-labelledby="vis-h">
+  <div class="frame">
+    <p class="act-num">Act II · The Idea</p>
+    <h2 id="vis-h">Verify <em>proportional</em> to risk.<br>Spend the budget where it matters.</h2>
+    <p style="font-family:'Fraunces',serif;font-size:var(--t-md);color:var(--ink-soft);max-width:60ch;margin:0;">
+      Verifying every action at full depth makes a system unusable. Verifying nothing leaves the cascade attack surface wide open. Risk-Proportional Verification spends compute on the dangerous calls and waves the cheap ones through.
+    </p>
+
+    <figure style="margin:2rem 0 0;">
+      <div class="codepane" aria-label="VIS formula">
+        <div class="filebar">verification investment score · vis(action, agent)</div>
+<pre>VIS = (<span class="tk-key">ConsequenceSeverity</span> / <span class="tk-key">TrustScore</span>)
+      &times; (<span class="tk-key">BudgetRemaining</span> / <span class="tk-key">BudgetTotal</span>)
+
+<span class="tk-cmt"># ConsequenceSeverity in [0, 1]
+#   file read       = 0.1
+#   API call        = 0.5
+#   data deletion   = 1.0
+#
+# TrustScore in (0, 1]   earned through verified good behavior
+# Budget ratio guards against cost explosion in long workflows</span>
+</pre>
+      </div>
+    </figure>
+
+    <table class="tiers" aria-label="Verification tiers by VIS range">
+      <thead>
+        <tr><th>VIS range</th><th>Tier</th><th>Verification action</th><th>Latency</th><th>Cost / check</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="vis">&lt; 0.2</td><td>1</td><td>Policy check only (YAML rules)</td><td class="lat">5-25ms</td><td class="lat">~$0</td></tr>
+        <tr><td class="vis">0.2 - 0.6</td><td>2</td><td>+ Cleanlab TLM trust score</td><td class="lat">200-500ms</td><td class="lat">~$0.001</td></tr>
+        <tr><td class="vis">0.6 - 0.9</td><td>3</td><td>+ LLM-as-judge (Haiku/Flash)</td><td class="lat">1-3s</td><td class="lat">~$0.005</td></tr>
+        <tr><td class="vis">&gt; 0.9</td><td>4</td><td>+ Human escalation (blocks)</td><td class="lat">N/A</td><td class="lat">N/A</td></tr>
+      </tbody>
+    </table>
+
+    <p style="font-family:'Fraunces',serif;font-size:var(--t-md);color:var(--ink-soft);max-width:60ch;margin:1.5rem 0 0;">
+      In typical workflows, <em style="color:var(--accent);font-style:italic;">70-80%</em> of actions resolve at Tier 1. Only <em style="color:var(--accent);font-style:italic;">5-15%</em> reach the expensive LLM-as-judge tier. The system stays cheap and fast on the boring stuff, careful on the dangerous stuff.
+    </p>
+  </div>
+</section>
+
+
+<!-- ============ ACT III · TRUST EVOLUTION ============ -->
+<section class="act" aria-labelledby="trust-h">
+  <div class="frame">
+    <p class="act-num">Act III · Trust as a credit score</p>
+    <h2 id="trust-h">Trust is <em>earned,</em> not granted.</h2>
+    <p style="font-family:'Fraunces',serif;font-size:var(--t-md);color:var(--ink-soft);max-width:60ch;margin:0;">
+      Each agent starts at neutral 0.5. Verified safe actions raise trust. A violation drops it proportional to history, not catastrophic. After about 60 consecutive safe actions, trust converges toward 1.0.
+    </p>
+
+    <figure style="margin:2rem 0 0;">
+      <div class="codepane" aria-label="Trust update rule">
+        <div class="filebar">trust update rule · per action</div>
+<pre>T(n+1) = <span class="tk-num">0.95</span> &times; T(n) + <span class="tk-num">0.05</span> &times; V(n)
+
+<span class="tk-cmt"># V(n) = 1 if verified safe
+# V(n) = 0 if violation detected
+#
+# Single violation from trust 0.9 -> drops to 0.855
+# Proportional to history. Not catastrophic.</span>
+</pre>
+      </div>
+    </figure>
+
+    <p class="act-num" style="margin-top:2.5rem;">An audit log entry</p>
+    <div class="audit" aria-label="Sample audit log entry from AgentTrust">
+      <div class="alabel">audit/2026-05-04T14-22.jsonl · append-only · sha-256 chained</div>
+<pre>{
+  <span class="tk-key">"ts"</span>: <span class="tk-str">"2026-05-04T14:22:08.412Z"</span>,
+  <span class="tk-key">"agent_id"</span>: <span class="tk-str">"code_writer"</span>,
+  <span class="tk-key">"tool"</span>: <span class="tk-str">"Bash"</span>,
+  <span class="tk-key">"input"</span>: <span class="tk-str">"rm -rf /"</span>,
+  <span class="tk-key">"vis_score"</span>: <span class="tk-num">1.4</span>,
+  <span class="tk-key">"tier"</span>: <span class="tk-num">4</span>,
+  <span class="tk-key">"decision"</span>: <span class="tk-str">"escalate"</span>,
+  <span class="tk-key">"trust_before"</span>: <span class="tk-num">0.91</span>,
+  <span class="tk-key">"trust_after"</span>: <span class="tk-num">0.86</span>,
+  <span class="tk-key">"policy"</span>: <span class="tk-str">"india-dpdp.yaml"</span>,
+  <span class="tk-key">"latency_ms"</span>: <span class="tk-num">23</span>,
+  <span class="tk-key">"prev_hash"</span>: <span class="tk-str">"a3f8c…"</span>
+}</pre>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ ACT IV · POLICIES ============ -->
+<section class="act" aria-labelledby="pol-h">
+  <div class="frame">
+    <p class="act-num">Act IV · Compliance, shipped</p>
+    <h2 id="pol-h">Four YAML policies.<br><em>India-ready</em> from day one.</h2>
+    <p style="font-family:'Fraunces',serif;font-size:var(--t-md);color:var(--ink-soft);max-width:60ch;margin:0;">
+      Policies are YAML files editable by non-developers. Custom policies define severity, PII patterns, rate limits, per-tool rules. Two ship with India compliance baked in.
+    </p>
+
+    <div class="pgrid">
+      <div class="pol">
+        <p class="fname">policies/default.yaml</p>
+        <h3>Default</h3>
+        <p>Sensible defaults for general-purpose multi-agent systems. The starting policy.</p>
+      </div>
+      <div class="pol">
+        <p class="fname">policies/india-dpdp.yaml</p>
+        <h3>India DPDP Act 2023</h3>
+        <p>Aadhaar, PAN, UPI, Indian phone PII detection. Data fiduciary duty (Section 8). Audit retention with erasure exemptions (Section 11). Auto-generated breach notification reports.</p>
+      </div>
+      <div class="pol">
+        <p class="fname">policies/india-it-rules-2026.yaml</p>
+        <h3>India IT Rules 2026</h3>
+        <p>SGI synthetic content labelling. 3-hour takedown compliance tracking. Traceability audit trails for AI agent actions. Safe-harbour documentation.</p>
+      </div>
+      <div class="pol">
+        <p class="fname">policies/owasp-asi07.yaml</p>
+        <h3>OWASP ASI07 hardening</h3>
+        <p>Inter-agent communication security. Authentication. Schema validation. The reference implementation of the OWASP control.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ END CTA ============ -->
+<section class="endcta" aria-labelledby="cta-h">
+  <div class="frame">
+    <div>
+      <h2 id="cta-h">If your agents talk to each other, <em>they need a referee.</em></h2>
+      <p>I design budget-aware trust systems for multi-agent stacks. OWASP-aligned, India-compliant, drop-in for the Claude Agent SDK. Five lines and you have an audit trail.</p>
+    </div>
+    <div class="actions">
+      <a class="btn btn-primary" href="../index.html#hire">Hire me</a>
+      <a class="btn btn-ghost" href="../index.html">Back to catalogue</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="frame">
+    <div>
+      <h2 style="font-family:'Fraunces',serif;font-size:var(--t-xl);margin:0 0 1rem;">dmj<span class="dot">.</span>one</h2>
+      <p>Dream, Manifest and Journey, Together as One.</p>
+      <p class="meta">© 2026 Divya Mohan. AgentTrust released under Apache 2.0. OWASP ASI07 reference implementation.</p>
+    </div>
+    <div>
+      <p class="meta">Catalogue</p>
+      <p><a href="../index.html#catalogue">All 47 products</a></p>
+      <p><a href="../index.html#cat-ai">AI · Agents</a></p>
+      <p><a href="../index.html#hire">Hire</a></p>
+    </div>
+    <div>
+      <p class="meta">AgentTrust</p>
+      <p><a href="https://pypi.org/project/agenttrust/" rel="noopener">PyPI package</a></p>
+      <p><a href="https://github.com/divyamohan1993/agent-trust" rel="noopener">Source</a></p>
+      <p><a href="mailto:contact@dmj.one">contact@dmj.one</a></p>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,822 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#d8631a">
+<meta name="color-scheme" content="light">
+
+<title>JalSeva · Three apps. One docker compose. 163M Indians. · dmj.one</title>
+<meta name="description" content="163 million Indians lack clean water. They call a tanker. They wait. Sometimes for hours. JalSeva is one platform: customer app, supplier console, admin hub. Voice-first in 22 languages. Team Dhurandhar SPRINT 2026.">
+<meta property="og:title" content="JalSeva · जलसेवा · Voice-first water delivery for Bharat">
+<meta property="og:description" content="A complete tanker delivery platform · booking, supplier, admin · in one Docker compose. 22 languages. Offline PWA. 20,000+ requests per second on a single VM.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,30..100&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;600&family=Tiro+Devanagari+Hindi&display=swap">
+<link rel="stylesheet" href="../assets/core.css">
+
+<style>
+:root { --accent: var(--c-bharat); --accent-deep: #a14710; --water: #1f6f7e; --water-soft: #cfe6e9; }
+body { background: var(--paper); }
+.devanagari { font-family: 'Tiro Devanagari Hindi', 'Fraunces', serif; }
+
+/* ==== HERO · split-screen, type left, water-wave SVG right ==== */
+.jl-hero {
+  position: relative;
+  border-bottom: var(--hair);
+  background: var(--paper);
+  overflow: hidden;
+}
+.jl-hero .frame {
+  display: grid; grid-template-columns: 1fr;
+  align-items: stretch;
+  padding-block: clamp(2.5rem, 5vw, 5rem) 0;
+  padding-bottom: 0;
+}
+@media (min-width: 980px) {
+  .jl-hero .frame {
+    grid-template-columns: 1.2fr 1fr;
+    gap: 3rem; align-items: end;
+    padding-block: clamp(3rem, 5vw + 1rem, 6rem) 0;
+  }
+}
+
+.crumbs {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink-mute); margin: 0 0 1.5rem;
+  display: flex; gap: 0.5rem; flex-wrap: wrap;
+}
+.crumbs a { border-bottom: 1px solid var(--ink-mute); padding-bottom: 1px; }
+.crumbs a:hover { color: var(--accent); border-color: var(--accent); }
+.crumbs span { color: var(--accent); }
+
+.jl-eyebrow {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  padding: 0.4rem 0.85rem;
+  border: 1px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  color: var(--accent-deep);
+  font-family: 'JetBrains Mono', monospace; font-size: var(--t-xs);
+  font-weight: 700; text-transform: uppercase; letter-spacing: 0.16em;
+  margin-bottom: 1.5rem;
+}
+.jl-eyebrow::before {
+  content: ""; width: 8px; height: 8px;
+  background: var(--accent); border-radius: 50%;
+}
+
+.jl-hero h1 {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(2.6rem, 6vw, 4.6rem);
+  font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 30, "WONK" 1;
+  letter-spacing: -0.03em; line-height: 0.95;
+  margin: 0; max-width: 14ch;
+}
+.jl-hero h1 .deva-block {
+  display: block;
+  font-family: 'Tiro Devanagari Hindi', serif;
+  font-size: 0.46em; color: var(--accent-deep);
+  font-style: normal; margin-top: 0.6rem;
+  letter-spacing: -0.005em; line-height: 1.1;
+}
+.jl-hero h1 em {
+  font-style: italic; color: var(--accent);
+  font-variation-settings: "opsz" 144, "SOFT" 100, "WONK" 1;
+}
+
+.jl-hero .lede {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md); font-weight: 300;
+  line-height: 1.5; color: var(--ink-soft);
+  margin: 1.75rem 0 0; max-width: 50ch;
+}
+.jl-hero .lede strong {
+  font-weight: 600; color: var(--ink);
+  background: linear-gradient(180deg, transparent 60%, color-mix(in srgb, var(--accent) 30%, transparent) 60%);
+  padding: 0 0.1em;
+}
+
+.jl-cta-row {
+  margin-top: 2.25rem; padding-bottom: clamp(2.5rem, 4vw, 4rem);
+  display: flex; gap: 0.75rem; flex-wrap: wrap;
+}
+.btn {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.7rem 1.1rem;
+  font-family: 'JetBrains Mono', monospace; font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.14em; font-weight: 700;
+  border: 1px solid var(--ink);
+  transition: background .15s, color .15s, transform .15s, box-shadow .15s;
+}
+.btn:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--ink); }
+.btn-primary { background: var(--accent); color: white; border-color: var(--accent); }
+.btn-ghost { background: transparent; color: var(--ink); }
+
+/* ==== HERO · right panel: tanker + waves SVG ==== */
+.jl-vessel {
+  position: relative;
+  background: linear-gradient(180deg, var(--paper) 0%, var(--water-soft) 100%);
+  border-left: var(--hair);
+  align-self: stretch;
+  min-height: 26rem;
+  display: flex; align-items: flex-end; justify-content: center;
+  padding: 2rem 1rem 0;
+  overflow: hidden;
+}
+@media (max-width: 979px) {
+  .jl-vessel { border-left: 0; border-top: var(--hair); margin-top: 1rem; min-height: 22rem; }
+}
+.jl-vessel svg {
+  width: 100%; max-width: 380px;
+  height: auto; display: block;
+}
+.jl-vessel::after {
+  content: ""; position: absolute; inset: 0;
+  background:
+    radial-gradient(circle at 20% 80%, color-mix(in srgb, var(--water) 8%, transparent), transparent 50%);
+  pointer-events: none;
+}
+
+/* ==== STATS ==== */
+.jl-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  background: var(--ink); color: var(--paper);
+  border-block: 2px solid var(--ink);
+}
+.jl-stat {
+  padding: 1.5rem clamp(1rem, 2vw, 1.5rem);
+  border-right: 1px solid color-mix(in srgb, var(--paper) 18%, transparent);
+}
+.jl-stat:last-child { border-right: 0; }
+.jl-stat .num {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl); font-weight: 400;
+  letter-spacing: -0.04em; display: block; line-height: 1;
+  font-variation-settings: "opsz" 144, "SOFT" 30;
+  color: var(--accent);
+}
+.jl-stat .lbl {
+  font-family: 'JetBrains Mono', monospace; font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.14em;
+  margin-top: 0.6rem; display: block;
+  color: color-mix(in srgb, var(--paper) 75%, transparent);
+}
+
+/* ==== ACTS ==== */
+.act { padding-block: clamp(3rem, 5vw, 5rem); border-bottom: var(--hair); position: relative; }
+.act-num {
+  font-family: 'JetBrains Mono', monospace; font-size: var(--t-xs);
+  letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--accent); font-weight: 700;
+  margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 1rem;
+}
+.act-num::before { content: ""; width: 2.5rem; height: 1px; background: var(--accent); }
+.act h2 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl); font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 50, "WONK" 1;
+  letter-spacing: -0.025em; line-height: 1.05;
+  margin: 0 0 1.5rem; max-width: 22ch;
+}
+.act h2 em { font-style: italic; color: var(--accent); }
+
+/* ==== ACT I · PROBLEM (single big quote) ==== */
+.act-problem {
+  background: linear-gradient(180deg, var(--paper) 0%, color-mix(in srgb, var(--water-soft) 50%, var(--paper)) 100%);
+}
+.problem-narrative {
+  display: grid; gap: 2rem;
+  grid-template-columns: 1fr;
+  margin-top: 2rem;
+}
+@media (min-width: 880px) { .problem-narrative { grid-template-columns: 1.2fr 1fr; gap: 3.5rem; align-items: start; } }
+.narrative-text p {
+  font-family: 'Fraunces', serif; font-size: var(--t-md);
+  line-height: 1.5; color: var(--ink-soft); margin: 0 0 1.25rem;
+}
+.narrative-text p:first-of-type::first-letter {
+  font-family: 'Fraunces', serif;
+  font-size: 4.5rem; float: left;
+  line-height: 0.85; padding: 0.4rem 0.6rem 0 0;
+  color: var(--accent); font-weight: 600;
+  font-variation-settings: "opsz" 144, "SOFT" 100, "WONK" 1;
+  font-style: italic;
+}
+
+.three-truths {
+  border: 1px solid var(--ink); padding: 1.5rem 1.5rem 0.5rem;
+  background: var(--paper);
+}
+.three-truths li {
+  display: grid; grid-template-columns: 3rem 1fr;
+  gap: 1rem; padding: 0.85rem 0;
+  border-bottom: var(--hair-soft);
+  font-size: var(--t-sm);
+}
+.three-truths li:last-child { border-bottom: 0; }
+.three-truths .num {
+  font-family: 'Fraunces', serif; font-style: italic;
+  font-size: 1.4rem; color: var(--accent);
+  font-variation-settings: "opsz" 144, "SOFT" 100;
+  line-height: 1;
+}
+.three-truths .num + div p { margin: 0; color: var(--ink-soft); }
+.three-truths .num + div p strong { color: var(--ink); font-weight: 700; }
+
+/* ==== ACT II · THREE APPS, ONE PLATFORM ==== */
+.three-apps {
+  display: grid; gap: 0;
+  grid-template-columns: 1fr;
+  margin-top: 2rem;
+  border: 1px solid var(--ink); background: var(--paper);
+}
+@media (min-width: 880px) { .three-apps { grid-template-columns: repeat(3, 1fr); } }
+.app-pane {
+  padding: 1.75rem 1.5rem;
+  border-bottom: 1px solid var(--ink);
+  position: relative;
+}
+@media (min-width: 880px) {
+  .app-pane { border-bottom: 0; border-right: 1px solid var(--ink); }
+  .app-pane:last-child { border-right: 0; }
+}
+.app-pane:last-child { border-bottom: 0; }
+.app-pane .app-tag {
+  font-family: 'JetBrains Mono', monospace; font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.18em;
+  color: var(--accent); font-weight: 700; margin-bottom: 0.5rem;
+}
+.app-pane h3 {
+  font-family: 'Fraunces', serif; font-weight: 500;
+  font-size: var(--t-lg); margin: 0 0 0.6rem;
+  letter-spacing: -0.015em; line-height: 1.05;
+}
+.app-pane h3 em { font-style: italic; color: var(--accent); }
+.app-pane > p { font-size: var(--t-sm); color: var(--ink-soft); margin: 0 0 1rem; line-height: 1.55; }
+.app-pane ul.feats { display: grid; gap: 0.4rem; }
+.app-pane ul.feats li {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs); letter-spacing: 0.04em;
+  color: var(--ink-soft);
+  padding-left: 1rem; position: relative;
+}
+.app-pane ul.feats li::before {
+  content: "→"; position: absolute; left: 0; color: var(--accent);
+}
+
+.compose-strip {
+  margin-top: 2rem; padding: 1.5rem;
+  background: var(--ink); color: var(--paper);
+  display: grid; gap: 1rem;
+  grid-template-columns: 1fr;
+  align-items: center;
+}
+@media (min-width: 760px) { .compose-strip { grid-template-columns: 1fr auto; } }
+.compose-strip h4 {
+  font-family: 'Fraunces', serif; font-style: italic;
+  font-weight: 400; font-size: var(--t-md); margin: 0;
+  color: var(--paper);
+}
+.compose-strip h4 em { color: var(--accent); font-style: italic; }
+.compose-strip code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-sm);
+  background: color-mix(in srgb, var(--paper) 10%, transparent);
+  padding: 0.5rem 0.85rem;
+  color: color-mix(in srgb, var(--paper) 95%, transparent);
+  display: inline-block;
+}
+
+/* ==== ACT III · THREE TAPS (horizontal timeline) ==== */
+.taps-line {
+  display: grid; gap: 2rem;
+  grid-template-columns: 1fr;
+  margin-top: 2rem;
+  position: relative;
+}
+@media (min-width: 880px) {
+  .taps-line { grid-template-columns: repeat(3, 1fr); gap: 0; }
+  .taps-line::before {
+    content: ""; position: absolute;
+    top: 1.6rem; left: 5%; right: 5%;
+    height: 2px;
+    background: repeating-linear-gradient(90deg, var(--accent) 0 6px, transparent 6px 12px);
+  }
+}
+.tap-step {
+  text-align: left;
+  padding: 0 1rem;
+  position: relative;
+}
+.tap-step .tap-circle {
+  width: 3.2rem; height: 3.2rem;
+  border-radius: 50%;
+  background: var(--paper);
+  border: 2px solid var(--accent);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Fraunces', serif; font-style: italic;
+  font-size: 1.5rem; color: var(--accent);
+  font-variation-settings: "opsz" 144, "SOFT" 100;
+  margin-bottom: 1rem;
+  position: relative; z-index: 2;
+}
+.tap-step h3 {
+  font-family: 'Fraunces', serif; font-weight: 500;
+  font-size: var(--t-md); margin: 0 0 0.4rem;
+  letter-spacing: -0.01em;
+}
+.tap-step p { margin: 0 0 0.5rem; font-size: var(--t-sm); color: var(--ink-soft); line-height: 1.5; }
+.tap-step .deva-line {
+  font-family: 'Tiro Devanagari Hindi', serif;
+  font-size: var(--t-sm); color: var(--accent-deep);
+  margin: 0;
+}
+
+/* ==== ACT IV · SCALE PATH ==== */
+.scale-table {
+  margin-top: 2rem; border: 1px solid var(--ink);
+  background: var(--paper);
+}
+.scale-row {
+  display: grid; gap: 1rem;
+  grid-template-columns: 1fr;
+  padding: 1.1rem 1.5rem;
+  border-bottom: 1px solid var(--paper-edge);
+}
+@media (min-width: 760px) {
+  .scale-row { grid-template-columns: 1fr 1fr 1.4fr 1fr; gap: 2rem; align-items: baseline; }
+}
+.scale-row:last-child { border-bottom: 0; }
+.scale-row.head {
+  background: var(--ink); color: var(--paper);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs); text-transform: uppercase;
+  letter-spacing: 0.16em; font-weight: 700;
+}
+.scale-row .s-stage {
+  font-family: 'Fraunces', serif; font-style: italic;
+  font-size: 1.15rem; font-weight: 500; color: var(--accent-deep);
+  font-variation-settings: "opsz" 144, "SOFT" 100;
+}
+.scale-row.head .s-stage { font-family: 'JetBrains Mono', monospace; font-style: normal; color: var(--accent); font-size: var(--t-xs); }
+.scale-row .s-cell {
+  font-family: 'JetBrains Mono', monospace; font-size: var(--t-sm);
+  color: var(--ink-soft);
+}
+.scale-row .s-cell.bold { color: var(--ink); font-weight: 600; }
+
+/* ==== PROOF ==== */
+.proof {
+  background: var(--ink); color: var(--paper);
+  padding-block: clamp(3rem, 5vw, 5rem);
+  position: relative; overflow: hidden;
+}
+.proof::before {
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 10% 100%, color-mix(in srgb, var(--accent) 30%, transparent), transparent 60%);
+  pointer-events: none;
+}
+.proof .frame { position: relative; }
+.proof h2 { color: var(--paper); }
+.proof h2 em { color: var(--accent); }
+.proof-grid {
+  display: grid; gap: 1rem; margin-top: 2rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { .proof-grid { grid-template-columns: repeat(2, 1fr); } }
+.proof-item {
+  border: 1px solid color-mix(in srgb, var(--paper) 30%, transparent);
+  padding: 1.5rem;
+  background: color-mix(in srgb, var(--paper) 5%, transparent);
+}
+.proof-item h3 {
+  font-family: 'Fraunces', serif; margin: 0 0 0.5rem;
+  font-size: var(--t-md); color: var(--accent);
+  font-weight: 500; letter-spacing: -0.01em;
+}
+.proof-item p { margin: 0; color: color-mix(in srgb, var(--paper) 80%, transparent); font-size: var(--t-sm); }
+
+/* ==== STACK ==== */
+.stack { padding-block: clamp(3rem, 5vw, 5rem); border-bottom: var(--hair); }
+.stack-list { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.5rem; }
+.stack-tag {
+  padding: 0.5rem 0.9rem; border: 1px solid var(--ink);
+  font-family: 'JetBrains Mono', monospace; font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.14em; font-weight: 600;
+}
+
+/* ==== END CTA ==== */
+.endcta {
+  padding-block: clamp(3rem, 5vw, 5rem);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 10%, transparent), var(--paper));
+}
+.endcta .frame { display: grid; gap: 2rem; grid-template-columns: 1fr; }
+@media (min-width: 760px) { .endcta .frame { grid-template-columns: 2fr 1fr; align-items: end; } }
+.endcta h2 {
+  font-family: 'Fraunces', serif; font-size: var(--t-2xl); font-weight: 300;
+  font-variation-settings: "opsz" 144, "SOFT" 100;
+  margin: 0 0 1rem; letter-spacing: -0.025em; line-height: 1.05;
+}
+.endcta h2 em {
+  font-style: italic; color: var(--accent);
+  background: linear-gradient(180deg, transparent 70%, color-mix(in srgb, var(--accent) 25%, transparent) 70%);
+}
+.endcta p { color: var(--ink-soft); margin: 0; max-width: 50ch; }
+.endcta .actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+
+.foot { background: var(--ink); color: var(--paper); }
+.foot .dot { color: var(--accent); }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topnav">
+  <div class="frame">
+    <div class="brand"><a href="../index.html">dmj<span class="dot">.</span>one</a></div>
+    <nav aria-label="Primary">
+      <ul>
+        <li><a href="../index.html#catalogue">Catalogue</a></li>
+        <li><a href="../index.html#manifesto">Manifesto</a></li>
+        <li><a href="../index.html#hire">Hire</a></li>
+        <li><a href="https://github.com/divyamohan1993/jalseva" rel="noopener">GitHub</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ============ HERO ============ -->
+<section class="jl-hero">
+  <div class="frame">
+    <div>
+      <p class="crumbs">
+        <a href="../index.html">Catalogue</a> /
+        <a href="../index.html#cat-bharat">Bharat-First</a> /
+        <span>JalSeva</span>
+      </p>
+
+      <span class="jl-eyebrow">No. 03 · Bharat-First · Water</span>
+
+      <h1>
+        <em>Three apps.</em><br>
+        One docker compose.<br>
+        163 million Indians.
+        <span class="deva-block">जलसेवा · JalSeva</span>
+      </h1>
+
+      <p class="lede">
+        <strong>Your grandmother who can't read English</strong> can order water with her voice. That is the bar. Customer app, supplier console, admin hub · one platform, one container, one tap (or three) from thirst to tanker. <strong>Voice-first in 22 Indian languages.</strong>
+      </p>
+
+      <div class="jl-cta-row">
+        <a class="btn btn-primary" href="https://github.com/divyamohan1993/jalseva" rel="noopener">View source</a>
+        <a class="btn btn-ghost" href="#three-apps">The three apps</a>
+        <a class="btn btn-ghost" href="#scale">Scale path</a>
+      </div>
+    </div>
+
+    <div class="jl-vessel" aria-hidden="true">
+      <svg viewBox="0 0 380 360" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="tank" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0" stop-color="#d8631a"/>
+            <stop offset="1" stop-color="#a14710"/>
+          </linearGradient>
+          <linearGradient id="watergrad" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0" stop-color="#1f6f7e" stop-opacity="0.85"/>
+            <stop offset="1" stop-color="#1f6f7e" stop-opacity="0.5"/>
+          </linearGradient>
+        </defs>
+        <!-- ground hairlines -->
+        <g stroke="#161310" stroke-width="0.5" opacity="0.3">
+          <line x1="0" y1="320" x2="380" y2="320"/>
+          <line x1="0" y1="332" x2="380" y2="332" stroke-dasharray="2 4"/>
+        </g>
+        <!-- tanker truck silhouette -->
+        <g>
+          <!-- cab -->
+          <rect x="40" y="200" width="70" height="80" fill="#161310"/>
+          <rect x="50" y="210" width="50" height="35" fill="#f3eee3"/>
+          <!-- tanker body (cylindrical) -->
+          <ellipse cx="120" cy="240" rx="22" ry="50" fill="url(#tank)"/>
+          <rect x="120" y="190" width="200" height="100" fill="url(#tank)"/>
+          <ellipse cx="320" cy="240" rx="22" ry="50" fill="#a14710"/>
+          <!-- tanker bands -->
+          <line x1="160" y1="190" x2="160" y2="290" stroke="#161310" stroke-width="2" opacity="0.4"/>
+          <line x1="220" y1="190" x2="220" y2="290" stroke="#161310" stroke-width="2" opacity="0.4"/>
+          <line x1="280" y1="190" x2="280" y2="290" stroke="#161310" stroke-width="2" opacity="0.4"/>
+          <!-- "JAL" devanagari label -->
+          <text x="220" y="248" text-anchor="middle" font-family="'Tiro Devanagari Hindi', serif" font-size="36" fill="#f3eee3" font-weight="500">जल</text>
+          <!-- wheels -->
+          <circle cx="80" cy="305" r="22" fill="#161310"/>
+          <circle cx="80" cy="305" r="9" fill="#f3eee3"/>
+          <circle cx="180" cy="305" r="22" fill="#161310"/>
+          <circle cx="180" cy="305" r="9" fill="#f3eee3"/>
+          <circle cx="260" cy="305" r="22" fill="#161310"/>
+          <circle cx="260" cy="305" r="9" fill="#f3eee3"/>
+          <circle cx="320" cy="305" r="22" fill="#161310"/>
+          <circle cx="320" cy="305" r="9" fill="#f3eee3"/>
+        </g>
+        <!-- water spout coming from tanker -->
+        <path d="M 95 270 Q 85 290 75 320" fill="none" stroke="url(#watergrad)" stroke-width="6" stroke-linecap="round"/>
+        <!-- water puddle / waves at base -->
+        <g fill="url(#watergrad)" opacity="0.7">
+          <path d="M 30 340 Q 60 332 90 340 T 150 340 T 210 340 T 270 340 T 330 340 T 380 340 L 380 360 L 0 360 L 0 340 Z"/>
+        </g>
+        <g fill="#1f6f7e" opacity="0.4">
+          <path d="M 0 348 Q 30 342 60 348 T 120 348 T 180 348 T 240 348 T 300 348 T 360 348 L 380 348 L 380 360 L 0 360 Z"/>
+        </g>
+        <!-- sun / signal dot top right -->
+        <circle cx="330" cy="55" r="20" fill="#d8631a" opacity="0.85"/>
+        <circle cx="330" cy="55" r="32" fill="none" stroke="#d8631a" stroke-width="1.2" opacity="0.4"/>
+        <!-- pin / location top -->
+        <g transform="translate(60 60)">
+          <path d="M 12 0 C 5 0 0 5 0 12 C 0 22 12 36 12 36 C 12 36 24 22 24 12 C 24 5 19 0 12 0 Z" fill="#161310"/>
+          <circle cx="12" cy="12" r="5" fill="#f3eee3"/>
+        </g>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATS ============ -->
+<section class="jl-stats" aria-label="At a glance">
+  <div class="jl-stat"><span class="num">163M</span><span class="lbl">Indians without clean water</span></div>
+  <div class="jl-stat"><span class="num">22</span><span class="lbl">Indian languages, voice-first</span></div>
+  <div class="jl-stat"><span class="num">3</span><span class="lbl">Apps in one container</span></div>
+  <div class="jl-stat"><span class="num">19</span><span class="lbl">Production API endpoints</span></div>
+  <div class="jl-stat"><span class="num">20K+</span><span class="lbl">Requests per second on one VM</span></div>
+</section>
+
+<!-- ============ ACT I · PROBLEM ============ -->
+<section class="act act-problem" aria-labelledby="prob-h">
+  <div class="frame">
+    <p class="act-num">Act I · The Problem</p>
+    <h2 id="prob-h">A phone call. <em>And then silence.</em></h2>
+
+    <div class="problem-narrative">
+      <div class="narrative-text">
+        <p>One hundred and sixty-three million Indians do not have access to clean drinking water. In thousands of towns across Bharat, families depend on water tankers. The system that delivers them was designed by nobody. It is a phone number on a wall, a man who may or may not pick up, and a wait that may or may not end.</p>
+        <p>No transparency. No tracking. No accountability. You call a number, you hope someone answers, and you wait. Sometimes for hours. Sometimes the tanker never arrives. There is nothing to refund and no one to ask.</p>
+        <p style="font-style:italic;color:var(--ink);">We thought we could do better.</p>
+      </div>
+
+      <ol class="three-truths">
+        <li>
+          <span class="num">i.</span>
+          <div><p><strong>The customer cannot see.</strong> No live tracking. No estimated arrival. No way to know if the order was even received.</p></div>
+        </li>
+        <li>
+          <span class="num">ii.</span>
+          <div><p><strong>The supplier cannot scale.</strong> Paper logs. Phone tag. No earnings visibility. Drivers paid in cash.</p></div>
+        </li>
+        <li>
+          <span class="num">iii.</span>
+          <div><p><strong>The town cannot govern.</strong> No commission framework. No verification. No way for a panchayat to know who is operating in their ward.</p></div>
+        </li>
+        <li>
+          <span class="num">iv.</span>
+          <div><p><strong>Most apps are not for Bharat.</strong> They assume English literacy, fast 4G, and a smartphone someone bought new. None of those are guaranteed.</p></div>
+        </li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ACT II · THREE APPS, ONE PLATFORM ============ -->
+<section class="act" id="three-apps" aria-labelledby="apps-h">
+  <div class="frame">
+    <p class="act-num">Act II · The Promise</p>
+    <h2 id="apps-h">One platform. <em>Three jobs.</em> Zero compromises.</h2>
+    <p style="font-family:'Fraunces',serif;font-size:var(--t-md);color:var(--ink-soft);max-width:62ch;margin:0 0 1rem;">
+      Most teams build the customer app first, the supplier app second, and the admin app three years later in a different framework. JalSeva ships all three as one Next.js app on day one. Same codebase. Same auth. Same data layer. One <code style="font-family:'JetBrains Mono',monospace;font-size:0.95em;background:color-mix(in srgb, var(--ink) 8%, transparent);padding:0.05em 0.3em;">docker compose up</code>.
+    </p>
+
+    <div class="three-apps">
+      <article class="app-pane">
+        <p class="app-tag">App · 01 · /</p>
+        <h3>Customer <em>booking</em></h3>
+        <p>Three taps from thirst to tanker. Voice ordering in 22 languages via Gemini. Live GPS tracking on the map. UPI payment with Razorpay. Rating after delivery.</p>
+        <ul class="feats">
+          <li>Voice-first PWA, offline capable</li>
+          <li>Hindi-first interface, RTL ready</li>
+          <li>Phone OTP login (Firebase Auth)</li>
+          <li>WhatsApp bot fallback for feature phones</li>
+        </ul>
+      </article>
+
+      <article class="app-pane">
+        <p class="app-tag">App · 02 · /supplier</p>
+        <h3>Supplier <em>console</em></h3>
+        <p>The driver opens the same URL with a different role. Real-time order notifications. Route navigation via Google Maps. Earnings analytics. Accept, dispatch, deliver, get paid.</p>
+        <ul class="feats">
+          <li>Real-time Firestore push</li>
+          <li>One-tap order acceptance</li>
+          <li>Daily and monthly earnings view</li>
+          <li>No paperwork. No middlemen.</li>
+        </ul>
+      </article>
+
+      <article class="app-pane">
+        <p class="app-tag">App · 03 · /admin</p>
+        <h3>Admin <em>hub</em></h3>
+        <p>For the panchayat, the operator, the regulator. Verify suppliers. Set commission rules. Watch every active delivery on a single live map. Pull analytics on demand.</p>
+        <ul class="feats">
+          <li>Supplier KYC verification flow</li>
+          <li>Commission management per region</li>
+          <li>Live operations map</li>
+          <li>Aggregate analytics dashboard</li>
+        </ul>
+      </article>
+    </div>
+
+    <div class="compose-strip">
+      <h4>Built for the operator, the supplier and the customer. <em>Same docker compose.</em></h4>
+      <code>docker compose up --build</code>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ACT III · THREE TAPS ============ -->
+<section class="act" aria-labelledby="taps-h">
+  <div class="frame">
+    <p class="act-num">Act III · The Product</p>
+    <h2 id="taps-h">Three taps. <em>That's it.</em></h2>
+    <p style="font-family:'Fraunces',serif;font-size:var(--t-md);color:var(--ink-soft);max-width:55ch;margin:0;">
+      And if that is still too much, just speak. JalSeva understands twenty-two languages. Then watch your tanker arrive in real time, on the map, on the phone you already own.
+    </p>
+
+    <ol class="taps-line">
+      <li class="tap-step">
+        <div class="tap-circle">i</div>
+        <h3>Pick the location</h3>
+        <p>Pin your home on the map, or tap a saved address. Or just say it out loud.</p>
+        <p class="deva-line">अपना स्थान चुनें</p>
+      </li>
+      <li class="tap-step">
+        <div class="tap-circle">ii</div>
+        <h3>Choose the tanker size</h3>
+        <p>Three sizes. Live pricing edge-cached for thirty seconds. No surprise charges.</p>
+        <p class="deva-line">टैंकर का साइज़ चुनें</p>
+      </li>
+      <li class="tap-step">
+        <div class="tap-circle">iii</div>
+        <h3>Pay with UPI</h3>
+        <p>Razorpay. Cards, wallets, UPI. Then watch the tanker arrive, live, on the map.</p>
+        <p class="deva-line">UPI से भुगतान करें</p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============ ACT IV · SCALE PATH ============ -->
+<section class="act" id="scale" aria-labelledby="scale-h">
+  <div class="frame">
+    <p class="act-num">Act IV · The Scale Path</p>
+    <h2 id="scale-h">From <em>one city</em> to <em>national</em>. Without rewriting a line.</h2>
+    <p style="font-family:'Fraunces',serif;font-size:var(--t-md);color:var(--ink-soft);max-width:62ch;margin:0;">
+      Most platforms need a rewrite to grow. Cluster mode, L1 in-process cache, batch writer with backpressure, and bounded Firestore queries are baked in from line one. Every scaling step is an infrastructure decision, not a code change.
+    </p>
+
+    <div class="scale-table" role="table">
+      <div class="scale-row head" role="row">
+        <span class="s-stage" role="columnheader">Stage</span>
+        <span class="s-cell" role="columnheader">Code change</span>
+        <span class="s-cell" role="columnheader">What you do</span>
+        <span class="s-cell" role="columnheader">Throughput</span>
+      </div>
+      <div class="scale-row" role="row">
+        <span class="s-stage" role="cell">One city · MVP</span>
+        <span class="s-cell bold" role="cell">None</span>
+        <span class="s-cell" role="cell">Single VM. <code>docker compose up</code>.</span>
+        <span class="s-cell" role="cell">5·10K req/s</span>
+      </div>
+      <div class="scale-row" role="row">
+        <span class="s-stage" role="cell">One state</span>
+        <span class="s-cell bold" role="cell">None</span>
+        <span class="s-cell" role="cell">Same VM, scaled compose mode with Nginx + 4 workers.</span>
+        <span class="s-cell" role="cell">~20K req/s</span>
+      </div>
+      <div class="scale-row" role="row">
+        <span class="s-stage" role="cell">Multi-state</span>
+        <span class="s-cell bold" role="cell">None</span>
+        <span class="s-cell" role="cell">Two VMs behind a Google Cloud load balancer.</span>
+        <span class="s-cell" role="cell">40·60K req/s</span>
+      </div>
+      <div class="scale-row" role="row">
+        <span class="s-stage" role="cell">National</span>
+        <span class="s-cell bold" role="cell">None</span>
+        <span class="s-cell" role="cell">GKE Autopilot + Memorystore Redis.</span>
+        <span class="s-cell" role="cell">Horizontal</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PROOF ============ -->
+<section class="proof act" aria-labelledby="proof-h">
+  <div class="frame">
+    <p class="act-num">Act V · Proof</p>
+    <h2 id="proof-h">Built by <em>Team Dhurandhar</em>. Open source.</h2>
+
+    <div class="proof-grid">
+      <div class="proof-item">
+        <h3>SPRINT 2026 · Team Dhurandhar</h3>
+        <p>Built end to end during the SPRINT 2026 cohort under the dmj.one banner. Voice ordering, supplier flows and admin hub all shipped in one cycle.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Resilience layers · everywhere</h3>
+        <p>Circuit breakers with exponential backoff and one-probe recovery. L1 in-process cache (1·120 s TTL). Batch writer with 50K buffer cap. Graceful shutdown with parallel flushes. Zero downtime drain.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Cluster mode · auto-detect cores</h3>
+        <p>One worker per CPU core. Two to four times throughput on the same VM, no manual config. Nginx edge cache (one year for static, thirty seconds for pricing) and gzip on every response.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Bounded queries · always</h3>
+        <p>Every Firestore scan has a <code>.limit()</code>. No runaway reads, ever. Haversine math runs sub-millisecond before any Maps API call is even attempted.</p>
+      </div>
+      <div class="proof-item">
+        <h3>ONDC · Beckn ready</h3>
+        <p>Open Network for Digital Commerce search and confirm endpoints implemented. JalSeva can list on India's national commerce protocol the day a supplier wants it.</p>
+      </div>
+      <div class="proof-item">
+        <h3>WCAG 2.2 AAA · slow phone</h3>
+        <p>ARIA labels, screen reader support, RTL-ready, reduced motion respected, full keyboard nav. The grandmother on a 4G feature-phone-style budget is a primary user.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STACK ============ -->
+<section class="stack" aria-labelledby="tech-h">
+  <div class="frame">
+    <p class="act-num">The Stack</p>
+    <h2 id="tech-h" style="font-size:var(--t-xl);font-weight:400;font-family:'Fraunces',serif;font-variation-settings:'opsz' 144,'SOFT' 50;margin:0;letter-spacing:-0.02em;">Next.js 16. Bun-fast TypeScript. <em>Production from line one.</em></h2>
+    <ul class="stack-list">
+      <li class="stack-tag">Next.js 16</li>
+      <li class="stack-tag">React 19</li>
+      <li class="stack-tag">TypeScript 5.9</li>
+      <li class="stack-tag">Tailwind CSS 4</li>
+      <li class="stack-tag">PWA (Serwist)</li>
+      <li class="stack-tag">Gemini 3 Flash</li>
+      <li class="stack-tag">Google Maps</li>
+      <li class="stack-tag">Firebase Auth (OTP)</li>
+      <li class="stack-tag">Cloud Firestore</li>
+      <li class="stack-tag">Upstash Redis</li>
+      <li class="stack-tag">Razorpay UPI</li>
+      <li class="stack-tag">Zustand</li>
+      <li class="stack-tag">Vitest</li>
+      <li class="stack-tag">Biome</li>
+      <li class="stack-tag">Docker · Nginx</li>
+      <li class="stack-tag">ONDC · Beckn</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ END CTA ============ -->
+<section class="endcta" aria-labelledby="cta-h">
+  <div class="frame">
+    <div>
+      <h2 id="cta-h">If 163 million Indians can drink from it, <em>your platform can run on it.</em></h2>
+      <p>I build production platforms that ship as one container, scale without rewrites, and treat the slow phone as a primary user. If your delivery, logistics or civic stack looks like this, I would like to talk.</p>
+    </div>
+    <div class="actions">
+      <a class="btn btn-primary" href="../index.html#hire">Hire me</a>
+      <a class="btn btn-ghost" href="../index.html">Back to catalogue</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="frame">
+    <div>
+      <h2 style="font-family:'Fraunces',serif;font-size:var(--t-xl);margin:0 0 1rem;">dmj<span class="dot">.</span>one</h2>
+      <p>Dream, Manifest and Journey, Together as One.</p>
+      <p class="meta">© 2026 Divya Mohan. JalSeva built by Team Dhurandhar during SPRINT 2026 under the dmj.one banner. ISC License.</p>
+    </div>
+    <div>
+      <p class="meta">Catalogue</p>
+      <p><a href="../index.html#catalogue">All 47 products</a></p>
+      <p><a href="../index.html#cat-bharat">Bharat-First</a></p>
+      <p><a href="../index.html#hire">Hire</a></p>
+    </div>
+    <div>
+      <p class="meta">JalSeva</p>
+      <p><a href="https://github.com/divyamohan1993/jalseva" rel="noopener">Source</a></p>
+      <p><a href="mailto:contact@dmj.one">contact@dmj.one</a></p>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

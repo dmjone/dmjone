@@ -1,0 +1,714 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#7a2c5e">
+<meta name="color-scheme" content="light">
+
+<title>SmartEvaluator-Omni · Four AI judges debate. One fair mark · dmj.one</title>
+<meta name="description" content="A multi-agent swarm grading system. Four specialised LLM judges (Gemini, Llama, Mistral or Claude, BERT) deliberate each answer, surface their reasoning, and converge on a fair, explainable mark. Audit trail per question.">
+<meta property="og:title" content="SmartEvaluator-Omni · The grading swarm">
+<meta property="og:description" content="Examiners are tired and biased. Four AI judges aren't. They debate, they justify, they converge on a defensible mark.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,30..100&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="../assets/core.css">
+
+<style>
+:root {
+  --accent: var(--c-ai);
+  --accent-deep: #4f1a3d;
+  --judge-1: #b03b5b;
+  --judge-2: #4b3e8e;
+  --judge-3: #2f7a47;
+  --judge-4: #b48a2b;
+}
+body { background: var(--paper); }
+
+/* ====== HERO · COURTROOM ============ */
+.le-hero {
+  position: relative;
+  padding-block: clamp(3rem, 5vw, 5rem) clamp(2rem, 4vw, 3rem);
+  border-bottom: var(--hair);
+  overflow: hidden;
+  background: var(--paper);
+}
+.le-hero::before {
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(ellipse 60% 80% at 50% 110%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 70%);
+  pointer-events: none;
+}
+.le-hero .frame { position: relative; z-index: 1; }
+
+.crumbs {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink-mute);
+  margin: 0 0 2rem;
+  display: flex; gap: 0.5rem; flex-wrap: wrap;
+}
+.crumbs a { border-bottom: 1px solid var(--ink-mute); padding-bottom: 1px; }
+.crumbs a:hover { color: var(--accent); border-color: var(--accent); }
+.crumbs span { color: var(--accent); }
+
+.le-eyebrow {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  padding: 0.4rem 0.85rem;
+  border: 1px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  color: var(--accent-deep);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  margin-bottom: 1.5rem;
+}
+.le-eyebrow::before {
+  content: ""; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+.le-hero h1 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-3xl);
+  font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 30, "WONK" 1;
+  letter-spacing: -0.03em;
+  line-height: 0.94;
+  margin: 0;
+  max-width: 14ch;
+}
+.le-hero h1 em {
+  font-style: italic;
+  color: var(--accent);
+  font-variation-settings: "opsz" 144, "SOFT" 100, "WONK" 1;
+}
+
+.le-hero .lede {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md);
+  font-weight: 300;
+  line-height: 1.45;
+  color: var(--ink-soft);
+  margin: 1.75rem 0 0;
+  max-width: 56ch;
+}
+.le-hero .lede strong {
+  font-weight: 600;
+  background: linear-gradient(180deg, transparent 60%, color-mix(in srgb, var(--accent) 30%, transparent) 60%);
+  padding: 0 0.1em;
+  color: var(--ink);
+}
+
+.cta-row {
+  margin-top: 1.75rem;
+  display: flex; gap: 0.75rem; flex-wrap: wrap;
+}
+.btn {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.7rem 1.1rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 700;
+  border: 1px solid var(--ink);
+  transition: background .15s, color .15s, transform .15s, box-shadow .15s;
+}
+.btn:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--ink); }
+.btn-primary { background: var(--accent); color: white; border-color: var(--accent); }
+.btn-ghost { background: transparent; color: var(--ink); }
+
+/* ====== COURTROOM TRANSCRIPT ============ */
+.courtroom {
+  margin-top: 3rem;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+}
+.case-head {
+  padding: 1rem 1.5rem;
+  background: var(--ink);
+  color: var(--paper);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  justify-content: space-between;
+}
+.case-head .caseid {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--paper) 70%, transparent);
+}
+.case-head .question {
+  font-family: 'Fraunces', serif;
+  font-size: 1.05rem;
+  font-style: italic;
+  color: var(--paper);
+}
+
+.transcript { display: grid; gap: 0; }
+.utter {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--paper-edge);
+  display: grid;
+  gap: 0.4rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) {
+  .utter { grid-template-columns: 11rem 1fr auto; gap: 1.5rem; align-items: start; }
+}
+.utter:last-child { border-bottom: 0; }
+.utter .speaker {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 700;
+  color: var(--judge);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.utter .speaker::before {
+  content: "";
+  width: 9px; height: 9px;
+  background: var(--judge);
+  border-radius: 50%;
+}
+.utter[data-j="1"] { --judge: var(--judge-1); }
+.utter[data-j="2"] { --judge: var(--judge-2); }
+.utter[data-j="3"] { --judge: var(--judge-3); }
+.utter[data-j="4"] { --judge: var(--judge-4); }
+.utter[data-j="0"] { --judge: var(--accent); background: color-mix(in srgb, var(--accent) 6%, transparent); }
+.utter .said {
+  font-family: 'Fraunces', serif;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  margin: 0;
+  color: var(--ink);
+}
+.utter .vote {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--judge);
+  white-space: nowrap;
+  letter-spacing: 0.04em;
+}
+
+.verdict {
+  background: color-mix(in srgb, var(--accent) 12%, var(--paper));
+  padding: 1.25rem 1.5rem;
+  border-top: 2px solid var(--accent);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1rem;
+  align-items: center;
+}
+.verdict .vlabel {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--accent-deep);
+  font-weight: 700;
+}
+.verdict .vfinal {
+  font-family: 'Fraunces', serif;
+  font-size: 1.6rem;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--accent-deep);
+  margin: 0.25rem 0 0;
+}
+.verdict .vmark {
+  font-family: 'Fraunces', serif;
+  font-size: 3rem;
+  font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 100;
+  color: var(--accent);
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+/* ====== STATS ============ */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  background: var(--ink);
+  color: var(--paper);
+  border-block: 2px solid var(--ink);
+}
+.stat {
+  padding: 1.5rem clamp(1rem, 2vw, 1.5rem);
+  border-right: 1px solid color-mix(in srgb, var(--paper) 20%, transparent);
+}
+.stat:last-child { border-right: 0; }
+.stat .num {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  font-variation-settings: "opsz" 144, "SOFT" 30;
+  display: block; line-height: 1; color: var(--accent);
+}
+.stat .lbl {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  margin-top: 0.6rem; display: block;
+  color: color-mix(in srgb, var(--paper) 75%, transparent);
+}
+
+/* ====== ACT ============ */
+.act {
+  padding-block: clamp(3rem, 5vw, 5rem);
+  border-bottom: var(--hair);
+}
+.act-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 700;
+  margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 1rem;
+}
+.act-num::before { content: ""; width: 2.5rem; height: 1px; background: var(--accent); }
+.act h2 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 50, "WONK" 1;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+  margin: 0 0 1.5rem;
+  max-width: 22ch;
+}
+.act h2 em { font-style: italic; color: var(--accent); }
+
+/* ====== JUDGES PANEL ============ */
+.bench {
+  display: grid;
+  gap: 0;
+  grid-template-columns: 1fr;
+  margin-top: 2rem;
+  border: 1px solid var(--ink);
+}
+@media (min-width: 880px) { .bench { grid-template-columns: repeat(4, 1fr); } }
+.judge {
+  padding: 1.5rem 1.25rem;
+  border-right: 1px solid var(--paper-edge);
+  background: var(--paper);
+  display: grid;
+  gap: 0.5rem;
+}
+.judge:last-child { border-right: 0; }
+@media (max-width: 879px) {
+  .judge { border-right: 0; border-bottom: 1px solid var(--paper-edge); }
+  .judge:last-child { border-bottom: 0; }
+}
+.judge[data-j="1"] { --jc: var(--judge-1); }
+.judge[data-j="2"] { --jc: var(--judge-2); }
+.judge[data-j="3"] { --jc: var(--judge-3); }
+.judge[data-j="4"] { --jc: var(--judge-4); }
+.judge .badge {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-weight: 700;
+  color: var(--jc);
+}
+.judge .badge::before {
+  content: ""; width: 10px; height: 10px;
+  background: var(--jc); border-radius: 50%;
+}
+.judge h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.15rem;
+  margin: 0;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.judge .role {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-size: 0.95rem;
+  color: var(--ink-mute);
+  margin: 0;
+}
+.judge .why {
+  font-size: var(--t-sm);
+  color: var(--ink-soft);
+  margin: 0.4rem 0 0;
+}
+
+/* ====== PROBLEM POINTS ============ */
+.pp-grid { display: grid; gap: 0; grid-template-columns: 1fr; margin-top: 2rem; border: 1px solid var(--ink); }
+@media (min-width: 760px) { .pp-grid { grid-template-columns: 1fr 1fr; } }
+.pp {
+  padding: 1.5rem 1.5rem;
+  border-right: 1px solid var(--paper-edge);
+  border-bottom: 1px solid var(--paper-edge);
+  background: var(--paper);
+}
+@media (min-width: 760px) {
+  .pp:nth-child(2n) { border-right: 0; }
+  .pp:nth-last-child(-n+2) { border-bottom: 0; }
+}
+.pp .pn {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-size: 1.5rem;
+  color: var(--accent);
+}
+.pp h3 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md);
+  font-weight: 500;
+  margin: 0.4rem 0 0.4rem;
+  letter-spacing: -0.01em;
+}
+.pp p { margin: 0; font-size: var(--t-sm); color: var(--ink-soft); }
+
+/* ====== TWIN ============ */
+.twin {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { .twin { grid-template-columns: 1fr 1fr; align-items: center; } }
+.twin h3 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-lg);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  margin: 0 0 0.5rem;
+}
+.twin h3 em { color: var(--accent); font-style: italic; }
+.twin p { margin: 0; font-size: var(--t-sm); color: var(--ink-soft); line-height: 1.5; }
+.twin .fakecard {
+  background: var(--paper-soft);
+  padding: 1rem 1.25rem;
+  border-left: 4px solid var(--accent);
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  color: var(--ink);
+  font-size: 0.95rem;
+}
+.twin .fakecard b { font-style: normal; font-weight: 700; color: var(--accent-deep); }
+
+/* ====== STACK ============ */
+.stack-list {
+  display: flex; flex-wrap: wrap; gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+.stack-tag {
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--ink);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 600;
+}
+
+/* ====== END CTA ============ */
+.endcta {
+  padding-block: clamp(3rem, 5vw, 5rem);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 10%, transparent), var(--paper));
+}
+.endcta .frame { display: grid; gap: 2rem; grid-template-columns: 1fr; }
+@media (min-width: 760px) { .endcta .frame { grid-template-columns: 2fr 1fr; align-items: end; } }
+.endcta h2 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 300;
+  font-variation-settings: "opsz" 144, "SOFT" 100;
+  margin: 0 0 1rem;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+}
+.endcta h2 em {
+  font-style: italic;
+  color: var(--accent);
+  background: linear-gradient(180deg, transparent 70%, color-mix(in srgb, var(--accent) 25%, transparent) 70%);
+}
+.endcta p { color: var(--ink-soft); margin: 0; max-width: 50ch; }
+.endcta .actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+
+.foot { background: var(--ink); color: var(--paper); }
+.foot .dot { color: var(--accent); }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topnav">
+  <div class="frame">
+    <div class="brand"><a href="../index.html">dmj<span class="dot">.</span>one</a></div>
+    <nav aria-label="Primary">
+      <ul>
+        <li><a href="../index.html#catalogue">Catalogue</a></li>
+        <li><a href="../index.html#manifesto">Manifesto</a></li>
+        <li><a href="../index.html#hire">Hire</a></li>
+        <li><a href="https://github.com/divyamohan1993/llm-evaluator" rel="noopener">GitHub</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ============ HERO ============ -->
+<section class="le-hero">
+  <div class="frame">
+    <p class="crumbs">
+      <a href="../index.html">Catalogue</a> /
+      <a href="../index.html#cat-ai">AI · Agents</a> /
+      <span>SmartEvaluator-Omni</span>
+    </p>
+
+    <span class="le-eyebrow">No. 19 · AI · Multi-agent grading swarm</span>
+
+    <h1>
+      Four AI judges <em>argue.</em><br>
+      One <em>fair</em> mark.
+    </h1>
+
+    <p class="lede">
+      One examiner is tired, biased, slow and outnumbered. Four specialised AI judges aren't. They <strong>read the same answer in parallel</strong>, lay out their reasoning, weigh each other's verdicts, and converge on a mark a student can dispute and a teacher can defend.
+    </p>
+
+    <div class="cta-row">
+      <a class="btn btn-primary" href="https://github.com/divyamohan1993/llm-evaluator" rel="noopener">View source</a>
+      <a class="btn btn-ghost" href="#bench">Meet the judges</a>
+      <a class="btn btn-ghost" href="#twin">The Digital Twin</a>
+    </div>
+
+    <!-- Courtroom transcript -->
+    <article class="courtroom" aria-label="Sample deliberation transcript">
+      <header class="case-head">
+        <span class="caseid">Case Q-0431 · OS · Semaphores · 10 marks</span>
+        <span class="question">"Explain how a binary semaphore prevents race conditions in producer-consumer."</span>
+      </header>
+      <div class="transcript">
+        <div class="utter" data-j="1">
+          <span class="speaker">Judge 01 · Gemini</span>
+          <p class="said">Definition is correct. Cited atomic P() and V(). Missed the bounded-buffer wraparound case. Strong on theory, light on application.</p>
+          <span class="vote">Vote · 7.5 / 10</span>
+        </div>
+        <div class="utter" data-j="2">
+          <span class="speaker">Judge 02 · Llama 3</span>
+          <p class="said">Pseudocode is syntactically valid. Init values stated. Critical section is correctly bracketed. Would award full 4 of 4 for code.</p>
+          <span class="vote">Vote · 8.0 / 10</span>
+        </div>
+        <div class="utter" data-j="3">
+          <span class="speaker">Judge 03 · Claude</span>
+          <p class="said">Concur on theory. Disagree with Judge 01 on the missed case, the student does mention "modulo N" implicitly. Half-mark restored.</p>
+          <span class="vote">Vote · 8.0 / 10</span>
+        </div>
+        <div class="utter" data-j="4">
+          <span class="speaker">Judge 04 · BERT · Plagiarism</span>
+          <p class="said">Cosine similarity 0.18 against the corpus. No verbatim copy detected. No veto raised.</p>
+          <span class="vote">Pass · No veto</span>
+        </div>
+        <div class="utter" data-j="0">
+          <span class="speaker">Consensus engine</span>
+          <p class="said">Weighted average across judges (0.30 / 0.25 / 0.30 / 0.15 with veto). Consensus mark recorded with full deliberation log.</p>
+          <span class="vote">Final · 7.83 / 10</span>
+        </div>
+      </div>
+      <div class="verdict">
+        <div>
+          <span class="vlabel">Final mark · explainable · auditable</span>
+          <p class="vfinal">Awarded 7.83 / 10 with deliberation log attached.</p>
+        </div>
+        <span class="vmark">7.83</span>
+      </div>
+    </article>
+  </div>
+</section>
+
+
+<!-- ============ STATS ============ -->
+<section class="stats" aria-label="At a glance">
+  <div class="stat"><span class="num">4</span><span class="lbl">Specialised LLM judges</span></div>
+  <div class="stat"><span class="num">1</span><span class="lbl">Veto vote on plagiarism</span></div>
+  <div class="stat"><span class="num">2</span><span class="lbl">Inference modes (cloud + local)</span></div>
+  <div class="stat"><span class="num">∞</span><span class="lbl">Audit log entries per question</span></div>
+  <div class="stat"><span class="num">0</span><span class="lbl">Single-judge bias</span></div>
+</section>
+
+
+<!-- ============ ACT I · PROBLEM ============ -->
+<section class="act" aria-labelledby="prob-h">
+  <div class="frame">
+    <p class="act-num">Act I · The Problem</p>
+    <h2 id="prob-h">A tired examiner<br>at <em>2 a.m.</em></h2>
+    <p style="font-family:'Fraunces',serif;font-size:var(--t-md);color:var(--ink-soft);max-width:60ch;margin:0;">Examiners grade hundreds of papers a week. Marks reflect mood, fatigue and order, not just the answer. Students can't see the reasoning. Teachers can't defend the score.</p>
+
+    <div class="pp-grid">
+      <div class="pp">
+        <span class="pn">i.</span>
+        <h3>Single-rater bias.</h3>
+        <p>One examiner equals one judgment call. Studies repeatedly show inter-rater variance of two full points on the same essay.</p>
+      </div>
+      <div class="pp">
+        <span class="pn">ii.</span>
+        <h3>No audit trail.</h3>
+        <p>The student receives a number. There is no log of the reasoning behind it. Disputes go nowhere.</p>
+      </div>
+      <div class="pp">
+        <span class="pn">iii.</span>
+        <h3>Plagiarism caught too late.</h3>
+        <p>Manual checks happen after the mark is awarded. By then the verdict is on the report card.</p>
+      </div>
+      <div class="pp">
+        <span class="pn">iv.</span>
+        <h3>One model is one bias.</h3>
+        <p>Use only Gemini and you inherit Gemini's blind spots. Use only Claude and you inherit Claude's. The fix is plurality.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ ACT II · THE BENCH ============ -->
+<section class="act" id="bench" style="background:var(--paper-soft);" aria-labelledby="bench-h">
+  <div class="frame">
+    <p class="act-num">Act II · The Bench</p>
+    <h2 id="bench-h">The four judges.<br>One <em>specialty</em> each.</h2>
+    <p style="font-family:'Fraunces',serif;font-size:var(--t-md);color:var(--ink-soft);max-width:60ch;margin:0;">Each model is asked the question it is best at. Their verdicts are weighted. The plagiarism judge can veto outright.</p>
+
+    <div class="bench">
+      <article class="judge" data-j="1">
+        <span class="badge">Judge 01</span>
+        <h3>Gemini Pro</h3>
+        <p class="role">The theorist.</p>
+        <p class="why">Reads the answer for conceptual accuracy. Strongest on definition, derivation, citation. Cloud inference via Google API.</p>
+      </article>
+      <article class="judge" data-j="2">
+        <span class="badge">Judge 02</span>
+        <h3>Llama 3 (Ollama)</h3>
+        <p class="role">The code reader.</p>
+        <p class="why">Local inference. Reads pseudocode and source for syntactic and structural correctness. No data leaves the building.</p>
+      </article>
+      <article class="judge" data-j="3">
+        <span class="badge">Judge 03</span>
+        <h3>Mistral or Claude</h3>
+        <p class="role">The dissenter.</p>
+        <p class="why">Reads the other judges' verdicts and argues against them when warranted. Restores marks the panel missed.</p>
+      </article>
+      <article class="judge" data-j="4">
+        <span class="badge">Judge 04</span>
+        <h3>BERT (similarity)</h3>
+        <p class="role">The veto.</p>
+        <p class="why">Computes cosine similarity against the corpus. Plagiarism above threshold cancels the panel verdict.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ ACT III · DIGITAL TWIN ============ -->
+<section class="act" id="twin" aria-labelledby="twin-h">
+  <div class="frame">
+    <p class="act-num">Act III · The Digital Twin</p>
+    <h2 id="twin-h">Grade in <em>your</em> teacher's voice.</h2>
+    <p style="font-family:'Fraunces',serif;font-size:var(--t-md);color:var(--ink-soft);max-width:60ch;margin:0;">A Vector RAG persona engine learns each teacher's style. Strict on units? Generous on partial credit? The swarm grades the way that teacher would, every time.</p>
+
+    <div class="twin">
+      <div>
+        <h3>The <em>Persona RAG</em> engine.</h3>
+        <p>Past corrected answers feed ChromaDB. Every new submission is graded by the swarm with that teacher's vector context injected. Two teachers get two different fair marks for the same paper, and both can defend their own.</p>
+      </div>
+      <div class="fakecard">
+        "Award partial credit for correctly stated principle even if the worked example is missing." <b>Dr Mehta's grading style, learned over 312 prior assessments.</b>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ ACT IV · INFRA ============ -->
+<section class="act" aria-labelledby="infra-h">
+  <div class="frame">
+    <p class="act-num">Act IV · Hybrid Infra</p>
+    <h2 id="infra-h">Cloud APIs <em>and</em> local Ollama.<br>Switch on a per-question basis.</h2>
+    <p style="font-family:'Fraunces',serif;font-size:var(--t-md);color:var(--ink-soft);max-width:60ch;margin:0;">A router decides which judge runs in the cloud and which runs on-prem. Sensitive student data never has to leave the institution.</p>
+
+    <ul class="stack-list">
+      <li class="stack-tag">Python 3.10+</li>
+      <li class="stack-tag">FastAPI (async)</li>
+      <li class="stack-tag">LangChain · CrewAI</li>
+      <li class="stack-tag">ChromaDB</li>
+      <li class="stack-tag">Pinecone (cloud)</li>
+      <li class="stack-tag">Ollama · Llama 3 local</li>
+      <li class="stack-tag">Google Gemini Pro</li>
+      <li class="stack-tag">Anthropic Claude</li>
+      <li class="stack-tag">OpenAI GPT-4</li>
+      <li class="stack-tag">BERT similarity</li>
+      <li class="stack-tag">Weighted consensus matrix</li>
+      <li class="stack-tag">Audit trail per question</li>
+    </ul>
+  </div>
+</section>
+
+
+<!-- ============ END CTA ============ -->
+<section class="endcta" aria-labelledby="cta-h">
+  <div class="frame">
+    <div>
+      <h2 id="cta-h">If a mark must be defensible, <em>one model is not enough.</em></h2>
+      <p>I architect multi-agent grading systems with auditable consensus, persona learning and on-prem fallback. Built for institutions where every mark might land in court.</p>
+    </div>
+    <div class="actions">
+      <a class="btn btn-primary" href="../index.html#hire">Hire me</a>
+      <a class="btn btn-ghost" href="../index.html">Back to catalogue</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="frame">
+    <div>
+      <h2 style="font-family:'Fraunces',serif;font-size:var(--t-xl);margin:0 0 1rem;">dmj<span class="dot">.</span>one</h2>
+      <p>Dream, Manifest and Journey, Together as One.</p>
+      <p class="meta">© 2026 Divya Mohan. SmartEvaluator-Omni released under MIT.</p>
+    </div>
+    <div>
+      <p class="meta">Catalogue</p>
+      <p><a href="../index.html#catalogue">All 47 products</a></p>
+      <p><a href="../index.html#cat-ai">AI · Agents</a></p>
+      <p><a href="../index.html#hire">Hire</a></p>
+    </div>
+    <div>
+      <p class="meta">SmartEvaluator-Omni</p>
+      <p><a href="https://github.com/divyamohan1993/llm-evaluator" rel="noopener">Source</a></p>
+      <p><a href="mailto:contact@dmj.one">contact@dmj.one</a></p>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

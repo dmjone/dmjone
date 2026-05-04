@@ -1,0 +1,658 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#b48a2b">
+<meta name="color-scheme" content="light">
+
+<title>Facebook to Blog · The poetry survives the platform · dmj.one</title>
+<meta name="description" content="A poetry blog that feels what your words feel. Auto-syncs poems from a Facebook group to a theme-aware site that adapts colour, type and mood to each poem. Built for poets. Free to host.">
+<meta property="og:title" content="Facebook to Blog · The poetry survives the platform.">
+<meta property="og:description" content="An auto-sync from Facebook to a beautiful, theme-aware poetry blog. Search, comments, newsletter. No platform lock.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,ital,wght,SOFT@9..144,0..1,300..900,30..100&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;600&family=Tiro+Devanagari+Hindi:ital@0;1&display=swap">
+<link rel="stylesheet" href="../assets/core.css">
+
+<style>
+:root { --accent: var(--c-tools); --accent-deep: #7a5d18; --rose: #b3506b; --rose-soft: #f3e0d8; }
+body { background: var(--paper); }
+
+.crumbs {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink-mute);
+  margin: 0 0 1.75rem;
+  display: flex; gap: 0.5rem; flex-wrap: wrap;
+}
+.crumbs a { border-bottom: 1px solid var(--ink-mute); padding-bottom: 1px; }
+.crumbs a:hover { color: var(--accent); border-color: var(--accent); }
+.crumbs span { color: var(--accent); }
+
+.btn {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.7rem 1.1rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 700;
+  border: 1px solid var(--ink);
+  transition: background .15s, color .15s, transform .15s, box-shadow .15s;
+}
+.btn:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--ink); }
+.btn-primary { background: var(--accent); color: white; border-color: var(--accent); }
+.btn-primary:hover { box-shadow: 4px 4px 0 var(--ink); }
+.btn-ghost { background: transparent; color: var(--ink); }
+
+/* ====== HERO · magazine cover ============ */
+.fb-hero {
+  position: relative;
+  border-bottom: var(--hair);
+  padding-block: clamp(3rem, 5vw + 1rem, 6rem) clamp(2.5rem, 4vw, 4.5rem);
+  background:
+    radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--accent) 14%, transparent), transparent 55%),
+    var(--paper);
+  overflow: hidden;
+}
+.fb-hero::after {
+  content: "";
+  position: absolute; inset: 0;
+  background:
+    repeating-linear-gradient(180deg,
+      transparent 0,
+      transparent 38px,
+      color-mix(in srgb, var(--ink) 4%, transparent) 38px,
+      color-mix(in srgb, var(--ink) 4%, transparent) 39px);
+  mask-image: linear-gradient(180deg, transparent 0%, black 30%, black 80%, transparent 100%);
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, black 30%, black 80%, transparent 100%);
+  pointer-events: none;
+}
+.fb-hero .frame { position: relative; z-index: 2; }
+
+.masthead {
+  display: flex; align-items: baseline; justify-content: space-between;
+  border-block: 1px solid var(--ink);
+  padding-block: 0.75rem;
+  margin-bottom: 2.25rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  flex-wrap: wrap; gap: 0.5rem;
+}
+.masthead .iss { color: var(--accent-deep); font-weight: 700; }
+.masthead .vol { color: var(--ink-mute); }
+
+.fb-eyebrow {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  padding: 0.4rem 0.85rem;
+  border: 1px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  color: var(--accent-deep);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  margin-bottom: 1.25rem;
+}
+.fb-eyebrow::before {
+  content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--accent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+.fb-hero h1 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-3xl);
+  font-weight: 300;
+  font-variation-settings: "opsz" 144, "SOFT" 100, "WONK" 1;
+  letter-spacing: -0.04em;
+  line-height: 0.92;
+  margin: 0;
+  max-width: 14ch;
+}
+.fb-hero h1 em {
+  font-style: italic;
+  color: var(--accent-deep);
+  font-variation-settings: "opsz" 144, "SOFT" 100, "WONK" 1;
+}
+
+.fb-hero .lede {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md);
+  font-weight: 300;
+  line-height: 1.5;
+  color: var(--ink-soft);
+  margin: 1.75rem 0 0;
+  max-width: 56ch;
+}
+.fb-hero .lede strong {
+  font-weight: 600;
+  color: var(--ink);
+  background: linear-gradient(180deg, transparent 60%, color-mix(in srgb, var(--accent) 28%, transparent) 60%);
+  padding: 0 0.1em;
+}
+.fb-cta { margin-top: 2rem; display: flex; gap: 0.6rem; flex-wrap: wrap; }
+
+/* ====== POETRY PULL ===================== */
+.pull {
+  margin-top: 3rem;
+  border-top: 1px solid var(--ink);
+  border-bottom: 1px solid var(--ink);
+  padding-block: clamp(2.5rem, 5vw, 4.5rem);
+  text-align: center;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 50%, color-mix(in srgb, var(--accent) 8%, transparent), transparent 70%);
+}
+.pull blockquote {
+  margin: 0 auto;
+  max-width: 36ch;
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-size: clamp(1.6rem, 1rem + 2.5vw, 2.6rem);
+  font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 100, "WONK" 1;
+  letter-spacing: -0.015em;
+  line-height: 1.25;
+  color: var(--ink);
+}
+.pull blockquote .deva {
+  display: block;
+  font-family: 'Tiro Devanagari Hindi', serif;
+  font-style: italic;
+  font-size: 0.7em;
+  color: var(--accent-deep);
+  margin-top: 1rem;
+  letter-spacing: 0;
+}
+.pull cite {
+  display: block;
+  margin-top: 1.5rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  font-style: normal;
+}
+.pull cite::before { content: "· "; }
+
+/* ====== STATS RIBBON ===================== */
+.fb-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  background: var(--ink);
+  color: var(--paper);
+  border-block: 2px solid var(--ink);
+}
+.fb-stat {
+  padding: 1.5rem clamp(1rem, 2vw, 1.5rem);
+  border-right: 1px solid color-mix(in srgb, var(--paper) 20%, transparent);
+}
+.fb-stat:last-child { border-right: 0; }
+.fb-stat .num {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  font-variation-settings: "opsz" 144, "SOFT" 30;
+  display: block;
+  line-height: 1;
+  color: var(--accent);
+}
+.fb-stat .lbl {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  margin-top: 0.6rem;
+  display: block;
+  color: color-mix(in srgb, var(--paper) 75%, transparent);
+}
+
+/* ====== ACTS ===================== */
+.act {
+  padding-block: clamp(3rem, 5vw, 5rem);
+  border-bottom: var(--hair);
+}
+.act-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 700;
+  margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 1rem;
+}
+.act-num::before { content: ""; width: 2.5rem; height: 1px; background: var(--accent); }
+.act h2 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 50, "WONK" 1;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+  margin: 0 0 1.5rem;
+  max-width: 22ch;
+}
+.act h2 em { font-style: italic; color: var(--accent); }
+.act-lede {
+  font-family: 'Fraunces', serif; font-size: var(--t-md);
+  color: var(--ink-soft); max-width: 56ch; margin: 0;
+}
+
+/* drop-cap problem */
+.dropcap {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md);
+  font-weight: 400;
+  line-height: 1.55;
+  color: var(--ink);
+  margin: 1.5rem 0 0;
+  max-width: 60ch;
+  column-count: 1;
+}
+.dropcap::first-letter {
+  font-family: 'Fraunces', serif;
+  font-size: 4.6rem;
+  font-weight: 300;
+  font-style: italic;
+  font-variation-settings: "opsz" 144, "SOFT" 100, "WONK" 1;
+  float: left;
+  line-height: 0.8;
+  margin: 0.4rem 0.6rem 0 0;
+  color: var(--accent-deep);
+}
+.dropcap em { font-style: italic; color: var(--accent-deep); }
+
+/* moods palette grid */
+.moods {
+  margin-top: 2.5rem;
+  display: grid; gap: 0;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-sm);
+}
+.mood-row {
+  display: grid;
+  grid-template-columns: 1.25fr 1fr 1fr 1.4fr;
+  border-bottom: 1px solid var(--paper-edge);
+  align-items: stretch;
+}
+.mood-row:last-child { border-bottom: 0; }
+.mood-row.head {
+  background: var(--ink);
+  color: var(--accent);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-size: var(--t-xs);
+}
+.mood-row > div {
+  padding: 0.85rem 1rem;
+  border-right: 1px solid var(--paper-edge);
+}
+.mood-row > div:last-child { border-right: 0; }
+.mood-name {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-size: 1.05rem;
+  color: var(--ink);
+  display: flex; align-items: center; gap: 0.6rem;
+}
+.mood-swatch { width: 14px; height: 14px; border-radius: 3px; border: 1px solid var(--ink); display: inline-block; }
+.mood-row.head > div { padding: 0.7rem 1rem; }
+
+/* sync flow */
+.flow {
+  margin-top: 2.5rem;
+  display: grid; gap: 1rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 800px) { .flow { grid-template-columns: repeat(3, 1fr); } }
+.flow-step {
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  padding: 1.5rem;
+  position: relative;
+}
+.flow-step .n {
+  position: absolute; top: -14px; left: 18px;
+  background: var(--accent); color: white;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  padding: 0.25rem 0.6rem;
+}
+.flow-step h3 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md);
+  margin: 0.5rem 0 0.5rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.flow-step p { margin: 0; font-size: var(--t-sm); color: var(--ink-soft); }
+
+/* stack */
+.stack { padding-block: clamp(3rem, 5vw, 5rem); border-bottom: var(--hair); }
+.stack-list { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.5rem; }
+.stack-tag {
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--ink);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 600;
+}
+
+/* proof */
+.proof {
+  background: var(--ink);
+  color: var(--paper);
+  padding-block: clamp(3rem, 5vw, 5rem);
+  position: relative;
+  overflow: hidden;
+}
+.proof::before {
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 20% 80%, color-mix(in srgb, var(--accent) 28%, transparent), transparent 60%);
+  pointer-events: none;
+}
+.proof .frame { position: relative; }
+.proof h2 { color: var(--paper); }
+.proof h2 em { color: var(--accent); }
+.proof-grid { display: grid; gap: 1rem; margin-top: 2rem; grid-template-columns: 1fr; }
+@media (min-width: 760px) { .proof-grid { grid-template-columns: repeat(2, 1fr); } }
+.proof-item {
+  border: 1px solid color-mix(in srgb, var(--paper) 30%, transparent);
+  padding: 1.5rem;
+  background: color-mix(in srgb, var(--paper) 5%, transparent);
+}
+.proof-item h3 {
+  font-family: 'Fraunces', serif;
+  margin: 0 0 0.5rem;
+  font-size: var(--t-md);
+  color: var(--accent);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.proof-item p { margin: 0; color: color-mix(in srgb, var(--paper) 80%, transparent); font-size: var(--t-sm); }
+
+/* end cta */
+.endcta {
+  padding-block: clamp(3rem, 5vw, 5rem);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 10%, transparent), var(--paper));
+}
+.endcta .frame { display: grid; gap: 2rem; grid-template-columns: 1fr; }
+@media (min-width: 760px) { .endcta .frame { grid-template-columns: 2fr 1fr; align-items: end; } }
+.endcta h2 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 300;
+  font-variation-settings: "opsz" 144, "SOFT" 100;
+  margin: 0 0 1rem;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+}
+.endcta h2 em {
+  font-style: italic;
+  color: var(--accent);
+  background: linear-gradient(180deg, transparent 70%, color-mix(in srgb, var(--accent) 25%, transparent) 70%);
+}
+.endcta p { color: var(--ink-soft); margin: 0; max-width: 50ch; }
+.endcta .actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+
+.foot { background: var(--ink); color: var(--paper); }
+.foot .dot { color: var(--accent); }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topnav">
+  <div class="frame">
+    <div class="brand"><a href="../index.html">dmj<span class="dot">.</span>one</a></div>
+    <nav aria-label="Primary">
+      <ul>
+        <li><a href="../index.html#catalogue">Catalogue</a></li>
+        <li><a href="../index.html#manifesto">Manifesto</a></li>
+        <li><a href="../index.html#hire">Hire</a></li>
+        <li><a href="https://github.com/divyamohan1993/facebook-to-blog" rel="noopener">GitHub</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ============ HERO ============ -->
+<section class="fb-hero">
+  <div class="frame">
+    <p class="crumbs">
+      <a href="../index.html">Catalogue</a> /
+      <a href="../index.html#cat-tools">Tools</a> /
+      <span>Facebook to Blog</span>
+    </p>
+
+    <div class="masthead" aria-hidden="true">
+      <span class="iss">Volume 01 · Issue 42</span>
+      <span class="vol">A poetry blog · open source · static · WCAG AAA</span>
+    </div>
+
+    <span class="fb-eyebrow">No. 42 · Tools · Publishing</span>
+
+    <h1>The poetry <em>survives</em> the platform.</h1>
+
+    <p class="lede">
+      A poet writes for ten years on a Facebook group nobody indexes. Then one morning the platform changes the rules, or quietly takes the page down. <strong>This tool moves the poems out · to a beautiful, theme-aware blog with search, comments and a newsletter.</strong> Mood is auto-detected. Hindi, Hinglish and English supported from line one. Free to host.
+    </p>
+
+    <div class="fb-cta">
+      <a class="btn btn-primary" href="https://github.com/divyamohan1993/facebook-to-blog" rel="noopener">View source</a>
+      <a class="btn btn-ghost" href="#how">See how it works</a>
+    </div>
+
+    <!-- poetry pull -->
+    <figure class="pull" aria-label="Original verse evoking Bharat, written for this page">
+      <blockquote>
+        She kept the Ganga in a brass cup,<br>
+        and a small fire, and a very old name.
+        <span class="deva">वो पीतल के लोटे में गंगा रखती थी ·<br>एक नन्ही आग, एक बहुत पुराना नाम।</span>
+      </blockquote>
+      <cite>An evening verse, written here</cite>
+    </figure>
+  </div>
+</section>
+
+<!-- ============ STATS ============ -->
+<section class="fb-stats" aria-label="At a glance">
+  <div class="fb-stat"><span class="num">7</span><span class="lbl">Moods, auto-detected</span></div>
+  <div class="fb-stat"><span class="num">14</span><span class="lbl">Visual worlds (light + dark)</span></div>
+  <div class="fb-stat"><span class="num">3 langs</span><span class="lbl">Hindi · Hinglish · English</span></div>
+  <div class="fb-stat"><span class="num">18</span><span class="lbl">Tests passing</span></div>
+  <div class="fb-stat"><span class="num">$0</span><span class="lbl">Hosting on Vercel free tier</span></div>
+</section>
+
+<!-- ============ ACT I · PROBLEM ============ -->
+<section class="act" aria-labelledby="prob-h">
+  <div class="frame">
+    <p class="act-num">Act I · The Problem</p>
+    <h2 id="prob-h">A poet writes ten years.<br><em>The feed eats them all.</em></h2>
+
+    <p class="dropcap">
+      Mrs. Vaidya wrote for a small Facebook group. Her poems were read by a few hundred people who loved them, and forgotten by an algorithm that loved <em>engagement</em>. Search engines never saw the words. The newsletter never went out. One day the group will lock, or rename, or close. The verse will follow it down. <strong>Not because anyone wanted it gone. Because no platform was ever built to keep it.</strong>
+    </p>
+  </div>
+</section>
+
+<!-- ============ ACT II · PROMISE ============ -->
+<section class="act" id="how" aria-labelledby="promise-h" style="background: var(--paper-soft);">
+  <div class="frame">
+    <p class="act-num">Act II · The Promise</p>
+    <h2 id="promise-h">Every poem gets <em>its own world.</em></h2>
+    <p class="act-lede">Mood is detected from the words themselves · Hindi and English keywords both. The whole page changes: palette, type, particles, even the cursor's quiet companions. Same blog, seven evenings.</p>
+
+    <div class="moods" role="table" aria-label="Mood themes">
+      <div class="mood-row head" role="row">
+        <div role="columnheader">Mood</div>
+        <div role="columnheader">Light</div>
+        <div role="columnheader">Dark</div>
+        <div role="columnheader">Particles</div>
+      </div>
+      <div class="mood-row" role="row">
+        <div class="mood-name"><span class="mood-swatch" style="background:#b3506b" aria-hidden="true"></span>Love</div>
+        <div>Cream, rose, gold</div><div>Burgundy, pink glow</div><div>Floating petals</div>
+      </div>
+      <div class="mood-row" role="row">
+        <div class="mood-name"><span class="mood-swatch" style="background:#355c3c" aria-hidden="true"></span>Nature</div>
+        <div>Warm white, forest</div><div>Dark forest, emerald</div><div>Drifting leaves</div>
+      </div>
+      <div class="mood-row" role="row">
+        <div class="mood-name"><span class="mood-swatch" style="background:#4a5b8a" aria-hidden="true"></span>Sadness</div>
+        <div>Pale lavender, slate</div><div>Deep navy, indigo</div><div>Falling rain</div>
+      </div>
+      <div class="mood-row" role="row">
+        <div class="mood-name"><span class="mood-swatch" style="background:#d8b85a" aria-hidden="true"></span>Joy</div>
+        <div>Warm ivory, amber</div><div>Charcoal, sunflower</div><div>Sparkles</div>
+      </div>
+      <div class="mood-row" role="row">
+        <div class="mood-name"><span class="mood-swatch" style="background:#d8631a" aria-hidden="true"></span>Spiritual</div>
+        <div>Off-white, saffron</div><div>Deep purple, saffron</div><div>Incense wisps</div>
+      </div>
+      <div class="mood-row" role="row">
+        <div class="mood-name"><span class="mood-swatch" style="background:#b03030" aria-hidden="true"></span>Anger</div>
+        <div>Light ash, crimson</div><div>Near-black, ember</div><div>Floating embers</div>
+      </div>
+      <div class="mood-row" role="row">
+        <div class="mood-name"><span class="mood-swatch" style="background:#a8804a" aria-hidden="true"></span>Nostalgia</div>
+        <div>Parchment, sepia</div><div>Dark walnut, grain</div><div>Dust motes</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ACT III · FLOW ============ -->
+<section class="act" aria-labelledby="flow-h">
+  <div class="frame">
+    <p class="act-num">Act III · The Product</p>
+    <h2 id="flow-h">Three ways in.<br>One <em>quiet</em> archive out.</h2>
+    <p class="act-lede">The poet should never have to think about JSON, or moods, or YAML. They write. The blog publishes.</p>
+
+    <ol class="flow">
+      <li class="flow-step">
+        <span class="n">A · CLI</span>
+        <h3>Interactive add-poem.</h3>
+        <p>Run <code>pnpm add-poem</code>. It asks for title, poem text, language. Mood is auto-detected. The MDX file is written. Done.</p>
+      </li>
+      <li class="flow-step">
+        <span class="n">B · MDX file</span>
+        <h3>Drop it in content/poems/.</h3>
+        <p>One file per poem. Frontmatter is optional, mood is auto-detected from Hindi and English keywords. Override anytime. <code>pnpm build</code>, deploy.</p>
+      </li>
+      <li class="flow-step">
+        <span class="n">C · Facebook import</span>
+        <h3>Bulk-import the archive.</h3>
+        <p>Request your Facebook data as JSON, point the import script at it, every post becomes a poem. Moods detected, dates preserved, original Facebook links kept.</p>
+      </li>
+    </ol>
+
+    <p style="font-family:'Fraunces',serif;font-style:italic;color:var(--ink-soft);margin-top:2.5rem;font-size:var(--t-md);max-width:60ch;">
+      A 3D leather book opens on the homepage. Search is fuzzy and instant. Bottom-tab navigation on mobile. Dark and light each get their own palette per mood. Skip links, focus rings, 7:1 contrast everywhere · because the poet's audience reads on whatever phone they have.
+    </p>
+  </div>
+</section>
+
+<!-- ============ STACK ============ -->
+<section class="stack" aria-labelledby="stack-h">
+  <div class="frame">
+    <p class="act-num">The Stack</p>
+    <h2 id="stack-h" style="font-size:var(--t-xl);font-weight:400;font-family:'Fraunces',serif;font-variation-settings:'opsz' 144,'SOFT' 50;margin:0;letter-spacing:-0.02em;">Static at build. Free at runtime. <em>Beautiful at any speed.</em></h2>
+    <ul class="stack-list">
+      <li class="stack-tag">Next.js 16 · App Router</li>
+      <li class="stack-tag">React 19</li>
+      <li class="stack-tag">TypeScript 5.9 (strict)</li>
+      <li class="stack-tag">Tailwind CSS 4</li>
+      <li class="stack-tag">Framer Motion 12</li>
+      <li class="stack-tag">MDX · gray-matter</li>
+      <li class="stack-tag">Fuse.js (client search)</li>
+      <li class="stack-tag">Vitest 4</li>
+      <li class="stack-tag">Tiro Devanagari · Crimson Pro</li>
+      <li class="stack-tag">Vercel free tier</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ PROOF ============ -->
+<section class="proof act" aria-labelledby="proof-h">
+  <div class="frame">
+    <p class="act-num">Act IV · Proof</p>
+    <h2 id="proof-h">Built for a real poet. <em>Designed for every poet.</em></h2>
+
+    <div class="proof-grid">
+      <div class="proof-item">
+        <h3>Mood detection in Hindi + English</h3>
+        <p>The detector reads Devanagari keywords (प्रेम, क्रोध, मेघ, राम) alongside English ones, so Hinglish and Hindi poems never default to the wrong palette.</p>
+      </div>
+      <div class="proof-item">
+        <h3>WCAG 2.2 AAA, 7:1 contrast</h3>
+        <p>Every mood, light and dark, holds 7:1 minimum text contrast. Skip link, focus rings, reduced-motion respect, screen-reader-friendly book hero.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Static export, free hosting</h3>
+        <p>The whole site exports to <code>out/</code> at build. No server, no database, no API costs. Vercel free tier is enough for a poet's lifetime.</p>
+      </div>
+      <div class="proof-item">
+        <h3>18 tests, all passing</h3>
+        <p>Mood detection, content parsing, theme switching and language routing are all covered. The poet doesn't see the tests. The poet sees the poems.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ END CTA ============ -->
+<section class="endcta" aria-labelledby="cta-h">
+  <div class="frame">
+    <div>
+      <h2 id="cta-h">Your community lives on someone else's feed. <em>Move it home.</em></h2>
+      <p>I build static, beautiful, multilingual publishing for people the platforms forget. Editorial typography, mood-aware design, accessibility from line one, and a build cost that rounds to zero.</p>
+    </div>
+    <div class="actions">
+      <a class="btn btn-primary" href="../index.html#hire">Hire me</a>
+      <a class="btn btn-ghost" href="../index.html">Back to catalogue</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="frame">
+    <div>
+      <h2 style="font-family:'Fraunces',serif;font-size:var(--t-xl);margin:0 0 1rem;">dmj<span class="dot">.</span>one</h2>
+      <p>Dream, Manifest and Journey, Together as One.</p>
+      <p class="meta">© 2026 Divya Mohan. Facebook to Blog was built for Mrs. Vaidya, and designed for every poet. MIT license.</p>
+    </div>
+    <div>
+      <p class="meta">Catalogue</p>
+      <p><a href="../index.html#catalogue">All 47 products</a></p>
+      <p><a href="../index.html#cat-tools">Tools</a></p>
+      <p><a href="../index.html#hire">Hire</a></p>
+    </div>
+    <div>
+      <p class="meta">Facebook to Blog</p>
+      <p><a href="https://github.com/divyamohan1993/facebook-to-blog" rel="noopener">Source</a></p>
+      <p><a href="mailto:contact@dmj.one">contact@dmj.one</a></p>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

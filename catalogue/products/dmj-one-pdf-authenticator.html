@@ -1,0 +1,735 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1f3a5f">
+<meta name="color-scheme" content="light">
+
+<title>PDF Authenticator - Zero-knowledge document signing on the edge · dmj.one</title>
+<meta name="description" content="A zero-knowledge PDF signing and verification system on Cloudflare Workers + D1. PAdES signatures via Apache PDFBox. SPKI-pinned verify portal. TOTP-secured revocation. Stores only 32-byte SHA-256 hashes.">
+<meta property="og:title" content="PDF Authenticator · Zero-knowledge document signing on the edge">
+<meta property="og:description" content="Cloudflare Workers + D1 + Java PAdES signer. The portal returns GENUINE, TAMPERED, REVOKED, or UNKNOWN. Never the document.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,30..100&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/core.css">
+
+<style>
+:root { --accent: var(--c-enterprise); --accent-deep: #0e1f33; --paper-doc: #f8f4ea; --seal: #8a1818; --gold: #b48a2b; --ok: #2a6a3a; --warn: #b86a1a; --bad: #b03030; }
+body { background: var(--paper); }
+
+/* ====== HERO - paper / document with seal ============= */
+.d-hero {
+  position: relative;
+  padding-block: clamp(3rem, 5vw, 5rem);
+  border-bottom: var(--hair);
+  background:
+    radial-gradient(ellipse 50% 40% at 0% 0%, color-mix(in srgb, var(--accent) 8%, transparent), transparent 65%),
+    var(--paper);
+  overflow: hidden;
+}
+.d-hero .frame { position: relative; z-index: 2; display: grid; gap: 3rem; grid-template-columns: 1fr; }
+@media (min-width: 1000px) { .d-hero .frame { grid-template-columns: 1.2fr 1fr; gap: 4rem; align-items: center; } }
+
+.crumbs {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink-mute);
+  margin: 0 0 2rem;
+  display: flex; gap: 0.5rem; flex-wrap: wrap;
+}
+.crumbs a { border-bottom: 1px solid currentColor; padding-bottom: 1px; }
+.crumbs a:hover { color: var(--accent); }
+.crumbs span { color: var(--accent); }
+
+.d-eyebrow {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  padding: 0.4rem 0.85rem;
+  border: 1px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  color: var(--accent);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  margin-bottom: 1.5rem;
+}
+.d-eyebrow::before {
+  content: ""; width: 8px; height: 8px;
+  background: var(--accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+.d-hero h1 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-3xl);
+  font-weight: 300;
+  font-variation-settings: "opsz" 144, "SOFT" 30, "WONK" 0;
+  letter-spacing: -0.035em;
+  line-height: 0.93;
+  margin: 0;
+  max-width: 16ch;
+}
+.d-hero h1 em {
+  font-style: italic;
+  color: var(--accent);
+  font-variation-settings: "opsz" 144, "SOFT" 100, "WONK" 1;
+  font-weight: 400;
+}
+
+.d-hero .lede {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md);
+  font-weight: 300;
+  line-height: 1.45;
+  color: var(--ink-soft);
+  margin: 1.75rem 0 0;
+  max-width: 56ch;
+}
+.d-hero .lede strong {
+  font-weight: 500;
+  color: var(--ink);
+  background: linear-gradient(180deg, transparent 60%, color-mix(in srgb, var(--accent) 22%, transparent) 60%);
+  padding: 0 0.1em;
+}
+
+.d-cta-row {
+  margin-top: 2rem;
+  display: flex; gap: 0.75rem; flex-wrap: wrap;
+}
+.btn {
+  display: inline-flex; align-items: center; gap: 0.45rem;
+  padding: 0.7rem 1.1rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 700;
+  border: 1px solid var(--ink);
+  transition: background .15s, color .15s, transform .15s, box-shadow .15s;
+}
+.btn:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--ink); }
+.btn-primary { background: var(--accent); color: white; border-color: var(--accent); }
+.btn-primary:hover { box-shadow: 4px 4px 0 var(--ink); }
+.btn-ghost { background: transparent; color: var(--ink); }
+
+/* ====== document mock with seal ============== */
+.doc-card {
+  position: relative;
+  background: var(--paper-doc);
+  border: 1px solid var(--paper-edge);
+  padding: 2rem 1.75rem 2.5rem;
+  font-family: 'Fraunces', serif;
+  box-shadow:
+    0 1px 0 var(--paper-edge),
+    8px 8px 0 var(--accent-deep);
+  /* Torn-paper-ish bottom edge */
+  clip-path: polygon(
+    0 0, 100% 0, 100% calc(100% - 14px),
+    96% 100%, 92% calc(100% - 8px),
+    88% 100%, 84% calc(100% - 12px),
+    80% 100%, 76% calc(100% - 6px),
+    72% 100%, 68% calc(100% - 14px),
+    64% 100%, 60% calc(100% - 8px),
+    56% 100%, 52% calc(100% - 12px),
+    48% 100%, 44% calc(100% - 6px),
+    40% 100%, 36% calc(100% - 14px),
+    32% 100%, 28% calc(100% - 8px),
+    24% 100%, 20% calc(100% - 12px),
+    16% 100%, 12% calc(100% - 6px),
+    8% 100%, 4% calc(100% - 14px),
+    0 100%);
+}
+.doc-card .doc-head {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  margin-bottom: 1rem;
+  display: flex; justify-content: space-between;
+  border-bottom: 1px solid var(--paper-edge);
+  padding-bottom: 0.7rem;
+}
+.doc-card h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.4rem;
+  margin: 0 0 0.4rem;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+.doc-card .body-line { color: var(--ink-soft); font-size: 0.95rem; line-height: 1.5; margin: 0.4rem 0; }
+.doc-card .body-line.muted { color: var(--ink-mute); }
+.doc-card .field {
+  display: grid; grid-template-columns: 7rem 1fr; gap: 0.5rem;
+  font-size: 0.85rem;
+  margin: 0.45rem 0;
+}
+.doc-card .field dt {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  padding-top: 2px;
+}
+.doc-card .field dd { margin: 0; color: var(--ink); font-weight: 500; word-break: break-all; font-family: 'Atkinson Hyperlegible', sans-serif; }
+.doc-card .field dd code {
+  font-family: 'JetBrains Mono', monospace; font-size: 0.78rem;
+  background: rgba(0,0,0,0.05); padding: 0.05rem 0.3rem; border: 1px solid var(--paper-edge);
+}
+
+/* the verified seal */
+.seal {
+  position: absolute;
+  right: -10px; top: 22px;
+  width: 130px; height: 130px;
+  display: flex; align-items: center; justify-content: center;
+  transform: rotate(8deg);
+  filter: drop-shadow(0 1px 0 rgba(0,0,0,.15));
+}
+.seal svg { width: 100%; height: 100%; }
+
+/* ====== STATS ribbon ============== */
+.d-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  background: var(--ink);
+  color: var(--paper);
+  border-block: 2px solid var(--ink);
+}
+.d-stat {
+  padding: 1.5rem clamp(1rem, 2vw, 1.5rem);
+  border-right: 1px solid color-mix(in srgb, var(--paper) 18%, transparent);
+}
+.d-stat:last-child { border-right: 0; }
+.d-stat .num {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 300;
+  letter-spacing: -0.04em;
+  font-variation-settings: "opsz" 144, "SOFT" 30;
+  display: block;
+  line-height: 1;
+  color: var(--accent);
+}
+.d-stat .lbl {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  margin-top: 0.6rem;
+  display: block;
+  color: color-mix(in srgb, var(--paper) 75%, transparent);
+}
+
+/* ACT */
+.act {
+  padding-block: clamp(3rem, 5vw, 5rem);
+  border-bottom: var(--hair);
+}
+.act-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 700;
+  margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 1rem;
+}
+.act-num::before { content: ""; width: 2.5rem; height: 1px; background: var(--accent); }
+.act h2 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 50, "WONK" 1;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+  margin: 0 0 1.5rem;
+  max-width: 22ch;
+}
+.act h2 em { font-style: italic; color: var(--accent); }
+.act .intro { font-family: 'Fraunces', serif; font-size: var(--t-md); color: var(--ink-soft); max-width: 60ch; margin: 0; }
+
+/* ACT 1 · pain card with "$5 app" */
+.pain-row {
+  display: grid; gap: 2rem; margin-top: 2rem; align-items: center;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 880px) { .pain-row { grid-template-columns: 1fr 1.4fr; } }
+.pain-quote {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(1.6rem, 1.2rem + 1.6vw, 2.4rem);
+  font-weight: 300;
+  font-variation-settings: "opsz" 144, "SOFT" 80;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+  margin: 0;
+}
+.pain-quote em { font-style: italic; color: var(--accent); background: linear-gradient(180deg, transparent 70%, color-mix(in srgb, var(--accent) 22%, transparent) 70%); }
+.pain-points { display: grid; gap: 1.5rem; }
+.pain-points li {
+  padding: 1.25rem 0;
+  border-top: 1px solid var(--paper-edge);
+  font-size: var(--t-sm);
+  color: var(--ink-soft);
+}
+.pain-points li:last-child { border-bottom: 1px solid var(--paper-edge); }
+.pain-points li b { color: var(--ink); font-weight: 700; font-family: 'Fraunces', serif; font-size: 1.05rem; display: block; margin-bottom: 0.3rem; }
+
+/* ACT 2 · verdict states */
+.verdict-grid {
+  display: grid; gap: 1rem; margin-top: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+.v-card {
+  padding: 1.5rem;
+  border: 2px solid currentColor;
+  text-align: left;
+  background: var(--paper);
+}
+.v-card.genuine { color: var(--ok); }
+.v-card.tampered { color: var(--bad); }
+.v-card.revoked { color: var(--warn); }
+.v-card.unknown { color: var(--ink-mute); }
+.v-card .label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-sm);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-weight: 700;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.v-card .label::before {
+  content: ""; width: 12px; height: 12px;
+  background: currentColor;
+}
+.v-card h3 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md);
+  margin: 0.6rem 0;
+  color: var(--ink);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.v-card p { margin: 0; color: var(--ink-soft); font-size: var(--t-sm); }
+
+/* ACT 3 · pipeline horizontal */
+.pipe {
+  display: grid; gap: 1rem; margin-top: 2rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { .pipe { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1080px) { .pipe { grid-template-columns: repeat(4, 1fr); } }
+.pipe-step {
+  border-top: 4px solid var(--accent);
+  border-left: 1px solid var(--paper-edge);
+  border-right: 1px solid var(--paper-edge);
+  border-bottom: 1px solid var(--paper-edge);
+  background: var(--paper);
+  padding: 1.4rem 1.25rem;
+}
+.pipe-step .num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.18em;
+  color: var(--accent);
+  font-weight: 700;
+  margin-bottom: 0.6rem;
+}
+.pipe-step h3 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md);
+  margin: 0 0 0.5rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.pipe-step p { margin: 0; font-size: var(--t-sm); color: var(--ink-soft); }
+.pipe-step code {
+  font-family: 'JetBrains Mono', monospace; font-size: 0.78rem;
+  color: var(--accent); background: var(--paper-soft); padding: 0.05rem 0.35rem; border: 1px solid var(--paper-edge);
+}
+
+/* ACT 4 · single-command callout */
+.deploy-call {
+  margin-top: 2rem;
+  background: var(--accent-deep);
+  color: var(--paper);
+  border: 1px solid var(--accent-deep);
+  padding: 1.5rem 1.75rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.82rem;
+  line-height: 1.6;
+  overflow-x: auto;
+}
+.deploy-call .label {
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: color-mix(in srgb, var(--paper) 60%, transparent);
+  margin-bottom: 0.6rem;
+}
+.deploy-call pre { margin: 0; white-space: pre-wrap; word-break: break-all; }
+.deploy-call pre b { color: #4a7bb5; }
+
+/* PROOF */
+.proof {
+  background: var(--ink);
+  color: var(--paper);
+  padding-block: clamp(3rem, 5vw, 5rem);
+  position: relative;
+  overflow: hidden;
+}
+.proof::before {
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 80% 20%, color-mix(in srgb, var(--accent) 28%, transparent), transparent 60%);
+}
+.proof .frame { position: relative; }
+.proof h2 { color: var(--paper); }
+.proof h2 em { color: var(--accent); }
+.proof-grid {
+  display: grid; gap: 1rem; margin-top: 2rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { .proof-grid { grid-template-columns: repeat(2, 1fr); } }
+.proof-item {
+  border: 1px solid color-mix(in srgb, var(--paper) 25%, transparent);
+  padding: 1.5rem;
+  background: color-mix(in srgb, var(--paper) 5%, transparent);
+}
+.proof-item h3 {
+  font-family: 'Fraunces', serif;
+  margin: 0 0 0.5rem;
+  font-size: var(--t-md);
+  color: var(--accent);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.proof-item p { margin: 0; color: color-mix(in srgb, var(--paper) 80%, transparent); font-size: var(--t-sm); }
+.proof-item code { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: color-mix(in srgb, var(--paper) 90%, transparent); }
+
+/* End CTA */
+.endcta {
+  padding-block: clamp(3rem, 5vw, 5rem);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 12%, transparent), var(--paper));
+}
+.endcta .frame { display: grid; gap: 2rem; grid-template-columns: 1fr; }
+@media (min-width: 760px) { .endcta .frame { grid-template-columns: 2fr 1fr; align-items: end; } }
+.endcta h2 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 300;
+  font-variation-settings: "opsz" 144, "SOFT" 100;
+  margin: 0 0 1rem;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+}
+.endcta h2 em {
+  font-style: italic;
+  color: var(--accent);
+  background: linear-gradient(180deg, transparent 70%, color-mix(in srgb, var(--accent) 22%, transparent) 70%);
+}
+.endcta p { color: var(--ink-soft); margin: 0; max-width: 50ch; }
+.endcta .actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+
+.foot { background: var(--accent-deep); color: var(--paper); }
+.foot .dot { color: var(--accent); }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topnav">
+  <div class="frame">
+    <div class="brand"><a href="../index.html">dmj<span class="dot">.</span>one</a></div>
+    <nav aria-label="Primary">
+      <ul>
+        <li><a href="../index.html#catalogue">Catalogue</a></li>
+        <li><a href="../index.html#manifesto">Manifesto</a></li>
+        <li><a href="../index.html#hire">Hire</a></li>
+        <li><a href="https://github.com/divyamohan1993/dmj-one-pdf-authenticator" rel="noopener">GitHub</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ============ HERO ============ -->
+<section class="d-hero">
+  <div class="frame">
+    <div>
+      <p class="crumbs">
+        <a href="../index.html">Catalogue</a> /
+        <a href="../index.html#cat-enterprise">Enterprise &amp; Security</a> /
+        <span>PDF Authenticator</span>
+      </p>
+
+      <span class="d-eyebrow">No. 31 · Enterprise · Documents · Zero-knowledge</span>
+
+      <h1>
+        Sign a document.<br>
+        Store <em>none</em> of it.
+      </h1>
+
+      <p class="lede">
+        A signed PDF can be forged with a $5 app and an afternoon. Universities, banks, and governments still pretend "wet signature scanned" is verification. <strong>This portal does not.</strong> PAdES signatures, SPKI-pinned verifier, TOTP-secured revocation. Server stores only a 32-byte SHA-256. The document itself never leaves your machine.
+      </p>
+
+      <div class="d-cta-row">
+        <a class="btn btn-primary" href="https://github.com/divyamohan1993/dmj-one-pdf-authenticator" rel="noopener">View source</a>
+        <a class="btn btn-ghost" href="#how">How it works</a>
+        <a class="btn btn-ghost" href="#deploy">Deploy in one command</a>
+      </div>
+    </div>
+
+    <!-- doc card with verified seal -->
+    <div class="doc-card" role="img" aria-label="Sample signed document with verified seal">
+      <div class="doc-head">
+        <span>doc-id · 01HX9G...A2C7</span>
+        <span>v · PAdES</span>
+      </div>
+      <h3>Bachelor of Technology · CSE</h3>
+      <p class="body-line muted">Issued by Shoolini University on 14 May 2024.</p>
+      <dl style="margin: 1rem 0 0; display: grid; gap: 0.4rem;">
+        <div class="field"><dt>Recipient</dt><dd>Divya Mohan</dd></div>
+        <div class="field"><dt>Roll</dt><dd>21SUMSCC0XX</dd></div>
+        <div class="field"><dt>SHA-256</dt><dd><code>4a8d7c1f...b9e2c19f</code></dd></div>
+        <div class="field"><dt>Signed</dt><dd>2024-05-14T09:12:08Z</dd></div>
+        <div class="field"><dt>SPKI pin</dt><dd><code>sha256:b1f4...e22a</code></dd></div>
+      </dl>
+      <p class="body-line muted" style="margin-top: 1.25rem; font-size: 0.78rem;">This is a representative card. Real documents are never stored on the server.</p>
+
+      <div class="seal" aria-hidden="true">
+        <svg viewBox="0 0 130 130" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <path id="circle-text" d="M 65 65 m -50 0 a 50 50 0 1 1 100 0 a 50 50 0 1 1 -100 0"/>
+          </defs>
+          <circle cx="65" cy="65" r="60" fill="none" stroke="#8a1818" stroke-width="2"/>
+          <circle cx="65" cy="65" r="52" fill="none" stroke="#8a1818" stroke-width="1"/>
+          <circle cx="65" cy="65" r="36" fill="#8a1818"/>
+          <text font-family="JetBrains Mono, monospace" font-size="9" font-weight="700" fill="#8a1818" letter-spacing="2">
+            <textPath href="#circle-text" startOffset="0">VERIFIED · GENUINE · DMJ.ONE · </textPath>
+          </text>
+          <text x="65" y="61" text-anchor="middle" font-family="Fraunces, serif" font-size="13" font-style="italic" fill="#f8f4ea" font-weight="500">verified</text>
+          <text x="65" y="78" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="7" fill="#f8f4ea" letter-spacing="1.2">PAdES · SPKI</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATS ============ -->
+<section class="d-stats" aria-label="At a glance">
+  <div class="d-stat"><span class="num">32 B</span><span class="lbl">Stored per document (SHA-256)</span></div>
+  <div class="d-stat"><span class="num">PAdES</span><span class="lbl">Embedded CMS signature</span></div>
+  <div class="d-stat"><span class="num">SPKI</span><span class="lbl">Pinned in verify portal</span></div>
+  <div class="d-stat"><span class="num">TOTP</span><span class="lbl">Revoke with second factor</span></div>
+  <div class="d-stat"><span class="num">1</span><span class="lbl">Command to deploy</span></div>
+</section>
+
+
+<!-- ============ ACT I · pain ============ -->
+<section class="act" aria-labelledby="pain-h">
+  <div class="frame">
+    <p class="act-num">Act I · The Problem</p>
+    <h2 id="pain-h">A signed PDF is <em>almost never</em> signed.</h2>
+
+    <div class="pain-row">
+      <p class="pain-quote">"Wet signature, scanned. <em>Looks official.</em> Move on."</p>
+      <ul class="pain-points">
+        <li><b>The forged degree.</b> A free PDF editor, a stolen header, a copied signature. The verifier squints, accepts, hires.</li>
+        <li><b>The altered transcript.</b> Grades changed in place. Original kept. The "tampered" copy passes the eye test.</li>
+        <li><b>The document that was real, then revoked.</b> No one can tell the difference. The institution has no way to say "this used to count, now it doesn't".</li>
+        <li><b>The verifier's privacy bill.</b> To check a document, the holder uploads it. The verifier reads it. Now a third party has the document. Forever.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ ACT II · verdicts ============ -->
+<section class="act" aria-labelledby="ver-h" style="background: linear-gradient(180deg, var(--paper-soft), var(--paper));">
+  <div class="frame">
+    <p class="act-num">Act II · The Promise</p>
+    <h2 id="ver-h">Four answers. <em>One portal.</em></h2>
+    <p class="intro">The verifier asks one question and gets one of four answers. The document never leaves their browser. The portal never sees its contents.</p>
+
+    <div class="verdict-grid">
+      <article class="v-card genuine">
+        <span class="label">Genuine</span>
+        <h3>Signed and current.</h3>
+        <p>Embedded CMS signature validates. SPKI pin matches the issuer. Hash recorded. Not revoked.</p>
+      </article>
+      <article class="v-card tampered">
+        <span class="label">Tampered</span>
+        <h3>Bytes changed since signing.</h3>
+        <p>Re-computed SHA-256 does not match. The signature math fails. Reject the document. Investigate.</p>
+      </article>
+      <article class="v-card revoked">
+        <span class="label">Revoked</span>
+        <h3>Was issued. Has been withdrawn.</h3>
+        <p>Issuer rotated TOTP and revoked. Hash recorded as void. Verifier sees the change in real time.</p>
+      </article>
+      <article class="v-card unknown">
+        <span class="label">Unknown</span>
+        <h3>Not in the issuer's registry.</h3>
+        <p>Hash never seen. Could be a draft, a forgery, or a document from a different issuer. Default conservative.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ ACT III · how it works ============ -->
+<section class="act" id="how" aria-labelledby="how-h">
+  <div class="frame">
+    <p class="act-num">Act III · The Pipeline</p>
+    <h2 id="how-h">Sign, store, verify, revoke. <em>End to end.</em></h2>
+
+    <ol class="pipe">
+      <li class="pipe-step">
+        <p class="num">Step 01 · Sign</p>
+        <h3>PAdES signature on the edge</h3>
+        <p>Admin authenticates via Argon2id-hashed password and TOTP. A Cloudflare Worker forwards a timestamp, nonce, and SHA-256 digest, HMAC-protected, to a Java microservice running Apache PDFBox + Bouncy Castle.</p>
+      </li>
+      <li class="pipe-step">
+        <p class="num">Step 02 · Store</p>
+        <h3>Only the hash hits D1</h3>
+        <p>D1 records 32 bytes per document plus metadata. The PDF itself is returned to the admin and never stored. <code>Zero-knowledge</code> in the literal sense.</p>
+      </li>
+      <li class="pipe-step">
+        <p class="num">Step 03 · Verify</p>
+        <h3>Pinned SPKI in the browser</h3>
+        <p>The verify portal validates the embedded CMS signature locally and checks the pinned SPKI fingerprint against the issuer. Returns one of four states. Never uploads the document.</p>
+      </li>
+      <li class="pipe-step">
+        <p class="num">Step 04 · Revoke</p>
+        <h3>One click, second-factor protected</h3>
+        <p>Issuer signs in, presents TOTP, clicks revoke. CSRF protection. Origin pin. The next verifier sees <code>REVOKED</code> instantly.</p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+
+<!-- ============ ACT IV · deploy ============ -->
+<section class="act" id="deploy" aria-labelledby="dep-h">
+  <div class="frame">
+    <p class="act-num">Act IV · The Deploy</p>
+    <h2 id="dep-h">One command. <em>One VM.</em></h2>
+    <p class="intro">An automated deployment script orchestrates the entire setup on a fresh Ubuntu or Debian VM. System dependencies, nginx, certificates, the Worker, the Java signer, the database wiring. Secrets are generated automatically.</p>
+
+    <div class="deploy-call">
+      <div class="label">single-command deployment · fresh ubuntu / debian VM</div>
+<pre>sudo bash -lc 'curl -fsSL \
+  https://raw.githubusercontent.com/divyamohan1993/dmj-one-pdf-authenticator/refs/heads/main/one-click-deployment/static/<b>autoconfig.sh</b>?nocache=$(date +%s) \
+  | sudo bash -s -- <b>YOUR-D1-DATABASE-ID</b>'</pre>
+    </div>
+
+    <div class="pipe" style="margin-top: 1.25rem;">
+      <div class="pipe-step">
+        <p class="num">part 01</p>
+        <h3>System setup</h3>
+        <p><code>dmj-part1.sh</code> installs dependencies, configures nginx, provisions certificates, wires firewall.</p>
+      </div>
+      <div class="pipe-step">
+        <p class="num">part 02</p>
+        <h3>Service deployment</h3>
+        <p><code>dmj-part2.sh</code> builds and deploys the Worker (TypeScript) and the Java signer (Maven). Dynamic port detection. Auto-reload nginx.</p>
+      </div>
+      <div class="pipe-step">
+        <p class="num">cron</p>
+        <h3>Daily cleanup</h3>
+        <p>Purges expired sessions, replay nonces, and rate-limit buckets. Database stays small. Forever.</p>
+      </div>
+      <div class="pipe-step">
+        <p class="num">CI</p>
+        <h3>Green badges</h3>
+        <p>GitHub Actions CI plus CodeQL run on every push. Both badges live on the repo README.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ PROOF ============ -->
+<section class="proof act" aria-labelledby="proof-h">
+  <div class="frame">
+    <p class="act-num">Act V · Proof</p>
+    <h2 id="proof-h">What ships <em>in the repo.</em></h2>
+
+    <div class="proof-grid">
+      <div class="proof-item">
+        <h3>Cloudflare Workers + D1</h3>
+        <p>Edge-served verify portal. Globally distributed. Rate limited. Stores only 32-byte digests plus metadata. The PDF is not on the server. Ever.</p>
+      </div>
+      <div class="proof-item">
+        <h3>HMAC-protected signing gateway</h3>
+        <p>Worker authenticates each signing request to the Java service with timestamp, nonce, and SHA-256. Replay-protected. Origin-pinned.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Apache PDFBox + Bouncy Castle</h3>
+        <p>Signing happens in a Java microservice using PDFBox for PAdES embedding and Bouncy Castle for the CMS signature. Java 17 friendly.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Attribution Assurance Licence</h3>
+        <p>Use it freely. Credit the author. AAL requires attribution in user-facing UI, derivative works, and source. <code>CITATION.cff</code> in the repo.</p>
+      </div>
+      <div class="proof-item">
+        <h3>One-command deploy</h3>
+        <p><code>autoconfig.sh</code> wraps both deployment phases. Wrangler-authenticated. Secrets generated and stored automatically. Idempotent.</p>
+      </div>
+      <div class="proof-item">
+        <h3>CI / CD plus CodeQL</h3>
+        <p>GitHub Actions. Pipeline badges live on the README. Every push checked. Every release tagged.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ End CTA ============ -->
+<section class="endcta" aria-labelledby="cta-h">
+  <div class="frame">
+    <div>
+      <h2 id="cta-h">If a degree, a transcript, or a permit needs to be <em>real</em>, sign it like it.</h2>
+      <p>I build verification systems where the verifier does not have to trust the issuer's server, and the issuer's server does not have to hold the document. The portal answers one question, four ways. Nothing more.</p>
+    </div>
+    <div class="actions">
+      <a class="btn btn-primary" href="../index.html#hire">Hire me</a>
+      <a class="btn btn-ghost" href="../index.html">Back to catalogue</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="frame">
+    <div>
+      <h2 style="font-family:'Fraunces',serif;font-size:var(--t-xl);margin:0 0 1rem;">dmj<span class="dot">.</span>one</h2>
+      <p>Dream, Manifest and Journey, Together as One.</p>
+      <p class="meta">© 2026 Divya Mohan. dmj-one PDF Authenticator is released under the Attribution Assurance Licence. Attribution is mandatory in user-facing interfaces and derivative works.</p>
+    </div>
+    <div>
+      <p class="meta">Catalogue</p>
+      <p><a href="../index.html#catalogue">All 47 products</a></p>
+      <p><a href="../index.html#cat-enterprise">Enterprise &amp; Security</a></p>
+      <p><a href="../index.html#hire">Hire</a></p>
+    </div>
+    <div>
+      <p class="meta">PDF Authenticator</p>
+      <p><a href="https://github.com/divyamohan1993/dmj-one-pdf-authenticator" rel="noopener">Source</a></p>
+      <p><a href="https://github.com/divyamohan1993/dmj-one-pdf-authenticator/discussions" rel="noopener">Discussions</a></p>
+      <p><a href="mailto:contact@dmj.one">contact@dmj.one</a></p>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

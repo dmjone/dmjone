@@ -1,0 +1,842 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#7a2c5e">
+<meta name="color-scheme" content="light">
+
+<title>Scry · Offensive-security research tool · Authorised use only · dmj.one</title>
+<meta name="description" content="Scry is a screen analysis and response system for offensive-security research and education only. Gemini Flash + Tesseract OCR redundancy. Machine-bound encryption. Ephemeral licensing. Strictly authorised use.">
+<meta property="og:title" content="Scry · Offensive-security research tool. Authorised use only.">
+<meta property="og:description" content="Screen-reading + AI response automation for blue-team defence research. SHA-256 integrity verification.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,30..100&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="../assets/core.css">
+
+<style>
+:root {
+  --accent: var(--c-ai);
+  --accent-deep: #4d1639;
+  --accent-soft: #9a4a7e;
+  --warn: #b03030;
+  --paper-mono: #ece5d4;
+  --grid: color-mix(in srgb, var(--ink) 10%, transparent);
+}
+body {
+  background: var(--paper-mono);
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+/* ====== DISCLAIMER BAR ============================ */
+.disclaimer {
+  background: var(--warn);
+  color: var(--paper);
+  padding: 0.85rem 0;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-sm);
+  border-block: 2px solid var(--ink);
+  position: relative;
+  z-index: 5;
+}
+.disclaimer .frame {
+  display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+.disclaimer .icon {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px;
+  border: 2px solid var(--paper);
+  font-weight: 800;
+  flex-shrink: 0;
+}
+.disclaimer strong {
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-weight: 800;
+}
+
+/* ====== HERO ============================================ */
+.sc-hero {
+  position: relative;
+  padding-block: clamp(3rem, 5vw, 6rem) clamp(2rem, 4vw, 5rem);
+  border-bottom: 2px solid var(--ink);
+  overflow: hidden;
+  background:
+    linear-gradient(0deg, var(--grid) 1px, transparent 1px) 0 0/1fr 32px,
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px) 0 0/32px 1fr,
+    var(--paper-mono);
+}
+.sc-hero .frame { position: relative; z-index: 2; }
+
+.crumbs {
+  font-size: var(--t-xs);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink-mute);
+  margin: 0 0 2rem;
+  display: flex; gap: 0.5rem; flex-wrap: wrap;
+  font-weight: 600;
+}
+.crumbs a { border-bottom: 1px solid var(--ink-mute); padding-bottom: 1px; }
+.crumbs a:hover { color: var(--accent); border-color: var(--accent); }
+.crumbs span { color: var(--accent); }
+
+.sc-meta {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.4rem 1.25rem;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--ink-soft);
+  margin-bottom: 2rem;
+  max-width: 36rem;
+  border-block: 1px solid var(--ink);
+  padding: 1rem 0;
+}
+.sc-meta dt { font-weight: 700; color: var(--ink); }
+.sc-meta dd { margin: 0; color: var(--ink-soft); }
+
+.sc-hero h1 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: clamp(2.4rem, 1.6rem + 4vw, 4.5rem);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  margin: 0;
+  max-width: 18ch;
+  color: var(--ink);
+  text-transform: uppercase;
+}
+.sc-hero h1 .accent {
+  color: var(--accent);
+  font-weight: 700;
+}
+.sc-hero h1 .ipa {
+  display: block;
+  font-size: 0.35em;
+  letter-spacing: 0.2em;
+  color: var(--ink-mute);
+  margin-top: 0.6rem;
+  font-weight: 400;
+  text-transform: none;
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+}
+
+.sc-hero .lede {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md);
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--ink-soft);
+  margin: 2rem 0 0;
+  max-width: 56ch;
+}
+.sc-hero .lede strong {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.sc-cta-row {
+  margin-top: 2.5rem;
+  display: flex; gap: 0.75rem; flex-wrap: wrap;
+}
+.btn {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.7rem 1.1rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 700;
+  border: 1px solid var(--ink);
+  transition: background .15s, color .15s, transform .15s, box-shadow .15s;
+}
+.btn:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--ink); }
+.btn-primary { background: var(--accent); color: white; border-color: var(--accent); }
+.btn-primary:hover { box-shadow: 4px 4px 0 var(--ink); }
+.btn-ghost { background: transparent; color: var(--ink); }
+.btn-warn { background: var(--warn); color: var(--paper); border-color: var(--warn); }
+
+/* ====== STATS RIBBON ==================================== */
+.sc-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  background: var(--ink);
+  color: var(--paper);
+  border-block: 2px solid var(--ink);
+}
+.sc-stat {
+  padding: 1.5rem clamp(1rem, 2vw, 1.5rem);
+  border-right: 1px solid color-mix(in srgb, var(--paper) 18%, transparent);
+}
+.sc-stat:last-child { border-right: 0; }
+.sc-stat .num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xl);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  display: block;
+  line-height: 1;
+  color: var(--accent-soft);
+}
+.sc-stat .lbl {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  margin-top: 0.6rem;
+  display: block;
+  color: color-mix(in srgb, var(--paper) 70%, transparent);
+}
+
+/* ====== ACT STRUCTURE =================================== */
+.act {
+  padding-block: clamp(3rem, 5vw, 5rem);
+  border-bottom: 1px solid var(--ink);
+}
+.act-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 700;
+  margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 1rem;
+}
+.act-num::before {
+  content: ""; width: 2.5rem; height: 1px; background: var(--accent);
+}
+.act h2 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: clamp(1.8rem, 1.2rem + 2vw, 3rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  margin: 0 0 1.5rem;
+  max-width: 26ch;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.act h2 .accent { color: var(--accent); }
+
+/* ====== AUTH RULES BOX ============================== */
+.auth-rules {
+  margin-top: 2.5rem;
+  border: 2px solid var(--ink);
+  background: var(--paper-mono);
+  padding: 0;
+}
+.auth-rules .ar-bar {
+  background: var(--ink);
+  color: var(--paper);
+  padding: 0.6rem 1.5rem;
+  font-size: var(--t-xs);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-weight: 700;
+  display: flex; gap: 1rem; flex-wrap: wrap;
+}
+.auth-rules .ar-bar .badge {
+  background: var(--warn);
+  padding: 0.15em 0.5em;
+  font-weight: 800;
+}
+.auth-rules .ar-body {
+  padding: 1.5rem;
+  display: grid; gap: 1rem;
+}
+.auth-rules .rule {
+  display: grid;
+  grid-template-columns: 3rem 1fr;
+  gap: 1rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-sm);
+  align-items: baseline;
+}
+.auth-rules .rule .n {
+  color: var(--accent);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+.auth-rules .rule p { margin: 0; color: var(--ink); line-height: 1.5; }
+.auth-rules .rule p em {
+  font-style: normal;
+  color: var(--warn);
+  font-weight: 700;
+}
+
+/* ====== ARCH ============================================ */
+.arch {
+  margin-top: 2.5rem;
+  display: grid; gap: 0;
+  grid-template-columns: 1fr;
+  border: 2px solid var(--ink);
+  background: var(--paper-mono);
+  font-family: 'JetBrains Mono', monospace;
+}
+@media (min-width: 760px) { .arch { grid-template-columns: repeat(3, 1fr); } }
+.arch-cell {
+  padding: 1.5rem;
+  border-right: 1px solid var(--ink);
+  border-bottom: 1px solid var(--ink);
+}
+@media (min-width: 760px) {
+  .arch-cell:nth-child(3n) { border-right: 0; }
+  .arch-cell:nth-last-child(-n+3) { border-bottom: 0; }
+}
+.arch-cell .ph {
+  font-size: var(--t-xs);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+.arch-cell h3 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-md);
+  margin: 0 0 0.5rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.arch-cell p {
+  margin: 0;
+  font-size: var(--t-sm);
+  color: var(--ink-soft);
+  line-height: 1.5;
+}
+.arch-cell code {
+  font-size: var(--t-xs);
+  color: var(--accent-deep);
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  padding: 0.15em 0.4em;
+}
+
+/* ====== SECURITY MATRIX ============================ */
+.sec-matrix {
+  margin-top: 2rem;
+  border: 2px solid var(--ink);
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--paper-mono);
+}
+.sec-matrix th, .sec-matrix td {
+  border: 1px solid var(--ink);
+  padding: 0.85rem 1rem;
+  text-align: left;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-sm);
+  vertical-align: middle;
+}
+.sec-matrix th {
+  background: var(--ink);
+  color: var(--paper);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-size: var(--t-xs);
+}
+.sec-matrix tbody th {
+  background: var(--paper-mono);
+  color: var(--ink);
+  font-weight: 700;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.sec-matrix .blocked {
+  color: var(--warn);
+  font-weight: 700;
+  display: inline-flex; align-items: center; gap: 0.5rem;
+}
+.sec-matrix .blocked::before { content: "✗"; font-size: 1.1em; }
+
+/* ====== TRIPLE-PRESS HOTKEY ============================ */
+.hotkeys {
+  margin-top: 2rem;
+  display: grid; gap: 1rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 720px) { .hotkeys { grid-template-columns: repeat(2, 1fr); } }
+.hotkey {
+  border: 2px solid var(--ink);
+  padding: 1.5rem;
+  background: var(--paper-mono);
+  font-family: 'JetBrains Mono', monospace;
+}
+.hotkey .label {
+  font-size: var(--t-xs);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+.hotkey .keys {
+  display: flex; gap: 0.5rem; align-items: center;
+  margin: 0.75rem 0;
+}
+.hotkey .key {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 2.4rem; height: 2.4rem;
+  background: var(--ink);
+  color: var(--paper);
+  font-weight: 700;
+  font-size: var(--t-md);
+  padding: 0 0.5rem;
+}
+.hotkey .x {
+  color: var(--accent);
+  font-weight: 700;
+  font-size: var(--t-sm);
+}
+.hotkey .desc {
+  font-size: var(--t-sm);
+  color: var(--ink-soft);
+  margin: 0;
+  line-height: 1.5;
+}
+.hotkey .note {
+  margin-top: 0.5rem;
+  font-size: var(--t-xs);
+  color: var(--warn);
+  letter-spacing: 0.05em;
+  font-weight: 700;
+}
+
+/* ====== PROOF =========================================== */
+.proof { background: var(--ink); color: var(--paper); }
+.proof h2 { color: var(--paper); }
+.proof h2 .accent { color: var(--accent-soft); }
+.proof-grid {
+  display: grid; gap: 1rem; margin-top: 2rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { .proof-grid { grid-template-columns: repeat(2, 1fr); } }
+.proof-item {
+  border: 1px solid color-mix(in srgb, var(--paper) 25%, transparent);
+  padding: 1.5rem;
+  background: color-mix(in srgb, var(--paper) 4%, transparent);
+}
+.proof-item h3 {
+  font-family: 'JetBrains Mono', monospace;
+  margin: 0 0 0.5rem;
+  font-size: var(--t-md);
+  color: var(--accent-soft);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+}
+.proof-item p { margin: 0; color: color-mix(in srgb, var(--paper) 80%, transparent); font-size: var(--t-sm); line-height: 1.5; }
+
+/* ====== STACK ======================== */
+.stack-list {
+  display: flex; flex-wrap: wrap; gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+.stack-tag {
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--ink);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 600;
+  background: var(--paper-mono);
+}
+
+/* ====== END CTA · explicit pre-flight ========================== */
+.endcta {
+  padding-block: clamp(3rem, 5vw, 5rem);
+  background: var(--paper-mono);
+  border-top: 2px solid var(--ink);
+}
+.endcta h2 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xl);
+  font-weight: 700;
+  margin: 0 0 1rem;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+  text-transform: uppercase;
+}
+.endcta h2 .accent { color: var(--accent); }
+.endcta p {
+  font-family: 'Fraunces', serif;
+  color: var(--ink-soft);
+  margin: 0 0 0.75rem;
+  max-width: 60ch;
+  line-height: 1.55;
+}
+.endcta .actions { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 1.5rem; }
+
+.foot { background: var(--ink); color: var(--paper); }
+.foot .dot { color: var(--accent); }
+.foot p { font-family: 'JetBrains Mono', monospace; }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topnav">
+  <div class="frame">
+    <div class="brand"><a href="../index.html">dmj<span class="dot">.</span>one</a></div>
+    <nav aria-label="Primary">
+      <ul>
+        <li><a href="../index.html#catalogue">Catalogue</a></li>
+        <li><a href="../index.html#manifesto">Manifesto</a></li>
+        <li><a href="../index.html#hire">Hire</a></li>
+        <li><a href="https://github.com/divyamohan1993/scry" rel="noopener">GitHub</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<!-- ============ DISCLAIMER BAR ============ -->
+<aside class="disclaimer" role="alert" aria-label="Authorised use disclaimer">
+  <div class="frame">
+    <span class="icon" aria-hidden="true">!</span>
+    <span><strong>Authorised research use only.</strong> Scry is published for offensive-security education and authorised testing. Unauthorised or unlawful use is strictly prohibited. The author accepts no liability for misuse. By continuing, you accept these terms.</span>
+  </div>
+</aside>
+
+<main id="main">
+
+<!-- ============ HERO ============ -->
+<section class="sc-hero">
+  <div class="frame">
+    <p class="crumbs">
+      <a href="../index.html">Catalogue</a> /
+      <a href="../index.html#cat-ai">AI · Agents</a> /
+      <span>Scry</span>
+    </p>
+
+    <dl class="sc-meta">
+      <dt>Project</dt><dd>Scry · Screen-AI Research Tool</dd>
+      <dt>Catalogue No.</dt><dd>26 / 47</dd>
+      <dt>Classification</dt><dd>Offensive-security · educational</dd>
+      <dt>Use</dt><dd>Authorised research only</dd>
+      <dt>Integrity</dt><dd>SHA-256 verified</dd>
+    </dl>
+
+    <h1>
+      Scry sees<br>
+      what your <span class="accent">screen</span> sees.<br>
+      <span class="ipa">/skraɪ/ · to see, to reveal, to divine hidden knowledge.</span>
+    </h1>
+
+    <p class="lede">
+      Scry is a research instrument. It demonstrates how screen-reading and AI response automation can be weaponised against unsuspecting systems, so blue teams can defend against the same techniques. <strong>It is published for education, red-team simulation and authorised assessment.</strong> It is not a productivity tool. It is not a cheat tool. It is not for use without permission.
+    </p>
+
+    <div class="sc-cta-row">
+      <a class="btn btn-warn" href="#authorised">Authorised use boundary</a>
+      <a class="btn btn-ghost" href="https://github.com/divyamohan1993/scry" rel="noopener">View source</a>
+      <a class="btn btn-ghost" href="https://github.com/divyamohan1993/scry/blob/main/docs/SECURITY.md" rel="noopener">SECURITY.md</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATS ============ -->
+<section class="sc-stats" aria-label="At a glance">
+  <div class="sc-stat"><span class="num">SHA-256</span><span class="lbl">Integrity verification</span></div>
+  <div class="sc-stat"><span class="num">3x</span><span class="lbl">Triple-press hotkey activation</span></div>
+  <div class="sc-stat"><span class="num">2</span><span class="lbl">OCR engines · Gemini + Tesseract</span></div>
+  <div class="sc-stat"><span class="num">Per-machine</span><span class="lbl">Ephemeral licence binding</span></div>
+  <div class="sc-stat"><span class="num">CI</span><span class="lbl">flake8 · bandit · pytest</span></div>
+</section>
+
+
+<!-- ============ ACT I · AUTHORISED USE ============ -->
+<section class="act" id="authorised" aria-labelledby="auth-h">
+  <div class="frame">
+    <p class="act-num">Section 01 · Boundary of Use</p>
+    <h2 id="auth-h">Read this <span class="accent">first.</span></h2>
+    <p style="font-family:'Fraunces',serif;font-size:var(--t-md);max-width:62ch;margin:0;color:var(--ink-soft);line-height:1.55;">Most security tools sit on the "informational use only" disclaimer and stop. Scry's threat model assumes a user who genuinely wants to research, demonstrate, or red-team. The boundary is named, controlled and enforced by design.</p>
+
+    <div class="auth-rules">
+      <div class="ar-bar">
+        <span class="badge">Rules of Engagement</span>
+        <span>Strict · per-session · author audited</span>
+      </div>
+      <div class="ar-body">
+        <div class="rule">
+          <span class="n">01</span>
+          <p><em>Permitted:</em> blue-team defence research, red-team engagements with written authorisation, classroom labs in offensive-security curricula, controlled simulations on systems you own.</p>
+        </div>
+        <div class="rule">
+          <span class="n">02</span>
+          <p><em>Prohibited:</em> use on systems you do not own or are not contracted to test, use during examinations or assessments where you are the subject, use to violate any platform's terms of service.</p>
+        </div>
+        <div class="rule">
+          <span class="n">03</span>
+          <p><em>Liability:</em> the author and dmj.one accept no liability for misuse. Using the software is acceptance of these terms.</p>
+        </div>
+        <div class="rule">
+          <span class="n">04</span>
+          <p><em>Distribution:</em> the optional ephemeral licensing system requires the owner to sign each session's challenge code. No license, no run.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ ACT II · WHY ============ -->
+<section class="act" aria-labelledby="why-h">
+  <div class="frame">
+    <p class="act-num">Section 02 · Why It Exists</p>
+    <h2 id="why-h">Defenders cannot defend against<br>what they have never <span class="accent">seen.</span></h2>
+    <p style="font-family:'Fraunces',serif;font-size:var(--t-md);max-width:62ch;margin:0;color:var(--ink-soft);line-height:1.55;">Screen-reading AI is now a commodity. Multimodal models can interpret arbitrary content rendered to a display. Combined with input automation, the assistive-tech surface becomes an exfiltration surface. Scry exists so blue teams can build detections before adversaries ship them.</p>
+
+    <div class="hotkeys">
+      <div class="hotkey">
+        <p class="label">Threat scenario A</p>
+        <p class="desc">Adversary places a screen-reading agent on a target endpoint. It interprets sensitive renderings (CRM, finance, source code) and exfiltrates structured summaries via covert channel.</p>
+        <p class="note">→ defender needs to detect input-injection + clipboard-streaming patterns</p>
+      </div>
+      <div class="hotkey">
+        <p class="label">Threat scenario B</p>
+        <p class="desc">Insider with legitimate access uses screen-reading AI to extract knowledge faster than DLP can flag it. No file is ever opened in a way that triggers existing alerts.</p>
+        <p class="note">→ defender needs OCR-egress detection in EDR signatures</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ ACT III · HOW ============ -->
+<section class="act" aria-labelledby="how-h">
+  <div class="frame">
+    <p class="act-num">Section 03 · Architecture</p>
+    <h2 id="how-h">Two engines.<br>Triple-press <span class="accent">activation.</span><br>SHA-256 integrity at every boot.</h2>
+
+    <div class="arch">
+      <div class="arch-cell">
+        <p class="ph">Phase 01</p>
+        <h3>Capture</h3>
+        <p>Screen capture pipeline. Region, full-screen, or active-window. Captured frames hashed with SHA-256 and discarded after analysis. <code>pyautogui</code> + <code>pillow</code>.</p>
+      </div>
+      <div class="arch-cell">
+        <p class="ph">Phase 02</p>
+        <h3>Read</h3>
+        <p>Hybrid OCR. Gemini Flash multimodal model handles structured visual content. Tesseract OCR runs in parallel for redundancy and offline fallback.</p>
+      </div>
+      <div class="arch-cell">
+        <p class="ph">Phase 03</p>
+        <h3>Reason</h3>
+        <p>Gemini Flash interprets the captured content according to mode (MCQ, descriptive, free-form). Output is constrained to the configured response schema.</p>
+      </div>
+      <div class="arch-cell">
+        <p class="ph">Phase 04</p>
+        <h3>Respond</h3>
+        <p>Optional input automation. Human-like typing simulation, configurable mouse speed, randomised inter-key delays. Off by default.</p>
+      </div>
+      <div class="arch-cell">
+        <p class="ph">Phase 05</p>
+        <h3>Stream</h3>
+        <p>Clipboard streaming on triple-press hotkey. Backspace pauses, <code>9</code> stops, arrow speeds up. All operator-controlled, no autonomous loop.</p>
+      </div>
+      <div class="arch-cell">
+        <p class="ph">Phase 06</p>
+        <h3>Self-update</h3>
+        <p>Source-mode auto-pull from main, binary-mode auto-update from signed GitHub releases. Versioned via <code>src/version.py</code>, GitHub Actions builds the EXE.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ ACT IV · SECURITY ============ -->
+<section class="act" aria-labelledby="sec-h">
+  <div class="frame">
+    <p class="act-num">Section 04 · Built-In Constraints</p>
+    <h2 id="sec-h">Designed to be <span class="accent">hard to misuse.</span></h2>
+
+    <div style="overflow-x:auto;">
+    <table class="sec-matrix" aria-label="Security threat matrix">
+      <thead>
+        <tr>
+          <th>Threat</th>
+          <th>Mitigation</th>
+          <th>Outcome</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th scope="row">Stolen .env file</th>
+          <td>Machine-bound encryption. Key derived from CPU, disk serial, MAC, install path, install ID.</td>
+          <td><span class="blocked">Useless on any other machine</span></td>
+        </tr>
+        <tr>
+          <th scope="row">Project copied to another path</th>
+          <td>Install-path hash mismatch invalidates the encrypted API key.</td>
+          <td><span class="blocked">Re-authorisation required</span></td>
+        </tr>
+        <tr>
+          <th scope="row">Casual hotkey trigger</th>
+          <td>Triple-press activation. Any other key in between resets the count.</td>
+          <td><span class="blocked">No accidental activation</span></td>
+        </tr>
+        <tr>
+          <th scope="row">Attacker has full source</th>
+          <td>Ephemeral licensing system, owner private key never in repo.</td>
+          <td><span class="blocked">Cannot generate session licences</span></td>
+        </tr>
+        <tr>
+          <th scope="row">Stolen one-time licence key</th>
+          <td>Each licence is challenge-bound, session-bound, expires on close.</td>
+          <td><span class="blocked">Single-use only</span></td>
+        </tr>
+        <tr>
+          <th scope="row">Tampered binary</th>
+          <td>SHA-256 integrity verification at boot. Modified files refuse to run.</td>
+          <td><span class="blocked">Boot aborted</span></td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ ACT V · HOTKEYS ============ -->
+<section class="act" aria-labelledby="hk-h">
+  <div class="frame">
+    <p class="act-num">Section 05 · Operator Controls</p>
+    <h2 id="hk-h">Every hotkey requires <span class="accent">three intentional presses.</span></h2>
+
+    <div class="hotkeys">
+      <div class="hotkey">
+        <p class="label">MCQ mode</p>
+        <div class="keys">
+          <span class="key">m</span><span class="x">×</span><span class="key">m</span><span class="x">×</span><span class="key">m</span>
+        </div>
+        <p class="desc">Capture, OCR, structured multiple-choice answer.</p>
+        <p class="note">Reset on any other key</p>
+      </div>
+      <div class="hotkey">
+        <p class="label">Descriptive mode</p>
+        <div class="keys">
+          <span class="key">d</span><span class="x">×</span><span class="key">d</span><span class="x">×</span><span class="key">d</span>
+        </div>
+        <p class="desc">Capture and produce free-form descriptive analysis.</p>
+        <p class="note">Reset on any other key</p>
+      </div>
+      <div class="hotkey">
+        <p class="label">Clipboard stream</p>
+        <div class="keys">
+          <span class="key">c</span><span class="x">×</span><span class="key">c</span><span class="x">×</span><span class="key">c</span>
+        </div>
+        <p class="desc">Type clipboard contents character-by-character. Backspace pauses, 9 stops.</p>
+        <p class="note">Operator-paced</p>
+      </div>
+      <div class="hotkey">
+        <p class="label">Force stop</p>
+        <div class="keys">
+          <span class="key">stop.bat</span>
+        </div>
+        <p class="desc">Terminates every running Scry process immediately.</p>
+        <p class="note">Always-available kill switch</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ PROOF ============ -->
+<section class="proof act" aria-labelledby="proof-h">
+  <div class="frame">
+    <p class="act-num">Section 06 · Proof</p>
+    <h2 id="proof-h">Engineered for <span class="accent">research integrity.</span></h2>
+
+    <div class="proof-grid">
+      <div class="proof-item">
+        <h3>CI · flake8 · bandit · pytest</h3>
+        <p>GitHub Actions on every push: linting, security static-analysis with bandit, unit tests with pytest. Build status on the README badge.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Signed release pipeline</h3>
+        <p>Bump <code>src/version.py</code>, push to main, Actions builds the obfuscated executable, creates a GitHub release, uploads the signed binary, clients self-update.</p>
+      </div>
+      <div class="proof-item">
+        <h3>True one-click bootstrap</h3>
+        <p>Double-click <code>Scry.vbs</code> on a fresh machine. Auto-installs Python if missing, creates venv, installs deps, opens the control centre in browser.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Mobile licence signer</h3>
+        <p>Owner runs <code>license_signer.py --server</code>. Mobile-friendly web interface signs challenge codes from a phone. Private key never on the operator machine.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ STACK ============ -->
+<section class="act" aria-labelledby="tech-h">
+  <div class="frame">
+    <p class="act-num">The Stack</p>
+    <h2 id="tech-h" style="font-size:var(--t-xl);">Python only. <span class="accent">Auditable.</span></h2>
+    <ul class="stack-list">
+      <li class="stack-tag">Python 3.10+</li>
+      <li class="stack-tag">Gemini Flash</li>
+      <li class="stack-tag">Tesseract OCR</li>
+      <li class="stack-tag">PyAutoGUI</li>
+      <li class="stack-tag">Pillow</li>
+      <li class="stack-tag">Pytest</li>
+      <li class="stack-tag">flake8</li>
+      <li class="stack-tag">bandit</li>
+      <li class="stack-tag">PyInstaller</li>
+      <li class="stack-tag">GitHub Actions</li>
+      <li class="stack-tag">Ed25519 licensing</li>
+      <li class="stack-tag">SHA-256 integrity</li>
+    </ul>
+  </div>
+</section>
+
+
+<!-- ============ END CTA ============ -->
+<section class="endcta" aria-labelledby="cta-h">
+  <div class="frame">
+    <h2 id="cta-h">If you can <span class="accent">build</span> the threat,<br>you can also build the defence.</h2>
+    <p>I build security research tools that are easy to study, hard to misuse, and impossible to ignore. If your team needs to threat-model the assistive-tech surface, talk to me.</p>
+    <p style="color:var(--warn);font-family:'JetBrains Mono',monospace;font-size:var(--t-xs);text-transform:uppercase;letter-spacing:0.16em;font-weight:700;">By using or distributing Scry you accept the authorised-use terms above.</p>
+    <div class="actions">
+      <a class="btn btn-primary" href="../index.html#hire">Hire me for security research</a>
+      <a class="btn btn-ghost" href="../index.html">Back to catalogue</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="frame">
+    <div>
+      <h2 style="font-family:'JetBrains Mono',monospace;font-size:var(--t-xl);margin:0 0 1rem;text-transform:uppercase;">dmj<span class="dot">.</span>one</h2>
+      <p>Dream, Manifest and Journey, Together as One.</p>
+      <p class="meta">© 2026 Divya Mohan. Scry published for offensive-security research and education only. MIT licence. Author accepts no liability for misuse.</p>
+    </div>
+    <div>
+      <p class="meta">Catalogue</p>
+      <p><a href="../index.html#catalogue">All 47 products</a></p>
+      <p><a href="../index.html#cat-ai">AI · Agents</a></p>
+      <p><a href="../index.html#hire">Hire</a></p>
+    </div>
+    <div>
+      <p class="meta">Scry</p>
+      <p><a href="https://github.com/divyamohan1993/scry" rel="noopener">Source</a></p>
+      <p><a href="https://github.com/divyamohan1993/scry/blob/main/docs/SECURITY.md" rel="noopener">SECURITY.md</a></p>
+      <p><a href="mailto:contact@dmj.one">contact@dmj.one</a></p>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,868 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1c5d63">
+<meta name="color-scheme" content="light">
+
+<title>DevOps Shell Scripts · A safe-defaults handbook for the first DevOps job · dmj.one</title>
+<meta name="description" content="A hands-on DevOps and DevSecOps lab repository for Shoolini University, built under L&amp;T EduTech. Bash with safe defaults from line one. Containers, Kubernetes, CI, observability and DevSecOps you can repeat without breaking the room.">
+<meta property="og:title" content="DevOps Shell Scripts · The handbook that survives the first day on the job.">
+<meta property="og:description" content="Lint-CI'd, MIT-licensed, set -euo pipefail by default. The DevOps and DevSecOps lab repo for Shoolini University, prepared under L&amp;T EduTech.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,30..100&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="../assets/core.css">
+
+<style>
+:root {
+  --accent: var(--c-cloud); --accent-deep: #0e3e43;
+  --term-bg: #0c1417;
+  --term-fg: #e6f0ee;
+  --term-mute: #6f8c8d;
+  --term-warn: #e6c14a;
+  --term-ok: #6ad296;
+  --term-fail: #ff7a6c;
+  --man-paper: #efe9d8;
+  --man-edge: #c8bf9e;
+}
+body { background: var(--paper); }
+
+/* ====== HERO · MANPAGE COVER =========================== */
+.ds-hero {
+  position: relative;
+  padding-block: clamp(3rem, 5vw + 1rem, 5.5rem) clamp(2rem, 4vw, 4rem);
+  border-bottom: var(--hair);
+  background: var(--paper);
+  overflow: hidden;
+}
+.ds-hero::before {
+  content: ""; position: absolute; inset: 0;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 23px, color-mix(in srgb, var(--ink) 4%, transparent) 23px 24px);
+  pointer-events: none;
+  mask: linear-gradient(180deg, black, transparent 90%);
+  -webkit-mask: linear-gradient(180deg, black, transparent 90%);
+}
+.ds-hero .frame { position: relative; z-index: 2; }
+
+.crumbs {
+  font-family: 'JetBrains Mono', monospace; font-size: var(--t-xs);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink-mute); margin: 0 0 1.5rem;
+  display: flex; gap: 0.5rem; flex-wrap: wrap;
+}
+.crumbs a { border-bottom: 1px solid var(--ink-mute); padding-bottom: 1px; }
+.crumbs a:hover { color: var(--accent); border-color: var(--accent); }
+.crumbs span { color: var(--accent); }
+
+/* manpage header strip */
+.man-strip {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.18em;
+  color: var(--ink);
+  border-top: 2px solid var(--ink); border-bottom: 2px solid var(--ink);
+  padding: 0.55rem 0;
+  margin: 0 0 2rem;
+  display: grid; gap: 0.5rem;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+}
+.man-strip .l { text-align: left; }
+.man-strip .c { color: var(--accent-deep); text-align: center; }
+.man-strip .r { text-align: right; color: var(--ink-mute); }
+
+.ds-hero h1 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: clamp(2.1rem, 5vw, 4rem);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1; margin: 0;
+  text-transform: uppercase;
+  max-width: 16ch;
+}
+.ds-hero h1 .name {
+  display: block; color: var(--accent-deep);
+  font-size: 1em;
+}
+.ds-hero h1 .sub {
+  display: block; font-family: 'Fraunces', serif;
+  font-style: italic; font-weight: 400;
+  font-size: 0.55em; text-transform: none;
+  letter-spacing: -0.01em;
+  font-variation-settings: "opsz" 144, "SOFT" 100;
+  color: var(--ink-soft);
+  margin-top: 0.4rem;
+}
+.ds-hero h1 em { color: var(--accent); font-style: italic; font-family: 'Fraunces', serif; font-weight: 500; }
+
+.ds-grid {
+  margin-top: 2rem;
+  display: grid; gap: 2.5rem;
+  grid-template-columns: 1fr;
+  align-items: end;
+}
+@media (min-width: 980px) { .ds-grid { grid-template-columns: 1.05fr 1fr; gap: 3.5rem; } }
+
+.ds-hero .lede {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md); font-weight: 300;
+  line-height: 1.55; color: var(--ink-soft);
+  margin: 0 0 1.5rem; max-width: 56ch;
+}
+.ds-hero .lede strong {
+  font-weight: 600; color: var(--ink);
+  background: linear-gradient(180deg, transparent 60%, color-mix(in srgb, var(--accent) 30%, transparent) 60%);
+  padding: 0 0.1em;
+}
+
+/* SYNOPSIS terminal block */
+.synopsis {
+  border: 2px solid var(--ink);
+  background: var(--term-bg); color: var(--term-fg);
+  font-family: 'JetBrains Mono', monospace;
+  box-shadow: 8px 8px 0 var(--accent);
+}
+.term-head {
+  padding: 0.55rem 0.95rem;
+  background: #07101a;
+  border-bottom: 1px solid color-mix(in srgb, white 10%, transparent);
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 0.7rem; text-transform: uppercase;
+  letter-spacing: 0.16em; font-weight: 700;
+  color: color-mix(in srgb, white 70%, transparent);
+}
+.term-head .dots { display: flex; gap: 0.35rem; }
+.term-head .dots i { width: 10px; height: 10px; border-radius: 50%; background: #2b3338; display: inline-block; }
+.term-head .dots i:nth-child(1) { background: var(--term-fail); }
+.term-head .dots i:nth-child(2) { background: var(--term-warn); }
+.term-head .dots i:nth-child(3) { background: var(--term-ok); }
+.term-body { padding: 1rem 1.1rem; font-size: 0.82rem; line-height: 1.6; }
+.term-body .pl { color: var(--accent); }
+.term-body .pl::before { content: "$ "; color: var(--term-mute); }
+.term-body .cm { color: var(--term-fg); }
+.term-body .cm em { color: var(--term-warn); font-style: normal; }
+.term-body .cm strong { color: var(--term-ok); font-weight: 700; }
+.term-body .out { color: var(--term-mute); display: block; padding-left: 1ch; }
+.term-body .out.ok { color: var(--term-ok); }
+.term-body .out.fail { color: var(--term-fail); }
+.term-body .hr { border-top: 1px dashed color-mix(in srgb, white 15%, transparent); margin: 0.7rem 0; }
+.term-body .lbl {
+  color: color-mix(in srgb, white 50%, transparent);
+  font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.16em;
+  margin: 0.2rem 0 0.4rem; display: block;
+}
+
+.ds-cta-row { margin-top: 2rem; display: flex; gap: 0.75rem; flex-wrap: wrap; }
+.btn {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.7rem 1.1rem;
+  font-family: 'JetBrains Mono', monospace; font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.14em; font-weight: 700;
+  border: 1px solid var(--ink);
+  transition: background .15s, color .15s, transform .15s, box-shadow .15s;
+}
+.btn:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--ink); }
+.btn-primary { background: var(--accent); color: white; border-color: var(--accent); }
+.btn-ghost { background: transparent; color: var(--ink); }
+
+/* ====== STATS ============================================ */
+.ds-stats {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  background: var(--ink); color: var(--paper);
+  border-block: 2px solid var(--ink);
+}
+.ds-stat { padding: 1.5rem clamp(1rem, 2vw, 1.5rem); border-right: 1px solid color-mix(in srgb, var(--paper) 18%, transparent); }
+.ds-stat:last-child { border-right: 0; }
+.ds-stat .num {
+  font-family: 'JetBrains Mono', monospace; font-size: clamp(1.6rem, 2vw + 1rem, 2.4rem);
+  font-weight: 700; letter-spacing: -0.04em;
+  display: block; line-height: 1; color: var(--accent);
+}
+.ds-stat .lbl {
+  font-family: 'JetBrains Mono', monospace; font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.14em;
+  margin-top: 0.6rem; display: block;
+  color: color-mix(in srgb, var(--paper) 75%, transparent);
+}
+
+/* ====== ACT ============================================== */
+.act { padding-block: clamp(3rem, 5vw, 5rem); border-bottom: var(--hair); position: relative; }
+.act-num {
+  font-family: 'JetBrains Mono', monospace; font-size: var(--t-xs);
+  letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--accent); font-weight: 700;
+  margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 1rem;
+}
+.act-num::before { content: ""; width: 2.5rem; height: 1px; background: var(--accent); }
+.act h2 {
+  font-family: 'Fraunces', serif; font-size: var(--t-2xl);
+  font-weight: 400; font-variation-settings: "opsz" 144, "SOFT" 50, "WONK" 1;
+  letter-spacing: -0.025em; line-height: 1.05;
+  margin: 0 0 1.5rem; max-width: 24ch;
+}
+.act h2 em { font-style: italic; color: var(--accent); }
+.act .intro {
+  font-family: 'Fraunces', serif; font-size: var(--t-md);
+  color: var(--ink-soft); max-width: 64ch; margin: 0;
+  line-height: 1.5;
+}
+
+/* ===== Problem rows ===== */
+.problem-stack { display: grid; gap: 0; margin-top: 2rem; }
+.problem-row {
+  display: grid; grid-template-columns: 5rem 1fr; gap: 1.25rem;
+  padding: 1.4rem 0; border-bottom: var(--hair-soft);
+}
+.problem-row:first-child { padding-top: 0; }
+.problem-row:last-child { border-bottom: 0; }
+.problem-row .pn {
+  font-family: 'JetBrains Mono', monospace; font-size: 0.78rem;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--accent); font-weight: 700; padding-top: 0.3rem;
+}
+.problem-row h3 {
+  font-family: 'Fraunces', serif; font-weight: 500;
+  font-size: var(--t-md); margin: 0 0 0.4rem; letter-spacing: -0.01em;
+}
+.problem-row p { margin: 0; color: var(--ink-soft); font-size: var(--t-sm); line-height: 1.55; }
+
+/* ===== Code block · safe-default pattern ===== */
+.code-card {
+  margin-top: 2rem;
+  border: 1px solid var(--ink);
+  background: var(--term-bg); color: var(--term-fg);
+  font-family: 'JetBrains Mono', monospace;
+}
+.code-head {
+  padding: 0.65rem 1rem;
+  background: #07101a;
+  border-bottom: 1px solid color-mix(in srgb, white 10%, transparent);
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 0.7rem; text-transform: uppercase;
+  letter-spacing: 0.16em; font-weight: 700;
+  color: color-mix(in srgb, white 70%, transparent);
+}
+.code-head .pth { color: var(--accent); }
+.code-head .badge {
+  font-size: 0.6rem; padding: 0.1rem 0.45rem;
+  background: var(--accent); color: white;
+  letter-spacing: 0.1em;
+}
+pre.code {
+  margin: 0; padding: 1rem 1.2rem;
+  font-size: 0.82rem; line-height: 1.65;
+  overflow-x: auto;
+  white-space: pre;
+  font-family: 'JetBrains Mono', monospace;
+}
+pre.code .cm-h { color: var(--term-mute); }
+pre.code .cm-k { color: var(--term-warn); font-weight: 700; }
+pre.code .cm-s { color: var(--term-ok); }
+pre.code .cm-v { color: #9ad3ff; }
+pre.code .cm-c { color: var(--accent); }
+
+/* ===== Lab table-of-contents ===== */
+.toc-wrap {
+  margin-top: 2rem;
+  border: 1px solid var(--ink);
+  background: var(--man-paper);
+  position: relative;
+}
+.toc-wrap::before {
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 6px;
+  background: repeating-linear-gradient(0deg, var(--accent) 0 8px, transparent 8px 16px);
+}
+.toc-head {
+  padding: 0.85rem 1.25rem 0.85rem 1.6rem;
+  border-bottom: 1px solid var(--ink);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.16em;
+  font-weight: 700; color: var(--accent-deep);
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 0.5rem;
+  background: color-mix(in srgb, var(--accent) 6%, var(--man-paper));
+}
+.toc-head .leaf { color: var(--ink-mute); font-weight: 600; }
+ol.toc {
+  margin: 0; padding: 0;
+  display: grid; grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { ol.toc { grid-template-columns: 1fr 1fr; } }
+.toc-row {
+  display: grid; grid-template-columns: 4.5rem 1fr;
+  gap: 0.75rem; padding: 0.85rem 1.25rem 0.85rem 1.6rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--ink) 12%, transparent);
+  font-family: 'Atkinson Hyperlegible', sans-serif;
+  align-items: baseline;
+}
+.toc-row:nth-child(2n) { background: color-mix(in srgb, var(--accent) 3%, transparent); }
+@media (min-width: 760px) {
+  .toc-row { border-right: 1px solid color-mix(in srgb, var(--ink) 12%, transparent); }
+  .toc-row:nth-child(2n) { border-right: 0; }
+}
+.toc-row .lab-id {
+  font-family: 'JetBrains Mono', monospace; font-size: 0.78rem;
+  font-weight: 700; color: var(--accent); letter-spacing: 0.08em;
+}
+.toc-row .lab-meta {
+  display: grid; gap: 0.2rem;
+}
+.toc-row h3 {
+  font-family: 'Fraunces', serif; font-weight: 500;
+  font-size: 1.05rem; margin: 0; letter-spacing: -0.01em; line-height: 1.2;
+}
+.toc-row p {
+  margin: 0; font-size: 0.83rem; color: var(--ink-soft); line-height: 1.45;
+}
+.toc-row .tag {
+  font-family: 'JetBrains Mono', monospace; font-size: 0.62rem;
+  text-transform: uppercase; letter-spacing: 0.14em;
+  color: var(--accent-deep); margin-top: 0.15rem;
+  font-weight: 700;
+}
+
+/* ===== Top-10 daily lists ===== */
+.daily-grid {
+  margin-top: 2rem;
+  display: grid; gap: 1.5rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 880px) { .daily-grid { grid-template-columns: 1fr 1fr; gap: 2.5rem; } }
+.daily-col {
+  border: 1px solid var(--ink);
+  background: var(--paper);
+}
+.daily-head {
+  padding: 0.85rem 1.2rem;
+  background: var(--ink); color: var(--paper);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.16em;
+  font-weight: 700;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.daily-head .pill {
+  background: var(--accent); color: white;
+  padding: 0.1rem 0.45rem; font-size: 0.6rem; letter-spacing: 0.1em;
+}
+ol.daily {
+  margin: 0; padding: 0;
+}
+.daily-row {
+  display: grid; grid-template-columns: 2.5rem 1fr;
+  gap: 0.6rem; padding: 0.7rem 1.2rem;
+  border-bottom: 1px solid var(--paper-edge);
+  font-family: 'Atkinson Hyperlegible', sans-serif;
+  font-size: 0.88rem; line-height: 1.45;
+  align-items: baseline;
+}
+.daily-row:last-child { border-bottom: 0; }
+.daily-row .n {
+  font-family: 'JetBrains Mono', monospace; font-size: 0.78rem;
+  font-weight: 700; color: var(--accent);
+}
+.daily-row .what { color: var(--ink); font-weight: 700; }
+.daily-row .tools { color: var(--ink-mute); font-size: 0.78rem; display: block; }
+
+/* ===== Proof KPIs ===== */
+.proof { background: var(--ink); color: var(--paper); padding-block: clamp(3rem, 5vw, 5rem); position: relative; overflow: hidden; }
+.proof::before {
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 90% 10%, color-mix(in srgb, var(--accent) 30%, transparent), transparent 60%);
+  pointer-events: none;
+}
+.proof .frame { position: relative; }
+.proof h2 { color: var(--paper); }
+.proof h2 em { color: var(--accent); }
+.kpi-grid {
+  display: grid; gap: 1rem; margin-top: 2rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1080px) { .kpi-grid { grid-template-columns: repeat(3, 1fr); } }
+.kpi {
+  border: 1px solid color-mix(in srgb, var(--paper) 30%, transparent);
+  padding: 1.4rem 1.5rem;
+  background: color-mix(in srgb, var(--paper) 5%, transparent);
+}
+.kpi h3 {
+  font-family: 'Fraunces', serif; margin: 0 0 0.35rem;
+  font-size: 1.1rem; color: var(--accent);
+  font-weight: 500; letter-spacing: -0.01em;
+}
+.kpi .target {
+  font-family: 'JetBrains Mono', monospace; font-size: 0.7rem;
+  text-transform: uppercase; letter-spacing: 0.14em;
+  color: color-mix(in srgb, var(--paper) 70%, transparent);
+  margin-bottom: 0.4rem;
+}
+.kpi .target strong { color: var(--accent); }
+.kpi p { margin: 0; color: color-mix(in srgb, var(--paper) 80%, transparent); font-size: 0.83rem; line-height: 1.5; }
+
+/* ===== Stack tags ===== */
+.stack { padding-block: clamp(3rem, 5vw, 5rem); border-bottom: var(--hair); }
+.stack-list { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.5rem; }
+.stack-tag {
+  padding: 0.5rem 0.9rem; border: 1px solid var(--ink);
+  font-family: 'JetBrains Mono', monospace; font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.14em; font-weight: 600;
+}
+
+/* ===== End CTA ===== */
+.endcta {
+  padding-block: clamp(3rem, 5vw, 5rem);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 10%, transparent), var(--paper));
+}
+.endcta .frame { display: grid; gap: 2rem; grid-template-columns: 1fr; }
+@media (min-width: 760px) { .endcta .frame { grid-template-columns: 2fr 1fr; align-items: end; } }
+.endcta h2 {
+  font-family: 'Fraunces', serif; font-size: var(--t-2xl);
+  font-weight: 300; font-variation-settings: "opsz" 144, "SOFT" 100;
+  margin: 0 0 1rem; letter-spacing: -0.025em; line-height: 1.05;
+}
+.endcta h2 em {
+  font-style: italic; color: var(--accent);
+  background: linear-gradient(180deg, transparent 70%, color-mix(in srgb, var(--accent) 25%, transparent) 70%);
+}
+.endcta p { color: var(--ink-soft); margin: 0; max-width: 52ch; }
+.endcta .actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+
+.foot { background: var(--ink); color: var(--paper); }
+.foot .dot { color: var(--accent); }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topnav">
+  <div class="frame">
+    <div class="brand"><a href="../index.html">dmj<span class="dot">.</span>one</a></div>
+    <nav aria-label="Primary">
+      <ul>
+        <li><a href="../index.html#catalogue">Catalogue</a></li>
+        <li><a href="../index.html#manifesto">Manifesto</a></li>
+        <li><a href="../index.html#hire">Hire</a></li>
+        <li><a href="https://github.com/divyamohan1993/devops-shell-scripts" rel="noopener">GitHub</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ============ HERO · MANPAGE COVER ============ -->
+<section class="ds-hero">
+  <div class="frame">
+    <p class="crumbs">
+      <a href="../index.html">Catalogue</a> /
+      <a href="../index.html#cat-cloud">Cloud · Infra</a> /
+      <span>DevOps Shell Scripts</span>
+    </p>
+
+    <p class="man-strip">
+      <span class="l">DEVOPS-SHELL-SCRIPTS(1)</span>
+      <span class="c">Training Handbook</span>
+      <span class="r">Shoolini · L&amp;T EduTech</span>
+    </p>
+
+    <h1>
+      <span class="name">devops-shell-scripts</span>
+      <span class="sub">A handbook for the bash that <em>survives</em> the first day on the job.</span>
+    </h1>
+
+    <div class="ds-grid">
+      <div>
+        <p class="lede">
+          Most training scripts work in the trainer's lab and break in the student's first job. They run with no error trapping, swallow undefined variables, hide failed pipes, and copy-paste straight into a prod incident. <strong>This handbook teaches the opposite.</strong> Industry-pattern bash from line one. Lint in CI. MIT-licensed. Run it in a container or a throwaway VM, never in production.
+        </p>
+        <div class="ds-cta-row">
+          <a class="btn btn-primary" href="https://github.com/divyamohan1993/devops-shell-scripts" rel="noopener">Open the repository</a>
+          <a class="btn btn-ghost" href="#labs">Browse the labs</a>
+          <a class="btn btn-ghost" href="#daily">Top-10 daily tools</a>
+        </div>
+      </div>
+
+      <aside class="synopsis" aria-label="Synopsis terminal">
+        <header class="term-head">
+          <span>SYNOPSIS · ~/devops-shell-scripts</span>
+          <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+        </header>
+        <div class="term-body">
+          <p class="lbl">// clone the handbook</p>
+          <p class="pl"><span class="cm">git clone https://github.com/divyamohan1993/devops-shell-scripts.git</span></p>
+          <p class="pl"><span class="cm">cd devops-shell-scripts</span></p>
+          <p class="hr"></p>
+          <p class="lbl">// always run experiments with strict bash</p>
+          <p class="pl"><span class="cm">bash <em>-euxo pipefail</em> ./docker/&lt;some-script&gt;.sh</span></p>
+          <p class="out ok">[ ok ] · errexit, nounset, xtrace, pipefail · all on</p>
+          <p class="hr"></p>
+          <p class="lbl">// lint every shell file before pushing</p>
+          <p class="pl"><span class="cm">shellcheck $(git ls-files <span class="cm">'*.sh'</span>)</span></p>
+          <p class="out ok">[ pass ] · CI runs the same gate on every PR</p>
+          <p class="hr"></p>
+          <p class="lbl">// container scan, the safe way</p>
+          <p class="pl"><span class="cm">trivy image alpine:3.20</span></p>
+          <p class="pl"><span class="cm">grype alpine:3.20</span></p>
+          <p class="pl"><span class="cm">checkov -d ./iac</span></p>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATS ============ -->
+<section class="ds-stats" aria-label="At a glance">
+  <div class="ds-stat"><span class="num">10</span><span class="lbl">Lab modules · containers to SIEM</span></div>
+  <div class="ds-stat"><span class="num">20</span><span class="lbl">Daily tools mapped · DevOps + DevSecOps</span></div>
+  <div class="ds-stat"><span class="num">CI</span><span class="lbl">Lint gate on every push</span></div>
+  <div class="ds-stat"><span class="num">MIT</span><span class="lbl">Licensed · learn in public</span></div>
+  <div class="ds-stat"><span class="num">0</span><span class="lbl">Scripts intended for production</span></div>
+</section>
+
+<!-- ============ ACT I · THE PROBLEM ============ -->
+<section class="act" aria-labelledby="prob-h">
+  <div class="frame">
+    <p class="act-num">Act I · The Problem</p>
+    <h2 id="prob-h">The training script worked. <em>The first job</em> did not.</h2>
+    <p class="intro">Most DevOps tutorials teach the happy path with unsafe defaults. The script runs once, the screen says "ok", the student learns the wrong habit. Then the same student lands at a real company, runs the same pattern against a real cluster, and an undefined variable expands to <code>rm -rf /</code> in front of the senior on call.</p>
+
+    <ol class="problem-stack">
+      <li class="problem-row">
+        <span class="pn">Pain · 01</span>
+        <div>
+          <h3>No <code>set -e</code>. No <code>set -u</code>. No <code>pipefail</code>.</h3>
+          <p>The script keeps running after a failed step. The exit code lies. The pipeline reports green. The pod is broken. The on-call learns the habit was never installed in the first place.</p>
+        </div>
+      </li>
+      <li class="problem-row">
+        <span class="pn">Pain · 02</span>
+        <div>
+          <h3>"It works on my machine" is the curriculum.</h3>
+          <p>The lab assumes the trainer's laptop. No container. No version pin. No idempotency. Re-running the script the second time blows up because the first run already created the resource. Real teams demand reruns.</p>
+        </div>
+      </li>
+      <li class="problem-row">
+        <span class="pn">Pain · 03</span>
+        <div>
+          <h3>Security is an afterthought, not a gate.</h3>
+          <p>SCA, SAST, secret scanning, container scanning, IaC policy, SBOMs. None of it is in the lab, none of it is in CI. The student ships a CV that says "DevOps" and walks into a DevSecOps interview unarmed.</p>
+        </div>
+      </li>
+      <li class="problem-row">
+        <span class="pn">Pain · 04</span>
+        <div>
+          <h3>The repo is one giant script, not ten small labs.</h3>
+          <p>You cannot study what you cannot isolate. A handbook needs a table of contents. Each lab needs to fail safely on its own. Each lab needs to lint, run, and clean up without taking the laptop with it.</p>
+        </div>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============ ACT II · SAFE DEFAULTS CODE ============ -->
+<section class="act" aria-labelledby="sd-h">
+  <div class="frame">
+    <p class="act-num">Act II · The Promise</p>
+    <h2 id="sd-h">Safe defaults <em>on line one.</em> Every script. Every lab.</h2>
+    <p class="intro">Bash has the discipline. Most curricula skip teaching it. This handbook puts the strict flags, the trap, the umask and the temp-dir cleanup at the top of every script. The student copies the pattern into the first job and never has to unlearn it.</p>
+
+    <article class="code-card" aria-label="Safe-default Bash skeleton">
+      <header class="code-head">
+        <span class="pth">~/devops-shell-scripts/_template.sh</span>
+        <span class="badge">copy · paste · keep</span>
+      </header>
+<pre class="code"><span class="cm-h">#!/usr/bin/env bash</span>
+<span class="cm-h"># ----------------------------------------------------------</span>
+<span class="cm-h"># Safe-default lab script · Shoolini × L&amp;T EduTech</span>
+<span class="cm-h"># Run inside a container or throwaway VM, never on prod.</span>
+<span class="cm-h"># ----------------------------------------------------------</span>
+<span class="cm-k">set</span> -Eeuo pipefail
+<span class="cm-k">shopt</span> -s inherit_errexit nullglob
+<span class="cm-k">umask</span> 077
+IFS=$<span class="cm-s">'\n\t'</span>
+
+<span class="cm-c">readonly</span> SCRIPT_NAME=<span class="cm-s">"${0##*/}"</span>
+<span class="cm-c">readonly</span> WORK_DIR=<span class="cm-s">"$(mktemp -d -t lab.XXXXXX)"</span>
+
+<span class="cm-c">log</span>()  { <span class="cm-k">printf</span> <span class="cm-s">'[%s] %s\n'</span> <span class="cm-s">"$(date -u +%FT%TZ)"</span> <span class="cm-s">"$*"</span>; }
+<span class="cm-c">die</span>()  { log <span class="cm-s">"FATAL: $*"</span>; exit 1; }
+<span class="cm-c">need</span>() { <span class="cm-k">command</span> -v <span class="cm-s">"$1"</span> &gt;/dev/null || die <span class="cm-s">"missing tool: $1"</span>; }
+
+<span class="cm-c">cleanup</span>() {
+  <span class="cm-v">local</span> rc=$?
+  <span class="cm-k">rm</span> -rf -- <span class="cm-s">"$WORK_DIR"</span>
+  log <span class="cm-s">"$SCRIPT_NAME exited rc=$rc"</span>
+  <span class="cm-k">exit</span> <span class="cm-s">"$rc"</span>
+}
+<span class="cm-k">trap</span> cleanup EXIT
+<span class="cm-k">trap</span> <span class="cm-s">'die "interrupted"'</span> INT TERM
+
+<span class="cm-c"># preflight · fail loudly, fail early</span>
+need docker; need kubectl; need shellcheck
+
+<span class="cm-c"># your lab here · idempotent, isolated, scoped to $WORK_DIR</span>
+log <span class="cm-s">"workspace=$WORK_DIR"</span>
+</pre>
+    </article>
+  </div>
+</section>
+
+<!-- ============ ACT III · LAB TABLE OF CONTENTS ============ -->
+<section class="act" id="labs" aria-labelledby="lab-h">
+  <div class="frame">
+    <p class="act-num">Act III · The Curriculum</p>
+    <h2 id="lab-h">Ten labs. <em>Each one ends with a habit</em> the first job will reward.</h2>
+    <p class="intro">Every lab lives in its own directory. Every lab is small enough to run on a 4 GB Linux VM or a Docker-in-Docker sandbox. Every lab finishes with a checklist the student walks into the office knowing.</p>
+
+    <article class="toc-wrap">
+      <header class="toc-head">
+        <span>Table of Contents · ten lab modules</span>
+        <span class="leaf">leaf 01 of 01 · run in order or pick what you need</span>
+      </header>
+      <ol class="toc">
+        <li class="toc-row">
+          <span class="lab-id">Lab 01</span>
+          <div class="lab-meta">
+            <h3>Defensive Bash</h3>
+            <p>Strict flags, traps, idempotency, ShellCheck. The skeleton above, drilled until it is muscle memory.</p>
+            <span class="tag">/_template.sh · shellcheck</span>
+          </div>
+        </li>
+        <li class="toc-row">
+          <span class="lab-id">Lab 02</span>
+          <div class="lab-meta">
+            <h3>Containers from scratch</h3>
+            <p>Multi-stage Dockerfiles, distroless runtime, non-root user, healthchecks. Compose for the local stack.</p>
+            <span class="tag">/docker · compose</span>
+          </div>
+        </li>
+        <li class="toc-row">
+          <span class="lab-id">Lab 03</span>
+          <div class="lab-meta">
+            <h3>Kubernetes by hand</h3>
+            <p>Manifests written before Helm. kind and minikube helpers. Kustomize overlays. Helm charts only after the manifests are read line by line.</p>
+            <span class="tag">/k8s · kind · kustomize</span>
+          </div>
+        </li>
+        <li class="toc-row">
+          <span class="lab-id">Lab 04</span>
+          <div class="lab-meta">
+            <h3>CI you can re-read</h3>
+            <p>Jenkins auto-config plus reusable GitHub Actions. Pipelines that fail loud, log structured, and rerun on retry.</p>
+            <span class="tag">/jenkins · .github/workflows</span>
+          </div>
+        </li>
+        <li class="toc-row">
+          <span class="lab-id">Lab 05</span>
+          <div class="lab-meta">
+            <h3>SonarQube quality gate</h3>
+            <p>Compose-up, scanner config, fail-the-build thresholds. The PR that does not meet the bar does not merge.</p>
+            <span class="tag">/sonarcube · quality gate</span>
+          </div>
+        </li>
+        <li class="toc-row">
+          <span class="lab-id">Lab 06</span>
+          <div class="lab-meta">
+            <h3>Observability starter</h3>
+            <p>Prometheus scrape config, Grafana dashboards, the four golden signals. A drill on writing one alert that pages and a hundred that do not.</p>
+            <span class="tag">/prometheus · /grafana</span>
+          </div>
+        </li>
+        <li class="toc-row">
+          <span class="lab-id">Lab 07</span>
+          <div class="lab-meta">
+            <h3>Spring Boot reference app</h3>
+            <p>The app the labs deploy. Real endpoints, real metrics, a real readiness probe. Used end to end across containers, K8s and CI.</p>
+            <span class="tag">/springboot</span>
+          </div>
+        </li>
+        <li class="toc-row">
+          <span class="lab-id">Lab 08</span>
+          <div class="lab-meta">
+            <h3>Zero-trust MySQL</h3>
+            <p>TLS-required connections, scoped users, network policy, secrets in the right place. A safer DB lab than the default tutorial.</p>
+            <span class="tag">/zero-trust-mysql</span>
+          </div>
+        </li>
+        <li class="toc-row">
+          <span class="lab-id">Lab 09</span>
+          <div class="lab-meta">
+            <h3>Autoscaling and load balancing</h3>
+            <p>HPA on a real metric, not CPU. Layer-4 vs layer-7 demonstration. A controlled chaos drill to watch it scale.</p>
+            <span class="tag">/autoscalling-loadbalancing-demo</span>
+          </div>
+        </li>
+        <li class="toc-row">
+          <span class="lab-id">Lab 10</span>
+          <div class="lab-meta">
+            <h3>DevSecOps gates</h3>
+            <p>Trivy and Grype on the image, Checkov on the IaC, Gitleaks on history, Semgrep on source, cosign on the artifact. Shift left, keep the habit.</p>
+            <span class="tag">trivy · grype · checkov · gitleaks · semgrep · cosign</span>
+          </div>
+        </li>
+      </ol>
+    </article>
+  </div>
+</section>
+
+<!-- ============ ACT IV · TOP-10 DAILY TOOLS ============ -->
+<section class="act" id="daily" aria-labelledby="dy-h">
+  <div class="frame">
+    <p class="act-num">Act IV · The Field Map</p>
+    <h2 id="dy-h">Twenty tools, two professions. <em>Recognise them all on day one.</em></h2>
+    <p class="intro">A junior engineer who can name and place these on a whiteboard is already an asset to the team. The handbook frames every lab against this map so the student leaves knowing where each tool sits in a real release.</p>
+
+    <div class="daily-grid">
+      <article class="daily-col">
+        <header class="daily-head">
+          <span>DevOps · top 10 daily</span>
+          <span class="pill">build · ship · run</span>
+        </header>
+        <ol class="daily">
+          <li class="daily-row"><span class="n">01</span><div><span class="what">Source control and PR flow</span><span class="tools">GitHub · GitLab · Bitbucket</span></div></li>
+          <li class="daily-row"><span class="n">02</span><div><span class="what">CI/CD pipelines</span><span class="tools">GitHub Actions · Jenkins · GitLab CI · Azure DevOps · CircleCI</span></div></li>
+          <li class="daily-row"><span class="n">03</span><div><span class="what">Containers</span><span class="tools">Docker · Podman</span></div></li>
+          <li class="daily-row"><span class="n">04</span><div><span class="what">Orchestration platform</span><span class="tools">Kubernetes · Helm · Kustomize · Argo CD · Flux</span></div></li>
+          <li class="daily-row"><span class="n">05</span><div><span class="what">Infrastructure as code</span><span class="tools">Terraform · OpenTofu · CloudFormation · Pulumi</span></div></li>
+          <li class="daily-row"><span class="n">06</span><div><span class="what">Config and release</span><span class="tools">Ansible · Helm · Packer</span></div></li>
+          <li class="daily-row"><span class="n">07</span><div><span class="what">Observability</span><span class="tools">Prometheus · Grafana · Datadog · New Relic · Splunk</span></div></li>
+          <li class="daily-row"><span class="n">08</span><div><span class="what">Centralised logging</span><span class="tools">Elastic Stack · Loki · CloudWatch · Cloud Logging</span></div></li>
+          <li class="daily-row"><span class="n">09</span><div><span class="what">Artifact and image registries</span><span class="tools">Artifactory · Nexus · Harbor · ECR · GCR · ACR</span></div></li>
+          <li class="daily-row"><span class="n">10</span><div><span class="what">Tracking and ChatOps</span><span class="tools">Jira · GitHub Issues · Slack · Microsoft Teams</span></div></li>
+        </ol>
+      </article>
+
+      <article class="daily-col">
+        <header class="daily-head">
+          <span>DevSecOps · top 10 daily</span>
+          <span class="pill">shift left</span>
+        </header>
+        <ol class="daily">
+          <li class="daily-row"><span class="n">01</span><div><span class="what">SCA and dependency updates</span><span class="tools">Dependabot · Snyk · OWASP Dependency-Check · Renovate</span></div></li>
+          <li class="daily-row"><span class="n">02</span><div><span class="what">Secret hygiene</span><span class="tools">GitHub Secret Scanning · Gitleaks · TruffleHog</span></div></li>
+          <li class="daily-row"><span class="n">03</span><div><span class="what">SAST in CI</span><span class="tools">SonarQube · Semgrep · Checkmarx · Veracode · GitLab SAST</span></div></li>
+          <li class="daily-row"><span class="n">04</span><div><span class="what">DAST</span><span class="tools">OWASP ZAP · Burp Suite · StackHawk</span></div></li>
+          <li class="daily-row"><span class="n">05</span><div><span class="what">Image and artifact scanning</span><span class="tools">Trivy · Grype · Anchore · Clair · Syft</span></div></li>
+          <li class="daily-row"><span class="n">06</span><div><span class="what">IaC and K8s policy</span><span class="tools">Checkov · tfsec · Terrascan · OPA · Conftest · Kyverno</span></div></li>
+          <li class="daily-row"><span class="n">07</span><div><span class="what">Secrets management</span><span class="tools">HashiCorp Vault · External Secrets Operator · cloud KMS</span></div></li>
+          <li class="daily-row"><span class="n">08</span><div><span class="what">Supply chain integrity</span><span class="tools">Syft · CycloneDX · SPDX · Sigstore cosign</span></div></li>
+          <li class="daily-row"><span class="n">09</span><div><span class="what">Runtime threat detection</span><span class="tools">Falco · CNAPP · CSPM · Wiz · Prisma · Defender</span></div></li>
+          <li class="daily-row"><span class="n">10</span><div><span class="what">Vulnerability and SIEM/SOAR</span><span class="tools">Nessus · Qualys · Defender for Cloud · Splunk · Sentinel</span></div></li>
+        </ol>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PROOF ============ -->
+<section class="proof" aria-labelledby="pr-h">
+  <div class="frame">
+    <p class="act-num">Act V · Proof</p>
+    <h2 id="pr-h">A handbook that <em>checks itself</em> on every push.</h2>
+
+    <div class="kpi-grid">
+      <article class="kpi">
+        <p class="target">CI · <strong>lint badge live</strong></p>
+        <h3>ShellCheck on every PR</h3>
+        <p>GitHub Actions runs <code>lint.yml</code> on every push and pull request. The handbook holds itself to the same gate the labs preach to the students.</p>
+      </article>
+      <article class="kpi">
+        <p class="target">Audience · <strong>Shoolini × L&amp;T EduTech</strong></p>
+        <h3>Hands-on training programme</h3>
+        <p>Prepared by Divya Mohan under the guidance of Prashant Singh Gautam, L&amp;T EduTech. The repository is the lab manual for the DevOps and Deployment programme at Shoolini University.</p>
+      </article>
+      <article class="kpi">
+        <p class="target">Licence · <strong>MIT</strong></p>
+        <h3>Learn in public, fork in public</h3>
+        <p>Every script is MIT licensed. Every lab is reproducible. Discussions, issues and pull requests are open. Security findings go to <code>SECURITY.md</code> first, never to the public tracker.</p>
+      </article>
+      <article class="kpi">
+        <p class="target">Surface · <strong>10 lab directories</strong></p>
+        <h3>Containers to SIEM</h3>
+        <p>docker, k8s, jenkins, sonarcube, prometheus, grafana, springboot, zero-trust-mysql, autoscalling-loadbalancing-demo, plus the DevSecOps gate set. Each one isolated, each one rerunnable.</p>
+      </article>
+      <article class="kpi">
+        <p class="target">Safety · <strong>container or VM only</strong></p>
+        <h3>Never the trainer's laptop</h3>
+        <p>Every lab is intended for an isolated environment. The repository's responsible-use note is the first thing the contributor reads. The pattern is the lesson.</p>
+      </article>
+      <article class="kpi">
+        <p class="target">Reach · <strong>students and early-career</strong></p>
+        <h3>From "what's a pod?" to "what's the SLO?"</h3>
+        <p>Designed for the student writing their first Dockerfile and the developer moving toward SRE. Small labs, fast feedback, safer habits than the default tutorial.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STACK ============ -->
+<section class="stack" aria-labelledby="te-h">
+  <div class="frame">
+    <p class="act-num">The Toolbelt</p>
+    <h2 id="te-h" style="font-size:var(--t-xl);font-weight:400;font-family:'Fraunces',serif;font-variation-settings:'opsz' 144,'SOFT' 50;margin:0;letter-spacing:-0.02em;">Boring on purpose. <em>Production-shaped from the first lab.</em></h2>
+    <ul class="stack-list">
+      <li class="stack-tag">Bash · set -Eeuo pipefail</li>
+      <li class="stack-tag">ShellCheck</li>
+      <li class="stack-tag">Docker · Compose</li>
+      <li class="stack-tag">Kubernetes</li>
+      <li class="stack-tag">kind · minikube</li>
+      <li class="stack-tag">Helm · Kustomize</li>
+      <li class="stack-tag">Jenkins</li>
+      <li class="stack-tag">GitHub Actions</li>
+      <li class="stack-tag">SonarQube</li>
+      <li class="stack-tag">Prometheus</li>
+      <li class="stack-tag">Grafana</li>
+      <li class="stack-tag">Spring Boot</li>
+      <li class="stack-tag">Trivy · Grype</li>
+      <li class="stack-tag">Checkov · tfsec</li>
+      <li class="stack-tag">Gitleaks · Semgrep</li>
+      <li class="stack-tag">Sigstore cosign</li>
+      <li class="stack-tag">OPA · Conftest · Kyverno</li>
+      <li class="stack-tag">MIT licence</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ END CTA ============ -->
+<section class="endcta" aria-labelledby="cta-h">
+  <div class="frame">
+    <div>
+      <h2 id="cta-h">If a training repo can ship like this, <em>your team's runbook can too.</em></h2>
+      <p>I write the handbooks the senior on call wishes the junior had read. If your team needs a curriculum, a hardened script template, or a CI lane that catches the bash mistakes the lab teaches by accident, the conversation starts here.</p>
+    </div>
+    <div class="actions">
+      <a class="btn btn-primary" href="../index.html#hire">Hire me</a>
+      <a class="btn btn-ghost" href="../index.html">Back to catalogue</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="frame">
+    <div>
+      <h2 style="font-family:'Fraunces',serif;font-size:var(--t-xl);margin:0 0 1rem;">dmj<span class="dot">.</span>one</h2>
+      <p>Dream, Manifest and Journey, Together as One.</p>
+      <p class="meta">© 2026 Divya Mohan · DevOps Shell Scripts is the lab repository for the DevOps and Deployment programme at Shoolini University, prepared under the guidance of Prashant Singh Gautam, L&amp;T EduTech. Logos belong to their respective owners and are referenced only for identification. MIT licensed. No warranty: use at your own risk, in containers and throwaway VMs only.</p>
+    </div>
+    <div>
+      <p class="meta">Catalogue</p>
+      <p><a href="../index.html#catalogue">All 47 products</a></p>
+      <p><a href="../index.html#cat-cloud">Cloud · Infra</a></p>
+      <p><a href="../index.html#hire">Hire</a></p>
+    </div>
+    <div>
+      <p class="meta">DevOps Shell Scripts</p>
+      <p><a href="https://github.com/divyamohan1993/devops-shell-scripts" rel="noopener">Source repository</a></p>
+      <p><a href="https://github.com/divyamohan1993/devops-shell-scripts/actions/workflows/lint.yml" rel="noopener">Lint CI</a></p>
+      <p><a href="mailto:contact@dmj.one">contact@dmj.one</a></p>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

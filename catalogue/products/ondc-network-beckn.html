@@ -1,0 +1,733 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1c5d63">
+<meta name="color-scheme" content="light">
+
+<title>Private Beckn Network · A complete ONDC, in your VPC · dmj.one</title>
+<meta name="description" content="Production-grade Beckn protocol implementation, protocol-identical to India's ONDC. Run as a private network or connect to real ONDC by changing two env vars.">
+<meta property="og:title" content="Private Beckn Network · A complete ONDC, in your VPC">
+<meta property="og:description" content="15 packages, ~1400 tests, post-quantum crypto, DPDPA compliance. Open source.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,30..100&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;600&family=Tiro+Devanagari+Hindi&display=swap">
+<link rel="stylesheet" href="../assets/core.css">
+
+<style>
+:root {
+  --accent: var(--c-cloud);
+  --accent-deep: #0e3d42;
+  --tiranga-saffron: #ff9933;
+  --tiranga-white: #ffffff;
+  --tiranga-green: #138808;
+  --tiranga-blue: #000080;
+}
+body { background: var(--paper); }
+
+/* ====== HERO · protocol/diagram led ====================== */
+.bn-hero {
+  position: relative;
+  padding-block: clamp(3rem, 5vw + 1rem, 6rem) clamp(2rem, 4vw, 4rem);
+  border-bottom: var(--hair);
+  overflow: hidden;
+  background: var(--paper);
+}
+/* tiranga subtle stripe at top */
+.bn-hero::before {
+  content: ""; position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 0.45rem;
+  background: linear-gradient(180deg,
+    var(--tiranga-saffron) 0 33.33%,
+    var(--tiranga-white) 33.33% 66.66%,
+    var(--tiranga-green) 66.66% 100%);
+  border-bottom: 1px solid var(--ink);
+  pointer-events: none;
+}
+/* faint chakra */
+.bn-hero::after {
+  content: ""; position: absolute;
+  right: -120px; top: -120px;
+  width: 480px; height: 480px;
+  border-radius: 50%;
+  background:
+    repeating-conic-gradient(from 0deg, color-mix(in srgb, var(--accent) 8%, transparent) 0 12deg, transparent 12deg 24deg);
+  pointer-events: none;
+  mask: radial-gradient(circle, black 0 80%, transparent 95%);
+  -webkit-mask: radial-gradient(circle, black 0 80%, transparent 95%);
+}
+.bn-hero .frame { position: relative; z-index: 2; }
+
+.crumbs {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs); letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink-mute); margin: 1rem 0 2rem;
+  display: flex; gap: 0.5rem; flex-wrap: wrap;
+}
+.crumbs a { border-bottom: 1px solid var(--ink-mute); padding-bottom: 1px; }
+.crumbs a:hover { color: var(--accent); border-color: var(--accent); }
+.crumbs span { color: var(--accent); }
+
+.parity-stamp {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  padding: 0.45rem 0.85rem;
+  border: 2px solid var(--accent);
+  background: var(--paper);
+  color: var(--accent-deep);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs); font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.18em;
+  margin-bottom: 1.5rem;
+  transform: rotate(-1.5deg);
+  box-shadow: 4px 4px 0 var(--ink);
+}
+.parity-stamp::before {
+  content: ""; width: 10px; height: 10px;
+  background: var(--accent);
+  display: inline-block;
+}
+
+.bn-hero h1 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-3xl); font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 30;
+  letter-spacing: -0.03em; line-height: 0.96;
+  margin: 0; max-width: 16ch;
+}
+.bn-hero h1 em {
+  font-style: italic; color: var(--accent);
+  font-variation-settings: "opsz" 144, "SOFT" 100;
+}
+.bn-hero h1 .deva {
+  display: block;
+  font-family: 'Tiro Devanagari Hindi', serif;
+  font-size: 0.42em;
+  color: var(--accent-deep);
+  font-style: normal;
+  margin-top: 0.4rem;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+}
+
+.bn-hero .lede {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md); font-weight: 300;
+  line-height: 1.45; color: var(--ink-soft);
+  margin: 1.5rem 0 0; max-width: 60ch;
+}
+.bn-hero .lede strong {
+  font-weight: 600; color: var(--ink);
+  background: linear-gradient(180deg, transparent 60%, color-mix(in srgb, var(--accent) 25%, transparent) 60%);
+  padding: 0 0.1em;
+}
+
+.bn-cta-row {
+  margin-top: 2.5rem;
+  display: flex; gap: 0.75rem; flex-wrap: wrap;
+}
+.btn {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.7rem 1.1rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs); text-transform: uppercase;
+  letter-spacing: 0.14em; font-weight: 700;
+  border: 1px solid var(--ink);
+  transition: background .15s, color .15s, transform .15s, box-shadow .15s;
+}
+.btn:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--ink); }
+.btn-primary { background: var(--accent); color: white; border-color: var(--accent); }
+.btn-primary:hover { box-shadow: 4px 4px 0 var(--ink); }
+.btn-ghost { background: transparent; color: var(--ink); }
+
+/* ====== STATS ============================================ */
+.bn-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  background: var(--ink); color: var(--paper);
+  border-block: 2px solid var(--ink);
+}
+.bn-stat {
+  padding: 1.5rem clamp(1rem, 2vw, 1.5rem);
+  border-right: 1px solid color-mix(in srgb, var(--paper) 20%, transparent);
+}
+.bn-stat:last-child { border-right: 0; }
+.bn-stat .num {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl); font-weight: 400;
+  letter-spacing: -0.04em;
+  font-variation-settings: "opsz" 144, "SOFT" 30;
+  display: block; line-height: 1;
+  color: var(--accent);
+}
+.bn-stat .lbl {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.14em;
+  margin-top: 0.6rem; display: block;
+  color: color-mix(in srgb, var(--paper) 75%, transparent);
+}
+
+/* ====== ACTS ============================================= */
+.act {
+  padding-block: clamp(3rem, 5vw, 5rem);
+  border-bottom: var(--hair);
+}
+.act-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs); letter-spacing: 0.22em;
+  text-transform: uppercase; color: var(--accent);
+  font-weight: 700; margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 1rem;
+}
+.act-num::before { content: ""; width: 2.5rem; height: 1px; background: var(--accent); }
+.act h2 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl); font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 50;
+  letter-spacing: -0.025em; line-height: 1.05;
+  margin: 0 0 1.5rem; max-width: 22ch;
+}
+.act h2 em { font-style: italic; color: var(--accent); }
+.act-lede {
+  font-family: 'Fraunces', serif; font-size: var(--t-md);
+  color: var(--ink-soft); max-width: 60ch; margin: 0 0 2rem;
+}
+
+/* protocol diagram */
+.proto {
+  display: grid; gap: 1.5rem;
+  margin-top: 2rem;
+  grid-template-columns: 1fr;
+  align-items: stretch;
+}
+@media (min-width: 880px) {
+  .proto {
+    grid-template-columns: 1fr 0.6fr 1fr;
+    align-items: center;
+  }
+}
+.proto-node {
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  padding: 1.5rem;
+  position: relative;
+}
+.proto-node.bap { background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 8%, var(--paper)), var(--paper)); }
+.proto-node.bpp { background: linear-gradient(180deg, var(--paper), color-mix(in srgb, var(--accent) 8%, var(--paper))); }
+.proto-node .role {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.18em;
+  color: var(--accent); font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+.proto-node h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.25rem; font-weight: 500;
+  margin: 0 0 0.5rem;
+  letter-spacing: -0.01em;
+}
+.proto-node p {
+  margin: 0 0 0.5rem;
+  font-size: var(--t-sm);
+  color: var(--ink-soft);
+}
+.proto-node .pkg {
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  background: var(--paper-soft);
+  padding: 0.15rem 0.4rem;
+  border: 1px solid var(--paper-edge);
+  margin-top: 0.2rem;
+  margin-right: 0.2rem;
+}
+.proto-spine {
+  border: 1px solid var(--ink);
+  background: var(--ink); color: var(--paper);
+  padding: 1.25rem;
+  text-align: center;
+}
+.proto-spine .arrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.1rem;
+  color: var(--accent);
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+}
+.proto-spine h4 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.1rem; font-weight: 500;
+  margin: 0 0 0.4rem;
+  color: var(--paper);
+}
+.proto-spine p {
+  margin: 0;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  color: color-mix(in srgb, var(--paper) 70%, transparent);
+  text-transform: uppercase; letter-spacing: 0.14em;
+}
+
+/* problem cards */
+.prob-cards {
+  display: grid; gap: 1rem; margin-top: 2rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { .prob-cards { grid-template-columns: repeat(2, 1fr); } }
+.prob-c {
+  border: 1px solid var(--ink);
+  padding: 1.5rem;
+  background: var(--paper);
+}
+.prob-c .axis {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.16em;
+  color: var(--signal); font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+.prob-c h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.15rem; font-weight: 500;
+  margin: 0 0 0.5rem; letter-spacing: -0.01em;
+}
+.prob-c p { margin: 0; color: var(--ink-soft); font-size: var(--t-sm); }
+
+/* packages table */
+.pkg-grid {
+  display: grid; gap: 0;
+  margin-top: 2rem;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { .pkg-grid { grid-template-columns: repeat(3, 1fr); } }
+.pkg-cell {
+  padding: 1rem 1.25rem;
+  border-right: 1px solid var(--paper-edge);
+  border-bottom: 1px solid var(--paper-edge);
+}
+@media (min-width: 760px) {
+  .pkg-cell:nth-child(3n) { border-right: 0; }
+}
+.pkg-cell .pn {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700; font-size: var(--t-xs);
+  color: var(--accent-deep);
+  margin-bottom: 0.3rem;
+  letter-spacing: 0.04em;
+}
+.pkg-cell p { margin: 0; font-size: 0.82rem; color: var(--ink-soft); }
+
+/* compliance laws */
+.laws {
+  display: grid; gap: 1rem; margin-top: 2rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { .laws { grid-template-columns: repeat(2, 1fr); } }
+.law {
+  border-left: 3px solid var(--accent);
+  padding: 1rem 1.25rem;
+  background: var(--paper-soft);
+}
+.law h4 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.05rem; font-weight: 500;
+  margin: 0 0 0.4rem; letter-spacing: -0.01em;
+}
+.law p { margin: 0; font-size: var(--t-sm); color: var(--ink-soft); }
+
+/* switch block */
+.switch {
+  margin-top: 2rem;
+  border: 1px solid var(--ink);
+  background: #0f1112;
+  color: #d0e8e9;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  overflow: hidden;
+  box-shadow: 6px 6px 0 var(--ink);
+}
+.switch-bar {
+  padding: 0.5rem 0.75rem;
+  background: #1a1d1f;
+  border-bottom: 1px solid #2c3033;
+  font-size: 0.72rem;
+  color: #95b9bb;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.switch-body { padding: 0.9rem 1rem; overflow-x: auto; }
+.switch-body .c { color: #6d8788; }
+.switch-body .v { color: #ffd06f; }
+.switch-body .e { color: #87d3a2; }
+.switch-body .k { color: #6fb6ba; font-weight: 700; }
+
+/* proof */
+.proof-act {
+  background: var(--ink); color: var(--paper);
+  position: relative; overflow: hidden;
+}
+.proof-act::before {
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 80% 20%, color-mix(in srgb, var(--accent) 30%, transparent), transparent 60%);
+  pointer-events: none;
+}
+.proof-act .frame { position: relative; }
+.proof-act h2 { color: var(--paper); }
+.proof-act h2 em { color: var(--accent); }
+.proof-grid {
+  display: grid; gap: 1rem; margin-top: 2rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { .proof-grid { grid-template-columns: repeat(2, 1fr); } }
+.proof-item {
+  border: 1px solid color-mix(in srgb, var(--paper) 30%, transparent);
+  padding: 1.5rem;
+  background: color-mix(in srgb, var(--paper) 5%, transparent);
+}
+.proof-item h3 {
+  font-family: 'Fraunces', serif;
+  margin: 0 0 0.5rem; font-size: var(--t-md);
+  color: var(--accent); font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.proof-item p { margin: 0; color: color-mix(in srgb, var(--paper) 80%, transparent); font-size: var(--t-sm); }
+
+/* stack */
+.stack-list {
+  display: flex; flex-wrap: wrap; gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+.stack-tag {
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--ink);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.14em;
+  font-weight: 600;
+}
+
+/* end cta */
+.endcta {
+  padding-block: clamp(3rem, 5vw, 5rem);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 10%, transparent), var(--paper));
+}
+.endcta .frame { display: grid; gap: 2rem; grid-template-columns: 1fr; }
+@media (min-width: 760px) { .endcta .frame { grid-template-columns: 2fr 1fr; align-items: end; } }
+.endcta h2 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl); font-weight: 300;
+  font-variation-settings: "opsz" 144, "SOFT" 100;
+  margin: 0 0 1rem; letter-spacing: -0.025em; line-height: 1.05;
+}
+.endcta h2 em {
+  font-style: italic; color: var(--accent);
+  background: linear-gradient(180deg, transparent 70%, color-mix(in srgb, var(--accent) 25%, transparent) 70%);
+}
+.endcta p { color: var(--ink-soft); margin: 0; max-width: 50ch; }
+.endcta .actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+
+.foot { background: var(--ink); color: var(--paper); }
+.foot .dot { color: var(--accent); }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topnav">
+  <div class="frame">
+    <div class="brand"><a href="../index.html">dmj<span class="dot">.</span>one</a></div>
+    <nav aria-label="Primary">
+      <ul>
+        <li><a href="../index.html#catalogue">Catalogue</a></li>
+        <li><a href="../index.html#manifesto">Manifesto</a></li>
+        <li><a href="../index.html#hire">Hire</a></li>
+        <li><a href="https://github.com/divyamohan1993/ondc-network-beckn" rel="noopener">GitHub</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ======= HERO ======= -->
+<section class="bn-hero">
+  <div class="frame">
+    <p class="crumbs">
+      <a href="../index.html">Catalogue</a> /
+      <a href="../index.html#cat-cloud">Cloud and Infra</a> /
+      <span>Private Beckn Network</span>
+    </p>
+
+    <span class="parity-stamp">Protocol-identical to Government ONDC</span>
+
+    <h1>
+      A complete <em>ONDC</em>,<br>in your VPC.
+      <span class="deva">बेकन प्रोटोकॉल · पूर्ण क्रियान्वयन</span>
+    </h1>
+
+    <p class="lede">
+      ONDC is government infrastructure. Private companies cannot run staging on it. Building anything Beckn-shaped means months of stub-writing. <strong>This is the whole network</strong>: registry, gateway, BAP, BPP, admin, storefront, seller dashboard. Run it private. Or flip two env vars and connect to real ONDC. Same code.
+    </p>
+
+    <div class="bn-cta-row">
+      <a class="btn btn-primary" href="https://github.com/divyamohan1993/ondc-network-beckn" rel="noopener">View source</a>
+      <a class="btn btn-ghost" href="#proto">The protocol</a>
+      <a class="btn btn-ghost" href="#switch">Connect to ONDC</a>
+    </div>
+  </div>
+</section>
+
+<!-- ======= STATS ======= -->
+<section class="bn-stats" aria-label="At a glance">
+  <div class="bn-stat"><span class="num">15</span><span class="lbl">TypeScript packages, monorepo</span></div>
+  <div class="bn-stat"><span class="num">1400</span><span class="lbl">Tests across 42 files (Vitest)</span></div>
+  <div class="bn-stat"><span class="num">10</span><span class="lbl">Beckn actions, all of them</span></div>
+  <div class="bn-stat"><span class="num">24</span><span class="lbl">ONDC domain codes covered</span></div>
+  <div class="bn-stat"><span class="num">70+</span><span class="lbl">Indian cities, STD-code format</span></div>
+  <div class="bn-stat"><span class="num">~8 min</span><span class="lbl">From terraform apply to live</span></div>
+</section>
+
+<!-- ======= ACT I · PROBLEM ======= -->
+<section class="act" aria-labelledby="prob-h">
+  <div class="frame">
+    <p class="act-num">Act I · The Problem</p>
+    <h2 id="prob-h">You cannot test against <em>government infrastructure.</em></h2>
+    <p class="act-lede">ONDC is a national open commerce protocol. Real, important, regulated. Which also means: you cannot stand up a copy of it for staging, you cannot mock the registry, and Pramaan certification needs you to already be partly working before you can even apply.</p>
+
+    <div class="prob-cards">
+      <div class="prob-c">
+        <p class="axis">Reality 01</p>
+        <h3>Months of stub-writing.</h3>
+        <p>Every team that touches Beckn writes their own mock registry, mock gateway, mock BAP, mock BPP. Most stop halfway. The integration breaks the day they connect to real ONDC.</p>
+      </div>
+      <div class="prob-c">
+        <p class="axis">Reality 02</p>
+        <h3>Compliance is its own project.</h3>
+        <p>DPDPA 2023, IT Act / CERT-In, Consumer Protection Act, GST. Each has obligations the protocol does not enforce. Most implementations bolt them on at the end, badly.</p>
+      </div>
+      <div class="prob-c">
+        <p class="axis">Reality 03</p>
+        <h3>One vertical at a time.</h3>
+        <p>Most Beckn implementations are wired for retail. Want logistics, food, water, agriculture? Re-fork the whole thing. Re-do the catalog. Re-do the categories.</p>
+      </div>
+      <div class="prob-c">
+        <p class="axis">Reality 04</p>
+        <h3>Crypto debt waiting to bite.</h3>
+        <p>Beckn signs every message. Most implementations are Ed25519 only. The day post-quantum signatures are required, the network has to ship a hard fork.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======= ACT II · PROTOCOL DIAGRAM ======= -->
+<section class="act" id="proto" style="background: linear-gradient(180deg, var(--paper-soft), var(--paper));" aria-labelledby="proto-h">
+  <div class="frame">
+    <p class="act-num">Act II · The Architecture</p>
+    <h2 id="proto-h">Buyer side. <em>Seller side.</em><br>The spine in between.</h2>
+    <p class="act-lede">Beckn separates the buyer experience from the seller experience by design. Anyone can build a BAP. Anyone can build a BPP. The registry and gateway in the middle make sure they can find each other and trust each other. This implementation ships every piece.</p>
+
+    <div class="proto" role="img" aria-label="Beckn architecture: BAP and BPP connected via registry and gateway">
+      <div class="proto-node bap">
+        <p class="role">Buyer side</p>
+        <h3>BAP</h3>
+        <p>Buyer Application Provider. All 10 Beckn actions: search, select, init, confirm, status, track, cancel, update, rating, support. Plus IGM and RSP.</p>
+        <span class="pkg">@ondc/bap</span>
+        <span class="pkg">@ondc/buyer-app</span>
+      </div>
+      <div class="proto-spine">
+        <p class="arrow">⇄</p>
+        <h4>Registry · Gateway</h4>
+        <p>Subscriber registration · key transparency · search broadcast · multicast routing</p>
+      </div>
+      <div class="proto-node bpp">
+        <p class="role">Seller side</p>
+        <h3>BPP</h3>
+        <p>Business Provider Platform. Catalogue, fulfilment, settlement processing. Catalog validation. Order state machine with audit trail.</p>
+        <span class="pkg">@ondc/bpp</span>
+        <span class="pkg">@ondc/seller-app</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======= ACT III · PACKAGES ======= -->
+<section class="act" aria-labelledby="pkg-h">
+  <div class="frame">
+    <p class="act-num">Act III · The Packages</p>
+    <h2 id="pkg-h">Fifteen packages. <em>One monorepo.</em></h2>
+    <p class="act-lede">A pnpm + Turborepo monorepo with one shared crypto and protocol package, the core network services, the three Next.js applications, and the operational supporting cast (vault, orchestrator, health, logs, simulation, mock).</p>
+
+    <div class="pkg-grid">
+      <div class="pkg-cell"><p class="pn">shared</p><p>Crypto, protocol types, middleware, DB schema, compliance modules, PII guard.</p></div>
+      <div class="pkg-cell"><p class="pn">registry</p><p>Subscriber registration, key management, lookup, key transparency log.</p></div>
+      <div class="pkg-cell"><p class="pn">gateway</p><p>Search broadcast, response aggregation, multicast routing via RabbitMQ.</p></div>
+      <div class="pkg-cell"><p class="pn">bap</p><p>Buyer Application Provider. All 10 Beckn actions plus IGM and RSP.</p></div>
+      <div class="pkg-cell"><p class="pn">bpp</p><p>Business Provider Platform. Catalogue, fulfilment, settlement processing.</p></div>
+      <div class="pkg-cell"><p class="pn">buyer-app</p><p>Next.js 15 consumer storefront. Hindi and English i18n.</p></div>
+      <div class="pkg-cell"><p class="pn">seller-app</p><p>Next.js 15 seller dashboard. Hindi and English i18n.</p></div>
+      <div class="pkg-cell"><p class="pn">admin</p><p>Next.js admin panel, 20+ pages: participants, orders, alerts, logs, simulation.</p></div>
+      <div class="pkg-cell"><p class="pn">docs</p><p>Public documentation portal.</p></div>
+      <div class="pkg-cell"><p class="pn">vault</p><p>AES-256-GCM secret management with auto-rotation.</p></div>
+      <div class="pkg-cell"><p class="pn">orchestrator</p><p>Docker lifecycle management, WebSocket hub.</p></div>
+      <div class="pkg-cell"><p class="pn">health-monitor</p><p>15-second health checks, three-tier alert generation.</p></div>
+      <div class="pkg-cell"><p class="pn">log-aggregator</p><p>Centralised structured logging (Pino JSON) with 30-day retention.</p></div>
+      <div class="pkg-cell"><p class="pn">simulation-engine</p><p>Order flow generator for load testing.</p></div>
+      <div class="pkg-cell"><p class="pn">mock-server</p><p>Simulated BAP/BPP responses for integration testing.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ======= ACT IV · THE FLIP ======= -->
+<section class="act" id="switch" aria-labelledby="switch-h">
+  <div class="frame">
+    <p class="act-num">Act IV · The Flip</p>
+    <h2 id="switch-h">Private network today. <em>ONDC participant tomorrow.</em><br>Same code.</h2>
+    <p class="act-lede">Run as a standalone private Beckn network. Or, after completing the operational onboarding (DPIIT, NP Agreement, Pramaan, KYC), point at the real ONDC registry and gateway. No code changes.</p>
+
+    <div class="switch" role="img" aria-label="Two environment variables flip the network from private to ONDC participant">
+      <div class="switch-bar">.env · ondc participant mode</div>
+      <div class="switch-body">
+<span class="c"># Point to ONDC's registry instead of your own</span>
+<span class="k">ONDC_REGISTRY_URL</span>=<span class="v">https://staging.registry.ondc.org</span>  <span class="c"># or preprod / prod</span>
+<span class="k">ONDC_GATEWAY_URL</span>=<span class="v">https://staging.gateway.ondc.org</span>
+
+<span class="c"># Your subscriber credentials (issued during ONDC onboarding)</span>
+<span class="k">SUBSCRIBER_ID</span>=<span class="v">your-domain.com</span>
+<span class="k">SUBSCRIBER_UNIQUE_KEY_ID</span>=<span class="v">your-key-id</span>
+
+<span class="c"># Optional · enable hybrid post-quantum signing</span>
+<span class="k">PQ_CRYPTO_ENABLED</span>=<span class="v">true</span>   <span class="c"># Ed25519 + ML-DSA-65, X25519 + ML-KEM-768</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======= ACT V · COMPLIANCE ======= -->
+<section class="act" style="background: var(--paper-soft);" aria-labelledby="comp-h">
+  <div class="frame">
+    <p class="act-num">Act V · Indian Law</p>
+    <h2 id="comp-h">Four laws. <em>Programmatic checks.</em></h2>
+    <p class="act-lede">The <code>@ondc/shared</code> compliance module ships tooling for the four laws every Indian commerce platform must answer to. These are tools, not legal advice. The README is honest about which obligations cannot be automated.</p>
+
+    <div class="laws">
+      <div class="law">
+        <h4>DPDPA 2023</h4>
+        <p>Consent notice generation, data principal rights tracking, breach notification deadlines, fiduciary obligation gap analysis, cross-border transfer rules.</p>
+      </div>
+      <div class="law">
+        <h4>IT Act 2000 / CERT-In Directions 2022</h4>
+        <p>Incident severity classification (6h / 24h / 72h reporting tiers), reportable incident type enumeration, deadline enforcement.</p>
+      </div>
+      <div class="law">
+        <h4>Consumer Protection Act 2019</h4>
+        <p>Seller disclosure schema validation, pricing transparency checks, grievance officer requirement verification.</p>
+      </div>
+      <div class="law">
+        <h4>GST</h4>
+        <p>GSTIN format validation, HSN code lookup, TCS computation helpers.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======= ACT VI · STACK ======= -->
+<section class="act" aria-labelledby="stack-h">
+  <div class="frame">
+    <p class="act-num">Act VI · The Stack</p>
+    <h2 id="stack-h">What is inside.</h2>
+    <ul class="stack-list">
+      <li class="stack-tag">TypeScript 5.9 strict</li>
+      <li class="stack-tag">Node.js 22 LTS</li>
+      <li class="stack-tag">Fastify 5</li>
+      <li class="stack-tag">Next.js 15</li>
+      <li class="stack-tag">Tailwind CSS 4</li>
+      <li class="stack-tag">PostgreSQL 16</li>
+      <li class="stack-tag">Drizzle ORM</li>
+      <li class="stack-tag">Redis 7</li>
+      <li class="stack-tag">RabbitMQ 3.13</li>
+      <li class="stack-tag">Ed25519 + ML-DSA-65</li>
+      <li class="stack-tag">AES-256-GCM</li>
+      <li class="stack-tag">X25519 + ML-KEM-768</li>
+      <li class="stack-tag">BLAKE-512</li>
+      <li class="stack-tag">Prometheus</li>
+      <li class="stack-tag">Grafana</li>
+      <li class="stack-tag">Vitest</li>
+      <li class="stack-tag">PM2</li>
+      <li class="stack-tag">nginx</li>
+      <li class="stack-tag">GitHub Actions</li>
+      <li class="stack-tag">Terraform (GCP)</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ======= PROOF ======= -->
+<section class="proof-act act" aria-labelledby="proof-h">
+  <div class="frame">
+    <p class="act-num">Act VII · Proof</p>
+    <h2 id="proof-h">Eight minutes <em>from clone to live.</em></h2>
+    <div class="proof-grid">
+      <div class="proof-item">
+        <h3>terraform apply · ~8 minutes</h3>
+        <p>One command provisions an e2-standard-4 VM in <code>asia-south1</code>, installs everything, starts the platform. Point your domain CNAME, you are live.</p>
+      </div>
+      <div class="proof-item">
+        <h3>~1400 tests across 42 files</h3>
+        <p>Vitest with V8 coverage. Watch mode. Browser-based test UI. Includes <code>pnpm export:pramaan</code> to export transaction logs in the format ONDC Pramaan certification expects.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Zero static secrets</h3>
+        <p>All credentials generated at deploy time. 24-hour password rotation. 30-day signing key rotation. Vault-managed. PII encrypted at field level before storage.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Honest about limits</h3>
+        <p><code>KNOWN_LIMITS.md</code> lists every obligation that needs organisational action: DPIIT, NP Agreement, Pramaan, KYC, NBBL onboarding, payment merchant accounts, GRO/DPO appointments. Not pretending it is plug-and-play.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======= END CTA ======= -->
+<section class="endcta" aria-labelledby="cta-h">
+  <div class="frame">
+    <div>
+      <h2 id="cta-h">Want a Beckn implementation that <em>actually ships compliance,</em> not just protocol?</h2>
+      <p>I build production-grade open-commerce infrastructure for Bharat. Protocol-correct. Cryptographically forward-looking. Honest about what is automated and what still needs a lawyer.</p>
+    </div>
+    <div class="actions">
+      <a class="btn btn-primary" href="../index.html#hire">Hire me</a>
+      <a class="btn btn-ghost" href="../index.html">Back to catalogue</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="frame">
+    <div>
+      <h2 style="font-family:'Fraunces',serif;font-size:var(--t-xl);margin:0 0 1rem;">dmj<span class="dot">.</span>one</h2>
+      <p>Dream, Manifest and Journey, Together as One.</p>
+      <p class="meta">© 2026 Divya Mohan. ONDC Network · Beckn Protocol Implementation. MIT licensed. Reference implementation and research platform, complementary to the government ONDC initiative. Read KNOWN_LIMITS.md before production use.</p>
+    </div>
+    <div>
+      <p class="meta">Catalogue</p>
+      <p><a href="../index.html#catalogue">All 47 products</a></p>
+      <p><a href="../index.html#cat-cloud">Cloud and Infra</a></p>
+      <p><a href="../index.html#hire">Hire</a></p>
+    </div>
+    <div>
+      <p class="meta">Private Beckn Network</p>
+      <p><a href="https://github.com/divyamohan1993/ondc-network-beckn" rel="noopener">Source</a></p>
+      <p><a href="mailto:contact@dmj.one">contact@dmj.one</a></p>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

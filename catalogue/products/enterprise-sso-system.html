@@ -1,0 +1,782 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1f3a5f">
+<meta name="color-scheme" content="light">
+
+<title>Enterprise SSO - Survives total infrastructure compromise · dmj.one</title>
+<meta name="description" content="MILNET SSO. 21 VMs. FROST 3-of-5 threshold signing. ML-KEM-1024 post-quantum KEM. OPAQUE server-blind passwords. No single machine can authenticate or sign a token.">
+<meta property="og:title" content="Enterprise SSO · Built to survive total infrastructure compromise">
+<meta property="og:description" content="Threshold cryptography, post-quantum primitives, forward-secret ratcheting. Live demo at sso-system-demo.dmj.one">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,30..100&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/core.css">
+
+<style>
+:root { --accent: var(--c-enterprise); --accent-deep: #0e1f33; --steel: #2c4a73; --quantum: #4a7bb5; }
+body { background: var(--paper); }
+
+/* ====== HERO - dark, heroic, quantum-grade ============== */
+.q-hero {
+  position: relative;
+  background: var(--accent-deep);
+  color: var(--paper);
+  padding-block: clamp(4rem, 7vw + 1rem, 8rem) clamp(3rem, 5vw, 5rem);
+  overflow: hidden;
+  border-bottom: 2px solid var(--accent);
+}
+.q-hero::before {
+  content: ""; position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 50% 40% at 80% 0%, color-mix(in srgb, var(--quantum) 25%, transparent), transparent 70%),
+    radial-gradient(ellipse 60% 50% at 0% 100%, color-mix(in srgb, var(--accent) 50%, transparent), transparent 65%);
+  pointer-events: none;
+}
+.q-hero::after {
+  content: ""; position: absolute; inset: 0;
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--paper) 4%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--paper) 4%, transparent) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none;
+  mask: radial-gradient(ellipse at center, black 30%, transparent 80%);
+  -webkit-mask: radial-gradient(ellipse at center, black 30%, transparent 80%);
+}
+.q-hero .frame { position: relative; z-index: 2; }
+
+.crumbs {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: color-mix(in srgb, var(--paper) 55%, transparent);
+  margin: 0 0 2.5rem;
+  display: flex; gap: 0.5rem; flex-wrap: wrap;
+}
+.crumbs a { border-bottom: 1px solid currentColor; padding-bottom: 1px; }
+.crumbs a:hover { color: var(--quantum); }
+.crumbs span { color: var(--quantum); }
+
+.q-eyebrow {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  padding: 0.45rem 0.9rem;
+  border: 1px solid var(--quantum);
+  background: color-mix(in srgb, var(--quantum) 12%, transparent);
+  color: var(--quantum);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  margin-bottom: 1.75rem;
+}
+.q-eyebrow::before {
+  content: ""; width: 8px; height: 8px;
+  background: var(--quantum); box-shadow: 0 0 0 4px color-mix(in srgb, var(--quantum) 25%, transparent);
+}
+
+.q-hero h1 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-3xl);
+  font-weight: 300;
+  font-variation-settings: "opsz" 144, "SOFT" 30, "WONK" 0;
+  letter-spacing: -0.035em;
+  line-height: 0.92;
+  margin: 0;
+  max-width: 18ch;
+  color: var(--paper);
+}
+.q-hero h1 em {
+  font-style: italic;
+  color: var(--quantum);
+  font-variation-settings: "opsz" 144, "SOFT" 100, "WONK" 1;
+  font-weight: 400;
+}
+
+.q-hero .lede {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md);
+  font-weight: 300;
+  line-height: 1.45;
+  color: color-mix(in srgb, var(--paper) 80%, transparent);
+  margin: 2rem 0 0;
+  max-width: 56ch;
+}
+.q-hero .lede strong {
+  font-weight: 500;
+  color: var(--paper);
+  background: linear-gradient(180deg, transparent 60%, color-mix(in srgb, var(--quantum) 35%, transparent) 60%);
+  padding: 0 0.1em;
+}
+
+.q-cta-row {
+  margin-top: 2.5rem;
+  display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;
+}
+.btn {
+  display: inline-flex; align-items: center; gap: 0.45rem;
+  padding: 0.75rem 1.15rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 700;
+  border: 1px solid currentColor;
+  transition: background .15s, color .15s, transform .15s, box-shadow .15s;
+}
+.btn:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 currentColor; }
+.btn-primary {
+  background: var(--quantum); color: var(--accent-deep); border-color: var(--quantum);
+}
+.btn-primary:hover { box-shadow: 4px 4px 0 var(--paper); color: var(--accent-deep); }
+.btn-ghost { background: transparent; color: var(--paper); }
+.btn-ghost:hover { box-shadow: 4px 4px 0 var(--paper); }
+
+.live-pulse {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.45rem 0.8rem;
+  background: color-mix(in srgb, var(--paper) 8%, transparent);
+  border: 1px dashed color-mix(in srgb, var(--paper) 25%, transparent);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.1em;
+  color: color-mix(in srgb, var(--paper) 80%, transparent);
+}
+.live-pulse .dot {
+  width: 8px; height: 8px; background: #4ade80;
+  box-shadow: 0 0 0 4px color-mix(in srgb, #4ade80 25%, transparent);
+  animation: ping 2s ease-in-out infinite;
+}
+@keyframes ping { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+/* hero side panel - cryptographic claim block */
+.q-hero-grid {
+  display: grid; gap: 3rem;
+  grid-template-columns: 1fr;
+  align-items: end;
+}
+@media (min-width: 980px) {
+  .q-hero-grid { grid-template-columns: 1.5fr 1fr; gap: 4rem; }
+}
+.crypto-claim {
+  border: 1px solid color-mix(in srgb, var(--paper) 25%, transparent);
+  background: color-mix(in srgb, var(--paper) 4%, transparent);
+  padding: 1.75rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-sm);
+  line-height: 1.6;
+  color: color-mix(in srgb, var(--paper) 85%, transparent);
+  position: relative;
+}
+.crypto-claim .label {
+  font-size: var(--t-xs);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--quantum);
+  font-weight: 700;
+  margin-bottom: 1rem;
+  display: block;
+}
+.crypto-claim ul { display: grid; gap: 0.6rem; }
+.crypto-claim li::before {
+  content: "› "; color: var(--quantum); font-weight: 700;
+}
+.crypto-claim em {
+  font-style: normal;
+  color: var(--paper);
+  font-weight: 500;
+}
+
+/* ====== STATS ribbon =================================== */
+.q-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  background: var(--paper);
+  border-bottom: 2px solid var(--accent-deep);
+}
+.q-stat {
+  padding: 1.75rem clamp(1rem, 2vw, 1.5rem);
+  border-right: 1px solid var(--paper-edge);
+  border-bottom: 1px solid var(--paper-edge);
+}
+.q-stat:last-child { border-right: 0; }
+.q-stat .num {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 300;
+  letter-spacing: -0.04em;
+  font-variation-settings: "opsz" 144, "SOFT" 30;
+  display: block;
+  line-height: 1;
+  color: var(--accent);
+}
+.q-stat .lbl {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  margin-top: 0.7rem;
+  display: block;
+  color: var(--ink-mute);
+}
+
+/* ====== ACT structure =================================== */
+.act {
+  padding-block: clamp(3rem, 5vw, 5rem);
+  border-bottom: var(--hair);
+  position: relative;
+}
+.act-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 700;
+  margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 1rem;
+}
+.act-num::before {
+  content: ""; width: 2.5rem; height: 1px; background: var(--accent);
+}
+.act h2 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 50, "WONK" 1;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+  margin: 0 0 1.5rem;
+  max-width: 22ch;
+}
+.act h2 em { font-style: italic; color: var(--accent); }
+
+/* ====== ACT 1 · pain =================================== */
+.act-pain .frame { display: grid; gap: 3rem; grid-template-columns: 1fr; }
+@media (min-width: 880px) { .act-pain .frame { grid-template-columns: 1fr 1.4fr; gap: 4rem; align-items: start; } }
+.pain-list { display: grid; gap: 0; border: 1px solid var(--ink); }
+.pain-row {
+  display: grid; grid-template-columns: 5rem 1fr; gap: 1.25rem;
+  padding: 1.5rem 1.5rem;
+  border-bottom: 1px solid var(--paper-edge);
+}
+.pain-row:last-child { border-bottom: 0; }
+.pain-row .pn {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.18em;
+  color: var(--accent);
+  font-weight: 700;
+  padding-top: 0.3rem;
+}
+.pain-row h3 {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: var(--t-md);
+  margin: 0 0 0.5rem;
+  letter-spacing: -0.01em;
+}
+.pain-row p { margin: 0; font-size: var(--t-sm); color: var(--ink-soft); }
+
+/* ====== ACT 2 · promise =============================== */
+.act-promise {
+  background: linear-gradient(180deg, var(--paper-soft), var(--paper));
+}
+.promise-quote {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(1.6rem, 1.2rem + 1.6vw, 2.6rem);
+  font-weight: 300;
+  font-variation-settings: "opsz" 144, "SOFT" 80;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  margin: 2rem 0;
+  max-width: 22ch;
+}
+.promise-quote em {
+  font-style: italic;
+  color: var(--accent);
+  background: linear-gradient(180deg, transparent 70%, color-mix(in srgb, var(--accent) 22%, transparent) 70%);
+}
+
+.principles {
+  display: grid; gap: 1.5rem; margin-top: 2rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { .principles { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1080px) { .principles { grid-template-columns: repeat(3, 1fr); } }
+.principle {
+  padding: 1.5rem;
+  border-left: 4px solid var(--accent);
+  background: var(--paper);
+  border-top: 1px solid var(--paper-edge);
+  border-right: 1px solid var(--paper-edge);
+  border-bottom: 1px solid var(--paper-edge);
+}
+.principle .pn {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 700;
+  margin-bottom: 0.7rem;
+}
+.principle h3 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md);
+  margin: 0 0 0.6rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.principle p { margin: 0; font-size: var(--t-sm); color: var(--ink-soft); }
+
+/* ====== ACT 3 · architecture diagram ================== */
+.arch {
+  margin-top: 2rem;
+  border: 1px solid var(--ink);
+  background: var(--accent-deep);
+  color: var(--paper);
+  padding: 2rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-sm);
+  line-height: 1.55;
+  overflow-x: auto;
+}
+.arch pre { margin: 0; white-space: pre; color: color-mix(in srgb, var(--paper) 90%, transparent); }
+.arch pre b { color: var(--quantum); font-weight: 700; }
+.arch .caption {
+  display: block; margin-top: 1.5rem;
+  font-size: var(--t-xs);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--paper) 55%, transparent);
+}
+
+/* ====== ACT 4 · crypto stack table ==================== */
+.crypto-table {
+  margin-top: 2rem;
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Atkinson Hyperlegible', sans-serif;
+  font-size: var(--t-sm);
+  border: 1px solid var(--ink);
+}
+.crypto-table caption {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--ink-mute);
+  margin-bottom: 0.75rem;
+  text-align: left;
+}
+.crypto-table th, .crypto-table td {
+  padding: 0.85rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--paper-edge);
+  vertical-align: top;
+}
+.crypto-table thead th {
+  background: var(--accent-deep);
+  color: var(--paper);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 700;
+}
+.crypto-table tbody th {
+  font-weight: 700;
+  color: var(--ink);
+  background: var(--paper-soft);
+}
+.crypto-table tbody td.alg {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  color: var(--accent);
+  font-weight: 600;
+}
+.crypto-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 4%, transparent); }
+.pq-yes {
+  color: #2a6a3a; font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+}
+.pq-yes::before { content: "● "; }
+
+/* ====== PROOF dark slab ============================== */
+.proof {
+  background: var(--accent-deep);
+  color: var(--paper);
+  padding-block: clamp(3rem, 5vw, 5rem);
+  position: relative;
+  overflow: hidden;
+}
+.proof::before {
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 70% 30%, color-mix(in srgb, var(--quantum) 25%, transparent), transparent 65%);
+  pointer-events: none;
+}
+.proof .frame { position: relative; }
+.proof h2 { color: var(--paper); }
+.proof h2 em { color: var(--quantum); font-style: italic; }
+.proof .act-num { color: var(--quantum); }
+.proof .act-num::before { background: var(--quantum); }
+.proof-grid {
+  display: grid; gap: 1rem; margin-top: 2rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { .proof-grid { grid-template-columns: repeat(2, 1fr); } }
+.proof-item {
+  border: 1px solid color-mix(in srgb, var(--paper) 25%, transparent);
+  padding: 1.5rem;
+  background: color-mix(in srgb, var(--paper) 5%, transparent);
+}
+.proof-item h3 {
+  font-family: 'Fraunces', serif;
+  margin: 0 0 0.5rem;
+  font-size: var(--t-md);
+  color: var(--quantum);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.proof-item p { margin: 0; color: color-mix(in srgb, var(--paper) 80%, transparent); font-size: var(--t-sm); }
+.proof-item code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  color: color-mix(in srgb, var(--paper) 90%, transparent);
+}
+
+/* ====== END CTA ====================================== */
+.endcta {
+  padding-block: clamp(3rem, 5vw, 5rem);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 12%, transparent), var(--paper));
+  text-align: left;
+}
+.endcta .frame { display: grid; gap: 2rem; grid-template-columns: 1fr; }
+@media (min-width: 760px) { .endcta .frame { grid-template-columns: 2fr 1fr; align-items: end; } }
+.endcta h2 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 300;
+  font-variation-settings: "opsz" 144, "SOFT" 100;
+  margin: 0 0 1rem;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+}
+.endcta h2 em {
+  font-style: italic;
+  color: var(--accent);
+  background: linear-gradient(180deg, transparent 70%, color-mix(in srgb, var(--accent) 22%, transparent) 70%);
+}
+.endcta p { color: var(--ink-soft); margin: 0; max-width: 50ch; }
+.endcta .actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+.endcta .btn-primary { background: var(--accent); color: white; border-color: var(--accent); }
+.endcta .btn-primary:hover { box-shadow: 4px 4px 0 var(--ink); }
+.endcta .btn-ghost { color: var(--ink); }
+.endcta .btn-ghost:hover { box-shadow: 4px 4px 0 var(--ink); }
+
+/* ====== FOOTER override ============================= */
+.foot { background: var(--accent-deep); color: var(--paper); }
+.foot .dot { color: var(--quantum); }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topnav">
+  <div class="frame">
+    <div class="brand"><a href="../index.html">dmj<span class="dot">.</span>one</a></div>
+    <nav aria-label="Primary">
+      <ul>
+        <li><a href="../index.html#catalogue">Catalogue</a></li>
+        <li><a href="../index.html#manifesto">Manifesto</a></li>
+        <li><a href="../index.html#hire">Hire</a></li>
+        <li><a href="https://github.com/divyamohan1993/enterprise-sso-system" rel="noopener">GitHub</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ============ HERO ============ -->
+<section class="q-hero">
+  <div class="frame">
+    <p class="crumbs">
+      <a href="../index.html">Catalogue</a> /
+      <a href="../index.html#cat-enterprise">Enterprise &amp; Security</a> /
+      <span>Enterprise SSO</span>
+    </p>
+
+    <span class="q-eyebrow">No. 27 · Enterprise · SSO · MILNET-grade</span>
+
+    <div class="q-hero-grid">
+      <div>
+        <h1>
+          Built to survive
+          <em>total infrastructure</em>
+          compromise.
+        </h1>
+
+        <p class="lede">
+          Most enterprise SSO is a Cognito wrapper. <strong>This is not.</strong> Twenty-one isolated VMs across eight security zones. No single machine can authenticate a user. No single machine can sign a token. Quantum computers cannot break it. Past sessions stay safe even if today's keys leak.
+        </p>
+
+        <div class="q-cta-row">
+          <a class="btn btn-primary" href="https://sso-system-demo.dmj.one" rel="noopener">Try the live demo</a>
+          <a class="btn btn-ghost" href="https://github.com/divyamohan1993/enterprise-sso-system" rel="noopener">View source</a>
+          <span class="live-pulse"><span class="dot" aria-hidden="true"></span> sso-system-demo.dmj.one</span>
+        </div>
+      </div>
+
+      <aside class="crypto-claim" aria-label="Cryptographic claims">
+        <span class="label">Six claims, all verifiable</span>
+        <ul>
+          <li>Passwords <em>never seen</em> by the server. OPAQUE RFC 9497.</li>
+          <li>Tokens signed by <em>3 of 5</em> VMs. FROST threshold.</li>
+          <li>Auth needs <em>2 of 3</em> VMs. Shamir share split.</li>
+          <li>Hybrid <em>X25519 + ML-KEM-1024</em>. FIPS 203.</li>
+          <li>Forward-secret <em>30-second</em> ratchet. Keys erased.</li>
+          <li>Audit log: <em>7-node BFT</em>. ML-DSA-87 signed.</li>
+        </ul>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATS ============ -->
+<section class="q-stats" aria-label="At a glance">
+  <div class="q-stat"><span class="num">21</span><span class="lbl">Isolated VMs</span></div>
+  <div class="q-stat"><span class="num">8</span><span class="lbl">Security zones</span></div>
+  <div class="q-stat"><span class="num">3-of-5</span><span class="lbl">FROST signing quorum</span></div>
+  <div class="q-stat"><span class="num">190+</span><span class="lbl">Tests, attack sims, chaos</span></div>
+  <div class="q-stat"><span class="num">0</span><span class="lbl">Secrets at the gateway</span></div>
+</section>
+
+
+<!-- ============ ACT I · PROBLEM ============ -->
+<section class="act act-pain" aria-labelledby="pain-h">
+  <div class="frame">
+    <div>
+      <p class="act-num">Act I · The Problem</p>
+      <h2 id="pain-h">The IdP layer is <em>the breach</em>.</h2>
+      <p style="font-family:'Fraunces',serif;font-style:italic;color:var(--ink-soft);font-size:var(--t-md);max-width:34ch;margin:0;">
+        Identity is the front door of every enterprise. It is also where the keys are kept. And it is where the same three failure modes keep showing up.
+      </p>
+    </div>
+    <ol class="pain-list">
+      <li class="pain-row">
+        <span class="pn">i. Server-side</span>
+        <div>
+          <h3>The IdP knows the password.</h3>
+          <p>If the IdP is breached, every user's credential is leaked. OPAQUE solves this. Almost nobody ships it.</p>
+        </div>
+      </li>
+      <li class="pain-row">
+        <span class="pn">ii. Single key</span>
+        <div>
+          <h3>One server signs every token.</h3>
+          <p>Compromise that one server and the attacker mints valid tokens for any user. Threshold cryptography solves this. Almost nobody runs it.</p>
+        </div>
+      </li>
+      <li class="pain-row">
+        <span class="pn">iii. Quantum</span>
+        <div>
+          <h3>"Harvest now, decrypt later" is here.</h3>
+          <p>State adversaries are recording TLS sessions today. ML-KEM-1024 in a hybrid envelope is the only honest defence.</p>
+        </div>
+      </li>
+      <li class="pain-row">
+        <span class="pn">iv. Audit</span>
+        <div>
+          <h3>The audit log is on the same machine as the breach.</h3>
+          <p>Every "tamper-evident" log can be tampered with by root. A 7-node BFT chain across 3 zones cannot.</p>
+        </div>
+      </li>
+    </ol>
+  </div>
+</section>
+
+
+<!-- ============ ACT II · PROMISE ============ -->
+<section class="act act-promise" aria-labelledby="prom-h">
+  <div class="frame">
+    <p class="act-num">Act II · The Promise</p>
+    <h2 id="prom-h">No single VM can <em>authenticate a user.</em></h2>
+
+    <p class="promise-quote">
+      "If you breach <em>one</em> machine,<br>
+      you have breached <em>nothing</em>."
+    </p>
+
+    <div class="principles">
+      <article class="principle">
+        <p class="pn">Threshold</p>
+        <h3>FROST 3-of-5 signing</h3>
+        <p>Five token-signing VMs across three availability zones. Any three together can mint a token. Two cannot. The signing key never exists in one place.</p>
+      </article>
+      <article class="principle">
+        <p class="pn">Server-blind</p>
+        <h3>OPAQUE 2-of-3 auth</h3>
+        <p>Password verification splits across three Confidential VMs (AMD SEV-SNP). The server never learns the password. Argon2id-hardened. RFC 9497.</p>
+      </article>
+      <article class="principle">
+        <p class="pn">Post-quantum</p>
+        <h3>X-Wing hybrid KEM</h3>
+        <p>X25519 for today's threats. ML-KEM-1024 for tomorrow's quantum computer. Hybrid means safe even if one breaks. Token signing wraps Ed25519 in ML-DSA-87.</p>
+      </article>
+      <article class="principle">
+        <p class="pn">Forward secret</p>
+        <h3>30-second ratchet</h3>
+        <p>HKDF-SHA512 epoch-based ratcheting. Every 30 seconds, prior keys are erased from memory. A breach today cannot decrypt yesterday.</p>
+      </article>
+      <article class="principle">
+        <p class="pn">BFT audit</p>
+        <h3>7-node hash chain</h3>
+        <p>Audit entries replicated across 7 nodes in 3 zones. Quorum 5. Each entry signed with ML-DSA-87. Root cannot rewrite history. Auditors can prove it.</p>
+      </article>
+      <article class="principle">
+        <p class="pn">Moving target</p>
+        <h3>Auto-mutating attack surface</h3>
+        <p>Keys, ports, and certificates rotate continuously across all 21 VMs. Whatever the attacker mapped yesterday is gone today.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ ACT III · ARCHITECTURE ============ -->
+<section class="act" id="arch" aria-labelledby="arch-h">
+  <div class="frame">
+    <p class="act-num">Act III · The Architecture</p>
+    <h2 id="arch-h">Twenty-one VMs.<br>One <em>ceremony.</em></h2>
+    <p style="font-family:'Fraunces',serif;font-size:var(--t-md);color:var(--ink-soft);max-width:55ch;margin:0;">No Docker. Native systemd on Shielded VMs with vTPM, Confidential Computing (AMD SEV-SNP), and Cloud HSM. Every hop is mTLS plus HMAC-SHA512 plus X-Wing KEM tunnel.</p>
+
+    <figure class="arch" aria-label="Request path through the SSO ceremony">
+<pre>Internet
+  │
+  ▼  Cloud Armor WAF
+<b>Gateway</b>           C2 Spot MIG · autoscale 1→50 · <b>zero secrets</b>
+  │  (hash-puzzle DDoS filter, X-Wing KEM tunnel)
+  ▼
+<b>Orchestrator</b>      HA pair · ceremony state machine
+  │  PendingOpaque → PendingTss → Complete
+  ├──► <b>OPAQUE 2-of-3</b>     Confidential VMs · Shamir shares
+  ├──► <b>FROST 3-of-5</b>      5 Confidential VMs · 3 AZs
+  ├──► <b>Verifier + Ratchet</b> HA pairs · forward-secret
+  ├──► <b>Audit BFT 7-node</b>  3 AZs · quorum 5 · ML-DSA-87
+  ├──► <b>PostgreSQL 3-node</b> CMEK + envelope + SEV-SNP
+  └──► <b>Risk + KT + Witness</b>
+</pre>
+      <span class="caption">21 VMs · 8 security zones · 3 availability zones · zero shared secrets</span>
+    </figure>
+  </div>
+</section>
+
+
+<!-- ============ ACT IV · CRYPTO STACK TABLE ============ -->
+<section class="act" aria-labelledby="stack-h">
+  <div class="frame">
+    <p class="act-num">Act IV · The Stack</p>
+    <h2 id="stack-h">Quantum-safe at <em>every layer.</em></h2>
+
+    <table class="crypto-table">
+      <caption>Cryptographic stack with FIPS standard and quantum status</caption>
+      <thead>
+        <tr><th scope="col">Layer</th><th scope="col">Algorithm</th><th scope="col">Standard</th><th scope="col">PQ</th></tr>
+      </thead>
+      <tbody>
+        <tr><th scope="row">Key exchange</th><td class="alg">X-Wing (X25519 + ML-KEM-1024)</td><td>FIPS 203</td><td><span class="pq-yes">Yes</span></td></tr>
+        <tr><th scope="row">Token signing</th><td class="alg">FROST 3-of-5 Ed25519 + ML-DSA-87</td><td>FIPS 204</td><td><span class="pq-yes">Yes</span></td></tr>
+        <tr><th scope="row">Password auth</th><td class="alg">OPAQUE Ristretto255 + Argon2id</td><td>RFC 9497</td><td><span class="pq-yes">Yes</span></td></tr>
+        <tr><th scope="row">Session keys</th><td class="alg">HKDF-SHA512 ratchet</td><td>RFC 5869</td><td><span class="pq-yes">Yes</span></td></tr>
+        <tr><th scope="row">Symmetric</th><td class="alg">AEGIS-256 / AES-256-GCM</td><td>RFC 9312</td><td><span class="pq-yes">Yes</span></td></tr>
+        <tr><th scope="row">Backup signatures</th><td class="alg">SLH-DSA</td><td>FIPS 205</td><td><span class="pq-yes">Yes</span></td></tr>
+        <tr><th scope="row">Audit signing</th><td class="alg">ML-DSA-87</td><td>FIPS 204</td><td><span class="pq-yes">Yes</span></td></tr>
+        <tr><th scope="row">DPoP proofs</th><td class="alg">ML-DSA-87</td><td>RFC 9449</td><td><span class="pq-yes">Yes</span></td></tr>
+        <tr><th scope="row">Entropy</th><td class="alg">Multi-source CSPRNG</td><td>SP 800-90B</td><td>n/a</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+
+<!-- ============ PROOF ============ -->
+<section class="proof act" aria-labelledby="proof-h">
+  <div class="frame">
+    <p class="act-num">Act V · Proof</p>
+    <h2 id="proof-h">It already <em>runs.</em></h2>
+
+    <div class="proof-grid">
+      <div class="proof-item">
+        <h3>Live · sso-system-demo.dmj.one</h3>
+        <p>Full ceremony from gateway through threshold signing. WebAuthn flow. OAuth 2.1 + OIDC + PKCE. Public demo, real cryptography, no shortcuts.</p>
+      </div>
+      <div class="proof-item">
+        <h3>15 Rust crates</h3>
+        <p><code>gateway · orchestrator · opaque · tss · verifier · ratchet · audit · admin · crypto · common · shard · sso-protocol · fido · kt · risk</code></p>
+      </div>
+      <div class="proof-item">
+        <h3>FIDO2 / WebAuthn first-class</h3>
+        <p>YubiKey, Windows Hello, platform authenticators. SHA3-256 Merkle Key Transparency tree. Real risk scoring with six signals and four levels.</p>
+      </div>
+      <div class="proof-item">
+        <h3>190+ tests · ceremony, attack, chaos</h3>
+        <p>Cryptographic correctness. End-to-end ceremonies. Adversarial simulations. Chaos injection. Compliance checks. <code>cargo test --workspace</code> green.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Apache 2.0 + patent retaliation</h3>
+        <p>Open source. Section 3 patent retaliation: sue over this software, lose the licence. Original cryptographic architecture by Divya Mohan.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Honey encryption + duress detection</h3>
+        <p>Five plausible decoy outputs on bad input. Silent lockdown PIN. The attacker cannot tell success from failure.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ END CTA ============ -->
+<section class="endcta" aria-labelledby="cta-h">
+  <div class="frame">
+    <div>
+      <h2 id="cta-h">If your IdP is the front door, <em>build it like a vault.</em></h2>
+      <p>I build production-grade post-quantum identity systems for governments, banks, and any team where "the IdP got popped" is the headline they cannot afford.</p>
+    </div>
+    <div class="actions">
+      <a class="btn btn-primary" href="../index.html#hire">Hire me</a>
+      <a class="btn btn-ghost" href="../index.html">Back to catalogue</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="frame">
+    <div>
+      <h2 style="font-family:'Fraunces',serif;font-size:var(--t-xl);margin:0 0 1rem;">dmj<span class="dot">.</span>one</h2>
+      <p>Dream, Manifest and Journey, Together as One.</p>
+      <p class="meta">© 2026 Divya Mohan. Enterprise SSO is research-grade software using pre-release ML-DSA and ML-KEM libraries. Independent FIPS 140-3 CMVP audit required before production deployment.</p>
+    </div>
+    <div>
+      <p class="meta">Catalogue</p>
+      <p><a href="../index.html#catalogue">All 47 products</a></p>
+      <p><a href="../index.html#cat-enterprise">Enterprise &amp; Security</a></p>
+      <p><a href="../index.html#hire">Hire</a></p>
+    </div>
+    <div>
+      <p class="meta">Enterprise SSO</p>
+      <p><a href="https://sso-system-demo.dmj.one" rel="noopener">Live demo</a></p>
+      <p><a href="https://github.com/divyamohan1993/enterprise-sso-system" rel="noopener">Source</a></p>
+      <p><a href="mailto:contact@dmj.one">contact@dmj.one</a></p>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

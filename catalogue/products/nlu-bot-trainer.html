@@ -1,0 +1,750 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#7a2c5e">
+<meta name="color-scheme" content="light">
+
+<title>NLU Bot Trainer · Train an enterprise classifier in your browser tab · dmj.one</title>
+<meta name="description" content="A 5-classifier stacking ensemble (171,772 parameters) that trains entirely in the browser. Zero data egress. No GPU. No SaaS subscription. Inference in 1 to 6 milliseconds.">
+<meta property="og:title" content="NLU Bot Trainer · Browser ML for the compliance team">
+<meta property="og:description" content="Five algorithms voting through learned meta-weights. Train in 30 seconds. Infer in milliseconds. The data never leaves the building.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,30..100&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="../assets/core.css">
+
+<style>
+:root {
+  --accent: var(--c-ai);
+  --accent-deep: #4f1a3d;
+  --c1: #b03b5b;
+  --c2: #b48a2b;
+  --c3: #2f7a47;
+  --c4: #4b3e8e;
+  --c5: #1f3a5f;
+}
+body { background: var(--paper); }
+
+/* ====== HERO ============ */
+.nl-hero {
+  position: relative;
+  padding-block: clamp(3rem, 5vw, 5rem) clamp(2rem, 4vw, 3rem);
+  border-bottom: var(--hair);
+  overflow: hidden;
+  background: var(--paper);
+}
+.nl-hero::after {
+  content: ""; position: absolute; right: -10%; top: 0; bottom: 0; width: 50%;
+  background:
+    repeating-linear-gradient(
+      45deg,
+      color-mix(in srgb, var(--accent) 10%, transparent) 0,
+      color-mix(in srgb, var(--accent) 10%, transparent) 1px,
+      transparent 1px, transparent 16px
+    );
+  mask: radial-gradient(ellipse at 100% 50%, black, transparent 75%);
+  -webkit-mask: radial-gradient(ellipse at 100% 50%, black, transparent 75%);
+  pointer-events: none;
+}
+.nl-hero .frame { position: relative; z-index: 1; }
+
+.crumbs {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink-mute);
+  margin: 0 0 2rem;
+  display: flex; gap: 0.5rem; flex-wrap: wrap;
+}
+.crumbs a { border-bottom: 1px solid var(--ink-mute); padding-bottom: 1px; }
+.crumbs a:hover { color: var(--accent); border-color: var(--accent); }
+.crumbs span { color: var(--accent); }
+
+.nl-eyebrow {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  padding: 0.4rem 0.85rem;
+  border: 1px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  color: var(--accent-deep);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  margin-bottom: 1.5rem;
+}
+.nl-eyebrow::before {
+  content: ""; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+.nl-grid {
+  display: grid;
+  gap: 3rem;
+  grid-template-columns: 1fr;
+  align-items: center;
+}
+@media (min-width: 1000px) {
+  .nl-grid { grid-template-columns: 1fr 1fr; gap: 3.5rem; }
+}
+
+.nl-hero h1 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-3xl);
+  font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 30, "WONK" 1;
+  letter-spacing: -0.03em;
+  line-height: 0.94;
+  margin: 0;
+  max-width: 14ch;
+}
+.nl-hero h1 em {
+  font-style: italic;
+  color: var(--accent);
+  font-variation-settings: "opsz" 144, "SOFT" 100, "WONK" 1;
+}
+.nl-hero .lede {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md);
+  font-weight: 300;
+  line-height: 1.45;
+  color: var(--ink-soft);
+  margin: 1.75rem 0 0;
+  max-width: 50ch;
+}
+.nl-hero .lede strong {
+  font-weight: 600;
+  background: linear-gradient(180deg, transparent 60%, color-mix(in srgb, var(--accent) 30%, transparent) 60%);
+  padding: 0 0.1em;
+  color: var(--ink);
+}
+
+.cta-row {
+  margin-top: 1.75rem;
+  display: flex; gap: 0.75rem; flex-wrap: wrap;
+}
+.btn {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.7rem 1.1rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 700;
+  border: 1px solid var(--ink);
+  transition: background .15s, color .15s, transform .15s, box-shadow .15s;
+}
+.btn:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--ink); }
+.btn-primary { background: var(--accent); color: white; border-color: var(--accent); }
+.btn-ghost { background: transparent; color: var(--ink); }
+
+/* ====== TRAINING WIDGET ============ */
+.trainer {
+  background: var(--paper);
+  border: 1px solid var(--ink);
+  padding: 1.5rem;
+  font-family: 'JetBrains Mono', monospace;
+  box-shadow: 8px 8px 0 var(--accent);
+}
+.trainer .head {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 1.25rem;
+}
+.trainer .head .lbl {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-weight: 700;
+  color: var(--accent);
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.trainer .head .lbl::before {
+  content: ""; width: 8px; height: 8px;
+  background: var(--accent); border-radius: 50%;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+.trainer .head .pct {
+  font-family: 'Fraunces', serif;
+  font-size: 2rem;
+  font-weight: 400;
+  color: var(--accent);
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+.bars { display: grid; gap: 0.7rem; margin-bottom: 1rem; }
+.bar { display: grid; grid-template-columns: 9rem 1fr 4rem; gap: 0.75rem; align-items: center; font-size: 0.72rem; }
+.bar .nm { color: var(--ink); font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; }
+.bar .track {
+  height: 8px;
+  background: var(--paper-soft);
+  position: relative;
+  border: 1px solid var(--paper-edge);
+}
+.bar .fill {
+  position: absolute; top: 0; left: 0; height: 100%;
+  background: var(--c);
+}
+.bar .pct { color: var(--c); font-weight: 700; text-align: right; }
+.bar[data-c="1"] { --c: var(--c1); }
+.bar[data-c="2"] { --c: var(--c2); }
+.bar[data-c="3"] { --c: var(--c3); }
+.bar[data-c="4"] { --c: var(--c4); }
+.bar[data-c="5"] { --c: var(--c5); }
+.trainer .foot {
+  border-top: 1px solid var(--paper-edge);
+  padding-top: 0.85rem;
+  display: flex; justify-content: space-between;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--ink-mute);
+  flex-wrap: wrap; gap: 0.5rem;
+}
+.trainer .foot b { color: var(--ink); }
+
+/* ====== STATS ============ */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  background: var(--ink);
+  color: var(--paper);
+  border-block: 2px solid var(--ink);
+  margin-top: 3.5rem;
+}
+.stat {
+  padding: 1.5rem clamp(1rem, 2vw, 1.5rem);
+  border-right: 1px solid color-mix(in srgb, var(--paper) 20%, transparent);
+}
+.stat:last-child { border-right: 0; }
+.stat .num {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  font-variation-settings: "opsz" 144, "SOFT" 30;
+  display: block; line-height: 1; color: var(--accent);
+}
+.stat .lbl {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  margin-top: 0.6rem; display: block;
+  color: color-mix(in srgb, var(--paper) 75%, transparent);
+}
+
+/* ====== ACT ============ */
+.act {
+  padding-block: clamp(3rem, 5vw, 5rem);
+  border-bottom: var(--hair);
+}
+.act-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 700;
+  margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 1rem;
+}
+.act-num::before { content: ""; width: 2.5rem; height: 1px; background: var(--accent); }
+.act h2 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 50, "WONK" 1;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+  margin: 0 0 1.5rem;
+  max-width: 22ch;
+}
+.act h2 em { font-style: italic; color: var(--accent); }
+
+/* ====== ENSEMBLE STACK DIAGRAM ============ */
+.ensemble {
+  margin-top: 2rem;
+  display: grid;
+  gap: 0;
+  grid-template-columns: 1fr;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+}
+.ens-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+  border-bottom: 1px solid var(--paper-edge);
+}
+.ens-row:last-child { border-bottom: 0; }
+.ens-stage {
+  padding: 1rem 1.5rem;
+  display: grid;
+  gap: 0.5rem;
+}
+.ens-row.classifiers {
+  grid-template-columns: 1fr;
+}
+@media (min-width: 880px) {
+  .ens-row.classifiers { grid-template-columns: repeat(5, 1fr); }
+}
+.ens-cls {
+  padding: 1rem 1.25rem;
+  border-right: 1px solid var(--paper-edge);
+  background: var(--paper);
+}
+.ens-cls:last-child { border-right: 0; }
+@media (max-width: 879px) {
+  .ens-cls { border-right: 0; border-bottom: 1px solid var(--paper-edge); }
+  .ens-cls:last-child { border-bottom: 0; }
+}
+.ens-cls[data-c="1"] { --c: var(--c1); }
+.ens-cls[data-c="2"] { --c: var(--c2); }
+.ens-cls[data-c="3"] { --c: var(--c3); }
+.ens-cls[data-c="4"] { --c: var(--c4); }
+.ens-cls[data-c="5"] { --c: var(--c5); }
+.ens-cls .pn {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--c);
+  font-weight: 700;
+}
+.ens-cls h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 1rem;
+  margin: 0.3rem 0;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+.ens-cls .params {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--ink-mute);
+  font-weight: 600;
+}
+.ens-cls .miss {
+  margin: 0.4rem 0 0;
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+  font-style: italic;
+}
+.ens-stage.lbl {
+  padding: 0.7rem 1.5rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--accent);
+  font-weight: 700;
+  background: color-mix(in srgb, var(--accent) 6%, transparent);
+}
+.ens-stage.lbl span { color: var(--ink); }
+.ens-stage.lbl b { color: var(--accent); }
+.ens-stage.final {
+  padding: 1.25rem 1.5rem;
+  background: var(--ink);
+  color: var(--paper);
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 0.75rem;
+}
+.ens-stage.final .fl {
+  font-family: 'Fraunces', serif;
+  font-size: 1.15rem;
+  font-style: italic;
+}
+.ens-stage.final .fr {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.95rem;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* ====== PROBLEM CARDS ============ */
+.pp-grid { display: grid; gap: 0; grid-template-columns: 1fr; margin-top: 2rem; border: 1px solid var(--ink); }
+@media (min-width: 760px) { .pp-grid { grid-template-columns: 1fr 1fr; } }
+.pp {
+  padding: 1.5rem 1.5rem;
+  border-right: 1px solid var(--paper-edge);
+  border-bottom: 1px solid var(--paper-edge);
+  background: var(--paper);
+}
+@media (min-width: 760px) {
+  .pp:nth-child(2n) { border-right: 0; }
+  .pp:nth-last-child(-n+2) { border-bottom: 0; }
+}
+.pp .pn {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-size: 1.5rem;
+  color: var(--accent);
+}
+.pp h3 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md);
+  font-weight: 500;
+  margin: 0.4rem 0 0.4rem;
+  letter-spacing: -0.01em;
+}
+.pp p { margin: 0; font-size: var(--t-sm); color: var(--ink-soft); }
+
+/* ====== CAPABILITIES ============ */
+.caps {
+  display: grid; gap: 0;
+  grid-template-columns: 1fr;
+  margin-top: 2rem;
+  border: 1px solid var(--ink);
+}
+@media (min-width: 760px) { .caps { grid-template-columns: repeat(2, 1fr); } }
+.cap {
+  padding: 1.25rem 1.5rem;
+  border-right: 1px solid var(--paper-edge);
+  border-bottom: 1px solid var(--paper-edge);
+  background: var(--paper);
+}
+@media (min-width: 760px) {
+  .cap:nth-child(2n) { border-right: 0; }
+  .cap:nth-last-child(-n+2) { border-bottom: 0; }
+}
+.cap h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin: 0 0 0.5rem;
+  letter-spacing: -0.01em;
+}
+.cap p { margin: 0; font-size: var(--t-sm); color: var(--ink-soft); line-height: 1.5; }
+
+/* ====== STACK ============ */
+.stack-list {
+  display: flex; flex-wrap: wrap; gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+.stack-tag {
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--ink);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 600;
+}
+
+/* ====== END CTA ============ */
+.endcta {
+  padding-block: clamp(3rem, 5vw, 5rem);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 10%, transparent), var(--paper));
+}
+.endcta .frame { display: grid; gap: 2rem; grid-template-columns: 1fr; }
+@media (min-width: 760px) { .endcta .frame { grid-template-columns: 2fr 1fr; align-items: end; } }
+.endcta h2 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 300;
+  font-variation-settings: "opsz" 144, "SOFT" 100;
+  margin: 0 0 1rem;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+}
+.endcta h2 em {
+  font-style: italic;
+  color: var(--accent);
+  background: linear-gradient(180deg, transparent 70%, color-mix(in srgb, var(--accent) 25%, transparent) 70%);
+}
+.endcta p { color: var(--ink-soft); margin: 0; max-width: 50ch; }
+.endcta .actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+
+.foot { background: var(--ink); color: var(--paper); }
+.foot .dot { color: var(--accent); }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topnav">
+  <div class="frame">
+    <div class="brand"><a href="../index.html">dmj<span class="dot">.</span>one</a></div>
+    <nav aria-label="Primary">
+      <ul>
+        <li><a href="../index.html#catalogue">Catalogue</a></li>
+        <li><a href="../index.html#manifesto">Manifesto</a></li>
+        <li><a href="../index.html#hire">Hire</a></li>
+        <li><a href="https://github.com/divyamohan1993/nlu-bot-trainer" rel="noopener">GitHub</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ============ HERO ============ -->
+<section class="nl-hero">
+  <div class="frame">
+    <p class="crumbs">
+      <a href="../index.html">Catalogue</a> /
+      <a href="../index.html#cat-ai">AI · Agents</a> /
+      <span>NLU Bot Trainer</span>
+    </p>
+
+    <span class="nl-eyebrow">No. 20 · AI · Browser ML · Sentio</span>
+
+    <div class="nl-grid">
+      <div>
+        <h1>
+          Train an enterprise classifier.<br>
+          In your <em>browser tab.</em>
+        </h1>
+        <p class="lede">
+          Most chatbot platforms charge six figures and train in someone else's cloud. The data leaves the building. Compliance teams panic. NLU Bot Trainer ships a <strong>5-classifier stacking ensemble of 171,772 parameters</strong> that runs entirely in the browser. Zero data egress. No GPU. No SaaS.
+        </p>
+        <div class="cta-row">
+          <a class="btn btn-primary" href="https://github.com/divyamohan1993/nlu-bot-trainer" rel="noopener">View source</a>
+          <a class="btn btn-ghost" href="#how">How the stack works</a>
+        </div>
+      </div>
+
+      <!-- Live training widget -->
+      <figure style="margin:0;">
+        <div class="trainer" aria-label="Snapshot of the in-browser training widget">
+          <div class="head">
+            <span class="lbl">Training · Local browser</span>
+            <span class="pct">94<small style="font-size:1rem;color:var(--ink-mute);">%</small></span>
+          </div>
+          <div class="bars">
+            <div class="bar" data-c="1">
+              <span class="nm">Logistic Reg.</span>
+              <div class="track"><span class="fill" style="width:100%"></span></div>
+              <span class="pct">12K</span>
+            </div>
+            <div class="bar" data-c="2">
+              <span class="nm">Complement NB</span>
+              <div class="track"><span class="fill" style="width:100%"></span></div>
+              <span class="pct">7K</span>
+            </div>
+            <div class="bar" data-c="3">
+              <span class="nm">Linear SVM</span>
+              <div class="track"><span class="fill" style="width:100%"></span></div>
+              <span class="pct">12K</span>
+            </div>
+            <div class="bar" data-c="4">
+              <span class="nm">MLP · 128h</span>
+              <div class="track"><span class="fill" style="width:96%"></span></div>
+              <span class="pct">133K</span>
+            </div>
+            <div class="bar" data-c="5">
+              <span class="nm">Gradient Boost</span>
+              <div class="track"><span class="fill" style="width:78%"></span></div>
+              <span class="pct">7K</span>
+            </div>
+          </div>
+          <div class="foot">
+            <span>171,772 params · <b>2.0 MB</b></span>
+            <span>Inference · <b>1-6 ms</b></span>
+            <span>Egress · <b>0 bytes</b></span>
+          </div>
+        </div>
+      </figure>
+    </div>
+
+    <!-- ============ STATS ============ -->
+    <section class="stats" aria-label="At a glance">
+      <div class="stat"><span class="num">5</span><span class="lbl">Classifiers stacking</span></div>
+      <div class="stat"><span class="num">171K</span><span class="lbl">Total parameters</span></div>
+      <div class="stat"><span class="num">30s</span><span class="lbl">Full ensemble training</span></div>
+      <div class="stat"><span class="num">1-6ms</span><span class="lbl">Inference latency</span></div>
+      <div class="stat"><span class="num">0</span><span class="lbl">Bytes egress</span></div>
+    </section>
+  </div>
+</section>
+
+
+<!-- ============ ACT I · PROBLEM ============ -->
+<section class="act" aria-labelledby="prob-h">
+  <div class="frame">
+    <p class="act-num">Act I · The Problem</p>
+    <h2 id="prob-h">The chatbot platform <em>owns the data.</em></h2>
+    <p style="font-family:'Fraunces',serif;font-size:var(--t-md);color:var(--ink-soft);max-width:60ch;margin:0;">Enterprise NLU is a six-figure subscription that ships customer transcripts to a third-party cloud. For regulated industries, that is the whole problem.</p>
+
+    <div class="pp-grid">
+      <div class="pp">
+        <span class="pn">i.</span>
+        <h3>Six figures a year, plus per-call.</h3>
+        <p>The big NLU platforms bill flat fees and per-message. Pricing scales with success. You succeed harder, you pay harder.</p>
+      </div>
+      <div class="pp">
+        <span class="pn">ii.</span>
+        <h3>Your customer data lives elsewhere.</h3>
+        <p>Training requires upload. Inference requires upload. Compliance teams cannot sign that off in DPDP, GDPR or HIPAA jurisdictions.</p>
+      </div>
+      <div class="pp">
+        <span class="pn">iii.</span>
+        <h3>One model, one bias.</h3>
+        <p>Linear models miss feature overlap. Naive Bayes struggles with correlations. SVMs overfit tight margins. A single algorithm is a single weakness.</p>
+      </div>
+      <div class="pp">
+        <span class="pn">iv.</span>
+        <h3>You cannot vendor-lock-out.</h3>
+        <p>Train on Lex, leave Lex, retrain on Dialogflow. Most teams stop trying. The ground truth gets stuck in someone else's format.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ ACT II · THE STACK ============ -->
+<section class="act" id="how" style="background:var(--paper-soft);" aria-labelledby="how-h">
+  <div class="frame">
+    <p class="act-num">Act II · The Stacking Ensemble</p>
+    <h2 id="how-h">Five algorithms.<br>One <em>vote.</em></h2>
+    <p style="font-family:'Fraunces',serif;font-size:var(--t-md);color:var(--ink-soft);max-width:60ch;margin:0;">Each classifier fails differently. The ensemble error rate is strictly lower than any individual. Cross-validated meta-weights decide who to trust on what.</p>
+
+    <div class="ensemble" role="img" aria-label="Five classifiers feeding into cross-validated meta-weights, then a final ranked prediction">
+      <!-- input -->
+      <div class="ens-row"><div class="ens-stage lbl"><span>Input · </span>"where is my package?" <b>· tokenised &rarr; MurmurHash3 &rarr; 1024-dim sparse vector</b></div></div>
+      <!-- classifiers -->
+      <div class="ens-row classifiers">
+        <div class="ens-cls" data-c="1">
+          <p class="pn">Classifier 01</p>
+          <h3>Logistic Regression</h3>
+          <p class="params">12K parameters</p>
+          <p class="miss">Strong on linear boundaries. Misses overlapping features.</p>
+        </div>
+        <div class="ens-cls" data-c="2">
+          <p class="pn">Classifier 02</p>
+          <h3>Complement Naive Bayes v2</h3>
+          <p class="params">7K parameters</p>
+          <p class="miss">Strong on small data. Struggles with correlations.</p>
+        </div>
+        <div class="ens-cls" data-c="3">
+          <p class="pn">Classifier 03</p>
+          <h3>Pegasos Linear SVM</h3>
+          <p class="params">12K parameters</p>
+          <p class="miss">Sharp margins. Overfits tight clusters.</p>
+        </div>
+        <div class="ens-cls" data-c="4">
+          <p class="pn">Classifier 04</p>
+          <h3>MLP · 128 hidden</h3>
+          <p class="params">133K parameters</p>
+          <p class="miss">Catches non-linear patterns. Hungry for data.</p>
+        </div>
+        <div class="ens-cls" data-c="5">
+          <p class="pn">Classifier 05</p>
+          <h3>Gradient Boosted Stumps</h3>
+          <p class="params">7K parameters</p>
+          <p class="miss">Great on sharp splits. Misses smooth boundaries.</p>
+        </div>
+      </div>
+      <!-- meta -->
+      <div class="ens-row"><div class="ens-stage lbl"><span>Meta-weights · </span>cross-validated · learned per intent</div></div>
+      <!-- output -->
+      <div class="ens-row"><div class="ens-stage final"><span class="fl">Predicted intent &mdash; "order_status"</span><span class="fr">confidence 0.94 · top-5 ranked</span></div></div>
+    </div>
+
+    <p style="font-family:'Fraunces',serif;font-size:var(--t-md);color:var(--ink-soft);max-width:60ch;margin:1.75rem 0 0;">Every algorithm (MurmurHash3, Pegasos SVM, Complement NB, backprop MLP, gradient boosted stumps) is implemented from scratch in TypeScript. <em style="color:var(--accent);font-style:italic;">Zero ML dependencies.</em> Ships as static files.</p>
+  </div>
+</section>
+
+
+<!-- ============ ACT III · CAPABILITIES ============ -->
+<section class="act" aria-labelledby="cap-h">
+  <div class="frame">
+    <p class="act-num">Act III · Built for production</p>
+    <h2 id="cap-h">Self-learning, drift-aware,<br><em>seven export formats.</em></h2>
+
+    <div class="caps">
+      <div class="cap">
+        <h3>Self-learning loop</h3>
+        <p>Evaluates, diagnoses weak intents, augments data, pseudo-labels high-confidence predictions, curriculum-orders, retrains, validates. Accepts only if accuracy does not regress. Fully autonomous.</p>
+      </div>
+      <div class="cap">
+        <h3>Drift detection</h3>
+        <p>Page-Hinkley for concept drift. DDM for error-rate drift. Vocabulary distribution monitored in real time. Dashboard shows you the moment behaviour shifts.</p>
+      </div>
+      <div class="cap">
+        <h3>Model registry</h3>
+        <p>Semantic versioning. Champion / challenger lifecycle. A/B testing with configurable traffic splits. Rollback in one click.</p>
+      </div>
+      <div class="cap">
+        <h3>Seven-platform export</h3>
+        <p>Rasa YAML 3.1, Dialogflow ES, Lex V2, LUIS, Wit.ai, CSV, JSON. Vendor-out is built into the product.</p>
+      </div>
+      <div class="cap">
+        <h3>Scales for free</h3>
+        <p>Every user brings their own compute, the browser. Ten users or ten million, the server load is identical: it serves static files.</p>
+      </div>
+      <div class="cap">
+        <h3>WCAG 2.2 AA</h3>
+        <p>Full keyboard navigation. Alt+1 through Alt+8 page switching. ARIA labels, screen reader support, reduced motion, skip navigation.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ ACT IV · STACK ============ -->
+<section class="act" aria-labelledby="tech-h">
+  <div class="frame">
+    <p class="act-num">The Stack</p>
+    <h2 id="tech-h" style="font-size:var(--t-xl);font-weight:400;font-family:'Fraunces',serif;font-variation-settings:'opsz' 144,'SOFT' 50;margin:0;letter-spacing:-0.02em;">Pure TypeScript math.<br><em>No Python runtime.</em> No GPU. No API keys.</h2>
+    <ul class="stack-list">
+      <li class="stack-tag">TypeScript 5.5</li>
+      <li class="stack-tag">Next.js 14.2</li>
+      <li class="stack-tag">React 18.3</li>
+      <li class="stack-tag">Pure-JS MurmurHash3</li>
+      <li class="stack-tag">Pegasos Linear SVM</li>
+      <li class="stack-tag">Complement Naive Bayes</li>
+      <li class="stack-tag">Backprop MLP</li>
+      <li class="stack-tag">Gradient Boosted Stumps</li>
+      <li class="stack-tag">localStorage model registry</li>
+      <li class="stack-tag">Page-Hinkley drift</li>
+      <li class="stack-tag">DDM error-rate drift</li>
+      <li class="stack-tag">Docker · Vercel · Any VM</li>
+      <li class="stack-tag">AGPL 3.0</li>
+    </ul>
+  </div>
+</section>
+
+
+<!-- ============ END CTA ============ -->
+<section class="endcta" aria-labelledby="cta-h">
+  <div class="frame">
+    <div>
+      <h2 id="cta-h">If your data cannot leave the building, <em>train it where it lives.</em></h2>
+      <p>I build privacy-first ML for regulated industries. From-scratch algorithms, no SaaS dependency, drop into any browser. Vendor-out is the product.</p>
+    </div>
+    <div class="actions">
+      <a class="btn btn-primary" href="../index.html#hire">Hire me</a>
+      <a class="btn btn-ghost" href="../index.html">Back to catalogue</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="frame">
+    <div>
+      <h2 style="font-family:'Fraunces',serif;font-size:var(--t-xl);margin:0 0 1rem;">dmj<span class="dot">.</span>one</h2>
+      <p>Dream, Manifest and Journey, Together as One.</p>
+      <p class="meta">© 2026 Divya Mohan. NLU Bot Trainer (Sentio) released under AGPL 3.0.</p>
+    </div>
+    <div>
+      <p class="meta">Catalogue</p>
+      <p><a href="../index.html#catalogue">All 47 products</a></p>
+      <p><a href="../index.html#cat-ai">AI · Agents</a></p>
+      <p><a href="../index.html#hire">Hire</a></p>
+    </div>
+    <div>
+      <p class="meta">NLU Bot Trainer</p>
+      <p><a href="https://github.com/divyamohan1993/nlu-bot-trainer" rel="noopener">Source</a></p>
+      <p><a href="mailto:contact@dmj.one">contact@dmj.one</a></p>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,711 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1c5d63">
+<meta name="color-scheme" content="light">
+
+<title>On-Demand Deployment · Recruiter clicks. VM lives. Receipt mailed · dmj.one</title>
+<meta name="description" content="A secure orchestrator that spins up GCP spot VMs on click. No password. Just name and email. reCAPTCHA Enterprise, 3 VMs/hour global cap, one-VM-at-a-time. Under one dollar a month.">
+<meta property="og:title" content="On-Demand Deployment · Recruiter clicks. VM lives.">
+<meta property="og:description" content="Spot VMs on click. No password. Cost-controlled. Cloudflare-fronted.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,30..100&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="../assets/core.css">
+
+<style>
+:root {
+  --accent: var(--c-cloud);
+  --accent-deep: #0e3d42;
+  --term-bg: #0f1112;
+  --term-fg: #d0e8e9;
+}
+body { background: var(--paper); }
+
+/* ====== HERO · terminal-led ============================== */
+.od-hero {
+  position: relative;
+  padding-block: clamp(3rem, 5vw + 1rem, 6rem) clamp(2rem, 4vw, 4rem);
+  border-bottom: var(--hair);
+  background: var(--paper);
+  overflow: hidden;
+}
+.od-hero::before {
+  content: ""; position: absolute; inset: 0;
+  background:
+    radial-gradient(circle at 20% 100%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 50%),
+    linear-gradient(180deg, var(--paper), color-mix(in srgb, var(--accent) 4%, var(--paper)));
+  pointer-events: none;
+}
+.od-hero .frame { position: relative; z-index: 2; display: grid; gap: 2.5rem; }
+@media (min-width: 960px) {
+  .od-hero .frame { grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center; }
+}
+
+.crumbs {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs); letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink-mute); margin: 0 0 2rem;
+  display: flex; gap: 0.5rem; flex-wrap: wrap;
+}
+.crumbs a { border-bottom: 1px solid var(--ink-mute); padding-bottom: 1px; }
+.crumbs a:hover { color: var(--accent); border-color: var(--accent); }
+.crumbs span { color: var(--accent); }
+
+.od-eyebrow {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  padding: 0.4rem 0.85rem;
+  border: 1px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  color: var(--accent-deep);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs); font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.16em;
+  margin-bottom: 1.5rem;
+}
+.od-eyebrow::before {
+  content: ""; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+.od-hero h1 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl); font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 30;
+  letter-spacing: -0.025em; line-height: 1.02;
+  margin: 0; max-width: 18ch;
+}
+.od-hero h1 em {
+  font-style: italic; color: var(--accent);
+  font-variation-settings: "opsz" 144, "SOFT" 100;
+}
+.od-hero .lede {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md); font-weight: 300;
+  line-height: 1.45; color: var(--ink-soft);
+  margin: 1.5rem 0 0; max-width: 56ch;
+}
+.od-hero .lede strong {
+  font-weight: 600; color: var(--ink);
+  background: linear-gradient(180deg, transparent 60%, color-mix(in srgb, var(--accent) 25%, transparent) 60%);
+  padding: 0 0.1em;
+}
+
+.od-cta-row {
+  margin-top: 2.5rem;
+  display: flex; gap: 0.75rem; flex-wrap: wrap;
+}
+.btn {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.7rem 1.1rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs); text-transform: uppercase;
+  letter-spacing: 0.14em; font-weight: 700;
+  border: 1px solid var(--ink);
+  transition: background .15s, color .15s, transform .15s, box-shadow .15s;
+}
+.btn:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--ink); }
+.btn-primary { background: var(--accent); color: white; border-color: var(--accent); }
+.btn-primary:hover { box-shadow: 4px 4px 0 var(--ink); }
+.btn-ghost { background: transparent; color: var(--ink); }
+
+/* big terminal */
+.term {
+  border: 1px solid var(--ink);
+  background: var(--term-bg);
+  color: var(--term-fg);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  overflow: hidden;
+  box-shadow: 8px 8px 0 var(--ink);
+}
+.term-bar {
+  display: flex; align-items: center; gap: 0.4rem;
+  padding: 0.55rem 0.85rem;
+  background: #1a1d1f;
+  border-bottom: 1px solid #2c3033;
+  font-size: 0.7rem;
+  color: #95b9bb;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.term-bar .dots { display: flex; gap: 0.35rem; }
+.term-bar .dots i {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: #353a3d; display: block;
+}
+.term-bar .ttl { margin-left: 0.5rem; }
+.term-body { padding: 1rem 1.1rem; }
+.term-body .p { color: #6fb6ba; }
+.term-body .ok { color: #87d3a2; }
+.term-body .warn { color: #ffd06f; }
+.term-body .err { color: #ff7a7a; }
+.term-body .mute { color: #6d8788; }
+.term-body .key { color: #6fb6ba; }
+.term-body .val { color: #d0e8e9; }
+.term-body .accent { color: #ffd06f; }
+.term-body .hr {
+  border-top: 1px dashed #2c3033;
+  margin: 0.5rem 0;
+}
+.term-body .blink::after {
+  content: "▌"; color: #d0e8e9;
+  animation: blink 1.1s steps(1) infinite;
+}
+@keyframes blink { 50% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .term-body .blink::after { animation: none; }
+}
+
+/* ====== STATS ============================================ */
+.od-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  background: var(--ink); color: var(--paper);
+  border-block: 2px solid var(--ink);
+}
+.od-stat {
+  padding: 1.5rem clamp(1rem, 2vw, 1.5rem);
+  border-right: 1px solid color-mix(in srgb, var(--paper) 20%, transparent);
+}
+.od-stat:last-child { border-right: 0; }
+.od-stat .num {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl); font-weight: 400;
+  letter-spacing: -0.04em;
+  font-variation-settings: "opsz" 144, "SOFT" 30;
+  display: block; line-height: 1;
+  color: var(--accent);
+}
+.od-stat .lbl {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.14em;
+  margin-top: 0.6rem; display: block;
+  color: color-mix(in srgb, var(--paper) 75%, transparent);
+}
+
+/* ====== ACTS ============================================= */
+.act {
+  padding-block: clamp(3rem, 5vw, 5rem);
+  border-bottom: var(--hair);
+}
+.act-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs); letter-spacing: 0.22em;
+  text-transform: uppercase; color: var(--accent);
+  font-weight: 700; margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 1rem;
+}
+.act-num::before { content: ""; width: 2.5rem; height: 1px; background: var(--accent); }
+.act h2 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl); font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 50;
+  letter-spacing: -0.025em; line-height: 1.05;
+  margin: 0 0 1.5rem; max-width: 22ch;
+}
+.act h2 em { font-style: italic; color: var(--accent); }
+.act-lede {
+  font-family: 'Fraunces', serif; font-size: var(--t-md);
+  color: var(--ink-soft); max-width: 60ch; margin: 0 0 2rem;
+}
+
+/* the 90s timeline */
+.tl-90 {
+  display: grid; gap: 0;
+  margin-top: 2rem;
+  border-top: 2px solid var(--accent);
+  border-bottom: 2px solid var(--accent);
+}
+.tl-row {
+  display: grid;
+  grid-template-columns: 6rem 1fr;
+  gap: 1rem; align-items: baseline;
+  padding: 0.85rem 0;
+  border-bottom: var(--hair-soft);
+}
+.tl-row:last-child { border-bottom: 0; }
+.tl-row .t {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem; font-weight: 700;
+  color: var(--accent-deep);
+  letter-spacing: 0.04em;
+}
+.tl-row .e {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md);
+  color: var(--ink);
+  font-weight: 500; letter-spacing: -0.005em;
+  margin: 0 0 0.2rem;
+}
+.tl-row .s {
+  margin: 0;
+  font-size: var(--t-sm);
+  color: var(--ink-soft);
+}
+
+/* security rail */
+.rails {
+  display: grid; gap: 0;
+  margin-top: 2rem;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { .rails { grid-template-columns: repeat(3, 1fr); } }
+.rail {
+  padding: 1.5rem;
+  border-right: 1px solid var(--paper-edge);
+  border-bottom: 1px solid var(--paper-edge);
+}
+@media (min-width: 760px) {
+  .rail:nth-child(3n) { border-right: 0; }
+  .rail:nth-last-child(-n+3) { border-bottom: 0; }
+}
+.rail .layer {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.18em;
+  color: var(--accent); font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+.rail h4 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.1rem; font-weight: 500;
+  margin: 0 0 0.4rem; letter-spacing: -0.01em;
+}
+.rail p { margin: 0; color: var(--ink-soft); font-size: var(--t-sm); }
+
+/* cost block */
+.cost {
+  margin-top: 2.5rem;
+  border: 1px solid var(--ink);
+  padding: 1.75rem;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 10%, var(--paper)), var(--paper));
+  display: grid; gap: 1rem;
+}
+@media (min-width: 760px) {
+  .cost { grid-template-columns: 1fr 1fr; align-items: center; }
+}
+.cost .big {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-3xl); font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 100;
+  color: var(--accent);
+  letter-spacing: -0.04em;
+  line-height: 1; margin: 0;
+}
+.cost .big em {
+  display: block;
+  font-size: 0.4em;
+  color: var(--ink-soft);
+  font-style: normal;
+  font-family: 'JetBrains Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  margin-top: 0.5rem;
+}
+.cost-table {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+}
+.cost-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  padding: 0.4rem 0;
+  border-bottom: 1px dashed var(--paper-edge);
+}
+.cost-row:last-child { border-bottom: 0; padding-top: 0.6rem; font-weight: 700; }
+.cost-row .v { color: var(--accent-deep); }
+.cost-row .v.free { color: var(--accent); font-weight: 700; }
+
+/* problem */
+.problems {
+  display: grid; gap: 1rem; margin-top: 2rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { .problems { grid-template-columns: repeat(2, 1fr); } }
+.problem {
+  border-left: 3px solid var(--signal);
+  padding: 1rem 1.25rem;
+  background: var(--paper-soft);
+}
+.problem h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.1rem; font-weight: 500;
+  margin: 0 0 0.4rem; letter-spacing: -0.01em;
+}
+.problem p { margin: 0; font-size: var(--t-sm); color: var(--ink-soft); }
+
+/* proof */
+.proof-act {
+  background: var(--ink); color: var(--paper);
+  position: relative; overflow: hidden;
+}
+.proof-act::before {
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 80% 20%, color-mix(in srgb, var(--accent) 30%, transparent), transparent 60%);
+  pointer-events: none;
+}
+.proof-act .frame { position: relative; }
+.proof-act h2 { color: var(--paper); }
+.proof-act h2 em { color: var(--accent); }
+.proof-grid {
+  display: grid; gap: 1rem; margin-top: 2rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { .proof-grid { grid-template-columns: repeat(2, 1fr); } }
+.proof-item {
+  border: 1px solid color-mix(in srgb, var(--paper) 30%, transparent);
+  padding: 1.5rem;
+  background: color-mix(in srgb, var(--paper) 5%, transparent);
+}
+.proof-item h3 {
+  font-family: 'Fraunces', serif;
+  margin: 0 0 0.5rem; font-size: var(--t-md);
+  color: var(--accent); font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.proof-item p { margin: 0; color: color-mix(in srgb, var(--paper) 80%, transparent); font-size: var(--t-sm); }
+
+/* stack */
+.stack-list {
+  display: flex; flex-wrap: wrap; gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+.stack-tag {
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--ink);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.14em;
+  font-weight: 600;
+}
+
+/* end cta */
+.endcta {
+  padding-block: clamp(3rem, 5vw, 5rem);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 10%, transparent), var(--paper));
+}
+.endcta .frame { display: grid; gap: 2rem; grid-template-columns: 1fr; }
+@media (min-width: 760px) { .endcta .frame { grid-template-columns: 2fr 1fr; align-items: end; } }
+.endcta h2 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl); font-weight: 300;
+  font-variation-settings: "opsz" 144, "SOFT" 100;
+  margin: 0 0 1rem; letter-spacing: -0.025em; line-height: 1.05;
+}
+.endcta h2 em {
+  font-style: italic; color: var(--accent);
+  background: linear-gradient(180deg, transparent 70%, color-mix(in srgb, var(--accent) 25%, transparent) 70%);
+}
+.endcta p { color: var(--ink-soft); margin: 0; max-width: 50ch; }
+.endcta .actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+
+.foot { background: var(--ink); color: var(--paper); }
+.foot .dot { color: var(--accent); }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topnav">
+  <div class="frame">
+    <div class="brand"><a href="../index.html">dmj<span class="dot">.</span>one</a></div>
+    <nav aria-label="Primary">
+      <ul>
+        <li><a href="../index.html#catalogue">Catalogue</a></li>
+        <li><a href="../index.html#manifesto">Manifesto</a></li>
+        <li><a href="../index.html#hire">Hire</a></li>
+        <li><a href="https://github.com/divyamohan1993/on-demand-project-deployment" rel="noopener">GitHub</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ======= HERO ======= -->
+<section class="od-hero">
+  <div class="frame">
+    <div>
+      <p class="crumbs">
+        <a href="../index.html">Catalogue</a> /
+        <a href="../index.html#cat-cloud">Cloud and Infra</a> /
+        <span>On-Demand Deployment</span>
+      </p>
+
+      <span class="od-eyebrow">Recruiter-friendly · Cost-controlled</span>
+
+      <h1>Recruiter clicks. <em>VM lives.</em><br>Receipt mailed.</h1>
+
+      <p class="lede">
+        Recruiters open your portfolio link. The demo VM is asleep, was deleted, or costs forty dollars a month to keep alive forever. Pick one. <strong>This orchestrator picks none.</strong> A click spins up a GCP spot VM, the recruiter's name and email become the audit trail, the VM dies in two hours. Total cost: under a dollar a month.
+      </p>
+
+      <div class="od-cta-row">
+        <a class="btn btn-primary" href="https://github.com/divyamohan1993/on-demand-project-deployment" rel="noopener">View source</a>
+        <a class="btn btn-ghost" href="#how">How it works</a>
+        <a class="btn btn-ghost" href="#cost">The bill</a>
+      </div>
+    </div>
+
+    <div class="term" role="img" aria-label="Terminal output: orchestrator receives a request, validates reCAPTCHA, kills any existing VM, spins up a fresh spot VM, returns the URL">
+      <div class="term-bar">
+        <span class="dots"><i></i><i></i><i></i></span>
+        <span class="ttl">project-orchestrator · journalctl -f</span>
+      </div>
+      <div class="term-body">
+<span class="mute">[14:02:18]</span> <span class="p">request</span> <span class="key">project=</span><span class="val">kisanmind</span> <span class="key">name=</span><span class="val">"Aisha K."</span> <span class="key">email=</span><span class="val">aisha@acme.com</span>
+<span class="mute">[14:02:18]</span> <span class="p">recaptcha</span> <span class="ok">score=0.92</span> <span class="mute">verified</span>
+<span class="mute">[14:02:18]</span> <span class="p">rate-limit</span> <span class="ok">global=2/3 · ip=1/5</span>
+<span class="mute">[14:02:19]</span> <span class="p">policy</span> <span class="warn">existing VM detected · kisanmind-prev</span>
+<span class="mute">[14:02:19]</span> <span class="p">terminate</span> <span class="ok">kisanmind-prev · ok</span>
+<span class="mute">[14:02:21]</span> <span class="p">create</span> <span class="key">e2-medium</span> <span class="key">spot</span> <span class="key">us-east1-b</span>
+<span class="mute">[14:02:53]</span> <span class="p">boot</span> <span class="ok">cloud-init complete · 32s</span>
+<span class="mute">[14:03:14]</span> <span class="p">app</span> <span class="ok">listening :3000 · healthy</span>
+<span class="mute">[14:03:14]</span> <span class="p">audit</span> <span class="accent">aisha@acme.com → kisanmind-9f3b live</span>
+<span class="mute">[14:03:14]</span> <span class="p">ttl</span> <span class="warn">auto-destroy in 02:00:00</span>
+<span class="mute">[--:--:--]</span> <span class="blink"></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======= STATS ======= -->
+<section class="od-stats" aria-label="At a glance">
+  <div class="od-stat"><span class="num">1</span><span class="lbl">click to live VM</span></div>
+  <div class="od-stat"><span class="num">3/h</span><span class="lbl">Global VM cap (anti-abuse)</span></div>
+  <div class="od-stat"><span class="num">1</span><span class="lbl">Active VM at a time, max</span></div>
+  <div class="od-stat"><span class="num">~2h</span><span class="lbl">Spot lifetime, then auto-destroy</span></div>
+  <div class="od-stat"><span class="num">&lt;$1</span><span class="lbl">Per month, all-in</span></div>
+</section>
+
+<!-- ======= ACT I · PROBLEM ======= -->
+<section class="act" aria-labelledby="prob-h">
+  <div class="frame">
+    <p class="act-num">Act I · The Problem</p>
+    <h2 id="prob-h">"My demo is live" is a <em>lie most engineers tell.</em></h2>
+    <p class="act-lede">The portfolio link works. The demo behind it does not. The VM is asleep, expired, deleted, or costs more than it earns. Recruiters click once, see a 502, never come back. Most engineers respond by either abandoning live demos or by paying forty dollars a month to keep one running. There is a third option.</p>
+
+    <div class="problems">
+      <div class="problem"><h3>Sleeping VMs are still expensive.</h3><p>An idle e2-medium that you "forgot about" is still billable. Multiply by every project. Most portfolios go silent because the wallet caught up.</p></div>
+      <div class="problem"><h3>Public credentials are not safe.</h3><p>Many demo portals ask the recruiter to log in. Either they bounce, or you handed out credentials to strangers.</p></div>
+      <div class="problem"><h3>Bots will find you.</h3><p>An open "click to deploy" endpoint is a coin-mining invitation. Without rate limits, captcha and one-VM-at-a-time, the cloud bill arrives in a week.</p></div>
+      <div class="problem"><h3>"How did this get spun up" is not optional.</h3><p>Without an audit trail of who triggered which VM, you cannot review abuse, cannot answer questions, cannot improve the funnel.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ======= ACT II · TIMELINE ======= -->
+<section class="act" id="how" style="background: linear-gradient(180deg, var(--paper-soft), var(--paper));" aria-labelledby="how-h">
+  <div class="frame">
+    <p class="act-num">Act II · The Sequence</p>
+    <h2 id="how-h">Click to live, in <em>about ninety seconds.</em></h2>
+    <p class="act-lede">A recruiter visits your projects page. Picks a project. Types a name and email. The orchestrator validates them, runs through every safety rail, then provisions and boots. The page polls until the VM is healthy, then redirects. Honest, observable, auditable.</p>
+
+    <div class="tl-90" aria-label="End-to-end timeline of an on-demand deployment">
+      <div class="tl-row">
+        <span class="t">00:00</span>
+        <div>
+          <p class="e">Recruiter submits the form.</p>
+          <p class="s">Name and email only. No password. reCAPTCHA Enterprise (invisible, score-based) runs in the background.</p>
+        </div>
+      </div>
+      <div class="tl-row">
+        <span class="t">00:01</span>
+        <div>
+          <p class="e">reCAPTCHA score and rate limit checked.</p>
+          <p class="s">Score below threshold? Rejected. Above 3 VMs in the last hour globally? Waitlisted. Above 5 requests per minute per IP? Rejected.</p>
+        </div>
+      </div>
+      <div class="tl-row">
+        <span class="t">00:02</span>
+        <div>
+          <p class="e">Existing VM, if any, is killed.</p>
+          <p class="s">One-VM-at-a-time policy. The new request kills the previous instance before spinning a fresh one. No cost overlap, no two-of-a-kind.</p>
+        </div>
+      </div>
+      <div class="tl-row">
+        <span class="t">00:05</span>
+        <div>
+          <p class="e">GCP spot VM is created.</p>
+          <p class="s">e2-class spot instance, US region. Lower price, suitable for short-lived demos. Cloud-init runs the project's <code>autoconfig.sh</code> from the target repo.</p>
+        </div>
+      </div>
+      <div class="tl-row">
+        <span class="t">00:55</span>
+        <div>
+          <p class="e">Boot complete, app starts.</p>
+          <p class="s">Cloud-init finishes, the project's start command runs, the configured port begins accepting traffic.</p>
+        </div>
+      </div>
+      <div class="tl-row">
+        <span class="t">01:30</span>
+        <div>
+          <p class="e">Health check passes, recruiter is redirected.</p>
+          <p class="s">The page that submitted the form has been polling the orchestrator. It sees the green light, redirects to the live URL. Audit row written.</p>
+        </div>
+      </div>
+      <div class="tl-row">
+        <span class="t">02:00:00</span>
+        <div>
+          <p class="e">Auto-destroy fires.</p>
+          <p class="s">The VM is reaped. The audit row gets a closed-at timestamp. Total wall time of one live demo: two hours. Total spot cost: about a cent and a half.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======= ACT III · SECURITY RAILS ======= -->
+<section class="act" aria-labelledby="rail-h">
+  <div class="frame">
+    <p class="act-num">Act III · The Safety Rails</p>
+    <h2 id="rail-h">Six layers between the click <em>and your wallet.</em></h2>
+
+    <div class="rails">
+      <div class="rail">
+        <p class="layer">Layer 01 · Validation</p>
+        <h4>reCAPTCHA Enterprise</h4>
+        <p>Invisible, score-based (0.0 - 1.0). Below threshold = silently rejected. No checkbox, no friction for humans.</p>
+      </div>
+      <div class="rail">
+        <p class="layer">Layer 02 · Identity</p>
+        <h4>Name and email audit</h4>
+        <p>Every spin-up logs name, email, IP and (if provided) company. Closed loop. No anonymous deploys.</p>
+      </div>
+      <div class="rail">
+        <p class="layer">Layer 03 · Rate limit</p>
+        <h4>3 VMs / hour global · 5 req / min per IP</h4>
+        <p>Global cap protects the wallet. Per-IP cap protects the orchestrator. Both stored in <code>deployment_log.json</code>.</p>
+      </div>
+      <div class="rail">
+        <p class="layer">Layer 04 · Concurrency</p>
+        <h4>One active VM, total</h4>
+        <p>New request kills the previous VM before booting. There can be at most one demo VM alive at any moment.</p>
+      </div>
+      <div class="rail">
+        <p class="layer">Layer 05 · Network</p>
+        <h4>Cloudflare Flexible SSL</h4>
+        <p>Cloudflare proxies HTTPS, hides the orchestrator's real IP. Cloudflare DNS, free plan. The VM never sees the open internet directly.</p>
+      </div>
+      <div class="rail">
+        <p class="layer">Layer 06 · Host</p>
+        <h4>UFW, Fail2Ban, non-root</h4>
+        <p>Standard hardening on the e2-micro orchestrator itself. Application runs as a service user. Systemd-managed. Restartable.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======= ACT IV · COST ======= -->
+<section class="act" id="cost" aria-labelledby="cost-h">
+  <div class="frame">
+    <p class="act-num">Act IV · The Bill</p>
+    <h2 id="cost-h">Recruiter-friendly. <em>Wallet-friendly.</em></h2>
+    <p class="act-lede">The orchestrator runs forever, free, on a GCP always-free e2-micro. Spot VMs run only when requested, and only for two hours. Cloudflare is free. The total cost of running this for a portfolio with five demos a day is under a dollar a month.</p>
+
+    <div class="cost">
+      <p class="big">&lt;$1<em>per month, total</em></p>
+      <div class="cost-table">
+        <div class="cost-row"><span>Orchestrator VM (e2-micro)</span><span class="v free">FREE</span></div>
+        <div class="cost-row"><span>Spot VM, only when requested (~2h)</span><span class="v">~$0.007 / hr</span></div>
+        <div class="cost-row"><span>Bandwidth (within free tier)</span><span class="v free">FREE</span></div>
+        <div class="cost-row"><span>Cloudflare DNS / SSL (free plan)</span><span class="v free">FREE</span></div>
+        <div class="cost-row"><span>Total · ~5 demos / day</span><span class="v">&lt; $1.00 / mo</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======= ACT V · STACK ======= -->
+<section class="act" aria-labelledby="stack-h">
+  <div class="frame">
+    <p class="act-num">Act V · The Stack</p>
+    <h2 id="stack-h">What is inside.</h2>
+    <ul class="stack-list">
+      <li class="stack-tag">Python 3.8+</li>
+      <li class="stack-tag">Flask / Gunicorn</li>
+      <li class="stack-tag">nginx</li>
+      <li class="stack-tag">systemd</li>
+      <li class="stack-tag">GCP Compute Engine (e2-micro free tier)</li>
+      <li class="stack-tag">GCP Spot VMs</li>
+      <li class="stack-tag">reCAPTCHA Enterprise</li>
+      <li class="stack-tag">Cloudflare DNS / Flexible SSL</li>
+      <li class="stack-tag">UFW + Fail2Ban</li>
+      <li class="stack-tag">cloud-init</li>
+      <li class="stack-tag">Bash autoconfig.sh</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ======= PROOF ======= -->
+<section class="proof-act act" aria-labelledby="proof-h">
+  <div class="frame">
+    <p class="act-num">Act VI · Proof</p>
+    <h2 id="proof-h">One bash. <em>Production hardened.</em></h2>
+    <div class="proof-grid">
+      <div class="proof-item">
+        <h3>autoconfig.sh · one command install</h3>
+        <p><code>sudo ./autoconfig.sh</code> creates a 4GB swap, installs Python, nginx, gunicorn, configures the systemd service, sets up the security hardening, and wires Cloudflare-friendly headers.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Adding a project · one dictionary entry</h3>
+        <p>Add a project by appending to the <code>PROJECTS</code> dictionary. Name, description, GitHub URL, autoconfig script, port, env vars. Done. The project shows on the demos page.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Audit log · deployment_log.json</h3>
+        <p>Every deploy: timestamp, project, recruiter name, recruiter email, recruiter IP, score, decision. Greppable. Backup-friendly. The whole history of every demo a recruiter ever launched.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Source · divyamohan1993/on-demand-project-deployment</h3>
+        <p>Public source. README walks through GCP setup, reCAPTCHA setup, Cloudflare setup, troubleshooting (the redirect-loop trap and the credentials trap, both real).</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======= END CTA ======= -->
+<section class="endcta" aria-labelledby="cta-h">
+  <div class="frame">
+    <div>
+      <h2 id="cta-h">Want a portfolio that <em>actually demos</em>, without paying for it forever?</h2>
+      <p>I build cost-aware deployment orchestrators that respect both the cloud bill and the recruiter's time. No spinners. No sleeping VMs. No coin-miners.</p>
+    </div>
+    <div class="actions">
+      <a class="btn btn-primary" href="../index.html#hire">Hire me</a>
+      <a class="btn btn-ghost" href="../index.html">Back to catalogue</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="frame">
+    <div>
+      <h2 style="font-family:'Fraunces',serif;font-size:var(--t-xl);margin:0 0 1rem;">dmj<span class="dot">.</span>one</h2>
+      <p>Dream, Manifest and Journey, Together as One.</p>
+      <p class="meta">© 2026 Divya Mohan. On-Demand Project Deployment Orchestrator. MIT licensed. Built for the developer community.</p>
+    </div>
+    <div>
+      <p class="meta">Catalogue</p>
+      <p><a href="../index.html#catalogue">All 47 products</a></p>
+      <p><a href="../index.html#cat-cloud">Cloud and Infra</a></p>
+      <p><a href="../index.html#hire">Hire</a></p>
+    </div>
+    <div>
+      <p class="meta">On-Demand Deployment</p>
+      <p><a href="https://github.com/divyamohan1993/on-demand-project-deployment" rel="noopener">Source</a></p>
+      <p><a href="mailto:contact@dmj.one">contact@dmj.one</a></p>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

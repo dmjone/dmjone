@@ -1,0 +1,660 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1f3a5f">
+<meta name="color-scheme" content="light">
+
+<title>Compliant VM - The audit folder builds itself · dmj.one</title>
+<meta name="description" content="A VM hardening template that ships with the proof. CIS-aligned controls, automated evidence collection, signed attestations. Audit folder builds itself.">
+<meta property="og:title" content="Compliant VM · The audit folder builds itself">
+<meta property="og:description" content="Compliance audits are theatre until the auditor asks for proof. This template hands the auditor a signed bundle on day one.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,30..100&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/core.css">
+
+<style>
+:root { --accent: var(--c-enterprise); --accent-deep: #0e1f33; --steel: #2c4a73; --tick: #2a6a3a; --warn: #b86a1a; }
+body { background: var(--paper); }
+
+/* ====== HERO - audit form aesthetic ============== */
+.c-hero {
+  position: relative;
+  padding-block: clamp(3rem, 5vw, 5rem) clamp(2rem, 4vw, 4rem);
+  border-bottom: var(--hair);
+  background:
+    repeating-linear-gradient(0deg, transparent 0 36px, color-mix(in srgb, var(--accent) 6%, transparent) 36px 37px),
+    var(--paper);
+}
+.c-hero .frame { position: relative; z-index: 2; }
+
+.crumbs {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink-mute);
+  margin: 0 0 2rem;
+  display: flex; gap: 0.5rem; flex-wrap: wrap;
+}
+.crumbs a { border-bottom: 1px solid currentColor; padding-bottom: 1px; }
+.crumbs a:hover { color: var(--accent); }
+.crumbs span { color: var(--accent); }
+
+/* form-style header */
+.form-strip {
+  display: grid;
+  grid-template-columns: 1fr;
+  border: 2px solid var(--ink);
+  background: var(--paper);
+  margin-bottom: 2rem;
+}
+@media (min-width: 760px) { .form-strip { grid-template-columns: 1.4fr 1fr 1fr; } }
+.form-strip .cell {
+  padding: 0.85rem 1.2rem;
+  border-right: 1px solid var(--paper-edge);
+  border-bottom: 1px solid var(--paper-edge);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.form-strip .cell:last-child { border-right: 0; }
+.form-strip .cell .lbl {
+  display: block; font-size: 0.65rem;
+  color: var(--ink-mute);
+  margin-bottom: 0.3rem;
+  letter-spacing: 0.18em;
+}
+.form-strip .cell .val { color: var(--ink); font-weight: 700; font-size: 0.85rem; letter-spacing: 0.06em; }
+.form-strip .cell.hl { background: var(--accent-deep); color: var(--paper); }
+.form-strip .cell.hl .lbl { color: color-mix(in srgb, var(--paper) 60%, transparent); }
+.form-strip .cell.hl .val { color: var(--paper); }
+
+.c-eyebrow {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  padding: 0.4rem 0.85rem;
+  border: 1px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  color: var(--accent);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  margin-bottom: 1.5rem;
+}
+.c-eyebrow::before {
+  content: ""; width: 8px; height: 8px;
+  background: var(--accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+.c-hero h1 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-3xl);
+  font-weight: 300;
+  font-variation-settings: "opsz" 144, "SOFT" 30;
+  letter-spacing: -0.035em;
+  line-height: 0.93;
+  margin: 0;
+  max-width: 14ch;
+}
+.c-hero h1 em {
+  font-style: italic;
+  color: var(--accent);
+  font-variation-settings: "opsz" 144, "SOFT" 100, "WONK" 1;
+  font-weight: 400;
+}
+
+.c-hero .lede {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md);
+  font-weight: 300;
+  line-height: 1.45;
+  color: var(--ink-soft);
+  margin: 1.75rem 0 0;
+  max-width: 56ch;
+}
+.c-hero .lede strong {
+  font-weight: 500;
+  color: var(--ink);
+  background: linear-gradient(180deg, transparent 60%, color-mix(in srgb, var(--accent) 22%, transparent) 60%);
+  padding: 0 0.1em;
+}
+
+.c-cta-row {
+  margin-top: 2rem;
+  display: flex; gap: 0.75rem; flex-wrap: wrap;
+}
+.btn {
+  display: inline-flex; align-items: center; gap: 0.45rem;
+  padding: 0.7rem 1.1rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 700;
+  border: 1px solid var(--ink);
+  transition: background .15s, color .15s, transform .15s, box-shadow .15s;
+}
+.btn:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--ink); }
+.btn-primary { background: var(--accent); color: white; border-color: var(--accent); }
+.btn-primary:hover { box-shadow: 4px 4px 0 var(--ink); }
+.btn-ghost { background: transparent; color: var(--ink); }
+
+/* ====== STATS ribbon ============== */
+.c-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  background: var(--ink);
+  color: var(--paper);
+  border-block: 2px solid var(--ink);
+}
+.c-stat {
+  padding: 1.5rem clamp(1rem, 2vw, 1.5rem);
+  border-right: 1px solid color-mix(in srgb, var(--paper) 18%, transparent);
+}
+.c-stat:last-child { border-right: 0; }
+.c-stat .num {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 300;
+  letter-spacing: -0.04em;
+  font-variation-settings: "opsz" 144, "SOFT" 30;
+  display: block;
+  line-height: 1;
+  color: var(--accent);
+}
+.c-stat .lbl {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  margin-top: 0.6rem;
+  display: block;
+  color: color-mix(in srgb, var(--paper) 75%, transparent);
+}
+
+/* ACT */
+.act {
+  padding-block: clamp(3rem, 5vw, 5rem);
+  border-bottom: var(--hair);
+}
+.act-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 700;
+  margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 1rem;
+}
+.act-num::before { content: ""; width: 2.5rem; height: 1px; background: var(--accent); }
+.act h2 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 50, "WONK" 1;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+  margin: 0 0 1.5rem;
+  max-width: 22ch;
+}
+.act h2 em { font-style: italic; color: var(--accent); }
+.act .intro { font-family: 'Fraunces', serif; font-size: var(--t-md); color: var(--ink-soft); max-width: 60ch; margin: 0; }
+
+/* ====== ACT I · three weeks =========== */
+.theatre {
+  margin-top: 2rem;
+  padding: 2rem;
+  border: 1px solid var(--ink);
+  background: var(--paper-soft);
+  display: grid; gap: 1.5rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 880px) { .theatre { grid-template-columns: 1fr 1.4fr; gap: 3rem; align-items: center; } }
+.theatre .quote {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(1.5rem, 1.2rem + 1.4vw, 2.1rem);
+  font-weight: 300;
+  font-variation-settings: "opsz" 144, "SOFT" 80;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  margin: 0;
+}
+.theatre .quote em { font-style: italic; color: var(--accent); }
+.theatre dl { margin: 0; display: grid; gap: 0.6rem; }
+.theatre dl div {
+  display: grid; grid-template-columns: 5rem 1fr; gap: 1rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--paper-edge);
+  font-size: var(--t-sm);
+}
+.theatre dl div:last-child { border-bottom: 0; }
+.theatre dl dt {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 700;
+}
+.theatre dl dd { margin: 0; color: var(--ink-soft); }
+.theatre dl dd b { color: var(--ink); font-weight: 700; }
+
+/* ====== ACT II · CIS controls grid ====== */
+.cis-grid {
+  display: grid; gap: 1px;
+  margin-top: 2rem;
+  background: var(--ink);
+  border: 1px solid var(--ink);
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { .cis-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1080px) { .cis-grid { grid-template-columns: repeat(3, 1fr); } }
+.cis {
+  background: var(--paper);
+  padding: 1.4rem 1.5rem;
+  position: relative;
+}
+.cis .row {
+  display: flex; align-items: center; justify-content: space-between;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-bottom: 0.7rem;
+}
+.cis .row .id { color: var(--accent); font-weight: 700; }
+.cis .row .tag {
+  color: var(--tick); font-weight: 700;
+  display: inline-flex; align-items: center; gap: 0.3rem;
+}
+.cis .row .tag::before {
+  content: "\2713";
+  display: inline-block;
+  width: 1rem; height: 1rem;
+  background: var(--tick); color: var(--paper);
+  text-align: center; line-height: 1;
+  font-weight: 700; font-family: 'Atkinson Hyperlegible', sans-serif;
+  padding-top: 1px;
+}
+.cis h3 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md);
+  margin: 0 0 0.5rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.cis p { margin: 0; font-size: var(--t-sm); color: var(--ink-soft); }
+
+/* ====== ACT III · bundle map ============= */
+.bundle {
+  margin-top: 2rem;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+}
+.bundle-head {
+  background: var(--accent-deep);
+  color: var(--paper);
+  padding: 0.8rem 1.25rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  display: flex; justify-content: space-between; gap: 1rem;
+}
+.bundle-head .seal { color: #4ade80; font-weight: 700; }
+.bundle-head .seal::before { content: "● "; }
+.bundle-list {
+  display: grid;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+}
+.bundle-list li {
+  display: grid; grid-template-columns: 2.5rem 1fr auto; gap: 1rem;
+  align-items: center;
+  padding: 0.85rem 1.25rem;
+  border-bottom: 1px solid var(--paper-edge);
+  color: var(--ink-soft);
+}
+.bundle-list li:last-child { border-bottom: 0; }
+.bundle-list li .ix { color: var(--accent); font-weight: 700; font-size: 0.78rem; letter-spacing: 0.12em; }
+.bundle-list li .name { color: var(--ink); font-weight: 700; }
+.bundle-list li .desc { color: var(--ink-mute); font-family: 'Atkinson Hyperlegible', sans-serif; font-size: var(--t-sm); }
+.bundle-list li .stat {
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  color: var(--tick);
+  font-weight: 700;
+  white-space: nowrap;
+}
+.bundle-list li .stat::before { content: "● "; }
+
+/* ====== PROOF ============ */
+.proof {
+  background: var(--ink);
+  color: var(--paper);
+  padding-block: clamp(3rem, 5vw, 5rem);
+  position: relative;
+  overflow: hidden;
+}
+.proof::before {
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 80% 20%, color-mix(in srgb, var(--accent) 28%, transparent), transparent 60%);
+}
+.proof .frame { position: relative; }
+.proof h2 { color: var(--paper); }
+.proof h2 em { color: var(--accent); }
+.proof-grid {
+  display: grid; gap: 1rem; margin-top: 2rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { .proof-grid { grid-template-columns: repeat(2, 1fr); } }
+.proof-item {
+  border: 1px solid color-mix(in srgb, var(--paper) 25%, transparent);
+  padding: 1.5rem;
+  background: color-mix(in srgb, var(--paper) 5%, transparent);
+}
+.proof-item h3 {
+  font-family: 'Fraunces', serif;
+  margin: 0 0 0.5rem;
+  font-size: var(--t-md);
+  color: var(--accent);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.proof-item p { margin: 0; color: color-mix(in srgb, var(--paper) 80%, transparent); font-size: var(--t-sm); }
+.proof-item code { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: color-mix(in srgb, var(--paper) 90%, transparent); }
+
+/* End CTA */
+.endcta {
+  padding-block: clamp(3rem, 5vw, 5rem);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 12%, transparent), var(--paper));
+}
+.endcta .frame { display: grid; gap: 2rem; grid-template-columns: 1fr; }
+@media (min-width: 760px) { .endcta .frame { grid-template-columns: 2fr 1fr; align-items: end; } }
+.endcta h2 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 300;
+  font-variation-settings: "opsz" 144, "SOFT" 100;
+  margin: 0 0 1rem;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+}
+.endcta h2 em {
+  font-style: italic;
+  color: var(--accent);
+  background: linear-gradient(180deg, transparent 70%, color-mix(in srgb, var(--accent) 22%, transparent) 70%);
+}
+.endcta p { color: var(--ink-soft); margin: 0; max-width: 50ch; }
+.endcta .actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+
+.foot { background: var(--accent-deep); color: var(--paper); }
+.foot .dot { color: var(--accent); }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topnav">
+  <div class="frame">
+    <div class="brand"><a href="../index.html">dmj<span class="dot">.</span>one</a></div>
+    <nav aria-label="Primary">
+      <ul>
+        <li><a href="../index.html#catalogue">Catalogue</a></li>
+        <li><a href="../index.html#manifesto">Manifesto</a></li>
+        <li><a href="../index.html#hire">Hire</a></li>
+        <li><a href="https://github.com/divyamohan1993/compliant-vm" rel="noopener">GitHub</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ============ HERO ============ -->
+<section class="c-hero">
+  <div class="frame">
+    <p class="crumbs">
+      <a href="../index.html">Catalogue</a> /
+      <a href="../index.html#cat-enterprise">Enterprise &amp; Security</a> /
+      <span>Compliant VM</span>
+    </p>
+
+    <div class="form-strip" role="presentation">
+      <div class="cell hl"><span class="lbl">Form</span><span class="val">CV-001 · Hardening Template</span></div>
+      <div class="cell"><span class="lbl">Standard</span><span class="val">CIS-aligned</span></div>
+      <div class="cell"><span class="lbl">Output</span><span class="val">Audit-ready bundle</span></div>
+    </div>
+
+    <span class="c-eyebrow">No. 33 · Enterprise · Compliance · Auto-evidence</span>
+
+    <h1>
+      The audit folder<br>
+      <em>builds itself.</em>
+    </h1>
+
+    <p class="lede">
+      Compliance audits are theatre until the auditor asks for proof and the team has none. Three weeks vanish chasing logs. <strong>This template ends that.</strong> CIS-aligned controls applied on first boot. Evidence collected automatically. Attestations signed. By the time the auditor arrives, the folder is already there.
+    </p>
+
+    <div class="c-cta-row">
+      <a class="btn btn-primary" href="https://github.com/divyamohan1993/compliant-vm" rel="noopener">View source</a>
+      <a class="btn btn-ghost" href="#controls">Control checklist</a>
+      <a class="btn btn-ghost" href="#bundle">The bundle</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATS ============ -->
+<section class="c-stats" aria-label="At a glance">
+  <div class="c-stat"><span class="num">CIS</span><span class="lbl">Aligned baseline</span></div>
+  <div class="c-stat"><span class="num">Auto</span><span class="lbl">Evidence collection</span></div>
+  <div class="c-stat"><span class="num">Signed</span><span class="lbl">Attestations · per check</span></div>
+  <div class="c-stat"><span class="num">3 weeks → 0</span><span class="lbl">Audit prep cycle</span></div>
+  <div class="c-stat"><span class="num">Day 1</span><span class="lbl">First evidence pack</span></div>
+</section>
+
+
+<!-- ============ ACT I · three weeks ============ -->
+<section class="act" aria-labelledby="th-h">
+  <div class="frame">
+    <p class="act-num">Act I · The Problem</p>
+    <h2 id="th-h">Three weeks. <em>Every audit.</em></h2>
+
+    <div class="theatre">
+      <p class="quote">"Send me the firewall log <em>from March</em>, the SSH config <em>from before the change</em>, and proof that disk encryption <em>was on the whole time.</em>"</p>
+      <dl>
+        <div><dt>Day 1</dt><dd>The auditor's checklist arrives. <b>Nobody knows where half the evidence lives.</b></dd></div>
+        <div><dt>Day 4</dt><dd>An engineer rebuilds the SSH config history from <code>git blame</code>. <b>The history is wrong.</b></dd></div>
+        <div><dt>Day 8</dt><dd>The firewall log got rotated. The retention bucket has gaps. <b>Evidence is missing.</b></dd></div>
+        <div><dt>Day 14</dt><dd>A spreadsheet titled "EVIDENCE FINAL FINAL v3" is in someone's email.</dd></div>
+        <div><dt>Day 21</dt><dd>The audit closes with three findings. None are real. All are paperwork.</dd></div>
+      </dl>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ ACT II · control checklist ============ -->
+<section class="act" id="controls" aria-labelledby="ctl-h" style="background: linear-gradient(180deg, var(--paper-soft), var(--paper));">
+  <div class="frame">
+    <p class="act-num">Act II · The Promise</p>
+    <h2 id="ctl-h">Twelve controls. <em>All ticked.</em></h2>
+    <p class="intro">Every control on this list is applied on first boot, re-verified on every run, and documented in the evidence bundle. There are no manual steps. There is no spreadsheet.</p>
+
+    <div class="cis-grid">
+      <article class="cis">
+        <div class="row"><span class="id">CIS 1.1</span><span class="tag">Applied</span></div>
+        <h3>Filesystem partitioning &amp; mount options</h3>
+        <p>Separate <code>/var</code>, <code>/tmp</code>, <code>/home</code>. <code>nodev</code>, <code>nosuid</code>, <code>noexec</code> where appropriate.</p>
+      </article>
+      <article class="cis">
+        <div class="row"><span class="id">CIS 2.2</span><span class="tag">Applied</span></div>
+        <h3>Unused services removed</h3>
+        <p>Default-deny on services. Only explicitly allowed daemons run on boot. Everything else uninstalled.</p>
+      </article>
+      <article class="cis">
+        <div class="row"><span class="id">CIS 3.4</span><span class="tag">Applied</span></div>
+        <h3>Host firewall · default deny</h3>
+        <p>UFW or nftables baseline. Inbound deny by default. Outbound deny by default. Allowlist documented.</p>
+      </article>
+      <article class="cis">
+        <div class="row"><span class="id">CIS 4.1</span><span class="tag">Applied</span></div>
+        <h3>Auditd with full ruleset</h3>
+        <p>Privileged commands, time changes, auth events, mount events, file integrity. Logs shipped off-host.</p>
+      </article>
+      <article class="cis">
+        <div class="row"><span class="id">CIS 5.2</span><span class="tag">Applied</span></div>
+        <h3>SSH hardened</h3>
+        <p>Key-only auth. No root login. Modern KEX and ciphers. Login-grace and max-auth-tries clamped.</p>
+      </article>
+      <article class="cis">
+        <div class="row"><span class="id">CIS 5.4</span><span class="tag">Applied</span></div>
+        <h3>Password policy &amp; PAM hardening</h3>
+        <p>Strong PAM rules. Lockout on brute force. Sudo audited. <code>NOPASSWD</code> denied except for evidence collectors.</p>
+      </article>
+      <article class="cis">
+        <div class="row"><span class="id">CIS 6.1</span><span class="tag">Applied</span></div>
+        <h3>File integrity monitoring</h3>
+        <p>AIDE baseline taken on first boot. Drift report shipped daily. Hash deltas signed for the evidence bundle.</p>
+      </article>
+      <article class="cis">
+        <div class="row"><span class="id">CIS 6.2</span><span class="tag">Applied</span></div>
+        <h3>System log integrity</h3>
+        <p>Logs forwarded to off-host sink. Local rotation locked. Loss of forwarder paged immediately.</p>
+      </article>
+      <article class="cis">
+        <div class="row"><span class="id">CIS 7.1</span><span class="tag">Applied</span></div>
+        <h3>Kernel hardening &amp; sysctl</h3>
+        <p>ASLR on. <code>kernel.kptr_restrict</code>, <code>kernel.dmesg_restrict</code>, <code>net.ipv4.conf.*.rp_filter</code>. Locked.</p>
+      </article>
+      <article class="cis">
+        <div class="row"><span class="id">CIS 8.3</span><span class="tag">Applied</span></div>
+        <h3>fail2ban on auth surfaces</h3>
+        <p>SSH, sudo, anywhere brute force is plausible. Bans logged and shipped. Re-baselined per environment.</p>
+      </article>
+      <article class="cis">
+        <div class="row"><span class="id">CIS 9.1</span><span class="tag">Applied</span></div>
+        <h3>Disk encryption verification</h3>
+        <p>LUKS or cloud-provider equivalent attested at boot. Key location and rotation policy recorded in evidence.</p>
+      </article>
+      <article class="cis">
+        <div class="row"><span class="id">CIS 10.1</span><span class="tag">Applied</span></div>
+        <h3>Time sync &amp; NTP authentication</h3>
+        <p>chrony with authenticated time sources. Drift logged. Off-host anchor for time integrity.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ ACT III · the bundle ============ -->
+<section class="act" id="bundle" aria-labelledby="bnd-h">
+  <div class="frame">
+    <p class="act-num">Act III · The Bundle</p>
+    <h2 id="bnd-h">One tarball. <em>One signature.</em></h2>
+    <p class="intro">Every run produces a self-describing evidence bundle. Each file is hashed. The hash list is signed. The auditor reads the manifest, verifies the signature, walks the files, and is done.</p>
+
+    <div class="bundle" aria-label="Evidence bundle contents">
+      <div class="bundle-head">
+        <span>/var/lib/compliant-vm/evidence/2026-05-04T11:42Z.tar.gz</span>
+        <span class="seal">SIGNED</span>
+      </div>
+      <ul class="bundle-list">
+        <li><span class="ix">01</span><span class="name">manifest.json</span><span class="desc">file list with sha-256, generated-at, host, control mapping</span><span class="stat">Ed25519</span></li>
+        <li><span class="ix">02</span><span class="name">sshd_config.snapshot</span><span class="desc">SSH daemon config at the moment of attestation</span><span class="stat">Captured</span></li>
+        <li><span class="ix">03</span><span class="name">firewall.rules</span><span class="desc">UFW or nftables rule listing with default-deny verification</span><span class="stat">Captured</span></li>
+        <li><span class="ix">04</span><span class="name">auditd.report</span><span class="desc">rule count, dropped events, last-rotation timestamp</span><span class="stat">Captured</span></li>
+        <li><span class="ix">05</span><span class="name">aide.diff</span><span class="desc">file-integrity drift since last baseline</span><span class="stat">Captured</span></li>
+        <li><span class="ix">06</span><span class="name">sysctl.snapshot</span><span class="desc">all kernel parameters relevant to hardening, exact values</span><span class="stat">Captured</span></li>
+        <li><span class="ix">07</span><span class="name">disk-encryption.attest</span><span class="desc">LUKS / cloud-disk encryption status at boot</span><span class="stat">Captured</span></li>
+        <li><span class="ix">08</span><span class="name">time-sync.report</span><span class="desc">chrony source authentication, drift, last sync</span><span class="stat">Captured</span></li>
+        <li><span class="ix">09</span><span class="name">openscap.xml</span><span class="desc">optional CIS / STIG SCAP scan output (when enabled)</span><span class="stat">Optional</span></li>
+        <li><span class="ix">10</span><span class="name">manifest.sig</span><span class="desc">Ed25519 detached signature over manifest.json</span><span class="stat">Signed</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ PROOF ============ -->
+<section class="proof act" aria-labelledby="proof-h">
+  <div class="frame">
+    <p class="act-num">Act IV · Proof</p>
+    <h2 id="proof-h">What the auditor <em>actually wants.</em></h2>
+
+    <div class="proof-grid">
+      <div class="proof-item">
+        <h3>First evidence pack on day one</h3>
+        <p>Boot the VM. Apply the template. Within minutes, the first signed evidence bundle is on disk. There is no preparation phase.</p>
+      </div>
+      <div class="proof-item">
+        <h3>CIS-aligned defaults, not interpretations</h3>
+        <p>Each control maps to a specific CIS Benchmark item. The mapping lives in the manifest. Auditors read it directly.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Tamper-evident attestation chain</h3>
+        <p>Every bundle is hashed. The hash list is Ed25519 signed. Bundles chain across time so that any retroactive change is visible.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Off-host evidence shipping</h3>
+        <p>Bundles ship to retention-locked object storage. The host can be wiped tomorrow. Yesterday's evidence remains.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Optional OpenSCAP integration</h3>
+        <p>When enabled, the bundle includes the SCAP 1.3 XML output. Useful where a regulator already speaks SCAP fluently.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Drop-in for any cloud or bare metal</h3>
+        <p>The template is shell. There is nothing magical. It works on Ubuntu and Debian today, with hooks for RHEL-family extension.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ End CTA ============ -->
+<section class="endcta" aria-labelledby="cta-h">
+  <div class="frame">
+    <div>
+      <h2 id="cta-h">If audit prep eats three weeks every quarter, <em>stop preparing.</em></h2>
+      <p>I build hardened baselines that produce their own evidence on a schedule. The audit folder is always current. The compliance team is never the bottleneck. The team that owned the engineering owns the proof.</p>
+    </div>
+    <div class="actions">
+      <a class="btn btn-primary" href="../index.html#hire">Hire me</a>
+      <a class="btn btn-ghost" href="../index.html">Back to catalogue</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="frame">
+    <div>
+      <h2 style="font-family:'Fraunces',serif;font-size:var(--t-xl);margin:0 0 1rem;">dmj<span class="dot">.</span>one</h2>
+      <p>Dream, Manifest and Journey, Together as One.</p>
+      <p class="meta">© 2026 Divya Mohan. Compliant VM is a hardening template aligned to CIS Benchmarks. It produces controls and evidence. It does not produce an authorisation. Independent assessment is required for any production use.</p>
+    </div>
+    <div>
+      <p class="meta">Catalogue</p>
+      <p><a href="../index.html#catalogue">All 47 products</a></p>
+      <p><a href="../index.html#cat-enterprise">Enterprise &amp; Security</a></p>
+      <p><a href="../index.html#hire">Hire</a></p>
+    </div>
+    <div>
+      <p class="meta">Compliant VM</p>
+      <p><a href="https://github.com/divyamohan1993/compliant-vm" rel="noopener">Source</a></p>
+      <p><a href="zero-trust-mysql.html">Sibling: ZT MySQL</a></p>
+      <p><a href="mailto:contact@dmj.one">contact@dmj.one</a></p>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

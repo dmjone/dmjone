@@ -1,0 +1,748 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#d8631a">
+<meta name="color-scheme" content="light">
+
+<title>Janani Suraksha · Three O(1) engines for a million ASHA workers · dmj.one</title>
+<meta name="description" content="22,500 women die in childbirth every year in India. Most are preventable. Janani Suraksha gives 1.18 million ASHA workers a constant-time AI tool to predict, route and prevent.">
+<meta property="og:title" content="Janani Suraksha · One ASHA worker. One phone. One life saved.">
+<meta property="og:description" content="Three constant-time engines for India's 1.18 million ASHA workers. Risk scoring, referral routing, anemia prediction. NFHS-5 + WHO + Lancet calibrated.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,30..100&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;600&family=Tiro+Devanagari+Hindi&display=swap">
+<link rel="stylesheet" href="../assets/core.css">
+
+<style>
+:root { --accent: var(--c-bharat); --accent-deep: #a14710; --pulse: #b03030; --care: #5a3a1f; }
+body { background: var(--paper); }
+.devanagari { font-family: 'Tiro Devanagari Hindi', 'Fraunces', serif; }
+
+/* ==== HERO · data-led, big number on left, three engines on right ==== */
+.js-hero {
+  position: relative;
+  padding-block: clamp(3rem, 5vw + 1rem, 6rem) clamp(2rem, 4vw, 4rem);
+  border-bottom: var(--hair);
+  overflow: hidden;
+  background: var(--paper);
+}
+.js-hero::before {
+  content: ""; position: absolute; inset: 0;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 39px, color-mix(in srgb, var(--ink) 5%, transparent) 39px 40px),
+    repeating-linear-gradient(90deg, transparent 0 39px, color-mix(in srgb, var(--ink) 5%, transparent) 39px 40px);
+  mask: linear-gradient(180deg, black, transparent 80%);
+  -webkit-mask: linear-gradient(180deg, black, transparent 80%);
+  pointer-events: none;
+}
+.js-hero .frame { position: relative; z-index: 2; }
+
+.crumbs {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink-mute);
+  margin: 0 0 1.5rem;
+  display: flex; gap: 0.5rem; flex-wrap: wrap;
+}
+.crumbs a { border-bottom: 1px solid var(--ink-mute); padding-bottom: 1px; }
+.crumbs a:hover { color: var(--accent); border-color: var(--accent); }
+.crumbs span { color: var(--accent); }
+
+.js-eyebrow {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  padding: 0.4rem 0.85rem;
+  border: 1px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  color: var(--accent-deep);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  font-weight: 700; text-transform: uppercase; letter-spacing: 0.16em;
+  margin-bottom: 1.5rem;
+}
+.js-eyebrow::before {
+  content: ""; width: 8px; height: 8px;
+  background: var(--pulse); border-radius: 50%;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--pulse) 25%, transparent);
+}
+
+.js-hero-grid {
+  display: grid; gap: 3rem;
+  grid-template-columns: 1fr;
+  align-items: end;
+}
+@media (min-width: 980px) {
+  .js-hero-grid { grid-template-columns: 1.3fr 1fr; gap: 4rem; }
+}
+
+.tick {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.18em;
+  color: var(--pulse); font-weight: 700;
+  margin: 0 0 1rem;
+  display: flex; align-items: center; gap: 0.6rem;
+}
+.tick::after {
+  content: ""; flex: 1; height: 1px;
+  background: linear-gradient(90deg, var(--pulse), transparent);
+}
+
+.js-hero h1 {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(2.7rem, 6vw, 4.8rem);
+  font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 30, "WONK" 1;
+  letter-spacing: -0.03em;
+  line-height: 0.96;
+  margin: 0;
+  max-width: 16ch;
+}
+.js-hero h1 strong {
+  font-weight: 600;
+  color: var(--accent-deep);
+  font-style: italic;
+  font-variation-settings: "opsz" 144, "SOFT" 100;
+}
+.js-hero h1 .deva {
+  display: block;
+  font-family: 'Tiro Devanagari Hindi', serif;
+  font-size: 0.42em;
+  font-style: normal;
+  color: var(--ink-mute);
+  margin-top: 0.6rem;
+}
+
+.js-hero .lede {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md); font-weight: 300;
+  line-height: 1.5; color: var(--ink-soft);
+  margin: 1.75rem 0 0; max-width: 50ch;
+}
+.js-hero .lede strong {
+  font-weight: 600; color: var(--ink);
+  background: linear-gradient(180deg, transparent 60%, color-mix(in srgb, var(--accent) 30%, transparent) 60%);
+  padding: 0 0.1em;
+}
+
+.engine-stack {
+  display: grid; gap: 0.75rem;
+}
+.engine-card {
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  padding: 1rem 1.25rem;
+  display: grid; grid-template-columns: auto 1fr; gap: 0.85rem;
+  align-items: baseline;
+  position: relative;
+}
+.engine-card::after {
+  content: ""; position: absolute; right: -4px; top: -4px;
+  width: 100%; height: 100%; border: 1px solid var(--accent); z-index: -1;
+}
+.engine-card .eng-no {
+  font-family: 'Fraunces', serif; font-style: italic;
+  font-size: 1.5rem; color: var(--accent);
+  font-variation-settings: "opsz" 144, "SOFT" 100;
+}
+.engine-card .eng-name {
+  font-family: 'Fraunces', serif; font-weight: 500;
+  font-size: 1.05rem; margin: 0; letter-spacing: -0.01em;
+}
+.engine-card .eng-spec {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs); color: var(--ink-mute);
+  text-transform: uppercase; letter-spacing: 0.12em;
+  margin: 0.25rem 0 0; grid-column: 2;
+}
+
+.js-cta-row {
+  margin-top: 2.25rem;
+  display: flex; gap: 0.75rem; flex-wrap: wrap;
+}
+.btn {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.7rem 1.1rem;
+  font-family: 'JetBrains Mono', monospace; font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.14em; font-weight: 700;
+  border: 1px solid var(--ink);
+  transition: background .15s, color .15s, transform .15s, box-shadow .15s;
+}
+.btn:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--ink); }
+.btn-primary { background: var(--accent); color: white; border-color: var(--accent); }
+.btn-ghost { background: transparent; color: var(--ink); }
+
+/* ==== STATS RIBBON · pulse line motif ==== */
+.js-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  background: var(--ink); color: var(--paper);
+  border-block: 2px solid var(--ink);
+  position: relative;
+}
+.js-stat {
+  padding: 1.5rem clamp(1rem, 2vw, 1.5rem);
+  border-right: 1px solid color-mix(in srgb, var(--paper) 18%, transparent);
+}
+.js-stat:last-child { border-right: 0; }
+.js-stat .num {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl); font-weight: 400;
+  letter-spacing: -0.04em;
+  font-variation-settings: "opsz" 144, "SOFT" 30;
+  display: block; line-height: 1; color: var(--accent);
+}
+.js-stat .lbl {
+  font-family: 'JetBrains Mono', monospace; font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.14em;
+  margin-top: 0.6rem; display: block;
+  color: color-mix(in srgb, var(--paper) 75%, transparent);
+}
+
+/* ==== ACT WRAPPER ==== */
+.act { padding-block: clamp(3rem, 5vw, 5rem); border-bottom: var(--hair); position: relative; }
+.act-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs); letter-spacing: 0.22em;
+  text-transform: uppercase; color: var(--accent);
+  font-weight: 700; margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 1rem;
+}
+.act-num::before { content: ""; width: 2.5rem; height: 1px; background: var(--accent); }
+.act h2 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl); font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 50, "WONK" 1;
+  letter-spacing: -0.025em; line-height: 1.05;
+  margin: 0 0 1.5rem; max-width: 22ch;
+}
+.act h2 em { font-style: italic; color: var(--accent); }
+
+/* ==== ACT 1 · PROBLEM (split with quote) ==== */
+.problem-grid { display: grid; gap: 2.5rem; grid-template-columns: 1fr; }
+@media (min-width: 880px) { .problem-grid { grid-template-columns: 1.1fr 1fr; gap: 4rem; align-items: start; } }
+.pain-stack { display: grid; gap: 0; }
+.pain-row {
+  display: grid; grid-template-columns: 5rem 1fr;
+  gap: 1.25rem; padding: 1.4rem 0;
+  border-bottom: var(--hair-soft);
+}
+.pain-row:first-child { padding-top: 0; }
+.pain-row:last-child { border-bottom: 0; }
+.pain-row .pn {
+  font-family: 'JetBrains Mono', monospace; font-size: 0.78rem;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--accent); font-weight: 700; padding-top: 0.3rem;
+}
+.pain-row h3 {
+  font-family: 'Fraunces', serif; font-weight: 500;
+  font-size: var(--t-md); margin: 0 0 0.4rem; letter-spacing: -0.01em;
+}
+.pain-row p { margin: 0; color: var(--ink-soft); font-size: var(--t-sm); line-height: 1.55; }
+
+.problem-aside {
+  border: 1px solid var(--ink);
+  padding: 1.75rem 1.75rem 1.75rem 2rem;
+  background: color-mix(in srgb, var(--accent) 6%, var(--paper));
+  position: relative;
+}
+.problem-aside::before {
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0;
+  width: 4px; background: var(--accent);
+}
+.problem-aside .label {
+  font-family: 'JetBrains Mono', monospace; font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.16em;
+  color: var(--accent-deep); font-weight: 700;
+  margin: 0 0 0.75rem;
+}
+.problem-aside blockquote {
+  font-family: 'Fraunces', serif; font-style: italic;
+  font-size: var(--t-md); line-height: 1.4;
+  margin: 0; color: var(--ink);
+  font-weight: 400;
+}
+.problem-aside cite {
+  display: block; font-style: normal;
+  font-family: 'JetBrains Mono', monospace; font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.14em;
+  color: var(--ink-mute); margin-top: 1rem;
+}
+
+/* ==== ACT 2 · THE THREE ENGINES (vertical timeline cards) ==== */
+.engines {
+  display: grid; gap: 0;
+  margin-top: 2rem;
+  position: relative;
+}
+.engines::before {
+  content: ""; position: absolute;
+  left: 1.4rem; top: 1rem; bottom: 1rem;
+  width: 1px; background: var(--accent);
+  opacity: 0.3;
+}
+.engine-block {
+  display: grid; grid-template-columns: 3rem 1fr;
+  gap: 1.5rem; padding: 1.75rem 0;
+  border-bottom: var(--hair-soft);
+  position: relative;
+}
+.engine-block:last-child { border-bottom: 0; }
+.engine-block .e-dot {
+  width: 2.8rem; height: 2.8rem;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem; font-weight: 700;
+  color: var(--accent);
+  position: relative; z-index: 2;
+}
+.engine-block h3 {
+  font-family: 'Fraunces', serif; font-weight: 500;
+  font-size: var(--t-lg); margin: 0 0 0.5rem;
+  letter-spacing: -0.015em; line-height: 1.1;
+}
+.engine-block h3 em { font-style: italic; color: var(--accent); }
+.engine-block .e-mech {
+  font-size: var(--t-sm); color: var(--ink-soft);
+  margin: 0 0 1rem; line-height: 1.55; max-width: 60ch;
+}
+.engine-block .e-spec {
+  display: flex; gap: 1.25rem; flex-wrap: wrap;
+  font-family: 'JetBrains Mono', monospace; font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--ink-mute);
+}
+.engine-block .e-spec span strong { color: var(--accent-deep); font-weight: 700; }
+
+/* ==== ACT 3 · EVIDENCE BASE (grid of sources) ==== */
+.evidence {
+  background: var(--paper-soft);
+}
+.evidence-grid {
+  display: grid; gap: 1px;
+  margin-top: 2rem;
+  background: var(--ink);
+  border: 1px solid var(--ink);
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { .evidence-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1080px) { .evidence-grid { grid-template-columns: repeat(3, 1fr); } }
+.ev-cell {
+  background: var(--paper);
+  padding: 1.25rem 1.4rem;
+}
+.ev-cell .ev-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs); text-transform: uppercase;
+  letter-spacing: 0.16em; color: var(--accent);
+  font-weight: 700; margin-bottom: 0.4rem;
+}
+.ev-cell h4 {
+  font-family: 'Fraunces', serif; font-weight: 500;
+  font-size: 1.05rem; margin: 0 0 0.4rem;
+  letter-spacing: -0.01em;
+}
+.ev-cell p {
+  margin: 0; font-size: var(--t-sm);
+  color: var(--ink-soft); line-height: 1.5;
+}
+
+/* ==== PROOF · dark, with deployment URLs ==== */
+.proof {
+  background: var(--ink); color: var(--paper);
+  padding-block: clamp(3rem, 5vw, 5rem);
+  position: relative; overflow: hidden;
+}
+.proof::before {
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 90% 10%, color-mix(in srgb, var(--accent) 30%, transparent), transparent 60%);
+  pointer-events: none;
+}
+.proof .frame { position: relative; }
+.proof h2 { color: var(--paper); }
+.proof h2 em { color: var(--accent); }
+.proof-grid {
+  display: grid; gap: 1rem; margin-top: 2rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { .proof-grid { grid-template-columns: repeat(2, 1fr); } }
+.proof-item {
+  border: 1px solid color-mix(in srgb, var(--paper) 30%, transparent);
+  padding: 1.5rem;
+  background: color-mix(in srgb, var(--paper) 5%, transparent);
+}
+.proof-item h3 {
+  font-family: 'Fraunces', serif; margin: 0 0 0.5rem;
+  font-size: var(--t-md); color: var(--accent);
+  font-weight: 500; letter-spacing: -0.01em;
+}
+.proof-item code {
+  font-family: 'JetBrains Mono', monospace; font-size: var(--t-xs);
+  color: color-mix(in srgb, var(--paper) 90%, transparent);
+  background: color-mix(in srgb, var(--paper) 8%, transparent);
+  padding: 0.15rem 0.4rem;
+}
+.proof-item p { margin: 0.5rem 0 0; color: color-mix(in srgb, var(--paper) 80%, transparent); font-size: var(--t-sm); }
+
+/* ==== STACK ==== */
+.stack { padding-block: clamp(3rem, 5vw, 5rem); border-bottom: var(--hair); }
+.stack-list {
+  display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.5rem;
+}
+.stack-tag {
+  padding: 0.5rem 0.9rem; border: 1px solid var(--ink);
+  font-family: 'JetBrains Mono', monospace; font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.14em; font-weight: 600;
+}
+
+/* ==== END CTA ==== */
+.endcta {
+  padding-block: clamp(3rem, 5vw, 5rem);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 10%, transparent), var(--paper));
+}
+.endcta .frame { display: grid; gap: 2rem; grid-template-columns: 1fr; }
+@media (min-width: 760px) { .endcta .frame { grid-template-columns: 2fr 1fr; align-items: end; } }
+.endcta h2 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl); font-weight: 300;
+  font-variation-settings: "opsz" 144, "SOFT" 100;
+  margin: 0 0 1rem; letter-spacing: -0.025em; line-height: 1.05;
+}
+.endcta h2 em {
+  font-style: italic; color: var(--accent);
+  background: linear-gradient(180deg, transparent 70%, color-mix(in srgb, var(--accent) 25%, transparent) 70%);
+}
+.endcta p { color: var(--ink-soft); margin: 0; max-width: 50ch; }
+.endcta .actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+
+.foot { background: var(--ink); color: var(--paper); }
+.foot .dot { color: var(--accent); }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topnav">
+  <div class="frame">
+    <div class="brand"><a href="../index.html">dmj<span class="dot">.</span>one</a></div>
+    <nav aria-label="Primary">
+      <ul>
+        <li><a href="../index.html#catalogue">Catalogue</a></li>
+        <li><a href="../index.html#manifesto">Manifesto</a></li>
+        <li><a href="../index.html#hire">Hire</a></li>
+        <li><a href="https://github.com/divyamohan1993/janani-suraksha" rel="noopener">GitHub</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ============ HERO ============ -->
+<section class="js-hero">
+  <div class="frame">
+    <p class="crumbs">
+      <a href="../index.html">Catalogue</a> /
+      <a href="../index.html#cat-bharat">Bharat-First</a> /
+      <span>Janani Suraksha</span>
+    </p>
+
+    <span class="js-eyebrow">No. 02 · Bharat-First · Maternal Health</span>
+
+    <div class="js-hero-grid">
+      <div>
+        <p class="tick">Live signal · India · 2026</p>
+        <h1>
+          Every <strong>23 minutes,</strong><br>
+          an Indian woman dies<br>
+          in childbirth.
+          <span class="deva">जननी सुरक्षा · Janani Suraksha</span>
+        </h1>
+        <p class="lede">
+          <strong>22,500 deaths a year.</strong> Most are preventable. India has 1.18 million ASHA workers walking village to village with a register and a pen. Janani Suraksha hands them three constant-time AI engines on the phone they already own. <strong>Predict the danger before it arrives.</strong>
+        </p>
+        <div class="js-cta-row">
+          <a class="btn btn-primary" href="https://janani-suraksha-pax2obvj3a-el.a.run.app" rel="noopener">Open the live app</a>
+          <a class="btn btn-ghost" href="https://github.com/divyamohan1993/janani-suraksha" rel="noopener">View source</a>
+          <a class="btn btn-ghost" href="#engines">The three engines</a>
+        </div>
+      </div>
+
+      <div class="engine-stack" aria-label="Engines at a glance">
+        <div class="engine-card">
+          <span class="eng-no">i.</span>
+          <div>
+            <h3 class="eng-name">Risk scoring</h3>
+            <p class="eng-spec">70,000 entries · &lt;5 ms · NFHS-5 calibrated</p>
+          </div>
+        </div>
+        <div class="engine-card">
+          <span class="eng-no">ii.</span>
+          <div>
+            <h3 class="eng-name">Referral routing</h3>
+            <p class="eng-spec">21 states · 2,823 blood banks · O(1) lookup</p>
+          </div>
+        </div>
+        <div class="engine-card">
+          <span class="eng-no">iii.</span>
+          <div>
+            <h3 class="eng-name">Anemia trajectory</h3>
+            <p class="eng-spec">7,480 profiles · learned index · 2,497 params</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATS ============ -->
+<section class="js-stats" aria-label="At a glance">
+  <div class="js-stat"><span class="num">22,500</span><span class="lbl">Deaths a year India can prevent</span></div>
+  <div class="js-stat"><span class="num">1.18M</span><span class="lbl">ASHA workers reached</span></div>
+  <div class="js-stat"><span class="num">3</span><span class="lbl">Constant-time AI engines</span></div>
+  <div class="js-stat"><span class="num">5</span><span class="lbl">Independent medical sources cross-validated</span></div>
+  <div class="js-stat"><span class="num">12</span><span class="lbl">Indian languages, voice input</span></div>
+</section>
+
+<!-- ============ ACT I · THE PROBLEM ============ -->
+<section class="act act-problem" aria-labelledby="prob-h">
+  <div class="frame">
+    <p class="act-num">Act I · The Problem</p>
+    <h2 id="prob-h">The deaths <em>are not</em> the mystery.<br>The early warning is.</h2>
+
+    <div class="problem-grid">
+      <ol class="pain-stack">
+        <li class="pain-row">
+          <span class="pn">Pain · 01</span>
+          <div>
+            <h3>The ASHA carries a register, not a model.</h3>
+            <p>1.18 million workers visit every pregnant woman every month. Their training is excellent. Their pen is honest. The question they cannot answer is which of these forty mothers is the next emergency.</p>
+          </div>
+        </li>
+        <li class="pain-row">
+          <span class="pn">Pain · 02</span>
+          <div>
+            <h3>The "nearest" hospital is the wrong question.</h3>
+            <p>The right hospital has a functional OT, a blood bank with the matching group, and a specialist on duty tonight. None of that fits on a roadside signboard.</p>
+          </div>
+        </li>
+        <li class="pain-row">
+          <span class="pn">Pain · 03</span>
+          <div>
+            <h3>Anemia is a slow bleed nobody plots.</h3>
+            <p>Hemoglobin trends across pregnancy. By the third trimester, the trajectory is a death sentence or a routine delivery. Today, nobody draws that line.</p>
+          </div>
+        </li>
+        <li class="pain-row">
+          <span class="pn">Pain · 04</span>
+          <div>
+            <h3>One free phone with one second of data.</h3>
+            <p>The tool has to run on the device the ASHA already owns. No GPU. No cloud round-trip. No assumptions about bandwidth or battery.</p>
+          </div>
+        </li>
+      </ol>
+
+      <aside class="problem-aside">
+        <p class="label">WHO · Maternal Health Position</p>
+        <blockquote>
+          "Most maternal deaths are preventable, as the health-care solutions to prevent or manage complications are well known."
+        </blockquote>
+        <cite>- World Health Organization · 2024</cite>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ACT II · THE THREE ENGINES ============ -->
+<section class="act" id="engines" aria-labelledby="eng-h">
+  <div class="frame">
+    <p class="act-num">Act II · The Promise</p>
+    <h2 id="eng-h">Three engines. Every answer in <em>under five milliseconds.</em></h2>
+    <p style="font-family:'Fraunces',serif;font-size:var(--t-md);color:var(--ink-soft);max-width:62ch;margin:0 0 1rem;">
+      Every prediction is a hash lookup. Nothing trains at runtime. The model lives in 33 megabytes baked into the container image, scales to zero, and answers before the next sentence finishes.
+    </p>
+
+    <div class="engines">
+      <article class="engine-block">
+        <div class="e-dot">i</div>
+        <div>
+          <h3>Engine one. <em>Multiplicative relative risk.</em></h3>
+          <p class="e-mech">
+            70,000 precomputed entries cover every realistic combination of twelve risk factors: age, parity, hemoglobin, blood pressure, gestational age, complication history, height, weight, more. A single hash returns Low, Medium, High or Critical. Every weight is cross-validated against five independent published sources.
+          </p>
+          <p class="e-spec">
+            <span><strong>70,000</strong> entries</span>
+            <span><strong>&lt;5 ms</strong> response</span>
+            <span><strong>33 MB</strong> on disk</span>
+            <span><strong>NFHS-5 · WHO · Cochrane · Lancet · ACOG</strong></span>
+          </p>
+        </div>
+      </article>
+
+      <article class="engine-block">
+        <div class="e-dot">ii</div>
+        <div>
+          <h3>Engine two. <em>Functional referral routing.</em></h3>
+          <p class="e-mech">
+            Real facilities from data.gov.in National Hospital Directory, with geocoordinates. 2,823 blood banks. Twenty-one states and two union territories. A precomputed spatial index per capability level returns the nearest hospital that has the OT, the specialist and the matching blood. Google Maps opens with one tap for navigation.
+          </p>
+          <p class="e-spec">
+            <span><strong>21</strong> states</span>
+            <span><strong>2,823</strong> blood banks</span>
+            <span><strong>O(1)</strong> primary lookup</span>
+            <span><strong>data.gov.in</strong> source</span>
+          </p>
+        </div>
+      </article>
+
+      <article class="engine-block">
+        <div class="e-dot">iii</div>
+        <div>
+          <h3>Engine three. <em>Anemia trajectory, learned.</em></h3>
+          <p class="e-mech">
+            A two-layer MLP (5 to 64 to 32 to 1, 2,497 parameters) predicts the position in a sorted trajectory array. Constant time. The output is a sentence the ASHA can act on: "with 90 percent IFA compliance, hemoglobin improves from 7.2 to 9.8 g/dL." Inspired by Kraska et al. learned indices, applied to maternal hematology.
+          </p>
+          <p class="e-spec">
+            <span><strong>7,480</strong> trajectories</span>
+            <span><strong>2,497</strong> parameters</span>
+            <span><strong>O(1)</strong> position lookup</span>
+            <span><strong>WHO-calibrated</strong> physiological model</span>
+          </p>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ACT III · EVIDENCE BASE ============ -->
+<section class="act evidence" aria-labelledby="ev-h">
+  <div class="frame">
+    <p class="act-num">Act III · The Evidence</p>
+    <h2 id="ev-h">Every weight in this model has a <em>citation</em> behind it.</h2>
+    <p style="font-family:'Fraunces',serif;font-size:var(--t-md);color:var(--ink-soft);max-width:60ch;margin:0;">
+      Risk in pregnancy is not a guess. It is a literature problem. Janani Suraksha pulls from twelve risk factors, cross-validates every coefficient against five independent sources, and refuses to ship a number that no one published.
+    </p>
+
+    <div class="evidence-grid">
+      <div class="ev-cell"><p class="ev-tag">Source · 01</p><h4>NFHS-5</h4><p>National Family Health Survey 2019-21. Indian baseline rates for parity, anemia prevalence, and antenatal coverage.</p></div>
+      <div class="ev-cell"><p class="ev-tag">Source · 02</p><h4>WHO Position</h4><p>Maternal mortality framework, anemia thresholds, eclampsia management protocols.</p></div>
+      <div class="ev-cell"><p class="ev-tag">Source · 03</p><h4>Cochrane Reviews</h4><p>Systematic review weights for IFA supplementation, blood pressure intervention, and gestational diabetes.</p></div>
+      <div class="ev-cell"><p class="ev-tag">Source · 04</p><h4>Lancet Series</h4><p>Maternal Health Series for relative risk coefficients on age, complication history, and BMI.</p></div>
+      <div class="ev-cell"><p class="ev-tag">Source · 05</p><h4>ACOG Guidelines</h4><p>American College of Obstetricians for cross-validation against high-income clinical practice.</p></div>
+      <div class="ev-cell"><p class="ev-tag">Source · 06</p><h4>data.gov.in</h4><p>National Hospital Directory with geocoordinates, plus 2,823 blood banks. Government of India, Ministry of Health and Family Welfare.</p></div>
+      <div class="ev-cell"><p class="ev-tag">Source · 07</p><h4>SRS 2021-23</h4><p>Sample Registration System: maternal mortality ratio of 88 per 100,000 live births, the figure this product attacks.</p></div>
+      <div class="ev-cell"><p class="ev-tag">Source · 08</p><h4>Three Delays Framework</h4><p>The accepted obstetric delay model used across low and middle income countries to design interventions.</p></div>
+      <div class="ev-cell"><p class="ev-tag">Source · 09</p><h4>India Telemedicine 2020</h4><p>Practice guidelines: every prediction requires human clinical confirmation. The ASHA is in the loop. Always.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PROOF ============ -->
+<section class="proof act" aria-labelledby="proof-h">
+  <div class="frame">
+    <p class="act-num">Act IV · Proof</p>
+    <h2 id="proof-h">It already <em>runs.</em> In production. On scale-to-zero.</h2>
+
+    <div class="proof-grid">
+      <div class="proof-item">
+        <h3>Live · Cloud Run · asia-east1</h3>
+        <code>janani-suraksha-pax2obvj3a-el.a.run.app</code>
+        <p>FastAPI on Google Cloud Run. Min instances zero, scales to thousands. ~$0/month at low traffic, no GPU at runtime, no database round-trips.</p>
+      </div>
+      <div class="proof-item">
+        <h3>34 of 34 tests passing</h3>
+        <code>make test</code>
+        <p>Risk scoring, referral routing, anemia prediction, full API contract. Every endpoint covered. CI gates every commit.</p>
+      </div>
+      <div class="proof-item">
+        <h3>One-click Terraform deploy</h3>
+        <code>make deploy</code>
+        <p>Infrastructure as code. Cloud Run, Artifact Registry, IAM. New region in minutes. Tear down with <code>make destroy</code>.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Six security layers · TLS 1.3</h3>
+        <code>defense-in-depth</code>
+        <p>Cloud Run IAM. Sliding-window rate limiting. Pydantic strict input validation with medical ranges. CSP, CORS, security headers. Audit log per assessment. Non-root container.</p>
+      </div>
+      <div class="proof-item">
+        <h3>District Health Officer dashboard</h3>
+        <code>/dashboard</code>
+        <p>Aggregated risk distribution, hotspot identification, intervention effectiveness. The block-level view a CMO actually opens at 9 AM.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Voice input · 12 Indian languages</h3>
+        <code>/api/voice</code>
+        <p>The ASHA does not have to type. She speaks. Hindi, Bengali, Telugu, Marathi, Tamil, Gujarati, Kannada, Malayalam, Punjabi, Odia, Assamese, English.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STACK ============ -->
+<section class="stack" aria-labelledby="tech-h">
+  <div class="frame">
+    <p class="act-num">The Stack</p>
+    <h2 id="tech-h" style="font-size:var(--t-xl);font-weight:400;font-family:'Fraunces',serif;font-variation-settings:'opsz' 144,'SOFT' 50;margin:0;letter-spacing:-0.02em;">Production-grade. Scale-to-zero. <em>WCAG 2.2 AAA from line one.</em></h2>
+    <ul class="stack-list">
+      <li class="stack-tag">Python 3.12</li>
+      <li class="stack-tag">FastAPI</li>
+      <li class="stack-tag">Pydantic v2 (strict)</li>
+      <li class="stack-tag">Tailwind CSS</li>
+      <li class="stack-tag">Alpine.js</li>
+      <li class="stack-tag">Docker (multi-stage, non-root)</li>
+      <li class="stack-tag">Terraform</li>
+      <li class="stack-tag">Google Cloud Run</li>
+      <li class="stack-tag">Artifact Registry</li>
+      <li class="stack-tag">data.gov.in</li>
+      <li class="stack-tag">Google Maps API</li>
+      <li class="stack-tag">Telegram Bot API</li>
+      <li class="stack-tag">Learned-index MLP</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ END CTA ============ -->
+<section class="endcta" aria-labelledby="cta-h">
+  <div class="frame">
+    <div>
+      <h2 id="cta-h">If a million ASHA workers can use it, <em>your field team can too.</em></h2>
+      <p>I build constant-time, evidence-cited AI for the parts of India where bandwidth, devices and decisions are all scarce at once. Healthcare, agriculture, civic infrastructure. If your problem looks like that, let's talk.</p>
+    </div>
+    <div class="actions">
+      <a class="btn btn-primary" href="../index.html#hire">Hire me</a>
+      <a class="btn btn-ghost" href="../index.html">Back to catalogue</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="frame">
+    <div>
+      <h2 style="font-family:'Fraunces',serif;font-size:var(--t-xl);margin:0 0 1rem;">dmj<span class="dot">.</span>one</h2>
+      <p>Dream, Manifest and Journey, Together as One.</p>
+      <p class="meta">© 2026 Divya Mohan. Janani Suraksha is a research-grade prototype calibrated against published medical literature. Field validation in progress; every prediction requires human clinical confirmation per India Telemedicine Practice Guidelines 2020.</p>
+    </div>
+    <div>
+      <p class="meta">Catalogue</p>
+      <p><a href="../index.html#catalogue">All 47 products</a></p>
+      <p><a href="../index.html#cat-bharat">Bharat-First</a></p>
+      <p><a href="../index.html#hire">Hire</a></p>
+    </div>
+    <div>
+      <p class="meta">Janani Suraksha</p>
+      <p><a href="https://janani-suraksha-pax2obvj3a-el.a.run.app" rel="noopener">Live app</a></p>
+      <p><a href="https://janani-suraksha-pax2obvj3a-el.a.run.app/dashboard" rel="noopener">DHO dashboard</a></p>
+      <p><a href="https://github.com/divyamohan1993/janani-suraksha" rel="noopener">Source</a></p>
+      <p><a href="mailto:contact@dmj.one">contact@dmj.one</a></p>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

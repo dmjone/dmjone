@@ -1,0 +1,881 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#7a2c5e">
+<meta name="color-scheme" content="light">
+
+<title>SentinelCloud · Five agents. Seven scenarios. Zero hallucinated kubectl. · dmj.one</title>
+<meta name="description" content="An autonomous DevOps engineer that closes the SRE loop end to end. Adversarial debate, blast-radius gating, calibrated confidence. Twelve research gaps closed in code.">
+<meta property="og:title" content="SentinelCloud · One closed loop. Five agents. Zero hallucinated kubectl.">
+<meta property="og:description" content="An autonomous DevOps engineer with adversarial debate, blast-radius gating and calibrated confidence. Live at sentinelcloud.dmj.one.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,30..100&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="../assets/core.css">
+
+<style>
+:root {
+  --accent: var(--c-ai); --accent-deep: #4a1a3a;
+  --term-bg: #0d1117; --term-border: #1f2530;
+  --term-fg: #c8d6e5;
+  --sev-crit: #ff4654;
+  --sev-high: #ff9933;
+  --sev-med: #ffd166;
+  --sev-low: #5cdb8a;
+  --gate-pass: #5cdb8a;
+  --gate-fail: #ff4654;
+}
+body { background: var(--paper); }
+
+/* ====== HERO · pager / on-call screen =========================== */
+.sc-hero {
+  position: relative;
+  padding-block: clamp(3rem, 5vw + 1rem, 6rem) clamp(2rem, 4vw, 4rem);
+  border-bottom: var(--hair);
+  overflow: hidden;
+  background: var(--paper);
+}
+.sc-hero::before {
+  content: ""; position: absolute; inset: 0;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 31px, color-mix(in srgb, var(--ink) 5%, transparent) 31px 32px),
+    repeating-linear-gradient(90deg, transparent 0 31px, color-mix(in srgb, var(--ink) 5%, transparent) 31px 32px);
+  mask: linear-gradient(180deg, black, transparent 80%);
+  -webkit-mask: linear-gradient(180deg, black, transparent 80%);
+  pointer-events: none;
+}
+.sc-hero .frame { position: relative; z-index: 2; }
+
+.crumbs {
+  font-family: 'JetBrains Mono', monospace; font-size: var(--t-xs);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink-mute); margin: 0 0 1.5rem;
+  display: flex; gap: 0.5rem; flex-wrap: wrap;
+}
+.crumbs a { border-bottom: 1px solid var(--ink-mute); padding-bottom: 1px; }
+.crumbs a:hover { color: var(--accent); border-color: var(--accent); }
+.crumbs span { color: var(--accent); }
+
+.sc-eyebrow {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  padding: 0.4rem 0.85rem;
+  border: 1px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  color: var(--accent-deep);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs); font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.16em;
+  margin-bottom: 1.5rem;
+}
+.sc-eyebrow::before {
+  content: ""; width: 8px; height: 8px;
+  background: var(--sev-crit); border-radius: 50%;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--sev-crit) 25%, transparent);
+}
+
+.sc-hero-grid {
+  display: grid; gap: 3rem; grid-template-columns: 1fr;
+  align-items: end;
+}
+@media (min-width: 980px) { .sc-hero-grid { grid-template-columns: 1.15fr 1fr; gap: 4rem; } }
+
+.sc-hero h1 {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(2.4rem, 5.5vw, 4.6rem);
+  font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 30, "WONK" 1;
+  letter-spacing: -0.03em; line-height: 0.96;
+  margin: 0; max-width: 16ch;
+}
+.sc-hero h1 em {
+  font-style: italic; color: var(--accent);
+  font-variation-settings: "opsz" 144, "SOFT" 100, "WONK" 1;
+}
+
+.sc-hero .lede {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md); font-weight: 300;
+  line-height: 1.5; color: var(--ink-soft);
+  margin: 1.75rem 0 0; max-width: 56ch;
+}
+.sc-hero .lede strong {
+  font-weight: 600; color: var(--ink);
+  background: linear-gradient(180deg, transparent 60%, color-mix(in srgb, var(--accent) 30%, transparent) 60%);
+  padding: 0 0.1em;
+}
+
+/* ===== Alert feed terminal ===== */
+.alert-feed {
+  border: 2px solid var(--ink);
+  background: var(--term-bg);
+  color: var(--term-fg);
+  font-family: 'JetBrains Mono', monospace;
+  position: relative;
+  box-shadow: 8px 8px 0 var(--accent);
+}
+.alert-head {
+  padding: 0.65rem 0.95rem;
+  background: #060a10;
+  border-bottom: 1px solid var(--term-border);
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 0.7rem; text-transform: uppercase;
+  letter-spacing: 0.16em; font-weight: 700;
+  color: color-mix(in srgb, white 70%, transparent);
+}
+.alert-head .nav-dots { display:flex; gap:0.35rem; }
+.alert-head .nav-dots i { width:10px; height:10px; border-radius:50%; background:#3b4250; display:inline-block; }
+.alert-head .nav-dots i:nth-child(1) { background: var(--sev-crit); }
+.alert-head .nav-dots i:nth-child(2) { background: var(--sev-high); }
+.alert-head .nav-dots i:nth-child(3) { background: var(--sev-low); }
+.alert-list { padding: 0.8rem 0; }
+.alert-item {
+  padding: 0.55rem 1rem;
+  border-bottom: 1px solid color-mix(in srgb, white 8%, transparent);
+  display: grid; grid-template-columns: 5.5rem 4.5rem 1fr;
+  gap: 0.6rem; align-items: baseline;
+  font-size: 0.74rem;
+}
+.alert-item:last-child { border-bottom: 0; }
+.alert-item .ts { color: color-mix(in srgb, white 50%, transparent); }
+.alert-item .sev {
+  text-transform: uppercase; letter-spacing: 0.12em;
+  font-weight: 700; font-size: 0.65rem;
+}
+.alert-item .sev.crit { color: var(--sev-crit); }
+.alert-item .sev.high { color: var(--sev-high); }
+.alert-item .sev.med { color: var(--sev-med); }
+.alert-item .sev.low { color: var(--sev-low); }
+.alert-item .msg { color: color-mix(in srgb, white 92%, transparent); }
+.alert-item .msg em {
+  font-style: normal; color: var(--accent);
+  font-weight: 600;
+}
+.alert-foot {
+  border-top: 1px solid var(--term-border);
+  padding: 0.7rem 1rem;
+  font-size: 0.68rem;
+  color: color-mix(in srgb, white 60%, transparent);
+  text-transform: uppercase; letter-spacing: 0.14em;
+  display: flex; justify-content: space-between;
+}
+.alert-foot strong { color: var(--gate-pass); }
+
+.sc-cta-row { margin-top: 2.25rem; display: flex; gap: 0.75rem; flex-wrap: wrap; }
+.btn {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.7rem 1.1rem;
+  font-family: 'JetBrains Mono', monospace; font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.14em; font-weight: 700;
+  border: 1px solid var(--ink);
+  transition: background .15s, color .15s, transform .15s, box-shadow .15s;
+}
+.btn:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--ink); }
+.btn-primary { background: var(--accent); color: white; border-color: var(--accent); }
+.btn-ghost { background: transparent; color: var(--ink); }
+
+/* ====== STATS ============================================ */
+.sc-stats {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  background: var(--ink); color: var(--paper);
+  border-block: 2px solid var(--ink);
+}
+.sc-stat { padding: 1.5rem clamp(1rem, 2vw, 1.5rem); border-right: 1px solid color-mix(in srgb, var(--paper) 18%, transparent); }
+.sc-stat:last-child { border-right: 0; }
+.sc-stat .num {
+  font-family: 'Fraunces', serif; font-size: var(--t-2xl);
+  font-weight: 400; letter-spacing: -0.04em;
+  font-variation-settings: "opsz" 144, "SOFT" 30;
+  display: block; line-height: 1; color: var(--accent);
+}
+.sc-stat .lbl {
+  font-family: 'JetBrains Mono', monospace; font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.14em;
+  margin-top: 0.6rem; display: block;
+  color: color-mix(in srgb, var(--paper) 75%, transparent);
+}
+
+/* ====== ACT ============================================== */
+.act { padding-block: clamp(3rem, 5vw, 5rem); border-bottom: var(--hair); position: relative; }
+.act-num {
+  font-family: 'JetBrains Mono', monospace; font-size: var(--t-xs);
+  letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--accent); font-weight: 700;
+  margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 1rem;
+}
+.act-num::before { content: ""; width: 2.5rem; height: 1px; background: var(--accent); }
+.act h2 {
+  font-family: 'Fraunces', serif; font-size: var(--t-2xl);
+  font-weight: 400; font-variation-settings: "opsz" 144, "SOFT" 50, "WONK" 1;
+  letter-spacing: -0.025em; line-height: 1.05;
+  margin: 0 0 1.5rem; max-width: 24ch;
+}
+.act h2 em { font-style: italic; color: var(--accent); }
+
+/* === ACT 1 · single-LLM problem === */
+.gap-grid { display: grid; gap: 2.5rem; grid-template-columns: 1fr; }
+@media (min-width: 880px) { .gap-grid { grid-template-columns: 1.1fr 1fr; gap: 4rem; align-items: start; } }
+.gap-stack { display: grid; gap: 0; }
+.gap-row {
+  display: grid; grid-template-columns: 5rem 1fr; gap: 1.25rem;
+  padding: 1.4rem 0; border-bottom: var(--hair-soft);
+}
+.gap-row:first-child { padding-top: 0; }
+.gap-row:last-child { border-bottom: 0; }
+.gap-row .pn {
+  font-family: 'JetBrains Mono', monospace; font-size: 0.78rem;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--accent); font-weight: 700; padding-top: 0.3rem;
+}
+.gap-row h3 {
+  font-family: 'Fraunces', serif; font-weight: 500;
+  font-size: var(--t-md); margin: 0 0 0.4rem; letter-spacing: -0.01em;
+}
+.gap-row p { margin: 0; color: var(--ink-soft); font-size: var(--t-sm); line-height: 1.55; }
+
+/* mentor / capstone block */
+.capstone-side {
+  border: 1px solid var(--ink);
+  padding: 1.5rem 1.5rem 1.5rem 1.75rem;
+  background: color-mix(in srgb, var(--accent) 6%, var(--paper));
+  position: relative;
+}
+.capstone-side::before {
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0;
+  width: 4px; background: var(--accent);
+}
+.capstone-side .label {
+  font-family: 'JetBrains Mono', monospace; font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.16em;
+  color: var(--accent-deep); font-weight: 700;
+  margin: 0 0 0.75rem;
+}
+.capstone-side h4 {
+  font-family: 'Fraunces', serif; font-weight: 500;
+  font-size: 1.15rem; margin: 0 0 0.5rem; letter-spacing: -0.01em;
+}
+.capstone-side p { font-size: var(--t-sm); color: var(--ink-soft); margin: 0 0 0.5rem; line-height: 1.5; }
+.capstone-side .seal {
+  margin-top: 0.85rem; padding-top: 0.85rem;
+  border-top: var(--hair-soft);
+  font-family: 'JetBrains Mono', monospace; font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.14em;
+  color: var(--ink-mute);
+}
+.capstone-side .seal strong { color: var(--accent-deep); }
+
+/* === ACT 2 · five agents arguing === */
+.debate {
+  margin-top: 2rem;
+  border: 1px solid var(--ink);
+  background: var(--term-bg); color: var(--term-fg);
+  font-family: 'JetBrains Mono', monospace;
+  padding: 1.4rem 1.4rem 1.6rem;
+}
+.debate-head {
+  font-size: 0.7rem; text-transform: uppercase;
+  letter-spacing: 0.18em; font-weight: 700;
+  color: color-mix(in srgb, white 65%, transparent);
+  margin-bottom: 1rem; padding-bottom: 0.6rem;
+  border-bottom: 1px solid var(--term-border);
+  display: flex; justify-content: space-between; flex-wrap: wrap;
+}
+.debate-head .scen { color: var(--accent); }
+.turn {
+  display: grid; grid-template-columns: 8.5rem 1fr; gap: 0.85rem;
+  padding: 0.7rem 0;
+  border-bottom: 1px dashed color-mix(in srgb, white 8%, transparent);
+  font-size: 0.78rem;
+  align-items: baseline;
+}
+.turn:last-child { border-bottom: 0; }
+.turn .who {
+  font-size: 0.7rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.12em;
+}
+.turn .who.analyst { color: #5cdbff; }
+.turn .who.devil { color: #ff7b6c; }
+.turn .who.safety { color: #c8b8ff; }
+.turn .who.strategist { color: var(--sev-low); }
+.turn .who.verifier { color: #ffd166; }
+.turn .who.critic { color: var(--accent); }
+.turn .say { color: color-mix(in srgb, white 92%, transparent); line-height: 1.55; }
+.turn .say em { font-style: normal; color: var(--accent); font-weight: 600; }
+.turn .conf {
+  display: inline-block;
+  padding: 0.05rem 0.4rem;
+  background: color-mix(in srgb, var(--gate-pass) 18%, transparent);
+  color: var(--gate-pass);
+  font-size: 0.65rem; letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-left: 0.4rem;
+}
+
+/* === ACT 3 · gate-by-gate decision flow === */
+.gates {
+  margin-top: 2rem;
+  display: grid; gap: 0.5rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { .gates { grid-template-columns: repeat(4, 1fr); gap: 0.75rem; } }
+.gate {
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  padding: 1.25rem 1.3rem;
+  position: relative;
+  display: grid; gap: 0.4rem;
+  align-content: start;
+}
+.gate .stage {
+  font-family: 'JetBrains Mono', monospace; font-size: 0.7rem;
+  text-transform: uppercase; letter-spacing: 0.16em;
+  color: var(--accent); font-weight: 700;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.gate .stage span.pass {
+  background: var(--gate-pass); color: #073b1c;
+  padding: 0.05rem 0.4rem;
+  font-size: 0.65rem; font-weight: 700;
+  letter-spacing: 0.08em;
+  border: 1px solid #2a5a3a;
+}
+.gate h3 {
+  font-family: 'Fraunces', serif; font-weight: 500;
+  font-size: 1.05rem; margin: 0;
+  letter-spacing: -0.01em; line-height: 1.15;
+}
+.gate h3 em { font-style: italic; color: var(--accent); }
+.gate p { margin: 0; font-size: 0.82rem; color: var(--ink-soft); line-height: 1.5; }
+.gate .meta {
+  font-family: 'JetBrains Mono', monospace; font-size: 0.66rem;
+  text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--ink-mute); margin-top: 0.4rem;
+}
+.gate-arrow {
+  display: none;
+}
+
+/* === ACT 4 · scenario gallery === */
+.scenarios {
+  background: var(--paper-soft);
+}
+.scen-grid {
+  margin-top: 2rem;
+  border: 1px solid var(--ink);
+  background: var(--ink);
+  display: grid; gap: 1px;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { .scen-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1080px) { .scen-grid { grid-template-columns: repeat(3, 1fr); } }
+.scen {
+  background: var(--paper);
+  padding: 1.2rem 1.4rem;
+  display: grid; gap: 0.4rem; align-content: start;
+}
+.scen .id {
+  font-family: 'JetBrains Mono', monospace; font-size: 0.7rem;
+  text-transform: uppercase; letter-spacing: 0.18em;
+  color: var(--accent); font-weight: 700;
+  display: flex; justify-content: space-between;
+}
+.scen .id .sev {
+  font-size: 0.65rem; padding: 0.05rem 0.4rem;
+  border: 1px solid currentColor; letter-spacing: 0.1em;
+}
+.scen .id .sev.crit { color: var(--sev-crit); }
+.scen .id .sev.high { color: #c46e10; }
+.scen .id .sev.med { color: #8a6a14; }
+.scen h4 {
+  font-family: 'Fraunces', serif; font-weight: 500;
+  font-size: 1.05rem; margin: 0; letter-spacing: -0.01em;
+}
+.scen p { margin: 0; font-size: 0.83rem; color: var(--ink-soft); line-height: 1.5; }
+.scen .gt {
+  font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;
+  text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--accent-deep);
+  border-top: 1px dashed color-mix(in srgb, var(--ink) 25%, transparent);
+  padding-top: 0.5rem; margin-top: 0.3rem;
+}
+.scen .gt strong { color: var(--ink); }
+
+/* === PROOF (KPIs) === */
+.proof { background: var(--ink); color: var(--paper); padding-block: clamp(3rem, 5vw, 5rem); position: relative; overflow: hidden; }
+.proof::before {
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 90% 10%, color-mix(in srgb, var(--accent) 30%, transparent), transparent 60%);
+  pointer-events: none;
+}
+.proof .frame { position: relative; }
+.proof h2 { color: var(--paper); }
+.proof h2 em { color: var(--accent); }
+.kpi-grid {
+  display: grid; gap: 1rem; margin-top: 2rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1080px) { .kpi-grid { grid-template-columns: repeat(3, 1fr); } }
+.kpi {
+  border: 1px solid color-mix(in srgb, var(--paper) 30%, transparent);
+  padding: 1.4rem 1.5rem;
+  background: color-mix(in srgb, var(--paper) 5%, transparent);
+}
+.kpi h3 {
+  font-family: 'Fraunces', serif; margin: 0 0 0.35rem;
+  font-size: 1.1rem; color: var(--accent);
+  font-weight: 500; letter-spacing: -0.01em;
+}
+.kpi .target {
+  font-family: 'JetBrains Mono', monospace; font-size: 0.7rem;
+  text-transform: uppercase; letter-spacing: 0.14em;
+  color: color-mix(in srgb, var(--paper) 70%, transparent);
+  margin-bottom: 0.4rem;
+}
+.kpi .target strong { color: var(--gate-pass); }
+.kpi p { margin: 0; color: color-mix(in srgb, var(--paper) 80%, transparent); font-size: 0.83rem; line-height: 1.5; }
+
+/* === STACK === */
+.stack { padding-block: clamp(3rem, 5vw, 5rem); border-bottom: var(--hair); }
+.stack-list { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.5rem; }
+.stack-tag {
+  padding: 0.5rem 0.9rem; border: 1px solid var(--ink);
+  font-family: 'JetBrains Mono', monospace; font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.14em; font-weight: 600;
+}
+
+/* === END CTA === */
+.endcta {
+  padding-block: clamp(3rem, 5vw, 5rem);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 10%, transparent), var(--paper));
+}
+.endcta .frame { display: grid; gap: 2rem; grid-template-columns: 1fr; }
+@media (min-width: 760px) { .endcta .frame { grid-template-columns: 2fr 1fr; align-items: end; } }
+.endcta h2 {
+  font-family: 'Fraunces', serif; font-size: var(--t-2xl);
+  font-weight: 300; font-variation-settings: "opsz" 144, "SOFT" 100;
+  margin: 0 0 1rem; letter-spacing: -0.025em; line-height: 1.05;
+}
+.endcta h2 em {
+  font-style: italic; color: var(--accent);
+  background: linear-gradient(180deg, transparent 70%, color-mix(in srgb, var(--accent) 25%, transparent) 70%);
+}
+.endcta p { color: var(--ink-soft); margin: 0; max-width: 52ch; }
+.endcta .actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+
+.foot { background: var(--ink); color: var(--paper); }
+.foot .dot { color: var(--accent); }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topnav">
+  <div class="frame">
+    <div class="brand"><a href="../index.html">dmj<span class="dot">.</span>one</a></div>
+    <nav aria-label="Primary">
+      <ul>
+        <li><a href="../index.html#catalogue">Catalogue</a></li>
+        <li><a href="../index.html#manifesto">Manifesto</a></li>
+        <li><a href="../index.html#hire">Hire</a></li>
+        <li><a href="https://github.com/Code-with-ME-Rohit/sentinelcloud" rel="noopener">GitHub</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ============ HERO ============ -->
+<section class="sc-hero">
+  <div class="frame">
+    <p class="crumbs">
+      <a href="../index.html">Catalogue</a> /
+      <a href="../index.html#cat-ai">AI · Agents</a> /
+      <span>SentinelCloud</span>
+    </p>
+
+    <span class="sc-eyebrow">Capstone · AI Agents · Cloud · DevOps</span>
+
+    <div class="sc-hero-grid">
+      <div>
+        <h1>
+          One closed loop.<br>
+          Five agents.<br>
+          <em>Zero hallucinated kubectl.</em>
+        </h1>
+        <p class="lede">
+          A single LLM wired to a tool registry hits 30 to 40 percent on real incident traces and confidently deletes the wrong pod. SentinelCloud picks the boring fight. <strong>Build the missing structure, measure everything, keep the demo deterministic.</strong>
+        </p>
+        <div class="sc-cta-row">
+          <a class="btn btn-primary" href="https://sentinelcloud.dmj.one" rel="noopener">Open the live demo</a>
+          <a class="btn btn-ghost" href="https://github.com/Code-with-ME-Rohit/sentinelcloud" rel="noopener">View source</a>
+          <a class="btn btn-ghost" href="#agents">See the debate</a>
+        </div>
+      </div>
+
+      <aside class="alert-feed" aria-label="On-call alert feed">
+        <header class="alert-head">
+          <span>SRE · ON-CALL · feed</span>
+          <span class="nav-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+        </header>
+        <div class="alert-list">
+          <div class="alert-item">
+            <span class="ts">02:14:08</span>
+            <span class="sev crit">Crit</span>
+            <span class="msg">payments-api v2.4 · OOM · <em>memleak</em></span>
+          </div>
+          <div class="alert-item">
+            <span class="ts">02:14:11</span>
+            <span class="sev high">High</span>
+            <span class="msg">orders-db · pool exhausted · <em>dbpool</em></span>
+          </div>
+          <div class="alert-item">
+            <span class="ts">02:14:18</span>
+            <span class="sev crit">Crit</span>
+            <span class="msg">CVE-2026-30412 in libcrypto-flex · <em>cve</em></span>
+          </div>
+          <div class="alert-item">
+            <span class="ts">02:14:24</span>
+            <span class="sev med">Med</span>
+            <span class="msg">reports-batch over-provisioned 6× · <em>finops</em></span>
+          </div>
+          <div class="alert-item">
+            <span class="ts">02:14:31</span>
+            <span class="sev high">High</span>
+            <span class="msg">manual mesh-weight change · <em>drift</em></span>
+          </div>
+          <div class="alert-item">
+            <span class="ts">02:14:42</span>
+            <span class="sev high">High</span>
+            <span class="msg">layer-7 traffic anomaly · one ASN · <em>ddos</em></span>
+          </div>
+        </div>
+        <footer class="alert-foot">
+          <span>seven scenarios</span>
+          <strong>auto-triage live</strong>
+        </footer>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATS ============ -->
+<section class="sc-stats" aria-label="At a glance">
+  <div class="sc-stat"><span class="num">5</span><span class="lbl">Agents · adversarial debate</span></div>
+  <div class="sc-stat"><span class="num">7</span><span class="lbl">Seeded scenarios · byte-for-byte</span></div>
+  <div class="sc-stat"><span class="num">12</span><span class="lbl">Research gaps closed in code</span></div>
+  <div class="sc-stat"><span class="num">7</span><span class="lbl">KPIs · every one defined</span></div>
+  <div class="sc-stat"><span class="num">&lt; 60 s</span><span class="lbl">Rollback any release</span></div>
+</section>
+
+<!-- ============ ACT I · WHY ============ -->
+<section class="act act-problem" aria-labelledby="prob-h">
+  <div class="frame">
+    <p class="act-num">Act I · The Problem</p>
+    <h2 id="prob-h">A single LLM is <em>a junior intern</em><br>with a credit card.</h2>
+
+    <div class="gap-grid">
+      <ol class="gap-stack">
+        <li class="gap-row">
+          <span class="pn">Pain · 01</span>
+          <div>
+            <h3>One model does not have an adversary.</h3>
+            <p>AIOpsLab, ITBench, RCAEval, AutoSRE all report the same number on real traces: 30 to 40 percent. The agent is fluent. The agent is wrong. There is no second voice in the room.</p>
+          </div>
+        </li>
+        <li class="gap-row">
+          <span class="pn">Pain · 02</span>
+          <div>
+            <h3>Tool calls are hallucinated.</h3>
+            <p>The model invents a flag the kubectl binary has never seen. Without a verifier checking every proposed call against a typed schema, the action lands and the page goes red.</p>
+          </div>
+        </li>
+        <li class="gap-row">
+          <span class="pn">Pain · 03</span>
+          <div>
+            <h3>Blast radius is invisible.</h3>
+            <p>"Restart this pod" is one command. It might also take down forty downstream services. Without a graph search before the action runs, the engineer ships the pager along with the fix.</p>
+          </div>
+        </li>
+        <li class="gap-row">
+          <span class="pn">Pain · 04</span>
+          <div>
+            <h3>Confidence is uncalibrated.</h3>
+            <p>The model says "high confidence" and is wrong. The system has to know when to auto-act, when to pause for a human, and when to refuse to ship. That decision has to be in code, not in a vibe.</p>
+          </div>
+        </li>
+        <li class="gap-row">
+          <span class="pn">Pain · 05</span>
+          <div>
+            <h3>Reproducibility is below 40 percent.</h3>
+            <p>Every paper benchmarks a different way, on a different fixture, with a different LLM. The numbers do not compose. A reviewer cannot replay the run.</p>
+          </div>
+        </li>
+      </ol>
+
+      <aside class="capstone-side">
+        <p class="label">Capstone · Final Semester</p>
+        <h4>Built by Rohit Kumar</h4>
+        <p>Reg. No. <strong>GF202220522</strong>. B.Tech CSE (Cloud Computing), Yogananda School of AI, Computers and Data Sciences, Shoolini University, Solan, H.P.</p>
+        <p>Twelve research gaps. Five agents. Seven seeded scenarios. Three gates. Seven KPIs. Every claim has a code path. Every code path has a measurement.</p>
+        <p class="seal">Capstone Mentor: <strong>Dr. Kritika Rana</strong> · Engineering and deploy partnership: <strong>dmj.one</strong> · Live: sentinelcloud.dmj.one</p>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ACT II · THE DEBATE ============ -->
+<section class="act" id="agents" aria-labelledby="ag-h">
+  <div class="frame">
+    <p class="act-num">Act II · The Promise</p>
+    <h2 id="ag-h">Five agents argue. <em>One verifier</em> writes the call.</h2>
+    <p style="font-family:'Fraunces',serif;font-size:var(--t-md);color:var(--ink-soft);max-width:62ch;margin:0;">
+      Every turn is a typed object with confidence, token count, and latency. The Devil's Advocate is contractually pinned to dissent. The Critic scores every tool call against a schema before dispatch. Group-think has no oxygen.
+    </p>
+
+    <div class="debate" aria-label="Sample agent debate · memleak scenario">
+      <header class="debate-head">
+        <span>orchestrator.run · trace=7c3a-9b0f</span>
+        <span class="scen">scenario: memleak · payments-api v2.4</span>
+      </header>
+      <div class="turn">
+        <span class="who analyst">Analyst</span>
+        <span class="say">RSS climbed 4.2 GB over 18 minutes. Heap profile says retainer in <em>v2.4</em> connection pool. Topology: payments-api → orders-db → fraud-check.<span class="conf">conf 0.82</span></span>
+      </div>
+      <div class="turn">
+        <span class="who devil">Devil's Advocate</span>
+        <span class="say">Counter-hypothesis: this could be cache warm-up after the morning deploy. Two prior false positives match this trace. Demand evidence the leak is <em>monotonic.</em><span class="conf">dissent quota +1</span></span>
+      </div>
+      <div class="turn">
+        <span class="who analyst">Analyst</span>
+        <span class="say">Verified · derivative is positive across nine consecutive intervals. Cache-warm hypothesis rejected. Leak is monotonic.<span class="conf">conf 0.91</span></span>
+      </div>
+      <div class="turn">
+        <span class="who strategist">Strategist</span>
+        <span class="say">Action: <em>rollback</em> to v2.3. Estimated cost delta -$0. Estimated downtime: 0 with blue-green.<span class="conf">conf 0.88</span></span>
+      </div>
+      <div class="turn">
+        <span class="who safety">Safety</span>
+        <span class="say">v2.3 was rolled out 36 days ago. CVE backlog clean. No blocking compliance flag for the rollback target.<span class="conf">policy.pass</span></span>
+      </div>
+      <div class="turn">
+        <span class="who critic">Critic</span>
+        <span class="say">Tool call <em>helm.rollback</em> validated against tool-card schema. Parameters resolve. Dispatch authorised.<span class="conf">tool.valid</span></span>
+      </div>
+      <div class="turn">
+        <span class="who verifier">Verifier</span>
+        <span class="say">Predicted post-action state: RSS plateau in 90 s, error rate to baseline in 4 min. Outcome confirmed at t+6 min · MTTR &lt; 5 min.<span class="conf">verified</span></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ACT III · GATES ============ -->
+<section class="act" aria-labelledby="gt-h">
+  <div class="frame">
+    <p class="act-num">Act III · The Gates</p>
+    <h2 id="gt-h">Four gates. <em>Every action passes them all,</em> in order.</h2>
+    <p style="font-family:'Fraunces',serif;font-size:var(--t-md);color:var(--ink-soft);max-width:64ch;margin:0;">
+      INGEST → ANALYZE → DEBATE → STRATEGIZE → CRITIC → SAFETY → VERIFY → POLICY GATE → CONFIDENCE GATE → AUTO_ACT or HITL_PAUSE → VERIFY OUTCOME → LEARN. The kill switches stay on at every phase of rollout.
+    </p>
+
+    <ol class="gates">
+      <li class="gate">
+        <p class="stage">Gate 01 <span class="pass">PASS</span></p>
+        <h3>Deterministic <em>policy.</em></h3>
+        <p>Compiled rules from the plain-English constitution. Hot path, cached. Allow-listed action verbs only.</p>
+        <p class="meta">policy/engine.ts</p>
+      </li>
+      <li class="gate">
+        <p class="stage">Gate 02 <span class="pass">PASS</span></p>
+        <h3>Semantic <em>policy judge.</em></h3>
+        <p>A dedicated LLM judges intent against the constitution. Catches the "regex-passes, intent-fails" class of incident.</p>
+        <p class="meta">policy/engine.ts · judge LLM</p>
+      </li>
+      <li class="gate">
+        <p class="stage">Gate 03 <span class="pass">PASS</span></p>
+        <h3>Blast-radius <em>cap.</em></h3>
+        <p>BFS over the dependency graph. 0 to 100 score. Above the cap, the action does not run · the page does.</p>
+        <p class="meta">agents/blast.ts · graph BFS</p>
+      </li>
+      <li class="gate">
+        <p class="stage">Gate 04 <span class="pass">PASS</span></p>
+        <h3>Calibration <em>threshold.</em></h3>
+        <p>Per-action-class confidence threshold. Below threshold, the run pauses and writes a human-on-the-loop summary.</p>
+        <p class="meta">agents/calibration.ts</p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============ ACT IV · SCENARIOS ============ -->
+<section class="act scenarios" aria-labelledby="sc-h">
+  <div class="frame">
+    <p class="act-num">Act IV · The Scenarios</p>
+    <h2 id="sc-h">Seven seeded fixtures. <em>Same fixture, same numbers.</em> Always.</h2>
+    <p style="font-family:'Fraunces',serif;font-size:var(--t-md);color:var(--ink-soft);max-width:62ch;margin:0;">
+      Ground-truth root cause and ground-truth action are encoded in every fixture so the orchestrator's choice is scored against an oracle. Set <code>SENTINEL_FORCE_STUB=1</code>, run any scenario twice, the numbers match.
+    </p>
+
+    <div class="scen-grid">
+      <article class="scen">
+        <p class="id"><span>memleak</span><span class="sev high">high</span></p>
+        <h4>Memory leak in payments-api v2.4</h4>
+        <p>Reliability. Heap retainer in the v2.4 connection pool. Adversary checks the cache-warm counter-hypothesis.</p>
+        <p class="gt">Ground truth · <strong>rollback</strong></p>
+      </article>
+      <article class="scen">
+        <p class="id"><span>dbpool</span><span class="sev high">high</span></p>
+        <h4>orders-db connection pool exhausted</h4>
+        <p>Reliability. Pool saturated. Pod restart pattern matches the historical recovery curve.</p>
+        <p class="gt">Ground truth · <strong>restart_pods</strong></p>
+      </article>
+      <article class="scen">
+        <p class="id"><span>cve</span><span class="sev crit">crit</span></p>
+        <h4>Zero-day CVE-2026-30412 · libcrypto-flex</h4>
+        <p>Security. WAF rule synthesised from the CVE description, validated against a replay corpus before activation.</p>
+        <p class="gt">Ground truth · <strong>waf_rule</strong></p>
+      </article>
+      <article class="scen">
+        <p class="id"><span>finops</span><span class="sev med">med</span></p>
+        <h4>reports-batch over-provisioned by 6×</h4>
+        <p>FinOps. Strategist walks the price · eviction · tolerance Pareto frontier. Right-size action signed against projected baseline.</p>
+        <p class="gt">Ground truth · <strong>right_size</strong></p>
+      </article>
+      <article class="scen">
+        <p class="id"><span>drift</span><span class="sev high">high</span></p>
+        <h4>Manual mesh-weight change detected</h4>
+        <p>Drift. Audit signal fires. Reverter opens a GitOps PR within the drift-latency target.</p>
+        <p class="gt">Ground truth · <strong>mesh_weight</strong></p>
+      </article>
+      <article class="scen">
+        <p class="id"><span>cascading</span><span class="sev crit">crit</span></p>
+        <h4>Cascading failure · fraud-check timeout</h4>
+        <p>Reliability. Blast-radius score climbs as the cascade walks the graph. Mesh weight isolates the failing leg.</p>
+        <p class="gt">Ground truth · <strong>mesh_weight</strong></p>
+      </article>
+      <article class="scen">
+        <p class="id"><span>ddos</span><span class="sev high">high</span></p>
+        <h4>Layer-7 anomaly · one ASN</h4>
+        <p>Security. WAF rule scoped to the offending ASN, not the whole edge. Replay corpus prevents collateral damage.</p>
+        <p class="gt">Ground truth · <strong>waf_rule</strong></p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PROOF · KPIs ============ -->
+<section class="proof act" aria-labelledby="proof-h">
+  <div class="frame">
+    <p class="act-num">Act V · KPIs</p>
+    <h2 id="proof-h">Seven KPIs. <em>Every one</em> defined, every one measured.</h2>
+
+    <div class="kpi-grid">
+      <article class="kpi">
+        <p class="target">Target · <strong>&lt; 5 min</strong></p>
+        <h3>MTTR (autonomous)</h3>
+        <p>Wall-clock from first signal to verifier-confirmed restoration. <code>finishedAt − startedAt</code> from the typed RunReport.</p>
+      </article>
+      <article class="kpi">
+        <p class="target">Target · <strong>&gt; 90%</strong></p>
+        <h3>Noise reduction</h3>
+        <p>Suppressed and auto-resolved alerts as a fraction of total alerts ingested, adjusted by blast score.</p>
+      </article>
+      <article class="kpi">
+        <p class="target">Target · <strong>&lt; 60 s</strong></p>
+        <h3>Drift latency</h3>
+        <p>Delta between the audit signal that detected the drift and the GitOps actuation that reverted it.</p>
+      </article>
+      <article class="kpi">
+        <p class="target">Target · <strong>&gt; 99.9%</strong></p>
+        <h3>Deployment success</h3>
+        <p>Rolling 30-day count of automated deployments without a follow-up rollback or hotfix. Persisted in Firestore episodes.</p>
+      </article>
+      <article class="kpi">
+        <p class="target">Target · <strong>&gt; 99%</strong></p>
+        <h3>Tool-call validity</h3>
+        <p>Critic verdicts per turn divided by total tool calls. Schema and parameter check fused from <code>AgentTurn.policyViolations</code>.</p>
+      </article>
+      <article class="kpi">
+        <p class="target">Target · <strong>&lt; 1%</strong></p>
+        <h3>Hallucination rate</h3>
+        <p>Verifier disagreement count over total verified runs, sampled at the confidence-gate phase.</p>
+      </article>
+      <article class="kpi">
+        <p class="target">Target · <strong>cumulative USD</strong></p>
+        <h3>Cost saved</h3>
+        <p>Sum of right-size, spot-migrate and feature-flag actions, signed against the projected baseline. The agent has to pay for itself.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STACK ============ -->
+<section class="stack" aria-labelledby="tech-h">
+  <div class="frame">
+    <p class="act-num">The Stack</p>
+    <h2 id="tech-h" style="font-size:var(--t-xl);font-weight:400;font-family:'Fraunces',serif;font-variation-settings:'opsz' 144,'SOFT' 50;margin:0;letter-spacing:-0.02em;">Single Cloud Run binary. <em>Reproducible by default.</em></h2>
+    <ul class="stack-list">
+      <li class="stack-tag">Next.js 15 (App Router)</li>
+      <li class="stack-tag">React 19</li>
+      <li class="stack-tag">TypeScript 5.5 strict</li>
+      <li class="stack-tag">Tailwind v4</li>
+      <li class="stack-tag">framer-motion (reduced-motion)</li>
+      <li class="stack-tag">Vertex AI · Gemini 2.5</li>
+      <li class="stack-tag">Anthropic · Claude Opus 4.7</li>
+      <li class="stack-tag">Deterministic stub gateway</li>
+      <li class="stack-tag">LangGraph-style state machine</li>
+      <li class="stack-tag">Firestore · embeddings + adjacency</li>
+      <li class="stack-tag">Secret Manager</li>
+      <li class="stack-tag">Cloud Logging · OpenTelemetry</li>
+      <li class="stack-tag">Cloud Run · asia-east1</li>
+      <li class="stack-tag">SSE streaming</li>
+      <li class="stack-tag">Workload Identity Federation</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ END CTA ============ -->
+<section class="endcta" aria-labelledby="cta-h">
+  <div class="frame">
+    <div>
+      <h2 id="cta-h">Need a partner who can ship · or a mentor who can guide a team to <em>ship the same way?</em></h2>
+      <p>If your application looks like an agent that has to argue with itself, gate every action, and prove the run was reproducible, the conversation starts the same way.</p>
+    </div>
+    <div class="actions">
+      <a class="btn btn-primary" href="../index.html#hire">Get in touch</a>
+      <a class="btn btn-ghost" href="../index.html">Back to catalogue</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="frame">
+    <div>
+      <h2 style="font-family:'Fraunces',serif;font-size:var(--t-xl);margin:0 0 1rem;">dmj<span class="dot">.</span>one</h2>
+      <p>Dream, Manifest and Journey, Together as One.</p>
+      <p class="meta">© 2026 Divya Mohan · SentinelCloud was built by Rohit Kumar as his B.Tech CSE (Cloud Computing) capstone at Shoolini University. Capstone Mentor: Dr. Kritika Rana. Engineering and deploy partnership with dmj.one. Repository transferred to the author. MIT-licensed.</p>
+    </div>
+    <div>
+      <p class="meta">Catalogue</p>
+      <p><a href="../index.html#catalogue">All 47 products</a></p>
+      <p><a href="../index.html#cat-ai">AI · Agents</a></p>
+      <p><a href="../index.html#hire">Hire</a></p>
+    </div>
+    <div>
+      <p class="meta">SentinelCloud</p>
+      <p><a href="https://sentinelcloud.dmj.one" rel="noopener">Live demo</a></p>
+      <p><a href="https://github.com/Code-with-ME-Rohit/sentinelcloud" rel="noopener">Source</a></p>
+      <p><a href="https://sentinelcloud.dmj.one/research" rel="noopener">Literature review</a></p>
+      <p><a href="mailto:contact@dmj.one">contact@dmj.one</a></p>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

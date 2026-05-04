@@ -1,0 +1,746 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1f3a5f">
+<meta name="color-scheme" content="light">
+
+<title>Facial Surveillance System · Production-grade recognition, zero-touch keys · dmj.one</title>
+<meta name="description" content="A production facial recognition surveillance system. Multi-database (PostgreSQL, MySQL, SQLite). AES-256 face encodings. Argon2 hashing. Keys that rotate themselves every 90 days, with no human in the loop.">
+<meta property="og:title" content="Facial Surveillance · Multi-DB. AES-256. Self-rotating keys.">
+<meta property="og:description" content="Built by Kaustuv Sharma under dmj.one. Production-grade facial recognition surveillance with automatic key management.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,30..100&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="../assets/core.css">
+
+<style>
+:root {
+  --accent: var(--c-enterprise);
+  --accent-deep: #142a45;
+  --signal-green: #2f9b5c;
+  --signal-amber: #d8a23a;
+  --cam-bg: #0a1320;
+  --cam-fg: #c8e2ff;
+  --cam-grid: #1a3050;
+}
+body { background: var(--paper); }
+
+.crumbs {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink-mute);
+  margin: 0 0 1.75rem;
+  display: flex; gap: 0.5rem; flex-wrap: wrap;
+}
+.crumbs a { border-bottom: 1px solid var(--ink-mute); padding-bottom: 1px; }
+.crumbs a:hover { color: var(--accent); border-color: var(--accent); }
+.crumbs span { color: var(--accent); }
+
+.btn {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.7rem 1.1rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 700;
+  border: 1px solid var(--ink);
+  transition: transform .15s, box-shadow .15s;
+}
+.btn:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--ink); }
+.btn-primary { background: var(--accent); color: white; border-color: var(--accent); }
+.btn-primary:hover { box-shadow: 4px 4px 0 var(--ink); }
+.btn-ghost { background: transparent; color: var(--ink); }
+
+/* ====== HERO · CCTV monitor =================== */
+.cam-hero {
+  position: relative;
+  border-bottom: var(--hair);
+  padding-block: clamp(2.5rem, 5vw, 4.5rem) clamp(2rem, 4vw, 3.5rem);
+  background: var(--paper);
+}
+.cam-hero .frame { display: grid; gap: 2.5rem; grid-template-columns: 1fr; align-items: start; }
+@media (min-width: 960px) { .cam-hero .frame { grid-template-columns: 1fr 1.05fr; gap: 3rem; } }
+
+.cam-eyebrow {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  padding: 0.4rem 0.85rem;
+  border: 1px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  color: var(--accent-deep);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  margin-bottom: 1.25rem;
+}
+.cam-eyebrow::before {
+  content: ""; width: 8px; height: 8px;
+  background: var(--signal-green);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--signal-green) 30%, transparent);
+  animation: rec 1.4s steps(2, end) infinite;
+}
+@keyframes rec { 0%,50% { opacity: 1; } 50.01%,100% { opacity: 0.25; } }
+@media (prefers-reduced-motion: reduce) { .cam-eyebrow::before { animation: none; } }
+
+.cam-hero h1 {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(2.4rem, 1.4rem + 4.5vw, 4.6rem);
+  font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 30, "WONK" 1;
+  letter-spacing: -0.035em;
+  line-height: 0.96;
+  margin: 0;
+  max-width: 14ch;
+}
+.cam-hero h1 em {
+  font-style: italic;
+  color: var(--accent);
+  font-variation-settings: "opsz" 144, "SOFT" 100, "WONK" 1;
+}
+.cam-hero .lede {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md);
+  font-weight: 300;
+  line-height: 1.45;
+  color: var(--ink-soft);
+  margin: 1.75rem 0 0;
+  max-width: 48ch;
+}
+.cam-hero .lede strong {
+  font-weight: 600; color: var(--ink);
+  background: linear-gradient(180deg, transparent 60%, color-mix(in srgb, var(--accent) 24%, transparent) 60%);
+}
+.cam-cta { margin-top: 2rem; display: flex; gap: 0.6rem; flex-wrap: wrap; }
+
+/* CCTV monitor frame */
+.cam-monitor {
+  background: var(--cam-bg);
+  border: 1px solid var(--ink);
+  box-shadow: 8px 8px 0 var(--ink);
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 4/3;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--cam-fg);
+}
+.cam-monitor::before {
+  content: ""; position: absolute; inset: 0;
+  background-image:
+    linear-gradient(var(--cam-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--cam-grid) 1px, transparent 1px);
+  background-size: 36px 36px;
+  opacity: 0.55;
+}
+.cam-monitor::after {
+  content: ""; position: absolute; inset: 0;
+  background: repeating-linear-gradient(180deg, transparent 0 3px, rgba(0,0,0,0.18) 3px 4px);
+  pointer-events: none;
+}
+.cam-bar {
+  position: absolute; left: 0; right: 0; padding: 0.55rem 0.85rem;
+  display: flex; gap: 1rem; justify-content: space-between;
+  font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase;
+  color: color-mix(in srgb, var(--cam-fg) 80%, transparent);
+  z-index: 2;
+}
+.cam-bar.top { top: 0; border-bottom: 1px solid color-mix(in srgb, var(--cam-fg) 18%, transparent); }
+.cam-bar.bot { bottom: 0; border-top: 1px solid color-mix(in srgb, var(--cam-fg) 18%, transparent); }
+.cam-bar .red { color: #ff5757; }
+.cam-bar .red::before { content: "● "; }
+.cam-face {
+  position: absolute;
+  left: 50%; top: 50%;
+  transform: translate(-50%, -52%);
+  width: 38%; aspect-ratio: 3/4;
+  border: 2px solid var(--signal-green);
+  box-shadow:
+    -10px -10px 0 -8px var(--signal-green),
+     10px -10px 0 -8px var(--signal-green),
+    -10px  10px 0 -8px var(--signal-green),
+     10px  10px 0 -8px var(--signal-green),
+    inset 0 0 0 1px color-mix(in srgb, var(--signal-green) 40%, transparent);
+  z-index: 1;
+}
+.cam-face::before, .cam-face::after {
+  content: ""; position: absolute;
+  background: var(--signal-green);
+}
+.cam-face::before { width: 24px; height: 2px; left: 50%; top: -1px; transform: translateX(-50%); }
+.cam-face::after  { width: 2px; height: 24px; left: -1px; top: 50%; transform: translateY(-50%); }
+.cam-tag {
+  position: absolute;
+  left: 50%;
+  bottom: 14%;
+  transform: translateX(-50%);
+  padding: 0.3rem 0.55rem;
+  background: color-mix(in srgb, var(--signal-green) 88%, black);
+  color: #051a0c;
+  font-size: 0.74rem; font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  z-index: 3;
+  white-space: nowrap;
+}
+.cam-tag .conf { background: white; color: var(--accent-deep); padding: 0.1rem 0.35rem; margin-left: 0.4rem; }
+.cam-scan {
+  position: absolute; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--signal-green) 90%, transparent), transparent);
+  top: 0;
+  animation: scan 2.6s linear infinite;
+  z-index: 2;
+  box-shadow: 0 0 18px color-mix(in srgb, var(--signal-green) 70%, transparent);
+}
+@keyframes scan { 0% { top: 8%; } 100% { top: 96%; } }
+@media (prefers-reduced-motion: reduce) { .cam-scan { animation: none; top: 50%; } }
+
+/* ====== STATS RIBBON =================== */
+.cam-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  background: var(--ink);
+  color: var(--paper);
+  border-block: 2px solid var(--ink);
+  font-family: 'JetBrains Mono', monospace;
+}
+.cam-stat {
+  padding: 1.5rem clamp(1rem, 2vw, 1.5rem);
+  border-right: 1px solid color-mix(in srgb, var(--paper) 20%, transparent);
+}
+.cam-stat:last-child { border-right: 0; }
+.cam-stat .num {
+  font-size: clamp(1.8rem, 1.2rem + 2vw, 2.6rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  color: var(--signal-green);
+  display: block; line-height: 1;
+}
+.cam-stat .lbl {
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  margin-top: 0.6rem;
+  display: block;
+  color: color-mix(in srgb, var(--paper) 75%, transparent);
+}
+
+/* ====== ACTS =================== */
+.act { padding-block: clamp(3rem, 5vw, 5rem); border-bottom: var(--hair); }
+.act-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 700;
+  margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 1rem;
+}
+.act-num::before { content: ""; width: 2.5rem; height: 1px; background: var(--accent); }
+.act h2 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 50, "WONK" 1;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+  margin: 0 0 1.5rem;
+  max-width: 22ch;
+}
+.act h2 em { font-style: italic; color: var(--accent); }
+.act-lede {
+  font-family: 'Fraunces', serif; font-size: var(--t-md);
+  color: var(--ink-soft); max-width: 56ch; margin: 0;
+}
+
+/* Multi-DB matrix table */
+.dbtable {
+  width: 100%;
+  margin-top: 2.25rem;
+  border: 1px solid var(--ink);
+  border-collapse: collapse;
+  background: var(--paper);
+  font-family: 'JetBrains Mono', monospace;
+}
+.dbtable thead th {
+  background: var(--ink);
+  color: var(--paper);
+  text-align: left;
+  padding: 0.85rem 1rem;
+  font-size: var(--t-xs);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+.dbtable th, .dbtable td {
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--paper-edge);
+  vertical-align: top;
+  font-size: var(--t-sm);
+}
+.dbtable tbody tr:last-child td { border-bottom: 0; }
+.dbtable .pri {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-size: 1.2rem;
+  color: var(--accent);
+  padding-right: 0;
+}
+.dbtable .name {
+  font-weight: 700; color: var(--ink);
+}
+.dbtable .role { color: var(--ink-soft); }
+.dbtable .badge {
+  display: inline-block;
+  padding: 0.15rem 0.45rem;
+  font-size: 0.7rem;
+  background: color-mix(in srgb, var(--signal-green) 18%, transparent);
+  color: #1d5536;
+  border: 1px solid color-mix(in srgb, var(--signal-green) 50%, transparent);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Key rotation lifecycle */
+.lifecycle {
+  margin-top: 2.5rem;
+  display: grid;
+  gap: 0;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  font-family: 'JetBrains Mono', monospace;
+}
+.lc-row {
+  display: grid; grid-template-columns: 110px 1fr;
+  border-bottom: 1px dashed color-mix(in srgb, var(--ink) 22%, transparent);
+}
+.lc-row:last-child { border-bottom: 0; }
+.lc-day {
+  background: color-mix(in srgb, var(--accent) 8%, var(--paper));
+  padding: 1.1rem 0.9rem;
+  font-size: var(--t-xs);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  border-right: 1px dashed color-mix(in srgb, var(--ink) 22%, transparent);
+  color: var(--accent-deep);
+  text-transform: uppercase;
+}
+.lc-text {
+  padding: 1.1rem 1.25rem;
+  font-family: 'Fraunces', serif;
+  font-size: 1.05rem;
+  color: var(--ink);
+}
+.lc-text .key { font-family: 'JetBrains Mono', monospace; font-size: 0.88rem; color: var(--accent); }
+
+/* Module / spec cards */
+.specgrid {
+  display: grid; gap: 0;
+  grid-template-columns: 1fr;
+  margin-top: 2rem;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+}
+@media (min-width: 760px) { .specgrid { grid-template-columns: 1fr 1fr; } }
+.spec {
+  padding: 1.5rem;
+  border-right: 1px solid var(--paper-edge);
+  border-bottom: 1px solid var(--paper-edge);
+}
+@media (min-width: 760px) {
+  .spec:nth-child(2n) { border-right: 0; }
+  .spec:nth-last-child(-n+2) { border-bottom: 0; }
+}
+.spec .pn {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.18em;
+  color: var(--accent);
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+  text-transform: uppercase;
+}
+.spec h3 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md);
+  margin: 0 0 0.5rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.spec p { margin: 0; font-size: var(--t-sm); color: var(--ink-soft); }
+.spec .meta {
+  margin-top: 0.6rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  color: var(--ink-mute);
+  letter-spacing: 0.06em;
+}
+
+/* Side block credit */
+.side-credit {
+  margin-top: 2rem;
+  padding: 1rem 1.25rem;
+  border: 1px dashed color-mix(in srgb, var(--accent) 50%, transparent);
+  background: color-mix(in srgb, var(--accent) 5%, transparent);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent-deep);
+  display: flex; gap: 0.6rem; flex-wrap: wrap;
+  align-items: baseline;
+}
+.side-credit strong { color: var(--ink); font-weight: 700; }
+.side-credit .sep { color: var(--accent); }
+
+/* Stack */
+.stack { padding-block: clamp(3rem, 5vw, 5rem); border-bottom: var(--hair); }
+.stack-list { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.5rem; }
+.stack-tag {
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--ink);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 600;
+}
+
+/* Proof */
+.proof {
+  background: var(--ink);
+  color: var(--paper);
+  padding-block: clamp(3rem, 5vw, 5rem);
+  position: relative;
+  overflow: hidden;
+}
+.proof::before {
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 80% 20%, color-mix(in srgb, var(--accent) 32%, transparent), transparent 60%);
+  pointer-events: none;
+}
+.proof .frame { position: relative; }
+.proof h2 { color: var(--paper); }
+.proof h2 em { color: var(--signal-green); }
+.proof-grid { display: grid; gap: 1rem; margin-top: 2rem; grid-template-columns: 1fr; }
+@media (min-width: 760px) { .proof-grid { grid-template-columns: repeat(2, 1fr); } }
+.proof-item {
+  border: 1px solid color-mix(in srgb, var(--paper) 30%, transparent);
+  padding: 1.5rem;
+  background: color-mix(in srgb, var(--paper) 5%, transparent);
+}
+.proof-item h3 {
+  font-family: 'JetBrains Mono', monospace;
+  margin: 0 0 0.5rem;
+  font-size: 0.95rem;
+  color: var(--signal-green);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+.proof-item p { margin: 0; color: color-mix(in srgb, var(--paper) 80%, transparent); font-size: var(--t-sm); }
+
+/* End CTA */
+.endcta {
+  padding-block: clamp(3rem, 5vw, 5rem);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 12%, transparent), var(--paper));
+}
+.endcta .frame { display: grid; gap: 2rem; grid-template-columns: 1fr; }
+@media (min-width: 760px) { .endcta .frame { grid-template-columns: 2fr 1fr; align-items: end; } }
+.endcta h2 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 300;
+  font-variation-settings: "opsz" 144, "SOFT" 100;
+  margin: 0 0 1rem;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+}
+.endcta h2 em {
+  font-style: italic;
+  color: var(--accent);
+  background: linear-gradient(180deg, transparent 70%, color-mix(in srgb, var(--accent) 25%, transparent) 70%);
+}
+.endcta p { color: var(--ink-soft); margin: 0; max-width: 50ch; }
+.endcta .actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+
+.foot { background: var(--ink); color: var(--paper); }
+.foot .dot { color: var(--accent); }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topnav">
+  <div class="frame">
+    <div class="brand"><a href="../index.html">dmj<span class="dot">.</span>one</a></div>
+    <nav aria-label="Primary">
+      <ul>
+        <li><a href="../index.html#catalogue">Catalogue</a></li>
+        <li><a href="../index.html#manifesto">Manifesto</a></li>
+        <li><a href="../index.html#hire">Hire</a></li>
+        <li><a href="https://github.com/kaustuvsharma/facial-recognition-surveillance-system" rel="noopener">GitHub</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ============ HERO · CCTV monitor ============ -->
+<section class="cam-hero">
+  <div class="frame">
+    <p class="crumbs">
+      <a href="../index.html">Catalogue</a> /
+      <a href="../index.html#cat-enterprise">Enterprise · Security</a> /
+      <span>Facial Surveillance</span>
+    </p>
+
+    <div>
+      <div>
+        <span class="cam-eyebrow">CAM 01 · Live · Enterprise · Security</span>
+        <h1>Watch the door.<br>Rotate the <em>keys.</em><br>Sleep at night.</h1>
+        <p class="lede">A production facial recognition surveillance system. Multi-database. <strong>AES-256 face encodings, Argon2 password hashes, keys that rotate themselves every 90 days.</strong> No human in the loop. No downtime when they roll over.</p>
+        <div class="cam-cta">
+          <a class="btn btn-primary" href="https://github.com/kaustuvsharma/facial-recognition-surveillance-system" rel="noopener">View source</a>
+          <a class="btn btn-ghost" href="#how">How it works</a>
+        </div>
+        <div class="side-credit" role="note">
+          <span>Built by <strong>Kaustuv Sharma</strong></span>
+          <span class="sep">·</span>
+          <span>Under <strong>dmj.one</strong></span>
+        </div>
+      </div>
+
+      <aside class="cam-monitor" aria-label="Stylised CCTV monitor frame showing a detection box and confidence score">
+        <div class="cam-bar top">
+          <span>CAM-01 · ENTRANCE</span>
+          <span class="red">REC · 2026-05-04 · 14:32:07 IST</span>
+        </div>
+        <div class="cam-face" aria-hidden="true"></div>
+        <div class="cam-tag" aria-hidden="true">DETECTED <span class="conf">0.94</span></div>
+        <div class="cam-scan" aria-hidden="true"></div>
+        <div class="cam-bar bot">
+          <span>STREAMLIT :8501</span>
+          <span>POSTGRES · ARGON2 · AES-256</span>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATS RIBBON ============ -->
+<section class="cam-stats" aria-label="At a glance">
+  <div class="cam-stat"><span class="num">3</span><span class="lbl">Databases · auto-fallback</span></div>
+  <div class="cam-stat"><span class="num">90 d</span><span class="lbl">Key rotation cadence</span></div>
+  <div class="cam-stat"><span class="num">24 h</span><span class="lbl">Grace window per rollover</span></div>
+  <div class="cam-stat"><span class="num">0.6</span><span class="lbl">Default match confidence</span></div>
+  <div class="cam-stat"><span class="num">3 OS</span><span class="lbl">Win · Linux · macOS</span></div>
+</section>
+
+
+<!-- ============ ACT I · THE PROBLEM ============ -->
+<section class="act" aria-labelledby="prob-h">
+  <div class="frame">
+    <p class="act-num">Act I · The Problem</p>
+    <h2 id="prob-h">Most surveillance fails the <em>second year.</em></h2>
+    <p class="act-lede">The camera works. The model works. The launch demo works. Then a key expires, and nobody knows where it lives. A database goes down, and there's no fallback. A junior rotates a secret, and last quarter's footage decrypts to noise. Production-grade is not the recognition. It is everything around it.</p>
+  </div>
+</section>
+
+
+<!-- ============ ACT II · MULTI-DB MATRIX ============ -->
+<section class="act" style="background: var(--paper-soft);" aria-labelledby="db-h">
+  <div class="frame">
+    <p class="act-num">Act II · The Foundation</p>
+    <h2 id="db-h">One install.<br>Three <em>real databases.</em></h2>
+    <p class="act-lede">Pick the database your operations team already runs. The system detects what is available, falls back when it has to, and never asks the operator to choose at install time.</p>
+
+    <table class="dbtable" aria-label="Database priority and use case">
+      <thead>
+        <tr>
+          <th scope="col">Priority</th>
+          <th scope="col">Database</th>
+          <th scope="col">Use case</th>
+          <th scope="col">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="pri">i.</td>
+          <td class="name">PostgreSQL</td>
+          <td class="role">Production. Multi-tenant deployments, audit-heavy workloads, write-heavy logging.</td>
+          <td><span class="badge">Recommended</span></td>
+        </tr>
+        <tr>
+          <td class="pri">ii.</td>
+          <td class="name">MySQL</td>
+          <td class="role">Production alternative for shops already standardised on MySQL or MariaDB.</td>
+          <td><span class="badge">Supported</span></td>
+        </tr>
+        <tr>
+          <td class="pri">iii.</td>
+          <td class="name">SQLite</td>
+          <td class="role">Development laptop, single-camera kiosk, air-gapped pilot. Zero-config fallback.</td>
+          <td><span class="badge">Default</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+
+<!-- ============ ACT III · KEY LIFECYCLE ============ -->
+<section class="act" id="how" aria-labelledby="lc-h">
+  <div class="frame">
+    <p class="act-num">Act III · The Key Lifecycle</p>
+    <h2 id="lc-h">Keys that <em>look after themselves.</em></h2>
+    <p class="act-lede">Every key the system uses is generated, encrypted, rotated and retired without a human on the keyboard. The PBKDF2-derived master key wraps everything else. Old data still decrypts during rollover. New data uses the new key the moment it is born.</p>
+
+    <ol class="lifecycle" aria-label="Key rotation lifecycle">
+      <li class="lc-row">
+        <span class="lc-day">Day 0</span>
+        <span class="lc-text">First boot. <span class="key">key_manager.init()</span> generates a fresh data-encryption key. Stored encrypted on disk by a master key derived with PBKDF2. No prompt. No human secret to lose.</span>
+      </li>
+      <li class="lc-row">
+        <span class="lc-day">Day 1 to 89</span>
+        <span class="lc-text">Face encodings encrypted with Fernet (AES-128-CBC + HMAC-SHA256 under the AES-256 envelope). Passwords hashed with Argon2id. <span class="key">bcrypt → scrypt</span> automatic fallback if Argon2 is missing on the host.</span>
+      </li>
+      <li class="lc-row">
+        <span class="lc-day">Day 90</span>
+        <span class="lc-text">Rotation triggers. New key generated. <span class="key">force_rotation()</span> available on demand. Old key stays valid for the next 24 hours: a grace period long enough for any in-flight write to settle.</span>
+      </li>
+      <li class="lc-row">
+        <span class="lc-day">Day 91</span>
+        <span class="lc-text">All new writes use the new key. Existing rows can be re-encrypted from the UI in the background. Audit log records every step. <span class="key">Zero downtime.</span></span>
+      </li>
+    </ol>
+  </div>
+</section>
+
+
+<!-- ============ ACT IV · THE PRODUCT ============ -->
+<section class="act" aria-labelledby="prod-h">
+  <div class="frame">
+    <p class="act-num">Act IV · The Product</p>
+    <h2 id="prod-h">Four modules.<br>One <em>verifiable</em> install.</h2>
+
+    <div class="specgrid">
+      <article class="spec">
+        <p class="pn">Module · core</p>
+        <h3>Config, key manager, security primitives.</h3>
+        <p>Configuration via env vars or a `.env` file. Rate limiting on the request path. Input sanitisation against SQL injection and XSS at every boundary.</p>
+        <p class="meta">src/core/{config,key_manager,security}.py</p>
+      </article>
+      <article class="spec">
+        <p class="pn">Module · database</p>
+        <h3>Connection pool with auto-fallback.</h3>
+        <p>One connection layer, three drivers. Health-checked at boot. Queries are parameterised. Schemas migrated by the manager itself, no manual SQL on first run.</p>
+        <p class="meta">src/database/{connection,manager}.py</p>
+      </article>
+      <article class="spec">
+        <p class="pn">Module · recognition</p>
+        <h3>Live video processing engine.</h3>
+        <p>Frame capture, detection, embedding, match. Default match threshold 0.6, configurable via `FR_MIN_CONFIDENCE`. Visitor logs include confidence per recognition.</p>
+        <p class="meta">src/recognition/processor.py</p>
+      </article>
+      <article class="spec">
+        <p class="pn">Surface · streamlit</p>
+        <h3>One web app. Run anywhere.</h3>
+        <p>`run.bat` on Windows. `run.sh` on Linux and macOS. Optional `install_service.sh` registers it as a systemd unit. Lives at <code>http://localhost:8501</code>.</p>
+        <p class="meta">app.py · run.bat · run.sh · install_service.sh</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ STACK ============ -->
+<section class="stack" aria-labelledby="stack-h">
+  <div class="frame">
+    <p class="act-num">The Stack</p>
+    <h2 id="stack-h" style="font-size:var(--t-xl);font-weight:400;font-family:'Fraunces',serif;font-variation-settings:'opsz' 144,'SOFT' 50;margin:0;letter-spacing:-0.02em;">Boring choices, on purpose. <em>Built to outlast the launch demo.</em></h2>
+    <ul class="stack-list">
+      <li class="stack-tag">Python 3.8+</li>
+      <li class="stack-tag">Streamlit 1.28+</li>
+      <li class="stack-tag">PostgreSQL · MySQL · SQLite</li>
+      <li class="stack-tag">Fernet · AES-256</li>
+      <li class="stack-tag">Argon2id · bcrypt · scrypt</li>
+      <li class="stack-tag">PBKDF2 master key</li>
+      <li class="stack-tag">pytest + coverage</li>
+      <li class="stack-tag">GitHub Actions CI</li>
+      <li class="stack-tag">systemd unit</li>
+      <li class="stack-tag">MIT (attribution)</li>
+    </ul>
+  </div>
+</section>
+
+
+<!-- ============ PROOF ============ -->
+<section class="proof act" aria-labelledby="proof-h">
+  <div class="frame">
+    <p class="act-num">Act V · Proof</p>
+    <h2 id="proof-h">Production-grade, on the <em>label</em> and in the code.</h2>
+    <div class="proof-grid">
+      <div class="proof-item">
+        <h3>CI · GitHub Actions</h3>
+        <p>Pipeline at `.github/workflows/ci.yml` runs the full pytest suite on every push. Tests cover key management, security primitives, database connections and configuration loading.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Cross-platform launchers</h3>
+        <p>`run.bat` for Windows, `run.sh` for Linux and macOS. `install_service.sh` registers a systemd unit so the recognition service comes up with the box.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Audit trail by default</h3>
+        <p>Every security event written to the audit log: key rotations, failed matches, rate-limit trips, configuration changes. Nothing happens silently inside the system.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Re-encrypt without downtime</h3>
+        <p>The 24-hour grace window means a rolled key never strands historical data. Optional one-click re-encryption migrates older rows to the current key from the UI.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ END CTA ============ -->
+<section class="endcta" aria-labelledby="cta-h">
+  <div class="frame">
+    <div>
+      <h2 id="cta-h">If your surveillance still ships with a static secret in a `.env`, <em>upgrade the foundation, not the camera.</em></h2>
+      <p>I build production security software the way operations teams want it: rotated keys, real fallbacks, audit trails, and one launcher per OS. Hire dmj.one for the parts of security you cannot demo.</p>
+    </div>
+    <div class="actions">
+      <a class="btn btn-primary" href="../index.html#hire">Hire me</a>
+      <a class="btn btn-ghost" href="../index.html">Back to catalogue</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="frame">
+    <div>
+      <h2 style="font-family:'Fraunces',serif;font-size:var(--t-xl);margin:0 0 1rem;">dmj<span class="dot">.</span>one</h2>
+      <p>Dream, Manifest and Journey, Together as One.</p>
+      <p class="meta">© 2026 Divya Mohan. Facial Surveillance built by Kaustuv Sharma under dmj.one. MIT license, attribution required.</p>
+    </div>
+    <div>
+      <p class="meta">Catalogue</p>
+      <p><a href="../index.html#catalogue">All products</a></p>
+      <p><a href="../index.html#cat-enterprise">Enterprise · Security</a></p>
+      <p><a href="../index.html#hire">Hire</a></p>
+    </div>
+    <div>
+      <p class="meta">Facial Surveillance</p>
+      <p><a href="https://github.com/kaustuvsharma/facial-recognition-surveillance-system" rel="noopener">Source</a></p>
+      <p><a href="mailto:contact@dmj.one">contact@dmj.one</a></p>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

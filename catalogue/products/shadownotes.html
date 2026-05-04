@@ -1,0 +1,798 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#7a2c5e">
+<meta name="color-scheme" content="light">
+
+<title>ShadowNotes · Encrypted field intelligence. Zero egress. · dmj.one</title>
+<meta name="description" content="Voice into structured intelligence, on-device. Qwen2.5 LLM, Whisper STT, Piper TTS, AES-256-GCM, WebAuthn. Every byte stays on the device. Built for journalists, auditors, doctors and field operatives.">
+<meta property="og:title" content="ShadowNotes · Encrypted field intelligence. Zero egress.">
+<meta property="og:description" content="Voice → on-device AI → structured notes. AES-256-GCM, WebAuthn, 231 tests.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,30..100&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;600&family=Special+Elite&display=swap">
+<link rel="stylesheet" href="../assets/core.css">
+
+<style>
+:root {
+  --accent: var(--c-ai);
+  --accent-deep: #4d1639;
+  --accent-soft: #9a4a7e;
+  --paper-tinted: #ece4d3;
+  --paper-edge: #c9bea3;
+}
+body { background: var(--paper-tinted); }
+
+.typewriter { font-family: 'Special Elite', 'JetBrains Mono', monospace; }
+
+/* ====== HERO ============================================ */
+.sn-hero {
+  position: relative;
+  padding-block: clamp(3.5rem, 6vw, 7rem) clamp(2.5rem, 5vw, 5rem);
+  border-bottom: var(--hair);
+  overflow: hidden;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 36px, color-mix(in srgb, var(--ink) 4%, transparent) 36px 37px),
+    var(--paper-tinted);
+}
+.sn-hero::before {
+  content: "TOP SECRET // FIELD OPS // EYES ONLY";
+  position: absolute; top: 1.25rem; left: 50%; transform: translateX(-50%);
+  font-family: 'Special Elite', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.4em;
+  color: color-mix(in srgb, var(--accent) 60%, transparent);
+  border-block: 1px solid color-mix(in srgb, var(--accent) 60%, transparent);
+  padding: 0.3rem 1rem;
+  white-space: nowrap;
+}
+
+.sn-hero .frame { position: relative; z-index: 2; padding-top: 2.5rem; }
+
+.crumbs {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink-mute);
+  margin: 0 0 2rem;
+  display: flex; gap: 0.5rem; flex-wrap: wrap;
+}
+.crumbs a { border-bottom: 1px solid var(--ink-mute); padding-bottom: 1px; }
+.crumbs a:hover { color: var(--accent); border-color: var(--accent); }
+.crumbs span { color: var(--accent); }
+
+/* CASE FILE STAMP */
+.case-stamp {
+  display: inline-grid;
+  grid-template-columns: auto auto;
+  gap: 0.5rem 1rem;
+  border: 2px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 6%, transparent);
+  padding: 0.85rem 1.1rem;
+  font-family: 'Special Elite', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--accent-deep);
+  margin-bottom: 1.75rem;
+  transform: rotate(-1.2deg);
+}
+.case-stamp dt { font-weight: 700; opacity: 0.7; }
+.case-stamp dd { margin: 0; font-weight: 700; }
+
+.sn-hero h1 {
+  font-family: 'Special Elite', 'JetBrains Mono', monospace;
+  font-size: clamp(2.5rem, 1.8rem + 4.5vw, 5.4rem);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  margin: 0;
+  max-width: 18ch;
+  color: var(--ink);
+}
+.sn-hero h1 .redacted {
+  display: inline-block;
+  background: var(--ink);
+  color: var(--ink);
+  padding: 0 0.4em;
+  user-select: none;
+  position: relative;
+}
+.sn-hero h1 .redacted::after {
+  content: "REDACTED";
+  position: absolute;
+  inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.35em;
+  letter-spacing: 0.25em;
+  color: color-mix(in srgb, var(--paper-tinted) 55%, transparent);
+  font-family: 'Special Elite', monospace;
+}
+.sn-hero h1 .accent { color: var(--accent); }
+
+.sn-hero .lede {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md);
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--ink-soft);
+  margin: 2.25rem 0 0;
+  max-width: 56ch;
+  border-left: 3px solid var(--accent);
+  padding-left: 1.25rem;
+}
+.sn-hero .lede strong { font-weight: 700; color: var(--ink); }
+
+.sn-cta-row {
+  margin-top: 2.5rem;
+  display: flex; gap: 0.75rem; flex-wrap: wrap;
+}
+.btn {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.7rem 1.1rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 700;
+  border: 1px solid var(--ink);
+  transition: background .15s, color .15s, transform .15s, box-shadow .15s;
+}
+.btn:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--ink); }
+.btn-primary { background: var(--accent); color: white; border-color: var(--accent); }
+.btn-primary:hover { box-shadow: 4px 4px 0 var(--ink); }
+.btn-ghost { background: transparent; color: var(--ink); }
+
+/* ====== STATS RIBBON ==================================== */
+.sn-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  background: var(--ink);
+  color: var(--paper);
+  border-block: 2px solid var(--ink);
+}
+.sn-stat {
+  padding: 1.5rem clamp(1rem, 2vw, 1.5rem);
+  border-right: 1px solid color-mix(in srgb, var(--paper) 20%, transparent);
+}
+.sn-stat:last-child { border-right: 0; }
+.sn-stat .num {
+  font-family: 'Special Elite', 'JetBrains Mono', monospace;
+  font-size: var(--t-2xl);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  display: block;
+  line-height: 1;
+  color: var(--accent-soft);
+}
+.sn-stat .lbl {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  margin-top: 0.6rem;
+  display: block;
+  color: color-mix(in srgb, var(--paper) 70%, transparent);
+}
+
+/* ====== ACT STRUCTURE =================================== */
+.act {
+  padding-block: clamp(3rem, 5vw, 5rem);
+  border-bottom: var(--hair);
+}
+.act-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 700;
+  margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 1rem;
+}
+.act-num::before {
+  content: ""; width: 2.5rem; height: 1px; background: var(--accent);
+}
+.act h2 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 50;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+  margin: 0 0 1.5rem;
+  max-width: 22ch;
+}
+.act h2 em { font-style: italic; color: var(--accent); }
+
+/* ====== ACT 1 · PROBLEM ============================= */
+.threat-grid {
+  display: grid; gap: 1rem;
+  grid-template-columns: 1fr;
+  margin-top: 2rem;
+}
+@media (min-width: 760px) { .threat-grid { grid-template-columns: repeat(3, 1fr); } }
+.threat-card {
+  border: 1px solid var(--ink);
+  background: var(--paper-tinted);
+  padding: 1.25rem 1.5rem;
+}
+.threat-card .who {
+  font-family: 'Special Elite', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.6rem;
+  font-weight: 700;
+}
+.threat-card .what {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md);
+  margin: 0 0 0.4rem;
+  letter-spacing: -0.01em;
+}
+.threat-card .stake {
+  font-family: 'Special Elite', monospace;
+  font-size: var(--t-xs);
+  color: var(--ink-soft);
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+/* ====== TERMINAL CARD =============================== */
+.terminal {
+  margin-top: 2.5rem;
+  background: #1a1410;
+  border: 1px solid var(--ink);
+  color: #e8d8c4;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-sm);
+  border-radius: 0;
+  overflow: hidden;
+}
+.terminal-bar {
+  display: flex; align-items: center; gap: 0.6rem;
+  padding: 0.6rem 1rem;
+  background: #0d0a08;
+  border-bottom: 1px solid #2a221c;
+}
+.terminal-bar .dot { width: 10px; height: 10px; border-radius: 50%; background: #5a4a3a; }
+.terminal-bar .dot:nth-child(2) { background: var(--accent-soft); }
+.terminal-bar .title {
+  margin-left: auto;
+  font-size: var(--t-xs);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #8a7a6a;
+}
+.terminal-body { padding: 1.25rem 1.5rem; line-height: 1.7; }
+.terminal-body .prompt { color: var(--accent-soft); user-select: none; }
+.terminal-body .out { color: #c8b8a4; }
+.terminal-body .keep { color: #6fcf6f; }
+.terminal-body .stop { color: #e07070; font-weight: 600; }
+.terminal-body .blink { display: inline-block; width: 8px; height: 1em; background: #e8d8c4; vertical-align: text-bottom; animation: blink 1s steps(2) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+
+/* ====== COMPARISON TABLE =============================== */
+.comp {
+  margin-top: 2rem;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-sm);
+}
+.comp th, .comp td {
+  border: 1px solid var(--paper-edge);
+  padding: 0.85rem 1rem;
+  text-align: left;
+  vertical-align: middle;
+}
+.comp th {
+  background: var(--ink);
+  color: var(--paper);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-size: var(--t-xs);
+}
+.comp tbody th {
+  background: var(--paper-tinted);
+  color: var(--ink);
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-size: var(--t-base);
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.comp .hit { color: var(--accent); font-weight: 700; }
+.comp .miss { color: var(--ink-mute); }
+.comp .perf { background: color-mix(in srgb, var(--accent) 8%, var(--paper)); color: var(--accent-deep); font-weight: 700; }
+
+/* ====== DOMAINS ===================================== */
+.domains {
+  display: grid; gap: 0;
+  grid-template-columns: 1fr;
+  margin-top: 2rem;
+  border: 1px solid var(--ink);
+}
+@media (min-width: 760px) { .domains { grid-template-columns: repeat(2, 1fr); } }
+.domain {
+  padding: 1.5rem;
+  border-right: 1px solid var(--paper-edge);
+  border-bottom: 1px solid var(--paper-edge);
+  background: var(--paper);
+  position: relative;
+}
+@media (min-width: 760px) {
+  .domain:nth-child(2n) { border-right: 0; }
+  .domain:nth-last-child(-n+2) { border-bottom: 0; }
+}
+.domain .dn {
+  font-family: 'Special Elite', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+}
+.domain h3 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md);
+  margin: 0 0 0.3rem;
+  letter-spacing: -0.01em;
+}
+.domain h3 .deva {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  color: var(--accent);
+  font-weight: 400;
+}
+.domain p { margin: 0.5rem 0 0; font-size: var(--t-sm); color: var(--ink-soft); line-height: 1.5; }
+.domain .corr {
+  margin-top: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--paper-tinted);
+  border-left: 3px solid var(--accent);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  color: var(--ink-soft);
+}
+
+/* ====== SECURITY CHECKLIST ============================ */
+.lockbox {
+  margin-top: 2rem;
+  border: 2px solid var(--ink);
+  background: var(--paper);
+  padding: 1.75rem;
+  position: relative;
+}
+.lockbox::before {
+  content: "VAULT // AES-256-GCM";
+  position: absolute; top: -0.8em; left: 1.5rem;
+  background: var(--paper-tinted);
+  padding: 0 0.6rem;
+  font-family: 'Special Elite', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.18em;
+  color: var(--accent);
+  font-weight: 700;
+}
+.lockbox ul { display: grid; gap: 0.85rem; grid-template-columns: 1fr; }
+@media (min-width: 720px) { .lockbox ul { grid-template-columns: 1fr 1fr; gap: 0.85rem 2rem; } }
+.lockbox li {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-sm);
+  color: var(--ink);
+  padding-left: 1.6rem;
+  position: relative;
+  line-height: 1.5;
+}
+.lockbox li::before {
+  content: "▣";
+  position: absolute; left: 0; top: 0.05em;
+  color: var(--accent);
+  font-family: 'JetBrains Mono', monospace;
+}
+.lockbox li strong { color: var(--accent-deep); font-weight: 700; }
+
+/* ====== PROOF =========================================== */
+.proof { background: var(--ink); color: var(--paper); position: relative; overflow: hidden; }
+.proof::before {
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(circle at 20% 80%, color-mix(in srgb, var(--accent) 30%, transparent), transparent 50%);
+  pointer-events: none;
+}
+.proof .frame { position: relative; }
+.proof h2 { color: var(--paper); }
+.proof h2 em { color: var(--accent-soft); }
+.proof-grid {
+  display: grid; gap: 1rem; margin-top: 2rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { .proof-grid { grid-template-columns: repeat(2, 1fr); } }
+.proof-item {
+  border: 1px solid color-mix(in srgb, var(--paper) 25%, transparent);
+  padding: 1.5rem;
+  background: color-mix(in srgb, var(--paper) 5%, transparent);
+}
+.proof-item h3 {
+  font-family: 'Fraunces', serif;
+  margin: 0 0 0.5rem;
+  font-size: var(--t-md);
+  color: var(--accent-soft);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.proof-item p { margin: 0; color: color-mix(in srgb, var(--paper) 80%, transparent); font-size: var(--t-sm); }
+
+/* ====== STACK ======================== */
+.stack-list {
+  display: flex; flex-wrap: wrap; gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+.stack-tag {
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--ink);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 600;
+}
+
+/* ====== END CTA ========================================= */
+.endcta {
+  padding-block: clamp(3rem, 5vw, 5rem);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 8%, transparent), var(--paper-tinted));
+}
+.endcta .frame { display: grid; gap: 2rem; grid-template-columns: 1fr; }
+@media (min-width: 760px) { .endcta .frame { grid-template-columns: 2fr 1fr; align-items: end; } }
+.endcta h2 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 300;
+  font-variation-settings: "opsz" 144, "SOFT" 100;
+  margin: 0 0 1rem;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+}
+.endcta h2 em {
+  font-style: italic;
+  color: var(--accent);
+  background: linear-gradient(180deg, transparent 70%, color-mix(in srgb, var(--accent) 25%, transparent) 70%);
+}
+.endcta p { color: var(--ink-soft); margin: 0; max-width: 50ch; }
+.endcta .actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+
+.foot { background: var(--ink); color: var(--paper); }
+.foot .dot { color: var(--accent); }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topnav">
+  <div class="frame">
+    <div class="brand"><a href="../index.html">dmj<span class="dot">.</span>one</a></div>
+    <nav aria-label="Primary">
+      <ul>
+        <li><a href="../index.html#catalogue">Catalogue</a></li>
+        <li><a href="../index.html#manifesto">Manifesto</a></li>
+        <li><a href="../index.html#hire">Hire</a></li>
+        <li><a href="https://github.com/divyamohan1993/shadownotes" rel="noopener">GitHub</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ============ HERO ============ -->
+<section class="sn-hero">
+  <div class="frame">
+    <p class="crumbs">
+      <a href="../index.html">Catalogue</a> /
+      <a href="../index.html#cat-ai">AI · Agents</a> /
+      <span>ShadowNotes</span>
+    </p>
+
+    <dl class="case-stamp" aria-label="Case file metadata">
+      <dt>Case</dt><dd>SN / 022</dd>
+      <dt>Class</dt><dd>Field Intel</dd>
+      <dt>Egress</dt><dd>Zero</dd>
+    </dl>
+
+    <h1>
+      Some notes should never<br>
+      exist <span class="redacted">anywhere</span> but<br>
+      <span class="accent">your own device.</span>
+    </h1>
+
+    <p class="lede">
+      <strong>One stolen phone is a betrayed source.</strong> ShadowNotes runs the entire AI pipeline, voice capture, transcription, and structured extraction inside the browser. Nothing is sent. Nothing is logged. Nothing is shared. Built for journalists, auditors, doctors and incident responders.
+    </p>
+
+    <div class="sn-cta-row">
+      <a class="btn btn-primary" href="https://shadownotes.dmj.one" rel="noopener">Open the live app</a>
+      <a class="btn btn-ghost" href="https://shadownotes.dmj.one/docs/field-manual.html" rel="noopener">Field manual</a>
+      <a class="btn btn-ghost" href="https://github.com/divyamohan1993/shadownotes" rel="noopener">View source</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATS ============ -->
+<section class="sn-stats" aria-label="At a glance">
+  <div class="sn-stat"><span class="num">0</span><span class="lbl">Bytes leave the device</span></div>
+  <div class="sn-stat"><span class="num">231</span><span class="lbl">Tests across 18 files</span></div>
+  <div class="sn-stat"><span class="num">600K</span><span class="lbl">PBKDF2 iterations</span></div>
+  <div class="sn-stat"><span class="num">4</span><span class="lbl">Domain profiles</span></div>
+  <div class="sn-stat"><span class="num">~810MB</span><span class="lbl">On-device LLM, OPFS-cached</span></div>
+</section>
+
+
+<!-- ============ ACT I · THE STAKES ============ -->
+<section class="act" aria-labelledby="prob-h">
+  <div class="frame">
+    <p class="act-num">Act I · The Stakes</p>
+    <h2 id="prob-h">Cloud AI is fast.<br>It is also <em>completely unacceptable.</em></h2>
+    <p style="font-family:'Fraunces',serif;font-size:var(--t-md);max-width:60ch;margin:0;color:var(--ink-soft);line-height:1.55;">Professionals handling classified, HIPAA-protected or legally privileged information face an impossible choice: cloud AI tools that exfiltrate every word, or offline tools with no intelligence at all.</p>
+
+    <div class="threat-grid">
+      <article class="threat-card">
+        <p class="who">Subject 01</p>
+        <h3 class="what">Investigative journalist</h3>
+        <p class="stake">One stolen phone. One betrayed source. One assassination.</p>
+      </article>
+      <article class="threat-card">
+        <p class="who">Subject 02</p>
+        <h3 class="what">Rural physician</h3>
+        <p class="stake">No internet, no clinic system, but every word is HIPAA-class.</p>
+      </article>
+      <article class="threat-card">
+        <p class="who">Subject 03</p>
+        <h3 class="what">Legal practitioner</h3>
+        <p class="stake">Deposition in real time. Attorney-client privilege at every word.</p>
+      </article>
+      <article class="threat-card">
+        <p class="who">Subject 04</p>
+        <h3 class="what">Security auditor</h3>
+        <p class="stake">Vulnerabilities mid-engagement. Data must not leave the building.</p>
+      </article>
+      <article class="threat-card">
+        <p class="who">Subject 05</p>
+        <h3 class="what">Incident responder</h3>
+        <p class="stake">Disaster site, no signal, classified intelligence streaming in.</p>
+      </article>
+      <article class="threat-card">
+        <p class="who">Subject 06</p>
+        <h3 class="what">You, three weeks from now</h3>
+        <p class="stake">A note you will be glad nobody else ever saw.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ ACT II · TERMINAL ============ -->
+<section class="act" aria-labelledby="term-h">
+  <div class="frame">
+    <p class="act-num">Act II · The Promise</p>
+    <h2 id="term-h">Voice in.<br>Structured intelligence out.<br><em>Network: never engaged.</em></h2>
+
+    <div class="terminal" role="img" aria-label="Terminal showing on-device transcription and zero network egress">
+      <div class="terminal-bar">
+        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        <span class="title">shadownotes // session 7B-AC4</span>
+      </div>
+      <div class="terminal-body">
+<span class="prompt">$</span> <span class="out">init session --domain=security-audit --auth=webauthn</span><br>
+<span class="keep">●</span> <span class="out">vault unlocked. AES-256-GCM, per-case HKDF.</span><br>
+<span class="keep">●</span> <span class="out">model: qwen2.5-0.5b loaded from OPFS (810MB cached)</span><br>
+<span class="keep">●</span> <span class="out">whisper-tiny ready. silero-VAD ready. piper-lessac ready.</span><br><br>
+<span class="prompt">&gt;</span> <span class="out">[mic] subject describes findings...</span><br>
+<span class="keep">●</span> <span class="out">stt → "we found a sequel injection in the login form..."</span><br>
+<span class="keep">●</span> <span class="out">domain correction: "sequel injection" → SQL injection</span><br>
+<span class="keep">●</span> <span class="out">extracting → vulnerabilities, timeline, evidence, risk</span><br>
+<span class="keep">●</span> <span class="out">RAG context injected from 3 prior findings</span><br><br>
+<span class="prompt">$</span> <span class="out">network.egress.check</span><br>
+<span class="stop">✗</span> <span class="out">network requests this session: </span><span class="keep">0</span><br>
+<span class="stop">✗</span> <span class="out">tokens transmitted: </span><span class="keep">0</span><br>
+<span class="stop">✗</span> <span class="out">cookies, localStorage, third-party calls: </span><span class="keep">0</span><br><br>
+<span class="prompt">$</span> <span class="out">vault.commit && session.encrypt</span><br>
+<span class="keep">●</span> <span class="out">session sealed. one tab close = total wipe.</span><span class="blink"></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ ACT III · COMPARISON ============ -->
+<section class="act" aria-labelledby="comp-h">
+  <div class="frame">
+    <p class="act-num">Act III · Why ShadowNotes Is Different</p>
+    <h2 id="comp-h">Pick one column.<br><em>Carefully.</em></h2>
+
+    <div style="overflow-x:auto;">
+    <table class="comp">
+      <thead>
+        <tr>
+          <th></th>
+          <th>Cloud AI<br><span style="font-weight:400;text-transform:none;letter-spacing:0;">ChatGPT, Otter</span></th>
+          <th>Encrypted Notes<br><span style="font-weight:400;text-transform:none;letter-spacing:0;">Standard Notes</span></th>
+          <th>ShadowNotes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><th scope="row">AI extraction</th><td class="hit">Yes (cloud)</td><td class="miss">No</td><td class="perf">Yes (on-device)</td></tr>
+        <tr><th scope="row">Works offline</th><td class="miss">No</td><td class="hit">Yes</td><td class="perf">Yes</td></tr>
+        <tr><th scope="row">Zero data transmission</th><td class="miss">No</td><td class="miss">Partial</td><td class="perf">100%</td></tr>
+        <tr><th scope="row">Domain-aware extraction</th><td class="miss">No</td><td class="miss">No</td><td class="perf">4 specialised</td></tr>
+        <tr><th scope="row">Streaming AI feedback</th><td class="hit">Yes (cloud)</td><td class="miss">N/A</td><td class="perf">Yes (local WASM)</td></tr>
+        <tr><th scope="row">Ephemeral mode</th><td class="miss">No</td><td class="miss">No</td><td class="perf">Built-in</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ ACT IV · DOMAINS ============ -->
+<section class="act" aria-labelledby="dom-h">
+  <div class="frame">
+    <p class="act-num">Act IV · Four Domains, Four Hindi Names</p>
+    <h2 id="dom-h">Each profile carries a name from <em>India's heritage.</em></h2>
+
+    <div class="domains">
+      <article class="domain">
+        <p class="dn">Domain 01 · Medical</p>
+        <h3>Sanjeevani <span class="deva">· the life-giving herb</span></h3>
+        <p>Symptoms, diagnoses, medications, vitals, follow-up. Speech-error correction tuned to Indian pharmacology.</p>
+        <p class="corr">"Tell me Satin" → Telmisartan · "parse atomol" → Paracetamol</p>
+      </article>
+      <article class="domain">
+        <p class="dn">Domain 02 · Security</p>
+        <h3>Kavach <span class="deva">· the divine shield</span></h3>
+        <p>Vulnerabilities, timeline, evidence, affected systems, risk assessment. Clean exports for blue teams.</p>
+        <p class="corr">"sequel injection" → SQL injection · "cross site" → XSS</p>
+      </article>
+      <article class="domain">
+        <p class="dn">Domain 03 · Legal</p>
+        <h3>Nyaaya <span class="deva">· the path of justice</span></h3>
+        <p>Key statements, timeline, parties involved, contradictions, exhibits. Privileged from line one.</p>
+        <p class="corr">"hay BS corpus" → habeas corpus</p>
+      </article>
+      <article class="domain">
+        <p class="dn">Domain 04 · Incident</p>
+        <h3>Prahari <span class="deva">· the vigilant sentinel</span></h3>
+        <p>Incident timeline, witnesses, damage assessment, root cause, next steps. Disaster-site capable, fully offline.</p>
+        <p class="corr">Domain-aware context, structured per-finding output.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ ACT V · VAULT ============ -->
+<section class="act" aria-labelledby="lock-h">
+  <div class="frame">
+    <p class="act-num">Act V · The Vault</p>
+    <h2 id="lock-h">Defence in depth, <em>line one to last.</em></h2>
+
+    <div class="lockbox">
+      <ul>
+        <li><strong>AES-256-GCM</strong> with per-case HKDF-derived keys for compartmentalised storage.</li>
+        <li><strong>WebAuthn + PRF extension</strong> via Windows Hello, Touch ID or Face ID for key material.</li>
+        <li><strong>PBKDF2 600,000 iterations</strong> on passphrase fallback. Brute-force backoff: 5s, 15s, 30s, 60s.</li>
+        <li><strong>Schema validation</strong> on every decrypted payload before use, no silent corruption.</li>
+        <li><strong>CSP, HSTS, COOP, COEP, Permissions-Policy</strong> headers from line one.</li>
+        <li><strong>OPFS storage</strong>: models in the browser's private filesystem, isolated per origin.</li>
+        <li><strong>GPU crash recovery</strong>: WebGPU detected, automatic CPU fallback if it crashes.</li>
+        <li><strong>DESTROY mode</strong>: cinematic burn animation, total state wipe, zero-trace exit.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ PROOF ============ -->
+<section class="proof act" aria-labelledby="proof-h">
+  <div class="frame">
+    <p class="act-num">Act VI · Proof</p>
+    <h2 id="proof-h">It already <em>works.</em></h2>
+
+    <div class="proof-grid">
+      <div class="proof-item">
+        <h3>Live · shadownotes.dmj.one</h3>
+        <p>Production deployment. Chrome 96+ or Edge 96+ recommended. PWA, installable, full offline support after first load.</p>
+      </div>
+      <div class="proof-item">
+        <h3>231 tests · 18 files · zero mocking</h3>
+        <p>Unit tests on extraction, crypto, auth, vault, domains, voice commands. Integration tests across all four domain lifecycles.</p>
+      </div>
+      <div class="proof-item">
+        <h3>RunAnywhere Vibe Challenge</h3>
+        <p>Built for the ThoughtWorks Technologies hackathon at GGSIPU Delhi. Twenty-plus load-bearing features across three RunAnywhere SDK packages.</p>
+      </div>
+      <div class="proof-item">
+        <h3>WCAG 2.2 · 172+ ARIA attributes</h3>
+        <p>Keyboard-navigable, screen-reader-friendly, reduced-motion respected. Three-step onboarding tutorial with full a11y.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ STACK ============ -->
+<section class="act" aria-labelledby="tech-h">
+  <div class="frame">
+    <p class="act-num">The Stack</p>
+    <h2 id="tech-h" style="font-size:var(--t-xl);">Three SDK packages. Two WASM backends. <em>One device.</em></h2>
+    <ul class="stack-list">
+      <li class="stack-tag">React 19</li>
+      <li class="stack-tag">TypeScript 5.9 strict</li>
+      <li class="stack-tag">Vite 7</li>
+      <li class="stack-tag">RunAnywhere SDK</li>
+      <li class="stack-tag">Qwen2.5 0.5B</li>
+      <li class="stack-tag">Gemma 3 1B</li>
+      <li class="stack-tag">SmolLM2 135M</li>
+      <li class="stack-tag">Whisper Tiny</li>
+      <li class="stack-tag">Silero VAD</li>
+      <li class="stack-tag">Piper TTS</li>
+      <li class="stack-tag">llama.cpp WASM</li>
+      <li class="stack-tag">ONNX Runtime</li>
+      <li class="stack-tag">WebCrypto + AES-GCM</li>
+      <li class="stack-tag">WebAuthn + PRF</li>
+      <li class="stack-tag">Vitest 4 · 231 tests</li>
+      <li class="stack-tag">Electron 35 desktop</li>
+    </ul>
+  </div>
+</section>
+
+
+<!-- ============ END CTA ============ -->
+<section class="endcta" aria-labelledby="cta-h">
+  <div class="frame">
+    <div>
+      <h2 id="cta-h">If a browser can keep a source <em>safe,</em> your product can too.</h2>
+      <p>I build privacy-architected AI products that prove themselves with a network monitor open. If your domain has secrets, talk to me.</p>
+    </div>
+    <div class="actions">
+      <a class="btn btn-primary" href="../index.html#hire">Hire me</a>
+      <a class="btn btn-ghost" href="../index.html">Back to catalogue</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="frame">
+    <div>
+      <h2 style="font-family:'Fraunces',serif;font-size:var(--t-xl);margin:0 0 1rem;">dmj<span class="dot">.</span>one</h2>
+      <p>Dream, Manifest and Journey, Together as One.</p>
+      <p class="meta">© 2026 Divya Mohan. ShadowNotes built for the RunAnywhere Vibe Challenge with Kumkum Thakur. MIT licence. #India2047.</p>
+    </div>
+    <div>
+      <p class="meta">Catalogue</p>
+      <p><a href="../index.html#catalogue">All 47 products</a></p>
+      <p><a href="../index.html#cat-ai">AI · Agents</a></p>
+      <p><a href="../index.html#hire">Hire</a></p>
+    </div>
+    <div>
+      <p class="meta">ShadowNotes</p>
+      <p><a href="https://shadownotes.dmj.one" rel="noopener">Live app</a></p>
+      <p><a href="https://github.com/divyamohan1993/shadownotes" rel="noopener">Source</a></p>
+      <p><a href="mailto:contact@dmj.one">contact@dmj.one</a></p>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,862 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#d8631a">
+<meta name="color-scheme" content="light">
+
+<title>Bharat eVote · A sealed ballot, a public Merkle root, every vote auditable · dmj.one</title>
+<meta name="description" content="Remote, auditable, accessible voting for Indian elections. Sealed ballots, AES-256-GCM, append-only Merkle audit log, hybrid PQ-ready. Sized for a 1 GB-RAM phone on 3G.">
+<meta property="og:title" content="Bharat eVote · A sealed ballot. A public Merkle root. Every vote auditable.">
+<meta property="og:description" content="Voter-ID + OTP. Sealed ballots. AES-256-GCM under HKDF-SHA-256. Append-only Merkle audit. Hybrid PQ-ready. Built for India.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,30..100&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;600&family=Tiro+Devanagari+Hindi&display=swap">
+<link rel="stylesheet" href="../assets/core.css">
+
+<style>
+:root {
+  --accent: var(--c-bharat); --accent-deep: #a14710;
+  --tri-saffron: #ff9933; --tri-white: #ffffff; --tri-green: #138808; --chakra: #000080;
+  --seal-ink: #11151c;
+}
+body { background: var(--paper); }
+
+/* tricolour hairline at the very top of the page */
+.tricolour {
+  height: 4px;
+  background: linear-gradient(90deg,
+    var(--tri-saffron) 0 33.33%,
+    var(--tri-white) 33.33% 66.66%,
+    var(--tri-green) 66.66% 100%);
+  border-bottom: 1px solid var(--ink);
+}
+
+/* ====== HERO · ballot paper ====================================== */
+.bv-hero {
+  position: relative;
+  padding-block: clamp(3rem, 5vw + 1rem, 6rem) clamp(2rem, 4vw, 4rem);
+  border-bottom: var(--hair);
+  overflow: hidden;
+  background: var(--paper);
+}
+.bv-hero::before {
+  content: ""; position: absolute; inset: 0;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 35px, color-mix(in srgb, var(--ink) 6%, transparent) 35px 36px);
+  mask: linear-gradient(180deg, black, transparent 85%);
+  -webkit-mask: linear-gradient(180deg, black, transparent 85%);
+  pointer-events: none;
+}
+.bv-hero .frame { position: relative; z-index: 2; }
+
+.crumbs {
+  font-family: 'JetBrains Mono', monospace; font-size: var(--t-xs);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink-mute); margin: 0 0 1.5rem;
+  display: flex; gap: 0.5rem; flex-wrap: wrap;
+}
+.crumbs a { border-bottom: 1px solid var(--ink-mute); padding-bottom: 1px; }
+.crumbs a:hover { color: var(--accent); border-color: var(--accent); }
+.crumbs span { color: var(--accent); }
+
+.bv-eyebrow {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  padding: 0.4rem 0.85rem;
+  border: 1px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  color: var(--accent-deep);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs); font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.16em;
+  margin-bottom: 1.5rem;
+}
+.bv-eyebrow::before {
+  content: ""; width: 8px; height: 8px;
+  background: var(--accent); border-radius: 50%;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+.bv-hero-grid {
+  display: grid; gap: 3rem; grid-template-columns: 1fr;
+  align-items: center;
+}
+@media (min-width: 980px) { .bv-hero-grid { grid-template-columns: 1.4fr 1fr; gap: 4rem; } }
+
+.bv-hero h1 {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(2.4rem, 5.5vw, 4.6rem);
+  font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 30, "WONK" 1;
+  letter-spacing: -0.03em; line-height: 0.96;
+  margin: 0; max-width: 16ch;
+}
+.bv-hero h1 em {
+  font-style: italic; color: var(--accent);
+  font-variation-settings: "opsz" 144, "SOFT" 100, "WONK" 1;
+}
+.bv-hero h1 .deva {
+  display: block; font-family: 'Tiro Devanagari Hindi', serif;
+  font-size: 0.5em; color: var(--ink-mute);
+  font-style: normal; margin-top: 0.5rem;
+}
+
+.bv-hero .lede {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md); font-weight: 300;
+  line-height: 1.5; color: var(--ink-soft);
+  margin: 1.75rem 0 0; max-width: 54ch;
+}
+.bv-hero .lede strong {
+  font-weight: 600; color: var(--ink);
+  background: linear-gradient(180deg, transparent 60%, color-mix(in srgb, var(--accent) 30%, transparent) 60%);
+  padding: 0 0.1em;
+}
+
+/* ===== SEALED ENVELOPE ===== */
+.envelope {
+  position: relative;
+  border: 2px solid var(--ink);
+  background: var(--paper-soft);
+  padding: 1.6rem 1.5rem 1.4rem;
+  box-shadow: 8px 8px 0 var(--ink);
+}
+.envelope::before {
+  /* top fold triangle */
+  content: ""; position: absolute; top: 0; left: 0; right: 0;
+  height: 60px;
+  background:
+    linear-gradient(135deg, var(--paper-soft) 49%, var(--ink) 49%, var(--ink) 50%, transparent 50%),
+    linear-gradient(225deg, var(--paper-soft) 49%, var(--ink) 49%, var(--ink) 50%, transparent 50%);
+  background-size: 50% 100%;
+  background-repeat: no-repeat;
+  background-position: left top, right top;
+  pointer-events: none;
+}
+.envelope-head {
+  font-family: 'JetBrains Mono', monospace; font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.16em;
+  color: var(--ink-mute); font-weight: 700;
+  margin: 1.5rem 0 0.75rem;
+}
+.envelope-row {
+  display: grid; grid-template-columns: 1.5rem 1fr;
+  gap: 0.75rem; padding: 0.6rem 0;
+  border-bottom: 1px dashed color-mix(in srgb, var(--ink) 25%, transparent);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+}
+.envelope-row:last-child { border-bottom: 0; }
+.envelope-row .k {
+  color: var(--accent-deep); font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.1em;
+}
+.envelope-row .v {
+  color: var(--ink); word-break: break-all;
+}
+.wax-seal {
+  position: absolute; right: -1rem; bottom: -1rem;
+  width: 88px; height: 88px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--accent) 80%, white) 0, var(--accent) 50%, var(--accent-deep) 100%);
+  border: 2px solid var(--accent-deep);
+  display: grid; place-items: center;
+  color: white;
+  font-family: 'Fraunces', serif;
+  font-size: 0.7rem; font-weight: 700;
+  text-align: center; line-height: 1.1;
+  text-transform: uppercase; letter-spacing: 0.06em;
+  padding: 0.4rem;
+  box-shadow: 2px 4px 0 var(--ink);
+}
+.wax-seal strong { display: block; font-size: 1.05rem; margin-bottom: 0.1rem; font-style: italic; }
+
+.bv-cta-row {
+  margin-top: 2.25rem;
+  display: flex; gap: 0.75rem; flex-wrap: wrap;
+}
+.btn {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.7rem 1.1rem;
+  font-family: 'JetBrains Mono', monospace; font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.14em; font-weight: 700;
+  border: 1px solid var(--ink);
+  transition: background .15s, color .15s, transform .15s, box-shadow .15s;
+}
+.btn:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--ink); }
+.btn-primary { background: var(--accent); color: white; border-color: var(--accent); }
+.btn-ghost { background: transparent; color: var(--ink); }
+
+/* ====== STATS ============================================ */
+.bv-stats {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  background: var(--ink); color: var(--paper);
+  border-block: 2px solid var(--ink);
+}
+.bv-stat { padding: 1.5rem clamp(1rem, 2vw, 1.5rem); border-right: 1px solid color-mix(in srgb, var(--paper) 18%, transparent); }
+.bv-stat:last-child { border-right: 0; }
+.bv-stat .num {
+  font-family: 'Fraunces', serif; font-size: var(--t-2xl);
+  font-weight: 400; letter-spacing: -0.04em;
+  font-variation-settings: "opsz" 144, "SOFT" 30;
+  display: block; line-height: 1; color: var(--accent);
+}
+.bv-stat .lbl {
+  font-family: 'JetBrains Mono', monospace; font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.14em;
+  margin-top: 0.6rem; display: block;
+  color: color-mix(in srgb, var(--paper) 75%, transparent);
+}
+
+/* ====== ACT WRAPPER ====================================== */
+.act { padding-block: clamp(3rem, 5vw, 5rem); border-bottom: var(--hair); position: relative; }
+.act-num {
+  font-family: 'JetBrains Mono', monospace; font-size: var(--t-xs);
+  letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--accent); font-weight: 700;
+  margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 1rem;
+}
+.act-num::before { content: ""; width: 2.5rem; height: 1px; background: var(--accent); }
+.act h2 {
+  font-family: 'Fraunces', serif; font-size: var(--t-2xl);
+  font-weight: 400; font-variation-settings: "opsz" 144, "SOFT" 50, "WONK" 1;
+  letter-spacing: -0.025em; line-height: 1.05;
+  margin: 0 0 1.5rem; max-width: 24ch;
+}
+.act h2 em { font-style: italic; color: var(--accent); }
+
+/* === ACT 1 · The Trust Crisis === */
+.crisis-grid { display: grid; gap: 2.5rem; grid-template-columns: 1fr; }
+@media (min-width: 880px) { .crisis-grid { grid-template-columns: 1.1fr 1fr; gap: 4rem; align-items: start; } }
+.crisis-stack { display: grid; gap: 0; }
+.crisis-row {
+  display: grid; grid-template-columns: 5rem 1fr; gap: 1.25rem;
+  padding: 1.4rem 0; border-bottom: var(--hair-soft);
+}
+.crisis-row:first-child { padding-top: 0; }
+.crisis-row:last-child { border-bottom: 0; }
+.crisis-row .pn {
+  font-family: 'JetBrains Mono', monospace; font-size: 0.78rem;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--accent); font-weight: 700; padding-top: 0.3rem;
+}
+.crisis-row h3 {
+  font-family: 'Fraunces', serif; font-weight: 500;
+  font-size: var(--t-md); margin: 0 0 0.4rem; letter-spacing: -0.01em;
+}
+.crisis-row p { margin: 0; color: var(--ink-soft); font-size: var(--t-sm); line-height: 1.55; }
+
+/* mentor / capstone block */
+.capstone-side {
+  border: 1px solid var(--ink);
+  padding: 1.5rem 1.5rem 1.5rem 1.75rem;
+  background: color-mix(in srgb, var(--accent) 6%, var(--paper));
+  position: relative;
+}
+.capstone-side::before {
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0;
+  width: 4px; background: var(--accent);
+}
+.capstone-side .label {
+  font-family: 'JetBrains Mono', monospace; font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.16em;
+  color: var(--accent-deep); font-weight: 700;
+  margin: 0 0 0.75rem;
+}
+.capstone-side h4 {
+  font-family: 'Fraunces', serif; font-weight: 500;
+  font-size: 1.15rem; margin: 0 0 0.5rem; letter-spacing: -0.01em;
+}
+.capstone-side p { font-size: var(--t-sm); color: var(--ink-soft); margin: 0 0 0.5rem; line-height: 1.5; }
+.capstone-side .seal {
+  margin-top: 0.85rem; padding-top: 0.85rem;
+  border-top: var(--hair-soft);
+  font-family: 'JetBrains Mono', monospace; font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.14em;
+  color: var(--ink-mute);
+}
+.capstone-side .seal strong { color: var(--accent-deep); }
+
+/* === ACT 2 · MERKLE TREE === */
+.merkle {
+  margin-top: 2rem;
+  padding: 2rem 1.5rem;
+  border: 1px solid var(--ink);
+  background: var(--seal-ink); color: var(--paper);
+  font-family: 'JetBrains Mono', monospace;
+  overflow-x: auto;
+}
+.merkle-tree {
+  display: grid; gap: 1rem;
+  font-size: 0.78rem; line-height: 1.4;
+  min-width: 540px;
+}
+.merkle-row { display: flex; justify-content: center; gap: 1rem; flex-wrap: nowrap; }
+.merkle-node {
+  border: 1px solid color-mix(in srgb, var(--paper) 30%, transparent);
+  padding: 0.5rem 0.75rem;
+  background: color-mix(in srgb, var(--paper) 6%, transparent);
+  color: color-mix(in srgb, var(--paper) 90%, transparent);
+  text-align: center;
+  min-width: 6.5rem;
+}
+.merkle-node strong {
+  display: block;
+  font-family: 'Fraunces', serif;
+  font-size: 0.7rem;
+  color: var(--accent); font-weight: 600; letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 0.2rem;
+}
+.merkle-root {
+  background: color-mix(in srgb, var(--accent) 25%, transparent);
+  border-color: var(--accent);
+  color: var(--paper);
+}
+.merkle-root strong { color: white; }
+.merkle-leaves .merkle-node {
+  font-size: 0.66rem;
+  min-width: 5rem;
+}
+.merkle-caption {
+  font-family: 'Fraunces', serif; font-style: italic;
+  font-size: var(--t-sm); color: color-mix(in srgb, var(--paper) 70%, transparent);
+  margin-top: 1.5rem; text-align: center;
+}
+
+/* === ACT 3 · AUDIT TRAIL TABLE === */
+.audit-feed {
+  margin-top: 2rem;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  overflow-x: auto;
+}
+.audit-feed-head {
+  display: grid; grid-template-columns: 7rem 8rem 1fr 5rem;
+  background: var(--ink); color: var(--paper);
+  padding: 0.6rem 1rem;
+  text-transform: uppercase; letter-spacing: 0.14em;
+  font-weight: 700; font-size: 0.7rem;
+}
+.audit-row {
+  display: grid; grid-template-columns: 7rem 8rem 1fr 5rem;
+  padding: 0.65rem 1rem;
+  border-top: var(--hair-soft);
+  align-items: center;
+}
+.audit-row:first-of-type { border-top: 0; }
+.audit-row .ts { color: var(--ink-mute); }
+.audit-row .ev { color: var(--accent-deep); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; }
+.audit-row .det { color: var(--ink-soft); word-break: break-all; }
+.audit-row .ok {
+  text-align: right;
+  color: var(--ink-mute); font-size: 0.7rem;
+}
+.audit-row .ok span {
+  display: inline-block;
+  padding: 0.1rem 0.4rem;
+  background: color-mix(in srgb, #2a5a3a 10%, transparent);
+  color: #1f4429;
+  border: 1px solid #2a5a3a;
+  text-transform: uppercase; letter-spacing: 0.08em;
+}
+
+/* === PHASES TIMELINE === */
+.phases {
+  display: grid; gap: 0;
+  margin-top: 2rem;
+}
+.phase {
+  display: grid; grid-template-columns: 4.5rem 1fr;
+  gap: 1.25rem; padding: 1.4rem 0;
+  border-bottom: var(--hair-soft);
+}
+.phase:last-child { border-bottom: 0; }
+.phase .ph {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem; font-weight: 700;
+  color: var(--accent); text-transform: uppercase; letter-spacing: 0.14em;
+  padding-top: 0.3rem;
+}
+.phase h3 {
+  font-family: 'Fraunces', serif; font-weight: 500;
+  font-size: var(--t-md); margin: 0 0 0.35rem; letter-spacing: -0.01em;
+}
+.phase h3 em { font-style: italic; color: var(--accent); }
+.phase p { margin: 0; font-size: var(--t-sm); color: var(--ink-soft); line-height: 1.55; max-width: 64ch; }
+
+/* === PROOF (dark) === */
+.proof { background: var(--ink); color: var(--paper); padding-block: clamp(3rem, 5vw, 5rem); position: relative; overflow: hidden; }
+.proof::before {
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 90% 10%, color-mix(in srgb, var(--accent) 30%, transparent), transparent 60%);
+  pointer-events: none;
+}
+.proof .frame { position: relative; }
+.proof h2 { color: var(--paper); }
+.proof h2 em { color: var(--accent); }
+.proof-grid {
+  display: grid; gap: 1rem; margin-top: 2rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { .proof-grid { grid-template-columns: repeat(2, 1fr); } }
+.proof-item {
+  border: 1px solid color-mix(in srgb, var(--paper) 30%, transparent);
+  padding: 1.5rem;
+  background: color-mix(in srgb, var(--paper) 5%, transparent);
+}
+.proof-item h3 {
+  font-family: 'Fraunces', serif; margin: 0 0 0.5rem;
+  font-size: var(--t-md); color: var(--accent);
+  font-weight: 500; letter-spacing: -0.01em;
+}
+.proof-item code {
+  font-family: 'JetBrains Mono', monospace; font-size: var(--t-xs);
+  color: color-mix(in srgb, var(--paper) 90%, transparent);
+  background: color-mix(in srgb, var(--paper) 8%, transparent);
+  padding: 0.15rem 0.4rem;
+}
+.proof-item p { margin: 0.5rem 0 0; color: color-mix(in srgb, var(--paper) 80%, transparent); font-size: var(--t-sm); }
+
+/* === STACK === */
+.stack { padding-block: clamp(3rem, 5vw, 5rem); border-bottom: var(--hair); }
+.stack-list { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.5rem; }
+.stack-tag {
+  padding: 0.5rem 0.9rem; border: 1px solid var(--ink);
+  font-family: 'JetBrains Mono', monospace; font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.14em; font-weight: 600;
+}
+
+/* === END CTA === */
+.endcta {
+  padding-block: clamp(3rem, 5vw, 5rem);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 10%, transparent), var(--paper));
+}
+.endcta .frame { display: grid; gap: 2rem; grid-template-columns: 1fr; }
+@media (min-width: 760px) { .endcta .frame { grid-template-columns: 2fr 1fr; align-items: end; } }
+.endcta h2 {
+  font-family: 'Fraunces', serif; font-size: var(--t-2xl);
+  font-weight: 300; font-variation-settings: "opsz" 144, "SOFT" 100;
+  margin: 0 0 1rem; letter-spacing: -0.025em; line-height: 1.05;
+}
+.endcta h2 em {
+  font-style: italic; color: var(--accent);
+  background: linear-gradient(180deg, transparent 70%, color-mix(in srgb, var(--accent) 25%, transparent) 70%);
+}
+.endcta p { color: var(--ink-soft); margin: 0; max-width: 52ch; }
+.endcta .actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+
+.foot { background: var(--ink); color: var(--paper); }
+.foot .dot { color: var(--accent); }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="tricolour" aria-hidden="true"></div>
+
+<header class="topnav">
+  <div class="frame">
+    <div class="brand"><a href="../index.html">dmj<span class="dot">.</span>one</a></div>
+    <nav aria-label="Primary">
+      <ul>
+        <li><a href="../index.html#catalogue">Catalogue</a></li>
+        <li><a href="../index.html#manifesto">Manifesto</a></li>
+        <li><a href="../index.html#hire">Hire</a></li>
+        <li><a href="https://github.com/ankit2807-tech/bharat-evote" rel="noopener">GitHub</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ============ HERO ============ -->
+<section class="bv-hero">
+  <div class="frame">
+    <p class="crumbs">
+      <a href="../index.html">Catalogue</a> /
+      <a href="../index.html#cat-bharat">Bharat-First</a> /
+      <span>Bharat eVote</span>
+    </p>
+
+    <span class="bv-eyebrow">Capstone · Bharat-First · Civic Tech</span>
+
+    <div class="bv-hero-grid">
+      <div>
+        <h1>
+          A sealed ballot.<br>
+          A public <em>Merkle root.</em><br>
+          Every vote auditable.
+          <span class="deva">भारत eVote · for an Indian election</span>
+        </h1>
+        <p class="lede">
+          A remote, auditable, accessible voting system for Indian elections. The application, the cryptographic audit log, the project report and the pitch deck <strong>all run from a single Cloud Run container,</strong> sized for a 1 GB-RAM phone on 3G.
+        </p>
+        <div class="bv-cta-row">
+          <a class="btn btn-primary" href="https://bharat-evote.dmj.one" rel="noopener">Open the live app</a>
+          <a class="btn btn-ghost" href="https://github.com/ankit2807-tech/bharat-evote" rel="noopener">View source</a>
+          <a class="btn btn-ghost" href="https://bharat-evote.dmj.one/audit.html" rel="noopener">Public audit page</a>
+        </div>
+      </div>
+
+      <aside class="envelope" aria-label="Sealed ballot envelope">
+        <p class="envelope-head">Sealed ballot · ciphertext header</p>
+        <div class="envelope-row">
+          <span class="k">alg</span><span class="v">AES-256-GCM</span>
+        </div>
+        <div class="envelope-row">
+          <span class="k">kdf</span><span class="v">HKDF-SHA-256</span>
+        </div>
+        <div class="envelope-row">
+          <span class="k">blind</span><span class="v">voter ↔ ballot unlinked</span>
+        </div>
+        <div class="envelope-row">
+          <span class="k">root</span><span class="v">7c3a · 9b0f · e441 · 8d12</span>
+        </div>
+        <div class="envelope-row">
+          <span class="k">leaf</span><span class="v">SHA-256(ciphertext)</span>
+        </div>
+        <div class="envelope-row">
+          <span class="k">pq</span><span class="v">ML-KEM-768 · X25519 (planned)</span>
+        </div>
+        <div class="wax-seal" aria-label="Sealed">
+          <span>Sealed</span>
+          <strong>EC</strong>
+          <span>2026</span>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATS ============ -->
+<section class="bv-stats" aria-label="At a glance">
+  <div class="bv-stat"><span class="num">1 GB</span><span class="lbl">Phone RAM target on 3G</span></div>
+  <div class="bv-stat"><span class="num">512 MB</span><span class="lbl">Cloud Run · scale-to-zero</span></div>
+  <div class="bv-stat"><span class="num">9</span><span class="lbl">Public routes · one image</span></div>
+  <div class="bv-stat"><span class="num">2</span><span class="lbl">Languages · EN + हिन्दी</span></div>
+  <div class="bv-stat"><span class="num">0</span><span class="lbl">Client npm dependencies</span></div>
+</section>
+
+<!-- ============ ACT I · TRUST CRISIS ============ -->
+<section class="act act-problem" aria-labelledby="prob-h">
+  <div class="frame">
+    <p class="act-num">Act I · The Crisis</p>
+    <h2 id="prob-h">A vote you cannot <em>verify</em><br>is a vote you cannot trust.</h2>
+
+    <div class="crisis-grid">
+      <ol class="crisis-stack">
+        <li class="crisis-row">
+          <span class="pn">Pain · 01</span>
+          <div>
+            <h3>Remote voting is not the same as online voting.</h3>
+            <p>The migrant worker, the deployed soldier, the student on exam day. Indian elections still ask them to be in their constituency on a Tuesday. The country is overdue a remote primitive that an Election Commission could actually trust.</p>
+          </div>
+        </li>
+        <li class="crisis-row">
+          <span class="pn">Pain · 02</span>
+          <div>
+            <h3>"Trust me, I am the server" is the wrong answer.</h3>
+            <p>An election cannot rest on the operator's good intentions. A ballot has to be sealed before it is cast, the audit log has to be append-only, and the public has to be able to verify the count without trusting the counter.</p>
+          </div>
+        </li>
+        <li class="crisis-row">
+          <span class="pn">Pain · 03</span>
+          <div>
+            <h3>The crypto has to survive the next twenty years.</h3>
+            <p>A 2026 ballot system that ships only AES and X25519 will be reading harvested ciphertext through a quantum lens by 2040. The contract has to slot ML-KEM-768 in without rewriting the protocol.</p>
+          </div>
+        </li>
+        <li class="crisis-row">
+          <span class="pn">Pain · 04</span>
+          <div>
+            <h3>Accessibility is a constitutional question.</h3>
+            <p>If the voting tool will not open on a 1 GB-RAM phone, on 3G, in two languages, with screen-reader support, a disenfranchisement is being built into the platform. WCAG 2.2 from the first commit, not the last.</p>
+          </div>
+        </li>
+      </ol>
+
+      <aside class="capstone-side">
+        <p class="label">Capstone · Final Semester</p>
+        <h4>Built by Ankit Saini</h4>
+        <p>Reg. No. <strong>GF202215717</strong>. B.Tech CSE (Data Science), Yogananda School of AI, Computers and Data Sciences, Shoolini University, Solan, H.P.</p>
+        <p>Single Express service. In-memory voter roll, ballot box and Merkle audit log. Web-based pitch deck and capstone report served from the same container as the app.</p>
+        <p class="seal">Capstone Mentor: <strong>Ms Ishani Sharma</strong> · Engineering and deploy partnership: <strong>dmj.one</strong></p>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ACT II · SEALED BALLOT + MERKLE ============ -->
+<section class="act" aria-labelledby="prom-h">
+  <div class="frame">
+    <p class="act-num">Act II · The Promise</p>
+    <h2 id="prom-h">Seal the ballot. Hash the ciphertext. <em>Publish the root.</em></h2>
+    <p style="font-family:'Fraunces',serif;font-size:var(--t-md);color:var(--ink-soft);max-width:62ch;margin:0;">
+      Every cast vote becomes a leaf. Every leaf hashes upward into a tree. Every observer can fetch the public root from <code>/audit.html</code> and prove their ballot is in the count, without revealing their choice. The voter ↔ ballot link is blinded before storage.
+    </p>
+
+    <figure class="merkle" aria-label="Merkle tree of sealed ballots">
+      <div class="merkle-tree">
+        <div class="merkle-row">
+          <div class="merkle-node merkle-root">
+            <strong>Public Root</strong>
+            7c3a · 9b0f
+          </div>
+        </div>
+        <div class="merkle-row">
+          <div class="merkle-node">
+            <strong>H(L1, L2)</strong>
+            a14e · 22c7
+          </div>
+          <div class="merkle-node">
+            <strong>H(L3, L4)</strong>
+            5d80 · ff19
+          </div>
+        </div>
+        <div class="merkle-row merkle-leaves">
+          <div class="merkle-node">
+            <strong>Leaf 1</strong>
+            ct·ABCD
+          </div>
+          <div class="merkle-node">
+            <strong>Leaf 2</strong>
+            ct·EF01
+          </div>
+          <div class="merkle-node">
+            <strong>Leaf 3</strong>
+            ct·2345
+          </div>
+          <div class="merkle-node">
+            <strong>Leaf 4</strong>
+            ct·6789
+          </div>
+        </div>
+      </div>
+      <figcaption class="merkle-caption">
+        Each leaf is SHA-256 of one sealed ballot. The root is published. The voter holds an inclusion proof. The count is auditable without breaking the seal.
+      </figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ============ ACT III · AUDIT TRAIL ============ -->
+<section class="act" aria-labelledby="audit-h">
+  <div class="frame">
+    <p class="act-num">Act III · The Trail</p>
+    <h2 id="audit-h">A public log every observer can <em>replay.</em></h2>
+    <p style="font-family:'Fraunces',serif;font-size:var(--t-md);color:var(--ink-soft);max-width:60ch;margin:0;">
+      The admin console exposes a SIEM-style log feed at <code>/admin.html</code> and a public audit page at <code>/audit.html</code>. PII never enters logs. Voter IDs are masked before any OTP-issuance line is written.
+    </p>
+
+    <div class="audit-feed" role="table" aria-label="Audit log sample">
+      <div class="audit-feed-head" role="row">
+        <span>Time</span>
+        <span>Event</span>
+        <span>Detail</span>
+        <span>Status</span>
+      </div>
+      <div class="audit-row" role="row">
+        <span class="ts">09:14:02</span>
+        <span class="ev">phase</span>
+        <span class="det">election.open · constituency=PB-13 · phase=cast</span>
+        <span class="ok"><span>OK</span></span>
+      </div>
+      <div class="audit-row" role="row">
+        <span class="ts">09:14:31</span>
+        <span class="ev">otp</span>
+        <span class="det">voter=••••••••07 · channel=sms · otp_sent</span>
+        <span class="ok"><span>OK</span></span>
+      </div>
+      <div class="audit-row" role="row">
+        <span class="ts">09:14:58</span>
+        <span class="ev">auth</span>
+        <span class="det">voter=••••••••07 · session.created · ttl=600s</span>
+        <span class="ok"><span>OK</span></span>
+      </div>
+      <div class="audit-row" role="row">
+        <span class="ts">09:15:22</span>
+        <span class="ev">ballot</span>
+        <span class="det">seal · alg=AES-256-GCM · leaf=ct·ABCD · merkle.append</span>
+        <span class="ok"><span>OK</span></span>
+      </div>
+      <div class="audit-row" role="row">
+        <span class="ts">09:15:22</span>
+        <span class="ev">root</span>
+        <span class="det">publish · root=7c3a·9b0f·e441·8d12 · height=14</span>
+        <span class="ok"><span>OK</span></span>
+      </div>
+      <div class="audit-row" role="row">
+        <span class="ts">09:16:04</span>
+        <span class="ev">deny</span>
+        <span class="det">voter=••••••••22 · reason=double_cast · session=expired</span>
+        <span class="ok"><span>OK</span></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ACT IV · PHASES ============ -->
+<section class="act" id="phases" aria-labelledby="ph-h">
+  <div class="frame">
+    <p class="act-num">Act IV · The Flow</p>
+    <h2 id="ph-h">Six phases. Five gates. <em>One container.</em></h2>
+
+    <ol class="phases">
+      <li class="phase">
+        <span class="ph">Phase 01</span>
+        <div>
+          <h3>Voter <em>identifies.</em></h3>
+          <p>Voter ID + OTP at <code>/auth.html</code>. Voter IDs are masked in every log line. In demo mode the OTP returns in the response so reviewers can complete the flow without an SMS gateway; production is gated behind <code>NODE_ENV</code>.</p>
+        </div>
+      </li>
+      <li class="phase">
+        <span class="ph">Phase 02</span>
+        <div>
+          <h3>Session <em>starts.</em></h3>
+          <p>Short-lived session, blinded link to the ballot box. Voter ↔ ballot mapping never leaves memory. Server holds the roll, the session table, and the ballot box in three separate compartments.</p>
+        </div>
+      </li>
+      <li class="phase">
+        <span class="ph">Phase 03</span>
+        <div>
+          <h3>Ballot <em>seals.</em></h3>
+          <p>AES-256-GCM under HKDF-SHA-256 derived key. The symmetric leg is structured to slot a future ML-KEM-768 + X25519 hybrid in place without changing the protocol surface.</p>
+        </div>
+      </li>
+      <li class="phase">
+        <span class="ph">Phase 04</span>
+        <div>
+          <h3>Leaf <em>appends.</em></h3>
+          <p>SHA-256 of the ciphertext appends to the Merkle log. The new root is computed, published, and pinned to the audit page. Append-only by construction.</p>
+        </div>
+      </li>
+      <li class="phase">
+        <span class="ph">Phase 05</span>
+        <div>
+          <h3>Tally <em>runs.</em></h3>
+          <p>Live tally at <code>/results.html</code> · by party, seats, constituency. Counted without unsealing individual ballots wherever the tally permits.</p>
+        </div>
+      </li>
+      <li class="phase">
+        <span class="ph">Phase 06</span>
+        <div>
+          <h3>Public <em>audits.</em></h3>
+          <p><code>/audit.html</code> exposes the current root and a tail of leaf hashes. Observers can verify any ballot's inclusion without learning the choice it carries.</p>
+        </div>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============ PROOF ============ -->
+<section class="proof act" aria-labelledby="proof-h">
+  <div class="frame">
+    <p class="act-num">Act V · Proof</p>
+    <h2 id="proof-h">It already <em>runs.</em> One image. Free tier.</h2>
+
+    <div class="proof-grid">
+      <div class="proof-item">
+        <h3>Live · Cloud Run · asia-east1</h3>
+        <code>bharat-evote.dmj.one</code>
+        <p>Express bootstrap. Min instances 0, max 10. 512 MiB RAM. CNAME to ghs.googlehosted.com on Cloudflare DNS-only. <code>scripts/deploy.sh</code> wraps the same command and prints the URL.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Public Merkle root</h3>
+        <code>/audit.html · GET /v1/audit/root</code>
+        <p>Append-only ballot tree. Root + ciphertext tail visible to any observer. The election is verifiable without unsealing the votes.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Pitch deck and report · in-container</h3>
+        <code>/pitch · /report</code>
+        <p>25-slide web deck (←/→ keys) and the capstone report (DOCX + Markdown export) served from the same Express service as the app. One image, every artifact.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Zero client npm dependencies</h3>
+        <code>public/js · vanilla</code>
+        <p>Static UI is hand-written HTML, CSS and vanilla JavaScript. Service worker and manifest ship a PWA-ready install. Slow phones load fast.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Hybrid PQ-ready crypto</h3>
+        <code>src/crypto.js</code>
+        <p>AES-256-GCM today, structured for ML-KEM-768 + X25519 hybrid plus ML-DSA-65 Merkle-root signatures (report §11.2). The protocol surface does not change.</p>
+      </div>
+      <div class="proof-item">
+        <h3>SIEM-style admin console</h3>
+        <code>/admin.html</code>
+        <p>Phase control, structured JSON log, ring buffer, in-memory store you can swap for Cloud Spanner behind the same interface. Reviewers replay the entire election without setup.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STACK ============ -->
+<section class="stack" aria-labelledby="tech-h">
+  <div class="frame">
+    <p class="act-num">The Stack</p>
+    <h2 id="tech-h" style="font-size:var(--t-xl);font-weight:400;font-family:'Fraunces',serif;font-variation-settings:'opsz' 144,'SOFT' 50;margin:0;letter-spacing:-0.02em;">One container. <em>Every artifact.</em></h2>
+    <ul class="stack-list">
+      <li class="stack-tag">Node.js 22</li>
+      <li class="stack-tag">Express</li>
+      <li class="stack-tag">AES-256-GCM</li>
+      <li class="stack-tag">HKDF-SHA-256</li>
+      <li class="stack-tag">SHA-256 Merkle</li>
+      <li class="stack-tag">ML-KEM-768 (planned)</li>
+      <li class="stack-tag">ML-DSA-65 (planned)</li>
+      <li class="stack-tag">Cloud Run</li>
+      <li class="stack-tag">Cloud Build</li>
+      <li class="stack-tag">Cloudflare DNS</li>
+      <li class="stack-tag">Service Worker · PWA</li>
+      <li class="stack-tag">Vanilla HTML / CSS / JS</li>
+      <li class="stack-tag">i18n EN / हिन्दी</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ END CTA ============ -->
+<section class="endcta" aria-labelledby="cta-h">
+  <div class="frame">
+    <div>
+      <h2 id="cta-h">Need a partner who can ship · or a mentor who can guide a team to <em>ship the same way?</em></h2>
+      <p>An election is the highest-stakes UX in the country. The same posture · sealed inputs, public audit, accessible from line one · works for any application where trust has to be earned in code.</p>
+    </div>
+    <div class="actions">
+      <a class="btn btn-primary" href="../index.html#hire">Get in touch</a>
+      <a class="btn btn-ghost" href="../index.html">Back to catalogue</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="frame">
+    <div>
+      <h2 style="font-family:'Fraunces',serif;font-size:var(--t-xl);margin:0 0 1rem;">dmj<span class="dot">.</span>one</h2>
+      <p>Dream, Manifest and Journey, Together as One.</p>
+      <p class="meta">© 2026 Divya Mohan · Bharat eVote was built by Ankit Saini as his B.Tech CSE (Data Science) capstone at Shoolini University. Capstone Mentor: Ms Ishani Sharma. Engineering and deploy partnership with dmj.one. Repository transferred to the author.</p>
+    </div>
+    <div>
+      <p class="meta">Catalogue</p>
+      <p><a href="../index.html#catalogue">All 47 products</a></p>
+      <p><a href="../index.html#cat-bharat">Bharat-First</a></p>
+      <p><a href="../index.html#hire">Hire</a></p>
+    </div>
+    <div>
+      <p class="meta">Bharat eVote</p>
+      <p><a href="https://bharat-evote.dmj.one" rel="noopener">Live app</a></p>
+      <p><a href="https://bharat-evote.dmj.one/audit.html" rel="noopener">Public audit</a></p>
+      <p><a href="https://bharat-evote.dmj.one/pitch/" rel="noopener">Pitch deck</a></p>
+      <p><a href="https://bharat-evote.dmj.one/report/" rel="noopener">Report</a></p>
+      <p><a href="https://github.com/ankit2807-tech/bharat-evote" rel="noopener">Source</a></p>
+      <p><a href="mailto:contact@dmj.one">contact@dmj.one</a></p>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

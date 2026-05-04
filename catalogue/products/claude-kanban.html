@@ -1,0 +1,708 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#7a2c5e">
+<meta name="color-scheme" content="light">
+
+<title>Claude Kanban · Drop an idea. Walk away. Come back to committed code · dmj.one</title>
+<meta name="description" content="An autonomous AI build pipeline using the Claude Code SDK. Brainstorms, builds, reviews, fixes, commits and pushes without a human in the loop. 305 tests passing. 5 dependencies.">
+<meta property="og:title" content="Claude Kanban · The kanban board that builds itself">
+<meta property="og:description" content="Drop an idea on the board. Walk away. Come back to committed code. Autonomous Claude Code SDK pipeline with self-healing and rejection learning.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,30..100&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="../assets/core.css">
+
+<style>
+:root {
+  --accent: var(--c-ai);
+  --accent-deep: #4f1a3d;
+  --col-todo:   #6b6b6b;
+  --col-doing:  #b48a2b;
+  --col-review: #1f3a5f;
+  --col-done:   #355c3c;
+}
+body { background: var(--paper); }
+
+/* ====== HERO · KANBAN-AS-MOTIF ============== */
+.ck-hero {
+  position: relative;
+  padding-block: clamp(3rem, 5vw, 5rem) clamp(2rem, 4vw, 3rem);
+  border-bottom: var(--hair);
+  background: var(--paper);
+  overflow: hidden;
+}
+.ck-hero::before {
+  content: ""; position: absolute; inset: 0;
+  background-image:
+    linear-gradient(90deg, color-mix(in srgb, var(--accent) 10%, transparent) 1px, transparent 1px);
+  background-size: 25% 100%;
+  opacity: 0.5;
+  pointer-events: none;
+}
+.ck-hero .frame { position: relative; z-index: 1; }
+
+.crumbs {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink-mute);
+  margin: 0 0 2rem;
+  display: flex; gap: 0.5rem; flex-wrap: wrap;
+}
+.crumbs a { border-bottom: 1px solid var(--ink-mute); padding-bottom: 1px; }
+.crumbs a:hover { color: var(--accent); border-color: var(--accent); }
+.crumbs span { color: var(--accent); }
+
+.ck-eyebrow {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  padding: 0.4rem 0.85rem;
+  border: 1px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  color: var(--accent-deep);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  margin-bottom: 1.5rem;
+}
+.ck-eyebrow::before {
+  content: ""; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+.ck-hero h1 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-3xl);
+  font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 30, "WONK" 1;
+  letter-spacing: -0.03em;
+  line-height: 0.94;
+  margin: 0;
+  max-width: 13ch;
+}
+.ck-hero h1 em {
+  font-style: italic;
+  color: var(--accent);
+  font-variation-settings: "opsz" 144, "SOFT" 100, "WONK" 1;
+}
+.ck-hero .lede {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md);
+  font-weight: 300;
+  line-height: 1.45;
+  color: var(--ink-soft);
+  margin: 1.75rem 0 0;
+  max-width: 56ch;
+}
+.ck-hero .lede strong {
+  font-weight: 600;
+  background: linear-gradient(180deg, transparent 60%, color-mix(in srgb, var(--accent) 30%, transparent) 60%);
+  padding: 0 0.1em;
+  color: var(--ink);
+}
+
+.cta-row {
+  margin-top: 2rem;
+  display: flex; gap: 0.75rem; flex-wrap: wrap;
+}
+.btn {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.7rem 1.1rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 700;
+  border: 1px solid var(--ink);
+  transition: background .15s, color .15s, transform .15s, box-shadow .15s;
+}
+.btn:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--ink); }
+.btn-primary { background: var(--accent); color: white; border-color: var(--accent); }
+.btn-ghost { background: transparent; color: var(--ink); }
+
+/* ====== KANBAN BOARD ============================== */
+.board {
+  margin-top: 3rem;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { .board { grid-template-columns: repeat(4, 1fr); } }
+
+.col {
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  display: grid;
+  grid-template-rows: auto 1fr;
+}
+.col-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--ink);
+  background: var(--paper-soft);
+}
+.col-head .ttl {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--ink);
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.col-head .ttl::before {
+  content: ""; width: 10px; height: 10px;
+  background: var(--col); border-radius: 50%;
+}
+.col-head .count {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  color: var(--ink-mute);
+  font-weight: 600;
+}
+.col[data-col="todo"]   { --col: var(--col-todo); }
+.col[data-col="doing"]  { --col: var(--col-doing); }
+.col[data-col="review"] { --col: var(--col-review); }
+.col[data-col="done"]   { --col: var(--col-done); }
+
+.col-body { padding: 0.6rem; display: grid; gap: 0.6rem; }
+.card {
+  background: var(--paper);
+  border: 1px solid var(--paper-edge);
+  border-left: 4px solid var(--col);
+  padding: 0.85rem 1rem;
+  display: grid; gap: 0.45rem;
+  box-shadow: 0 1px 0 var(--paper-edge);
+}
+.card .id {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--ink-mute);
+  font-weight: 700;
+}
+.card .title {
+  font-family: 'Fraunces', serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  margin: 0;
+  line-height: 1.25;
+}
+.card .meta {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--ink-mute);
+  display: flex; gap: 0.5rem; flex-wrap: wrap;
+}
+.card .score {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--col);
+  font-weight: 700;
+}
+
+/* ====== STATS ============== */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  background: var(--ink);
+  color: var(--paper);
+  border-block: 2px solid var(--ink);
+}
+.stat {
+  padding: 1.5rem clamp(1rem, 2vw, 1.5rem);
+  border-right: 1px solid color-mix(in srgb, var(--paper) 20%, transparent);
+}
+.stat:last-child { border-right: 0; }
+.stat .num {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  font-variation-settings: "opsz" 144, "SOFT" 30;
+  display: block; line-height: 1; color: var(--accent);
+}
+.stat .lbl {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  margin-top: 0.6rem; display: block;
+  color: color-mix(in srgb, var(--paper) 75%, transparent);
+}
+
+/* ====== ACT ============== */
+.act {
+  padding-block: clamp(3rem, 5vw, 5rem);
+  border-bottom: var(--hair);
+}
+.act-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 700;
+  margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 1rem;
+}
+.act-num::before { content: ""; width: 2.5rem; height: 1px; background: var(--accent); }
+.act h2 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 50, "WONK" 1;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+  margin: 0 0 1.5rem;
+  max-width: 22ch;
+}
+.act h2 em { font-style: italic; color: var(--accent); }
+
+.problem-grid { display: grid; gap: 1.5rem; grid-template-columns: 1fr; margin-top: 2rem; }
+@media (min-width: 760px) { .problem-grid { grid-template-columns: 1fr 1fr; } }
+.pp {
+  display: grid; grid-template-columns: auto 1fr; gap: 1.25rem;
+  padding: 1.25rem 0;
+  border-top: var(--hair-soft);
+}
+.pp .pn {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-size: 1.6rem;
+  color: var(--accent);
+  line-height: 1;
+}
+.pp h3 {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: var(--t-md);
+  margin: 0 0 0.4rem;
+  letter-spacing: -0.01em;
+}
+.pp p { margin: 0; font-size: var(--t-sm); color: var(--ink-soft); }
+
+/* ====== PIPELINE STEPS ============== */
+.pipe {
+  display: grid;
+  gap: 0;
+  grid-template-columns: 1fr;
+  margin-top: 2rem;
+  border: 1px solid var(--ink);
+}
+@media (min-width: 880px) { .pipe { grid-template-columns: repeat(5, 1fr); } }
+.pstep {
+  padding: 1.5rem 1.25rem;
+  border-right: 1px solid var(--paper-edge);
+  position: relative;
+  background: var(--paper);
+}
+.pstep:last-child { border-right: 0; }
+@media (max-width: 879px) {
+  .pstep { border-right: 0; border-bottom: 1px solid var(--paper-edge); }
+  .pstep:last-child { border-bottom: 0; }
+}
+.pstep .pn {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--accent);
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+.pstep h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.05rem;
+  margin: 0 0 0.5rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.pstep p { margin: 0; font-size: var(--t-sm); color: var(--ink-soft); line-height: 1.45; }
+
+/* ====== TRUST GRID ============== */
+.trust-grid {
+  display: grid;
+  gap: 0;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  margin-top: 2rem;
+  border: 1px solid var(--ink);
+}
+.trust-cell {
+  padding: 1.5rem 1.25rem;
+  border-right: 1px solid var(--paper-edge);
+  background: var(--paper);
+  text-align: center;
+}
+.trust-cell:last-child { border-right: 0; }
+.trust-cell .n {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 50;
+  letter-spacing: -0.03em;
+  color: var(--accent);
+  display: block;
+  line-height: 1;
+}
+.trust-cell .l {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--ink);
+  font-weight: 600;
+  display: block;
+  margin-top: 0.6rem;
+}
+
+/* ====== TECH STACK ============== */
+.stack-list {
+  display: flex; flex-wrap: wrap; gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+.stack-tag {
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--ink);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 600;
+}
+
+/* ====== END CTA ============== */
+.endcta {
+  padding-block: clamp(3rem, 5vw, 5rem);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 10%, transparent), var(--paper));
+}
+.endcta .frame { display: grid; gap: 2rem; grid-template-columns: 1fr; }
+@media (min-width: 760px) { .endcta .frame { grid-template-columns: 2fr 1fr; align-items: end; } }
+.endcta h2 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 300;
+  font-variation-settings: "opsz" 144, "SOFT" 100;
+  margin: 0 0 1rem;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+}
+.endcta h2 em {
+  font-style: italic;
+  color: var(--accent);
+  background: linear-gradient(180deg, transparent 70%, color-mix(in srgb, var(--accent) 25%, transparent) 70%);
+}
+.endcta p { color: var(--ink-soft); margin: 0; max-width: 50ch; }
+.endcta .actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+
+.foot { background: var(--ink); color: var(--paper); }
+.foot .dot { color: var(--accent); }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topnav">
+  <div class="frame">
+    <div class="brand"><a href="../index.html">dmj<span class="dot">.</span>one</a></div>
+    <nav aria-label="Primary">
+      <ul>
+        <li><a href="../index.html#catalogue">Catalogue</a></li>
+        <li><a href="../index.html#manifesto">Manifesto</a></li>
+        <li><a href="../index.html#hire">Hire</a></li>
+        <li><a href="https://github.com/divyamohan1993/claude-kanban" rel="noopener">GitHub</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ============ HERO ============ -->
+<section class="ck-hero">
+  <div class="frame">
+    <p class="crumbs">
+      <a href="../index.html">Catalogue</a> /
+      <a href="../index.html#cat-ai">AI · Agents</a> /
+      <span>Claude Kanban</span>
+    </p>
+
+    <span class="ck-eyebrow">No. 17 · AI · Autonomous build pipeline</span>
+
+    <h1>
+      Drop an idea.<br>
+      Walk away.<br>
+      Come back to <em>committed code.</em>
+    </h1>
+
+    <p class="lede">
+      Most "AI coding" tools want the engineer present. The hard part of software is not the typing. It is the <strong>long, lonely back-half of an idea</strong>: the spec, the tests, the review loop, the rebase, the push. Claude Kanban does that part. By itself.
+    </p>
+
+    <div class="cta-row">
+      <a class="btn btn-primary" href="https://github.com/divyamohan1993/claude-kanban" rel="noopener">View source</a>
+      <a class="btn btn-ghost" href="https://github.com/divyamohan1993/claude-kanban#-quick-start" rel="noopener">Quick start</a>
+      <a class="btn btn-ghost" href="#how">How the loop runs</a>
+    </div>
+
+    <!-- Live kanban motif -->
+    <div class="board" role="img" aria-label="A live snapshot of the kanban board, showing four columns from idea to committed code">
+      <div class="col" data-col="todo">
+        <div class="col-head"><span class="ttl">Backlog</span><span class="count">3</span></div>
+        <div class="col-body">
+          <article class="card">
+            <span class="id">CARD-127</span>
+            <h3 class="title">Add CSV import to settings</h3>
+            <span class="meta">label · enhancement</span>
+          </article>
+          <article class="card">
+            <span class="id">CARD-128</span>
+            <h3 class="title">Cache user-prefs in IndexedDB</h3>
+            <span class="meta">label · perf</span>
+          </article>
+          <article class="card">
+            <span class="id">CARD-129</span>
+            <h3 class="title">Fix focus ring on dialog close</h3>
+            <span class="meta">label · a11y</span>
+          </article>
+        </div>
+      </div>
+
+      <div class="col" data-col="doing">
+        <div class="col-head"><span class="ttl">Building</span><span class="count">1</span></div>
+        <div class="col-body">
+          <article class="card">
+            <span class="id">CARD-126</span>
+            <h3 class="title">Add CSV import to settings</h3>
+            <span class="meta">claude-sonnet-4-6 · auto-snapshot</span>
+            <span class="score">Build active</span>
+          </article>
+        </div>
+      </div>
+
+      <div class="col" data-col="review">
+        <div class="col-head"><span class="ttl">AI Review</span><span class="count">1</span></div>
+        <div class="col-body">
+          <article class="card">
+            <span class="id">CARD-125</span>
+            <h3 class="title">Cache user-prefs in IndexedDB</h3>
+            <span class="meta">auto-fix · attempt 2/3</span>
+            <span class="score">Score 7 / 10</span>
+          </article>
+        </div>
+      </div>
+
+      <div class="col" data-col="done">
+        <div class="col-head"><span class="ttl">Done</span><span class="count">2</span></div>
+        <div class="col-body">
+          <article class="card">
+            <span class="id">CARD-124</span>
+            <h3 class="title">Fix focus ring on dialog close</h3>
+            <span class="meta">commit a3f8c · pushed</span>
+            <span class="score">Score 9 / 10 · Approved</span>
+          </article>
+          <article class="card">
+            <span class="id">CARD-123</span>
+            <h3 class="title">Refactor session middleware</h3>
+            <span class="meta">commit 1b04e · pushed</span>
+            <span class="score">Score 10 / 10 · Approved</span>
+          </article>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ STATS ============ -->
+<section class="stats" aria-label="At a glance">
+  <div class="stat"><span class="num">305</span><span class="lbl">Automated tests passing</span></div>
+  <div class="stat"><span class="num">5</span><span class="lbl">Production dependencies</span></div>
+  <div class="stat"><span class="num">100</span><span class="lbl">API endpoints documented</span></div>
+  <div class="stat"><span class="num">9</span><span class="lbl">Stages per card cycle</span></div>
+  <div class="stat"><span class="num">0</span><span class="lbl">Build step required</span></div>
+</section>
+
+
+<!-- ============ ACT I · THE PROBLEM ============ -->
+<section class="act" aria-labelledby="prob-h">
+  <div class="frame">
+    <p class="act-num">Act I · The Problem</p>
+    <h2 id="prob-h">Coding tools <em>don't</em> let you walk away.</h2>
+    <p style="font-family:'Fraunces',serif;font-size:var(--t-md);color:var(--ink-soft);max-width:60ch;margin:0;">Pair-programming AI ships completions. But the back-half of building software, the bit that takes days, is still on you.</p>
+
+    <div class="problem-grid">
+      <div class="pp">
+        <span class="pn">i.</span>
+        <div>
+          <h3>Watch the agent. Approve every step.</h3>
+          <p>Most tools demand attention at every prompt. You can't go to bed. The flywheel breaks the moment you log off.</p>
+        </div>
+      </div>
+      <div class="pp">
+        <span class="pn">ii.</span>
+        <div>
+          <h3>Wire up the tests yourself.</h3>
+          <p>Generated code without a feedback loop is half a tool. There is no automatic re-run, no auto-fix, no rollback when the patch breaks main.</p>
+        </div>
+      </div>
+      <div class="pp">
+        <span class="pn">iii.</span>
+        <div>
+          <h3>Forget your own preferences next session.</h3>
+          <p>You said "no Tailwind" yesterday. Today it added Tailwind. The model forgets. The team rolls eyes.</p>
+        </div>
+      </div>
+      <div class="pp">
+        <span class="pn">iv.</span>
+        <div>
+          <h3>One bad command bricks the repo.</h3>
+          <p>Without snapshots, audit logs and rollback, an autonomous agent is a liability. Most teams will not run one in production.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ ACT II · PROMISE ============ -->
+<section class="act" style="background:var(--paper-soft);" aria-labelledby="prom-h">
+  <div class="frame">
+    <p class="act-num">Act II · The Promise</p>
+    <h2 id="prom-h">A board.<br>An idea file.<br><em>That is the input.</em></h2>
+    <p style="font-family:'Fraunces',serif;font-size:var(--t-md);color:var(--ink-soft);max-width:60ch;margin:0;">
+      Drop an <code style="font-family:'JetBrains Mono',monospace;font-size:0.95em;color:var(--accent);">idea.md</code> in a folder. Set the mode to single-project. The orchestrator reads it as the north star. Every 30 minutes it analyses the codebase and creates improvement cards. Each card flows through the full nine-stage cycle. No human required.
+    </p>
+  </div>
+</section>
+
+
+<!-- ============ ACT III · HOW IT WORKS ============ -->
+<section class="act" id="how" aria-labelledby="how-h">
+  <div class="frame">
+    <p class="act-num">Act III · The Pipeline</p>
+    <h2 id="how-h">Five moves.<br>Run on a <em>loop.</em></h2>
+
+    <ol class="pipe">
+      <li class="pstep">
+        <p class="pn">Step 01</p>
+        <h3>Brainstorm</h3>
+        <p>Card title in. Claude generates a spec, lists files to touch, estimates the work, surfaces risks. Snapshot taken before any byte is written.</p>
+      </li>
+      <li class="pstep">
+        <p class="pn">Step 02</p>
+        <h3>Build</h3>
+        <p>Claude Code SDK runs the patch in a real shell. Self-healing engine groups failures by card, scans every 30s, retries with new context.</p>
+      </li>
+      <li class="pstep">
+        <p class="pn">Step 03</p>
+        <h3>AI Review · 1 to 10</h3>
+        <p>A separate Claude session reviews the diff. Scores out of 10. Score 8+ ships. 5-7 triggers up to three auto-fix passes. Below 5 escalates to human.</p>
+      </li>
+      <li class="pstep">
+        <p class="pn">Step 04</p>
+        <h3>Commit and push</h3>
+        <p>Approved cards get a real git commit, real message, real push. Concurrency configurable. Card dependencies respected so two PRs never collide.</p>
+      </li>
+      <li class="pstep">
+        <p class="pn">Step 05</p>
+        <h3>Learn the rejection</h3>
+        <p>You reject a card, the orchestrator asks why. Your feedback is stored and injected into future brainstorm and discovery prompts. The board adapts.</p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+
+<!-- ============ ACT IV · TRUST ============ -->
+<section class="act" aria-labelledby="trust-h">
+  <div class="frame">
+    <p class="act-num">Act IV · Trust by the numbers</p>
+    <h2 id="trust-h">Production-grade <em>or it does not ship.</em></h2>
+    <p style="font-family:'Fraunces',serif;font-size:var(--t-md);color:var(--ink-soft);max-width:60ch;margin:0;">305 tests across five suites. Two-server security. Tiered backups. Argon2id passwords. AES-256-GCM encryption. CSP nonce. CSRF. Token-bucket rate limiting. WCAG 2.2 AAA on the board.</p>
+
+    <div class="trust-grid">
+      <div class="trust-cell"><span class="n">168</span><span class="l">Reliability</span></div>
+      <div class="trust-cell"><span class="n">27</span><span class="l">Dependency audit</span></div>
+      <div class="trust-cell"><span class="n">28</span><span class="l">Performance</span></div>
+      <div class="trust-cell"><span class="n">35</span><span class="l">Data durability</span></div>
+      <div class="trust-cell"><span class="n">47</span><span class="l">Code quality</span></div>
+    </div>
+
+    <p class="act-num" style="margin-top:3rem;">Two-server design</p>
+    <h3 style="font-family:'Fraunces',serif;font-size:var(--t-xl);font-weight:400;font-variation-settings:'opsz' 144,'SOFT' 50;margin:0 0 1rem;letter-spacing:-0.02em;max-width:30ch;">Public board on <em style="color:var(--accent);font-style:italic;">0.0.0.0</em>. Admin panel locked to <em style="color:var(--accent);font-style:italic;">127.0.0.1</em>.</h3>
+    <p style="font-family:'Fraunces',serif;font-size:var(--t-md);color:var(--ink-soft);max-width:60ch;margin:0;">Kernel-level TCP reject on the admin port. Roles tiered superadmin then admin then user. JWT auth, AES-256-GCM field encryption. Tiered backups every 5 minutes, hourly, daily. Heartbeat watchdog. Graceful shutdown with pipeline drain.</p>
+  </div>
+</section>
+
+
+<!-- ============ STACK ============ -->
+<section class="act" aria-labelledby="tech-h">
+  <div class="frame">
+    <p class="act-num">The Stack</p>
+    <h2 id="tech-h" style="font-size:var(--t-xl);font-weight:400;font-family:'Fraunces',serif;font-variation-settings:'opsz' 144,'SOFT' 50;margin:0;letter-spacing:-0.02em;">Five dependencies.<br>Zero <em>build step.</em><br>Cross-platform start script.</h2>
+    <ul class="stack-list">
+      <li class="stack-tag">JavaScript</li>
+      <li class="stack-tag">Node.js 18+</li>
+      <li class="stack-tag">Express</li>
+      <li class="stack-tag">SQLite (WAL)</li>
+      <li class="stack-tag">Argon2id + JWT + AES-256-GCM</li>
+      <li class="stack-tag">Pino structured logs</li>
+      <li class="stack-tag">Vanilla JS frontend (150KB)</li>
+      <li class="stack-tag">Claude Code SDK</li>
+      <li class="stack-tag">SSE live updates</li>
+      <li class="stack-tag">GitHub Actions CI</li>
+      <li class="stack-tag">Docker + Compose</li>
+      <li class="stack-tag">Kubernetes manifests</li>
+      <li class="stack-tag">GCP autoconfig (systemd + Nginx)</li>
+    </ul>
+  </div>
+</section>
+
+
+<!-- ============ END CTA ============ -->
+<section class="endcta" aria-labelledby="cta-h">
+  <div class="frame">
+    <div>
+      <h2 id="cta-h">If a board can ship code overnight, <em>your team can sleep.</em></h2>
+      <p>I build autonomous AI pipelines that survive contact with production: snapshots, audits, rollbacks, role-based access, kernel-level isolation. Drop me an idea.</p>
+    </div>
+    <div class="actions">
+      <a class="btn btn-primary" href="../index.html#hire">Hire me</a>
+      <a class="btn btn-ghost" href="../index.html">Back to catalogue</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="frame">
+    <div>
+      <h2 style="font-family:'Fraunces',serif;font-size:var(--t-xl);margin:0 0 1rem;">dmj<span class="dot">.</span>one</h2>
+      <p>Dream, Manifest and Journey, Together as One.</p>
+      <p class="meta">© 2026 Divya Mohan. Claude Kanban released under Apache 2.0. See NOTICE for attribution.</p>
+    </div>
+    <div>
+      <p class="meta">Catalogue</p>
+      <p><a href="../index.html#catalogue">All 47 products</a></p>
+      <p><a href="../index.html#cat-ai">AI · Agents</a></p>
+      <p><a href="../index.html#hire">Hire</a></p>
+    </div>
+    <div>
+      <p class="meta">Claude Kanban</p>
+      <p><a href="https://github.com/divyamohan1993/claude-kanban" rel="noopener">Source</a></p>
+      <p><a href="https://github.com/divyamohan1993/claude-kanban/actions" rel="noopener">CI status</a></p>
+      <p><a href="mailto:contact@dmj.one">contact@dmj.one</a></p>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

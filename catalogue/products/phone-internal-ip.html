@@ -1,0 +1,553 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#b48a2b">
+<meta name="color-scheme" content="light">
+
+<title>Phone IP Finder · Get the photos back from a cracked phone · dmj.one</title>
+<meta name="description" content="Your screen cracked. Your photos are inside. scrcpy needs the phone's local IP, but you cannot unlock the phone to read it. This is the small browser tool that finds it for you.">
+<meta property="og:title" content="Phone IP Finder · The photos come back.">
+<meta property="og:description" content="A tiny browser tool that surfaces your phone's internal IP so scrcpy can rescue what is inside.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,ital,wght,SOFT@9..144,0..1,300..900,30..100&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="../assets/core.css">
+
+<style>
+:root { --accent: var(--c-tools); --accent-deep: #7a5d18; }
+body { background: var(--paper); }
+
+.crumbs {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink-mute);
+  margin: 0 0 1.75rem;
+  display: flex; gap: 0.5rem; flex-wrap: wrap;
+}
+.crumbs a { border-bottom: 1px solid var(--ink-mute); padding-bottom: 1px; }
+.crumbs a:hover { color: var(--accent); border-color: var(--accent); }
+.crumbs span { color: var(--accent); }
+
+.btn {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.7rem 1.1rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 700;
+  border: 1px solid var(--ink);
+  transition: background .15s, color .15s, transform .15s, box-shadow .15s;
+}
+.btn:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--ink); }
+.btn-primary { background: var(--accent); color: white; border-color: var(--accent); }
+.btn-primary:hover { box-shadow: 4px 4px 0 var(--ink); }
+.btn-ghost { background: transparent; color: var(--ink); }
+
+/* ===== HERO · single column, broken-screen visual ==== */
+.pi-hero {
+  position: relative;
+  border-bottom: var(--hair);
+  padding-block: clamp(2.5rem, 5vw, 5rem) clamp(2rem, 4vw, 3.5rem);
+  background:
+    radial-gradient(ellipse 70% 60% at 50% 100%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 60%),
+    var(--paper);
+  overflow: hidden;
+}
+.pi-hero .frame { position: relative; z-index: 2; max-width: 880px; }
+
+.pi-eyebrow {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  padding: 0.4rem 0.85rem;
+  border: 1px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  color: var(--accent-deep);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  margin-bottom: 1.25rem;
+}
+.pi-eyebrow::before {
+  content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--accent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+.pi-hero h1 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-3xl);
+  font-weight: 300;
+  font-variation-settings: "opsz" 144, "SOFT" 100, "WONK" 1;
+  letter-spacing: -0.035em;
+  line-height: 0.95;
+  margin: 0;
+  max-width: 18ch;
+}
+.pi-hero h1 em {
+  font-style: italic;
+  color: var(--accent-deep);
+}
+
+.pi-hero .lede {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md);
+  font-weight: 300;
+  line-height: 1.5;
+  color: var(--ink-soft);
+  margin: 1.75rem 0 0;
+  max-width: 56ch;
+}
+.pi-hero .lede strong {
+  font-weight: 600;
+  color: var(--ink);
+  background: linear-gradient(180deg, transparent 60%, color-mix(in srgb, var(--accent) 28%, transparent) 60%);
+  padding: 0 0.1em;
+}
+.pi-cta { margin-top: 2rem; display: flex; gap: 0.6rem; flex-wrap: wrap; }
+
+/* ===== broken-screen SVG centerpiece ===== */
+.phone-art {
+  margin: 2.75rem auto 0;
+  max-width: 380px;
+  display: block;
+  filter: drop-shadow(0 12px 0 var(--ink));
+}
+.phone-art svg { width: 100%; height: auto; display: block; }
+
+/* ===== STATS RIBBON ===== */
+.pi-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  background: var(--ink);
+  color: var(--paper);
+  border-block: 2px solid var(--ink);
+}
+.pi-stat {
+  padding: 1.5rem clamp(1rem, 2vw, 1.5rem);
+  border-right: 1px solid color-mix(in srgb, var(--paper) 20%, transparent);
+}
+.pi-stat:last-child { border-right: 0; }
+.pi-stat .num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: clamp(2rem, 1.4rem + 2vw, 3rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  display: block; line-height: 1;
+  color: var(--accent);
+}
+.pi-stat .lbl {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  margin-top: 0.6rem; display: block;
+  color: color-mix(in srgb, var(--paper) 75%, transparent);
+}
+
+/* ===== ACTS ===== */
+.act {
+  padding-block: clamp(3rem, 5vw, 5rem);
+  border-bottom: var(--hair);
+}
+.act .frame { max-width: 880px; }
+.act-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 700;
+  margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 1rem;
+}
+.act-num::before { content: ""; width: 2.5rem; height: 1px; background: var(--accent); }
+.act h2 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 50, "WONK" 1;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+  margin: 0 0 1.5rem;
+  max-width: 22ch;
+}
+.act h2 em { font-style: italic; color: var(--accent); }
+.act-lede {
+  font-family: 'Fraunces', serif; font-size: var(--t-md);
+  color: var(--ink-soft); max-width: 56ch; margin: 0;
+}
+
+/* ===== STORY ARC · vertical timeline ===== */
+.arc {
+  margin-top: 2.5rem;
+  position: relative;
+  padding-left: 2.5rem;
+  border-left: 2px solid var(--accent);
+}
+.arc-step {
+  position: relative;
+  padding: 0 0 2.5rem 0;
+}
+.arc-step:last-child { padding-bottom: 0; }
+.arc-step::before {
+  content: ""; position: absolute;
+  left: -2.95rem; top: 0.35rem;
+  width: 0.95rem; height: 0.95rem;
+  background: var(--paper);
+  border: 2px solid var(--accent);
+  border-radius: 50%;
+}
+.arc-step .when {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--accent-deep);
+  margin: 0 0 0.4rem;
+}
+.arc-step h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.4rem;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  margin: 0 0 0.5rem;
+}
+.arc-step p {
+  margin: 0;
+  font-size: var(--t-base);
+  color: var(--ink-soft);
+}
+
+/* ===== how-it-works diagram ===== */
+.diagram {
+  margin-top: 2.25rem;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  padding: 1.75rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: var(--ink);
+  overflow-x: auto;
+}
+.diagram .a { color: var(--accent-deep); font-weight: 700; }
+.diagram .b { color: var(--ink-mute); }
+.diagram pre { margin: 0; }
+
+/* stack */
+.stack { padding-block: clamp(3rem, 5vw, 5rem); border-bottom: var(--hair); }
+.stack .frame { max-width: 880px; }
+.stack-list { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.5rem; }
+.stack-tag {
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--ink);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 600;
+}
+
+/* proof */
+.proof {
+  background: var(--ink);
+  color: var(--paper);
+  padding-block: clamp(3rem, 5vw, 5rem);
+  position: relative;
+  overflow: hidden;
+}
+.proof::before {
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 50% 100%, color-mix(in srgb, var(--accent) 30%, transparent), transparent 60%);
+  pointer-events: none;
+}
+.proof .frame { position: relative; max-width: 880px; }
+.proof h2 { color: var(--paper); }
+.proof h2 em { color: var(--accent); }
+.proof-grid { display: grid; gap: 1rem; margin-top: 2rem; grid-template-columns: 1fr; }
+@media (min-width: 760px) { .proof-grid { grid-template-columns: repeat(2, 1fr); } }
+.proof-item {
+  border: 1px solid color-mix(in srgb, var(--paper) 30%, transparent);
+  padding: 1.5rem;
+  background: color-mix(in srgb, var(--paper) 5%, transparent);
+}
+.proof-item h3 {
+  font-family: 'JetBrains Mono', monospace;
+  margin: 0 0 0.5rem;
+  font-size: 0.95rem;
+  color: var(--accent);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+.proof-item p { margin: 0; color: color-mix(in srgb, var(--paper) 80%, transparent); font-size: var(--t-sm); }
+
+/* end cta */
+.endcta {
+  padding-block: clamp(3rem, 5vw, 5rem);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 12%, transparent), var(--paper));
+}
+.endcta .frame { display: grid; gap: 2rem; grid-template-columns: 1fr; max-width: 880px; }
+@media (min-width: 760px) { .endcta .frame { grid-template-columns: 2fr 1fr; align-items: end; } }
+.endcta h2 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 300;
+  font-variation-settings: "opsz" 144, "SOFT" 100;
+  margin: 0 0 1rem;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+}
+.endcta h2 em {
+  font-style: italic;
+  color: var(--accent);
+  background: linear-gradient(180deg, transparent 70%, color-mix(in srgb, var(--accent) 25%, transparent) 70%);
+}
+.endcta p { color: var(--ink-soft); margin: 0; max-width: 50ch; }
+.endcta .actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+
+.foot { background: var(--ink); color: var(--paper); }
+.foot .dot { color: var(--accent); }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topnav">
+  <div class="frame">
+    <div class="brand"><a href="../index.html">dmj<span class="dot">.</span>one</a></div>
+    <nav aria-label="Primary">
+      <ul>
+        <li><a href="../index.html#catalogue">Catalogue</a></li>
+        <li><a href="../index.html#manifesto">Manifesto</a></li>
+        <li><a href="../index.html#hire">Hire</a></li>
+        <li><a href="https://github.com/divyamohan1993/phone-internal-ip" rel="noopener">GitHub</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ============ HERO ============ -->
+<section class="pi-hero">
+  <div class="frame">
+    <p class="crumbs">
+      <a href="../index.html">Catalogue</a> /
+      <a href="../index.html#cat-tools">Tools</a> /
+      <span>Phone IP Finder</span>
+    </p>
+
+    <span class="pi-eyebrow">No. 43 · Tools · Recovery</span>
+
+    <h1>Cracked screen. <em>Photos still inside.</em></h1>
+
+    <p class="lede">
+      scrcpy can rescue everything on a phone with a broken screen. It just needs the phone's local IP. <strong>You cannot read that IP, because you cannot see the screen.</strong> This is the small browser tool that finds it for you, from the network side, before you ever touch the phone.
+    </p>
+
+    <div class="pi-cta">
+      <a class="btn btn-primary" href="https://github.com/divyamohan1993/phone-internal-ip" rel="noopener">View source</a>
+      <a class="btn btn-ghost" href="#story">Read the story</a>
+    </div>
+
+    <figure class="phone-art" aria-label="Illustration of a phone with a cracked screen">
+      <svg viewBox="0 0 220 360" role="img" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#f3eee3"/>
+            <stop offset="1" stop-color="#ebe4d4"/>
+          </linearGradient>
+        </defs>
+        <!-- phone body -->
+        <rect x="6" y="6" width="208" height="348" rx="26" fill="#161310"/>
+        <rect x="14" y="14" width="192" height="332" rx="20" fill="url(#g1)"/>
+        <!-- camera island -->
+        <rect x="86" y="20" width="48" height="10" rx="5" fill="#161310"/>
+        <circle cx="105" cy="25" r="2.5" fill="#b48a2b"/>
+        <!-- cracks -->
+        <g stroke="#161310" stroke-width="1.4" fill="none" stroke-linecap="round">
+          <path d="M 30 70 L 90 130 L 60 200 L 130 230 L 100 300"/>
+          <path d="M 90 130 L 170 110 L 200 180"/>
+          <path d="M 90 130 L 80 80 L 130 60"/>
+          <path d="M 130 230 L 200 250"/>
+          <path d="M 130 230 L 170 320"/>
+          <path d="M 60 200 L 30 250 L 60 320"/>
+          <path d="M 100 300 L 60 320"/>
+          <path d="M 100 300 L 150 330"/>
+        </g>
+        <!-- shatter dots -->
+        <g fill="#161310">
+          <circle cx="90" cy="130" r="3"/>
+          <circle cx="60" cy="200" r="2.6"/>
+          <circle cx="130" cy="230" r="2.6"/>
+          <circle cx="100" cy="300" r="2.4"/>
+          <circle cx="170" cy="110" r="2"/>
+          <circle cx="170" cy="320" r="2"/>
+        </g>
+        <!-- IP overlay caption -->
+        <g font-family="JetBrains Mono, monospace" font-weight="700">
+          <rect x="32" y="160" width="156" height="38" rx="4" fill="#161310"/>
+          <text x="110" y="178" text-anchor="middle" fill="#b48a2b" font-size="10" letter-spacing="2">YOUR PHONE IP</text>
+          <text x="110" y="192" text-anchor="middle" fill="#f3eee3" font-size="14">10.10.9.50</text>
+        </g>
+        <!-- speaker -->
+        <rect x="98" y="338" width="24" height="3" rx="1.5" fill="#161310"/>
+      </svg>
+    </figure>
+  </div>
+</section>
+
+<!-- ============ STATS ============ -->
+<section class="pi-stats" aria-label="At a glance">
+  <div class="pi-stat"><span class="num">1 page</span><span class="lbl">Whole tool, one URL</span></div>
+  <div class="pi-stat"><span class="num">0 install</span><span class="lbl">Browser only</span></div>
+  <div class="pi-stat"><span class="num">5 min</span><span class="lbl">From cracked to mirrored</span></div>
+  <div class="pi-stat"><span class="num">Worker</span><span class="lbl">Cloudflare KV, edge-cached</span></div>
+</section>
+
+<!-- ============ ACT I · STORY ARC ============ -->
+<section class="act" id="story" aria-labelledby="story-h">
+  <div class="frame">
+    <p class="act-num">Act I · The Story</p>
+    <h2 id="story-h">Five minutes between <em>panic and relief.</em></h2>
+    <p class="act-lede">It is the same week, every year, for someone you know. Glass meets concrete. The phone keeps working. The screen does not. The photos cannot wait for a service centre's queue.</p>
+
+    <ol class="arc" aria-label="Recovery story arc">
+      <li class="arc-step">
+        <p class="when">Minute 0</p>
+        <h3>The phone falls.</h3>
+        <p>You can hear notifications. The phone is alive. The screen is a spider web. You cannot see the IP. You cannot tap a "show IP" toggle. You cannot do anything visible on it.</p>
+      </li>
+      <li class="arc-step">
+        <p class="when">Minute 1</p>
+        <h3>scrcpy needs an IP.</h3>
+        <p>scrcpy can mirror the phone over Wi-Fi and let you control it from a laptop. Pictures, contacts, that one note from your father · all reachable. But it needs the phone's local IP. And only the phone knows that.</p>
+      </li>
+      <li class="arc-step">
+        <p class="when">Minute 2</p>
+        <h3>The phone has been telling you all along.</h3>
+        <p>A tiny Termux boot script on the phone has been posting its IP to a Cloudflare Worker every few minutes. The Worker writes the latest IP and timestamp into KV. You set this up months ago and forgot.</p>
+      </li>
+      <li class="arc-step">
+        <p class="when">Minute 3</p>
+        <h3>You open the URL on a laptop.</h3>
+        <p>One page. No login. <code>IP: 10.10.9.50 · Updated: 15:12 IST</code>. No-cache headers, the truth right now.</p>
+      </li>
+      <li class="arc-step">
+        <p class="when">Minute 5</p>
+        <h3>scrcpy connects. The photos come back.</h3>
+        <p>You run <code>adb connect 10.10.9.50:5555</code>, then <code>scrcpy</code>. Your phone screen appears on your laptop. You unlock with the right pattern, blind, on memory. You drag the photos out.</p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============ ACT II · HOW IT WORKS ============ -->
+<section class="act" aria-labelledby="how-h" style="background: var(--paper-soft);">
+  <div class="frame">
+    <p class="act-num">Act II · How it works</p>
+    <h2 id="how-h">A worker. A KV store.<br>A boot script. <em>That is all.</em></h2>
+    <p class="act-lede">No cloud account, no SaaS. Cloudflare Workers + KV is free at this scale. The phone pushes its IP every five minutes. The page reads it back, no-cache, instantly.</p>
+
+    <div class="diagram" aria-label="System diagram">
+<pre>
+  <span class="b">phone (Termux:Boot)</span>            <span class="b">cloudflare worker</span>            <span class="b">your laptop</span>
+  +---------------------+         +---------------------+         +---------------------+
+  | every 5 minutes:    |  POST   | /update             |   GET   | open the URL        |
+  | read wlan0 IP       | ─────►  | verify SECRET       | ◄────── | phoneip.dmj.one /   |
+  | <span class="a">curl /update</span>        |  json   | KV.put('latest')    |  text   | <span class="a">IP: 10.10.9.50</span>      |
+  +---------------------+         +---------------------+         | Updated: 15:12 IST  |
+                                                                  +---------------------+
+  always-on                       no cache, no bloat              one page, no install
+</pre>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STACK ============ -->
+<section class="stack" aria-labelledby="stack-h">
+  <div class="frame">
+    <p class="act-num">The Stack</p>
+    <h2 id="stack-h" style="font-size:var(--t-xl);font-weight:400;font-family:'Fraunces',serif;font-variation-settings:'opsz' 144,'SOFT' 50;margin:0;letter-spacing:-0.02em;">Three small pieces. <em>Free at this scale.</em></h2>
+    <ul class="stack-list">
+      <li class="stack-tag">Cloudflare Workers</li>
+      <li class="stack-tag">Cloudflare KV</li>
+      <li class="stack-tag">Termux + Termux:Boot</li>
+      <li class="stack-tag">Bash + wget</li>
+      <li class="stack-tag">scrcpy / adb</li>
+      <li class="stack-tag">Plain JavaScript</li>
+      <li class="stack-tag">No-cache headers</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ PROOF ============ -->
+<section class="proof act" aria-labelledby="proof-h">
+  <div class="frame">
+    <p class="act-num">Act III · Proof</p>
+    <h2 id="proof-h">Built once. <em>Used the day you need it most.</em></h2>
+    <div class="proof-grid">
+      <div class="proof-item">
+        <h3>Boot-time auto-restart</h3>
+        <p>Termux:Boot runs <code>update_ip.sh</code> on every reboot. Old loops are killed via PIDFILE, so multiple boots never stack background processes. Logs to <code>~/update_ip.log</code>.</p>
+      </div>
+      <div class="proof-item">
+        <h3>No-cache from the worker</h3>
+        <p>The worker sets <code>Cache-Control: no-store</code>, <code>Pragma: no-cache</code>, <code>Expires: 0</code>. The IP you read is always the latest one the phone reported, never an edge stale.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Shared secret on POST</h3>
+        <p>Only the phone (or anything that has the <code>UPDATE_SECRET</code>) can write. Anyone can read, because the read URL is on a private subdomain you only share with yourself.</p>
+      </div>
+      <div class="proof-item">
+        <h3>IST-formatted timestamp</h3>
+        <p>The timestamp is rendered in Asia/Kolkata, 24-hour. So when you read "15:12:22" you know without thinking whether the loop is alive or stuck.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ END CTA ============ -->
+<section class="endcta" aria-labelledby="cta-h">
+  <div class="frame">
+    <div>
+      <h2 id="cta-h">Tiny tools. <em>Outsized days.</em></h2>
+      <p>I build the small things you only need once a year, that save the day when you do. Free to host, no app to install, no account to sign up for.</p>
+    </div>
+    <div class="actions">
+      <a class="btn btn-primary" href="../index.html#hire">Hire me</a>
+      <a class="btn btn-ghost" href="../index.html">Back to catalogue</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="frame">
+    <div>
+      <h2 style="font-family:'Fraunces',serif;font-size:var(--t-xl);margin:0 0 1rem;">dmj<span class="dot">.</span>one</h2>
+      <p>Dream, Manifest and Journey, Together as One.</p>
+      <p class="meta">© 2026 Divya Mohan. Phone IP Finder is a recovery tool. Use it on your own devices.</p>
+    </div>
+    <div>
+      <p class="meta">Catalogue</p>
+      <p><a href="../index.html#catalogue">All 47 products</a></p>
+      <p><a href="../index.html#cat-tools">Tools</a></p>
+      <p><a href="../index.html#hire">Hire</a></p>
+    </div>
+    <div>
+      <p class="meta">Phone IP Finder</p>
+      <p><a href="https://github.com/divyamohan1993/phone-internal-ip" rel="noopener">Source</a></p>
+      <p><a href="mailto:contact@dmj.one">contact@dmj.one</a></p>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

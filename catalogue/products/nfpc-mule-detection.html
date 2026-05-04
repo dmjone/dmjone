@@ -1,0 +1,836 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#d8631a">
+<meta name="color-scheme" content="light">
+
+<title>NFPC Mule Detection · 0.985 AUC-ROC on real Indian banking data · dmj.one</title>
+<meta name="description" content="Indians lost 11,000 crore rupees to digital fraud in 2024. Most flows through mule accounts. NFPC Mule Detection: a LightGBM and XGBoost ensemble at 0.985 AUC-ROC, 125 features, 12 fraud patterns, SHAP-explainable. Built for RBIH x IIT Delhi TRYST 2025.">
+<meta property="og:title" content="NFPC Mule Detection · 0.985 AUC-ROC against India's mule problem.">
+<meta property="og:description" content="Money mule account detection on the RBI Innovation Hub challenge. LightGBM and XGBoost ensemble. 125 engineered features. SHAP-explainable.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,30..100&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="../assets/core.css">
+
+<style>
+:root { --accent: var(--c-bharat); --accent-deep: #a14710; --grid: #d6cdb4; --hot: #b03030; }
+body { background: var(--paper); }
+
+/* shared */
+.crumbs {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink-mute);
+  margin: 0 0 2rem;
+  display: flex; gap: 0.5rem; flex-wrap: wrap;
+}
+.crumbs a { border-bottom: 1px solid var(--ink-mute); padding-bottom: 1px; }
+.crumbs a:hover { color: var(--accent); border-color: var(--accent); }
+.crumbs span { color: var(--accent); }
+.btn {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.7rem 1.1rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.14em; font-weight: 700;
+  border: 1px solid var(--ink);
+  transition: transform .15s, box-shadow .15s;
+}
+.btn:hover { transform: translate(-2px,-2px); box-shadow: 4px 4px 0 var(--ink); }
+.btn-primary { background: var(--accent); color: white; border-color: var(--accent); }
+.btn-ghost { background: transparent; color: var(--ink); }
+
+/* ===== HERO · fullscreen number ===== */
+.score {
+  position: relative;
+  padding-block: clamp(3rem, 5vw, 5.5rem) clamp(2.5rem, 4vw, 4rem);
+  border-bottom: var(--hair);
+  overflow: hidden;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 36px, color-mix(in srgb, var(--ink) 5%, transparent) 36px 37px),
+    repeating-linear-gradient(90deg, transparent 0 36px, color-mix(in srgb, var(--ink) 5%, transparent) 36px 37px),
+    var(--paper);
+}
+.score::before {
+  content: ""; position: absolute; right: -10%; top: -10%;
+  width: 60%; height: 120%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--accent) 14%, transparent), transparent 60%);
+}
+.score .frame { position: relative; z-index: 2; }
+
+.score-tag {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  padding: 0.4rem 0.85rem;
+  border: 1px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  color: var(--accent-deep);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.16em;
+  margin-bottom: 1.5rem;
+}
+.score-tag::before {
+  content: ""; width: 8px; height: 8px;
+  background: var(--accent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+.hero-grid {
+  display: grid; gap: 2rem;
+  grid-template-columns: 1fr;
+  align-items: end;
+}
+@media (min-width: 980px) { .hero-grid { grid-template-columns: 1.1fr 1fr; gap: 3rem; align-items: end; } }
+
+.mega {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: clamp(6rem, 18vw, 16rem);
+  font-weight: 700;
+  line-height: 0.85;
+  color: var(--accent);
+  letter-spacing: -0.06em;
+  margin: 0;
+  display: block;
+  font-feature-settings: "tnum";
+  text-shadow: 6px 6px 0 var(--ink);
+}
+.mega-cap {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 0.7rem 0 0;
+  display: block;
+}
+.mega-cap b { color: var(--accent-deep); }
+
+.score h1 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 30, "WONK" 1;
+  letter-spacing: -0.025em;
+  line-height: 1;
+  margin: 0;
+  max-width: 16ch;
+}
+.score h1 em {
+  font-style: italic; color: var(--accent);
+  font-variation-settings: "opsz" 144, "SOFT" 100, "WONK" 1;
+}
+
+.score .lede {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md);
+  font-weight: 300;
+  line-height: 1.45;
+  color: var(--ink-soft);
+  margin: 1.5rem 0 0;
+  max-width: 50ch;
+}
+.score .lede strong {
+  font-weight: 600;
+  background: linear-gradient(180deg, transparent 60%, color-mix(in srgb, var(--accent) 28%, transparent) 60%);
+  padding: 0 0.1em;
+  color: var(--ink);
+}
+.score .actions {
+  margin-top: 2rem;
+  display: flex; gap: 0.75rem; flex-wrap: wrap;
+}
+
+/* ===== STATS RIBBON ===== */
+.ribbon {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  background: var(--ink);
+  color: var(--paper);
+  border-block: 2px solid var(--ink);
+}
+.ribbon .stat {
+  padding: 1.5rem clamp(1rem, 2vw, 1.5rem);
+  border-right: 1px solid color-mix(in srgb, var(--paper) 18%, transparent);
+}
+.ribbon .stat:last-child { border-right: 0; }
+.ribbon .num {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  font-variation-settings: "opsz" 144, "SOFT" 30;
+  display: block;
+  line-height: 1;
+  color: var(--accent);
+}
+.ribbon .lbl {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  margin-top: 0.6rem;
+  display: block;
+  color: color-mix(in srgb, var(--paper) 75%, transparent);
+}
+
+/* ===== ACTS ===== */
+.act {
+  padding-block: clamp(3rem, 5vw, 5rem);
+  border-bottom: var(--hair);
+}
+.act-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 700;
+  margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 1rem;
+}
+.act-num::before { content: ""; width: 2.5rem; height: 1px; background: var(--accent); }
+.act h2 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 50, "WONK" 1;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+  margin: 0 0 1.5rem;
+  max-width: 24ch;
+}
+.act h2 em { font-style: italic; color: var(--accent); }
+.act .blurb {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md);
+  color: var(--ink-soft);
+  max-width: 60ch;
+  margin: 0;
+}
+
+/* Act I · fan-in / fan-out diagram */
+.diagram {
+  display: grid; gap: 2rem;
+  grid-template-columns: 1fr;
+  margin-top: 2.5rem;
+  align-items: center;
+}
+@media (min-width: 880px) { .diagram { grid-template-columns: 1.4fr 1fr; gap: 3rem; } }
+.diagram .pic {
+  border: 1px solid var(--ink);
+  background: white;
+  padding: 1.5rem;
+}
+.diagram .pic svg { display: block; width: 100%; height: auto; }
+.diagram .pic .cap {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.14em;
+  color: var(--ink-mute);
+  margin: 0.8rem 0 0;
+  font-weight: 700;
+  text-align: center;
+}
+.diagram .legend dl { display: grid; gap: 0.8rem; margin: 0; }
+.diagram .legend dt {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.14em;
+  color: var(--accent);
+  font-weight: 700;
+  margin: 0;
+}
+.diagram .legend dd {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md);
+  margin: 0 0 0.4rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.diagram .legend p { margin: 0 0 1rem; font-size: var(--t-sm); color: var(--ink-soft); }
+
+/* Act II · patterns table */
+.patterns {
+  display: grid; gap: 0;
+  margin-top: 2rem;
+  grid-template-columns: 1fr;
+  border-top: var(--hair);
+}
+@media (min-width: 760px) { .patterns { grid-template-columns: repeat(2, 1fr); column-gap: 0; } }
+.pattern {
+  display: grid;
+  grid-template-columns: 4ch 1fr;
+  gap: 0.9rem;
+  padding: 1rem 1rem 1rem 0;
+  border-bottom: var(--hair-soft);
+  align-items: baseline;
+}
+@media (min-width: 760px) {
+  .pattern:nth-child(odd) { padding-right: 2rem; border-right: var(--hair-soft); padding-left: 0; }
+  .pattern:nth-child(even) { padding-left: 2rem; padding-right: 0; }
+}
+.pattern .pn {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  font-size: var(--t-md);
+  color: var(--accent-deep);
+  letter-spacing: -0.02em;
+}
+.pattern h3 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md);
+  margin: 0 0 0.3rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.pattern p { margin: 0; font-size: var(--t-sm); color: var(--ink-soft); }
+
+/* Act III · stack-of-models pipeline */
+.models {
+  display: grid; gap: 0;
+  margin-top: 2rem;
+  grid-template-columns: 1fr;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+}
+@media (min-width: 880px) { .models { grid-template-columns: repeat(3, 1fr); } }
+.model-col {
+  padding: 1.5rem;
+  border-right: 1px solid var(--paper-edge);
+  border-bottom: 1px solid var(--paper-edge);
+  position: relative;
+}
+@media (min-width: 880px) {
+  .model-col:nth-child(3n) { border-right: 0; }
+  .model-col { border-bottom: 0; }
+}
+.model-col .pri {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+}
+.model-col h4 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md);
+  margin: 0 0 0.5rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.model-col .auc {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  color: var(--ink);
+  display: block;
+  margin: 0.2rem 0 0.4rem;
+}
+.model-col p { margin: 0; font-size: var(--t-sm); color: var(--ink-soft); }
+.model-col.win { background: color-mix(in srgb, var(--accent) 8%, var(--paper)); }
+.model-col.win .auc { color: var(--accent); }
+
+/* Act IV · feature pyramid (categories) */
+.cats {
+  display: grid; gap: 0;
+  margin-top: 2rem;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+}
+.cat-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  border-bottom: var(--hair-soft);
+}
+.cat-row:last-child { border-bottom: 0; }
+@media (min-width: 720px) {
+  .cat-row { grid-template-columns: 22ch 6ch 1fr; align-items: center; }
+}
+.cat-row .name {
+  padding: 0.95rem 1.2rem;
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.cat-row .count {
+  padding: 0.95rem 1.2rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  font-size: var(--t-md);
+  color: var(--accent);
+  letter-spacing: -0.02em;
+}
+.cat-row .ex {
+  padding: 0.95rem 1.2rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  color: var(--ink-mute);
+  letter-spacing: 0.04em;
+}
+.cat-row.head {
+  background: var(--ink); color: var(--paper);
+}
+.cat-row.head .name, .cat-row.head .count, .cat-row.head .ex {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-weight: 700;
+  color: color-mix(in srgb, var(--paper) 75%, transparent);
+}
+.cat-row.head .count { color: var(--accent); }
+
+/* Proof */
+.proof {
+  background: var(--ink);
+  color: var(--paper);
+  padding-block: clamp(3rem, 5vw, 5rem);
+  position: relative;
+  overflow: hidden;
+}
+.proof::before {
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 80% 20%, color-mix(in srgb, var(--accent) 30%, transparent), transparent 60%);
+}
+.proof .frame { position: relative; }
+.proof h2 { color: var(--paper); }
+.proof h2 em { color: var(--accent); }
+.proof-grid {
+  display: grid; gap: 1rem; margin-top: 2rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { .proof-grid { grid-template-columns: repeat(2, 1fr); } }
+.proof-item {
+  border: 1px solid color-mix(in srgb, var(--paper) 30%, transparent);
+  padding: 1.5rem;
+  background: color-mix(in srgb, var(--paper) 5%, transparent);
+}
+.proof-item h3 {
+  font-family: 'Fraunces', serif;
+  margin: 0 0 0.5rem;
+  font-size: var(--t-md);
+  color: var(--accent);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.proof-item .km {
+  display: block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  color: var(--paper);
+  margin: 0.4rem 0 0.5rem;
+}
+.proof-item p { margin: 0; color: color-mix(in srgb, var(--paper) 80%, transparent); font-size: var(--t-sm); }
+
+/* Stack + endcta */
+.stack {
+  padding-block: clamp(3rem, 5vw, 5rem);
+  border-bottom: var(--hair);
+}
+.stack-list {
+  display: flex; flex-wrap: wrap; gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+.stack-tag {
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--ink);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.14em;
+  font-weight: 600;
+}
+.endcta {
+  padding-block: clamp(3rem, 5vw, 5rem);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 10%, transparent), var(--paper));
+}
+.endcta .frame { display: grid; gap: 2rem; grid-template-columns: 1fr; }
+@media (min-width: 760px) { .endcta .frame { grid-template-columns: 2fr 1fr; align-items: end; } }
+.endcta h2 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 300;
+  font-variation-settings: "opsz" 144, "SOFT" 100;
+  margin: 0 0 1rem;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+}
+.endcta h2 em {
+  font-style: italic; color: var(--accent);
+  background: linear-gradient(180deg, transparent 70%, color-mix(in srgb, var(--accent) 25%, transparent) 70%);
+}
+.endcta p { color: var(--ink-soft); margin: 0; max-width: 50ch; }
+.endcta .actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+
+.foot { background: var(--ink); color: var(--paper); }
+.foot .dot { color: var(--accent); }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topnav">
+  <div class="frame">
+    <div class="brand"><a href="../index.html">dmj<span class="dot">.</span>one</a></div>
+    <nav aria-label="Primary">
+      <ul>
+        <li><a href="../index.html#catalogue">Catalogue</a></li>
+        <li><a href="../index.html#manifesto">Manifesto</a></li>
+        <li><a href="../index.html#hire">Hire</a></li>
+        <li><a href="https://github.com/divyamohan1993/nfpc-mule-detection" rel="noopener">GitHub</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ============ HERO · FULLSCREEN NUMBER ============ -->
+<section class="score">
+  <div class="frame">
+    <p class="crumbs">
+      <a href="../index.html">Catalogue</a> /
+      <a href="../index.html#cat-bharat">Bharat-First</a> /
+      <span>NFPC Mule Detection</span>
+    </p>
+
+    <span class="score-tag">No. 15 · Bharat-First · Finance</span>
+
+    <div class="hero-grid">
+      <div>
+        <span class="mega" aria-label="Out-of-fold AUC-ROC zero point nine eight five">0.985</span>
+        <p class="mega-cap"><b>OOF AUC-ROC</b> · LightGBM × XGBoost ensemble · Phase 1</p>
+
+        <h1 style="margin-top:1.75rem;">
+          The mule moves<br>
+          the money. <em>The bank<br>
+          finds out</em> too late.
+        </h1>
+        <p class="lede">
+          Indians lost <strong>11,000 crore rupees</strong> to digital fraud in 2024. Most of it does not leave through one big account. It rivers through thousands of "mule" accounts, real names, fake intent, opened just to wash. NFPC Mule Detection scores those accounts before the money lands. <strong>Built for the RBI Innovation Hub × IIT Delhi TRYST 2025 challenge.</strong>
+        </p>
+
+        <div class="actions">
+          <a class="btn btn-primary" href="https://github.com/divyamohan1993/nfpc-mule-detection" rel="noopener">View source</a>
+          <a class="btn btn-ghost" href="#patterns">12 fraud patterns</a>
+          <a class="btn btn-ghost" href="#proof">Final scores</a>
+        </div>
+      </div>
+
+      <div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATS RIBBON ============ -->
+<section class="ribbon" aria-label="At a glance">
+  <div class="stat"><span class="num">0.985</span><span class="lbl">Phase 1 OOF AUC-ROC</span></div>
+  <div class="stat"><span class="num">208</span><span class="lbl">Engineered features (Phase 2)</span></div>
+  <div class="stat"><span class="num">12</span><span class="lbl">Mule behaviour patterns covered</span></div>
+  <div class="stat"><span class="num">15,848</span><span class="lbl">Test accounts scored</span></div>
+  <div class="stat"><span class="num">3</span><span class="lbl">Models in the final ensemble</span></div>
+</section>
+
+<!-- ============ ACT I · THE PROBLEM ============ -->
+<section class="act" aria-labelledby="prob-h">
+  <div class="frame">
+    <p class="act-num">Act I · The Anatomy</p>
+    <h2 id="prob-h">A mule is a <em>real</em> account<br>doing somebody else's work.</h2>
+    <p class="blurb">A mule account belongs to a real person, KYC and all. They were paid, threatened or tricked into letting it be used. Money lands in, money leaves in seconds. By the time the fraud is reported, the money has crossed five accounts, and the trail is cold.</p>
+
+    <div class="diagram">
+      <div class="pic" aria-label="Fan-in fan-out flow diagram">
+        <svg viewBox="0 0 480 240" role="img" aria-label="Many sources fan in to one mule account, then fan out to many destinations">
+          <defs>
+            <marker id="arr" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="strokeWidth">
+              <path d="M0,0 L8,4 L0,8 z" fill="#161310"/>
+            </marker>
+            <marker id="arrA" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="strokeWidth">
+              <path d="M0,0 L8,4 L0,8 z" fill="#d8631a"/>
+            </marker>
+          </defs>
+          <!-- left victims -->
+          <g fill="#fbf6ea" stroke="#161310" stroke-width="1.5">
+            <circle cx="40" cy="40" r="14"/>
+            <circle cx="40" cy="80" r="14"/>
+            <circle cx="40" cy="120" r="14"/>
+            <circle cx="40" cy="160" r="14"/>
+            <circle cx="40" cy="200" r="14"/>
+          </g>
+          <!-- mule -->
+          <rect x="200" y="100" width="80" height="40" fill="#d8631a" stroke="#161310" stroke-width="2"/>
+          <text x="240" y="125" text-anchor="middle" fill="#fff" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" letter-spacing="0.1em">MULE</text>
+          <!-- right destinations -->
+          <g fill="#fbf6ea" stroke="#161310" stroke-width="1.5">
+            <circle cx="440" cy="40" r="12"/>
+            <circle cx="440" cy="80" r="12"/>
+            <circle cx="440" cy="120" r="12"/>
+            <circle cx="440" cy="160" r="12"/>
+            <circle cx="440" cy="200" r="12"/>
+          </g>
+          <!-- fan in lines -->
+          <g stroke="#161310" stroke-width="1.2" fill="none" marker-end="url(#arr)">
+            <path d="M 56,40 Q 130,80 200,118"/>
+            <path d="M 56,80 Q 130,95 200,118"/>
+            <path d="M 56,120 L 200,120"/>
+            <path d="M 56,160 Q 130,140 200,122"/>
+            <path d="M 56,200 Q 130,160 200,122"/>
+          </g>
+          <!-- fan out lines -->
+          <g stroke="#d8631a" stroke-width="1.4" fill="none" marker-end="url(#arrA)">
+            <path d="M 280,118 Q 360,80 428,40"/>
+            <path d="M 280,118 Q 360,90 428,80"/>
+            <path d="M 280,120 L 428,120"/>
+            <path d="M 280,122 Q 360,140 428,160"/>
+            <path d="M 280,122 Q 360,170 428,200"/>
+          </g>
+          <!-- labels -->
+          <text x="40" y="22" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#5a5048" letter-spacing="0.12em">VICTIMS</text>
+          <text x="440" y="22" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#5a5048" letter-spacing="0.12em">EXFILTRATION</text>
+        </svg>
+        <p class="cap">Fan-in. Pass-through. Fan-out. Five seconds.</p>
+      </div>
+
+      <div class="legend">
+        <dl>
+          <dt>Signal 01 · Velocity</dt>
+          <dd>Burstiness</dd>
+          <p>Inactive account, then a sudden surge. A salaried account does not start moving in 30-second intervals at midnight.</p>
+          <dt>Signal 02 · Topology</dt>
+          <dd>Fan-in × Fan-out</dd>
+          <p>Many counterparties one way, many the other. Real account holders do not transact with thirty new strangers in an hour.</p>
+          <dt>Signal 03 · Structuring</dt>
+          <dd>The 50,000 line</dd>
+          <p>Transactions just below the reporting threshold. Round amounts, repeated. Compliance hides in plain sight.</p>
+        </dl>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ACT II · 12 FRAUD PATTERNS ============ -->
+<section class="act" id="patterns" aria-labelledby="pat-h">
+  <div class="frame">
+    <p class="act-num">Act II · The Catalogue</p>
+    <h2 id="pat-h">Twelve patterns.<br>Every one <em>covered.</em></h2>
+    <p class="blurb">The challenge specification names twelve known mule behaviours. The pipeline identifies all twelve, with statistical evidence and SHAP-explainable feature contributions for every flagged account.</p>
+
+    <ol class="patterns">
+      <li class="pattern"><span class="pn">01</span><div><h3>Dormant activation</h3><p>Inactive accounts that suddenly handle high-value bursts.</p></div></li>
+      <li class="pattern"><span class="pn">02</span><div><h3>Structuring</h3><p>Transactions parked just below the 50,000 INR reporting threshold.</p></div></li>
+      <li class="pattern"><span class="pn">03</span><div><h3>Rapid pass-through</h3><p>Near-unity credit-to-debit ratio inside the same hour.</p></div></li>
+      <li class="pattern"><span class="pn">04</span><div><h3>Fan-in / fan-out</h3><p>Many-to-one or one-to-many fund flows around a single hub account.</p></div></li>
+      <li class="pattern"><span class="pn">05</span><div><h3>Geographic anomaly</h3><p>PIN code mismatches across customer, branch and address records.</p></div></li>
+      <li class="pattern"><span class="pn">06</span><div><h3>New account high value</h3><p>Young accounts handling volume disproportionate to their tenure.</p></div></li>
+      <li class="pattern"><span class="pn">07</span><div><h3>Income mismatch</h3><p>Transaction values that do not line up with the declared balance and income profile.</p></div></li>
+      <li class="pattern"><span class="pn">08</span><div><h3>Post-mobile-change spike</h3><p>Activity surge in the days immediately after a mobile number update.</p></div></li>
+      <li class="pattern"><span class="pn">09</span><div><h3>Round-amount patterns</h3><p>Overuse of exact-round transfer amounts beyond the population baseline.</p></div></li>
+      <li class="pattern"><span class="pn">10</span><div><h3>Layered / subtle</h3><p>Weak signals across many low-confidence dimensions that combine into a clear flag.</p></div></li>
+      <li class="pattern"><span class="pn">11</span><div><h3>Salary cycle exploitation</h3><p>Laundering windows aligned with the salary credit cycle to hide inside expected flow.</p></div></li>
+      <li class="pattern"><span class="pn">12</span><div><h3>Branch-level collusion</h3><p>Suspicious account clusters traced back to one branch or one onboarding agent.</p></div></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============ ACT III · THE STACK OF MODELS ============ -->
+<section class="act" aria-labelledby="ens-h">
+  <div class="frame">
+    <p class="act-num">Act III · The Ensemble</p>
+    <h2 id="ens-h">No single model<br>catches every <em>mule.</em></h2>
+    <p class="blurb">LightGBM is fast on tabular. XGBoost catches what LightGBM misses. CatBoost handles categorical fan-out without one-hot blowup. The final submission averages ranks across three seeds and five folds, so a borderline account does not flip on a single fold's noise.</p>
+
+    <div class="models">
+      <div class="model-col">
+        <p class="pri">Model 01</p>
+        <h4>LightGBM</h4>
+        <span class="auc">0.9834</span>
+        <p>Fast on the 125-feature Phase 1 set. Strong on velocity, structuring and salary-cycle signals. The base learner of the ensemble.</p>
+      </div>
+      <div class="model-col">
+        <p class="pri">Model 02</p>
+        <h4>XGBoost</h4>
+        <span class="auc">0.9789</span>
+        <p>Catches the layered, multi-signal mules where LightGBM is less confident. Tuned with explicit class-imbalance weighting.</p>
+      </div>
+      <div class="model-col win">
+        <p class="pri">Model 03 · Winner</p>
+        <h4>Ensemble</h4>
+        <span class="auc">0.9851</span>
+        <p>Rank-averaged across LightGBM and XGBoost. Phase 2 adds CatBoost into the same pattern, taking the ensemble to a 3-model stack.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ACT IV · FEATURE CATEGORIES ============ -->
+<section class="act" aria-labelledby="cat-h">
+  <div class="frame">
+    <p class="act-num">Act IV · The Features</p>
+    <h2 id="cat-h">125 features.<br>13 <em>categories.</em></h2>
+    <p class="blurb">Every feature is named, sourced and ranked by SHAP importance. Phase 2 expands this to 208 features with graph signals: PageRank, HITS, betweenness centrality and Louvain communities on the counterparty graph.</p>
+
+    <div class="cats" role="table" aria-label="Feature categories">
+      <div class="cat-row head" role="row">
+        <div class="name" role="columnheader">Category</div>
+        <div class="count" role="columnheader">Count</div>
+        <div class="ex" role="columnheader">Example feature</div>
+      </div>
+      <div class="cat-row" role="row">
+        <div class="name" role="cell">Transaction aggregation</div>
+        <div class="count" role="cell">7</div>
+        <div class="ex" role="cell">txn_count · mean_amount · std_amount</div>
+      </div>
+      <div class="cat-row" role="row">
+        <div class="name" role="cell">Structuring detection</div>
+        <div class="count" role="cell">7</div>
+        <div class="ex" role="cell">near_50k_rate · round_10k_rate</div>
+      </div>
+      <div class="cat-row" role="row">
+        <div class="name" role="cell">Velocity &amp; burstiness</div>
+        <div class="count" role="cell">10</div>
+        <div class="ex" role="cell">min_gap_hrs · med_gap_hrs · burstiness</div>
+      </div>
+      <div class="cat-row" role="row">
+        <div class="name" role="cell">Graph &amp; network</div>
+        <div class="count" role="cell">8</div>
+        <div class="ex" role="cell">n_unique_counterparties · cp_per_txn</div>
+      </div>
+      <div class="cat-row" role="row">
+        <div class="name" role="cell">Channel usage</div>
+        <div class="count" role="cell">12</div>
+        <div class="ex" role="cell">ch_UPD_rate · ch_CHQ_rate · ch_ATW_rate</div>
+      </div>
+      <div class="cat-row" role="row">
+        <div class="name" role="cell">Unsupervised / anomaly</div>
+        <div class="count" role="cell">18</div>
+        <div class="ex" role="cell">digital_score · kyc_score</div>
+      </div>
+      <div class="cat-row" role="row">
+        <div class="name" role="cell">Demographics &amp; product</div>
+        <div class="count" role="cell">37</div>
+        <div class="ex" role="cell">account_age · product_holdings · branch_class</div>
+      </div>
+      <div class="cat-row" role="row">
+        <div class="name" role="cell">Six other categories</div>
+        <div class="count" role="cell">26</div>
+        <div class="ex" role="cell">temporal · geo · MCC · scheme · post-event · cohort</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PROOF ============ -->
+<section class="proof act" id="proof" aria-labelledby="proof-h">
+  <div class="frame">
+    <p class="act-num">Act V · Proof</p>
+    <h2 id="proof-h">Held against the <em>private</em> set.</h2>
+
+    <div class="proof-grid">
+      <div class="proof-item">
+        <h3>Phase 1 · OOF AUC-ROC</h3>
+        <span class="km">0.9851</span>
+        <p>Out-of-fold score on the 5-fold cross-validation. LightGBM × XGBoost rank-averaged ensemble on 125 engineered features.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Phase 2 · Public AUC-ROC</h3>
+        <span class="km">0.968136</span>
+        <p>Final RBIHub leaderboard, public set. 3-model ensemble: LightGBM + XGBoost + CatBoost. 208 features, 3-seed × 5-fold CV, rank averaging.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Phase 2 · Private AUC-ROC</h3>
+        <span class="km">0.955815</span>
+        <p>The held-out private leaderboard score. The drop from public to private is small, which is the score that actually matters in production.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Reproducible from one command</h3>
+        <span class="km">run_v3.py</span>
+        <p>Pipeline orchestrator runs end-to-end: features, label cleaning, ensemble, submission. Skip-Optuna flag reproduces the exact submitted score from a clean clone.</p>
+      </div>
+      <div class="proof-item">
+        <h3>SHAP-explainable</h3>
+        <span class="km">125 → 1</span>
+        <p>Every flagged account ships with a per-feature SHAP contribution. The fraud team sees why the model said yes, not just that it did.</p>
+      </div>
+      <div class="proof-item">
+        <h3>RBIH × IIT Delhi TRYST 2025</h3>
+        <span class="km">Team dmj.one</span>
+        <p>Built for the National Fraud Prevention Challenge hosted by Reserve Bank Innovation Hub in association with IIT Delhi TRYST.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TECH STACK ============ -->
+<section class="stack" aria-labelledby="tech-h">
+  <div class="frame">
+    <p class="act-num">The Stack</p>
+    <h2 id="tech-h" style="font-size:var(--t-xl);font-weight:400;font-family:'Fraunces',serif;font-variation-settings:'opsz' 144,'SOFT' 50;margin:0;letter-spacing:-0.02em;">Tabular ML, done <em>seriously.</em></h2>
+    <ul class="stack-list">
+      <li class="stack-tag">Python</li>
+      <li class="stack-tag">LightGBM</li>
+      <li class="stack-tag">XGBoost</li>
+      <li class="stack-tag">CatBoost</li>
+      <li class="stack-tag">SHAP</li>
+      <li class="stack-tag">Optuna</li>
+      <li class="stack-tag">Confident Learning</li>
+      <li class="stack-tag">Pandas / Polars</li>
+      <li class="stack-tag">Parquet</li>
+      <li class="stack-tag">NetworkX (graph features)</li>
+      <li class="stack-tag">Louvain communities</li>
+      <li class="stack-tag">PageRank / HITS</li>
+      <li class="stack-tag">Next.js (showcase)</li>
+      <li class="stack-tag">Vercel</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ END CTA ============ -->
+<section class="endcta" aria-labelledby="cta-h">
+  <div class="frame">
+    <div>
+      <h2 id="cta-h">If a hackathon model can score 0.985,<br><em>your production fraud team can do better.</em></h2>
+      <p>I build explainable, ensemble-based fraud and risk models on real Indian financial data. Banks, payment processors and central-bank innovation hubs: this is the engineer to call.</p>
+    </div>
+    <div class="actions">
+      <a class="btn btn-primary" href="../index.html#hire">Hire me</a>
+      <a class="btn btn-ghost" href="../index.html">Back to catalogue</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="frame">
+    <div>
+      <h2 style="font-family:'Fraunces',serif;font-size:var(--t-xl);margin:0 0 1rem;">dmj<span class="dot">.</span>one</h2>
+      <p>Dream, Manifest and Journey, Together as One.</p>
+      <p class="meta">© 2026 Divya Mohan. NFPC Mule Detection built for Reserve Bank Innovation Hub × IIT Delhi TRYST 2025.</p>
+    </div>
+    <div>
+      <p class="meta">Catalogue</p>
+      <p><a href="../index.html#catalogue">All 47 products</a></p>
+      <p><a href="../index.html#cat-bharat">Bharat-First</a></p>
+      <p><a href="../index.html#hire">Hire</a></p>
+    </div>
+    <div>
+      <p class="meta">NFPC Mule Detection</p>
+      <p><a href="https://github.com/divyamohan1993/nfpc-mule-detection" rel="noopener">Source</a></p>
+      <p><a href="mailto:contact@dmj.one">contact@dmj.one</a></p>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

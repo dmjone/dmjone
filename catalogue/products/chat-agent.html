@@ -1,0 +1,844 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#7a2c5e">
+<meta name="color-scheme" content="light">
+
+<title>RealtyAssistant · AI lead qualifier in real Indian accents · dmj.one</title>
+<meta name="description" content="An AI voice and chat agent that qualifies real-estate leads in Noida-Gurugram English, runs on a ₹500/month VPS, falls back gracefully when the database breaks, and never loses a lead.">
+<meta property="og:title" content="RealtyAssistant · 11 PM Hindi-Punjabi mix. Lead qualified anyway.">
+<meta property="og:description" content="Whisper + Hybrid LLM (Ollama + Gemini). Self-healing SQLite. ₹500/month VPS production.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,30..100&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;600&family=Tiro+Devanagari+Hindi&display=swap">
+<link rel="stylesheet" href="../assets/core.css">
+
+<style>
+:root {
+  --accent: var(--c-ai);
+  --accent-deep: #4d1639;
+  --accent-soft: #9a4a7e;
+  --paper-warm: #f3eee3;
+  --signal-call: #3a7a45;
+}
+body { background: var(--paper-warm); }
+
+/* ====== HERO · split with phone ============================ */
+.ca-hero {
+  position: relative;
+  padding-block: clamp(3.5rem, 6vw, 6rem) clamp(2.5rem, 5vw, 5rem);
+  border-bottom: var(--hair);
+  overflow: hidden;
+  background: var(--paper-warm);
+}
+.ca-hero .frame {
+  position: relative;
+  display: grid;
+  gap: 3rem;
+  grid-template-columns: 1fr;
+  align-items: center;
+}
+@media (min-width: 920px) {
+  .ca-hero .frame { grid-template-columns: 1.5fr 1fr; gap: 4rem; }
+}
+
+.crumbs {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink-mute);
+  margin: 0 0 1.5rem;
+  display: flex; gap: 0.5rem; flex-wrap: wrap;
+}
+.crumbs a { border-bottom: 1px solid var(--ink-mute); padding-bottom: 1px; }
+.crumbs a:hover { color: var(--accent); border-color: var(--accent); }
+.crumbs span { color: var(--accent); }
+
+.ca-eyebrow {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  padding: 0.4rem 0.85rem;
+  border: 1px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  color: var(--accent-deep);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  margin-bottom: 1.5rem;
+}
+.ca-eyebrow::before {
+  content: ""; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--signal-call);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--signal-call) 25%, transparent);
+}
+
+.ca-hero h1 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-3xl);
+  font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 30, "WONK" 1;
+  letter-spacing: -0.035em;
+  line-height: 0.95;
+  margin: 0;
+  max-width: 14ch;
+}
+.ca-hero h1 em {
+  font-style: italic;
+  color: var(--accent);
+  font-variation-settings: "opsz" 144, "SOFT" 100, "WONK" 1;
+}
+
+.ca-hero .lede {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md);
+  font-weight: 300;
+  line-height: 1.5;
+  color: var(--ink-soft);
+  margin: 1.75rem 0 0;
+  max-width: 56ch;
+}
+.ca-hero .lede strong {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.ca-cta-row {
+  margin-top: 2.5rem;
+  display: flex; gap: 0.75rem; flex-wrap: wrap;
+}
+.btn {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.7rem 1.1rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 700;
+  border: 1px solid var(--ink);
+  transition: background .15s, color .15s, transform .15s, box-shadow .15s;
+}
+.btn:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--ink); }
+.btn-primary { background: var(--accent); color: white; border-color: var(--accent); }
+.btn-primary:hover { box-shadow: 4px 4px 0 var(--ink); }
+.btn-ghost { background: transparent; color: var(--ink); }
+
+/* ===== Phone illustration ===== */
+.phone-mock {
+  width: 100%;
+  max-width: 320px;
+  margin-inline: auto;
+  border: 12px solid var(--ink);
+  border-radius: 36px;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 6%, var(--paper)), var(--paper));
+  padding: 1.25rem 1rem 1.5rem;
+  box-shadow: 8px 8px 0 var(--accent);
+  position: relative;
+}
+.phone-mock::before {
+  content: ""; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: 120px; height: 18px;
+  background: var(--ink);
+  border-radius: 0 0 14px 14px;
+}
+.phone-screen {
+  margin-top: 1rem;
+  text-align: center;
+}
+.ph-time {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+.ph-status {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--signal-call);
+  font-weight: 700;
+  margin-top: 0.5rem;
+}
+.ph-status::before {
+  content: "● "; color: var(--signal-call);
+}
+.ph-name {
+  font-family: 'Fraunces', serif;
+  font-size: 1.6rem;
+  margin: 0.75rem 0 0.25rem;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+.ph-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-sm);
+  color: var(--ink-soft);
+  letter-spacing: 0.05em;
+}
+.ph-wave {
+  margin: 1.5rem 0;
+  display: flex; gap: 4px; justify-content: center; align-items: center;
+  height: 36px;
+}
+.ph-wave span {
+  display: block; width: 4px; background: var(--accent);
+  animation: wave 1.4s ease-in-out infinite;
+  border-radius: 2px;
+}
+.ph-wave span:nth-child(1) { height: 30%; animation-delay: 0s; }
+.ph-wave span:nth-child(2) { height: 60%; animation-delay: 0.15s; }
+.ph-wave span:nth-child(3) { height: 90%; animation-delay: 0.3s; }
+.ph-wave span:nth-child(4) { height: 100%; animation-delay: 0.45s; }
+.ph-wave span:nth-child(5) { height: 70%; animation-delay: 0.6s; }
+.ph-wave span:nth-child(6) { height: 50%; animation-delay: 0.75s; }
+.ph-wave span:nth-child(7) { height: 35%; animation-delay: 0.9s; }
+.ph-wave span:nth-child(8) { height: 25%; animation-delay: 1.05s; }
+@keyframes wave {
+  0%, 100% { transform: scaleY(0.4); }
+  50% { transform: scaleY(1); }
+}
+.ph-keypad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+.ph-key {
+  border: 1px solid var(--paper-edge);
+  background: var(--paper);
+  padding: 0.6rem 0;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  text-align: center;
+  border-radius: 50%;
+  aspect-ratio: 1;
+  display: flex; align-items: center; justify-content: center;
+  font-size: var(--t-md);
+  color: var(--ink);
+}
+.ph-key.callbtn { background: var(--signal-call); color: var(--paper); border-color: var(--signal-call); }
+.ph-key.endbtn { background: var(--accent); color: var(--paper); border-color: var(--accent); }
+
+/* ====== STATS RIBBON ==================================== */
+.ca-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  background: var(--ink);
+  color: var(--paper);
+  border-block: 2px solid var(--ink);
+}
+.ca-stat {
+  padding: 1.5rem clamp(1rem, 2vw, 1.5rem);
+  border-right: 1px solid color-mix(in srgb, var(--paper) 18%, transparent);
+}
+.ca-stat:last-child { border-right: 0; }
+.ca-stat .num {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  font-variation-settings: "opsz" 144, "SOFT" 30;
+  display: block;
+  line-height: 1;
+  color: var(--accent-soft);
+}
+.ca-stat .lbl {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  margin-top: 0.6rem;
+  display: block;
+  color: color-mix(in srgb, var(--paper) 70%, transparent);
+}
+
+/* ====== ACT STRUCTURE =================================== */
+.act {
+  padding-block: clamp(3rem, 5vw, 5rem);
+  border-bottom: var(--hair);
+}
+.act-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 700;
+  margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 1rem;
+}
+.act-num::before {
+  content: ""; width: 2.5rem; height: 1px; background: var(--accent);
+}
+.act h2 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 50;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+  margin: 0 0 1.5rem;
+  max-width: 22ch;
+}
+.act h2 em { font-style: italic; color: var(--accent); }
+
+/* ====== ACT 1 · PROBLEM CARDS ============================= */
+.lose-grid {
+  display: grid; gap: 1.5rem; margin-top: 2rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { .lose-grid { grid-template-columns: 1fr 1fr; gap: 2rem; } }
+.lose-card {
+  border-left: 4px solid var(--accent);
+  padding: 0.5rem 0 0.5rem 1.5rem;
+}
+.lose-card .n {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  color: var(--accent);
+  display: block;
+  line-height: 1;
+}
+.lose-card .l {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--ink-mute);
+  margin: 0.5rem 0 0.75rem;
+  display: block;
+  font-weight: 700;
+}
+.lose-card p {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md);
+  margin: 0;
+  color: var(--ink);
+  line-height: 1.5;
+}
+
+/* ====== ACT 2 · TRANSCRIPT ============================ */
+.transcript {
+  margin-top: 2.5rem;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  overflow: hidden;
+}
+.transcript-bar {
+  display: flex; gap: 1rem; align-items: baseline;
+  padding: 0.85rem 1.5rem;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+.transcript-bar .rec {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  color: var(--signal-call);
+  font-weight: 700;
+}
+.transcript-bar .rec::before {
+  content: ""; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--signal-call);
+  animation: pulse2 1.5s infinite;
+}
+@keyframes pulse2 { 50% { opacity: 0.4; } }
+.transcript-bar .meta {
+  margin-left: auto;
+  color: color-mix(in srgb, var(--paper) 65%, transparent);
+}
+.transcript-body {
+  padding: 1.5rem;
+  display: grid; gap: 1.25rem;
+}
+.tx-line {
+  display: grid;
+  grid-template-columns: 5rem 1fr;
+  gap: 1.25rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px dashed var(--paper-edge);
+}
+.tx-line:last-child { border-bottom: 0; }
+.tx-time {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  color: var(--ink-mute);
+  letter-spacing: 0.05em;
+  padding-top: 0.2rem;
+}
+.tx-content .who {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+}
+.tx-content .who.lead { color: var(--ink-soft); }
+.tx-content .who.bot { color: var(--accent); }
+.tx-content .said {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md);
+  margin: 0;
+  color: var(--ink);
+  line-height: 1.45;
+}
+.tx-content .said em {
+  font-style: italic;
+  color: var(--accent);
+}
+.tx-content .extracted {
+  margin-top: 0.6rem;
+  display: inline-flex; gap: 0.4rem; flex-wrap: wrap;
+}
+.tx-content .extracted span {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  background: color-mix(in srgb, var(--accent) 10%, var(--paper));
+  border: 1px solid var(--accent);
+  color: var(--accent-deep);
+  padding: 0.2rem 0.5rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+/* ====== ACT 3 · FAILSAFE ARCHITECTURE ============================ */
+.fs-grid {
+  display: grid; gap: 1rem; margin-top: 2rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { .fs-grid { grid-template-columns: repeat(2, 1fr); } }
+.fs-card {
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  padding: 1.5rem;
+  position: relative;
+}
+.fs-card .pn {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+.fs-card h3 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md);
+  margin: 0 0 0.5rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.fs-card p { margin: 0; font-size: var(--t-sm); color: var(--ink-soft); line-height: 1.5; }
+.fs-card .scenario {
+  margin-top: 0.75rem;
+  padding: 0.6rem 0.85rem;
+  background: var(--paper-warm);
+  border-left: 3px solid var(--accent);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  color: var(--ink-soft);
+}
+
+/* ====== PROOF ============================================ */
+.proof { background: var(--ink); color: var(--paper); }
+.proof h2 { color: var(--paper); }
+.proof h2 em { color: var(--accent-soft); }
+.proof-grid {
+  display: grid; gap: 1rem; margin-top: 2rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { .proof-grid { grid-template-columns: repeat(2, 1fr); } }
+.proof-item {
+  border: 1px solid color-mix(in srgb, var(--paper) 25%, transparent);
+  padding: 1.5rem;
+  background: color-mix(in srgb, var(--paper) 4%, transparent);
+}
+.proof-item h3 {
+  font-family: 'Fraunces', serif;
+  margin: 0 0 0.5rem;
+  font-size: var(--t-md);
+  color: var(--accent-soft);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.proof-item p { margin: 0; color: color-mix(in srgb, var(--paper) 80%, transparent); font-size: var(--t-sm); line-height: 1.5; }
+
+/* ====== STACK ======================== */
+.stack-list {
+  display: flex; flex-wrap: wrap; gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+.stack-tag {
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--ink);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 600;
+}
+
+/* ====== END CTA ========================================= */
+.endcta {
+  padding-block: clamp(3rem, 5vw, 5rem);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 10%, transparent), var(--paper-warm));
+}
+.endcta .frame { display: grid; gap: 2rem; grid-template-columns: 1fr; }
+@media (min-width: 760px) { .endcta .frame { grid-template-columns: 2fr 1fr; align-items: end; } }
+.endcta h2 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 300;
+  font-variation-settings: "opsz" 144, "SOFT" 100;
+  margin: 0 0 1rem;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+}
+.endcta h2 em {
+  font-style: italic;
+  color: var(--accent);
+  background: linear-gradient(180deg, transparent 70%, color-mix(in srgb, var(--accent) 25%, transparent) 70%);
+}
+.endcta p { color: var(--ink-soft); margin: 0; max-width: 50ch; }
+.endcta .actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+
+.foot { background: var(--ink); color: var(--paper); }
+.foot .dot { color: var(--accent); }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topnav">
+  <div class="frame">
+    <div class="brand"><a href="../index.html">dmj<span class="dot">.</span>one</a></div>
+    <nav aria-label="Primary">
+      <ul>
+        <li><a href="../index.html#catalogue">Catalogue</a></li>
+        <li><a href="../index.html#manifesto">Manifesto</a></li>
+        <li><a href="../index.html#hire">Hire</a></li>
+        <li><a href="https://github.com/divyamohan1993/chat-agent" rel="noopener">GitHub</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ============ HERO ============ -->
+<section class="ca-hero">
+  <div class="frame">
+    <div>
+      <p class="crumbs">
+        <a href="../index.html">Catalogue</a> /
+        <a href="../index.html#cat-ai">AI · Agents</a> /
+        <span>RealtyAssistant</span>
+      </p>
+
+      <span class="ca-eyebrow">No. 25 · Live · Real Estate Lead Qualification</span>
+
+      <h1>
+        11 PM. Hindi-Punjabi mix.<br>
+        Lead <em>qualified anyway.</em>
+      </h1>
+
+      <p class="lede">
+        Real estate sales <strong>lose 70% of leads to follow-up failure.</strong> The leads call at 11 PM in code-mixed Indian English. Sales reps speak office English by day only. RealtyAssistant picks up on the first ring, handles Noida-Gurugram accents, and never drops a lead, even when the database breaks.
+      </p>
+
+      <div class="ca-cta-row">
+        <a class="btn btn-primary" href="https://github.com/divyamohan1993/chat-agent" rel="noopener">View source</a>
+        <a class="btn btn-ghost" href="#transcript">Hear a real call</a>
+        <a class="btn btn-ghost" href="#failsafe">Fail-safe design</a>
+      </div>
+    </div>
+
+    <div aria-hidden="true">
+      <div class="phone-mock">
+        <div class="phone-screen">
+          <p class="ph-time">22:47 · Friday</p>
+          <p class="ph-status">Call in progress</p>
+          <p class="ph-name">RealtyAssistant</p>
+          <p class="ph-num">+91 noida sector 150</p>
+          <div class="ph-wave">
+            <span></span><span></span><span></span><span></span>
+            <span></span><span></span><span></span><span></span>
+          </div>
+        </div>
+        <div class="ph-keypad">
+          <div class="ph-key">1</div><div class="ph-key">2</div><div class="ph-key">3</div>
+          <div class="ph-key">4</div><div class="ph-key">5</div><div class="ph-key">6</div>
+          <div class="ph-key">7</div><div class="ph-key">8</div><div class="ph-key">9</div>
+          <div class="ph-key">*</div><div class="ph-key callbtn">●</div><div class="ph-key endbtn">×</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATS ============ -->
+<section class="ca-stats" aria-label="At a glance">
+  <div class="ca-stat"><span class="num">~₹500</span><span class="lbl">Per month VPS · all-in</span></div>
+  <div class="ca-stat"><span class="num">70%</span><span class="lbl">Industry follow-up failure</span></div>
+  <div class="ca-stat"><span class="num">0</span><span class="lbl">Leads lost on DB failure</span></div>
+  <div class="ca-stat"><span class="num">2</span><span class="lbl">LLM tiers · Ollama + Gemini</span></div>
+  <div class="ca-stat"><span class="num">1-click</span><span class="lbl">Deploy · Windows or Linux</span></div>
+</section>
+
+
+<!-- ============ ACT I · THE LOST LEADS ============ -->
+<section class="act" aria-labelledby="prob-h">
+  <div class="frame">
+    <p class="act-num">Act I · The Lost Leads</p>
+    <h2 id="prob-h">The lead is awake.<br>The agent is <em>asleep.</em></h2>
+
+    <div class="lose-grid">
+      <div class="lose-card">
+        <span class="n">11 PM</span>
+        <span class="l">When the leads call</span>
+        <p>The phone rings after dinner, after the kids, after the Zoom calls. The agent's office-hour answering service takes a name. By morning the lead has already toured a competitor's project.</p>
+      </div>
+      <div class="lose-card">
+        <span class="n">Hindi+Punjabi+English</span>
+        <span class="l">In one sentence</span>
+        <p>"Bhai 3BHK chahiye Noida Extension mein, around 50 lakh, schools nearby, RERA approved, kal site visit ho sakta hai?" Most voice bots stop existing at sentence two.</p>
+      </div>
+      <div class="lose-card">
+        <span class="n">70%</span>
+        <span class="l">Industry follow-up failure</span>
+        <p>The lead asks four questions. The CRM gets two. Sales calls back twice. The lead has moved on. Industry-standard outcome: lost.</p>
+      </div>
+      <div class="lose-card">
+        <span class="n">SaaS bots</span>
+        <span class="l">Cost ₹40K+ per month</span>
+        <p>Most "AI receptionist" platforms price for US enterprises. The mid-market broker in Gurugram cannot afford the wrapper, let alone the AI.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ ACT II · TRANSCRIPT ============ -->
+<section class="act" id="transcript" aria-labelledby="tx-h">
+  <div class="frame">
+    <p class="act-num">Act II · The Promise</p>
+    <h2 id="tx-h">"I want a 3 BHK in Noida under 50 lakhs."<br><em>Understood instantly.</em></h2>
+
+    <div class="transcript">
+      <div class="transcript-bar">
+        <span class="rec">REC</span>
+        <span>Call · 22:47 IST · Sector 150 inquiry</span>
+        <span class="meta">Whisper STT · Hybrid LLM · session #14829</span>
+      </div>
+      <div class="transcript-body">
+        <div class="tx-line">
+          <span class="tx-time">00:02</span>
+          <div class="tx-content">
+            <p class="who lead">Lead</p>
+            <p class="said">Hi, I am looking for a 3 BHK apartment in Noida Extension, around 50 lakhs.</p>
+            <p class="extracted">
+              <span>3 BHK</span><span>Apartment</span><span>Noida Extension</span><span>≤ ₹50L</span>
+            </p>
+          </div>
+        </div>
+        <div class="tx-line">
+          <span class="tx-time">00:09</span>
+          <div class="tx-content">
+            <p class="who bot">RealtyAssistant</p>
+            <p class="said">Got it. <em>Three-BHK in Noida Extension under 50 lakhs.</em> One quick check, RERA-approved projects only, or are open-plot too?</p>
+          </div>
+        </div>
+        <div class="tx-line">
+          <span class="tx-time">00:16</span>
+          <div class="tx-content">
+            <p class="who lead">Lead</p>
+            <p class="said">RERA approved, school nearby, possession within 1 year.</p>
+            <p class="extracted">
+              <span>RERA</span><span>School proximity</span><span>Possession ≤ 12mo</span>
+            </p>
+          </div>
+        </div>
+        <div class="tx-line">
+          <span class="tx-time">00:21</span>
+          <div class="tx-content">
+            <p class="who bot">RealtyAssistant</p>
+            <p class="said">Pulling live listings from realtyassistant.in. <em>Six matches.</em> I will text you the top three with site-visit slots for tomorrow. What time works?</p>
+          </div>
+        </div>
+        <div class="tx-line">
+          <span class="tx-time">00:28</span>
+          <div class="tx-content">
+            <p class="who lead">Lead</p>
+            <p class="said">11 baje free hoon, brother.</p>
+            <p class="extracted">
+              <span>11:00 IST</span><span>Site visit confirmed</span>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ ACT III · FAIL-SAFE ============ -->
+<section class="act" id="failsafe" aria-labelledby="fs-h">
+  <div class="frame">
+    <p class="act-num">Act III · The Fail-Safe</p>
+    <h2 id="fs-h">When the database breaks,<br>RealtyAssistant <em>does not.</em></h2>
+    <p style="font-family:'Fraunces',serif;font-size:var(--t-md);max-width:60ch;margin:0;color:var(--ink-soft);line-height:1.55;">A ₹500/month VPS will fail. The disk will fill. The LLM will time out. The hybrid architecture treats every dependency as untrusted. Leads are captured, no matter what.</p>
+
+    <div class="fs-grid">
+      <article class="fs-card">
+        <p class="pn">Layer 01 · Voice</p>
+        <h3>Whisper STT · Indian-tuned fuzzy match</h3>
+        <p>Local Whisper engine for transcription. Fuzzy-matching for Indian place names: Noida, Greater Noida, Noida Extension, Sector 150 are all canonicalised to one entity.</p>
+        <p class="scenario">Scenario: lead says "Noyda" → matched → entity captured</p>
+      </article>
+
+      <article class="fs-card">
+        <p class="pn">Layer 02 · Brain</p>
+        <h3>Hybrid LLM · Ollama → Gemini</h3>
+        <p>Local Ollama serves the common case. If the local model times out or hallucinates, Gemini takes over. If both fail, deterministic regex extraction still captures the structured fields.</p>
+        <p class="scenario">Scenario: Ollama hangs → Gemini in 1.2s → lead saved</p>
+      </article>
+
+      <article class="fs-card">
+        <p class="pn">Layer 03 · Memory</p>
+        <h3>Self-healing SQLite</h3>
+        <p>Auto-detects database corruption, runs integrity check, repairs in place. If the disk is unwritable, falls back to an in-memory store and writes to log so leads can be replayed.</p>
+        <p class="scenario">Scenario: disk full → in-memory + log → zero loss</p>
+      </article>
+
+      <article class="fs-card">
+        <p class="pn">Layer 04 · Surface</p>
+        <h3>Live property scraper</h3>
+        <p>Scrapes <code>realtyassistant.in</code> in real time so the listings shown to the lead are the listings still on market. Cached for 60 seconds, refreshed in the background.</p>
+        <p class="scenario">Scenario: scraper down → cached pool served</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ ACT IV · DEPLOY ============ -->
+<section class="act" aria-labelledby="dep-h">
+  <div class="frame">
+    <p class="act-num">Act IV · One-Click Deploy</p>
+    <h2 id="dep-h">Two scripts.<br><em>Either OS.</em><br>Production by lunch.</h2>
+
+    <div class="lose-grid">
+      <div class="lose-card">
+        <span class="n">run_project.bat</span>
+        <span class="l">Windows · development</span>
+        <p>Checks Python 3.10+, creates venv, installs deps, frees port 20000, starts the server. Open localhost:20000/demo and start qualifying.</p>
+      </div>
+      <div class="lose-card">
+        <span class="n">run_project.sh</span>
+        <span class="l">Ubuntu VPS · production</span>
+        <p>Installs system deps, sets up nginx reverse-proxy, registers as a systemd service, comes back up after reboot. Total cost: one ₹500/month VPS.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ PROOF ============ -->
+<section class="proof act" aria-labelledby="proof-h">
+  <div class="frame">
+    <p class="act-num">Act V · Proof</p>
+    <h2 id="proof-h">Production-ready. <em>Indian-priced.</em></h2>
+
+    <div class="proof-grid">
+      <div class="proof-item">
+        <h3>~₹500 per month, all-in</h3>
+        <p>Single Ubuntu VPS. Nginx reverse-proxy. Local Ollama for the common case. Gemini for the hard cases. Cheaper than a single junior outbound call.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Indian-tuned fuzzy match</h3>
+        <p>Place names like Noyda, NOIDA, Noida-Ext, Greater Noida West all normalise to canonical entities. Pricing tokens like "50 lakh" and "5 crore" parsed at extraction time.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Twilio + VAPI voice providers</h3>
+        <p>Pluggable voice provider via <code>VOICE_PROVIDER</code> env. Switch from Twilio to VAPI without code changes. Webhook-driven, scales horizontally.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Admin lead dashboard at /leads</h3>
+        <p>Every captured lead, every extracted entity, every transcript chunk. SQLite-backed, exportable. Sales sees what the AI saw.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ STACK ============ -->
+<section class="act" aria-labelledby="tech-h">
+  <div class="frame">
+    <p class="act-num">The Stack</p>
+    <h2 id="tech-h" style="font-size:var(--t-xl);">FastAPI in. <em>Indian English out.</em></h2>
+    <ul class="stack-list">
+      <li class="stack-tag">Python 3.10+</li>
+      <li class="stack-tag">FastAPI 0.115</li>
+      <li class="stack-tag">Whisper STT</li>
+      <li class="stack-tag">Ollama LLM</li>
+      <li class="stack-tag">Gemini fallback</li>
+      <li class="stack-tag">SQLite self-heal</li>
+      <li class="stack-tag">Twilio · VAPI</li>
+      <li class="stack-tag">Nginx</li>
+      <li class="stack-tag">systemd</li>
+      <li class="stack-tag">Ubuntu VPS</li>
+    </ul>
+  </div>
+</section>
+
+
+<!-- ============ END CTA ============ -->
+<section class="endcta" aria-labelledby="cta-h">
+  <div class="frame">
+    <div>
+      <h2 id="cta-h">If a ₹500 VPS can run a Hindi-English voice agent, <em>your customer support can too.</em></h2>
+      <p>I build voice-first products for India that survive bad disks, bad networks and code-mixed sentences. If your CX is leaking leads, talk to me.</p>
+    </div>
+    <div class="actions">
+      <a class="btn btn-primary" href="../index.html#hire">Hire me</a>
+      <a class="btn btn-ghost" href="../index.html">Back to catalogue</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="frame">
+    <div>
+      <h2 style="font-family:'Fraunces',serif;font-size:var(--t-xl);margin:0 0 1rem;">dmj<span class="dot">.</span>one</h2>
+      <p>Dream, Manifest and Journey, Together as One.</p>
+      <p class="meta">© 2026 Divya Mohan. RealtyAssistant production AI agent. MIT licence.</p>
+    </div>
+    <div>
+      <p class="meta">Catalogue</p>
+      <p><a href="../index.html#catalogue">All 47 products</a></p>
+      <p><a href="../index.html#cat-ai">AI · Agents</a></p>
+      <p><a href="../index.html#hire">Hire</a></p>
+    </div>
+    <div>
+      <p class="meta">RealtyAssistant</p>
+      <p><a href="https://github.com/divyamohan1993/chat-agent" rel="noopener">Source</a></p>
+      <p><a href="mailto:contact@dmj.one">contact@dmj.one</a></p>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

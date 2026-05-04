@@ -1,0 +1,787 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#355c3c">
+<meta name="color-scheme" content="light">
+
+<title>DIP Practical Handbook · 8 experiments × 3 runtimes · dmj.one</title>
+<meta name="description" content="A complete practical lab handbook for CSU2543 Digital Image Processing at Shoolini University. 8 experiments, 3 runtimes each (Jupyter, Flask on Cloud Run, static Cloudflare Pages), plus a print-ready PDF with cover, certificate, index, QR codes and watermark.">
+<meta property="og:title" content="DIP Practical Handbook · 8 experiments × 3 runtimes.">
+<meta property="og:description" content="The same lab works in Colab, on a Cloud Run server, or as plain HTML files. Print to a Chicago-style PDF, ready for submission.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,ital,wght,SOFT@9..144,0..1,300..900,30..100&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="../assets/core.css">
+
+<style>
+:root { --accent: var(--c-research); --accent-deep: #1f3823; --paper-warm: #ebe4d4; --c-aim:#1f3a5f; --c-th:#7a2c5e; --c-code:#355c3c; --c-out:#b48a2b; --c-conc:#b03030; }
+body { background: var(--paper); }
+
+.crumbs {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink-mute);
+  margin: 0 0 1.75rem;
+  display: flex; gap: 0.5rem; flex-wrap: wrap;
+}
+.crumbs a { border-bottom: 1px solid var(--ink-mute); padding-bottom: 1px; }
+.crumbs a:hover { color: var(--accent); border-color: var(--accent); }
+.crumbs span { color: var(--accent); }
+
+.btn {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.7rem 1.1rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 700;
+  border: 1px solid var(--ink);
+  transition: background .15s, color .15s, transform .15s, box-shadow .15s;
+}
+.btn:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--ink); }
+.btn-primary { background: var(--accent); color: white; border-color: var(--accent); }
+.btn-primary:hover { box-shadow: 4px 4px 0 var(--ink); }
+.btn-ghost { background: transparent; color: var(--ink); }
+
+/* ====== HERO · book cover ============ */
+.dp-hero {
+  position: relative;
+  border-bottom: var(--hair);
+  padding-block: clamp(3rem, 5vw + 1rem, 5.5rem) clamp(2.5rem, 4vw, 4.5rem);
+  background: var(--paper);
+  overflow: hidden;
+}
+.dp-hero .frame { position: relative; z-index: 2; }
+.dp-grid { display: grid; gap: 3rem; grid-template-columns: 1fr; align-items: stretch; }
+@media (min-width: 980px) { .dp-grid { grid-template-columns: 1.1fr 1fr; gap: 4rem; align-items: end; } }
+
+.dp-eyebrow {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  padding: 0.4rem 0.85rem;
+  border: 1px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  color: var(--accent-deep);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  margin-bottom: 1.25rem;
+}
+.dp-eyebrow::before {
+  content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--accent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+.dp-hero h1 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-3xl);
+  font-weight: 300;
+  font-variation-settings: "opsz" 144, "SOFT" 100, "WONK" 1;
+  letter-spacing: -0.04em;
+  line-height: 0.92;
+  margin: 0;
+  max-width: 14ch;
+}
+.dp-hero h1 em {
+  font-style: italic;
+  color: var(--accent-deep);
+  font-variation-settings: "opsz" 144, "SOFT" 100, "WONK" 1;
+}
+
+.course-meta {
+  margin-top: 1.5rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+.course-meta strong { color: var(--accent-deep); }
+
+.dp-hero .lede {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md);
+  font-weight: 300;
+  line-height: 1.5;
+  color: var(--ink-soft);
+  margin: 1.75rem 0 0;
+  max-width: 56ch;
+}
+.dp-hero .lede strong {
+  font-weight: 600;
+  color: var(--ink);
+  background: linear-gradient(180deg, transparent 60%, color-mix(in srgb, var(--accent) 28%, transparent) 60%);
+  padding: 0 0.1em;
+}
+.dp-cta { margin-top: 2rem; display: flex; gap: 0.6rem; flex-wrap: wrap; }
+
+/* book cover visual */
+.book {
+  position: relative;
+  background: var(--paper-warm);
+  border: 1px solid var(--ink);
+  box-shadow: 12px 12px 0 var(--ink);
+  padding: 2rem 1.75rem;
+  font-family: 'Fraunces', serif;
+  min-height: 380px;
+  display: flex; flex-direction: column;
+  background-image:
+    linear-gradient(90deg, color-mix(in srgb, var(--ink) 35%, transparent) 0 4px, transparent 4px 8px, color-mix(in srgb, var(--ink) 18%, transparent) 8px 9px, transparent 9px);
+  background-repeat: no-repeat;
+  background-size: 9px 100%;
+  background-position: left top;
+  padding-left: 2.5rem;
+}
+.book::before {
+  content: "CSU2543";
+  position: absolute;
+  top: 1rem; right: 1rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  color: var(--accent-deep);
+  font-weight: 700;
+}
+.book h3 {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-size: 0.95rem;
+  font-weight: 400;
+  color: var(--ink-soft);
+  margin: 0 0 0.5rem;
+  letter-spacing: 0.03em;
+}
+.book .title {
+  font-family: 'Fraunces', serif;
+  font-weight: 300;
+  font-variation-settings: "opsz" 144, "SOFT" 80, "WONK" 1;
+  font-size: clamp(1.7rem, 1rem + 2.4vw, 2.4rem);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  margin: 0;
+}
+.book .title em { color: var(--accent-deep); font-style: italic; }
+.book .meta-rule {
+  margin: 1.25rem 0;
+  border: 0;
+  border-top: 2px solid var(--ink);
+  width: 60%;
+}
+.book .credit {
+  font-family: 'Fraunces', serif;
+  font-size: 0.95rem;
+  color: var(--ink-soft);
+  line-height: 1.55;
+}
+.book .credit b { color: var(--ink); font-weight: 600; }
+.book .footer-row {
+  margin-top: auto;
+  display: flex; align-items: center; justify-content: space-between;
+  padding-top: 1.5rem;
+}
+.book .qr {
+  width: 64px; height: 64px;
+  background:
+    repeating-conic-gradient(var(--ink) 0 25%, var(--paper-warm) 0 50%) 0 0/16px 16px,
+    var(--paper-warm);
+  border: 1px solid var(--ink);
+}
+.book .uni {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  text-align: right;
+  font-weight: 700;
+  line-height: 1.5;
+}
+.book .uni strong { color: var(--accent-deep); display: block; }
+.book .stamp {
+  position: absolute;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%) rotate(-12deg);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.3em;
+  color: color-mix(in srgb, var(--accent-deep) 60%, transparent);
+  border: 2px solid color-mix(in srgb, var(--accent-deep) 60%, transparent);
+  padding: 0.3rem 0.8rem;
+  font-weight: 700;
+  pointer-events: none;
+  opacity: 0.55;
+}
+
+/* ====== STATS RIBBON ====== */
+.dp-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  background: var(--ink);
+  color: var(--paper);
+  border-block: 2px solid var(--ink);
+}
+.dp-stat {
+  padding: 1.5rem clamp(1rem, 2vw, 1.5rem);
+  border-right: 1px solid color-mix(in srgb, var(--paper) 20%, transparent);
+}
+.dp-stat:last-child { border-right: 0; }
+.dp-stat .num {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  font-variation-settings: "opsz" 144, "SOFT" 30;
+  display: block; line-height: 1;
+  color: var(--accent);
+}
+.dp-stat .lbl {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  margin-top: 0.6rem; display: block;
+  color: color-mix(in srgb, var(--paper) 75%, transparent);
+}
+
+/* ===== ACTS ===== */
+.act { padding-block: clamp(3rem, 5vw, 5rem); border-bottom: var(--hair); }
+.act-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 700;
+  margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 1rem;
+}
+.act-num::before { content: ""; width: 2.5rem; height: 1px; background: var(--accent); }
+.act h2 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 50, "WONK" 1;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+  margin: 0 0 1.5rem;
+  max-width: 22ch;
+}
+.act h2 em { font-style: italic; color: var(--accent); }
+.act-lede {
+  font-family: 'Fraunces', serif; font-size: var(--t-md);
+  color: var(--ink-soft); max-width: 60ch; margin: 0;
+}
+
+/* ===== TABLE OF CONTENTS · leader dots ===== */
+.toc {
+  margin-top: 2.5rem;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  padding: 1.5rem 1.75rem;
+}
+.toc h3 {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin: 0 0 1rem;
+  color: var(--accent-deep);
+  letter-spacing: -0.01em;
+  border-bottom: 1px solid var(--paper-edge);
+  padding-bottom: 0.6rem;
+}
+.toc ol {
+  display: grid; gap: 0.55rem;
+  font-family: 'Fraunces', serif;
+  font-size: 1.05rem;
+}
+.toc li {
+  display: flex; align-items: baseline; gap: 0.35rem;
+  position: relative;
+}
+.toc .n {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--accent);
+  width: 2.2rem;
+  flex-shrink: 0;
+}
+.toc .nm { color: var(--ink); }
+.toc .lead {
+  flex: 1;
+  border-bottom: 1px dotted color-mix(in srgb, var(--ink) 30%, transparent);
+  margin: 0 0.5rem;
+  position: relative;
+  top: -0.3rem;
+}
+.toc .ref {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  color: var(--ink-mute);
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
+}
+
+/* ===== 8 × 3 RUNTIMES MATRIX ===== */
+.matrix {
+  margin-top: 2.5rem;
+  width: 100%;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  border-collapse: collapse;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-sm);
+  overflow-x: auto;
+  display: block;
+}
+.matrix thead { background: var(--ink); color: var(--accent); }
+.matrix th, .matrix td {
+  padding: 0.75rem 0.85rem;
+  border-bottom: 1px solid var(--paper-edge);
+  text-align: left;
+  vertical-align: top;
+  white-space: nowrap;
+}
+.matrix th {
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-size: var(--t-xs);
+}
+.matrix tbody tr:last-child td { border-bottom: 0; }
+.matrix .nm { color: var(--accent-deep); font-weight: 700; }
+.matrix .y {
+  display: inline-block; width: 18px; height: 18px;
+  background: var(--accent);
+  color: white;
+  text-align: center;
+  font-weight: 700;
+  font-size: 0.8rem;
+  line-height: 18px;
+  border-radius: 2px;
+}
+.matrix-cap {
+  margin-top: 0.85rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  text-align: right;
+}
+.matrix-cap b { color: var(--accent-deep); }
+
+/* ===== HANDBOOK FEATURES ===== */
+.handbook {
+  margin-top: 2.5rem;
+  display: grid; gap: 0;
+  grid-template-columns: 1fr;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+}
+@media (min-width: 760px) { .handbook { grid-template-columns: repeat(3, 1fr); } }
+.hb {
+  padding: 1.4rem 1.5rem;
+  border-right: 1px solid var(--paper-edge);
+  border-bottom: 1px solid var(--paper-edge);
+}
+@media (min-width: 760px) {
+  .hb:nth-child(3n) { border-right: 0; }
+  .hb:nth-last-child(-n+3) { border-bottom: 0; }
+}
+.hb .swatch {
+  width: 28px; height: 4px; margin-bottom: 0.6rem;
+  background: var(--accent);
+}
+.hb h3 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md);
+  margin: 0 0 0.45rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.hb p { margin: 0; font-size: var(--t-sm); color: var(--ink-soft); }
+
+/* color-coded section banners */
+.banners {
+  margin-top: 2rem;
+  display: grid; gap: 0.5rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { .banners { grid-template-columns: repeat(5, 1fr); } }
+.banner {
+  padding: 0.85rem 1rem;
+  color: white;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-weight: 700;
+}
+
+/* stack */
+.stack { padding-block: clamp(3rem, 5vw, 5rem); border-bottom: var(--hair); }
+.stack-list { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.5rem; }
+.stack-tag {
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--ink);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 600;
+}
+
+/* proof */
+.proof {
+  background: var(--ink);
+  color: var(--paper);
+  padding-block: clamp(3rem, 5vw, 5rem);
+  position: relative;
+  overflow: hidden;
+}
+.proof::before {
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 80% 20%, color-mix(in srgb, var(--accent) 28%, transparent), transparent 60%);
+  pointer-events: none;
+}
+.proof .frame { position: relative; }
+.proof h2 { color: var(--paper); }
+.proof h2 em { color: var(--accent); }
+.proof-grid { display: grid; gap: 1rem; margin-top: 2rem; grid-template-columns: 1fr; }
+@media (min-width: 760px) { .proof-grid { grid-template-columns: repeat(2, 1fr); } }
+.proof-item {
+  border: 1px solid color-mix(in srgb, var(--paper) 30%, transparent);
+  padding: 1.5rem;
+  background: color-mix(in srgb, var(--paper) 5%, transparent);
+}
+.proof-item h3 {
+  font-family: 'JetBrains Mono', monospace;
+  margin: 0 0 0.5rem;
+  font-size: 0.95rem;
+  color: var(--accent);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+.proof-item p { margin: 0; color: color-mix(in srgb, var(--paper) 80%, transparent); font-size: var(--t-sm); }
+
+/* end cta */
+.endcta {
+  padding-block: clamp(3rem, 5vw, 5rem);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 12%, transparent), var(--paper));
+}
+.endcta .frame { display: grid; gap: 2rem; grid-template-columns: 1fr; }
+@media (min-width: 760px) { .endcta .frame { grid-template-columns: 2fr 1fr; align-items: end; } }
+.endcta h2 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 300;
+  font-variation-settings: "opsz" 144, "SOFT" 100;
+  margin: 0 0 1rem;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+}
+.endcta h2 em {
+  font-style: italic;
+  color: var(--accent);
+  background: linear-gradient(180deg, transparent 70%, color-mix(in srgb, var(--accent) 25%, transparent) 70%);
+}
+.endcta p { color: var(--ink-soft); margin: 0; max-width: 50ch; }
+.endcta .actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+
+.foot { background: var(--ink); color: var(--paper); }
+.foot .dot { color: var(--accent); }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topnav">
+  <div class="frame">
+    <div class="brand"><a href="../index.html">dmj<span class="dot">.</span>one</a></div>
+    <nav aria-label="Primary">
+      <ul>
+        <li><a href="../index.html#catalogue">Catalogue</a></li>
+        <li><a href="../index.html#manifesto">Manifesto</a></li>
+        <li><a href="../index.html#hire">Hire</a></li>
+        <li><a href="https://github.com/divyamohan1993/dip-practical" rel="noopener">GitHub</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ============ HERO ============ -->
+<section class="dp-hero">
+  <div class="frame">
+    <p class="crumbs">
+      <a href="../index.html">Catalogue</a> /
+      <a href="../index.html#cat-research">Research</a> /
+      <span>DIP Practical Handbook</span>
+    </p>
+
+    <div class="dp-grid">
+      <div>
+        <span class="dp-eyebrow">No. 47 · Education · Imaging</span>
+
+        <h1>The lab handbook that <em>actually runs.</em></h1>
+
+        <p class="course-meta"><strong>CSU2543</strong> · Digital Image Processing · <strong>Shoolini University</strong> · Solan, H.P. · 2025-2026</p>
+
+        <p class="lede">
+          Most practical handbooks are PDFs nobody can run. Students copy code that does not compile, hate the subject, and graduate without a portfolio. <strong>This handbook ships eight Gonzalez &amp; Woods experiments, each in three independently-runnable forms · Jupyter, Flask on Cloud Run, static Cloudflare Pages · plus a print-ready Chicago-style PDF with cover, certificate, index, QR codes and watermark.</strong>
+        </p>
+
+        <div class="dp-cta">
+          <a class="btn btn-primary" href="https://dip.dmj.one" rel="noopener">Open the lab</a>
+          <a class="btn btn-ghost" href="https://github.com/divyamohan1993/dip-practical" rel="noopener">View source</a>
+        </div>
+      </div>
+
+      <aside class="book" aria-label="Mock cover of the print-ready PDF handbook">
+        <h3>Practical File</h3>
+        <p class="title">Digital Image <em>Processing</em></p>
+        <hr class="meta-rule">
+        <p class="credit">
+          <b>Submitted by:</b> Divya Mohan · GF202214698<br>
+          <b>Submitted to:</b> Ms. Ishani Sharma<br>
+          <b>Programme:</b> B.Tech. CSE · 8th semester
+        </p>
+        <span class="stamp">CSU 2543 · APPROVED</span>
+        <div class="footer-row">
+          <div class="qr" aria-hidden="true"></div>
+          <div class="uni">
+            <strong>Shoolini University</strong>
+            Yogananda School of AI<br>
+            Computers &amp; Data Sciences
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATS ============ -->
+<section class="dp-stats" aria-label="At a glance">
+  <div class="dp-stat"><span class="num">8 × 3</span><span class="lbl">Experiments × runtimes</span></div>
+  <div class="dp-stat"><span class="num">32</span><span class="lbl">Pre-baked result figures</span></div>
+  <div class="dp-stat"><span class="num">Cloud Run</span><span class="lbl">asia-south1 · live</span></div>
+  <div class="dp-stat"><span class="num">AAA</span><span class="lbl">WCAG 2.2 from line one</span></div>
+  <div class="dp-stat"><span class="num">PDF</span><span class="lbl">Print-ready, submission-ready</span></div>
+</section>
+
+<!-- ============ ACT I · TOC ============ -->
+<section class="act" aria-labelledby="toc-h">
+  <div class="frame">
+    <p class="act-num">Act I · The Syllabus</p>
+    <h2 id="toc-h">Eight experiments. <em>Gonzalez &amp; Woods, third.</em></h2>
+    <p class="act-lede">The full prescribed list, end to end. Every entry runs in three places, and every entry prints to a colour-coded section template.</p>
+
+    <div class="toc" aria-label="Table of contents · 8 experiments">
+      <h3>Index · Practical File · CSU2543</h3>
+      <ol>
+        <li><span class="n">1.</span><span class="nm">Loading and displaying digital images</span><span class="lead"></span><span class="ref">G&amp;W Ch 2</span></li>
+        <li><span class="n">2.</span><span class="nm">Impact of sampling rate on spatial resolution</span><span class="lead"></span><span class="ref">G&amp;W Ch 2</span></li>
+        <li><span class="n">3.</span><span class="nm">Image negation, subtraction and inversion</span><span class="lead"></span><span class="ref">G&amp;W Ch 2-3</span></li>
+        <li><span class="n">4.</span><span class="nm">Gamma correction and power-law transformations</span><span class="lead"></span><span class="ref">G&amp;W Ch 3</span></li>
+        <li><span class="n">5.</span><span class="nm">Histogram equalization</span><span class="lead"></span><span class="ref">G&amp;W Ch 3</span></li>
+        <li><span class="n">6.</span><span class="nm">Histogram matching and specification</span><span class="lead"></span><span class="ref">G&amp;W Ch 3</span></li>
+        <li><span class="n">7.</span><span class="nm">2D correlation and convolution</span><span class="lead"></span><span class="ref">G&amp;W Ch 3</span></li>
+        <li><span class="n">8.</span><span class="nm">Spatial filtering · box, median, Laplacian, Sobel</span><span class="lead"></span><span class="ref">G&amp;W Ch 3</span></li>
+      </ol>
+    </div>
+
+    <div class="banners" aria-label="Color-coded section banners across notebooks, web app and print">
+      <div class="banner" style="background:var(--c-aim);">Aim</div>
+      <div class="banner" style="background:var(--c-th);">Description / Theory</div>
+      <div class="banner" style="background:var(--c-code);">Code</div>
+      <div class="banner" style="background:var(--c-out);">Output</div>
+      <div class="banner" style="background:var(--c-conc);">Analysis / Conclusion</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ACT II · 8x3 MATRIX ============ -->
+<section class="act" aria-labelledby="mat-h" style="background: var(--paper-soft);">
+  <div class="frame">
+    <p class="act-num">Act II · The Matrix</p>
+    <h2 id="mat-h">Same lab. <em>Three independent runtimes.</em></h2>
+    <p class="act-lede">A student opens Colab. A teacher demos it on the projector through the Cloud Run app. An evaluator with no internet opens the static folder. All three see the same experiment, with the same colour-coded sections.</p>
+
+    <div style="overflow-x:auto;">
+    <table class="matrix" aria-label="8 experiments × 3 runtimes matrix">
+      <thead>
+        <tr>
+          <th>#</th><th>Experiment</th>
+          <th>Jupyter</th><th>Flask · Cloud Run</th><th>Static · Cloudflare</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="nm">1</td><td>Display</td><td><span class="y">Y</span></td><td><span class="y">Y</span></td><td><span class="y">Y</span></td></tr>
+        <tr><td class="nm">2</td><td>Sampling</td><td><span class="y">Y</span></td><td><span class="y">Y</span></td><td><span class="y">Y</span></td></tr>
+        <tr><td class="nm">3</td><td>Negation / Subtract</td><td><span class="y">Y</span></td><td><span class="y">Y</span></td><td><span class="y">Y</span></td></tr>
+        <tr><td class="nm">4</td><td>Gamma / Power law</td><td><span class="y">Y</span></td><td><span class="y">Y</span></td><td><span class="y">Y</span></td></tr>
+        <tr><td class="nm">5</td><td>Equalization</td><td><span class="y">Y</span></td><td><span class="y">Y</span></td><td><span class="y">Y</span></td></tr>
+        <tr><td class="nm">6</td><td>Matching</td><td><span class="y">Y</span></td><td><span class="y">Y</span></td><td><span class="y">Y</span></td></tr>
+        <tr><td class="nm">7</td><td>Conv / Corr</td><td><span class="y">Y</span></td><td><span class="y">Y</span></td><td><span class="y">Y</span></td></tr>
+        <tr><td class="nm">8</td><td>Spatial filtering</td><td><span class="y">Y</span></td><td><span class="y">Y</span></td><td><span class="y">Y</span></td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p class="matrix-cap">8 experiments · 3 runtimes · <b>24 independent paths</b></p>
+  </div>
+</section>
+
+<!-- ============ ACT III · PRINT-READY HANDBOOK ============ -->
+<section class="act" aria-labelledby="hb-h">
+  <div class="frame">
+    <p class="act-num">Act III · The Handbook</p>
+    <h2 id="hb-h">Press Ctrl+P. <em>Submit it.</em></h2>
+    <p class="act-lede">Every page on the live site is print-ready. The PDF is Chicago-style, AAA-accessible, and matches the Shoolini practical-file template exactly.</p>
+
+    <div class="handbook">
+      <article class="hb">
+        <span class="swatch"></span>
+        <h3>Cover, Certificate, Acknowledgement, Index</h3>
+        <p>Universal pages prepended when printing from <code>/</code>. Title, programme, Submitted by / to, school, university, location, date · all the fields the practical-file rubric expects.</p>
+      </article>
+      <article class="hb">
+        <span class="swatch"></span>
+        <h3>Per-practical cover identifier</h3>
+        <p>"Practical 7: 2D Correlation &amp; Convolution" appears when printing an individual practical, suppressed on the consolidated home printout. One template, both modes.</p>
+      </article>
+      <article class="hb">
+        <span class="swatch"></span>
+        <h3>Five colour-coded section banners</h3>
+        <p>Aim (blue), Description / Theory (purple), Code (green), Output (orange), Analysis / Conclusion (red). Identical palette across notebooks and the web app.</p>
+      </article>
+      <article class="hb">
+        <span class="swatch"></span>
+        <h3>Literal Python rendered in Code section</h3>
+        <p>The exact Python from the notebooks is embedded in the Code block, not the server processors · so the printed code matches what the student actually ran.</p>
+      </article>
+      <article class="hb">
+        <span class="swatch"></span>
+        <h3>Result figures auto-mirrored under Output</h3>
+        <p>A <code>beforeprint</code> JS hook copies every visible figure into the Output container, so what is on screen ends up on paper.</p>
+      </article>
+      <article class="hb">
+        <span class="swatch"></span>
+        <h3>2"×2" QR + 22% watermark</h3>
+        <p>QR on each cover encodes the canonical page URL (works behind Cloudflare via Werkzeug ProxyFix). Centred dmj.one watermark on every content page, suppressed on the cover.</p>
+      </article>
+      <article class="hb">
+        <span class="swatch"></span>
+        <h3>Per-practical page numbers</h3>
+        <p>1.1, 1.2, …, 8.5 using CSS named-page contexts. Cover unnumbered. Times New Roman 12pt, justified, 1-inch margins. JetBrains Mono code blocks.</p>
+      </article>
+      <article class="hb">
+        <span class="swatch"></span>
+        <h3>32 result figures pre-baked</h3>
+        <p><code>precompute.py</code> runs at Docker build time. Pages render instantly on first hit, and printed PDFs include the figures even before the user clicks anything.</p>
+      </article>
+      <article class="hb">
+        <span class="swatch"></span>
+        <h3>Auto-downloaded G&amp;W dataset</h3>
+        <p>Chapters 02 and 03 are fetched from imageprocessingplace.com on first run, then cached locally. The Colab notebooks do the same so they run end-to-end with one click.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STACK ============ -->
+<section class="stack" aria-labelledby="stack-h">
+  <div class="frame">
+    <p class="act-num">The Stack</p>
+    <h2 id="stack-h" style="font-size:var(--t-xl);font-weight:400;font-family:'Fraunces',serif;font-variation-settings:'opsz' 144,'SOFT' 50;margin:0;letter-spacing:-0.02em;">Three runtimes, <em>one source of truth.</em></h2>
+    <ul class="stack-list">
+      <li class="stack-tag">Flask 3.1 · Gunicorn 25</li>
+      <li class="stack-tag">OpenCV 4.13 (headless)</li>
+      <li class="stack-tag">Matplotlib 3.10 · Agg</li>
+      <li class="stack-tag">NumPy 2.4 · Pillow 12</li>
+      <li class="stack-tag">qrcode 8</li>
+      <li class="stack-tag">Vanilla JS · Canvas API</li>
+      <li class="stack-tag">Chart.js 4 · MathJax 3</li>
+      <li class="stack-tag">Cloud Run · asia-south1</li>
+      <li class="stack-tag">Cloudflare Pages</li>
+      <li class="stack-tag">Jupyter / Colab</li>
+      <li class="stack-tag">CSS Paged Media</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ PROOF ============ -->
+<section class="proof act" aria-labelledby="proof-h">
+  <div class="frame">
+    <p class="act-num">Act IV · Proof</p>
+    <h2 id="proof-h">Live. <em>In production.</em></h2>
+    <div class="proof-grid">
+      <div class="proof-item">
+        <h3>dip.dmj.one · Cloud Run, asia-south1</h3>
+        <p>Production deployment behind Cloudflare. Werkzeug ProxyFix honours <code>X-Forwarded-*</code> only from the Cloud Run / Cloudflare hop. Custom domain, HSTS preloaded.</p>
+      </div>
+      <div class="proof-item">
+        <h3>One command to deploy</h3>
+        <p><code>gcloud run deploy dip-practical --source . --region asia-south1 --memory 2Gi --allow-unauthenticated</code>. The Dockerfile runs precompute.py at build time so the image ships with all 32 cached figures.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Bare-metal Linux VM, idempotent</h3>
+        <p><code>autoconfig.sh</code> installs Python, Nginx (with microcache), systemd unit, log rotation, UFW rules on a fresh Ubuntu 24.04 host. Deterministic from start to finish.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Static client-side build, free hosting</h3>
+        <p>The <code>pages/</code> folder re-implements every operation in pure JavaScript via the Canvas API. Deploy to Cloudflare Pages or GitHub Pages with no backend at all.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ END CTA ============ -->
+<section class="endcta" aria-labelledby="cta-h">
+  <div class="frame">
+    <div>
+      <h2 id="cta-h">Coursework that <em>doesn't die in a PDF.</em></h2>
+      <p>I build teaching artefacts that ship as real systems · runnable in three places, accessible to every reader, ready for submission, ready for production.</p>
+    </div>
+    <div class="actions">
+      <a class="btn btn-primary" href="../index.html#hire">Hire me</a>
+      <a class="btn btn-ghost" href="../index.html">Back to catalogue</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="frame">
+    <div>
+      <h2 style="font-family:'Fraunces',serif;font-size:var(--t-xl);margin:0 0 1rem;">dmj<span class="dot">.</span>one</h2>
+      <p>Dream, Manifest and Journey, Together as One.</p>
+      <p class="meta">© 2026 Divya Mohan. CSU2543 Digital Image Processing practical handbook · Shoolini University · MIT license. Reference dataset © Gonzalez &amp; Woods / imageprocessingplace.com.</p>
+    </div>
+    <div>
+      <p class="meta">Catalogue</p>
+      <p><a href="../index.html#catalogue">All 47 products</a></p>
+      <p><a href="../index.html#cat-research">Research</a></p>
+      <p><a href="../index.html#hire">Hire</a></p>
+    </div>
+    <div>
+      <p class="meta">DIP Practical</p>
+      <p><a href="https://dip.dmj.one" rel="noopener">Live · dip.dmj.one</a></p>
+      <p><a href="https://github.com/divyamohan1993/dip-practical" rel="noopener">Source</a></p>
+      <p><a href="mailto:contact@dmj.one">contact@dmj.one</a></p>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

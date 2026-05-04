@@ -1,0 +1,776 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1f3a5f">
+<meta name="color-scheme" content="light">
+
+<title>VSBS - Zero-touch autonomous vehicle service booking · dmj.one</title>
+<meta name="description" content="A research-grade autonomous booking system for vehicle service. LangGraph supervisor, Next.js 16, Hono on Bun. 125 tests passing. Apache 2.0. DPDP-native. Post-quantum hybrid.">
+<meta property="og:title" content="VSBS · The first agentic vehicle-service booking that you can read end to end">
+<meta property="og:description" content="LangGraph + Next.js 16 + Hono. 125 tests, 32/32 smoke. Every architectural decision cites a paper or a standard.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,30..100&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/core.css">
+
+<style>
+:root { --accent: var(--c-enterprise); --accent-deep: #0e1f33; --route: #2c4a73; --green: #2a6a3a; }
+body { background: var(--paper); }
+
+/* ====== HERO - split screen, agent log on right ===== */
+.v-hero {
+  position: relative;
+  border-bottom: var(--hair);
+  background: var(--paper);
+  padding-block: clamp(3rem, 5vw, 5rem);
+  overflow: hidden;
+}
+.v-hero::before {
+  content: ""; position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 60% 50% at 100% 0%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 65%);
+  pointer-events: none;
+}
+.v-hero .frame { position: relative; z-index: 2; display: grid; gap: 3rem; grid-template-columns: 1fr; }
+@media (min-width: 1000px) { .v-hero .frame { grid-template-columns: 1.1fr 1fr; gap: 4rem; align-items: center; } }
+
+.crumbs {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink-mute);
+  margin: 0 0 2rem;
+  display: flex; gap: 0.5rem; flex-wrap: wrap;
+}
+.crumbs a { border-bottom: 1px solid currentColor; padding-bottom: 1px; }
+.crumbs a:hover { color: var(--accent); }
+.crumbs span { color: var(--accent); }
+
+.v-eyebrow {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  padding: 0.4rem 0.85rem;
+  border: 1px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  color: var(--accent);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  margin-bottom: 1.5rem;
+}
+.v-eyebrow::before {
+  content: ""; width: 8px; height: 8px;
+  background: var(--accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+.v-hero h1 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-3xl);
+  font-weight: 300;
+  font-variation-settings: "opsz" 144, "SOFT" 30, "WONK" 0;
+  letter-spacing: -0.035em;
+  line-height: 0.93;
+  margin: 0;
+  max-width: 14ch;
+}
+.v-hero h1 em {
+  font-style: italic;
+  color: var(--accent);
+  font-variation-settings: "opsz" 144, "SOFT" 100, "WONK" 1;
+  font-weight: 400;
+}
+
+.v-hero .lede {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md);
+  font-weight: 300;
+  line-height: 1.45;
+  color: var(--ink-soft);
+  margin: 1.75rem 0 0;
+  max-width: 56ch;
+}
+.v-hero .lede strong {
+  font-weight: 500;
+  color: var(--ink);
+  background: linear-gradient(180deg, transparent 60%, color-mix(in srgb, var(--accent) 22%, transparent) 60%);
+  padding: 0 0.1em;
+}
+
+.v-cta-row {
+  margin-top: 2.25rem;
+  display: flex; gap: 0.75rem; flex-wrap: wrap;
+}
+.btn {
+  display: inline-flex; align-items: center; gap: 0.45rem;
+  padding: 0.7rem 1.1rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 700;
+  border: 1px solid var(--ink);
+  transition: background .15s, color .15s, transform .15s, box-shadow .15s;
+}
+.btn:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--ink); }
+.btn-primary { background: var(--accent); color: white; border-color: var(--accent); }
+.btn-primary:hover { box-shadow: 4px 4px 0 var(--ink); }
+.btn-ghost { background: transparent; color: var(--ink); }
+
+/* badge row right under hero */
+.badges {
+  display: flex; gap: 0.5rem; flex-wrap: wrap;
+  margin-top: 1.5rem;
+}
+.badge {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.35rem 0.7rem;
+  border: 1px solid var(--paper-edge);
+  background: var(--paper-soft);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.08em;
+  font-weight: 600;
+}
+.badge.green { color: var(--green); border-color: color-mix(in srgb, var(--green) 40%, transparent); background: color-mix(in srgb, var(--green) 8%, var(--paper)); }
+.badge.green::before { content: "● "; }
+
+/* live agent terminal mock */
+.agent-term {
+  background: var(--accent-deep);
+  color: var(--paper);
+  border: 1px solid var(--accent-deep);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  box-shadow: 8px 8px 0 var(--ink);
+  position: relative;
+}
+.agent-term .head {
+  display: flex; align-items: center; gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--paper) 20%, transparent);
+  background: color-mix(in srgb, var(--paper) 5%, transparent);
+}
+.agent-term .head .dot {
+  width: 10px; height: 10px; background: #888; border-radius: 50%;
+}
+.agent-term .head .dot.red { background: #d96a6a; }
+.agent-term .head .dot.amber { background: #d8a83a; }
+.agent-term .head .dot.green { background: #4ade80; }
+.agent-term .head .label {
+  margin-left: auto;
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--paper) 60%, transparent);
+}
+.agent-term .body {
+  padding: 1.1rem 1.2rem;
+  display: grid; gap: 0.45rem;
+  max-height: 460px;
+  overflow: hidden;
+}
+.agent-term .ev { display: grid; grid-template-columns: 5.5rem 1fr; gap: 0.7rem; }
+.agent-term .ev .t { color: color-mix(in srgb, var(--paper) 45%, transparent); }
+.agent-term .ev.tool .t { color: #4a7bb5; font-weight: 700; }
+.agent-term .ev.verif .t { color: #d8a83a; font-weight: 700; }
+.agent-term .ev.result .t { color: #4ade80; font-weight: 700; }
+.agent-term .ev.final .t { color: #c0c0ff; font-weight: 700; }
+.agent-term .ev .v { color: color-mix(in srgb, var(--paper) 92%, transparent); word-break: break-word; }
+.agent-term .ev .v b { color: var(--paper); font-weight: 700; }
+
+/* ====== STATS ribbon ============================== */
+.v-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  background: var(--ink);
+  color: var(--paper);
+  border-block: 2px solid var(--ink);
+}
+.v-stat {
+  padding: 1.5rem clamp(1rem, 2vw, 1.5rem);
+  border-right: 1px solid color-mix(in srgb, var(--paper) 18%, transparent);
+}
+.v-stat:last-child { border-right: 0; }
+.v-stat .num {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 300;
+  letter-spacing: -0.04em;
+  font-variation-settings: "opsz" 144, "SOFT" 30;
+  display: block;
+  line-height: 1;
+  color: var(--accent);
+}
+.v-stat .num.green { color: #4ade80; }
+.v-stat .lbl {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  margin-top: 0.6rem;
+  display: block;
+  color: color-mix(in srgb, var(--paper) 75%, transparent);
+}
+
+/* ====== ACT structure ============================== */
+.act {
+  padding-block: clamp(3rem, 5vw, 5rem);
+  border-bottom: var(--hair);
+}
+.act-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 700;
+  margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 1rem;
+}
+.act-num::before {
+  content: ""; width: 2.5rem; height: 1px; background: var(--accent);
+}
+.act h2 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 50, "WONK" 1;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+  margin: 0 0 1.5rem;
+  max-width: 22ch;
+}
+.act h2 em { font-style: italic; color: var(--accent); }
+
+.act .intro {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md);
+  color: var(--ink-soft);
+  max-width: 60ch;
+  margin: 0;
+}
+
+/* ACT 1 · pain card */
+.pain-grid {
+  display: grid; gap: 1rem; margin-top: 2rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { .pain-grid { grid-template-columns: repeat(3, 1fr); } }
+.pain-card {
+  border: 1px solid var(--ink);
+  padding: 1.5rem;
+  background: var(--paper);
+  position: relative;
+}
+.pain-card .big {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 300;
+  letter-spacing: -0.04em;
+  color: var(--accent);
+  font-variation-settings: "opsz" 144, "SOFT" 30;
+  line-height: 1;
+}
+.pain-card h3 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md);
+  margin: 0.75rem 0 0.5rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.pain-card p { margin: 0; font-size: var(--t-sm); color: var(--ink-soft); }
+
+/* ACT 2 · vertical journey timeline */
+.journey {
+  margin-top: 2rem;
+  position: relative;
+  display: grid; gap: 1.5rem;
+  max-width: 56rem;
+}
+.journey::before {
+  content: "";
+  position: absolute; left: 1.85rem; top: 0.5rem; bottom: 0.5rem;
+  width: 2px;
+  background: linear-gradient(180deg, var(--accent), color-mix(in srgb, var(--accent) 30%, transparent));
+}
+.j-step {
+  display: grid; grid-template-columns: 4rem 1fr; gap: 1.25rem;
+  position: relative;
+  background: var(--paper);
+  padding-left: 0;
+}
+.j-step .marker {
+  width: 3.7rem; height: 3.7rem;
+  border: 2px solid var(--accent);
+  background: var(--paper);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-size: 1.5rem;
+  color: var(--accent);
+  position: relative;
+  z-index: 2;
+  border-radius: 50%;
+}
+.j-step .body {
+  padding: 0.5rem 0;
+}
+.j-step .body h3 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md);
+  margin: 0 0 0.4rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.j-step .body p { margin: 0 0 0.5rem; font-size: var(--t-sm); color: var(--ink-soft); }
+.j-step .body code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  background: var(--paper-soft);
+  padding: 0.1rem 0.4rem;
+  border: 1px solid var(--paper-edge);
+  color: var(--accent);
+}
+
+/* ACT 3 · six things nobody ships together */
+.six-grid {
+  display: grid; gap: 1px;
+  margin-top: 2rem;
+  background: var(--ink);
+  border: 1px solid var(--ink);
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { .six-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1080px) { .six-grid { grid-template-columns: repeat(3, 1fr); } }
+.six {
+  background: var(--paper);
+  padding: 1.5rem;
+}
+.six .num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.18em;
+  color: var(--accent);
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+}
+.six h3 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md);
+  margin: 0 0 0.6rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.six p { margin: 0; font-size: var(--t-sm); color: var(--ink-soft); }
+.six code {
+  font-family: 'JetBrains Mono', monospace; font-size: 0.78rem;
+  color: var(--accent); background: var(--paper-soft);
+  padding: 0.05rem 0.35rem; border: 1px solid var(--paper-edge);
+}
+
+/* PROOF dark slab */
+.proof {
+  background: var(--ink);
+  color: var(--paper);
+  padding-block: clamp(3rem, 5vw, 5rem);
+  position: relative;
+  overflow: hidden;
+}
+.proof::before {
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 80% 20%, color-mix(in srgb, var(--accent) 28%, transparent), transparent 60%);
+}
+.proof .frame { position: relative; }
+.proof h2 { color: var(--paper); }
+.proof h2 em { color: var(--accent); }
+.proof-grid {
+  display: grid; gap: 1rem; margin-top: 2rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { .proof-grid { grid-template-columns: repeat(2, 1fr); } }
+.proof-item {
+  border: 1px solid color-mix(in srgb, var(--paper) 25%, transparent);
+  padding: 1.5rem;
+  background: color-mix(in srgb, var(--paper) 5%, transparent);
+}
+.proof-item h3 {
+  font-family: 'Fraunces', serif;
+  margin: 0 0 0.5rem;
+  font-size: var(--t-md);
+  color: var(--accent);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.proof-item p { margin: 0; color: color-mix(in srgb, var(--paper) 80%, transparent); font-size: var(--t-sm); }
+.proof-item code { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: color-mix(in srgb, var(--paper) 90%, transparent); }
+
+/* Stack tag wall */
+.stack-list { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.5rem; }
+.stack-tag {
+  padding: 0.45rem 0.8rem;
+  border: 1px solid var(--ink);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 600;
+}
+
+/* End CTA */
+.endcta {
+  padding-block: clamp(3rem, 5vw, 5rem);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 12%, transparent), var(--paper));
+}
+.endcta .frame { display: grid; gap: 2rem; grid-template-columns: 1fr; }
+@media (min-width: 760px) { .endcta .frame { grid-template-columns: 2fr 1fr; align-items: end; } }
+.endcta h2 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 300;
+  font-variation-settings: "opsz" 144, "SOFT" 100;
+  margin: 0 0 1rem;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+}
+.endcta h2 em {
+  font-style: italic;
+  color: var(--accent);
+  background: linear-gradient(180deg, transparent 70%, color-mix(in srgb, var(--accent) 22%, transparent) 70%);
+}
+.endcta p { color: var(--ink-soft); margin: 0; max-width: 50ch; }
+.endcta .actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+
+/* Footer */
+.foot { background: var(--accent-deep); color: var(--paper); }
+.foot .dot { color: var(--accent); }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topnav">
+  <div class="frame">
+    <div class="brand"><a href="../index.html">dmj<span class="dot">.</span>one</a></div>
+    <nav aria-label="Primary">
+      <ul>
+        <li><a href="../index.html#catalogue">Catalogue</a></li>
+        <li><a href="../index.html#manifesto">Manifesto</a></li>
+        <li><a href="../index.html#hire">Hire</a></li>
+        <li><a href="https://github.com/divyamohan1993/vsbs" rel="noopener">GitHub</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ============ HERO ============ -->
+<section class="v-hero">
+  <div class="frame">
+
+    <div>
+      <p class="crumbs">
+        <a href="../index.html">Catalogue</a> /
+        <a href="../index.html#cat-enterprise">Enterprise &amp; Security</a> /
+        <span>VSBS</span>
+      </p>
+
+      <span class="v-eyebrow">No. 28 · Enterprise · Mobility · Research-grade</span>
+
+      <h1>
+        A booking flow with
+        <em>nobody on the line.</em>
+      </h1>
+
+      <p class="lede">
+        Booking your car for service is still a 1990s phone call. <strong>VSBS is the opposite.</strong> A LangGraph supervisor with a verifier on every tool call, a deterministic safety engine, a wellbeing score with ten peer-reviewed sub-scores, and a payment state machine that runs the same in sim and in production. Zero human operators in the loop.
+      </p>
+
+      <div class="badges">
+        <span class="badge green">125 tests passing</span>
+        <span class="badge green">32 / 32 smoke</span>
+        <span class="badge">Apache 2.0</span>
+        <span class="badge">DPDP 2025 native</span>
+        <span class="badge">EU AI Act FRIA</span>
+        <span class="badge">ML-KEM-768 hybrid</span>
+        <span class="badge">WCAG 2.2 AAA</span>
+      </div>
+
+      <div class="v-cta-row">
+        <a class="btn btn-primary" href="https://github.com/divyamohan1993/vsbs" rel="noopener">View source</a>
+        <a class="btn btn-ghost" href="#how">See the loop</a>
+        <a class="btn btn-ghost" href="#stack">The stack</a>
+      </div>
+    </div>
+
+    <!-- live agent SSE mock -->
+    <div class="agent-term" role="img" aria-label="Live SSE trace from a single concierge turn">
+      <div class="head">
+        <span class="dot red" aria-hidden="true"></span>
+        <span class="dot amber" aria-hidden="true"></span>
+        <span class="dot green" aria-hidden="true"></span>
+        <span class="label">POST /v1/concierge/turn · sim</span>
+      </div>
+      <div class="body">
+        <div class="ev"><span class="t">user</span><span class="v">"My 2024 Honda Civic is grinding when I brake."</span></div>
+        <div class="ev tool"><span class="t">tool-call</span><span class="v">vinDecode <b>1HGCV...</b></span></div>
+        <div class="ev verif"><span class="t">verifier</span><span class="v">grounded · NHTSA vPIC · pass</span></div>
+        <div class="ev result"><span class="t">tool-result</span><span class="v">Honda Civic Sport · 2.0L i4 · 2024</span></div>
+        <div class="ev tool"><span class="t">tool-call</span><span class="v">assessSafety <b>brake-grind</b></span></div>
+        <div class="ev verif"><span class="t">verifier</span><span class="v">red-flag gate · severity HIGH · post-check pass</span></div>
+        <div class="ev result"><span class="t">tool-result</span><span class="v">do not drive · arrange recovery</span></div>
+        <div class="ev tool"><span class="t">tool-call</span><span class="v">scoreWellbeing <b>10 sub-scores</b></span></div>
+        <div class="ev result"><span class="t">tool-result</span><span class="v">composite 0.87 · stress low · trust high</span></div>
+        <div class="ev tool"><span class="t">tool-call</span><span class="v">dispatchTow + bookSlot</span></div>
+        <div class="ev result"><span class="t">tool-result</span><span class="v">slot Wed 09:00 · CommandGrant minted</span></div>
+        <div class="ev final"><span class="t">final</span><span class="v">"Recovery on the way. Slot confirmed for Wed 09:00."</span></div>
+        <div class="ev"><span class="t">end</span><span class="v">11 frames · 312 ms · zero external API calls</span></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============ STATS ============ -->
+<section class="v-stats" aria-label="At a glance">
+  <div class="v-stat"><span class="num green">125</span><span class="lbl">Unit tests passing</span></div>
+  <div class="v-stat"><span class="num green">32 / 32</span><span class="lbl">HTTP smoke tests</span></div>
+  <div class="v-stat"><span class="num">10</span><span class="lbl">Verified tools in registry</span></div>
+  <div class="v-stat"><span class="num">6</span><span class="lbl">LLM providers, one switch</span></div>
+  <div class="v-stat"><span class="num">0</span><span class="lbl">API keys for sim mode</span></div>
+</section>
+
+
+<!-- ============ ACT I ============ -->
+<section class="act" aria-labelledby="pain-h">
+  <div class="frame">
+    <p class="act-num">Act I · The Problem</p>
+    <h2 id="pain-h">A 1990s call centre, in <em>2026.</em></h2>
+    <p class="intro">Vehicle service is still synchronous, opaque, and built around the dealer's diary. Three problems compound, and customers absorb every one of them.</p>
+
+    <div class="pain-grid">
+      <article class="pain-card">
+        <span class="big">30%</span>
+        <h3>Slots are lost</h3>
+        <p>Dealers lose nearly a third of bookable slots to no-shows, mis-scheduling, and missed callbacks. Margin evaporates.</p>
+      </article>
+      <article class="pain-card">
+        <span class="big">90&nbsp;min</span>
+        <h3>Customer time spent</h3>
+        <p>The owner repeats the symptom three times, on hold, on email, in person. The mechanic still gets the wrong context.</p>
+      </article>
+      <article class="pain-card">
+        <span class="big">0</span>
+        <h3>Safety triage upfront</h3>
+        <p>"Grinding when I brake" should never wait three days for an appointment. Today, it does. Nobody is checking.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ ACT II · the booking journey ============ -->
+<section class="act" id="how" aria-labelledby="how-h" style="background: linear-gradient(180deg, var(--paper-soft), var(--paper));">
+  <div class="frame">
+    <p class="act-num">Act II · The Promise</p>
+    <h2 id="how-h">One conversation. <em>Booked.</em></h2>
+    <p class="intro">Type a symptom. The agent does the rest. Every step is auditable, deterministic where it must be, and shows its working.</p>
+
+    <ol class="journey">
+      <li class="j-step">
+        <span class="marker">01</span>
+        <div class="body">
+          <h3>Owner speaks. VIN, OTP, symptom.</h3>
+          <p>The wizard captures intent in plain language. <code>GET /v1/vin/:vin</code> hits the real NHTSA vPIC database, free, no key.</p>
+        </div>
+      </li>
+      <li class="j-step">
+        <span class="marker">02</span>
+        <div class="body">
+          <h3>Safety engine fires first.</h3>
+          <p>A deterministic red-flag gate runs <em>before</em> the LLM. "Grinding when braking" returns severity HIGH and a "do not drive" message before any model speaks.</p>
+        </div>
+      </li>
+      <li class="j-step">
+        <span class="marker">03</span>
+        <div class="body">
+          <h3>LangGraph supervisor takes over.</h3>
+          <p>Each tool call gets verified by a cheap second model. Hallucinated tool calls fail the verifier and are dropped.</p>
+        </div>
+      </li>
+      <li class="j-step">
+        <span class="marker">04</span>
+        <div class="body">
+          <h3>Wellbeing scored. Slot proposed.</h3>
+          <p>A composite score with ten peer-reviewed sub-scores ranks dispatch options by stress, trust, and transparency, not just distance.</p>
+        </div>
+      </li>
+      <li class="j-step">
+        <span class="marker">05</span>
+        <div class="body">
+          <h3>CommandGrant minted.</h3>
+          <p>If the vehicle is autonomous, a signed capability token authorises the journey. Post-quantum hybrid envelope: ML-KEM-768 + X25519. Time-bounded. Revocable.</p>
+        </div>
+      </li>
+      <li class="j-step">
+        <span class="marker">06</span>
+        <div class="body">
+          <h3>Razorpay state machine settles.</h3>
+          <p><code>order → intent → authorise → capture → settle</code>. Identical wire flow in <code>sim</code> and in production. Idempotent. Webhook-driven.</p>
+        </div>
+      </li>
+    </ol>
+  </div>
+</section>
+
+
+<!-- ============ ACT III · six things ============ -->
+<section class="act" aria-labelledby="six-h">
+  <div class="frame">
+    <p class="act-num">Act III · The Composition</p>
+    <h2 id="six-h">Six things <em>nobody ships together.</em></h2>
+    <p class="intro">Any one of these is a research project. VSBS composes all six in a repo you can clone, build, and read end to end on a Sunday afternoon.</p>
+
+    <div class="six-grid">
+      <div class="six">
+        <p class="num">01 · Supervisor</p>
+        <h3>LangGraph with a verifier chain</h3>
+        <p>Every tool call is checked by a cheap second model for grounding before the result is trusted. Hallucinated calls are dropped, not executed.</p>
+      </div>
+      <div class="six">
+        <p class="num">02 · Provider-agnostic</p>
+        <h3>One env var, six LLMs</h3>
+        <p>Run on Gemini, Vertex Claude, OpenAI, Anthropic direct, or a scripted sim driver. <code>LLM_PROFILE=sim</code> needs zero keys.</p>
+      </div>
+      <div class="six">
+        <p class="num">03 · Sensors</p>
+        <h3>Kalman fusion + SOTIF arbitration</h3>
+        <p>Deterministic simulator. Distinguishes sensor faults from actual events. Aligned with ISO 21448.</p>
+      </div>
+      <div class="six">
+        <p class="num">04 · Prognostics</p>
+        <h3>ISO 13374 health state machine</h3>
+        <p>Refuses autonomous operation when a tier-1 safety-critical sensor is dead. Fails closed, by design.</p>
+      </div>
+      <div class="six">
+        <p class="num">05 · Privacy</p>
+        <h3>DPDP 2025 native</h3>
+        <p>Append-only consent log with evidence hashes. 72-hour breach runbook checked into the repo. FRIA documented.</p>
+      </div>
+      <div class="six">
+        <p class="num">06 · Crypto</p>
+        <h3>Post-quantum hybrid envelope</h3>
+        <p>Cloud KMS ML-KEM-768 + X25519 for long-lived secrets. Today's threats and tomorrow's quantum, both covered.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ STACK ============ -->
+<section class="act" id="stack" aria-labelledby="stack-h">
+  <div class="frame">
+    <p class="act-num">Act IV · The Stack</p>
+    <h2 id="stack-h">Production-shape, in <em>one repo.</em></h2>
+    <p class="intro">Every line is in the open. <code>pnpm install</code>, <code>pnpm -r typecheck</code>, six packages clean, 125 tests green, full repo build, agent loop running in under a minute.</p>
+
+    <ul class="stack-list">
+      <li class="stack-tag">TypeScript 5.7</li>
+      <li class="stack-tag">Next.js 16</li>
+      <li class="stack-tag">React 19 + Compiler</li>
+      <li class="stack-tag">Hono 4</li>
+      <li class="stack-tag">Bun 1.3</li>
+      <li class="stack-tag">LangGraph 0.2</li>
+      <li class="stack-tag">Tailwind 4 OKLCH</li>
+      <li class="stack-tag">Zod schemas</li>
+      <li class="stack-tag">Mem0 memory</li>
+      <li class="stack-tag">Razorpay state machine</li>
+      <li class="stack-tag">NHTSA vPIC</li>
+      <li class="stack-tag">CARLA bridge</li>
+      <li class="stack-tag">Cloud KMS</li>
+      <li class="stack-tag">Trivy SBOM CI</li>
+    </ul>
+  </div>
+</section>
+
+
+<!-- ============ PROOF ============ -->
+<section class="proof act" aria-labelledby="proof-h">
+  <div class="frame">
+    <p class="act-num">Act V · Proof</p>
+    <h2 id="proof-h">It already <em>runs.</em></h2>
+
+    <div class="proof-grid">
+      <div class="proof-item">
+        <h3>SSE concierge endpoint</h3>
+        <p><code>POST /v1/concierge/turn</code> streams typed events: <code>tool-call → verifier → tool-result → delta → final</code>. Every arrow is real code you can read today.</p>
+      </div>
+      <div class="proof-item">
+        <h3>CARLA bridge, optional</h3>
+        <p>Replay mode runs in CI without a CARLA install. Live mode drives a Tesla Model 3 simulation at 10 Hz: 8 cameras, 4D radar, LiDAR, thermal, IMU, V2X, 96-cell HV pack.</p>
+      </div>
+      <div class="proof-item">
+        <h3>L5 sensor dashboard</h3>
+        <p>BEV view, perception event log, OOD score, UNECE R157 takeover ladder, MRM, capability budget, DMS gaze. Every channel a real production AV stack publishes off-vehicle.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Compliance evidence in repo</h3>
+        <p>DPIA, FRIA, gap-audit, defensive publication, simulation policy, safety notice. Every architectural decision traces to a paper or a published standard.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Apache 2.0 with safety notice</h3>
+        <p>Honest about what it is: research-grade reference architecture. Not a certified safety-of-life system. The repo says so on line one.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Defensive publication filed</h3>
+        <p>Published as prior art so nobody can patent the loop and lock OEMs out. <code>docs/defensive-publication.md</code>.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ END CTA ============ -->
+<section class="endcta" aria-labelledby="cta-h">
+  <div class="frame">
+    <div>
+      <h2 id="cta-h">If a service-advisor job can be agentic, <em>so can your back office.</em></h2>
+      <p>I build agentic workflows that ground every tool call, fail closed on safety, cite their sources, and run on a slow phone. Every architectural decision has a paper or a standard behind it.</p>
+    </div>
+    <div class="actions">
+      <a class="btn btn-primary" href="../index.html#hire">Hire me</a>
+      <a class="btn btn-ghost" href="../index.html">Back to catalogue</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="frame">
+    <div>
+      <h2 style="font-family:'Fraunces',serif;font-size:var(--t-xl);margin:0 0 1rem;">dmj<span class="dot">.</span>one</h2>
+      <p>Dream, Manifest and Journey, Together as One.</p>
+      <p class="meta">© 2026 Divya Mohan. VSBS is research-grade reference software. Not a certified safety-of-life system. See SAFETY-NOTICE.md before any deployment near a real vehicle.</p>
+    </div>
+    <div>
+      <p class="meta">Catalogue</p>
+      <p><a href="../index.html#catalogue">All 47 products</a></p>
+      <p><a href="../index.html#cat-enterprise">Enterprise &amp; Security</a></p>
+      <p><a href="../index.html#hire">Hire</a></p>
+    </div>
+    <div>
+      <p class="meta">VSBS</p>
+      <p><a href="https://github.com/divyamohan1993/vsbs" rel="noopener">Source</a></p>
+      <p><a href="https://github.com/divyamohan1993/vsbs/blob/main/SAFETY-NOTICE.md" rel="noopener">Safety notice</a></p>
+      <p><a href="mailto:contact@dmj.one">contact@dmj.one</a></p>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,906 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#d8631a">
+<meta name="color-scheme" content="light">
+
+<title>RecoveryPilot · 145,000 lines for 300 million surgeries · dmj.one</title>
+<meta name="description" content="Autonomous post-operative care orchestrator. 40+ peer-reviewed clinical algorithms. 14 pure-TypeScript ML models. 2,700+ tests. Multi-region compliance: DPDPA, HIPAA, UK GDPR.">
+<meta property="og:title" content="RecoveryPilot · The post-operative co-pilot that watches when nobody else can">
+<meta property="og:description" content="40+ clinical scoring systems. 14 ML models, zero ML library dependencies. Multi-region Kubernetes. DPDPA + HIPAA + UK GDPR compliance from one monorepo.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,30..100&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="../assets/core.css">
+
+<style>
+:root {
+  --accent: var(--c-bharat); --accent-deep: #a14710;
+  --chart-grid: #cdc5b4;
+  --chart-day: #5a3a1f;
+  --vital-red: #b03030;
+  --vital-amber: #c8881e;
+  --vital-green: #2a5a3a;
+}
+body { background: var(--paper); }
+
+/* ====== HERO · patient chart =================================== */
+.rp-hero {
+  position: relative;
+  padding-block: clamp(3rem, 5vw + 1rem, 6rem) clamp(2rem, 4vw, 4rem);
+  border-bottom: var(--hair);
+  overflow: hidden;
+  background: var(--paper);
+}
+.rp-hero::before {
+  /* graph paper background */
+  content: ""; position: absolute; inset: 0;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 23px, color-mix(in srgb, var(--ink) 5%, transparent) 23px 24px),
+    repeating-linear-gradient(90deg, transparent 0 23px, color-mix(in srgb, var(--ink) 5%, transparent) 23px 24px);
+  mask: linear-gradient(180deg, black, transparent 80%);
+  -webkit-mask: linear-gradient(180deg, black, transparent 80%);
+  pointer-events: none;
+}
+.rp-hero .frame { position: relative; z-index: 2; }
+
+.crumbs {
+  font-family: 'JetBrains Mono', monospace; font-size: var(--t-xs);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink-mute); margin: 0 0 1.5rem;
+  display: flex; gap: 0.5rem; flex-wrap: wrap;
+}
+.crumbs a { border-bottom: 1px solid var(--ink-mute); padding-bottom: 1px; }
+.crumbs a:hover { color: var(--accent); border-color: var(--accent); }
+.crumbs span { color: var(--accent); }
+
+.rp-eyebrow {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  padding: 0.4rem 0.85rem;
+  border: 1px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  color: var(--accent-deep);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs); font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.16em;
+  margin-bottom: 1.5rem;
+}
+.rp-eyebrow::before {
+  content: ""; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--vital-red);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--vital-red) 25%, transparent);
+}
+
+.rp-hero-grid {
+  display: grid; gap: 3rem; grid-template-columns: 1fr;
+  align-items: end;
+}
+@media (min-width: 980px) { .rp-hero-grid { grid-template-columns: 1.3fr 1fr; gap: 4rem; } }
+
+.rp-hero h1 {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(2.4rem, 5.5vw, 4.6rem);
+  font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 30, "WONK" 1;
+  letter-spacing: -0.03em; line-height: 0.96;
+  margin: 0; max-width: 16ch;
+}
+.rp-hero h1 em {
+  font-style: italic; color: var(--accent);
+  font-variation-settings: "opsz" 144, "SOFT" 100, "WONK" 1;
+}
+
+.scale-line {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  color: var(--vital-red);
+  font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.18em;
+  margin: 0 0 1rem;
+  display: flex; align-items: center; gap: 0.6rem;
+}
+.scale-line::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--vital-red), transparent); }
+
+.rp-hero .lede {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md); font-weight: 300;
+  line-height: 1.5; color: var(--ink-soft);
+  margin: 1.75rem 0 0; max-width: 56ch;
+}
+.rp-hero .lede strong {
+  font-weight: 600; color: var(--ink);
+  background: linear-gradient(180deg, transparent 60%, color-mix(in srgb, var(--accent) 30%, transparent) 60%);
+  padding: 0 0.1em;
+}
+
+/* ===== Vitals card · monitor look ===== */
+.vitals-card {
+  border: 2px solid var(--ink);
+  background: #11151c;
+  color: #cfeede;
+  font-family: 'JetBrains Mono', monospace;
+  position: relative;
+  box-shadow: 8px 8px 0 var(--accent);
+}
+.vitals-head {
+  padding: 0.75rem 1rem;
+  background: #060a10;
+  border-bottom: 1px solid color-mix(in srgb, white 18%, transparent);
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: var(--t-xs); text-transform: uppercase;
+  letter-spacing: 0.16em; font-weight: 700;
+  color: color-mix(in srgb, white 80%, transparent);
+}
+.vitals-head .live { display: inline-flex; align-items: center; gap: 0.4rem; color: #5cdb8a; }
+.vitals-head .live::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: #5cdb8a; box-shadow: 0 0 0 3px color-mix(in srgb, #5cdb8a 30%, transparent); }
+.vitals-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px;
+  background: color-mix(in srgb, white 12%, transparent);
+}
+.vital {
+  padding: 0.95rem 1.05rem;
+  background: #11151c;
+  display: grid; gap: 0.15rem;
+}
+.vital .name {
+  font-size: 0.65rem; letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, white 60%, transparent);
+}
+.vital .num {
+  font-family: 'Fraunces', serif;
+  font-size: 1.55rem; font-weight: 500;
+  font-variation-settings: "opsz" 144, "SOFT" 30;
+  letter-spacing: -0.02em; line-height: 1;
+  color: #5cdb8a;
+}
+.vital .num.warn { color: #ffb84a; }
+.vital .num.alert { color: #ff7b6c; }
+.vital .unit {
+  font-size: 0.65rem; letter-spacing: 0.16em;
+  color: color-mix(in srgb, white 50%, transparent);
+  text-transform: uppercase;
+  margin-top: 0.1rem;
+}
+.vitals-foot {
+  padding: 0.7rem 1rem;
+  border-top: 1px solid color-mix(in srgb, white 14%, transparent);
+  font-size: 0.7rem;
+  text-transform: uppercase; letter-spacing: 0.14em;
+  color: color-mix(in srgb, white 70%, transparent);
+  display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.4rem;
+}
+.vitals-foot .news2 strong { color: #5cdb8a; }
+
+.rp-cta-row { margin-top: 2.25rem; display: flex; gap: 0.75rem; flex-wrap: wrap; }
+.btn {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.7rem 1.1rem;
+  font-family: 'JetBrains Mono', monospace; font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.14em; font-weight: 700;
+  border: 1px solid var(--ink);
+  transition: background .15s, color .15s, transform .15s, box-shadow .15s;
+}
+.btn:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--ink); }
+.btn-primary { background: var(--accent); color: white; border-color: var(--accent); }
+.btn-ghost { background: transparent; color: var(--ink); }
+
+/* ====== STATS · big scale numbers ============================= */
+.rp-stats {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  background: var(--ink); color: var(--paper);
+  border-block: 2px solid var(--ink);
+}
+.rp-stat { padding: 1.5rem clamp(1rem, 2vw, 1.5rem); border-right: 1px solid color-mix(in srgb, var(--paper) 18%, transparent); }
+.rp-stat:last-child { border-right: 0; }
+.rp-stat .num {
+  font-family: 'Fraunces', serif; font-size: var(--t-2xl);
+  font-weight: 400; letter-spacing: -0.04em;
+  font-variation-settings: "opsz" 144, "SOFT" 30;
+  display: block; line-height: 1; color: var(--accent);
+}
+.rp-stat .lbl {
+  font-family: 'JetBrains Mono', monospace; font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.14em;
+  margin-top: 0.6rem; display: block;
+  color: color-mix(in srgb, var(--paper) 75%, transparent);
+}
+
+/* ====== ACT ============================================== */
+.act { padding-block: clamp(3rem, 5vw, 5rem); border-bottom: var(--hair); position: relative; }
+.act-num {
+  font-family: 'JetBrains Mono', monospace; font-size: var(--t-xs);
+  letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--accent); font-weight: 700;
+  margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 1rem;
+}
+.act-num::before { content: ""; width: 2.5rem; height: 1px; background: var(--accent); }
+.act h2 {
+  font-family: 'Fraunces', serif; font-size: var(--t-2xl);
+  font-weight: 400; font-variation-settings: "opsz" 144, "SOFT" 50, "WONK" 1;
+  letter-spacing: -0.025em; line-height: 1.05;
+  margin: 0 0 1.5rem; max-width: 24ch;
+}
+.act h2 em { font-style: italic; color: var(--accent); }
+
+/* === ACT 1 · Discharge gap === */
+.gap-grid { display: grid; gap: 2.5rem; grid-template-columns: 1fr; }
+@media (min-width: 880px) { .gap-grid { grid-template-columns: 1.1fr 1fr; gap: 4rem; align-items: start; } }
+.gap-stack { display: grid; gap: 0; }
+.gap-row {
+  display: grid; grid-template-columns: 5rem 1fr; gap: 1.25rem;
+  padding: 1.4rem 0; border-bottom: var(--hair-soft);
+}
+.gap-row:first-child { padding-top: 0; }
+.gap-row:last-child { border-bottom: 0; }
+.gap-row .pn {
+  font-family: 'JetBrains Mono', monospace; font-size: 0.78rem;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--accent); font-weight: 700; padding-top: 0.3rem;
+}
+.gap-row h3 {
+  font-family: 'Fraunces', serif; font-weight: 500;
+  font-size: var(--t-md); margin: 0 0 0.4rem; letter-spacing: -0.01em;
+}
+.gap-row p { margin: 0; color: var(--ink-soft); font-size: var(--t-sm); line-height: 1.55; }
+
+/* mentor / capstone block */
+.capstone-side {
+  border: 1px solid var(--ink);
+  padding: 1.5rem 1.5rem 1.5rem 1.75rem;
+  background: color-mix(in srgb, var(--accent) 6%, var(--paper));
+  position: relative;
+}
+.capstone-side::before {
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0;
+  width: 4px; background: var(--accent);
+}
+.capstone-side .label {
+  font-family: 'JetBrains Mono', monospace; font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.16em;
+  color: var(--accent-deep); font-weight: 700;
+  margin: 0 0 0.75rem;
+}
+.capstone-side h4 {
+  font-family: 'Fraunces', serif; font-weight: 500;
+  font-size: 1.15rem; margin: 0 0 0.5rem; letter-spacing: -0.01em;
+}
+.capstone-side p { font-size: var(--t-sm); color: var(--ink-soft); margin: 0 0 0.5rem; line-height: 1.5; }
+.capstone-side .seal {
+  margin-top: 0.85rem; padding-top: 0.85rem;
+  border-top: var(--hair-soft);
+  font-family: 'JetBrains Mono', monospace; font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.14em;
+  color: var(--ink-mute);
+}
+.capstone-side .seal strong { color: var(--accent-deep); }
+
+/* === ACT 2 · POST-OP TIMELINE === */
+.timeline {
+  margin-top: 2rem;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  display: grid;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 880px) { .timeline { grid-template-columns: repeat(4, 1fr); } }
+.day {
+  padding: 1.4rem 1.5rem;
+  border-right: 1px solid var(--paper-edge);
+  border-bottom: 1px solid var(--paper-edge);
+  background: var(--paper);
+  position: relative;
+  display: grid; gap: 0.6rem;
+  align-content: start;
+}
+@media (min-width: 880px) {
+  .day { border-bottom: 0; }
+  .day:last-child { border-right: 0; }
+}
+.day .stamp {
+  font-family: 'JetBrains Mono', monospace; font-size: 0.7rem;
+  text-transform: uppercase; letter-spacing: 0.18em;
+  color: var(--accent-deep); font-weight: 700;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.day .stamp::before {
+  content: ""; width: 10px; height: 10px;
+  background: var(--accent);
+  border: 1px solid var(--accent-deep);
+}
+.day h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.4rem; font-weight: 500;
+  margin: 0; letter-spacing: -0.02em;
+  font-variation-settings: "opsz" 144, "SOFT" 50;
+}
+.day h3 em { font-style: italic; color: var(--accent); }
+.day p { margin: 0; font-size: 0.86rem; color: var(--ink-soft); line-height: 1.55; }
+.day .ord { display: grid; gap: 0.25rem; margin-top: 0.5rem; }
+.day .ord li {
+  font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;
+  color: var(--ink); padding-left: 1rem; position: relative;
+}
+.day .ord li::before {
+  content: ""; position: absolute; left: 0; top: 0.4rem;
+  width: 6px; height: 6px;
+  border: 1px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+/* === ACT 3 · COMPLIANCE BADGES === */
+.compliance {
+  display: grid; gap: 1rem;
+  margin-top: 2rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { .compliance { grid-template-columns: repeat(3, 1fr); } }
+.cmp-badge {
+  border: 2px solid var(--ink);
+  background: var(--paper);
+  padding: 1.4rem 1.5rem 1.5rem;
+  position: relative;
+  box-shadow: 4px 4px 0 var(--ink);
+}
+.cmp-badge .reg {
+  font-family: 'JetBrains Mono', monospace; font-size: 0.7rem;
+  text-transform: uppercase; letter-spacing: 0.18em;
+  color: var(--ink-mute); font-weight: 700;
+  margin-bottom: 0.6rem;
+}
+.cmp-badge h4 {
+  font-family: 'Fraunces', serif; font-weight: 500;
+  font-size: 1.55rem; margin: 0 0 0.3rem; letter-spacing: -0.02em;
+  font-variation-settings: "opsz" 144, "SOFT" 80;
+}
+.cmp-badge h4 em { font-style: italic; color: var(--accent); }
+.cmp-badge p { margin: 0; font-size: 0.86rem; color: var(--ink-soft); line-height: 1.5; }
+.cmp-badge .region {
+  margin-top: 1rem; padding-top: 0.8rem;
+  border-top: 1px dashed color-mix(in srgb, var(--ink) 25%, transparent);
+  font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;
+  text-transform: uppercase; letter-spacing: 0.12em;
+  color: var(--accent-deep);
+}
+
+/* === ACT 4 · ALGORITHM CITATIONS === */
+.algos {
+  background: var(--paper-soft);
+}
+.algos-grid {
+  margin-top: 2rem;
+  border: 1px solid var(--ink);
+  background: var(--ink);
+  display: grid; gap: 1px;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { .algos-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1080px) { .algos-grid { grid-template-columns: repeat(3, 1fr); } }
+.algo {
+  background: var(--paper);
+  padding: 1.2rem 1.4rem;
+  display: grid; gap: 0.35rem; align-content: start;
+}
+.algo .area {
+  font-family: 'JetBrains Mono', monospace; font-size: 0.7rem;
+  text-transform: uppercase; letter-spacing: 0.18em;
+  color: var(--accent); font-weight: 700;
+}
+.algo h4 {
+  font-family: 'Fraunces', serif; font-weight: 500;
+  font-size: 1.05rem; margin: 0; letter-spacing: -0.01em;
+}
+.algo p { margin: 0; font-size: 0.84rem; color: var(--ink-soft); line-height: 1.5; }
+.algo .cite {
+  font-family: 'JetBrains Mono', monospace; font-size: 0.7rem;
+  color: var(--ink-mute);
+  border-top: 1px dashed color-mix(in srgb, var(--ink) 25%, transparent);
+  padding-top: 0.5rem; margin-top: 0.4rem;
+  letter-spacing: 0.04em;
+}
+
+/* === PROOF === */
+.proof { background: var(--ink); color: var(--paper); padding-block: clamp(3rem, 5vw, 5rem); position: relative; overflow: hidden; }
+.proof::before {
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 90% 10%, color-mix(in srgb, var(--accent) 30%, transparent), transparent 60%);
+  pointer-events: none;
+}
+.proof .frame { position: relative; }
+.proof h2 { color: var(--paper); }
+.proof h2 em { color: var(--accent); }
+.proof-grid {
+  display: grid; gap: 1rem; margin-top: 2rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { .proof-grid { grid-template-columns: repeat(2, 1fr); } }
+.proof-item {
+  border: 1px solid color-mix(in srgb, var(--paper) 30%, transparent);
+  padding: 1.5rem;
+  background: color-mix(in srgb, var(--paper) 5%, transparent);
+}
+.proof-item h3 {
+  font-family: 'Fraunces', serif; margin: 0 0 0.5rem;
+  font-size: var(--t-md); color: var(--accent);
+  font-weight: 500; letter-spacing: -0.01em;
+}
+.proof-item code {
+  font-family: 'JetBrains Mono', monospace; font-size: var(--t-xs);
+  color: color-mix(in srgb, var(--paper) 90%, transparent);
+  background: color-mix(in srgb, var(--paper) 8%, transparent);
+  padding: 0.15rem 0.4rem;
+}
+.proof-item p { margin: 0.5rem 0 0; color: color-mix(in srgb, var(--paper) 80%, transparent); font-size: var(--t-sm); }
+
+/* === STACK === */
+.stack { padding-block: clamp(3rem, 5vw, 5rem); border-bottom: var(--hair); }
+.stack-list { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.5rem; }
+.stack-tag {
+  padding: 0.5rem 0.9rem; border: 1px solid var(--ink);
+  font-family: 'JetBrains Mono', monospace; font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.14em; font-weight: 600;
+}
+
+/* === clinical disclaimer banner === */
+.disclaimer {
+  background: color-mix(in srgb, var(--vital-red) 10%, var(--paper));
+  border-block: 1px solid var(--vital-red);
+  padding: 1rem clamp(1.1rem, 3vw, 2.5rem);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  text-transform: uppercase; letter-spacing: 0.12em;
+  color: var(--vital-red); font-weight: 700;
+  text-align: center;
+}
+.disclaimer span { color: var(--ink); font-weight: 400; text-transform: none; letter-spacing: 0; font-family: 'Fraunces', serif; font-style: italic; }
+
+/* === END CTA === */
+.endcta {
+  padding-block: clamp(3rem, 5vw, 5rem);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 10%, transparent), var(--paper));
+}
+.endcta .frame { display: grid; gap: 2rem; grid-template-columns: 1fr; }
+@media (min-width: 760px) { .endcta .frame { grid-template-columns: 2fr 1fr; align-items: end; } }
+.endcta h2 {
+  font-family: 'Fraunces', serif; font-size: var(--t-2xl);
+  font-weight: 300; font-variation-settings: "opsz" 144, "SOFT" 100;
+  margin: 0 0 1rem; letter-spacing: -0.025em; line-height: 1.05;
+}
+.endcta h2 em {
+  font-style: italic; color: var(--accent);
+  background: linear-gradient(180deg, transparent 70%, color-mix(in srgb, var(--accent) 25%, transparent) 70%);
+}
+.endcta p { color: var(--ink-soft); margin: 0; max-width: 52ch; }
+.endcta .actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+
+.foot { background: var(--ink); color: var(--paper); }
+.foot .dot { color: var(--accent); }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topnav">
+  <div class="frame">
+    <div class="brand"><a href="../index.html">dmj<span class="dot">.</span>one</a></div>
+    <nav aria-label="Primary">
+      <ul>
+        <li><a href="../index.html#catalogue">Catalogue</a></li>
+        <li><a href="../index.html#manifesto">Manifesto</a></li>
+        <li><a href="../index.html#hire">Hire</a></li>
+        <li><a href="https://github.com/kumkum-thakur/recovery-pilot" rel="noopener">GitHub</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<div class="disclaimer" role="note">
+  Research and demonstration platform. <span>Never use as a substitute for professional medical judgment. Always consult qualified healthcare professionals for actual decisions.</span>
+</div>
+
+<main id="main">
+
+<!-- ============ HERO ============ -->
+<section class="rp-hero">
+  <div class="frame">
+    <p class="crumbs">
+      <a href="../index.html">Catalogue</a> /
+      <a href="../index.html#cat-bharat">Bharat-First</a> /
+      <span>RecoveryPilot</span>
+    </p>
+
+    <span class="rp-eyebrow">Welfare initiative · Healthcare · Multi-region</span>
+
+    <div class="rp-hero-grid">
+      <div>
+        <p class="scale-line">300 million surgeries · One printed sheet · A follow-up six weeks away</p>
+        <h1>
+          The post-operative co-pilot for the <em>weeks nobody is watching.</em>
+        </h1>
+        <p class="lede">
+          For most patients, recovery is a printed instruction sheet and a calendar reminder. RecoveryPilot replaces that gap with active orchestration: <strong>40+ peer-reviewed clinical scoring systems, 14 pure-TypeScript ML models, 2,700+ tests · all in one monorepo,</strong> with the physician in command of every decision.
+        </p>
+        <div class="rp-cta-row">
+          <a class="btn btn-primary" href="https://github.com/kumkum-thakur/recovery-pilot" rel="noopener">View source</a>
+          <a class="btn btn-ghost" href="#timeline">Recovery timeline</a>
+          <a class="btn btn-ghost" href="#algorithms">Evidence base</a>
+        </div>
+      </div>
+
+      <aside class="vitals-card" aria-label="Sample patient monitor">
+        <header class="vitals-head">
+          <span>Patient · ROOM 412</span>
+          <span class="live">Live</span>
+        </header>
+        <div class="vitals-grid">
+          <div class="vital">
+            <span class="name">Heart rate</span>
+            <span class="num">82</span>
+            <span class="unit">bpm</span>
+          </div>
+          <div class="vital">
+            <span class="name">SpO₂</span>
+            <span class="num">96</span>
+            <span class="unit">%</span>
+          </div>
+          <div class="vital">
+            <span class="name">BP · sys/dia</span>
+            <span class="num warn">128/84</span>
+            <span class="unit">mm Hg</span>
+          </div>
+          <div class="vital">
+            <span class="name">Resp rate</span>
+            <span class="num">16</span>
+            <span class="unit">br/min</span>
+          </div>
+          <div class="vital">
+            <span class="name">Temp</span>
+            <span class="num">37.2</span>
+            <span class="unit">°C</span>
+          </div>
+          <div class="vital">
+            <span class="name">Pain · VAS</span>
+            <span class="num warn">4</span>
+            <span class="unit">/10</span>
+          </div>
+        </div>
+        <footer class="vitals-foot">
+          <span>NEWS2 score</span>
+          <span class="news2"><strong>2 · Low</strong></span>
+        </footer>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATS · scale ============ -->
+<section class="rp-stats" aria-label="At a glance">
+  <div class="rp-stat"><span class="num">145K</span><span class="lbl">Lines of TypeScript</span></div>
+  <div class="rp-stat"><span class="num">40+</span><span class="lbl">Peer-reviewed clinical algorithms</span></div>
+  <div class="rp-stat"><span class="num">14</span><span class="lbl">Pure-TS ML models · zero ML deps</span></div>
+  <div class="rp-stat"><span class="num">2,700+</span><span class="lbl">Test cases · 92 files</span></div>
+  <div class="rp-stat"><span class="num">3</span><span class="lbl">Compliance regimes · one monorepo</span></div>
+</section>
+
+<!-- ============ ACT I · DISCHARGE GAP ============ -->
+<section class="act act-problem" aria-labelledby="prob-h">
+  <div class="frame">
+    <p class="act-num">Act I · The Gap</p>
+    <h2 id="prob-h">The recovery gap is <em>where</em><br>most readmissions are born.</h2>
+
+    <div class="gap-grid">
+      <ol class="gap-stack">
+        <li class="gap-row">
+          <span class="pn">Pain · 01</span>
+          <div>
+            <h3>Discharge is a paper handoff to nobody.</h3>
+            <p>Over 300 million surgeries every year worldwide. The patient leaves with a sheet, a script and a follow-up appointment weeks away. Sepsis, DVT and falls do not wait for the appointment.</p>
+          </div>
+        </li>
+        <li class="gap-row">
+          <span class="pn">Pain · 02</span>
+          <div>
+            <h3>Telehealth is passive. Recovery is not.</h3>
+            <p>Most platforms wait for the patient to message. The right tool initiates: missions, check-ins, photo uploads, vital signs, all on a schedule the patient does not have to remember.</p>
+          </div>
+        </li>
+        <li class="gap-row">
+          <span class="pn">Pain · 03</span>
+          <div>
+            <h3>"AI" without a citation is a guess.</h3>
+            <p>Cloud APIs, undocumented heuristics, opaque scores. Fine for a recommendation feed; unacceptable for sepsis screening. Every algorithm needs a published source the doctor can read.</p>
+          </div>
+        </li>
+        <li class="gap-row">
+          <span class="pn">Pain · 04</span>
+          <div>
+            <h3>Compliance lives in three jurisdictions at once.</h3>
+            <p>India is DPDPA. The US is HIPAA. The UK is post-Brexit GDPR. A platform that wants to serve all three needs data residency, regional encryption keys and erasure APIs from line one.</p>
+          </div>
+        </li>
+      </ol>
+
+      <aside class="capstone-side">
+        <p class="label">Welfare initiative</p>
+        <h4>Built by Kumkum Thakur</h4>
+        <p>Full-stack healthcare platform: React 19 frontend, Express 5 API, PostgreSQL 17 with read replicas, Redis four-database architecture, multi-region Kubernetes, automated DPDPA + HIPAA + UK GDPR enforcement.</p>
+        <p>Every clinical algorithm traced to a peer-reviewed citation. Every ML model implemented in pure TypeScript with zero external ML library.</p>
+        <p class="seal">A <strong>dmj.one welfare initiative</strong> · mentored by Divya Mohan · MIT-licensed</p>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ACT II · POST-OP TIMELINE ============ -->
+<section class="act" id="timeline" aria-labelledby="tl-h">
+  <div class="frame">
+    <p class="act-num">Act II · The Promise</p>
+    <h2 id="tl-h">A timeline that <em>watches the patient</em> when nobody else can.</h2>
+    <p style="font-family:'Fraunces',serif;font-size:var(--t-md);color:var(--ink-soft);max-width:62ch;margin:0;">
+      Day 0 to Day 90, the orchestrator initiates the right scoring system on the right day. The doctor sees the result with a confidence score and an approve/reject button. No surprise readings, no missed scores.
+    </p>
+
+    <div class="timeline">
+      <article class="day">
+        <p class="stamp">Day 0 · Immediate</p>
+        <h3>Stabilise.</h3>
+        <p>NEWS2 every two hours. Pain on the WHO Analgesic Ladder. Caprini VTE score on admission · prophylaxis recommendation generated automatically.</p>
+        <ul class="ord">
+          <li>NEWS2 q2h</li>
+          <li>Pain · VAS + Ladder</li>
+          <li>Caprini VTE</li>
+          <li>ASA · NNIS SSI risk</li>
+        </ul>
+      </article>
+      <article class="day">
+        <p class="stamp">Day 1-7 · Inpatient</p>
+        <h3>Watch <em>for sepsis.</em></h3>
+        <p>qSOFA at the bedside. SOFA organ-by-organ. Morse Fall Scale before mobilisation. Wound photo daily, classified through the wound healing model.</p>
+        <ul class="ord">
+          <li>qSOFA · SIRS · SOFA</li>
+          <li>Morse · Hendrich II</li>
+          <li>Wound phase classifier</li>
+          <li>Glucose · ADA targets</li>
+        </ul>
+      </article>
+      <article class="day">
+        <p class="stamp">Day 8-30 · Home</p>
+        <h3>Catch <em>the readmission.</em></h3>
+        <p>LACE Index for 30-day readmission risk. Daily missions: medication, photo, walk, sleep. Sentiment analysis on the journal screens for post-op depression early.</p>
+        <ul class="ord">
+          <li>LACE · 30-day readmit</li>
+          <li>Recovery missions · streaks</li>
+          <li>Sentiment · TF-IDF + lexicon</li>
+          <li>Adherence · Osterberg model</li>
+        </ul>
+      </article>
+      <article class="day">
+        <p class="stamp">Day 31-90 · Long arc</p>
+        <h3>Verify <em>the recovery.</em></h3>
+        <p>Functional outcomes, HCAHPS satisfaction, treatment-response regression. Cohort analytics inform the next patient's care plan. The loop closes.</p>
+        <ul class="ord">
+          <li>HCAHPS · CMS</li>
+          <li>K-means cohort segments</li>
+          <li>Bayesian complication network</li>
+          <li>Self-learning calibration</li>
+        </ul>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ACT III · COMPLIANCE TRIPLE ============ -->
+<section class="act" aria-labelledby="cmp-h">
+  <div class="frame">
+    <p class="act-num">Act III · The Compliance</p>
+    <h2 id="cmp-h">Three regimes. <em>One monorepo.</em> Data stays where the law says.</h2>
+    <p style="font-family:'Fraunces',serif;font-size:var(--t-md);color:var(--ink-soft);max-width:62ch;margin:0;">
+      Three regional Kubernetes overlays enforce data residency from the cluster up. Encryption keys live in the regional KMS. Erasure and portability APIs are built into the platform, not bolted on at audit time.
+    </p>
+
+    <div class="compliance">
+      <div class="cmp-badge">
+        <p class="reg">India · ap-south-1</p>
+        <h4><em>DPDPA</em></h4>
+        <p>Digital Personal Data Protection Act 2023. Consent, granular, revocable. Real deletion through the cascade. PII never in URLs or logs.</p>
+        <p class="region">overlays/india/</p>
+      </div>
+      <div class="cmp-badge">
+        <p class="reg">United States · us-east-1</p>
+        <h4><em>HIPAA</em></h4>
+        <p>Field-level AES-256-GCM at rest. Audit log hash-chained, tamper-evident. PHI redaction in Pino structured logs, never logged in plain.</p>
+        <p class="region">overlays/us/</p>
+      </div>
+      <div class="cmp-badge">
+        <p class="reg">United Kingdom · eu-west-2</p>
+        <h4><em>UK GDPR</em></h4>
+        <p>Right-to-access and right-to-erasure APIs. Consent versioning. Data portability through the FHIR R4 export bundle.</p>
+        <p class="region">overlays/uk/</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ACT IV · ALGORITHMS WITH CITATIONS ============ -->
+<section class="act algos" id="algorithms" aria-labelledby="al-h">
+  <div class="frame">
+    <p class="act-num">Act IV · The Evidence</p>
+    <h2 id="al-h">Forty-plus algorithms. <em>Every one with a citation.</em></h2>
+    <p style="font-family:'Fraunces',serif;font-size:var(--t-md);color:var(--ink-soft);max-width:62ch;margin:0;">
+      None are arbitrary heuristics. Each has a traceable provenance to published research. A doctor can open the source file and read the paper that wrote the score.</p>
+
+    <div class="algos-grid">
+      <div class="algo">
+        <p class="area">Sepsis</p>
+        <h4>qSOFA · SIRS · SOFA</h4>
+        <p>Bedside sepsis screen, organ-by-organ deterioration. Self-learning thresholds reduce false positives over time.</p>
+        <p class="cite">Singer 2016 · Bone 1992 · Vincent 1996</p>
+      </div>
+      <div class="algo">
+        <p class="area">VTE</p>
+        <h4>Caprini · Wells · Geneva</h4>
+        <p>Forty-plus weighted risk factors. Auto-recommends mechanical, pharmacological or combined prophylaxis.</p>
+        <p class="cite">Caprini 2001 · Wells 2003 · Le Gal 2006</p>
+      </div>
+      <div class="algo">
+        <p class="area">Falls</p>
+        <h4>Morse · Hendrich II · TUG</h4>
+        <p>Six-item Morse, eight-item Hendrich II, Timed Up and Go for the geriatric subset. Triggered before every mobilisation.</p>
+        <p class="cite">Morse 1989 · Hendrich 2003 · Podsiadlo 1991</p>
+      </div>
+      <div class="algo">
+        <p class="area">Nutrition</p>
+        <h4>NRS-2002 · MUST · SGA</h4>
+        <p>Plus Harris-Benedict and Mifflin-St Jeor for caloric needs. ESPEN-recommended screen baked in.</p>
+        <p class="cite">Kondrup 2003 · Elia 2003 · Detsky 1987</p>
+      </div>
+      <div class="algo">
+        <p class="area">SSI</p>
+        <h4>NNIS · CDC · ASA · ASEPSIS</h4>
+        <p>NNIS Risk Index 0-3. CDC superficial / deep / organ-space classification. Modifiable risk-factor list per patient.</p>
+        <p class="cite">Culver 1991 · Horan 2008 · Wilson 1986</p>
+      </div>
+      <div class="algo">
+        <p class="area">Glucose</p>
+        <h4>ADA · 1800 / 500 rules · 15/15</h4>
+        <p>Inpatient targets 140-180 mg/dL. Insulin correction = 1800/TDD. Hypoglycemia 15/15 rule, levels 1-3.</p>
+        <p class="cite">ADA 2024 · Umpierrez 2012 · Walsh 2011</p>
+      </div>
+      <div class="algo">
+        <p class="area">Vitals</p>
+        <h4>NEWS2 · MEWS · Holt forecast</h4>
+        <p>Seven-parameter NEWS2. Double exponential smoothing forecasts trajectories 24h ahead with confidence intervals.</p>
+        <p class="cite">RCP 2017 · Subbe 2001 · Holt 2004</p>
+      </div>
+      <div class="algo">
+        <p class="area">Antibiotic</p>
+        <h4>IDSA · CYP450 · Sanford</h4>
+        <p>Thirty-plus antibiotics with spectrum profiles. Renal dose adjust by CrCl. IV-to-oral conversion when eligible.</p>
+        <p class="cite">IDSA · Flockhart 2007 · Sanford 2024</p>
+      </div>
+      <div class="algo">
+        <p class="area">Readmission</p>
+        <h4>LACE · Charlson</h4>
+        <p>Thirty-day readmission risk plus comorbidity weighting. Surfaces high-risk patients before discharge.</p>
+        <p class="cite">van Walraven 2010 · Charlson 1987</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PROOF ============ -->
+<section class="proof act" aria-labelledby="proof-h">
+  <div class="frame">
+    <p class="act-num">Act V · Proof</p>
+    <h2 id="proof-h">Production posture. <em>Day one.</em></h2>
+
+    <div class="proof-grid">
+      <div class="proof-item">
+        <h3>2,700+ test cases · 92 files</h3>
+        <code>npm run test</code>
+        <p>Vitest unit, integration and E2E. React Testing Library for the UI. fast-check property tests on the math. CI gates every push.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Multi-region Kubernetes</h3>
+        <code>kubectl apply -k overlays/india</code>
+        <p>Three regional overlays · India, US, UK · enforce data residency at the cluster boundary. One-click <code>autodeploy-k8s.sh</code> ships the lot.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Five async queues</h3>
+        <code>BullMQ · Redis</code>
+        <p>Image analysis, notifications, data export, compliance. The API stays interactive while heavy work runs out-of-band.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Twenty-plus alert rules</h3>
+        <code>Prometheus · Grafana</code>
+        <p>API error rate, DB connection exhaustion, Redis memory pressure, queue backlog, auth failure spikes. Symptom-driven, not log-driven.</p>
+      </div>
+      <div class="proof-item">
+        <h3>FHIR R4 export</h3>
+        <code>/api/export/fhir</code>
+        <p>HL7 FHIR R4 resource generation. Patient portability built into the platform, not bolted on for audit.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Backup / DR posture</h3>
+        <code>RTO 4h · RPO 1h</code>
+        <p>Automated backup policies. Recovery objectives set against the platform's clinical use case, not against generic enterprise defaults.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STACK ============ -->
+<section class="stack" aria-labelledby="tech-h">
+  <div class="frame">
+    <p class="act-num">The Stack</p>
+    <h2 id="tech-h" style="font-size:var(--t-xl);font-weight:400;font-family:'Fraunces',serif;font-variation-settings:'opsz' 144,'SOFT' 50;margin:0;letter-spacing:-0.02em;">Full-stack monorepo. <em>Zero ML library dependencies.</em></h2>
+    <ul class="stack-list">
+      <li class="stack-tag">React 19.2</li>
+      <li class="stack-tag">TypeScript 5.9 strict</li>
+      <li class="stack-tag">Zustand · 22 stores</li>
+      <li class="stack-tag">Vite (Rolldown)</li>
+      <li class="stack-tag">Express 5</li>
+      <li class="stack-tag">Node.js 22 cluster</li>
+      <li class="stack-tag">PostgreSQL 17 + read replica</li>
+      <li class="stack-tag">Redis (ioredis) · 4 DBs</li>
+      <li class="stack-tag">BullMQ · 5 queues</li>
+      <li class="stack-tag">Passport.js + JWT</li>
+      <li class="stack-tag">Argon2id</li>
+      <li class="stack-tag">otplib TOTP</li>
+      <li class="stack-tag">Zod · every endpoint</li>
+      <li class="stack-tag">Pino · PHI-redacted</li>
+      <li class="stack-tag">Helmet · 3-tier rate limit</li>
+      <li class="stack-tag">AES-256-GCM · field-level</li>
+      <li class="stack-tag">AWS S3 · KMS · Secrets Manager</li>
+      <li class="stack-tag">Kubernetes · 3 regional overlays</li>
+      <li class="stack-tag">Terraform IaC</li>
+      <li class="stack-tag">Prometheus + Grafana</li>
+      <li class="stack-tag">Nginx · TLS</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ END CTA ============ -->
+<section class="endcta" aria-labelledby="cta-h">
+  <div class="frame">
+    <div>
+      <h2 id="cta-h">Need a partner who can ship · or a mentor who can guide a team to <em>ship the same way?</em></h2>
+      <p>Healthcare, fintech, civic infrastructure: the same posture · evidence base, multi-region compliance, audit log on day one · scales to the parts of India and the world where mistakes are not retryable.</p>
+    </div>
+    <div class="actions">
+      <a class="btn btn-primary" href="../index.html#hire">Get in touch</a>
+      <a class="btn btn-ghost" href="../index.html">Back to catalogue</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="frame">
+    <div>
+      <h2 style="font-family:'Fraunces',serif;font-size:var(--t-xl);margin:0 0 1rem;">dmj<span class="dot">.</span>one</h2>
+      <p>Dream, Manifest and Journey, Together as One.</p>
+      <p class="meta">© 2026 Divya Mohan · RecoveryPilot is a dmj.one welfare initiative built by Kumkum Thakur, mentored by Divya Mohan. Research and demonstration platform · not certified for production clinical use. Always consult qualified healthcare professionals. MIT-licensed.</p>
+    </div>
+    <div>
+      <p class="meta">Catalogue</p>
+      <p><a href="../index.html#catalogue">All 47 products</a></p>
+      <p><a href="../index.html#cat-bharat">Bharat-First</a></p>
+      <p><a href="../index.html#hire">Hire</a></p>
+    </div>
+    <div>
+      <p class="meta">RecoveryPilot</p>
+      <p><a href="https://github.com/kumkum-thakur/recovery-pilot" rel="noopener">Source</a></p>
+      <p><a href="https://github.com/kumkum-thakur/recovery-pilot/blob/main/docs/ARCHITECTURE.md" rel="noopener">Architecture</a></p>
+      <p><a href="https://github.com/kumkum-thakur/recovery-pilot/blob/main/docs/ALGORITHMS.md" rel="noopener">Algorithm reference</a></p>
+      <p><a href="mailto:contact@dmj.one">contact@dmj.one</a></p>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

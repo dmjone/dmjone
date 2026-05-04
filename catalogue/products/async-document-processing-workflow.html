@@ -1,0 +1,685 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1c5d63">
+<meta name="color-scheme" content="light">
+
+<title>Async Document Workflow · From upload to export, never stuck on a spinner · dmj.one</title>
+<meta name="description" content="Production-grade async document pipeline. Next.js 14 + FastAPI + Celery + Redis Pub/Sub + PostgreSQL. Real-time SSE progress, JWT auth, one Docker compose to deploy.">
+<meta property="og:title" content="Async Document Workflow · Real-time SSE progress, never a forever spinner">
+<meta property="og:description" content="Production-grade async document pipeline with SSE progress, JWT auth, and one-compose deploy.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,30..100&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="../assets/core.css">
+
+<style>
+:root {
+  --accent: var(--c-cloud);
+  --accent-deep: #0e3d42;
+  --pipe-line: color-mix(in srgb, var(--accent) 30%, transparent);
+}
+body { background: var(--paper); }
+
+/* ====== HERO · pipeline-led ============================== */
+.ax-hero {
+  position: relative;
+  padding-block: clamp(3rem, 5vw + 1rem, 6rem) clamp(2rem, 4vw, 4rem);
+  border-bottom: var(--hair);
+  overflow: hidden;
+  background: var(--paper);
+}
+.ax-hero::after {
+  content: ""; position: absolute; inset: auto 0 0 0; height: 60%;
+  background-image:
+    repeating-linear-gradient(45deg,
+      transparent 0 11px,
+      color-mix(in srgb, var(--accent) 4%, transparent) 11px 12px);
+  pointer-events: none;
+  mask: linear-gradient(0deg, black, transparent);
+  -webkit-mask: linear-gradient(0deg, black, transparent);
+}
+.ax-hero .frame { position: relative; z-index: 2; }
+
+.crumbs {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs); letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink-mute); margin: 0 0 2rem;
+  display: flex; gap: 0.5rem; flex-wrap: wrap;
+}
+.crumbs a { border-bottom: 1px solid var(--ink-mute); padding-bottom: 1px; }
+.crumbs a:hover { color: var(--accent); border-color: var(--accent); }
+.crumbs span { color: var(--accent); }
+
+.ax-eyebrow {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  padding: 0.4rem 0.85rem;
+  border: 1px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  color: var(--accent-deep);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs); font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.16em;
+  margin-bottom: 1.5rem;
+}
+.ax-eyebrow::before {
+  content: ""; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+.ax-hero h1 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-3xl); font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 30;
+  letter-spacing: -0.03em; line-height: 0.96;
+  margin: 0; max-width: 18ch;
+}
+.ax-hero h1 em {
+  font-style: italic; color: var(--accent);
+  font-variation-settings: "opsz" 144, "SOFT" 100;
+}
+.ax-hero .lede {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md); font-weight: 300;
+  line-height: 1.45; color: var(--ink-soft);
+  margin: 1.5rem 0 0; max-width: 56ch;
+}
+.ax-hero .lede strong {
+  font-weight: 600; color: var(--ink);
+  background: linear-gradient(180deg, transparent 60%, color-mix(in srgb, var(--accent) 25%, transparent) 60%);
+  padding: 0 0.1em;
+}
+
+/* the actual pipeline progress strip */
+.pipe-strip {
+  margin-top: 2.5rem;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  padding: 1rem 1.25rem;
+  box-shadow: 6px 6px 0 var(--ink);
+}
+.pipe-strip .pipe-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.18em;
+  color: var(--ink-mute); font-weight: 700;
+  margin-bottom: 0.75rem;
+}
+.pipe-strip .pipe-stages {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 0.4rem;
+}
+.pipe-stage {
+  border: 1px solid var(--accent);
+  padding: 0.55rem 0.4rem;
+  text-align: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  text-transform: uppercase; letter-spacing: 0.12em;
+  font-weight: 700;
+  background: color-mix(in srgb, var(--accent) 10%, var(--paper));
+  color: var(--accent-deep);
+  position: relative;
+}
+.pipe-stage.done { background: var(--accent); color: white; }
+.pipe-stage.active {
+  background: var(--accent);
+  color: white;
+  box-shadow: inset 0 -3px 0 var(--ink);
+}
+.pipe-stage.queued { background: var(--paper-soft); color: var(--ink-mute); border-color: var(--ink-mute); }
+@media (max-width: 600px) {
+  .pipe-strip .pipe-stages { grid-template-columns: repeat(3, 1fr); }
+}
+.pipe-meta {
+  margin-top: 0.6rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  color: var(--ink-mute);
+  display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+}
+.pipe-meta strong { color: var(--accent); }
+
+.ax-cta-row {
+  margin-top: 2.5rem;
+  display: flex; gap: 0.75rem; flex-wrap: wrap;
+}
+.btn {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.7rem 1.1rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs); text-transform: uppercase;
+  letter-spacing: 0.14em; font-weight: 700;
+  border: 1px solid var(--ink);
+  transition: background .15s, color .15s, transform .15s, box-shadow .15s;
+}
+.btn:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--ink); }
+.btn-primary { background: var(--accent); color: white; border-color: var(--accent); }
+.btn-primary:hover { box-shadow: 4px 4px 0 var(--ink); }
+.btn-ghost { background: transparent; color: var(--ink); }
+
+/* ====== STATS ============================================ */
+.ax-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  background: var(--ink); color: var(--paper);
+  border-block: 2px solid var(--ink);
+}
+.ax-stat {
+  padding: 1.5rem clamp(1rem, 2vw, 1.5rem);
+  border-right: 1px solid color-mix(in srgb, var(--paper) 20%, transparent);
+}
+.ax-stat:last-child { border-right: 0; }
+.ax-stat .num {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl); font-weight: 400;
+  letter-spacing: -0.04em;
+  font-variation-settings: "opsz" 144, "SOFT" 30;
+  display: block; line-height: 1;
+  color: var(--accent);
+}
+.ax-stat .lbl {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.14em;
+  margin-top: 0.6rem; display: block;
+  color: color-mix(in srgb, var(--paper) 75%, transparent);
+}
+
+/* ====== ACTS ============================================= */
+.act {
+  padding-block: clamp(3rem, 5vw, 5rem);
+  border-bottom: var(--hair);
+}
+.act-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs); letter-spacing: 0.22em;
+  text-transform: uppercase; color: var(--accent);
+  font-weight: 700; margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 1rem;
+}
+.act-num::before { content: ""; width: 2.5rem; height: 1px; background: var(--accent); }
+.act h2 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl); font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 50;
+  letter-spacing: -0.025em; line-height: 1.05;
+  margin: 0 0 1.5rem; max-width: 22ch;
+}
+.act h2 em { font-style: italic; color: var(--accent); }
+.act-lede {
+  font-family: 'Fraunces', serif; font-size: var(--t-md);
+  color: var(--ink-soft); max-width: 60ch; margin: 0 0 2rem;
+}
+
+/* problem callouts */
+.callouts {
+  display: grid; gap: 1rem;
+  grid-template-columns: 1fr;
+  margin-top: 2rem;
+}
+@media (min-width: 760px) { .callouts { grid-template-columns: repeat(3, 1fr); } }
+.callout {
+  border-left: 3px solid var(--signal);
+  padding: 1rem 1.25rem;
+  background: var(--paper-soft);
+}
+.callout h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.1rem; font-weight: 500;
+  letter-spacing: -0.01em;
+  margin: 0 0 0.4rem;
+}
+.callout p { margin: 0; font-size: var(--t-sm); color: var(--ink-soft); }
+
+/* SSE terminal */
+.terminal {
+  margin-top: 2rem;
+  border: 1px solid var(--ink);
+  background: #0f1112;
+  color: #d0e8e9;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  overflow: hidden;
+  box-shadow: 6px 6px 0 var(--ink);
+}
+.terminal-bar {
+  display: flex; align-items: center; gap: 0.4rem;
+  padding: 0.5rem 0.75rem;
+  background: #1a1d1f;
+  border-bottom: 1px solid #2c3033;
+  font-size: 0.72rem;
+  color: #95b9bb;
+  letter-spacing: 0.1em;
+}
+.terminal-bar .dots { display: flex; gap: 0.35rem; }
+.terminal-bar .dots i {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: #353a3d; display: block;
+}
+.terminal-bar .ttl { margin-left: 0.5rem; text-transform: uppercase; }
+.terminal-body { padding: 0.9rem 1rem; overflow-x: auto; }
+.terminal-body .prompt { color: #6fb6ba; }
+.terminal-body .cmd { color: #d0e8e9; }
+.terminal-body .out { color: #b6c9ca; }
+.terminal-body .key { color: #ffd06f; }
+.terminal-body .str { color: #87d3a2; }
+.terminal-body .num { color: #f29e74; }
+.terminal-body .data { color: #6fb6ba; }
+.terminal-body .blink::after {
+  content: "▌";
+  color: #d0e8e9;
+  animation: blink 1.1s steps(1) infinite;
+}
+@keyframes blink { 50% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .terminal-body .blink::after { animation: none; }
+}
+
+/* arch grid */
+.arch-grid {
+  display: grid; gap: 0;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  margin-top: 2rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { .arch-grid { grid-template-columns: repeat(3, 1fr); } }
+.arch {
+  padding: 1.5rem;
+  border-right: 1px solid var(--paper-edge);
+  border-bottom: 1px solid var(--paper-edge);
+}
+@media (min-width: 760px) {
+  .arch:nth-child(3n) { border-right: 0; }
+  .arch:nth-last-child(-n+3) { border-bottom: 0; }
+}
+.arch .layer {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.18em;
+  color: var(--accent); font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+.arch h4 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.1rem; font-weight: 500;
+  margin: 0 0 0.4rem;
+}
+.arch p { margin: 0; color: var(--ink-soft); font-size: var(--t-sm); }
+.arch ul { margin: 0.4rem 0 0; }
+.arch li {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem; color: var(--ink-mute);
+  padding: 0.2rem 0;
+}
+
+/* api endpoints table */
+.api-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 2rem;
+  background: var(--paper);
+  border: 1px solid var(--ink);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+}
+.api-table th, .api-table td {
+  padding: 0.7rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--paper-edge);
+  vertical-align: top;
+}
+.api-table th {
+  background: var(--paper-soft);
+  text-transform: uppercase; letter-spacing: 0.14em;
+  font-size: 0.7rem; color: var(--ink-mute);
+}
+.api-table .verb {
+  font-weight: 700;
+  color: var(--accent-deep);
+}
+.api-table tr:last-child td { border-bottom: 0; }
+
+/* proof */
+.proof-act {
+  background: var(--ink); color: var(--paper);
+  position: relative; overflow: hidden;
+}
+.proof-act::before {
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 80% 20%, color-mix(in srgb, var(--accent) 30%, transparent), transparent 60%);
+  pointer-events: none;
+}
+.proof-act .frame { position: relative; }
+.proof-act h2 { color: var(--paper); }
+.proof-act h2 em { color: var(--accent); }
+.proof-grid {
+  display: grid; gap: 1rem; margin-top: 2rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { .proof-grid { grid-template-columns: repeat(2, 1fr); } }
+.proof-item {
+  border: 1px solid color-mix(in srgb, var(--paper) 30%, transparent);
+  padding: 1.5rem;
+  background: color-mix(in srgb, var(--paper) 5%, transparent);
+}
+.proof-item h3 {
+  font-family: 'Fraunces', serif;
+  margin: 0 0 0.5rem; font-size: var(--t-md);
+  color: var(--accent); font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.proof-item p { margin: 0; color: color-mix(in srgb, var(--paper) 80%, transparent); font-size: var(--t-sm); }
+
+/* stack */
+.stack-list {
+  display: flex; flex-wrap: wrap; gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+.stack-tag {
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--ink);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.14em;
+  font-weight: 600;
+}
+
+/* end cta */
+.endcta {
+  padding-block: clamp(3rem, 5vw, 5rem);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 10%, transparent), var(--paper));
+}
+.endcta .frame { display: grid; gap: 2rem; grid-template-columns: 1fr; }
+@media (min-width: 760px) { .endcta .frame { grid-template-columns: 2fr 1fr; align-items: end; } }
+.endcta h2 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl); font-weight: 300;
+  font-variation-settings: "opsz" 144, "SOFT" 100;
+  margin: 0 0 1rem; letter-spacing: -0.025em; line-height: 1.05;
+}
+.endcta h2 em {
+  font-style: italic; color: var(--accent);
+  background: linear-gradient(180deg, transparent 70%, color-mix(in srgb, var(--accent) 25%, transparent) 70%);
+}
+.endcta p { color: var(--ink-soft); margin: 0; max-width: 50ch; }
+.endcta .actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+
+.foot { background: var(--ink); color: var(--paper); }
+.foot .dot { color: var(--accent); }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topnav">
+  <div class="frame">
+    <div class="brand"><a href="../index.html">dmj<span class="dot">.</span>one</a></div>
+    <nav aria-label="Primary">
+      <ul>
+        <li><a href="../index.html#catalogue">Catalogue</a></li>
+        <li><a href="../index.html#manifesto">Manifesto</a></li>
+        <li><a href="../index.html#hire">Hire</a></li>
+        <li><a href="https://github.com/divyamohan1993/async-document-processing-workflow" rel="noopener">GitHub</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ======= HERO ======= -->
+<section class="ax-hero">
+  <div class="frame">
+    <p class="crumbs">
+      <a href="../index.html">Catalogue</a> /
+      <a href="../index.html#cat-cloud">Cloud and Infra</a> /
+      <span>Async Document Workflow</span>
+    </p>
+
+    <span class="ax-eyebrow">Production-grade · Async pipeline</span>
+
+    <h1>From upload to export, <em>never</em> stuck on a spinner.</h1>
+
+    <p class="lede">
+      Document workflows die quietly. A worker crashes. A queue backs up. The user sees a spinner forever and assumes the upload failed. <strong>This system streams every stage as it happens</strong> over Server-Sent Events, with a Celery worker pool, Redis Pub/Sub, PostgreSQL persistence and a Docker compose that brings the whole thing up on one command.
+    </p>
+
+    <div class="pipe-strip" role="img" aria-label="Pipeline progress: upload, extract done; analyzing in progress; categorize, review, export queued">
+      <p class="pipe-label">document · 550e8400-e29b-41d4 · live</p>
+      <div class="pipe-stages">
+        <div class="pipe-stage done">Upload</div>
+        <div class="pipe-stage done">Extract</div>
+        <div class="pipe-stage active">Analyze · 50%</div>
+        <div class="pipe-stage queued">Categorize</div>
+        <div class="pipe-stage queued">Review</div>
+        <div class="pipe-stage queued">Export</div>
+      </div>
+      <div class="pipe-meta">
+        <span>SSE channel · <strong>open</strong> · 12 events · 4.1s elapsed</span>
+        <span>worker · celery@docs-1 · queue=documents</span>
+      </div>
+    </div>
+
+    <div class="ax-cta-row">
+      <a class="btn btn-primary" href="https://github.com/divyamohan1993/async-document-processing-workflow" rel="noopener">View source</a>
+      <a class="btn btn-ghost" href="#how">How it works</a>
+      <a class="btn btn-ghost" href="#api">API</a>
+    </div>
+  </div>
+</section>
+
+<!-- ======= STATS ======= -->
+<section class="ax-stats" aria-label="At a glance">
+  <div class="ax-stat"><span class="num">5</span><span class="lbl">Pipeline stages, every one streamed</span></div>
+  <div class="ax-stat"><span class="num">5</span><span class="lbl">Accepted formats: PDF, TXT, CSV, JSON, MD</span></div>
+  <div class="ax-stat"><span class="num">50MB</span><span class="lbl">Default file-size ceiling</span></div>
+  <div class="ax-stat"><span class="num">20+</span><span class="lbl">Makefile targets, one to learn</span></div>
+  <div class="ax-stat"><span class="num">1</span><span class="lbl">docker compose up</span></div>
+</section>
+
+<!-- ======= ACT I · PROBLEM ======= -->
+<section class="act" aria-labelledby="prob-h">
+  <div class="frame">
+    <p class="act-num">Act I · The Problem</p>
+    <h2 id="prob-h">The user sees one spinner. <em>The system knows ten things.</em></h2>
+    <p class="act-lede">A document upload kicks off file validation, text extraction, analysis, categorization, a human review step and an export. Every one of those can fail. None of it is visible to the person who clicked Upload. The product feels broken even when it is working.</p>
+
+    <div class="callouts">
+      <div class="callout"><h3>Spinner forever.</h3><p>Worker crashed. Queue backed up. The UI has no signal so it shows the same thing it always shows. The user reloads, retries, gives up.</p></div>
+      <div class="callout"><h3>No human-in-the-loop.</h3><p>Most pipelines auto-finalise. Real workflows need a person to approve, reject or request reprocessing before the export.</p></div>
+      <div class="callout"><h3>Demo only.</h3><p>Plenty of "async pipeline" repos. Almost none ship with health checks, rate limits, JWT auth, backups, and a one-command compose that boots cleanly.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ======= ACT II · SSE STREAM ======= -->
+<section class="act" style="background: linear-gradient(180deg, var(--paper-soft), var(--paper));" aria-labelledby="sse-h">
+  <div class="frame">
+    <p class="act-num">Act II · The Promise</p>
+    <h2 id="sse-h">Every stage. <em>Streamed.</em> While it happens.</h2>
+    <p class="act-lede">The frontend opens an EventSource. The backend subscribes to a per-document Redis channel. The Celery worker publishes progress as it works. The client gets a live event for every stage transition. A real progress bar that reflects a real worker.</p>
+
+    <div class="terminal" role="img" aria-label="Curl SSE stream showing stage transitions from extracting through completed">
+      <div class="terminal-bar">
+        <span class="dots"><i></i><i></i><i></i></span>
+        <span class="ttl">curl · sse stream</span>
+      </div>
+      <div class="terminal-body">
+<span class="prompt">$</span> <span class="cmd">curl -N http://localhost/api/v1/documents/550e8400/stream \</span>
+<span class="cmd">     -H "Authorization: Bearer $TOKEN"</span>
+
+<span class="data">data:</span> {<span class="key">"stage"</span>: <span class="str">"extracting"</span>, <span class="key">"progress"</span>: <span class="num">25</span>, <span class="key">"message"</span>: <span class="str">"Extracting text content..."</span>}
+
+<span class="data">data:</span> {<span class="key">"stage"</span>: <span class="str">"analyzing"</span>, <span class="key">"progress"</span>: <span class="num">50</span>, <span class="key">"message"</span>: <span class="str">"Analyzing document structure..."</span>}
+
+<span class="data">data:</span> {<span class="key">"stage"</span>: <span class="str">"categorizing"</span>, <span class="key">"progress"</span>: <span class="num">75</span>, <span class="key">"message"</span>: <span class="str">"Categorizing document..."</span>}
+
+<span class="data">data:</span> {<span class="key">"stage"</span>: <span class="str">"completed"</span>, <span class="key">"progress"</span>: <span class="num">100</span>, <span class="key">"message"</span>: <span class="str">"Processing complete. Ready for review."</span>}<span class="blink"></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======= ACT III · ARCHITECTURE ======= -->
+<section class="act" id="how" aria-labelledby="arch-h">
+  <div class="frame">
+    <p class="act-num">Act III · The Architecture</p>
+    <h2 id="arch-h">Three planes. <em>One compose.</em></h2>
+    <p class="act-lede">Browser to nginx, nginx to Next.js for UI and FastAPI for the API, FastAPI to Celery via Redis broker, Celery to PostgreSQL for persistence and Redis Pub/Sub for progress. Every container has a health check, a resource limit and a structured log line.</p>
+
+    <div class="arch-grid">
+      <div class="arch">
+        <p class="layer">Edge</p>
+        <h4>nginx · ports 80/443</h4>
+        <p>Reverse proxy with rate limiting and security headers. Serves Next.js on the root and FastAPI under <code>/api/v1</code>.</p>
+      </div>
+      <div class="arch">
+        <p class="layer">UI</p>
+        <h4>Next.js 14 · TypeScript</h4>
+        <p>Tailwind CSS, EventSource for SSE, hot-reload dev mode via source mount. JWT auth per request.</p>
+      </div>
+      <div class="arch">
+        <p class="layer">API</p>
+        <h4>FastAPI · async/await</h4>
+        <p>Pydantic v2 schemas, async SQLAlchemy, dependency injection. Repository pattern, thin route handlers, business logic in services.</p>
+      </div>
+      <div class="arch">
+        <p class="layer">Workers</p>
+        <h4>Celery 5 · documents queue</h4>
+        <p>Multi-stage tasks for extract, analyze, categorize. Automatic retry on transient failures. Flower dashboard at port 5555.</p>
+      </div>
+      <div class="arch">
+        <p class="layer">State</p>
+        <h4>PostgreSQL 16</h4>
+        <p>Document metadata, status transitions, audit trail. UUID primary keys. Trigram extension for full-text search. Alembic migrations.</p>
+      </div>
+      <div class="arch">
+        <p class="layer">Bus</p>
+        <h4>Redis 7 · broker + Pub/Sub</h4>
+        <p>Celery broker, result backend, cache. Per-document Pub/Sub channel that the SSE endpoint subscribes to and forwards to the client.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======= ACT IV · API ======= -->
+<section class="act" id="api" aria-labelledby="api-h">
+  <div class="frame">
+    <p class="act-num">Act IV · The API</p>
+    <h2 id="api-h">REST + SSE. <em>Versioned from day one.</em></h2>
+    <p class="act-lede">Real endpoints. JWT auth. Idempotency-friendly. Versioned under <code>/api/v1</code>. Auto-generated OpenAPI docs at <code>/api/v1/docs</code>. The shape of every error: <code>{"error": {"code", "message", "details"}}</code>.</p>
+
+    <table class="api-table" aria-label="Selected API endpoints">
+      <thead>
+        <tr><th>Verb</th><th>Endpoint</th><th>What it does</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="verb">POST</td><td>/api/v1/documents</td><td>Upload a document. Returns id, status=uploaded, kicks off Celery task.</td></tr>
+        <tr><td class="verb">GET</td><td>/api/v1/documents/{id}</td><td>Get current state, metadata, summary, keywords.</td></tr>
+        <tr><td class="verb">GET</td><td>/api/v1/documents/{id}/stream</td><td>SSE stream of progress events for that document.</td></tr>
+        <tr><td class="verb">POST</td><td>/api/v1/review/{id}/approve</td><td>Human-in-the-loop approval. Marks document finalised.</td></tr>
+        <tr><td class="verb">POST</td><td>/api/v1/review/{id}/reject</td><td>Reject and stop the pipeline. Audit logged.</td></tr>
+        <tr><td class="verb">POST</td><td>/api/v1/review/{id}/reprocess</td><td>Send back to the worker pool. Status returns to processing.</td></tr>
+        <tr><td class="verb">GET</td><td>/api/v1/export?format=json|csv</td><td>Bulk export of finalised documents.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ======= ACT V · STACK ======= -->
+<section class="act" aria-labelledby="stack-h">
+  <div class="frame">
+    <p class="act-num">Act V · The Stack</p>
+    <h2 id="stack-h">What is inside.</h2>
+    <ul class="stack-list">
+      <li class="stack-tag">Next.js 14</li>
+      <li class="stack-tag">React</li>
+      <li class="stack-tag">TypeScript 5</li>
+      <li class="stack-tag">Tailwind CSS 3</li>
+      <li class="stack-tag">FastAPI 0.109+</li>
+      <li class="stack-tag">Python 3.11+</li>
+      <li class="stack-tag">Celery 5.3+</li>
+      <li class="stack-tag">Flower 2.0</li>
+      <li class="stack-tag">PostgreSQL 16</li>
+      <li class="stack-tag">Redis 7</li>
+      <li class="stack-tag">SQLAlchemy 2 async</li>
+      <li class="stack-tag">Alembic 1.13</li>
+      <li class="stack-tag">nginx Alpine</li>
+      <li class="stack-tag">Docker + Compose 24+</li>
+      <li class="stack-tag">JWT</li>
+      <li class="stack-tag">Server-Sent Events</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ======= PROOF ======= -->
+<section class="proof-act act" aria-labelledby="proof-h">
+  <div class="frame">
+    <p class="act-num">Act VI · Proof</p>
+    <h2 id="proof-h">It boots. <em>It tests. It backs up.</em></h2>
+    <div class="proof-grid">
+      <div class="proof-item">
+        <h3>One command · make up</h3>
+        <p>Or <code>docker compose up -d</code>. All services come up with health checks, dependency ordering, and isolated networking. <code>make health</code> verifies every container.</p>
+      </div>
+      <div class="proof-item">
+        <h3>20+ Makefile targets</h3>
+        <p>build, up, down, logs, status, health, migrate, backup, restore, shell, test, lint. The README walks through each. New engineer is productive in under an hour.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Backup · restore · monitor</h3>
+        <p>Database backup and restore scripts. Flower dashboard for tasks. Automated deploy script for Ubuntu. Resource limits on every container.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Honest limits, in the README</h3>
+        <p>SSE connections are long-lived. No document versioning. Single-region deploy. IP-based rate limiting. All of it written down, so you know what you are getting.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======= END CTA ======= -->
+<section class="endcta" aria-labelledby="cta-h">
+  <div class="frame">
+    <div>
+      <h2 id="cta-h">Want a pipeline that <em>tells the user the truth, every second?</em></h2>
+      <p>I build production-grade async systems with real progress, real workers and real recovery. The kind that stay up in production, not just in a demo.</p>
+    </div>
+    <div class="actions">
+      <a class="btn btn-primary" href="../index.html#hire">Hire me</a>
+      <a class="btn btn-ghost" href="../index.html">Back to catalogue</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="frame">
+    <div>
+      <h2 style="font-family:'Fraunces',serif;font-size:var(--t-xl);margin:0 0 1rem;">dmj<span class="dot">.</span>one</h2>
+      <p>Dream, Manifest and Journey, Together as One.</p>
+      <p class="meta">© 2026 Divya Mohan. Async Document Workflow: Next.js 14 + FastAPI + Celery + Redis + PostgreSQL. MIT licensed. Self-host with one Docker compose.</p>
+    </div>
+    <div>
+      <p class="meta">Catalogue</p>
+      <p><a href="../index.html#catalogue">All 47 products</a></p>
+      <p><a href="../index.html#cat-cloud">Cloud and Infra</a></p>
+      <p><a href="../index.html#hire">Hire</a></p>
+    </div>
+    <div>
+      <p class="meta">Async Document Workflow</p>
+      <p><a href="https://github.com/divyamohan1993/async-document-processing-workflow" rel="noopener">Source</a></p>
+      <p><a href="mailto:contact@dmj.one">contact@dmj.one</a></p>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,703 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#d8631a">
+<meta name="color-scheme" content="light">
+
+<title>BioVault · A trust score, not a password · dmj.one</title>
+<meta name="description" content="Multi-modal biometric authentication: face, voice, keystroke and a WebAuthn passkey, fused into a calibrated trust score. In-browser ML. Stateless backend. Live on Cloud Run.">
+<meta property="og:title" content="BioVault · 0.85 means allow. 0.65 means step up. Below means deny.">
+<meta property="og:description" content="Four signals. One trust score. Zero raw biometric data on the wire.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,30..100&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="../assets/core.css">
+
+<style>
+:root {
+  --accent: var(--c-bharat); --accent-deep: #a14710;
+  --allow: #2f6b3b; --step: #b48a2b; --deny: #b03030;
+}
+body { background: var(--paper); }
+
+.crumbs {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs); letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink-mute); margin: 0 0 1.75rem;
+  display: flex; gap: 0.5rem; flex-wrap: wrap;
+}
+.crumbs a { border-bottom: 1px solid var(--ink-mute); padding-bottom: 1px; }
+.crumbs a:hover { color: var(--accent); border-color: var(--accent); }
+.crumbs span { color: var(--accent); }
+
+.eyebrow {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  padding: 0.4rem 0.85rem;
+  border: 1px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  color: var(--accent-deep);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs); font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.16em;
+  margin-bottom: 1.5rem;
+}
+.eyebrow::before {
+  content: ""; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+.btn {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.7rem 1.1rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs); text-transform: uppercase;
+  letter-spacing: 0.14em; font-weight: 700;
+  border: 1px solid var(--ink);
+  transition: background .15s, color .15s, transform .15s, box-shadow .15s;
+}
+.btn:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--ink); }
+.btn-primary { background: var(--accent); color: white; border-color: var(--accent); }
+.btn-ghost { background: transparent; color: var(--ink); }
+
+/* ====== HERO · single huge numeral motif ============ */
+.hero {
+  position: relative;
+  border-bottom: var(--hair);
+  overflow: hidden;
+  padding-block: clamp(3rem, 6vw, 6rem);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--accent) 5%, var(--paper)) 0%, var(--paper) 100%);
+}
+.hero::before {
+  content: ""; position: absolute; inset: 0;
+  background-image:
+    repeating-linear-gradient(0deg, transparent 0 79px, color-mix(in srgb, var(--ink) 7%, transparent) 79px 80px),
+    repeating-linear-gradient(90deg, transparent 0 79px, color-mix(in srgb, var(--ink) 7%, transparent) 79px 80px);
+  opacity: 0.5;
+  pointer-events: none;
+  mask: radial-gradient(ellipse at 65% 50%, black 0%, transparent 75%);
+  -webkit-mask: radial-gradient(ellipse at 65% 50%, black 0%, transparent 75%);
+}
+.hero .frame { position: relative; z-index: 2; }
+
+.hero-grid {
+  display: grid; gap: 2rem;
+  grid-template-columns: 1fr;
+  align-items: center;
+}
+@media (min-width: 980px) { .hero-grid { grid-template-columns: 1fr 1.05fr; gap: 3.5rem; } }
+
+.hero-meta h1 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 50, "WONK" 1;
+  letter-spacing: -0.025em;
+  line-height: 1.0;
+  margin: 0 0 1.5rem;
+  max-width: 22ch;
+}
+.hero-meta h1 em { font-style: italic; color: var(--accent); }
+.hero-meta .lede {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md);
+  font-weight: 300;
+  line-height: 1.45;
+  color: var(--ink-soft);
+  margin: 0 0 2rem;
+  max-width: 50ch;
+}
+.hero-meta .lede strong {
+  font-weight: 600; color: var(--ink);
+  background: linear-gradient(180deg, transparent 60%, color-mix(in srgb, var(--accent) 25%, transparent) 60%);
+  padding: 0 0.1em;
+}
+.hero-cta { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+
+/* The huge numeral block */
+.numeral-card {
+  position: relative;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  padding: 1.5rem 1.5rem 1.25rem;
+  overflow: hidden;
+}
+.numeral-card::before {
+  content: "TRUST · t = (Σ wᵢ · sᵢ) / Σ wᵢ";
+  position: absolute;
+  top: -0.6rem; left: 1rem;
+  background: var(--paper);
+  padding: 0 0.5rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.18em;
+  color: var(--accent);
+  font-weight: 700;
+}
+.numeral-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+  align-items: center;
+}
+@media (min-width: 600px) { .numeral-grid { grid-template-columns: 1.1fr 1fr; } }
+.bignum {
+  font-family: 'Fraunces', serif;
+  font-weight: 400;
+  font-style: italic;
+  font-variation-settings: "opsz" 144, "SOFT" 100, "WONK" 1;
+  font-size: clamp(7rem, 14vw, 12rem);
+  line-height: 0.85;
+  color: var(--accent);
+  letter-spacing: -0.06em;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+}
+.bignum .point {
+  font-style: normal;
+  font-variation-settings: "opsz" 144, "SOFT" 30;
+}
+.bignum-cap {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  margin: 0;
+}
+.bignum-cap span { color: var(--accent-deep); font-weight: 700; }
+
+.bands {
+  display: grid; gap: 0.5rem;
+}
+.band {
+  display: grid; grid-template-columns: 5.25rem 1fr auto; gap: 1rem;
+  align-items: baseline;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--ink);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.06em;
+}
+.band .range { font-weight: 700; }
+.band .what {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-size: var(--t-sm);
+  letter-spacing: -0.005em;
+  color: var(--ink-soft);
+}
+.band .verdict {
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  padding: 0.2rem 0.5rem;
+}
+.band.allow .verdict { background: var(--allow); color: white; }
+.band.step .verdict { background: var(--step); color: white; }
+.band.deny .verdict { background: var(--deny); color: white; }
+.band.allow { border-left: 4px solid var(--allow); }
+.band.step { border-left: 4px solid var(--step); }
+.band.deny { border-left: 4px solid var(--deny); }
+
+/* ====== STATS ============ */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  background: var(--ink); color: var(--paper);
+  border-block: 2px solid var(--ink);
+}
+.stat {
+  padding: 1.5rem clamp(1rem, 2vw, 1.5rem);
+  border-right: 1px solid color-mix(in srgb, var(--paper) 20%, transparent);
+}
+.stat:last-child { border-right: 0; }
+.stat .num {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  font-variation-settings: "opsz" 144, "SOFT" 30;
+  display: block; line-height: 1;
+  color: var(--accent);
+}
+.stat .lbl {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  margin-top: 0.6rem;
+  display: block;
+  color: color-mix(in srgb, var(--paper) 75%, transparent);
+}
+
+/* ====== Acts ============ */
+.act { padding-block: clamp(3rem, 5vw, 5rem); border-bottom: var(--hair); position: relative; }
+.act-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs); letter-spacing: 0.22em;
+  text-transform: uppercase; color: var(--accent);
+  font-weight: 700; margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 1rem;
+}
+.act-num::before { content: ""; width: 2.5rem; height: 1px; background: var(--accent); }
+.act h2 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 50, "WONK" 1;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+  margin: 0 0 1.5rem;
+  max-width: 26ch;
+}
+.act h2 em { font-style: italic; color: var(--accent); }
+
+/* Problem · three vertical pull quotes */
+.pulls {
+  display: grid; gap: 1.25rem;
+  margin-top: 2rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { .pulls { grid-template-columns: repeat(3, 1fr); } }
+.pull {
+  border: 1px solid var(--ink);
+  padding: 1.5rem;
+  background: var(--paper);
+  position: relative;
+}
+.pull .lead {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-lg);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--accent-deep);
+  margin: 0 0 1rem;
+}
+.pull .lead em { font-style: italic; color: var(--accent); }
+.pull p { margin: 0; color: var(--ink-soft); font-size: var(--t-sm); }
+
+/* The fusion diagram */
+.act-fusion { background: linear-gradient(180deg, var(--paper-soft), var(--paper)); }
+.factors {
+  margin-top: 2rem;
+  display: grid; gap: 0;
+  grid-template-columns: 1fr;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+}
+@media (min-width: 760px) { .factors { grid-template-columns: repeat(4, 1fr); } }
+.factor {
+  padding: 1.25rem 1.25rem 1rem;
+  border-bottom: var(--hair-soft);
+  position: relative;
+}
+.factor:last-child { border-bottom: 0; }
+@media (min-width: 760px) {
+  .factor { border-bottom: 0; border-right: var(--hair-soft); }
+  .factor:last-child { border-right: 0; }
+}
+.factor .label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.18em;
+  color: var(--accent); font-weight: 700;
+}
+.factor h3 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md);
+  margin: 0.4rem 0 0.5rem;
+  font-weight: 500; letter-spacing: -0.01em;
+}
+.factor .vec {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  color: var(--ink-mute);
+  letter-spacing: 0.06em;
+  display: block;
+  margin-bottom: 0.6rem;
+}
+.factor p { margin: 0 0 0.75rem; font-size: var(--t-sm); color: var(--ink-soft); }
+.factor .weight {
+  display: inline-block;
+  background: var(--ink); color: var(--paper);
+  padding: 0.2rem 0.5rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+/* Performance numbers */
+.perf {
+  margin-top: 2rem;
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.04em;
+}
+.perf th, .perf td {
+  padding: 0.85rem 1rem;
+  border-bottom: var(--hair-soft);
+  text-align: left;
+}
+.perf thead th {
+  border-bottom: 1px solid var(--ink);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--accent); font-weight: 700;
+}
+.perf td.metric { font-family: 'Fraunces', serif; font-size: var(--t-md); font-style: italic; letter-spacing: -0.005em; text-transform: none; }
+.perf td.value { color: var(--accent-deep); font-weight: 700; text-align: right; }
+
+/* Stack */
+.stack-list { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.5rem; }
+.stack-tag {
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--ink);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.14em;
+  font-weight: 600;
+}
+
+/* Proof */
+.proof {
+  background: var(--ink); color: var(--paper);
+  padding-block: clamp(3rem, 5vw, 5rem);
+  position: relative; overflow: hidden;
+}
+.proof::before {
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 80% 20%, color-mix(in srgb, var(--accent) 30%, transparent), transparent 60%);
+  pointer-events: none;
+}
+.proof .frame { position: relative; }
+.proof h2 { color: var(--paper); }
+.proof h2 em { color: var(--accent); }
+.proof-grid {
+  display: grid; gap: 1rem; margin-top: 2rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { .proof-grid { grid-template-columns: repeat(2, 1fr); } }
+.proof-item {
+  border: 1px solid color-mix(in srgb, var(--paper) 30%, transparent);
+  padding: 1.5rem;
+  background: color-mix(in srgb, var(--paper) 5%, transparent);
+}
+.proof-item h3 {
+  font-family: 'Fraunces', serif;
+  margin: 0 0 0.5rem;
+  font-size: var(--t-md);
+  color: var(--accent);
+  font-weight: 500; letter-spacing: -0.01em;
+}
+.proof-item p { margin: 0; color: color-mix(in srgb, var(--paper) 80%, transparent); font-size: var(--t-sm); }
+.proof-item .url {
+  display: block; margin-top: 0.5rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  color: color-mix(in srgb, var(--paper) 70%, transparent);
+  word-break: break-all;
+}
+
+/* End CTA */
+.endcta {
+  padding-block: clamp(3rem, 5vw, 5rem);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 10%, transparent), var(--paper));
+}
+.endcta .frame { display: grid; gap: 2rem; grid-template-columns: 1fr; }
+@media (min-width: 760px) { .endcta .frame { grid-template-columns: 2fr 1fr; align-items: end; } }
+.endcta h2 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 300;
+  font-variation-settings: "opsz" 144, "SOFT" 100;
+  margin: 0 0 1rem;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+}
+.endcta h2 em {
+  font-style: italic; color: var(--accent);
+  background: linear-gradient(180deg, transparent 70%, color-mix(in srgb, var(--accent) 25%, transparent) 70%);
+}
+.endcta p { color: var(--ink-soft); margin: 0; max-width: 50ch; }
+.endcta .actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+
+.foot { background: var(--ink); color: var(--paper); }
+.foot .dot { color: var(--accent); }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topnav">
+  <div class="frame">
+    <div class="brand"><a href="../index.html">dmj<span class="dot">.</span>one</a></div>
+    <nav aria-label="Primary">
+      <ul>
+        <li><a href="../index.html#catalogue">Catalogue</a></li>
+        <li><a href="../index.html#manifesto">Manifesto</a></li>
+        <li><a href="../index.html#hire">Hire</a></li>
+        <li><a href="https://github.com/divyamohan1993/biovault" rel="noopener">GitHub</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ============ HERO · numeral motif ============ -->
+<section class="hero">
+  <div class="frame">
+    <p class="crumbs">
+      <a href="../index.html">Catalogue</a> /
+      <a href="../index.html#cat-bharat">Bharat-First</a> /
+      <span>BioVault</span>
+    </p>
+
+    <span class="eyebrow">No. 10 · Bharat-First · Identity</span>
+
+    <div class="hero-grid">
+      <div class="hero-meta">
+        <h1>Stop asking <em>who.</em><br>Start measuring <em>how sure.</em></h1>
+        <p class="lede">
+          Passwords are the weakest link in <strong>81% of breaches.</strong> A single biometric falls to a single spoof. BioVault fuses four signals (face, voice, keystroke, WebAuthn passkey) into one calibrated trust score. Raw biometric data <strong>never leaves the browser.</strong> The backend stores embeddings, not media, and forgets them after thirty minutes.
+        </p>
+        <div class="hero-cta">
+          <a class="btn btn-primary" href="https://biovault.dmj.one" rel="noopener">Try the live demo</a>
+          <a class="btn btn-ghost" href="https://github.com/divyamohan1993/biovault" rel="noopener">View source</a>
+          <a class="btn btn-ghost" href="#how">How it fuses</a>
+        </div>
+      </div>
+
+      <figure class="numeral-card">
+        <div class="numeral-grid">
+          <p class="bignum">0<span class="point">.</span>85</p>
+          <div class="bands">
+            <div class="band allow">
+              <span class="range">t &ge; 0.85</span>
+              <span class="what">Confident enough to let in</span>
+              <span class="verdict">Allow</span>
+            </div>
+            <div class="band step">
+              <span class="range">0.65 &ndash; 0.85</span>
+              <span class="what">Step up with another factor</span>
+              <span class="verdict">Step up</span>
+            </div>
+            <div class="band deny">
+              <span class="range">t &lt; 0.65</span>
+              <span class="what">Refuse and audit</span>
+              <span class="verdict">Deny</span>
+            </div>
+          </div>
+        </div>
+        <p class="bignum-cap" style="margin-top:1rem;"><span>Decision policy</span> · weights face 0.35 · passkey 0.30 · voice 0.20 · keystroke 0.15</p>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATS ============ -->
+<section class="stats" aria-label="At a glance">
+  <div class="stat"><span class="num">81%</span><span class="lbl">Breaches involve weak credentials</span></div>
+  <div class="stat"><span class="num">4</span><span class="lbl">Signals fused per decision</span></div>
+  <div class="stat"><span class="num">&lt;25 ms</span><span class="lbl">Face verify p95</span></div>
+  <div class="stat"><span class="num">30 min</span><span class="lbl">Template TTL · then erased</span></div>
+  <div class="stat"><span class="num">&#8377;0</span><span class="lbl">Idle cost on Cloud Run</span></div>
+</section>
+
+<!-- ============ ACT I · PROBLEM ============ -->
+<section class="act" aria-labelledby="prob-h">
+  <div class="frame">
+    <p class="act-num">Act I · Every Single Factor Loses</p>
+    <h2 id="prob-h">Pick one and you lose.<br>The fix is not a new factor. It is <em>a new sentence.</em></h2>
+
+    <div class="pulls">
+      <div class="pull">
+        <p class="lead">Passwords <em>are guessed.</em></p>
+        <p>Eighty-one percent of confirmed breaches involve stolen, reused or guessed credentials. The user is not the problem. The model is.</p>
+      </div>
+      <div class="pull">
+        <p class="lead">OTPs <em>are stolen.</em></p>
+        <p>SIM swap is industrial. SS7 interception is real. A code in a text message is no longer a second factor in any meaningful sense.</p>
+      </div>
+      <div class="pull">
+        <p class="lead">A single biometric <em>is spoofed.</em></p>
+        <p>A photo defeats face. A recording defeats voice. A 3D-printed finger defeats most fingerprint readers in consumer phones.</p>
+      </div>
+    </div>
+
+    <p style="font-family:'Fraunces',serif;font-style:italic;color:var(--ink-soft);font-size:var(--t-md);max-width:60ch;border-left:3px solid var(--accent);padding-left:1rem;margin:2rem 0 0;">
+      The honest sentence is not &ldquo;is this user authenticated.&rdquo; It is &ldquo;how sure am I, given everything I just observed.&rdquo; A trust score fits that sentence. A pass-or-fail check does not.
+    </p>
+  </div>
+</section>
+
+<!-- ============ ACT II · FUSION ============ -->
+<section class="act act-fusion" aria-labelledby="fusion-h">
+  <div class="frame">
+    <p class="act-num">Act II · The Fusion</p>
+    <h2 id="fusion-h">Four signals.<br>One number. <em>Zero raw media on the wire.</em></h2>
+    <p style="font-family:'Fraunces',serif;font-size:var(--t-md);color:var(--ink-soft);max-width:60ch;margin:0;">All four models run in the browser. The backend sees only one-way embeddings, a public key and a sign counter. There is nothing in storage that can be replayed against the user later.</p>
+
+    <div class="factors" aria-label="Four signals fused">
+      <div class="factor">
+        <span class="label">Signal 01</span>
+        <h3>Face</h3>
+        <span class="vec">float[128] · cosine + euclidean</span>
+        <p>face-api.js produces a 128-dimension descriptor. A blink challenge defeats the trivial photo replay. The frame never leaves the device.</p>
+        <span class="weight">w = 0.35</span>
+      </div>
+      <div class="factor">
+        <span class="label">Signal 02</span>
+        <h3>Voice</h3>
+        <span class="vec">float[18] · z-score cosine</span>
+        <p>Web Audio extracts an 18-dimension feature vector of aggregate spectral statistics. The audio buffer is discarded after the descriptor is computed.</p>
+        <span class="weight">w = 0.20</span>
+      </div>
+      <div class="factor">
+        <span class="label">Signal 03</span>
+        <h3>Keystroke</h3>
+        <span class="vec">float[2N-1] · manhattan</span>
+        <p>Dwell and flight times across the user's typed phrase. Behavioural by nature, hard to forge, and silent to the user.</p>
+        <span class="weight">w = 0.15</span>
+      </div>
+      <div class="factor">
+        <span class="label">Signal 04</span>
+        <h3>Passkey</h3>
+        <span class="vec">WebAuthn · public key + counter</span>
+        <p>Phishing-resistant by design. Origin-bound by the browser. The single hardest signal to spoof and the only one bound to a hardware authenticator.</p>
+        <span class="weight">w = 0.30</span>
+      </div>
+    </div>
+
+    <p style="font-family:'JetBrains Mono',monospace;background:var(--ink);color:var(--paper);padding:1rem;margin:1.5rem 0 0;font-size:var(--t-sm);overflow-x:auto;">
+      trust = (&Sigma; w<sub>i</sub> &middot; score<sub>i</sub>) / &Sigma; w<sub>i</sub> &nbsp; &times; 0.9 if single factor &nbsp; &times; cap 0.5 if any hard-fail
+    </p>
+  </div>
+</section>
+
+<!-- ============ ACT III · HOW IT WORKS ============ -->
+<section class="act" id="how" aria-labelledby="how-h">
+  <div class="frame">
+    <p class="act-num">Act III · The Server Sees Almost Nothing</p>
+    <h2 id="how-h">The browser does the maths.<br>The server <em>holds the policy.</em></h2>
+    <p style="font-family:'Fraunces',serif;font-size:var(--t-md);color:var(--ink-soft);max-width:60ch;margin:0;">FastAPI on Cloud Run, asia-east1, min-instances=0. Stateless. In-memory. One container image at around 85 MiB. The endpoints are deliberately small.</p>
+
+    <table class="perf" aria-label="API surface, selected">
+      <thead><tr><th>Endpoint</th><th>Verifies</th><th style="text-align:right">p95</th></tr></thead>
+      <tbody>
+        <tr><td class="metric">/api/face/verify</td><td>128-D descriptor against enrolled vector</td><td class="value">&lt; 25 ms</td></tr>
+        <tr><td class="metric">/api/voice/verify</td><td>18-D z-score cosine</td><td class="value">&lt; 8 ms</td></tr>
+        <tr><td class="metric">/api/keystroke/verify</td><td>(2N-1)-D Manhattan distance</td><td class="value">&lt; 6 ms</td></tr>
+        <tr><td class="metric">/api/passkey/auth</td><td>WebAuthn assertion + sign counter</td><td class="value">browser-bound</td></tr>
+        <tr><td class="metric">/api/risk/score</td><td>Weighted fusion + decision band</td><td class="value">deterministic</td></tr>
+        <tr><td class="metric">/api/events</td><td>Audit ring buffer with correlation IDs</td><td class="value">structured JSON</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============ ACT IV · STACK ============ -->
+<section class="act" aria-labelledby="stack-h">
+  <div class="frame">
+    <p class="act-num">Act IV · The Stack</p>
+    <h2 id="stack-h">In-browser ML, stateless backend.<br>Privacy by <em>architecture,</em> not policy.</h2>
+    <p style="font-family:'Fraunces',serif;font-size:var(--t-md);color:var(--ink-soft);max-width:60ch;margin:0;">Templates evict after thirty minutes or whenever the Cloud Run instance scales to zero. There is no database to forget to wipe. DPDP Act 2023 and GDPR alignment are consequences of the design, not retrofits.</p>
+
+    <ul class="stack-list">
+      <li class="stack-tag">FastAPI · Python 3.11</li>
+      <li class="stack-tag">Pydantic v2</li>
+      <li class="stack-tag">NumPy</li>
+      <li class="stack-tag">face-api.js · 128-D</li>
+      <li class="stack-tag">Web Audio API</li>
+      <li class="stack-tag">WebAuthn · passkey</li>
+      <li class="stack-tag">Cloud Run · asia-east1</li>
+      <li class="stack-tag">Container ~85 MiB</li>
+      <li class="stack-tag">min-instances = 0</li>
+      <li class="stack-tag">Cold start 250·350 ms</li>
+      <li class="stack-tag">In-memory store · 30 min TTL</li>
+      <li class="stack-tag">JSON audit · correlation IDs</li>
+      <li class="stack-tag">DPDP Act 2023 aligned</li>
+      <li class="stack-tag">GDPR aligned · India residency</li>
+      <li class="stack-tag">OpenAPI / Swagger UI</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ PROOF ============ -->
+<section class="proof act" aria-labelledby="proof-h">
+  <div class="frame">
+    <p class="act-num">Act V · Proof</p>
+    <h2 id="proof-h">Live. Documented. <em>Cap-stoned.</em></h2>
+
+    <div class="proof-grid">
+      <div class="proof-item">
+        <h3>Production demo</h3>
+        <p>Enroll any subset of factors. Verify. Watch the trust meter compute the band live. No persistence, no replay attack surface.</p>
+        <span class="url">https://biovault.dmj.one</span>
+      </div>
+      <div class="proof-item">
+        <h3>Pitch deck and capstone report</h3>
+        <p>A keyboard-driven twelve-slide deck and the full capstone report live on the same domain. OpenAPI lives at /api/docs.</p>
+        <span class="url">/pitch · /report · /report.docx · /api/docs</span>
+      </div>
+      <div class="proof-item">
+        <h3>Capstone author</h3>
+        <p>Lakshika Tanwar, GF202220476, B.Tech CSE Cloud Computing, Shoolini University, Solan. Mentored as part of the dmj.one capstone programme.</p>
+      </div>
+      <div class="proof-item">
+        <h3>One-shot deploy</h3>
+        <p>PROJECT=dmjone REGION=asia-east1 bash scripts/deploy.sh. Cloud Run from zero to live in a single command. CI/CD pipeline shipped in .github/workflows/deploy.yml.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ END CTA ============ -->
+<section class="endcta" aria-labelledby="cta-h">
+  <div class="frame">
+    <div>
+      <h2 id="cta-h">If a thirty-minute trust score is enough for the user, <em>it is enough for you.</em></h2>
+      <p>I architect identity and security MLPs that ship on free-tier serverless without a single raw biometric on the wire. Capstone-quality on the inside. Production-quality on the outside.</p>
+    </div>
+    <div class="actions">
+      <a class="btn btn-primary" href="../index.html#hire">Hire me</a>
+      <a class="btn btn-ghost" href="../index.html">Back to catalogue</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="frame">
+    <div>
+      <h2 style="font-family:'Fraunces',serif;font-size:var(--t-xl);margin:0 0 1rem;">dmj<span class="dot">.</span>one</h2>
+      <p>Dream, Manifest and Journey, Together as One.</p>
+      <p class="meta">&copy; 2026 Divya Mohan. BioVault is the B.Tech CSE Cloud Computing capstone of Lakshika Tanwar (GF202220476), Shoolini University, Solan.</p>
+    </div>
+    <div>
+      <p class="meta">Catalogue</p>
+      <p><a href="../index.html#catalogue">All 47 products</a></p>
+      <p><a href="../index.html#cat-bharat">Bharat-First</a></p>
+      <p><a href="../index.html#hire">Hire</a></p>
+    </div>
+    <div>
+      <p class="meta">BioVault</p>
+      <p><a href="https://biovault.dmj.one" rel="noopener">Live demo</a></p>
+      <p><a href="https://github.com/divyamohan1993/biovault" rel="noopener">Source</a></p>
+      <p><a href="mailto:contact@dmj.one">contact@dmj.one</a></p>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,698 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1f3a5f">
+<meta name="color-scheme" content="light">
+
+<title>Zero-Trust API Broker - Default deny. Every call signed. · dmj.one</title>
+<meta name="description" content="An internal-API broker built so teams cannot accidentally misuse it. Default-deny policy, scoped tokens, mutual TLS on every hop, and a signed audit log emitted per call.">
+<meta property="og:title" content="Zero-Trust API Broker · Default deny. Every call signed.">
+<meta property="og:description" content="Internal APIs are the new attack surface. SSRF, leaked tokens, and over-broad service identities. The broker fixes all three.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,30..100&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/core.css">
+
+<style>
+:root { --accent: var(--c-enterprise); --accent-deep: #0e1f33; --gate: #2c4a73; --deny: #b03030; --allow: #2a6a3a; }
+body { background: var(--paper); }
+
+/* ====== HERO - checkpoint motif ============== */
+.g-hero {
+  position: relative;
+  border-bottom: var(--hair);
+  padding-block: clamp(3.5rem, 6vw + 1rem, 7rem) clamp(2.5rem, 5vw, 4.5rem);
+  background:
+    radial-gradient(ellipse 60% 50% at 50% 0%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 65%),
+    var(--paper);
+  overflow: hidden;
+}
+.g-hero::before {
+  content: ""; position: absolute; inset: 0;
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--accent) 8%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--accent) 8%, transparent) 1px, transparent 1px);
+  background-size: 36px 36px;
+  pointer-events: none;
+  mask: radial-gradient(ellipse at center top, black 30%, transparent 75%);
+  -webkit-mask: radial-gradient(ellipse at center top, black 30%, transparent 75%);
+}
+.g-hero .frame { position: relative; z-index: 2; }
+
+.crumbs {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink-mute);
+  margin: 0 0 2.5rem;
+  display: flex; gap: 0.5rem; flex-wrap: wrap;
+}
+.crumbs a { border-bottom: 1px solid currentColor; padding-bottom: 1px; }
+.crumbs a:hover { color: var(--accent); }
+.crumbs span { color: var(--accent); }
+
+.g-eyebrow {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  padding: 0.4rem 0.85rem;
+  border: 1px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  color: var(--accent);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  margin-bottom: 1.5rem;
+}
+.g-eyebrow::before {
+  content: ""; width: 8px; height: 8px;
+  background: var(--accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+/* big checkpoint headline */
+.g-hero h1 {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(3rem, 2rem + 5vw, 6rem);
+  font-weight: 300;
+  font-variation-settings: "opsz" 144, "SOFT" 30;
+  letter-spacing: -0.04em;
+  line-height: 0.92;
+  margin: 0;
+  text-align: center;
+  max-width: 18ch;
+  margin-inline: auto;
+}
+.g-hero h1 em {
+  font-style: italic;
+  color: var(--accent);
+  font-variation-settings: "opsz" 144, "SOFT" 100, "WONK" 1;
+  font-weight: 400;
+}
+.g-hero h1 .deny-stamp {
+  display: inline-block;
+  border: 4px double var(--deny);
+  color: var(--deny);
+  padding: 0.1em 0.4em;
+  font-style: normal;
+  letter-spacing: -0.02em;
+  font-weight: 500;
+  transform: rotate(-2deg);
+  font-variation-settings: "opsz" 144, "SOFT" 50, "WONK" 1;
+}
+
+.g-hero .lede {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md);
+  font-weight: 300;
+  line-height: 1.45;
+  color: var(--ink-soft);
+  margin: 2rem auto 0;
+  max-width: 56ch;
+  text-align: center;
+}
+.g-hero .lede strong {
+  font-weight: 500;
+  color: var(--ink);
+  background: linear-gradient(180deg, transparent 60%, color-mix(in srgb, var(--accent) 22%, transparent) 60%);
+  padding: 0 0.1em;
+}
+
+.g-cta-row {
+  margin-top: 2.5rem;
+  display: flex; gap: 0.75rem; flex-wrap: wrap; justify-content: center;
+}
+.btn {
+  display: inline-flex; align-items: center; gap: 0.45rem;
+  padding: 0.7rem 1.1rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 700;
+  border: 1px solid var(--ink);
+  transition: background .15s, color .15s, transform .15s, box-shadow .15s;
+}
+.btn:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--ink); }
+.btn-primary { background: var(--accent); color: white; border-color: var(--accent); }
+.btn-primary:hover { box-shadow: 4px 4px 0 var(--ink); }
+.btn-ghost { background: transparent; color: var(--ink); }
+
+/* ====== STATS ribbon ====================== */
+.g-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  background: var(--ink);
+  color: var(--paper);
+  border-block: 2px solid var(--ink);
+}
+.g-stat {
+  padding: 1.5rem clamp(1rem, 2vw, 1.5rem);
+  border-right: 1px solid color-mix(in srgb, var(--paper) 18%, transparent);
+}
+.g-stat:last-child { border-right: 0; }
+.g-stat .num {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 300;
+  letter-spacing: -0.04em;
+  font-variation-settings: "opsz" 144, "SOFT" 30;
+  display: block;
+  line-height: 1;
+  color: var(--accent);
+}
+.g-stat .lbl {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  margin-top: 0.6rem;
+  display: block;
+  color: color-mix(in srgb, var(--paper) 75%, transparent);
+}
+
+/* ACT */
+.act {
+  padding-block: clamp(3rem, 5vw, 5rem);
+  border-bottom: var(--hair);
+}
+.act-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 700;
+  margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 1rem;
+}
+.act-num::before { content: ""; width: 2.5rem; height: 1px; background: var(--accent); }
+.act h2 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 50, "WONK" 1;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+  margin: 0 0 1.5rem;
+  max-width: 22ch;
+}
+.act h2 em { font-style: italic; color: var(--accent); }
+.act .intro { font-family: 'Fraunces', serif; font-size: var(--t-md); color: var(--ink-soft); max-width: 60ch; margin: 0; }
+
+/* ====== ACT 1 · three failures ============ */
+.fail-grid {
+  display: grid; gap: 0;
+  margin-top: 2rem;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { .fail-grid { grid-template-columns: repeat(3, 1fr); } }
+.fail {
+  padding: 1.75rem 1.5rem;
+  border-right: 1px solid var(--paper-edge);
+}
+.fail:last-child { border-right: 0; }
+.fail .acro {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.18em;
+  color: var(--deny);
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+}
+.fail .acro::before { content: "× "; }
+.fail h3 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md);
+  margin: 0 0 0.6rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.fail p { margin: 0; font-size: var(--t-sm); color: var(--ink-soft); }
+
+/* ====== ACT 2 · checkpoint sequence ========= */
+.ckpt {
+  display: grid; gap: 1rem; margin-top: 2rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { .ckpt { grid-template-columns: repeat(2, 1fr); } }
+.ckpt-step {
+  padding: 1.5rem;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  display: grid; grid-template-columns: 4rem 1fr; gap: 1rem;
+}
+.ckpt-step .gate {
+  width: 3rem; height: 3rem;
+  background: var(--accent);
+  color: var(--paper);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+.ckpt-step h3 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md);
+  margin: 0 0 0.5rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.ckpt-step p { margin: 0; font-size: var(--t-sm); color: var(--ink-soft); }
+.ckpt-step .state {
+  display: inline-block;
+  margin-top: 0.6rem;
+  padding: 0.2rem 0.6rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  border: 1px solid var(--allow);
+  color: var(--allow);
+  background: color-mix(in srgb, var(--allow) 8%, transparent);
+}
+
+/* ====== signed audit log entry display ====== */
+.audit-display {
+  margin-top: 2rem;
+  background: var(--accent-deep);
+  color: var(--paper);
+  border: 1px solid var(--accent-deep);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  line-height: 1.6;
+}
+.audit-display .head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.7rem 1.2rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--paper) 20%, transparent);
+  background: color-mix(in srgb, var(--paper) 5%, transparent);
+}
+.audit-display .head .label {
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--paper) 75%, transparent);
+  font-weight: 700;
+}
+.audit-display .head .seal {
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  color: #4ade80;
+  font-weight: 700;
+}
+.audit-display .head .seal::before { content: "● "; }
+.audit-display pre {
+  margin: 0;
+  padding: 1.25rem 1.5rem;
+  white-space: pre;
+  overflow-x: auto;
+  color: color-mix(in srgb, var(--paper) 88%, transparent);
+}
+.audit-display pre .k { color: #4a7bb5; }
+.audit-display pre .s { color: #d8a83a; }
+.audit-display pre .b { color: #c0c0ff; font-weight: 700; }
+.audit-display pre .c { color: color-mix(in srgb, var(--paper) 45%, transparent); }
+.audit-display .foot-note {
+  padding: 0.8rem 1.2rem;
+  border-top: 1px solid color-mix(in srgb, var(--paper) 20%, transparent);
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--paper) 55%, transparent);
+}
+
+/* ====== PROOF ============ */
+.proof {
+  background: var(--ink);
+  color: var(--paper);
+  padding-block: clamp(3rem, 5vw, 5rem);
+  position: relative;
+  overflow: hidden;
+}
+.proof::before {
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 80% 20%, color-mix(in srgb, var(--accent) 28%, transparent), transparent 60%);
+}
+.proof .frame { position: relative; }
+.proof h2 { color: var(--paper); }
+.proof h2 em { color: var(--accent); }
+.proof-grid {
+  display: grid; gap: 1rem; margin-top: 2rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { .proof-grid { grid-template-columns: repeat(2, 1fr); } }
+.proof-item {
+  border: 1px solid color-mix(in srgb, var(--paper) 25%, transparent);
+  padding: 1.5rem;
+  background: color-mix(in srgb, var(--paper) 5%, transparent);
+}
+.proof-item h3 {
+  font-family: 'Fraunces', serif;
+  margin: 0 0 0.5rem;
+  font-size: var(--t-md);
+  color: var(--accent);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.proof-item p { margin: 0; color: color-mix(in srgb, var(--paper) 80%, transparent); font-size: var(--t-sm); }
+.proof-item code { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: color-mix(in srgb, var(--paper) 90%, transparent); }
+
+/* End CTA */
+.endcta {
+  padding-block: clamp(3rem, 5vw, 5rem);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 12%, transparent), var(--paper));
+}
+.endcta .frame { display: grid; gap: 2rem; grid-template-columns: 1fr; }
+@media (min-width: 760px) { .endcta .frame { grid-template-columns: 2fr 1fr; align-items: end; } }
+.endcta h2 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 300;
+  font-variation-settings: "opsz" 144, "SOFT" 100;
+  margin: 0 0 1rem;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+}
+.endcta h2 em {
+  font-style: italic;
+  color: var(--accent);
+  background: linear-gradient(180deg, transparent 70%, color-mix(in srgb, var(--accent) 22%, transparent) 70%);
+}
+.endcta p { color: var(--ink-soft); margin: 0; max-width: 50ch; }
+.endcta .actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+
+.foot { background: var(--accent-deep); color: var(--paper); }
+.foot .dot { color: var(--accent); }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topnav">
+  <div class="frame">
+    <div class="brand"><a href="../index.html">dmj<span class="dot">.</span>one</a></div>
+    <nav aria-label="Primary">
+      <ul>
+        <li><a href="../index.html#catalogue">Catalogue</a></li>
+        <li><a href="../index.html#manifesto">Manifesto</a></li>
+        <li><a href="../index.html#hire">Hire</a></li>
+        <li><a href="https://github.com/divyamohan1993/zero-trust-api-broker" rel="noopener">GitHub</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ============ HERO - checkpoint stamp ============ -->
+<section class="g-hero">
+  <div class="frame">
+    <p class="crumbs">
+      <a href="../index.html">Catalogue</a> /
+      <a href="../index.html#cat-enterprise">Enterprise &amp; Security</a> /
+      <span>Zero-Trust API Broker</span>
+    </p>
+
+    <div style="text-align:center;">
+      <span class="g-eyebrow">No. 30 · Enterprise · API · Default-deny</span>
+    </div>
+
+    <h1>
+      Default <span class="deny-stamp">DENY.</span><br>
+      Every call <em>signed.</em>
+    </h1>
+
+    <p class="lede">
+      Internal APIs are the new attack surface. SSRF, leaked tokens, over-broad service identities. <strong>The broker stops all three.</strong> Every request is authenticated. Every token is scoped. Every hop is mutual TLS. Every call leaves a signed audit log on its way out, even if your team forgets to log it.
+    </p>
+
+    <div class="g-cta-row">
+      <a class="btn btn-primary" href="https://github.com/divyamohan1993/zero-trust-api-broker" rel="noopener">View source</a>
+      <a class="btn btn-ghost" href="#checkpoint">The five gates</a>
+      <a class="btn btn-ghost" href="#audit">Audit log shape</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATS ============ -->
+<section class="g-stats" aria-label="At a glance">
+  <div class="g-stat"><span class="num">DENY</span><span class="lbl">Default policy</span></div>
+  <div class="g-stat"><span class="num">mTLS</span><span class="lbl">Every hop · every call</span></div>
+  <div class="g-stat"><span class="num">1 / call</span><span class="lbl">Signed audit entry emitted</span></div>
+  <div class="g-stat"><span class="num">Scoped</span><span class="lbl">Tokens · least privilege</span></div>
+  <div class="g-stat"><span class="num">0</span><span class="lbl">SSRF paths · by design</span></div>
+</section>
+
+
+<!-- ============ ACT I · three failures ============ -->
+<section class="act" aria-labelledby="fail-h">
+  <div class="frame">
+    <p class="act-num">Act I · The Problem</p>
+    <h2 id="fail-h">Three failures, <em>all internal.</em></h2>
+    <p class="intro">External breaches make headlines. Internal misuse drains balance sheets. The broker stops the three failure modes that show up in every post-mortem.</p>
+
+    <div class="fail-grid">
+      <article class="fail">
+        <p class="acro">SSRF</p>
+        <h3>The service makes the call you didn't authorise.</h3>
+        <p>An untrusted input becomes a URL. The service fetches it. Internal metadata, cloud creds, neighbour services, all readable from the inside.</p>
+      </article>
+      <article class="fail">
+        <p class="acro">Leaked token</p>
+        <h3>One token. Every API. Forever.</h3>
+        <p>A debug print, a CI log, a misconfigured Sentry, and the long-lived service token is in the wild. The token has admin scope on six services it never needed.</p>
+      </article>
+      <article class="fail">
+        <p class="acro">Over-broad identity</p>
+        <h3>"It needed to talk to the database, sometimes."</h3>
+        <p>So it got blanket access. Now any code path under that service identity can read every row, drop every table, call every other API in the mesh.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ ACT II · checkpoint sequence ============ -->
+<section class="act" id="checkpoint" aria-labelledby="ck-h" style="background: linear-gradient(180deg, var(--paper-soft), var(--paper));">
+  <div class="frame">
+    <p class="act-num">Act II · The Promise</p>
+    <h2 id="ck-h">Five gates. <em>One call.</em></h2>
+    <p class="intro">A request that survives all five gates is allowed and audited. A request that fails any gate is rejected and audited. There is no other path.</p>
+
+    <div class="ckpt">
+      <article class="ckpt-step">
+        <div class="gate">01</div>
+        <div>
+          <h3>Identity gate. mTLS or stop.</h3>
+          <p>The caller presents a client certificate. The broker pins it to a known service identity. No certificate, no conversation. No fallback to bearer-only.</p>
+          <span class="state">Authenticated</span>
+        </div>
+      </article>
+      <article class="ckpt-step">
+        <div class="gate">02</div>
+        <div>
+          <h3>Scope gate. Token must match action.</h3>
+          <p>Each token carries the minimum scope for one action against one upstream. Scope mismatch is a hard reject. Tokens are short-lived and rotate on each call.</p>
+          <span class="state">Authorised</span>
+        </div>
+      </article>
+      <article class="ckpt-step">
+        <div class="gate">03</div>
+        <div>
+          <h3>Allowlist gate. Only registered upstreams.</h3>
+          <p>The upstream URL must resolve to an entry in the registry. Arbitrary URLs are rejected. SSRF is a category error here, not a vulnerability.</p>
+          <span class="state">Routable</span>
+        </div>
+      </article>
+      <article class="ckpt-step">
+        <div class="gate">04</div>
+        <div>
+          <h3>Shape gate. Schema, size, headers.</h3>
+          <p>Request body validated against a registered schema. Headers stripped to the required set. Size capped. Anything weird, dropped before it reaches the upstream.</p>
+          <span class="state">Validated</span>
+        </div>
+      </article>
+      <article class="ckpt-step">
+        <div class="gate">05</div>
+        <div>
+          <h3>Egress gate. Sign and forward.</h3>
+          <p>Broker signs the audit entry, then issues the upstream call over its own mTLS connection. Upstream sees a stable broker identity, not the original caller.</p>
+          <span class="state">Forwarded · signed</span>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ ACT III · signed audit entry ============ -->
+<section class="act" id="audit" aria-labelledby="aud-h">
+  <div class="frame">
+    <p class="act-num">Act III · The Receipt</p>
+    <h2 id="aud-h">One call. <em>One signed receipt.</em></h2>
+    <p class="intro">No buffering. No batching. No "the agent crashed before the log shipped". The audit entry is written, signed, and emitted before the upstream sees the request.</p>
+
+    <figure class="audit-display" aria-label="Example signed audit log entry">
+      <div class="head">
+        <span class="label">audit · /v1/orders/create · Ed25519 signed</span>
+        <span class="seal">SEALED</span>
+      </div>
+<pre>{
+  <span class="k">"v"</span>: <span class="s">"ztb-1"</span>,
+  <span class="k">"ts"</span>: <span class="s">"2026-05-04T11:42:08.317Z"</span>,
+  <span class="k">"call_id"</span>: <span class="s">"01HX9GZ6P7B2WMK0RTV3F8N4QE"</span>,
+  <span class="k">"caller"</span>: {
+    <span class="k">"spki"</span>: <span class="s">"sha256:b1f4...e22a"</span>,
+    <span class="k">"identity"</span>: <span class="s">"svc.checkout"</span>
+  },
+  <span class="k">"upstream"</span>: {
+    <span class="k">"name"</span>: <span class="s">"orders.api.internal"</span>,
+    <span class="k">"path"</span>: <span class="s">"/v1/orders/create"</span>,
+    <span class="k">"method"</span>: <span class="s">"POST"</span>
+  },
+  <span class="k">"token"</span>: {
+    <span class="k">"scope"</span>: [<span class="s">"orders:create"</span>],
+    <span class="k">"exp_in_s"</span>: <span class="b">60</span>
+  },
+  <span class="k">"shape"</span>: {
+    <span class="k">"schema"</span>: <span class="s">"order.create.v3"</span>,
+    <span class="k">"bytes"</span>: <span class="b">412</span>,
+    <span class="k">"sha256"</span>: <span class="s">"4a8d...c19f"</span>
+  },
+  <span class="k">"decision"</span>: <span class="b">"ALLOW"</span>,
+  <span class="k">"latency_ms"</span>: <span class="b">3</span>,
+  <span class="k">"prev_hash"</span>: <span class="s">"7e0c...9d31"</span>,
+  <span class="k">"sig"</span>: <span class="s">"ed25519:9f...7c"</span>  <span class="c">// signed before egress</span>
+}</pre>
+      <div class="foot-note">Each entry chains <code style="color:#4a7bb5">prev_hash → curr_hash</code>. Tampering one entry breaks the chain for every entry after it.</div>
+    </figure>
+  </div>
+</section>
+
+
+<!-- ============ ACT IV · sibling pattern ============ -->
+<section class="act" aria-labelledby="sib-h">
+  <div class="frame">
+    <p class="act-num">Act IV · The Pattern</p>
+    <h2 id="sib-h">Same posture. <em>Different surface.</em></h2>
+    <p class="intro">The broker is the API-shaped sibling of <a style="color:var(--accent);border-bottom:1px solid currentColor;" href="zero-trust-mysql.html">Zero-Trust MySQL</a>. Both refuse to trust the network, the operator, and the caller. Both produce a hash-chained audit pack the auditor accepts. Both prefer a small, verifiable surface to a large, "configurable" one.</p>
+
+    <div class="ckpt">
+      <article class="ckpt-step">
+        <div class="gate">A</div>
+        <div>
+          <h3>Same default. DENY.</h3>
+          <p>Nothing routes, nothing decrypts, nothing executes unless an explicit policy says so. New endpoints are off until they are registered.</p>
+          <span class="state">Fail closed</span>
+        </div>
+      </article>
+      <article class="ckpt-step">
+        <div class="gate">B</div>
+        <div>
+          <h3>Same audit shape.</h3>
+          <p>Hash-chained entries. Off-host anchor. Signed before emission. Auditor walks the chain and verifies continuity end to end.</p>
+          <span class="state">Tamper-evident</span>
+        </div>
+      </article>
+      <article class="ckpt-step">
+        <div class="gate">C</div>
+        <div>
+          <h3>Same proof model.</h3>
+          <p>Controls expressed as scripts that pass or fail. Evidence bundle generated on demand. No self-signed compliance reports.</p>
+          <span class="state">Verifiable</span>
+        </div>
+      </article>
+      <article class="ckpt-step">
+        <div class="gate">D</div>
+        <div>
+          <h3>Same blast radius.</h3>
+          <p>Compromise a caller, you get one short-lived token with one scope on one endpoint. The blast radius is one row, not one cluster.</p>
+          <span class="state">Contained</span>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ PROOF ============ -->
+<section class="proof act" aria-labelledby="proof-h">
+  <div class="frame">
+    <p class="act-num">Act V · Proof</p>
+    <h2 id="proof-h">What the auditor <em>sees.</em></h2>
+
+    <div class="proof-grid">
+      <div class="proof-item">
+        <h3>Signed audit log per call</h3>
+        <p>Ed25519 signature emitted before the upstream sees the request. Hash chained. Off-host anchor. Tampering one entry breaks every entry after.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Scoped, short-lived tokens</h3>
+        <p>One scope, one upstream, one minute. Rotated per call. Leaking a token leaks one minute of one action against one endpoint.</p>
+      </div>
+      <div class="proof-item">
+        <h3>mTLS on every hop</h3>
+        <p>Caller to broker, broker to upstream. SPKI-pinned. No bearer-only fallback path. No anonymous calls anywhere on the data plane.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Allowlist-only routing</h3>
+        <p>Upstream URLs come from the registry, not the request. SSRF is a category error here, not a CVE. Untrusted URLs cannot be resolved.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Schema-validated shape</h3>
+        <p>Body validated against a registered schema. Headers reduced to the required set. Size capped. Anything weird is dropped at the gate.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Built so teams cannot misuse it</h3>
+        <p>The default path is the only path. There is no "skip the gate for performance" flag. Misuse requires a code change and a registry change, both reviewed.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ End CTA ============ -->
+<section class="endcta" aria-labelledby="cta-h">
+  <div class="frame">
+    <div>
+      <h2 id="cta-h">If your blast radius is "the whole mesh", <em>fix the gate.</em></h2>
+      <p>I build internal API gateways that prefer one verifiable path to ten configurable ones. Default deny. Signed audit. Scoped tokens. The gate makes the right thing the easy thing.</p>
+    </div>
+    <div class="actions">
+      <a class="btn btn-primary" href="../index.html#hire">Hire me</a>
+      <a class="btn btn-ghost" href="../index.html">Back to catalogue</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="frame">
+    <div>
+      <h2 style="font-family:'Fraunces',serif;font-size:var(--t-xl);margin:0 0 1rem;">dmj<span class="dot">.</span>one</h2>
+      <p>Dream, Manifest and Journey, Together as One.</p>
+      <p class="meta">© 2026 Divya Mohan. Zero-Trust API Broker is a reference pattern. Use it as a starting point, not a finished product. Independent assessment is required for any production deployment.</p>
+    </div>
+    <div>
+      <p class="meta">Catalogue</p>
+      <p><a href="../index.html#catalogue">All 47 products</a></p>
+      <p><a href="../index.html#cat-enterprise">Enterprise &amp; Security</a></p>
+      <p><a href="../index.html#hire">Hire</a></p>
+    </div>
+    <div>
+      <p class="meta">API Broker</p>
+      <p><a href="https://github.com/divyamohan1993/zero-trust-api-broker" rel="noopener">Source</a></p>
+      <p><a href="zero-trust-mysql.html">Sibling: ZT MySQL</a></p>
+      <p><a href="mailto:contact@dmj.one">contact@dmj.one</a></p>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

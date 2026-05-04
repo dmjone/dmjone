@@ -1,0 +1,710 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1f3a5f">
+<meta name="color-scheme" content="light">
+
+<title>Zero-Trust MySQL - Spec sheet for a database that trusts nothing · dmj.one</title>
+<meta name="description" content="A reference deployment of MySQL 8 that trusts neither network, operator, nor application. TLS 1.3 mTLS, client-side AES-GCM via HSM-backed KMS, tenant isolation, append-only hash-chained audit, automated proof-of-controls.">
+<meta property="og:title" content="Zero-Trust MySQL · A spec sheet, not a wishlist">
+<meta property="og:description" content="MySQL 8 hardened for production. Every control verifiable by a script. Audit-ready evidence bundle in one command.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,30..100&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/core.css">
+
+<style>
+:root { --accent: var(--c-enterprise); --accent-deep: #0e1f33; --steel: #2c4a73; --ok: #2a6a3a; --warn: #b86a1a; }
+body { background: var(--paper); }
+
+/* ====== HERO - spec sheet aesthetic ============== */
+.s-hero {
+  position: relative;
+  border-bottom: 2px solid var(--ink);
+  padding-block: clamp(3rem, 5vw, 5rem) clamp(2rem, 4vw, 4rem);
+  background:
+    repeating-linear-gradient(90deg, transparent 0 64px, color-mix(in srgb, var(--accent) 4%, transparent) 64px 65px),
+    var(--paper);
+}
+.s-hero .frame { position: relative; z-index: 2; }
+
+.crumbs {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink-mute);
+  margin: 0 0 2rem;
+  display: flex; gap: 0.5rem; flex-wrap: wrap;
+}
+.crumbs a { border-bottom: 1px solid currentColor; padding-bottom: 1px; }
+.crumbs a:hover { color: var(--accent); }
+.crumbs span { color: var(--accent); }
+
+/* spec-sheet header band */
+.spec-band {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  border-top: 2px solid var(--ink);
+  border-bottom: 2px solid var(--ink);
+  margin-bottom: 2rem;
+  background: var(--paper);
+}
+.spec-band .lhs {
+  padding: 0.75rem 1rem;
+  background: var(--accent-deep);
+  color: var(--paper);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-weight: 700;
+  display: flex; align-items: center;
+}
+.spec-band .rhs {
+  padding: 0.75rem 1rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.12em;
+  display: flex; gap: 1.5rem; flex-wrap: wrap;
+  color: var(--ink-soft);
+}
+.spec-band .rhs b { color: var(--ink); font-weight: 700; }
+
+.s-hero h1 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-3xl);
+  font-weight: 300;
+  font-variation-settings: "opsz" 144, "SOFT" 30;
+  letter-spacing: -0.035em;
+  line-height: 0.93;
+  margin: 0;
+  max-width: 16ch;
+}
+.s-hero h1 em {
+  font-style: italic;
+  color: var(--accent);
+  font-variation-settings: "opsz" 144, "SOFT" 100, "WONK" 1;
+  font-weight: 400;
+}
+
+.s-hero .lede {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md);
+  font-weight: 300;
+  line-height: 1.45;
+  color: var(--ink-soft);
+  margin: 1.75rem 0 0;
+  max-width: 56ch;
+}
+.s-hero .lede strong {
+  font-weight: 500;
+  color: var(--ink);
+  background: linear-gradient(180deg, transparent 60%, color-mix(in srgb, var(--accent) 22%, transparent) 60%);
+  padding: 0 0.1em;
+}
+
+.s-cta-row {
+  margin-top: 2rem;
+  display: flex; gap: 0.75rem; flex-wrap: wrap;
+}
+.btn {
+  display: inline-flex; align-items: center; gap: 0.45rem;
+  padding: 0.7rem 1.1rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 700;
+  border: 1px solid var(--ink);
+  transition: background .15s, color .15s, transform .15s, box-shadow .15s;
+}
+.btn:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--ink); }
+.btn-primary { background: var(--accent); color: white; border-color: var(--accent); }
+.btn-primary:hover { box-shadow: 4px 4px 0 var(--ink); }
+.btn-ghost { background: transparent; color: var(--ink); }
+
+/* ====== STATS ribbon as spec rows ============== */
+.s-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  background: var(--ink);
+  color: var(--paper);
+  border-bottom: 2px solid var(--ink);
+}
+.s-stat {
+  padding: 1.5rem clamp(1rem, 2vw, 1.5rem);
+  border-right: 1px solid color-mix(in srgb, var(--paper) 18%, transparent);
+}
+.s-stat:last-child { border-right: 0; }
+.s-stat .num {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-xl);
+  font-weight: 300;
+  letter-spacing: -0.03em;
+  font-variation-settings: "opsz" 144, "SOFT" 30;
+  display: block;
+  line-height: 1;
+  color: var(--accent);
+}
+.s-stat .lbl {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  margin-top: 0.55rem;
+  display: block;
+  color: color-mix(in srgb, var(--paper) 75%, transparent);
+}
+
+/* ACT */
+.act {
+  padding-block: clamp(3rem, 5vw, 5rem);
+  border-bottom: var(--hair);
+}
+.act-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 700;
+  margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 1rem;
+}
+.act-num::before { content: ""; width: 2.5rem; height: 1px; background: var(--accent); }
+.act h2 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 50, "WONK" 1;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+  margin: 0 0 1.5rem;
+  max-width: 22ch;
+}
+.act h2 em { font-style: italic; color: var(--accent); }
+.act .intro { font-family: 'Fraunces', serif; font-size: var(--t-md); color: var(--ink-soft); max-width: 60ch; margin: 0; }
+
+/* ====== threat model boxes ============== */
+.threat-grid {
+  display: grid; gap: 1rem; margin-top: 2rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { .threat-grid { grid-template-columns: repeat(2, 1fr); } }
+.threat {
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  padding: 1.5rem;
+  display: grid; grid-template-columns: auto 1fr; gap: 1rem;
+}
+.threat .icon {
+  width: 3rem; height: 3rem;
+  background: var(--accent-deep);
+  color: var(--paper);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+.threat h3 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md);
+  margin: 0 0 0.5rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.threat p { margin: 0; font-size: var(--t-sm); color: var(--ink-soft); }
+.threat .verdict {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--ok);
+  font-weight: 700;
+  margin-top: 0.6rem;
+  display: inline-block;
+}
+.threat .verdict::before { content: "● "; }
+
+/* ====== control matrix table ============== */
+.ctl-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Atkinson Hyperlegible', sans-serif;
+  font-size: var(--t-sm);
+  border: 1px solid var(--ink);
+  margin-top: 2rem;
+}
+.ctl-table caption {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--ink-mute);
+  margin-bottom: 0.75rem;
+  text-align: left;
+}
+.ctl-table th, .ctl-table td {
+  padding: 0.85rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--paper-edge);
+  vertical-align: top;
+}
+.ctl-table thead th {
+  background: var(--accent-deep);
+  color: var(--paper);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 700;
+}
+.ctl-table tbody th {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+  font-weight: 700;
+  background: var(--paper-soft);
+  text-transform: uppercase;
+  width: 9rem;
+}
+.ctl-table tbody td.std {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  color: var(--ink-mute);
+}
+.ctl-table tbody td.status {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  color: var(--ok);
+  font-weight: 700;
+  white-space: nowrap;
+}
+.ctl-table tbody td.status::before { content: "● "; }
+.ctl-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 4%, transparent); }
+
+/* ====== data flow blocks ============ */
+.flow {
+  display: grid; gap: 1rem; margin-top: 2rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { .flow { grid-template-columns: repeat(2, 1fr); } }
+.flow-block {
+  border: 1px solid var(--ink);
+  background: var(--paper);
+}
+.flow-block .head {
+  background: var(--accent);
+  color: var(--paper);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-weight: 700;
+  padding: 0.7rem 1rem;
+}
+.flow-block ol {
+  display: grid; padding: 1rem 1.25rem;
+  font-family: 'Atkinson Hyperlegible', sans-serif;
+  font-size: var(--t-sm);
+  counter-reset: stp;
+}
+.flow-block ol li {
+  padding: 0.7rem 0 0.7rem 2.4rem;
+  border-bottom: 1px solid var(--paper-edge);
+  position: relative;
+  counter-increment: stp;
+  color: var(--ink-soft);
+}
+.flow-block ol li::before {
+  content: counter(stp, decimal-leading-zero);
+  position: absolute; left: 0; top: 0.7rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.14em;
+}
+.flow-block ol li:last-child { border-bottom: 0; }
+.flow-block ol li code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  color: var(--accent);
+  background: var(--paper-soft);
+  padding: 0.05rem 0.35rem;
+  border: 1px solid var(--paper-edge);
+}
+.flow-block ol li b { color: var(--ink); font-weight: 700; }
+
+/* ====== deploy as ascii block ============ */
+.deploy {
+  margin-top: 2rem;
+  background: var(--accent-deep);
+  color: var(--paper);
+  border: 1px solid var(--accent-deep);
+  padding: 1.5rem 1.75rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.82rem;
+  line-height: 1.6;
+  overflow-x: auto;
+}
+.deploy pre { margin: 0; white-space: pre; }
+.deploy pre b { color: #4a7bb5; }
+.deploy pre i { font-style: normal; color: color-mix(in srgb, var(--paper) 50%, transparent); }
+
+/* ====== PROOF ============ */
+.proof {
+  background: var(--ink);
+  color: var(--paper);
+  padding-block: clamp(3rem, 5vw, 5rem);
+  position: relative;
+  overflow: hidden;
+}
+.proof::before {
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 80% 20%, color-mix(in srgb, var(--accent) 28%, transparent), transparent 60%);
+}
+.proof .frame { position: relative; }
+.proof h2 { color: var(--paper); }
+.proof h2 em { color: var(--accent); }
+.proof-grid {
+  display: grid; gap: 1rem; margin-top: 2rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { .proof-grid { grid-template-columns: repeat(2, 1fr); } }
+.proof-item {
+  border: 1px solid color-mix(in srgb, var(--paper) 25%, transparent);
+  padding: 1.5rem;
+  background: color-mix(in srgb, var(--paper) 5%, transparent);
+}
+.proof-item h3 {
+  font-family: 'Fraunces', serif;
+  margin: 0 0 0.5rem;
+  font-size: var(--t-md);
+  color: var(--accent);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.proof-item p { margin: 0; color: color-mix(in srgb, var(--paper) 80%, transparent); font-size: var(--t-sm); }
+.proof-item code { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: color-mix(in srgb, var(--paper) 90%, transparent); }
+
+/* End CTA */
+.endcta {
+  padding-block: clamp(3rem, 5vw, 5rem);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 12%, transparent), var(--paper));
+}
+.endcta .frame { display: grid; gap: 2rem; grid-template-columns: 1fr; }
+@media (min-width: 760px) { .endcta .frame { grid-template-columns: 2fr 1fr; align-items: end; } }
+.endcta h2 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 300;
+  font-variation-settings: "opsz" 144, "SOFT" 100;
+  margin: 0 0 1rem;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+}
+.endcta h2 em {
+  font-style: italic;
+  color: var(--accent);
+  background: linear-gradient(180deg, transparent 70%, color-mix(in srgb, var(--accent) 22%, transparent) 70%);
+}
+.endcta p { color: var(--ink-soft); margin: 0; max-width: 50ch; }
+.endcta .actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+
+.foot { background: var(--accent-deep); color: var(--paper); }
+.foot .dot { color: var(--accent); }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topnav">
+  <div class="frame">
+    <div class="brand"><a href="../index.html">dmj<span class="dot">.</span>one</a></div>
+    <nav aria-label="Primary">
+      <ul>
+        <li><a href="../index.html#catalogue">Catalogue</a></li>
+        <li><a href="../index.html#manifesto">Manifesto</a></li>
+        <li><a href="../index.html#hire">Hire</a></li>
+        <li><a href="https://github.com/divyamohan1993/zero-trust-mysql" rel="noopener">GitHub</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ============ HERO ============ -->
+<section class="s-hero">
+  <div class="frame">
+    <p class="crumbs">
+      <a href="../index.html">Catalogue</a> /
+      <a href="../index.html#cat-enterprise">Enterprise &amp; Security</a> /
+      <span>Zero-Trust MySQL</span>
+    </p>
+
+    <div class="spec-band" role="presentation">
+      <div class="lhs">DOC · ZTM-001 · v1.0</div>
+      <div class="rhs">
+        <span><b>Class</b> Reference deployment</span>
+        <span><b>Engine</b> MySQL 8</span>
+        <span><b>Posture</b> Zero-trust</span>
+        <span><b>Crypto</b> Client-side AES-GCM</span>
+        <span><b>Audit</b> Hash-chained · WORM-anchored</span>
+      </div>
+    </div>
+
+    <h1>
+      A database that <em>trusts nothing.</em>
+    </h1>
+
+    <p class="lede">
+      Most MySQL clusters trust the network, the operator, and the application. <strong>Three places that get breached weekly.</strong> This deployment trusts none of them. The DB cannot decrypt PII. The operator cannot rewrite history. The application cannot bypass the procedure layer. Every claim is verifiable by a script in the repo.
+    </p>
+
+    <div class="s-cta-row">
+      <a class="btn btn-primary" href="https://github.com/divyamohan1993/zero-trust-mysql" rel="noopener">View source</a>
+      <a class="btn btn-ghost" href="#controls">Control matrix</a>
+      <a class="btn btn-ghost" href="#deploy">Deploy in five steps</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATS ============ -->
+<section class="s-stats" aria-label="At a glance">
+  <div class="s-stat"><span class="num">TLS 1.3</span><span class="lbl">mTLS · required</span></div>
+  <div class="s-stat"><span class="num">AES-256-GCM</span><span class="lbl">Client-side · HSM-wrapped</span></div>
+  <div class="s-stat"><span class="num">SHA-256</span><span class="lbl">Append-only audit chain</span></div>
+  <div class="s-stat"><span class="num">60 s</span><span class="lbl">WORM anchor cadence</span></div>
+  <div class="s-stat"><span class="num">0</span><span class="lbl">Plaintext PII at rest</span></div>
+</section>
+
+
+<!-- ============ ACT I · Threat model ============ -->
+<section class="act" aria-labelledby="threat-h">
+  <div class="frame">
+    <p class="act-num">Act I · The Threat Model</p>
+    <h2 id="threat-h">Four breaches. <em>All survived.</em></h2>
+    <p class="intro">A threat model is only as honest as its non-goals. Here is what this design defeats, and what it does not pretend to.</p>
+
+    <div class="threat-grid">
+      <article class="threat">
+        <div class="icon">01</div>
+        <div>
+          <h3>Network attacker reads plaintext</h3>
+          <p>TLS 1.3 with mutual authentication. <code>require_secure_transport=ON</code>. Cipher locked to AES-256-GCM-SHA384 and CHACHA20-POLY1305.</p>
+          <span class="verdict">Defeated</span>
+        </div>
+      </article>
+      <article class="threat">
+        <div class="icon">02</div>
+        <div>
+          <h3>App identity bypasses access control</h3>
+          <p>App role can <code>EXECUTE</code> a small set of stored procedures and <code>SELECT</code> tenant-scoped views. No direct table access. No DDL.</p>
+          <span class="verdict">Defeated</span>
+        </div>
+      </article>
+      <article class="threat">
+        <div class="icon">03</div>
+        <div>
+          <h3>DBA quietly rewrites history</h3>
+          <p>Audit table is append-only, globally hash-chained, and anchored every minute to off-host WORM storage. Two triggers reject UPDATE and DELETE on it.</p>
+          <span class="verdict">Defeated</span>
+        </div>
+      </article>
+      <article class="threat">
+        <div class="icon">04</div>
+        <div>
+          <h3>DB host compromise leaks PII</h3>
+          <p>The DB never holds the key. PII is decrypted only in the client, with DEKs unwrapped by HSM-backed KMS. Compromising the host gets you ciphertext and IVs.</p>
+          <span class="verdict">Defeated</span>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ ACT II · Control matrix ============ -->
+<section class="act" id="controls" aria-labelledby="ctl-h">
+  <div class="frame">
+    <p class="act-num">Act II · The Control Matrix</p>
+    <h2 id="ctl-h">Every control. <em>Every standard.</em></h2>
+    <p class="intro">Eleven controls across six layers. Each one cites the standard that backs it and the script that proves it.</p>
+
+    <table class="ctl-table">
+      <caption>Zero-Trust MySQL · Control matrix · v1.0</caption>
+      <thead>
+        <tr>
+          <th scope="col">Layer</th>
+          <th scope="col">Control</th>
+          <th scope="col">Standard</th>
+          <th scope="col">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><th scope="row">Transport</th><td>TLS 1.3 with mutual authentication. Strong cipher suites only.</td><td class="std">RFC 8446</td><td class="status">Enforced</td></tr>
+        <tr><th scope="row">Identity</th><td>Per-connection client certificate. Locked server keys.</td><td class="std">X.509 · mTLS</td><td class="status">Enforced</td></tr>
+        <tr><th scope="row">Access</th><td>Stored-procedure-only writes. Tenant-scoped views. No SUPER on app accounts.</td><td class="std">Least privilege</td><td class="status">Enforced</td></tr>
+        <tr><th scope="row">Tenant</th><td>Per-connection tenant context via <code>security_set_tenant()</code>. Cross-tenant rejected.</td><td class="std">Tenant isolation</td><td class="status">Enforced</td></tr>
+        <tr><th scope="row">Crypto</th><td>Client-side AES-256-GCM. DEKs wrapped by HSM-backed KMS.</td><td class="std">NIST SP 800-38D</td><td class="status">Enforced</td></tr>
+        <tr><th scope="row">Crypto</th><td>Optional Kyber768 hybrid wrap for long-tail PQ posture.</td><td class="std">FIPS 203</td><td class="status">Available</td></tr>
+        <tr><th scope="row">Audit</th><td>SHA-256 chained <code>prev_hash · curr_hash</code>. Triggers reject UPDATE / DELETE.</td><td class="std">Tamper-evident</td><td class="status">Enforced</td></tr>
+        <tr><th scope="row">Audit</th><td>Chain head emitted to syslog every 60 s. Shipped to retention-locked WORM bucket.</td><td class="std">Off-host anchor</td><td class="status">Enforced</td></tr>
+        <tr><th scope="row">Host</th><td>UFW default deny. fail2ban on SSH. <code>local_infile=0</code>. <code>skip_name_resolve=ON</code>.</td><td class="std">CIS-aligned</td><td class="status">Enforced</td></tr>
+        <tr><th scope="row">Proof</th><td><code>proof_suite.sh</code> generates <code>/tmp/proof_bundle.tar.gz</code> for assessors.</td><td class="std">Evidence pack</td><td class="status">Generated</td></tr>
+        <tr><th scope="row">Scan</th><td>Optional OpenSCAP CIS / STIG scan. Output bundled with evidence.</td><td class="std">SCAP 1.3</td><td class="status">Optional</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+
+<!-- ============ ACT III · Read & write flow ============ -->
+<section class="act" aria-labelledby="flow-h" style="background: linear-gradient(180deg, var(--paper-soft), var(--paper));">
+  <div class="frame">
+    <p class="act-num">Act III · The Data Path</p>
+    <h2 id="flow-h">PII in. <em>Ciphertext stored.</em></h2>
+    <p class="intro">The DB holds ciphertext, IV, AAD, and a wrapped DEK. It cannot decrypt. The app cannot decrypt without the HSM. The HSM cannot read the DB.</p>
+
+    <div class="flow">
+      <div class="flow-block" aria-label="Write path">
+        <div class="head">Write path · client → DB</div>
+        <ol>
+          <li>Client calls <code>encrypt(kms_key, DEK)</code>. KMS never reveals the master key. <b>Wrapped DEK returned.</b></li>
+          <li>Client AES-256-GCM encrypts each PII field locally. Output: ciphertext, IV, AAD.</li>
+          <li>Client invokes <code>app_create_user_encrypted(...)</code> over mTLS, passing only ciphertexts.</li>
+          <li>DB stores values <b>without any decrypt path in SQL.</b> Procedure validates tenant context.</li>
+          <li>Audit triggers append a row. Chain head recomputed and anchored to syslog within 60 s.</li>
+        </ol>
+      </div>
+      <div class="flow-block" aria-label="Read path">
+        <div class="head">Read path · DB → client</div>
+        <ol>
+          <li>Client calls a tenant-scoped view. mTLS required. App role has <code>SELECT</code> only.</li>
+          <li>DB returns ciphertext, IV, AAD, and the KMS-wrapped DEK. <b>No plaintext leaves the host.</b></li>
+          <li>Client unwraps the DEK by calling <code>decrypt(kms_key, wrapped_DEK)</code> against the HSM.</li>
+          <li>Client AES-256-GCM decrypts locally. Plaintext lives only in the client process.</li>
+          <li>Audit triggers log the read with actor, tenant, columns. Chain head re-anchored.</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ ACT IV · Deploy ============ -->
+<section class="act" id="deploy" aria-labelledby="dep-h">
+  <div class="frame">
+    <p class="act-num">Act IV · Deployment</p>
+    <h2 id="dep-h">Five steps. <em>Production-ready.</em></h2>
+    <p class="intro">Three scripts run outside the VM. Two scripts run on the VM. One evidence bundle for the auditor. No yak-shaving.</p>
+
+    <figure class="deploy" aria-label="Deployment sequence">
+<pre><i># 1. PKI on workstation</i>
+./outside/<b>outside_pki.sh</b>
+scp pki_server.tar.gz vm:/tmp/
+
+<i># 2. KMS + WORM sink (cloud equivalent of your choice)</i>
+PROJECT_ID=&lt;id&gt; BUCKET=gs://&lt;worm_bucket&gt; \
+  ./outside/<b>outside_gcp_setup.sh</b>
+
+<i># 3. VM one-click installer</i>
+sudo PKI_TAR=/tmp/pki_server.tar.gz \
+  ./vm/<b>vm_oneclick.sh</b>
+<i># configures: TLS, mTLS, hardening, roles, proc API,</i>
+<i># tenant isolation, audit triggers, chain anchor, UFW, fail2ban</i>
+
+<i># 4. Client-side envelope encryption</i>
+python3 outside/<b>pq_envelope_cli.py</b> \
+  projects/&lt;p&gt;/locations/&lt;l&gt;/keyRings/&lt;r&gt;/cryptoKeys/&lt;k&gt; \
+  &lt;tenant-uuid&gt; "Alice Admin" "admin" "alice@acme.example" ...
+
+<i># 5. Evidence bundle for the auditor</i>
+sudo CLIENTS_DIR=/path/to/clients ./vm/<b>proof_suite.sh</b>
+<i># → /tmp/proof_bundle.tar.gz</i></pre>
+    </figure>
+  </div>
+</section>
+
+
+<!-- ============ PROOF ============ -->
+<section class="proof act" aria-labelledby="proof-h">
+  <div class="frame">
+    <p class="act-num">Act V · Proof</p>
+    <h2 id="proof-h">Evidence the <em>auditor accepts.</em></h2>
+
+    <div class="proof-grid">
+      <div class="proof-item">
+        <h3>proof_suite.sh runs the matrix</h3>
+        <p>Verifies TLS enforced, no-SSL connections blocked, TLS 1.3 handshake, mTLS client validation, hardened MySQL variables, proc-only writes, tenant isolation.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Append-only chain integrity proof</h3>
+        <p>Walks the audit table, recomputes <code>SHA-256(prev_hash || payload)</code>, compares against <code>curr_hash</code>. Any break is flagged before evidence ships.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Off-host WORM anchor</h3>
+        <p>systemd timer logs chain head every minute to syslog. Cloud Logging exports to retention-locked object storage. Auditors can verify continuity end to end.</p>
+      </div>
+      <div class="proof-item">
+        <h3>OpenSCAP CIS / STIG output</h3>
+        <p>Optional <code>scripts/openscap_scan.sh</code>. Bundled into the evidence tarball. FIPS, AppArmor, SELinux signals captured.</p>
+      </div>
+      <div class="proof-item">
+        <h3>CodeQL + CI green</h3>
+        <p>GitHub CodeQL workflow runs on every push. CI workflow validates installer scripts. Both badges live on the repo README.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Honest non-goals</h3>
+        <p>The README states what this defeats and what it does not: live-memory scraping in the client, or a fully compromised KMS control plane. No security theatre.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ End CTA ============ -->
+<section class="endcta" aria-labelledby="cta-h">
+  <div class="frame">
+    <div>
+      <h2 id="cta-h">If your DB is the keys to the kingdom, <em>stop trusting it.</em></h2>
+      <p>I build database deployments where the operator, the network, and the application all distrust each other. The auditor gets a bundle. The compliance team gets a script. Production gets a deployment that fails closed.</p>
+    </div>
+    <div class="actions">
+      <a class="btn btn-primary" href="../index.html#hire">Hire me</a>
+      <a class="btn btn-ghost" href="../index.html">Back to catalogue</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="frame">
+    <div>
+      <h2 style="font-family:'Fraunces',serif;font-size:var(--t-xl);margin:0 0 1rem;">dmj<span class="dot">.</span>one</h2>
+      <p>Dream, Manifest and Journey, Together as One.</p>
+      <p class="meta">© 2026 Divya Mohan. Zero-Trust MySQL is a reference deployment. ATO requires independent assessment. The repository provides controls and evidence generation, not an authorisation.</p>
+    </div>
+    <div>
+      <p class="meta">Catalogue</p>
+      <p><a href="../index.html#catalogue">All 47 products</a></p>
+      <p><a href="../index.html#cat-enterprise">Enterprise &amp; Security</a></p>
+      <p><a href="../index.html#hire">Hire</a></p>
+    </div>
+    <div>
+      <p class="meta">Zero-Trust MySQL</p>
+      <p><a href="https://github.com/divyamohan1993/zero-trust-mysql" rel="noopener">Source</a></p>
+      <p><a href="https://github.com/divyamohan1993/zero-trust-mysql/actions" rel="noopener">CI · CodeQL</a></p>
+      <p><a href="mailto:contact@dmj.one">contact@dmj.one</a></p>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,748 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#355c3c">
+<meta name="color-scheme" content="light">
+
+<title>ECO-LENS · Every traffic camera is now an air-quality sensor · dmj.one</title>
+<meta name="description" content="4.2 million people die each year from outdoor air pollution. ECO-LENS turns the million traffic cameras already installed into virtual air-quality sensors using EPA AP-42 emission factors and Gaussian plume dispersion. Hacksagon 2026.">
+<meta property="og:title" content="ECO-LENS · The cameras are already there.">
+<meta property="og:description" content="Vision-counted vehicles × EPA AP-42 × Gaussian plume = hyper-local AQI from existing traffic cameras. No new hardware. Built at Hacksagon 2026.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,ital,wght,SOFT@9..144,0..1,300..900,30..100&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="../assets/core.css">
+
+<style>
+:root { --accent: var(--c-research); --accent-deep: #1f3823; --signal-red: #b03030; --signal-amb: #b48a2b; }
+body { background: var(--paper); }
+
+.crumbs {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink-mute);
+  margin: 0 0 1.75rem;
+  display: flex; gap: 0.5rem; flex-wrap: wrap;
+}
+.crumbs a { border-bottom: 1px solid var(--ink-mute); padding-bottom: 1px; }
+.crumbs a:hover { color: var(--accent); border-color: var(--accent); }
+.crumbs span { color: var(--accent); }
+
+.btn {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.7rem 1.1rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 700;
+  border: 1px solid var(--ink);
+  transition: background .15s, color .15s, transform .15s, box-shadow .15s;
+}
+.btn:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--ink); }
+.btn-primary { background: var(--accent); color: white; border-color: var(--accent); }
+.btn-primary:hover { box-shadow: 4px 4px 0 var(--ink); }
+.btn-ghost { background: transparent; color: var(--ink); }
+
+/* ====== HERO · fullscreen number ============ */
+.el-hero {
+  position: relative;
+  border-bottom: var(--hair);
+  padding-block: clamp(3rem, 5vw + 1rem, 6rem) clamp(2.5rem, 4vw, 4.5rem);
+  background:
+    radial-gradient(ellipse 80% 60% at 90% 10%, color-mix(in srgb, var(--accent) 18%, transparent), transparent 60%),
+    radial-gradient(ellipse 50% 50% at 0% 100%, color-mix(in srgb, var(--signal-red) 10%, transparent), transparent 60%),
+    var(--paper);
+  overflow: hidden;
+}
+.el-hero::before {
+  content: ""; position: absolute; inset: 0;
+  background-image:
+    linear-gradient(0deg, color-mix(in srgb, var(--accent) 14%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--accent) 14%, transparent) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse 50% 70% at 100% 30%, black, transparent 80%);
+  -webkit-mask-image: radial-gradient(ellipse 50% 70% at 100% 30%, black, transparent 80%);
+  pointer-events: none;
+  opacity: 0.6;
+}
+.el-hero .frame { position: relative; z-index: 2; }
+.el-hero-grid { display: grid; gap: 3rem; grid-template-columns: 1fr; align-items: end; }
+@media (min-width: 980px) { .el-hero-grid { grid-template-columns: 1.05fr 1fr; gap: 4rem; } }
+
+.el-eyebrow {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  padding: 0.4rem 0.85rem;
+  border: 1px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  color: var(--accent-deep);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  margin-bottom: 1.25rem;
+}
+.el-eyebrow::before {
+  content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--accent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+.el-hero h1 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 50, "WONK" 1;
+  letter-spacing: -0.025em;
+  line-height: 1;
+  margin: 0 0 1.5rem;
+  max-width: 18ch;
+}
+.el-hero h1 em { font-style: italic; color: var(--accent); }
+
+/* big stat block */
+.bigstat {
+  display: block;
+  font-family: 'Fraunces', serif;
+  font-weight: 300;
+  font-variation-settings: "opsz" 144, "SOFT" 100, "WONK" 1;
+  font-size: clamp(4.5rem, 4rem + 8vw, 11rem);
+  line-height: 0.9;
+  letter-spacing: -0.05em;
+  color: var(--signal-red);
+  margin: 0;
+}
+.bigstat-sub {
+  display: block;
+  margin-top: 0.5rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  font-weight: 700;
+}
+
+.el-hero .lede {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md);
+  font-weight: 300;
+  line-height: 1.5;
+  color: var(--ink-soft);
+  margin: 1.75rem 0 0;
+  max-width: 56ch;
+}
+.el-hero .lede strong {
+  font-weight: 600;
+  color: var(--ink);
+  background: linear-gradient(180deg, transparent 60%, color-mix(in srgb, var(--accent) 30%, transparent) 60%);
+  padding: 0 0.1em;
+}
+.el-cta { margin-top: 2rem; display: flex; gap: 0.6rem; flex-wrap: wrap; }
+
+/* camera-to-sensor visual */
+.cam-to-sensor {
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  padding: 1.5rem;
+  box-shadow: 8px 8px 0 var(--ink);
+}
+.cam-to-sensor svg { width: 100%; height: auto; display: block; }
+.cts-cap {
+  margin-top: 0.85rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  text-align: center;
+}
+.cts-cap strong { color: var(--accent); }
+
+/* ====== STATS RIBBON ===== */
+.el-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  background: var(--ink);
+  color: var(--paper);
+  border-block: 2px solid var(--ink);
+}
+.el-stat {
+  padding: 1.5rem clamp(1rem, 2vw, 1.5rem);
+  border-right: 1px solid color-mix(in srgb, var(--paper) 20%, transparent);
+}
+.el-stat:last-child { border-right: 0; }
+.el-stat .num {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  font-variation-settings: "opsz" 144, "SOFT" 30;
+  display: block; line-height: 1;
+  color: var(--accent);
+}
+.el-stat .lbl {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  margin-top: 0.6rem; display: block;
+  color: color-mix(in srgb, var(--paper) 75%, transparent);
+}
+
+/* ===== ACTS ===== */
+.act { padding-block: clamp(3rem, 5vw, 5rem); border-bottom: var(--hair); }
+.act-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 700;
+  margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 1rem;
+}
+.act-num::before { content: ""; width: 2.5rem; height: 1px; background: var(--accent); }
+.act h2 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 50, "WONK" 1;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+  margin: 0 0 1.5rem;
+  max-width: 24ch;
+}
+.act h2 em { font-style: italic; color: var(--accent); }
+.act-lede {
+  font-family: 'Fraunces', serif; font-size: var(--t-md);
+  color: var(--ink-soft); max-width: 60ch; margin: 0;
+}
+
+/* problem grid */
+.prob-grid {
+  margin-top: 2.5rem;
+  display: grid; gap: 1rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 800px) { .prob-grid { grid-template-columns: repeat(3, 1fr); } }
+.prob-card {
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  padding: 1.5rem;
+}
+.prob-card .pn {
+  font-family: 'Fraunces', serif;
+  font-size: 2.4rem;
+  font-style: italic;
+  color: var(--signal-red);
+  font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 80, "WONK" 1;
+  line-height: 1;
+}
+.prob-card .pl {
+  display: block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--ink-mute);
+  font-weight: 700;
+  margin-top: 0.5rem;
+}
+.prob-card h3 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md);
+  margin: 0.75rem 0 0.5rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.prob-card p { margin: 0; color: var(--ink-soft); font-size: var(--t-sm); }
+
+/* equation block */
+.equation {
+  margin-top: 2.5rem;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  padding: 1.75rem;
+  text-align: center;
+  box-shadow: 6px 6px 0 var(--ink);
+}
+.eq-lbl {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent-deep);
+  font-weight: 700;
+}
+.eq-formula {
+  margin-top: 0.85rem;
+  font-family: 'Fraunces', serif;
+  font-size: clamp(1.4rem, 1rem + 1.6vw, 2.1rem);
+  font-style: italic;
+  font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 100, "WONK" 1;
+  color: var(--ink);
+  letter-spacing: -0.015em;
+  line-height: 1.3;
+}
+.eq-formula b { color: var(--accent); font-style: normal; font-weight: 600; }
+.eq-formula .op { color: var(--ink-mute); font-style: normal; padding: 0 0.3em; }
+.eq-formula .eq { color: var(--accent-deep); font-weight: 700; font-style: normal; padding: 0 0.3em; }
+
+/* feature columns */
+.features {
+  margin-top: 2.5rem;
+  display: grid; gap: 0;
+  grid-template-columns: 1fr;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+}
+@media (min-width: 800px) { .features { grid-template-columns: repeat(2, 1fr); } }
+.feature {
+  padding: 1.6rem;
+  border-right: 1px solid var(--paper-edge);
+  border-bottom: 1px solid var(--paper-edge);
+}
+@media (min-width: 800px) {
+  .feature:nth-child(2n) { border-right: 0; }
+  .feature:nth-last-child(-n+2) { border-bottom: 0; }
+}
+.feature .fn {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 0.6rem;
+}
+.feature h3 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md);
+  margin: 0 0 0.5rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.feature p { margin: 0 0 0.5rem; font-size: var(--t-sm); color: var(--ink-soft); }
+.feature .pull {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  color: var(--accent-deep);
+  font-size: 0.95rem;
+  margin: 0.5rem 0 0;
+  border-left: 3px solid var(--accent);
+  padding-left: 0.85rem;
+}
+
+/* science citations */
+.sci {
+  margin-top: 2.5rem;
+  display: grid; gap: 1rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { .sci { grid-template-columns: repeat(2, 1fr); } }
+.sci-item {
+  border-left: 3px solid var(--accent);
+  padding: 0.85rem 1rem;
+  background: var(--paper);
+}
+.sci-item h4 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.1rem;
+  margin: 0 0 0.25rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.sci-item p { margin: 0; font-size: var(--t-sm); color: var(--ink-soft); }
+
+/* stack */
+.stack { padding-block: clamp(3rem, 5vw, 5rem); border-bottom: var(--hair); }
+.stack-list { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.5rem; }
+.stack-tag {
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--ink);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 600;
+}
+
+/* proof */
+.proof {
+  background: var(--ink);
+  color: var(--paper);
+  padding-block: clamp(3rem, 5vw, 5rem);
+  position: relative;
+  overflow: hidden;
+}
+.proof::before {
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 80% 20%, color-mix(in srgb, var(--accent) 30%, transparent), transparent 60%);
+  pointer-events: none;
+}
+.proof .frame { position: relative; }
+.proof h2 { color: var(--paper); }
+.proof h2 em { color: var(--accent); }
+.proof-grid { display: grid; gap: 1rem; margin-top: 2rem; grid-template-columns: 1fr; }
+@media (min-width: 760px) { .proof-grid { grid-template-columns: repeat(2, 1fr); } }
+.proof-item {
+  border: 1px solid color-mix(in srgb, var(--paper) 30%, transparent);
+  padding: 1.5rem;
+  background: color-mix(in srgb, var(--paper) 5%, transparent);
+}
+.proof-item h3 {
+  font-family: 'Fraunces', serif;
+  margin: 0 0 0.5rem;
+  font-size: var(--t-md);
+  color: var(--accent);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.proof-item p { margin: 0; color: color-mix(in srgb, var(--paper) 80%, transparent); font-size: var(--t-sm); }
+
+/* end cta */
+.endcta {
+  padding-block: clamp(3rem, 5vw, 5rem);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 12%, transparent), var(--paper));
+}
+.endcta .frame { display: grid; gap: 2rem; grid-template-columns: 1fr; }
+@media (min-width: 760px) { .endcta .frame { grid-template-columns: 2fr 1fr; align-items: end; } }
+.endcta h2 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 300;
+  font-variation-settings: "opsz" 144, "SOFT" 100;
+  margin: 0 0 1rem;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+}
+.endcta h2 em {
+  font-style: italic;
+  color: var(--accent);
+  background: linear-gradient(180deg, transparent 70%, color-mix(in srgb, var(--accent) 25%, transparent) 70%);
+}
+.endcta p { color: var(--ink-soft); margin: 0; max-width: 50ch; }
+.endcta .actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+
+.foot { background: var(--ink); color: var(--paper); }
+.foot .dot { color: var(--accent); }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topnav">
+  <div class="frame">
+    <div class="brand"><a href="../index.html">dmj<span class="dot">.</span>one</a></div>
+    <nav aria-label="Primary">
+      <ul>
+        <li><a href="../index.html#catalogue">Catalogue</a></li>
+        <li><a href="../index.html#manifesto">Manifesto</a></li>
+        <li><a href="../index.html#hire">Hire</a></li>
+        <li><a href="https://github.com/divyamohan1993/hacksagon" rel="noopener">GitHub</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ============ HERO ============ -->
+<section class="el-hero">
+  <div class="frame">
+    <p class="crumbs">
+      <a href="../index.html">Catalogue</a> /
+      <a href="../index.html#cat-research">Research</a> /
+      <span>ECO-LENS</span>
+    </p>
+
+    <div class="el-hero-grid">
+      <div>
+        <span class="el-eyebrow">No. 44 · Research · Public Health · Hacksagon 2026</span>
+
+        <p class="bigstat" aria-label="4.2 million">4.2M</p>
+        <span class="bigstat-sub">deaths a year · outdoor air pollution · WHO 2023</span>
+
+        <h1 style="margin-top:2rem;">Most cities have <em>fewer than ten</em> sensors.</h1>
+
+        <p class="lede">
+          A hardware air-quality monitor costs <strong>fifteen to fifty thousand dollars</strong> and takes months to install. There are over a million traffic cameras already on poles in US cities. <strong>ECO-LENS turns each one into a virtual air-quality sensor</strong> using vision-counted vehicles, EPA AP-42 emission factors and Gaussian plume dispersion. No new hardware. Hyper-local. Near-zero cost.
+        </p>
+
+        <div class="el-cta">
+          <a class="btn btn-primary" href="https://github.com/divyamohan1993/hacksagon" rel="noopener">View source</a>
+          <a class="btn btn-ghost" href="#how">See the science</a>
+        </div>
+      </div>
+
+      <aside class="cam-to-sensor" aria-label="Diagram showing a traffic camera becoming a virtual air-quality sensor">
+        <svg viewBox="0 0 360 260" role="img" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+              <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#d8cfb9" stroke-width="0.6"/>
+            </pattern>
+            <radialGradient id="plume" cx="0.5" cy="0.5" r="0.5">
+              <stop offset="0" stop-color="#b03030" stop-opacity="0.55"/>
+              <stop offset="0.5" stop-color="#d8631a" stop-opacity="0.32"/>
+              <stop offset="1" stop-color="#355c3c" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+          <rect width="360" height="260" fill="url(#grid)"/>
+
+          <!-- pole + camera -->
+          <line x1="60" y1="220" x2="60" y2="80" stroke="#161310" stroke-width="3"/>
+          <line x1="60" y1="80" x2="105" y2="80" stroke="#161310" stroke-width="3"/>
+          <rect x="100" y="68" width="34" height="22" rx="3" fill="#161310"/>
+          <circle cx="120" cy="79" r="5" fill="#b48a2b"/>
+          <text x="60" y="245" font-family="JetBrains Mono, monospace" font-size="9" font-weight="700" fill="#5a5048" text-anchor="middle" letter-spacing="1.2">EXISTING CAMERA</text>
+
+          <!-- plume cloud over road -->
+          <ellipse cx="240" cy="160" rx="110" ry="45" fill="url(#plume)"/>
+
+          <!-- road -->
+          <rect x="135" y="180" width="220" height="36" fill="#2a2521"/>
+          <line x1="135" y1="198" x2="355" y2="198" stroke="#b48a2b" stroke-width="2" stroke-dasharray="10 8"/>
+
+          <!-- cars -->
+          <g fill="#f3eee3">
+            <rect x="160" y="186" width="22" height="9" rx="2"/>
+            <rect x="200" y="186" width="22" height="9" rx="2"/>
+            <rect x="240" y="186" width="28" height="9" rx="2"/>
+            <rect x="290" y="186" width="22" height="9" rx="2"/>
+          </g>
+          <g fill="#b48a2b">
+            <rect x="170" y="201" width="22" height="9" rx="2"/>
+            <rect x="220" y="201" width="32" height="9" rx="2"/>
+            <rect x="280" y="201" width="22" height="9" rx="2"/>
+          </g>
+
+          <!-- view cone -->
+          <path d="M 134 80 L 320 130 L 320 200 L 134 90 Z" fill="#355c3c" fill-opacity="0.10" stroke="#355c3c" stroke-width="1" stroke-dasharray="3 3"/>
+
+          <!-- aqi badges -->
+          <g font-family="JetBrains Mono, monospace" font-weight="700">
+            <rect x="240" y="50" width="92" height="34" fill="#161310"/>
+            <text x="286" y="65" text-anchor="middle" fill="#b48a2b" font-size="8" letter-spacing="1.2">PM2.5  AQI</text>
+            <text x="286" y="79" text-anchor="middle" fill="#f3eee3" font-size="13">45.2  ·  124</text>
+          </g>
+
+          <text x="180" y="245" font-family="JetBrains Mono, monospace" font-size="9" font-weight="700" fill="#355c3c" letter-spacing="1.2">VIRTUAL SENSOR  →  HYPER-LOCAL AQI</text>
+        </svg>
+        <p class="cts-cap">One pole, one camera · now <strong>one sensor</strong>.</p>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATS ============ -->
+<section class="el-stats" aria-label="At a glance">
+  <div class="el-stat"><span class="num">4.2M</span><span class="lbl">Annual deaths · WHO 2023</span></div>
+  <div class="el-stat"><span class="num">1M+</span><span class="lbl">US traffic cameras already deployed</span></div>
+  <div class="el-stat"><span class="num">$15-50K</span><span class="lbl">Cost of a single hardware sensor</span></div>
+  <div class="el-stat"><span class="num">50×50</span><span class="lbl">Virtual-sensor mesh per area</span></div>
+  <div class="el-stat"><span class="num">5 s</span><span class="lbl">WebSocket update interval</span></div>
+</section>
+
+<!-- ============ ACT I · THE PROBLEM ============ -->
+<section class="act" aria-labelledby="prob-h">
+  <div class="frame">
+    <p class="act-num">Act I · The Problem</p>
+    <h2 id="prob-h">The air the sensor reads is <em>not the air you breathe.</em></h2>
+    <p class="act-lede">A reference monitor on a rooftop two kilometres away does not know that you live next to a six-lane intersection. The communities living near busy roads, often low-income, breathe air two to three times more polluted than the nearest station ever reports.</p>
+
+    <div class="prob-grid">
+      <article class="prob-card">
+        <span class="pn">i.</span><span class="pl">Hardware</span>
+        <h3>Sensors cost a small car.</h3>
+        <p>Regulatory-grade monitors run $15,000 to $50,000 each. Cities buy a handful. Hundreds of square kilometres are then "covered" by ten data points.</p>
+      </article>
+      <article class="prob-card">
+        <span class="pn">ii.</span><span class="pl">Resolution</span>
+        <h3>2-3× under-reported, near roads.</h3>
+        <p>The pollution gradient between an intersection and the nearest fixed monitor is steep. Vulnerable communities are systematically misrepresented on official maps.</p>
+      </article>
+      <article class="prob-card">
+        <span class="pn">iii.</span><span class="pl">Latency</span>
+        <h3>Procurement takes months.</h3>
+        <p>Every new pole, every new sensor, every new calibration. Meanwhile the camera infrastructure already on every other corner watches traffic and watches nothing else.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ACT II · THE EQUATION ============ -->
+<section class="act" id="how" aria-labelledby="eq-h" style="background: var(--paper-soft);">
+  <div class="frame">
+    <p class="act-num">Act II · The Promise</p>
+    <h2 id="eq-h">No new hardware.<br>Only the <em>physics</em> the existing cameras don't know.</h2>
+    <p class="act-lede">Three peer-reviewed pieces, multiplied. The output is a continuous, hyper-local AQI surface · at the cost of the compute alone.</p>
+
+    <figure class="equation" aria-label="Core equation: vehicles times AP-42 factors times Gaussian plume equals hyper-local AQI">
+      <p class="eq-lbl">The ECO-LENS Identity</p>
+      <p class="eq-formula">
+        <b>YOLOv8</b> vehicle counts
+        <span class="op">×</span>
+        <b>EPA AP-42</b> emission factors
+        <span class="op">×</span>
+        <b>Gaussian plume</b> dispersion
+        <span class="eq">=</span>
+        <b>hyper-local AQI</b>
+      </p>
+    </figure>
+
+    <div class="features">
+      <article class="feature">
+        <p class="fn">01 · Virtual sensor mesh</p>
+        <h3>Kriging interpolates the gaps.</h3>
+        <p>Ordinary Kriging with variogram modelling builds a continuous pollution surface from a handful of camera-derived points, with confidence intervals at every cell.</p>
+        <p class="pull">A 50×50 virtual sensor mesh from 3-5 camera feeds.</p>
+      </article>
+      <article class="feature">
+        <p class="fn">02 · Equivalent cigarettes</p>
+        <h3>μg/m³ becomes a feeling.</h3>
+        <p>Berkeley Earth: 22 μg/m³ PM2.5 over 24 hours equals one cigarette. ECO-LENS streams a live counter, dose accrued, in plain English.</p>
+        <p class="pull">"You have breathed 0.3 cigarettes in the last hour."</p>
+      </article>
+      <article class="feature">
+        <p class="fn">03 · Plume particle simulation</p>
+        <h3>Watch the invisible drift.</h3>
+        <p>Pasquill-Gifford stability classes, real-time wind from OpenWeatherMap, thousands of particles colour-coded by PM2.5. The dashboard makes the chemistry visible.</p>
+        <p class="pull">Plumes drift downwind from intersections, in real time.</p>
+      </article>
+      <article class="feature">
+        <p class="fn">04 · Green corridor routing</p>
+        <h3>The cleanest route, not the fastest.</h3>
+        <p>A modified A* with edge weights = distance × PM2.5. Compares fastest vs cleanest with an exposure-savings percentage. Same source, same vehicles · different physics.</p>
+        <p class="pull">"2 minutes longer. 40% less PM2.5 inhaled."</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ACT III · SCIENTIFIC BASIS ============ -->
+<section class="act" aria-labelledby="sci-h">
+  <div class="frame">
+    <p class="act-num">Act III · The Science</p>
+    <h2 id="sci-h">Every number is <em>traceable to a paper.</em></h2>
+    <p class="act-lede">Nothing is hand-waved. Every layer of the pipeline points back to a peer-reviewed source · the same sources EPA, WHO and FHWA already trust.</p>
+
+    <div class="sci">
+      <div class="sci-item">
+        <h4>EPA AP-42 · Chapter 13</h4>
+        <p>Per-vehicle-class emission factors for PM2.5, PM10, NOx, CO, CO2, VOC, SO2 · the US gold standard for emission estimation.</p>
+      </div>
+      <div class="sci-item">
+        <h4>Gaussian plume · Pasquill-Gifford A-F</h4>
+        <p>Same model framework as EPA's AERMOD and SCREEN3 regulatory dispersion models, with real-time wind and atmospheric stability.</p>
+      </div>
+      <div class="sci-item">
+        <h4>WHO Air Quality Guidelines 2021</h4>
+        <p>Annual PM2.5 below 5 μg/m³, 24-hour below 15 μg/m³. The thresholds the dashboard surfaces against your live readings.</p>
+      </div>
+      <div class="sci-item">
+        <h4>Global Burden of Disease · dose-response</h4>
+        <p>All-cause mortality RR 1.06 per 10 μg/m³ PM2.5 · respiratory 1.10 · cardiovascular 1.08. The relative risks behind the cigarette equivalence and the health score.</p>
+      </div>
+      <div class="sci-item">
+        <h4>FHWA Traffic Noise Model (TNM)</h4>
+        <p>Reference sound levels per vehicle class, log-distance attenuation, energy-sum aggregation. The same source · vehicles · drives both pollution and noise.</p>
+      </div>
+      <div class="sci-item">
+        <h4>Berkeley Earth · Muller 2015</h4>
+        <p>22 μg/m³ over 24 hours = 1 cigarette. The one number the public actually feels.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STACK ============ -->
+<section class="stack" aria-labelledby="stack-h">
+  <div class="frame">
+    <p class="act-num">The Stack</p>
+    <h2 id="stack-h" style="font-size:var(--t-xl);font-weight:400;font-family:'Fraunces',serif;font-variation-settings:'opsz' 144,'SOFT' 50;margin:0;letter-spacing:-0.02em;">Async API. WebSocket stream. <em>One docker compose up.</em></h2>
+    <ul class="stack-list">
+      <li class="stack-tag">Python 3.11+</li>
+      <li class="stack-tag">FastAPI</li>
+      <li class="stack-tag">Next.js 16 · React 18</li>
+      <li class="stack-tag">YOLOv8 (Ultralytics)</li>
+      <li class="stack-tag">NumPy + SciPy</li>
+      <li class="stack-tag">Leaflet + Deck.gl</li>
+      <li class="stack-tag">WebSockets · 5s</li>
+      <li class="stack-tag">SQLite / PostgreSQL</li>
+      <li class="stack-tag">OpenWeatherMap</li>
+      <li class="stack-tag">Docker Compose</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ PROOF ============ -->
+<section class="proof act" aria-labelledby="proof-h">
+  <div class="frame">
+    <p class="act-num">Act IV · Proof</p>
+    <h2 id="proof-h">Hacksagon 2026, <em>shipping form.</em></h2>
+    <div class="proof-grid">
+      <div class="proof-item">
+        <h3>One-command deploy</h3>
+        <p><code>docker compose up --build</code> · backend, frontend, database, all networked. Or <code>autoconfig.sh</code> on Linux/macOS, <code>autoconfig.bat</code> on Windows, with key rotation built in.</p>
+      </div>
+      <div class="proof-item">
+        <h3>9 REST endpoints + WebSocket</h3>
+        <p>/api/sensors, /api/grid, /api/forecast, /api/health-impact, /api/routing/green-path. Five-second WebSocket stream of every sensor, particle and statistic.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Eight scientific engines</h3>
+        <p>Detection, emission, dispersion, kriging, dosimetry, noise, routing, forecasting (Holt-Winters). Each isolated, each test-covered, each documented.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Demo mode included</h3>
+        <p>No camera feed needed for the demo. Simulation mode generates realistic vehicle counts so judges and city procurement officers can run the dashboard immediately.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ END CTA ============ -->
+<section class="endcta" aria-labelledby="cta-h">
+  <div class="frame">
+    <div>
+      <h2 id="cta-h">The cameras are on the poles. <em>The science is in the papers.</em></h2>
+      <p>I build hackathon-grade research that ships as a real system. Async APIs, WebSocket streams, regulatory-grade physics, accessible dashboards. The kind of work cities can actually pilot.</p>
+    </div>
+    <div class="actions">
+      <a class="btn btn-primary" href="../index.html#hire">Hire me</a>
+      <a class="btn btn-ghost" href="../index.html">Back to catalogue</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="frame">
+    <div>
+      <h2 style="font-family:'Fraunces',serif;font-size:var(--t-xl);margin:0 0 1rem;">dmj<span class="dot">.</span>one</h2>
+      <p>Dream, Manifest and Journey, Together as One.</p>
+      <p class="meta">© 2026 Divya Mohan. ECO-LENS built for Hacksagon 2026. MIT license. Because the air you breathe shouldn't be a mystery.</p>
+    </div>
+    <div>
+      <p class="meta">Catalogue</p>
+      <p><a href="../index.html#catalogue">All 47 products</a></p>
+      <p><a href="../index.html#cat-research">Research</a></p>
+      <p><a href="../index.html#hire">Hire</a></p>
+    </div>
+    <div>
+      <p class="meta">ECO-LENS</p>
+      <p><a href="https://github.com/divyamohan1993/hacksagon" rel="noopener">Source (hacksagon)</a></p>
+      <p><a href="mailto:contact@dmj.one">contact@dmj.one</a></p>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

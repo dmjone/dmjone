@@ -1,0 +1,729 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#355c3c">
+<meta name="color-scheme" content="light">
+
+<title>Personal Finance Tracker · Money in. Money out. What's left. · dmj.one</title>
+<meta name="description" content="A simple Python program to track money you earn and money you spend. No internet required. Data stays on your computer. 51 passing tests. Built by Lakshika under dmj.one welfare initiatives.">
+<meta property="og:title" content="Personal Finance Tracker · Money in. Money out. What's left.">
+<meta property="og:description" content="A pocket-notebook ledger as a Python program. Honest, offline, 51 passing tests. Built by Lakshika under dmj.one.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,30..100&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;500;600;700&family=Tiro+Devanagari+Hindi&display=swap">
+<link rel="stylesheet" href="../assets/core.css">
+
+<style>
+:root {
+  --accent: var(--c-research);
+  --accent-deep: #1f3a25;
+  --in-color: #2a6a3a;
+  --out-color: #a13838;
+  --paper-warm: #f6efde;
+  --rule: #c9c0a8;
+}
+body { background: var(--paper); }
+
+.crumbs {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink-mute);
+  margin: 0 0 1.75rem;
+  display: flex; gap: 0.5rem; flex-wrap: wrap;
+}
+.crumbs a { border-bottom: 1px solid var(--ink-mute); padding-bottom: 1px; }
+.crumbs a:hover { color: var(--accent); border-color: var(--accent); }
+.crumbs span { color: var(--accent); }
+
+.btn {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.7rem 1.1rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 700;
+  border: 1px solid var(--ink);
+  transition: transform .15s, box-shadow .15s;
+}
+.btn:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--ink); }
+.btn-primary { background: var(--accent); color: white; border-color: var(--accent); }
+.btn-ghost { background: transparent; color: var(--ink); }
+
+/* ====== HERO · pocket-notebook ledger ====== */
+.lg-hero {
+  position: relative;
+  border-bottom: var(--hair);
+  padding-block: clamp(3rem, 5vw + 1rem, 5.5rem) clamp(2.5rem, 4vw, 4rem);
+  background: var(--paper-warm);
+  overflow: hidden;
+}
+.lg-hero::before {
+  content: ""; position: absolute; inset: 0;
+  background-image:
+    repeating-linear-gradient(180deg, transparent 0 31px, var(--rule) 31px 32px);
+  opacity: 0.4;
+  mask-image: radial-gradient(ellipse 100% 80% at 0% 100%, black, transparent);
+  -webkit-mask-image: radial-gradient(ellipse 100% 80% at 0% 100%, black, transparent);
+  pointer-events: none;
+}
+.lg-hero::after {
+  content: ""; position: absolute;
+  top: 0; bottom: 0;
+  left: clamp(1.5rem, 5vw, 4rem);
+  width: 1px;
+  background: color-mix(in srgb, var(--out-color) 60%, transparent);
+  opacity: 0.5;
+}
+.lg-hero .frame { position: relative; }
+
+.lg-grid {
+  display: grid; gap: 2.5rem;
+  grid-template-columns: 1fr;
+  align-items: end;
+}
+@media (min-width: 960px) { .lg-grid { grid-template-columns: 1.05fr 1fr; gap: 3rem; } }
+
+.lg-eyebrow {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  padding: 0.4rem 0.85rem;
+  border: 1px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  color: var(--accent-deep);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  margin-bottom: 1.25rem;
+}
+.lg-eyebrow::before { content: "₹"; color: var(--accent); font-weight: 700; font-family: 'Fraunces', serif; }
+
+.lg-hero h1 {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(2.6rem, 1.5rem + 5vw, 5rem);
+  font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 30, "WONK" 1;
+  letter-spacing: -0.04em;
+  line-height: 0.94;
+  margin: 0;
+}
+.lg-hero h1 em {
+  font-style: italic;
+  color: var(--accent);
+  font-variation-settings: "opsz" 144, "SOFT" 100, "WONK" 1;
+}
+.lg-hero .lede {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md);
+  font-weight: 300;
+  line-height: 1.45;
+  color: var(--ink-soft);
+  margin: 1.75rem 0 0;
+  max-width: 48ch;
+}
+.lg-hero .lede strong {
+  font-weight: 600; color: var(--ink);
+  background: linear-gradient(180deg, transparent 60%, color-mix(in srgb, var(--accent) 24%, transparent) 60%);
+  padding: 0 0.1em;
+}
+.lg-cta { margin-top: 2rem; display: flex; gap: 0.6rem; flex-wrap: wrap; }
+.side-credit {
+  margin-top: 1.5rem;
+  padding: 0.85rem 1rem;
+  border: 1px dashed color-mix(in srgb, var(--accent) 50%, transparent);
+  background: color-mix(in srgb, var(--accent) 5%, transparent);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent-deep);
+  display: flex; gap: 0.6rem; flex-wrap: wrap;
+  align-items: baseline;
+}
+.side-credit strong { color: var(--ink); font-weight: 700; }
+.side-credit .sep { color: var(--accent); }
+
+/* ====== Big rupee motif + sample ledger ===== */
+.lg-card {
+  position: relative;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  box-shadow: 8px 8px 0 var(--ink);
+  padding: 1.4rem 1.4rem 1.4rem;
+  font-family: 'JetBrains Mono', monospace;
+  overflow: hidden;
+}
+.lg-card .rupee {
+  position: absolute;
+  right: -0.3rem; bottom: -1.7rem;
+  font-family: 'Fraunces', serif;
+  font-size: clamp(8rem, 6rem + 6vw, 14rem);
+  font-weight: 300;
+  font-variation-settings: "opsz" 144, "SOFT" 100, "WONK" 1;
+  color: color-mix(in srgb, var(--accent) 14%, transparent);
+  line-height: 0.85;
+  letter-spacing: -0.05em;
+  pointer-events: none;
+  z-index: 0;
+}
+.lg-card .topbar {
+  display: flex; justify-content: space-between;
+  font-size: 0.74rem;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--ink-mute);
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 0.6rem;
+  margin-bottom: 0.6rem;
+  position: relative; z-index: 1;
+}
+.lg-card .ledger {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.84rem;
+  position: relative; z-index: 1;
+}
+.lg-card .ledger th, .lg-card .ledger td {
+  padding: 0.45rem 0.5rem;
+  border-bottom: 1px dashed color-mix(in srgb, var(--ink) 18%, transparent);
+  text-align: left;
+}
+.lg-card .ledger th {
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  font-weight: 600;
+  border-bottom: 1px solid var(--ink);
+}
+.lg-card .ledger td.amt { text-align: right; font-weight: 600; }
+.lg-card .ledger td.in  { color: var(--in-color); }
+.lg-card .ledger td.out { color: var(--out-color); }
+.lg-card .ledger tr.bal td { border-top: 1px solid var(--ink); border-bottom: 0; padding-top: 0.7rem; font-weight: 700; color: var(--ink); }
+.lg-card .ledger tr.bal td.amt { color: var(--in-color); font-size: 1rem; }
+
+/* ====== STATS ====== */
+.lg-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  background: var(--ink);
+  color: var(--paper);
+  border-block: 2px solid var(--ink);
+  font-family: 'JetBrains Mono', monospace;
+}
+.lg-stat {
+  padding: 1.5rem clamp(1rem, 2vw, 1.5rem);
+  border-right: 1px solid color-mix(in srgb, var(--paper) 20%, transparent);
+}
+.lg-stat:last-child { border-right: 0; }
+.lg-stat .num {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(2rem, 1.4rem + 2vw, 3rem);
+  font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 30;
+  letter-spacing: -0.04em;
+  display: block; line-height: 1;
+  color: var(--accent);
+}
+.lg-stat .lbl {
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  margin-top: 0.6rem;
+  display: block;
+  color: color-mix(in srgb, var(--paper) 75%, transparent);
+}
+
+/* ====== ACT ====== */
+.act { padding-block: clamp(3rem, 5vw, 5rem); border-bottom: var(--hair); }
+.act-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 700;
+  margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 1rem;
+}
+.act-num::before { content: ""; width: 2.5rem; height: 1px; background: var(--accent); }
+.act h2 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 50, "WONK" 1;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+  margin: 0 0 1.5rem;
+  max-width: 22ch;
+}
+.act h2 em { font-style: italic; color: var(--accent); }
+.act-lede {
+  font-family: 'Fraunces', serif; font-size: var(--t-md);
+  color: var(--ink-soft); max-width: 56ch; margin: 0;
+}
+
+/* === Two-column running balance === */
+.run {
+  margin-top: 2.5rem;
+  width: 100%;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  border-collapse: collapse;
+  font-family: 'JetBrains Mono', monospace;
+}
+.run thead th {
+  background: var(--ink);
+  color: var(--paper);
+  text-align: left;
+  padding: 0.85rem 1rem;
+  font-size: var(--t-xs);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.run th, .run td {
+  padding: 0.8rem 1rem;
+  border-bottom: 1px solid var(--paper-edge);
+  font-size: var(--t-sm);
+}
+.run td.in   { color: var(--in-color);  text-align: right; font-weight: 600; }
+.run td.out  { color: var(--out-color); text-align: right; font-weight: 600; }
+.run td.bal  { color: var(--ink); text-align: right; font-weight: 700; }
+.run td.empty { color: var(--ink-mute); text-align: right; }
+.run tbody tr:nth-child(odd) { background: color-mix(in srgb, var(--accent) 4%, var(--paper)); }
+.run tbody tr.totals td { border-top: 2px solid var(--ink); border-bottom: 0; font-weight: 700; padding-top: 1rem; }
+.run tbody tr.totals td.bal { font-size: 1.1rem; color: var(--in-color); }
+.run td.cat {
+  font-family: 'Atkinson Hyperlegible', system-ui;
+  font-size: var(--t-sm);
+  color: var(--ink-soft);
+}
+
+/* === Categories grid === */
+.cats {
+  margin-top: 2.5rem;
+  display: grid; gap: 1.5rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { .cats { grid-template-columns: 1fr 1fr; } }
+.cat-card {
+  border: 1px solid var(--ink);
+  background: var(--paper);
+}
+.cat-card h3 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin: 0;
+  padding: 0.75rem 1rem;
+  background: var(--ink);
+  color: var(--accent);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.cat-card h3.in { color: #8fd6a0; }
+.cat-card h3.out { color: #f0a5a5; }
+.cat-card ul {
+  display: grid; gap: 0.5rem;
+  padding: 1rem 1.25rem;
+  font-family: 'Atkinson Hyperlegible', system-ui;
+}
+.cat-card li {
+  display: grid; grid-template-columns: 1.5rem 1fr;
+  gap: 0.5rem;
+  align-items: baseline;
+  font-size: var(--t-sm);
+  border-bottom: 1px dashed color-mix(in srgb, var(--ink) 14%, transparent);
+  padding-bottom: 0.4rem;
+}
+.cat-card li:last-child { border-bottom: 0; padding-bottom: 0; }
+.cat-card li .glyph {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  text-align: center;
+}
+.cat-card li.in  .glyph { color: var(--in-color); }
+.cat-card li.out .glyph { color: var(--out-color); }
+
+/* === Test row block === */
+.test-row {
+  margin-top: 2rem;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { .test-row { grid-template-columns: 1.4fr 1fr; align-items: stretch; } }
+.proof-block {
+  background: var(--ink);
+  color: var(--paper);
+  padding: 2rem 2rem;
+  position: relative;
+  overflow: hidden;
+}
+.proof-block::before {
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 100% 100%, color-mix(in srgb, var(--accent) 38%, transparent), transparent 60%);
+  pointer-events: none;
+}
+.proof-block .pn {
+  position: relative;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 700;
+  margin: 0 0 0.6rem;
+}
+.proof-block .big {
+  position: relative;
+  font-family: 'Fraunces', serif;
+  font-size: clamp(3rem, 1.5rem + 6vw, 6rem);
+  line-height: 0.95;
+  font-weight: 300;
+  letter-spacing: -0.04em;
+  color: var(--paper);
+  margin: 0;
+}
+.proof-block .big em { color: var(--accent); font-style: italic; }
+.proof-block p { position: relative; margin: 1rem 0 0; color: color-mix(in srgb, var(--paper) 78%, transparent); font-size: var(--t-sm); max-width: 40ch; }
+
+.notes {
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  padding: 1.4rem 1.5rem;
+  display: grid; gap: 0.7rem;
+}
+.notes h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.15rem;
+  margin: 0 0 0.3rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.notes p { margin: 0; font-size: var(--t-sm); color: var(--ink-soft); }
+.notes p .glyph { color: var(--in-color); font-weight: 700; }
+
+/* Stack */
+.stack { padding-block: clamp(3rem, 5vw, 5rem); border-bottom: var(--hair); }
+.stack-list { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.5rem; }
+.stack-tag {
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--ink);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 600;
+}
+
+/* End CTA */
+.endcta {
+  padding-block: clamp(3rem, 5vw, 5rem);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 14%, transparent), var(--paper));
+}
+.endcta .frame { display: grid; gap: 2rem; grid-template-columns: 1fr; }
+@media (min-width: 760px) { .endcta .frame { grid-template-columns: 2fr 1fr; align-items: end; } }
+.endcta h2 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 300;
+  font-variation-settings: "opsz" 144, "SOFT" 100;
+  margin: 0 0 1rem;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+}
+.endcta h2 em {
+  font-style: italic;
+  color: var(--accent);
+  background: linear-gradient(180deg, transparent 70%, color-mix(in srgb, var(--accent) 25%, transparent) 70%);
+}
+.endcta p { color: var(--ink-soft); margin: 0; max-width: 50ch; }
+.endcta .actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+
+.foot { background: var(--ink); color: var(--paper); }
+.foot .dot { color: var(--accent); }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topnav">
+  <div class="frame">
+    <div class="brand"><a href="../index.html">dmj<span class="dot">.</span>one</a></div>
+    <nav aria-label="Primary">
+      <ul>
+        <li><a href="../index.html#catalogue">Catalogue</a></li>
+        <li><a href="../index.html#manifesto">Manifesto</a></li>
+        <li><a href="../index.html#hire">Hire</a></li>
+        <li><a href="https://github.com/dmjone/personal-finance-tracker-lakshika" rel="noopener">GitHub</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ============ HERO · pocket ledger ============ -->
+<section class="lg-hero">
+  <div class="frame">
+    <p class="crumbs">
+      <a href="../index.html">Catalogue</a> /
+      <a href="../index.html#cat-research">Research · Education</a> /
+      <span>Personal Finance Tracker</span>
+    </p>
+
+    <div class="lg-grid">
+      <div>
+        <span class="lg-eyebrow">Notebook · CS50P · welfare</span>
+        <h1>
+          Money in.<br>
+          Money <em>out.</em><br>
+          What's left.
+        </h1>
+        <p class="lede">
+          A small Python program that does what a pocket notebook does, only with arithmetic that never lies. <strong>Records what you earned. Records what you spent. Tells you what is left.</strong> No internet. No login. Your data stays on your computer.
+        </p>
+        <div class="lg-cta">
+          <a class="btn btn-primary" href="https://github.com/dmjone/personal-finance-tracker-lakshika" rel="noopener">View source</a>
+          <a class="btn btn-ghost" href="#how">How it works</a>
+        </div>
+        <div class="side-credit" role="note">
+          <span>Built by <strong>Lakshika</strong></span>
+          <span class="sep">·</span>
+          <span>Under <strong>dmj.one</strong></span>
+        </div>
+      </div>
+
+      <aside class="lg-card" aria-label="Sample ledger entries">
+        <span class="rupee" aria-hidden="true">₹</span>
+        <div class="topbar">
+          <span>Page 01 · Apr 2026</span>
+          <span>finances.json</span>
+        </div>
+        <table class="ledger" role="table">
+          <thead>
+            <tr><th>Date</th><th>Category</th><th>Amount</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>04 Apr</td><td>Salary</td><td class="amt in">+ 50,000.00</td></tr>
+            <tr><td>05 Apr</td><td>Rent</td><td class="amt out">- 18,000.00</td></tr>
+            <tr><td>07 Apr</td><td>Food</td><td class="amt out">- 2,450.00</td></tr>
+            <tr><td>11 Apr</td><td>Freelance</td><td class="amt in">+ 8,500.00</td></tr>
+            <tr><td>15 Apr</td><td>Transport</td><td class="amt out">- 1,200.00</td></tr>
+            <tr class="bal"><td colspan="2">Net balance</td><td class="amt in">+ 36,850.00</td></tr>
+          </tbody>
+        </table>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATS ============ -->
+<section class="lg-stats" aria-label="At a glance">
+  <div class="lg-stat"><span class="num">51 ✓</span><span class="lbl">Tests passing</span></div>
+  <div class="lg-stat"><span class="num">3.10+</span><span class="lbl">Python supported</span></div>
+  <div class="lg-stat"><span class="num">0</span><span class="lbl">Bytes leave your computer</span></div>
+  <div class="lg-stat"><span class="num">8</span><span class="lbl">Menu options · 1-8</span></div>
+  <div class="lg-stat"><span class="num">MIT</span><span class="lbl">Free to use, forever</span></div>
+</section>
+
+
+<!-- ============ ACT I · THE PROBLEM ============ -->
+<section class="act" aria-labelledby="prob-h">
+  <div class="frame">
+    <p class="act-num">Act I · The Problem</p>
+    <h2 id="prob-h">A first salary, and <em>nowhere honest</em> to write it down.</h2>
+    <p class="act-lede">The bank app shows the balance. It does not show why it is shrinking. The fancy budgeting app wants a login, an internet connection, and a permission to read your messages. The ledger you actually need is two columns, on your machine, with arithmetic you can trust.</p>
+  </div>
+</section>
+
+
+<!-- ============ ACT II · THE PROMISE ============ -->
+<section class="act" id="how" style="background: var(--paper-soft);" aria-labelledby="prom-h">
+  <div class="frame">
+    <p class="act-num">Act II · The Promise</p>
+    <h2 id="prom-h">Two columns.<br>One <em>running</em> balance.</h2>
+    <p class="act-lede">Type a number. Pick a category. Hit enter. The total updates. That is the whole product. The same shape your grandparent would draw on the back of a chequebook, only this one adds up correctly every single time.</p>
+
+    <table class="run" aria-label="Sample running balance ledger">
+      <thead>
+        <tr>
+          <th scope="col">Date</th>
+          <th scope="col">Category</th>
+          <th scope="col" style="text-align:right;">In</th>
+          <th scope="col" style="text-align:right;">Out</th>
+          <th scope="col" style="text-align:right;">Balance</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>04 Apr 2026</td>
+          <td class="cat">Salary</td>
+          <td class="in">₹ 50,000.00</td>
+          <td class="empty">·</td>
+          <td class="bal">₹ 50,000.00</td>
+        </tr>
+        <tr>
+          <td>05 Apr 2026</td>
+          <td class="cat">Rent</td>
+          <td class="empty">·</td>
+          <td class="out">₹ 18,000.00</td>
+          <td class="bal">₹ 32,000.00</td>
+        </tr>
+        <tr>
+          <td>07 Apr 2026</td>
+          <td class="cat">Food</td>
+          <td class="empty">·</td>
+          <td class="out">₹ 2,450.00</td>
+          <td class="bal">₹ 29,550.00</td>
+        </tr>
+        <tr>
+          <td>11 Apr 2026</td>
+          <td class="cat">Freelance</td>
+          <td class="in">₹ 8,500.00</td>
+          <td class="empty">·</td>
+          <td class="bal">₹ 38,050.00</td>
+        </tr>
+        <tr>
+          <td>15 Apr 2026</td>
+          <td class="cat">Transport</td>
+          <td class="empty">·</td>
+          <td class="out">₹ 1,200.00</td>
+          <td class="bal">₹ 36,850.00</td>
+        </tr>
+        <tr class="totals">
+          <td colspan="2">Total</td>
+          <td class="in">₹ 58,500.00</td>
+          <td class="out">₹ 21,650.00</td>
+          <td class="bal">₹ 36,850.00</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+
+<!-- ============ ACT III · CATEGORIES ============ -->
+<section class="act" aria-labelledby="cat-h">
+  <div class="frame">
+    <p class="act-num">Act III · The Buckets</p>
+    <h2 id="cat-h">Five ways money <em>comes in</em>.<br>Nine ways it <em>goes out</em>.</h2>
+    <p class="act-lede">No more, no fewer. Categories you can pick by typing a single digit. The point is to record, not to file taxes.</p>
+
+    <div class="cats">
+      <article class="cat-card">
+        <h3 class="in">In · the money you receive</h3>
+        <ul>
+          <li class="in"><span class="glyph">+</span><span>Salary</span></li>
+          <li class="in"><span class="glyph">+</span><span>Freelance</span></li>
+          <li class="in"><span class="glyph">+</span><span>Investment</span></li>
+          <li class="in"><span class="glyph">+</span><span>Gift</span></li>
+          <li class="in"><span class="glyph">+</span><span>Other Income</span></li>
+        </ul>
+      </article>
+      <article class="cat-card">
+        <h3 class="out">Out · the money you spend</h3>
+        <ul>
+          <li class="out"><span class="glyph">-</span><span>Food</span></li>
+          <li class="out"><span class="glyph">-</span><span>Transport</span></li>
+          <li class="out"><span class="glyph">-</span><span>Utilities</span></li>
+          <li class="out"><span class="glyph">-</span><span>Entertainment</span></li>
+          <li class="out"><span class="glyph">-</span><span>Shopping</span></li>
+          <li class="out"><span class="glyph">-</span><span>Healthcare</span></li>
+          <li class="out"><span class="glyph">-</span><span>Education</span></li>
+          <li class="out"><span class="glyph">-</span><span>Rent</span></li>
+          <li class="out"><span class="glyph">-</span><span>Other Expense</span></li>
+        </ul>
+      </article>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ ACT IV · PROOF ============ -->
+<section class="act" aria-labelledby="proof-h" style="background: var(--paper-soft);">
+  <div class="frame">
+    <p class="act-num">Act IV · Proof</p>
+    <h2 id="proof-h">The arithmetic <em>does not lie.</em></h2>
+    <p class="act-lede">Every core function has tests. Adding a transaction, calculating the balance, filtering by category, generating the summary, validating the amount, validating the date. Run them in the terminal. They go green.</p>
+
+    <div class="test-row">
+      <div class="proof-block">
+        <p class="pn">pytest test_project.py -v</p>
+        <p class="big"><em>51 ✓</em><br>passing.</p>
+        <p>Built as a Harvard CS50P final project. The test count is the receipt: every function is covered, in writing.</p>
+      </div>
+      <div class="notes">
+        <h3>What the tests actually check</h3>
+        <p><span class="glyph">✓</span> A transaction is added with the right amount, date and category.</p>
+        <p><span class="glyph">✓</span> The balance equals total income minus total expenses, every time.</p>
+        <p><span class="glyph">✓</span> Filtering by category returns only the matching rows.</p>
+        <p><span class="glyph">✓</span> Bad amounts and bad dates are rejected before they corrupt the file.</p>
+        <p><span class="glyph">✓</span> The summary includes largest income, largest expense, and a breakdown.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ STACK ============ -->
+<section class="stack" aria-labelledby="stack-h">
+  <div class="frame">
+    <p class="act-num">The Stack</p>
+    <h2 id="stack-h" style="font-size:var(--t-xl);font-weight:400;font-family:'Fraunces',serif;font-variation-settings:'opsz' 144,'SOFT' 50;margin:0;letter-spacing:-0.02em;">A small program. <em>Honestly built.</em></h2>
+    <ul class="stack-list">
+      <li class="stack-tag">Python 3.10+</li>
+      <li class="stack-tag">tabulate</li>
+      <li class="stack-tag">pytest · 51 tests</li>
+      <li class="stack-tag">finances.json (local)</li>
+      <li class="stack-tag">stdlib datetime</li>
+      <li class="stack-tag">Terminal UI</li>
+      <li class="stack-tag">No internet</li>
+      <li class="stack-tag">MIT</li>
+    </ul>
+  </div>
+</section>
+
+
+<!-- ============ END CTA ============ -->
+<section class="endcta" aria-labelledby="cta-h">
+  <div class="frame">
+    <div>
+      <h2 id="cta-h">Honest software does not need a login screen. <em>It just needs to add up.</em></h2>
+      <p>This is what the dmj.one welfare initiative looks like in practice: a first-year student ships a real, tested, offline-first program, free for anyone to use. We can build that level of care for you next.</p>
+    </div>
+    <div class="actions">
+      <a class="btn btn-primary" href="../index.html#hire">Hire me</a>
+      <a class="btn btn-ghost" href="../index.html">Back to catalogue</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="frame">
+    <div>
+      <h2 style="font-family:'Fraunces',serif;font-size:var(--t-xl);margin:0 0 1rem;">dmj<span class="dot">.</span>one</h2>
+      <p>Dream, Manifest and Journey, Together as One.</p>
+      <p class="meta">© 2026 dmj.one. Personal Finance Tracker built by Lakshika as part of dmj.one welfare initiatives. CS50P final project. MIT licensed.</p>
+    </div>
+    <div>
+      <p class="meta">Catalogue</p>
+      <p><a href="../index.html#catalogue">All products</a></p>
+      <p><a href="../index.html#cat-research">Research · Education</a></p>
+      <p><a href="../index.html#hire">Hire</a></p>
+    </div>
+    <div>
+      <p class="meta">Personal Finance Tracker</p>
+      <p><a href="https://github.com/dmjone/personal-finance-tracker-lakshika" rel="noopener">Source</a></p>
+      <p><a href="mailto:contact@dmj.one">contact@dmj.one</a></p>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

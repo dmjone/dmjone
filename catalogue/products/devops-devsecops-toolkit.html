@@ -1,0 +1,749 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1c5d63">
+<meta name="color-scheme" content="light">
+
+<title>DevOps · DevSecOps Toolkit · seven tools, zero system pollution · dmj.one</title>
+<meta name="description" content="A self-contained DevSecOps stack · SonarQube, Jenkins, Trivy, OWASP ZAP, Grafana, Prometheus, Vault · that installs, manages and removes itself without touching your host machine. Run from a folder. Delete the folder.">
+<meta property="og:title" content="DevOps · DevSecOps Toolkit · dmj.one">
+<meta property="og:description" content="Seven enterprise security tools. One folder. Zero system pollution.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,30..100&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="../assets/core.css">
+
+<style>
+:root {
+  --accent: var(--c-cloud);
+  --accent-deep: #143f44;
+  --rack: #0f2629;
+  --rack-soft: #163337;
+}
+
+/* ===== HERO · toolrack motif ============================ */
+.tk-hero {
+  position: relative;
+  background: var(--rack);
+  color: var(--paper);
+  padding-block: clamp(3.5rem, 6vw + 1rem, 7rem) clamp(2rem, 4vw, 4rem);
+  overflow: hidden;
+  border-bottom: 3px solid var(--accent);
+}
+.tk-hero::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 38px, color-mix(in srgb, var(--paper) 4%, transparent) 38px 39px),
+    radial-gradient(ellipse at 90% 10%, color-mix(in srgb, var(--accent) 28%, transparent), transparent 60%);
+}
+.tk-hero .frame { position: relative; z-index: 2; }
+
+.tk-eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--accent); font-weight: 700;
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  margin: 0 0 1.5rem;
+}
+.tk-eyebrow::before { content: ""; width: 8px; height: 8px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 25%, transparent); }
+
+.tk-crumbs {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: color-mix(in srgb, var(--paper) 60%, transparent);
+  margin: 0 0 1.5rem;
+}
+.tk-crumbs a { border-bottom: 1px solid color-mix(in srgb, var(--paper) 40%, transparent); padding-bottom: 1px; }
+.tk-crumbs a:hover { color: var(--accent); border-color: var(--accent); }
+.tk-crumbs span { color: var(--accent); }
+
+.tk-hero h1 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-3xl);
+  font-variation-settings: "opsz" 144, "SOFT" 30, "WONK" 1;
+  font-weight: 400;
+  line-height: 0.94;
+  letter-spacing: -0.03em;
+  margin: 0;
+  max-width: 16ch;
+  color: var(--paper);
+}
+.tk-hero h1 em {
+  font-style: italic;
+  color: var(--accent);
+  font-variation-settings: "opsz" 144, "SOFT" 100, "WONK" 1;
+}
+.tk-hero .lede {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md);
+  font-weight: 300;
+  line-height: 1.45;
+  margin: 1.5rem 0 0;
+  max-width: 56ch;
+  color: color-mix(in srgb, var(--paper) 85%, transparent);
+}
+.tk-hero .lede strong {
+  font-weight: 600;
+  color: var(--paper);
+  background: linear-gradient(180deg, transparent 60%, color-mix(in srgb, var(--accent) 35%, transparent) 60%);
+  padding: 0 0.1em;
+}
+
+.tk-cta {
+  display: flex; gap: 0.75rem; flex-wrap: wrap;
+  margin-top: 2.5rem;
+}
+.tk-btn {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.7rem 1.1rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 700;
+  border: 1px solid var(--accent);
+  color: var(--paper);
+  transition: background .15s, color .15s, transform .15s, box-shadow .15s;
+}
+.tk-btn:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--accent); }
+.tk-btn-primary { background: var(--accent); color: var(--rack); border-color: var(--accent); font-weight: 700; }
+.tk-btn-primary:hover { box-shadow: 4px 4px 0 var(--paper); }
+
+/* ===== STATS RIBBON ===================================== */
+.tk-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  border-bottom: var(--hair);
+}
+.tk-stat {
+  padding: 1.5rem clamp(1rem, 2vw, 1.5rem);
+  border-right: var(--hair-soft);
+  background: var(--paper);
+}
+.tk-stat:last-child { border-right: 0; }
+.tk-stat .num {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  font-variation-settings: "opsz" 144, "SOFT" 30;
+  color: var(--accent);
+  line-height: 1;
+  display: block;
+}
+.tk-stat .lbl {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--ink-mute);
+  display: block;
+  margin-top: 0.6rem;
+}
+
+/* ===== ACT ============================================== */
+.act { padding-block: clamp(3rem, 5vw, 5rem); border-bottom: var(--hair); }
+.act-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 700;
+  margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 1rem;
+}
+.act-num::before { content: ""; width: 2.5rem; height: 1px; background: var(--accent); }
+.act h2 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 50, "WONK" 1;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+  margin: 0 0 1.5rem;
+  max-width: 22ch;
+}
+.act h2 em { font-style: italic; color: var(--accent); }
+.act .intro {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md);
+  font-weight: 300;
+  color: var(--ink-soft);
+  max-width: 56ch;
+  margin: 0 0 2rem;
+}
+
+/* ===== ACT I · pollution comparison ===================== */
+.compare {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+@media (min-width: 760px) { .compare { grid-template-columns: 1fr 1fr; gap: 0; } }
+.compare-col {
+  padding: 1.75rem;
+  border: 1px solid var(--ink);
+}
+.compare-col + .compare-col { border-left: 0; }
+@media (max-width: 759px) {
+  .compare-col + .compare-col { border-left: 1px solid var(--ink); border-top: 0; }
+}
+.compare-col h3 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  margin: 0 0 1rem;
+  font-weight: 700;
+}
+.compare-col.bad h3 { color: var(--signal); }
+.compare-col.good h3 { color: var(--accent); }
+.compare-col ul { display: grid; gap: 0.6rem; font-size: var(--t-sm); }
+.compare-col li {
+  padding-left: 1.5rem;
+  position: relative;
+  line-height: 1.5;
+}
+.compare-col.bad li::before {
+  content: "×"; position: absolute; left: 0; top: -0.05em;
+  color: var(--signal);
+  font-weight: 700;
+  font-size: 1.2em;
+}
+.compare-col.good li::before {
+  content: "✓"; position: absolute; left: 0; top: 0;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* ===== TOOL RACK ======================================== */
+.rack {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+  margin-top: 2rem;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+}
+@media (min-width: 760px) { .rack { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1080px) { .rack { grid-template-columns: repeat(3, 1fr); } }
+.tool {
+  padding: 1.5rem;
+  border-right: 1px solid var(--paper-edge);
+  border-bottom: 1px solid var(--paper-edge);
+  display: grid; grid-template-rows: auto auto auto auto 1fr; gap: 0.5rem;
+}
+@media (min-width: 1080px) {
+  .tool:nth-child(3n) { border-right: 0; }
+}
+@media (min-width: 760px) and (max-width: 1079px) {
+  .tool:nth-child(2n) { border-right: 0; }
+}
+.tool .tn {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--accent);
+}
+.tool h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.35rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+.tool .role {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  font-weight: 600;
+}
+.tool .port {
+  display: inline-flex; align-items: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  background: var(--rack); color: var(--accent);
+  padding: 0.2rem 0.55rem;
+  border-radius: 2px;
+  letter-spacing: 0.05em;
+  margin-top: 0.25rem;
+  width: fit-content;
+}
+.tool p { font-size: var(--t-sm); color: var(--ink-soft); margin: 0; line-height: 1.5; }
+
+/* ===== TERMINAL ========================================= */
+.term {
+  background: #0a1c1f;
+  color: #d8e8e8;
+  border: 1px solid var(--ink);
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.92rem;
+  padding: 1.5rem;
+  margin: 2rem 0;
+  overflow-x: auto;
+  line-height: 1.65;
+}
+.term .prompt { color: var(--accent); }
+.term .kw { color: #f0c987; }
+.term .str { color: #b3d4a0; }
+.term .com { color: color-mix(in srgb, #d8e8e8 50%, transparent); }
+.term .ok { color: #6ed1a3; }
+.term .head {
+  display: flex; gap: 0.4rem; margin-bottom: 1rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid color-mix(in srgb, #d8e8e8 12%, transparent);
+}
+.term .dot { width: 10px; height: 10px; border-radius: 50%; background: #444; }
+.term .dot.r { background: #ee6a5f; }
+.term .dot.y { background: #f5bf4f; }
+.term .dot.g { background: #62c554; }
+.term .label { font-size: var(--t-xs); margin-left: auto; color: color-mix(in srgb, #d8e8e8 50%, transparent); letter-spacing: 0.1em; }
+
+/* ===== TIMELINE ========================================== */
+.tl {
+  display: grid; gap: 0;
+  grid-template-columns: 1fr;
+  margin-top: 2rem;
+}
+.tl-row {
+  display: grid;
+  grid-template-columns: 6rem 1fr;
+  gap: 1.5rem;
+  padding: 1rem 0;
+  border-bottom: var(--hair-soft);
+  align-items: baseline;
+}
+.tl-row:last-child { border-bottom: 0; }
+.tl-row .t {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 700;
+}
+.tl-row h4 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md);
+  margin: 0 0 0.4rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.tl-row p { margin: 0; font-size: var(--t-sm); color: var(--ink-soft); }
+
+/* ===== PROOF ============================================ */
+.proof {
+  background: var(--rack);
+  color: var(--paper);
+  padding-block: clamp(3rem, 5vw, 5rem);
+  position: relative;
+}
+.proof h2 { color: var(--paper); }
+.proof h2 em { color: var(--accent); }
+.proof-grid {
+  display: grid; gap: 1rem; margin-top: 2rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { .proof-grid { grid-template-columns: repeat(2, 1fr); } }
+.proof-item {
+  border: 1px solid color-mix(in srgb, var(--paper) 30%, transparent);
+  padding: 1.5rem;
+  background: color-mix(in srgb, var(--paper) 5%, transparent);
+}
+.proof-item h3 {
+  font-family: 'Fraunces', serif;
+  margin: 0 0 0.5rem;
+  font-size: var(--t-md);
+  color: var(--accent);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.proof-item p { margin: 0; color: color-mix(in srgb, var(--paper) 80%, transparent); font-size: var(--t-sm); }
+
+/* ===== STACK ============================================ */
+.stack-list {
+  display: flex; flex-wrap: wrap; gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+.stack-tag {
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--ink);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 600;
+}
+
+/* ===== END CTA ========================================= */
+.endcta {
+  padding-block: clamp(3rem, 5vw, 5rem);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 10%, transparent), var(--paper));
+}
+.endcta .frame { display: grid; gap: 2rem; grid-template-columns: 1fr; }
+@media (min-width: 760px) { .endcta .frame { grid-template-columns: 2fr 1fr; align-items: end; } }
+.endcta h2 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl);
+  font-weight: 300;
+  font-variation-settings: "opsz" 144, "SOFT" 100;
+  margin: 0 0 1rem;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+}
+.endcta h2 em { font-style: italic; color: var(--accent); }
+.endcta p { color: var(--ink-soft); margin: 0; max-width: 50ch; }
+.endcta .actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+.btn {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.7rem 1.1rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 700;
+  border: 1px solid var(--ink);
+  transition: background .15s, color .15s, transform .15s, box-shadow .15s;
+}
+.btn:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--ink); }
+.btn-primary { background: var(--accent); color: white; border-color: var(--accent); }
+.btn-ghost { background: transparent; color: var(--ink); }
+
+.foot { background: var(--ink); color: var(--paper); }
+.foot .dot { color: var(--accent); }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topnav">
+  <div class="frame">
+    <div class="brand"><a href="../index.html">dmj<span class="dot">.</span>one</a></div>
+    <nav aria-label="Primary">
+      <ul>
+        <li><a href="../index.html#catalogue">Catalogue</a></li>
+        <li><a href="../index.html#manifesto">Manifesto</a></li>
+        <li><a href="../index.html#hire">Hire</a></li>
+        <li><a href="https://github.com/divyamohan1993/devops-devsecops-toolkit" rel="noopener">GitHub</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ============ HERO ============ -->
+<section class="tk-hero">
+  <div class="frame">
+    <p class="tk-crumbs">
+      <a href="../index.html">Catalogue</a> /
+      <a href="../index.html#cat-cloud">Cloud · Infra</a> /
+      <span>DevOps · DevSecOps Toolkit</span>
+    </p>
+
+    <span class="tk-eyebrow">No. 40 · Cloud · DevSecOps</span>
+
+    <h1>
+      Seven security tools.<br>
+      One folder.<br>
+      <em>Zero system pollution.</em>
+    </h1>
+
+    <p class="lede">
+      Most DevSecOps stacks ask for a clean machine, an admin password, and an afternoon. This toolkit asks for a folder. <strong>Run it. Use it. Delete it.</strong> Your registry never knew it was there.
+    </p>
+
+    <div class="tk-cta">
+      <a class="tk-btn tk-btn-primary" href="https://github.com/divyamohan1993/devops-devsecops-toolkit" rel="noopener">View source →</a>
+      <a class="tk-btn" href="#tools">See the seven tools</a>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ STATS ============ -->
+<section class="tk-stats" aria-label="At a glance">
+  <div class="tk-stat"><span class="num">7</span><span class="lbl">Production tools shipped</span></div>
+  <div class="tk-stat"><span class="num">0</span><span class="lbl">System-wide installs</span></div>
+  <div class="tk-stat"><span class="num">1</span><span class="lbl">Folder · drag &amp; drop</span></div>
+  <div class="tk-stat"><span class="num">1×</span><span class="lbl">Click to install all</span></div>
+  <div class="tk-stat"><span class="num">8GB</span><span class="lbl">RAM · enterprise-grade</span></div>
+</section>
+
+
+<!-- ============ ACT I · THE PROBLEM ============ -->
+<section class="act" aria-labelledby="prob-h">
+  <div class="frame">
+    <p class="act-num">Act I · The Problem</p>
+    <h2 id="prob-h">"Just install our DevSecOps stack." <em>Famous last words.</em></h2>
+    <p class="intro">A one-line install promise hides a two-day reality: PATH variables that never recover, services that auto-start at boot, registry keys you can't find, and a machine that refuses to feel clean again.</p>
+
+    <div class="compare">
+      <div class="compare-col bad">
+        <h3>The usual experience</h3>
+        <ul>
+          <li>Each tool ships its own installer with admin rights</li>
+          <li>Java versions collide. PATH gets polluted.</li>
+          <li>Services register globally and auto-start at boot</li>
+          <li>Uninstall scripts leave orphan files in three directories</li>
+          <li>Two days lost before the first scan runs</li>
+        </ul>
+      </div>
+      <div class="compare-col good">
+        <h3>This toolkit</h3>
+        <ul>
+          <li>Each tool lives in its own folder, with its own JDK</li>
+          <li>Install, start, stop, scan, destroy · from one menu</li>
+          <li>Nothing on PATH, no service registration, no boot start</li>
+          <li>Delete the folder. The machine is clean again.</li>
+          <li>Double-click the .bat. Pick a tool. Go.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ ACT II · THE PROMISE / TERMINAL ============ -->
+<section class="act" aria-labelledby="prom-h">
+  <div class="frame">
+    <p class="act-num">Act II · The Promise</p>
+    <h2 id="prom-h">A single menu. <em>Seven enterprise tools.</em></h2>
+    <p class="intro">No SaaS subscriptions. No Docker required. No "shared services" team blocking your PR. Production-grade SAST, DAST, secrets management, monitoring · all running from your own folder, owned by your own filesystem, scanned by you.</p>
+
+    <div class="term" role="img" aria-label="DevOps Toolkit menu screenshot">
+      <div class="head">
+        <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+        <span class="label">devops-toolkit-manager.bat</span>
+      </div>
+<pre style="margin:0;background:transparent;color:inherit;font:inherit;">  <span class="prompt">╔═══════════════════════════════════════════════════════════════════════════╗</span>
+  <span class="prompt">║</span>                    <span class="kw">DEVOPS · DEVSECOPS TOOLKIT</span>                          <span class="prompt">║</span>
+  <span class="prompt">╠═══════════════════════════════════════════════════════════════════════════╣</span>
+  <span class="prompt">║</span>   <span class="ok">[1]</span>  SonarQube           Static Code &amp; Vulnerability Analysis        <span class="prompt">║</span>
+  <span class="prompt">║</span>   <span class="ok">[2]</span>  Jenkins             CI / CD Automation Server                    <span class="prompt">║</span>
+  <span class="prompt">║</span>   <span class="ok">[3]</span>  Trivy               Container &amp; Image Vulnerability Scanner     <span class="prompt">║</span>
+  <span class="prompt">║</span>   <span class="ok">[4]</span>  OWASP ZAP           Dynamic Application Security Testing        <span class="prompt">║</span>
+  <span class="prompt">║</span>   <span class="ok">[5]</span>  Grafana + Prometheus Metrics, Monitoring &amp; Alerting              <span class="prompt">║</span>
+  <span class="prompt">║</span>   <span class="ok">[6]</span>  HashiCorp Vault     Secrets Management &amp; Encryption             <span class="prompt">║</span>
+  <span class="prompt">║</span>   <span class="kw">[A]</span>  Install All Tools   Setup complete DevSecOps environment         <span class="prompt">║</span>
+  <span class="prompt">║</span>   <span class="kw">[S]</span>  Status All          Check status of all tools                    <span class="prompt">║</span>
+  <span class="prompt">║</span>   <span class="str">[D]</span>  Destroy All         Remove all tools and data                    <span class="prompt">║</span>
+  <span class="prompt">╚═══════════════════════════════════════════════════════════════════════════╝</span>
+  <span class="com"># pick a tool. install. scan. destroy. nothing left behind.</span></pre>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ ACT III · THE SEVEN TOOLS ============ -->
+<section class="act" id="tools" aria-labelledby="rack-h">
+  <div class="frame">
+    <p class="act-num">Act III · The Rack</p>
+    <h2 id="rack-h">Seven tools. <em>Each in its own folder.</em></h2>
+    <p class="intro">Pick the one you need. Open its sub-manager. Each one knows how to install, start, stop, scan, and destroy itself · without consulting the host machine.</p>
+
+    <div class="rack">
+      <div class="tool">
+        <p class="tn">01 · SAST</p>
+        <h3>SonarQube</h3>
+        <p class="role">Static code analysis</p>
+        <span class="port">localhost:9000</span>
+        <p>OWASP Top 10 scanning across 30+ languages. Bugs, vulnerabilities, code smells, technical debt. Folder-isolated JDK.</p>
+      </div>
+      <div class="tool">
+        <p class="tn">02 · CI / CD</p>
+        <h3>Jenkins</h3>
+        <p class="role">Pipeline automation</p>
+        <span class="port">localhost:8080</span>
+        <p>The standard CI server, without the system-wide install. Folder-local JDK, zero service registration, kill-the-folder uninstall.</p>
+      </div>
+      <div class="tool">
+        <p class="tn">03 · Container Sec</p>
+        <h3>Trivy</h3>
+        <p class="role">Image &amp; filesystem scanner</p>
+        <span class="port">CLI · folder-local</span>
+        <p>Catches CVEs in container images and IaC files. Reports stay inside its folder. No global PATH entry needed.</p>
+      </div>
+      <div class="tool">
+        <p class="tn">04 · DAST</p>
+        <h3>OWASP ZAP</h3>
+        <p class="role">Live-application scanner</p>
+        <span class="port">localhost:8090</span>
+        <p>The web pentester's standard. Active scan, passive scan, automated reports · all from a folder you can throw away.</p>
+      </div>
+      <div class="tool">
+        <p class="tn">05 · Metrics</p>
+        <h3>Grafana</h3>
+        <p class="role">Dashboards &amp; alerting</p>
+        <span class="port">localhost:3000</span>
+        <p>Pre-wired to the bundled Prometheus instance. Comes up with sensible default dashboards. Goes down with one menu pick.</p>
+      </div>
+      <div class="tool">
+        <p class="tn">06 · Telemetry</p>
+        <h3>Prometheus</h3>
+        <p class="role">Metrics collection</p>
+        <span class="port">localhost:9090</span>
+        <p>Scrapes targets, stores time-series locally inside its folder, exposes /metrics. Pairs with the bundled Grafana.</p>
+      </div>
+      <div class="tool">
+        <p class="tn">07 · Secrets</p>
+        <h3>HashiCorp Vault</h3>
+        <p class="role">Secrets &amp; encryption</p>
+        <span class="port">localhost:8200</span>
+        <p>Encrypts secrets at rest, brokers short-lived tokens, audits every access. Folder-local data store. Boot-isolated.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ ACT IV · LIFECYCLE ============ -->
+<section class="act" aria-labelledby="life-h">
+  <div class="frame">
+    <p class="act-num">Act IV · The Lifecycle</p>
+    <h2 id="life-h">Install. Use. <em>Destroy.</em></h2>
+    <p class="intro">The same five verbs work on every tool. Learn them once. They never lie about what they do.</p>
+
+    <ol class="tl">
+      <li class="tl-row">
+        <span class="t">Step 01</span>
+        <div>
+          <h4>Install</h4>
+          <p>Each tool downloads only into its own subfolder. Its own JDK. Its own data directory. Nothing global.</p>
+        </div>
+      </li>
+      <li class="tl-row">
+        <span class="t">Step 02</span>
+        <div>
+          <h4>Start</h4>
+          <p>Tool boots on its assigned localhost port. No service registration. No boot start. The process belongs to your terminal.</p>
+        </div>
+      </li>
+      <li class="tl-row">
+        <span class="t">Step 03</span>
+        <div>
+          <h4>Scan / Use</h4>
+          <p>Run a SonarQube analysis, ZAP a target, scrape metrics, store secrets. Same vocabulary across every tool's manager.</p>
+        </div>
+      </li>
+      <li class="tl-row">
+        <span class="t">Step 04</span>
+        <div>
+          <h4>Stop</h4>
+          <p>One command. The process exits. No background service waiting at boot.</p>
+        </div>
+      </li>
+      <li class="tl-row">
+        <span class="t">Step 05</span>
+        <div>
+          <h4>Destroy</h4>
+          <p>The folder goes. Data goes. The machine forgets the tool was ever installed. <code>git pull</code> a year later and start again, clean.</p>
+        </div>
+      </li>
+    </ol>
+  </div>
+</section>
+
+
+<!-- ============ PROOF ============ -->
+<section class="proof act" aria-labelledby="proof-h">
+  <div class="frame">
+    <p class="act-num">Act V · Proof</p>
+    <h2 id="proof-h">Why it stays clean. <em>Every time.</em></h2>
+
+    <div class="proof-grid">
+      <div class="proof-item">
+        <h3>One BAT to rule them all</h3>
+        <p><code>devops-toolkit-manager.bat</code> is the only entry point. It dispatches into per-tool sub-managers, each independent, each replaceable.</p>
+      </div>
+      <div class="proof-item">
+        <h3>PowerShell core, Windows-native</h3>
+        <p>Built for Windows 10/11 and Windows Server 2016+. PowerShell 5.1+, no third-party shells, no WSL required.</p>
+      </div>
+      <div class="proof-item">
+        <h3>8GB RAM · 20GB disk · done</h3>
+        <p>Reasonable on any developer laptop. The whole stack · SonarQube, Jenkins, Grafana, Prometheus, Vault, ZAP, Trivy · fits in a single folder under 20GB.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Status &amp; Destroy modes</h3>
+        <p>One command shows the running state of every tool. Another command tears them all down. Both are idempotent.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ STACK ============ -->
+<section class="act" aria-labelledby="stack-h">
+  <div class="frame">
+    <p class="act-num">The Stack</p>
+    <h2 id="stack-h" style="font-size:var(--t-xl);font-weight:400;font-family:'Fraunces',serif;font-variation-settings:'opsz' 144,'SOFT' 50;margin:0 0 0.5rem;letter-spacing:-0.02em;">PowerShell first. <em>Production-grade everywhere.</em></h2>
+    <p class="intro">Each tool is the canonical open-source build, wrapped in folder-isolation rather than reimplemented.</p>
+    <ul class="stack-list">
+      <li class="stack-tag">PowerShell 5.1+</li>
+      <li class="stack-tag">Windows 10 / 11 / Server 2016+</li>
+      <li class="stack-tag">SonarQube</li>
+      <li class="stack-tag">Jenkins</li>
+      <li class="stack-tag">Trivy</li>
+      <li class="stack-tag">OWASP ZAP</li>
+      <li class="stack-tag">Grafana</li>
+      <li class="stack-tag">Prometheus</li>
+      <li class="stack-tag">HashiCorp Vault</li>
+      <li class="stack-tag">file.dmj.one</li>
+      <li class="stack-tag">Aatmanirbhar Bharat</li>
+    </ul>
+  </div>
+</section>
+
+
+<!-- ============ END CTA ============ -->
+<section class="endcta" aria-labelledby="cta-h">
+  <div class="frame">
+    <div>
+      <h2 id="cta-h">If your team can clone a repo, <em>it can ship DevSecOps.</em></h2>
+      <p>I build tooling that respects the host machine · folder-isolated, idempotent, deletable. The same discipline goes into every product in the catalogue.</p>
+    </div>
+    <div class="actions">
+      <a class="btn btn-primary" href="../index.html#hire">Hire me →</a>
+      <a class="btn btn-ghost" href="../index.html">Back to catalogue</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="frame">
+    <div>
+      <h2 style="font-family:'Fraunces',serif;font-size:var(--t-xl);margin:0 0 1rem;">dmj<span class="dot">.</span>one</h2>
+      <p>Dream, Manifest and Journey, Together as One.</p>
+      <p class="meta">© 2026 Divya Mohan. DevOps · DevSecOps Toolkit ships under file.dmj.one as part of the Aatmanirbhar Bharat tooling line.</p>
+    </div>
+    <div>
+      <p class="meta">Catalogue</p>
+      <p><a href="../index.html#catalogue">All 47 products</a></p>
+      <p><a href="../index.html#cat-cloud">Cloud · Infra</a></p>
+      <p><a href="../index.html#hire">Hire</a></p>
+    </div>
+    <div>
+      <p class="meta">Toolkit</p>
+      <p><a href="https://github.com/divyamohan1993/devops-devsecops-toolkit" rel="noopener">Source</a></p>
+      <p><a href="https://file.dmj.one" rel="noopener">file.dmj.one</a></p>
+      <p><a href="mailto:contact@dmj.one">contact@dmj.one</a></p>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,675 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1c5d63">
+<meta name="color-scheme" content="light">
+
+<title>GreenScale · Route around the coal grid · dmj.one</title>
+<meta name="description" content="A carbon-, cold-start-, latency- and cost-aware routing plane for multi-region serverless. Pick the region that is cleanest right now, not the one that was cheapest yesterday.">
+<meta property="og:title" content="GreenScale · Route around the coal grid">
+<meta property="og:description" content="Carbon-aware routing for multi-region serverless. Capstone, Shoolini University.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,30..100&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="../assets/core.css">
+
+<style>
+:root {
+  --accent: var(--c-cloud);
+  --accent-deep: #0e3d42;
+  --leaf: #2d7a47;
+  --carbon-low: #2d7a47;
+  --carbon-mid: #b48a2b;
+  --carbon-high: #b03030;
+}
+body { background: var(--paper); }
+
+/* ====== HERO ============================================ */
+.gs-hero {
+  position: relative;
+  padding-block: clamp(3rem, 5vw + 1rem, 6rem) clamp(2rem, 4vw, 4rem);
+  border-bottom: var(--hair);
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, var(--paper) 0%, color-mix(in srgb, var(--accent) 6%, var(--paper)) 100%);
+}
+.gs-hero::before {
+  content: ""; position: absolute; inset: 0;
+  background-image:
+    linear-gradient(to right, color-mix(in srgb, var(--accent) 8%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--accent) 8%, transparent) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask: linear-gradient(180deg, black, transparent 75%);
+  -webkit-mask: linear-gradient(180deg, black, transparent 75%);
+  pointer-events: none;
+}
+.gs-hero .frame { position: relative; z-index: 2; display: grid; gap: 2.5rem; }
+@media (min-width: 960px) {
+  .gs-hero .frame { grid-template-columns: 1.4fr 1fr; gap: 4rem; align-items: center; }
+}
+
+.crumbs {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs); letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink-mute); margin: 0 0 2rem;
+  display: flex; gap: 0.5rem; flex-wrap: wrap;
+}
+.crumbs a { border-bottom: 1px solid var(--ink-mute); padding-bottom: 1px; }
+.crumbs a:hover { color: var(--accent); border-color: var(--accent); }
+.crumbs span { color: var(--accent); }
+
+.gs-eyebrow {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  padding: 0.4rem 0.85rem;
+  border: 1px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  color: var(--accent-deep);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs); font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.16em;
+  margin-bottom: 1.5rem;
+}
+.gs-eyebrow::before {
+  content: ""; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--leaf); box-shadow: 0 0 0 4px color-mix(in srgb, var(--leaf) 25%, transparent);
+}
+
+.gs-hero h1 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-3xl); font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 30;
+  letter-spacing: -0.03em; line-height: 0.96;
+  margin: 0; max-width: 14ch;
+}
+.gs-hero h1 em {
+  font-style: italic; color: var(--accent);
+  font-variation-settings: "opsz" 144, "SOFT" 100;
+}
+.gs-hero .lede {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md); font-weight: 300;
+  line-height: 1.45; color: var(--ink-soft);
+  margin: 1.5rem 0 0; max-width: 52ch;
+}
+.gs-hero .lede strong {
+  font-weight: 600;
+  background: linear-gradient(180deg, transparent 60%, color-mix(in srgb, var(--accent) 25%, transparent) 60%);
+  padding: 0 0.1em; color: var(--ink);
+}
+
+/* carbon gauge SVG */
+.carbon-card {
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  padding: 1.5rem;
+  box-shadow: 6px 6px 0 var(--ink);
+  display: grid; gap: 1rem;
+}
+.carbon-card .label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.18em;
+  color: var(--ink-mute); font-weight: 700;
+}
+.region-row {
+  display: grid; grid-template-columns: 5rem 1fr 4rem;
+  gap: 0.75rem; align-items: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+}
+.region-row .name { font-weight: 600; color: var(--ink); }
+.region-row .bar {
+  height: 0.6rem; border: 1px solid var(--ink); position: relative;
+  background: var(--paper-soft);
+}
+.region-row .bar span {
+  display: block; height: 100%; transition: width .4s;
+}
+.region-row .val { text-align: right; font-weight: 700; }
+.bar.low span { background: var(--carbon-low); width: 22%; }
+.bar.mid span { background: var(--carbon-mid); width: 58%; }
+.bar.high span { background: var(--carbon-high); width: 88%; }
+.bar.lowmid span { background: var(--carbon-mid); width: 41%; }
+.carbon-foot {
+  border-top: 1px solid var(--paper-edge);
+  padding-top: 0.75rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  color: var(--ink-mute);
+}
+.carbon-foot strong { color: var(--leaf); }
+
+.gs-cta-row {
+  margin-top: 2.5rem;
+  display: flex; gap: 0.75rem; flex-wrap: wrap;
+}
+.btn {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.7rem 1.1rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs); text-transform: uppercase;
+  letter-spacing: 0.14em; font-weight: 700;
+  border: 1px solid var(--ink);
+  transition: background .15s, color .15s, transform .15s, box-shadow .15s;
+}
+.btn:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--ink); }
+.btn-primary { background: var(--accent); color: white; border-color: var(--accent); }
+.btn-primary:hover { box-shadow: 4px 4px 0 var(--ink); }
+.btn-ghost { background: transparent; color: var(--ink); }
+
+/* ====== STATS ============================================ */
+.gs-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  background: var(--ink); color: var(--paper);
+  border-block: 2px solid var(--ink);
+}
+.gs-stat {
+  padding: 1.5rem clamp(1rem, 2vw, 1.5rem);
+  border-right: 1px solid color-mix(in srgb, var(--paper) 20%, transparent);
+}
+.gs-stat:last-child { border-right: 0; }
+.gs-stat .num {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl); font-weight: 400;
+  letter-spacing: -0.04em;
+  font-variation-settings: "opsz" 144, "SOFT" 30;
+  display: block; line-height: 1;
+  color: var(--accent);
+}
+.gs-stat .lbl {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.14em;
+  margin-top: 0.6rem; display: block;
+  color: color-mix(in srgb, var(--paper) 75%, transparent);
+}
+
+/* ====== ACT ============================================== */
+.act {
+  padding-block: clamp(3rem, 5vw, 5rem);
+  border-bottom: var(--hair);
+}
+.act-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs); letter-spacing: 0.22em;
+  text-transform: uppercase; color: var(--accent);
+  font-weight: 700; margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 1rem;
+}
+.act-num::before { content: ""; width: 2.5rem; height: 1px; background: var(--accent); }
+.act h2 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl); font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 50;
+  letter-spacing: -0.025em; line-height: 1.05;
+  margin: 0 0 1.5rem; max-width: 22ch;
+}
+.act h2 em { font-style: italic; color: var(--accent); }
+.act-lede {
+  font-family: 'Fraunces', serif; font-size: var(--t-md);
+  color: var(--ink-soft); max-width: 60ch; margin: 0 0 2rem;
+}
+
+/* problem grid */
+.prob-grid {
+  display: grid; gap: 0;
+  grid-template-columns: 1fr;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+}
+@media (min-width: 760px) { .prob-grid { grid-template-columns: 1fr 1fr; } }
+.prob-cell {
+  padding: 1.5rem;
+  border-right: 1px solid var(--paper-edge);
+  border-bottom: 1px solid var(--paper-edge);
+}
+@media (min-width: 760px) {
+  .prob-cell:nth-child(2n) { border-right: 0; }
+  .prob-cell:nth-last-child(-n+2) { border-bottom: 0; }
+}
+.prob-cell .axis {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.16em;
+  color: var(--accent); font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+.prob-cell h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.15rem; font-weight: 500;
+  letter-spacing: -0.01em;
+  margin: 0 0 0.5rem;
+}
+.prob-cell p { margin: 0; color: var(--ink-soft); font-size: var(--t-sm); }
+
+/* timeline */
+.timeline {
+  display: grid; gap: 0;
+  margin-top: 2rem;
+  border-left: 2px solid var(--accent);
+  padding-left: 0;
+}
+.tl-step {
+  padding: 1.5rem 0 1.5rem 2rem;
+  border-bottom: var(--hair-soft);
+  position: relative;
+}
+.tl-step:last-child { border-bottom: 0; }
+.tl-step::before {
+  content: ""; position: absolute;
+  left: -7px; top: 1.7rem;
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid var(--paper);
+}
+.tl-step .tn {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--accent-deep); font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+.tl-step h3 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md); font-weight: 500;
+  letter-spacing: -0.01em;
+  margin: 0 0 0.5rem;
+}
+.tl-step p {
+  margin: 0; color: var(--ink-soft); font-size: var(--t-sm);
+  max-width: 64ch;
+}
+.tl-step code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85em;
+  padding: 0.1rem 0.3rem;
+  background: var(--paper-soft);
+  border: 1px solid var(--paper-edge);
+}
+
+/* sources/components */
+.comp-grid {
+  display: grid; gap: 0; margin-top: 2rem;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { .comp-grid { grid-template-columns: repeat(3, 1fr); } }
+.comp {
+  padding: 1.25rem 1.5rem;
+  border-right: 1px solid var(--paper-edge);
+  border-bottom: 1px solid var(--paper-edge);
+}
+@media (min-width: 760px) {
+  .comp:nth-child(3n) { border-right: 0; }
+  .comp:nth-last-child(-n+3) { border-bottom: 0; }
+}
+.comp .ct {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--accent); font-weight: 700;
+  margin-bottom: 0.4rem;
+}
+.comp h4 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.1rem; font-weight: 500;
+  letter-spacing: -0.01em;
+  margin: 0 0 0.4rem;
+}
+.comp p { margin: 0; color: var(--ink-soft); font-size: var(--t-sm); line-height: 1.45; }
+
+/* proof */
+.proof-act {
+  background: var(--ink); color: var(--paper);
+  position: relative; overflow: hidden;
+}
+.proof-act::before {
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 80% 20%, color-mix(in srgb, var(--accent) 30%, transparent), transparent 60%);
+  pointer-events: none;
+}
+.proof-act .frame { position: relative; }
+.proof-act h2 { color: var(--paper); }
+.proof-act h2 em { color: var(--accent); }
+.proof-grid {
+  display: grid; gap: 1rem; margin-top: 2rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { .proof-grid { grid-template-columns: repeat(2, 1fr); } }
+.proof-item {
+  border: 1px solid color-mix(in srgb, var(--paper) 30%, transparent);
+  padding: 1.5rem;
+  background: color-mix(in srgb, var(--paper) 5%, transparent);
+}
+.proof-item h3 {
+  font-family: 'Fraunces', serif;
+  margin: 0 0 0.5rem; font-size: var(--t-md);
+  color: var(--accent); font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.proof-item p { margin: 0; color: color-mix(in srgb, var(--paper) 80%, transparent); font-size: var(--t-sm); }
+
+/* credit */
+.credit {
+  padding-block: clamp(2.5rem, 4vw, 4rem);
+  background: var(--paper-soft);
+  border-bottom: var(--hair);
+}
+.credit-grid {
+  display: grid; gap: 1.5rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { .credit-grid { grid-template-columns: 2fr 1fr 1fr; align-items: start; } }
+.credit-block .role {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs); letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--accent);
+  font-weight: 700; margin-bottom: 0.5rem;
+}
+.credit-block h3 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-md); font-weight: 500;
+  margin: 0 0 0.4rem;
+  letter-spacing: -0.01em;
+}
+.credit-block p { margin: 0; font-size: var(--t-sm); color: var(--ink-soft); }
+
+/* stack */
+.stack-list {
+  display: flex; flex-wrap: wrap; gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+.stack-tag {
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--ink);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-xs);
+  text-transform: uppercase; letter-spacing: 0.14em;
+  font-weight: 600;
+}
+
+/* end cta */
+.endcta {
+  padding-block: clamp(3rem, 5vw, 5rem);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 10%, transparent), var(--paper));
+}
+.endcta .frame { display: grid; gap: 2rem; grid-template-columns: 1fr; }
+@media (min-width: 760px) { .endcta .frame { grid-template-columns: 2fr 1fr; align-items: end; } }
+.endcta h2 {
+  font-family: 'Fraunces', serif;
+  font-size: var(--t-2xl); font-weight: 300;
+  font-variation-settings: "opsz" 144, "SOFT" 100;
+  margin: 0 0 1rem; letter-spacing: -0.025em; line-height: 1.05;
+}
+.endcta h2 em {
+  font-style: italic; color: var(--accent);
+  background: linear-gradient(180deg, transparent 70%, color-mix(in srgb, var(--accent) 25%, transparent) 70%);
+}
+.endcta p { color: var(--ink-soft); margin: 0; max-width: 50ch; }
+.endcta .actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+
+/* footer */
+.foot { background: var(--ink); color: var(--paper); }
+.foot .dot { color: var(--accent); }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topnav">
+  <div class="frame">
+    <div class="brand"><a href="../index.html">dmj<span class="dot">.</span>one</a></div>
+    <nav aria-label="Primary">
+      <ul>
+        <li><a href="../index.html#catalogue">Catalogue</a></li>
+        <li><a href="../index.html#manifesto">Manifesto</a></li>
+        <li><a href="../index.html#hire">Hire</a></li>
+        <li><a class="btn" href="https://greenscale.dmj.one" rel="noopener">Try the live app →</a>
+      <a href="https://github.com/divyamohan1993/greenscale" rel="noopener">GitHub</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ======= HERO ======= -->
+<section class="gs-hero">
+  <div class="frame">
+    <div>
+      <p class="crumbs">
+        <a href="../index.html">Catalogue</a> /
+        <a href="../index.html#cat-cloud">Cloud and Infra</a> /
+        <span>GreenScale</span>
+      </p>
+
+      <span class="gs-eyebrow">Capstone · Carbon-aware routing</span>
+
+      <h1>Route around <em>the coal grid.</em></h1>
+
+      <p class="lede">
+        Serverless platforms route by latency and price. They ignore that one region is burning <strong>coal at 720 gCO₂ per kWh</strong> while the next runs on hydro at 90. GreenScale fixes that. Same request, same SLA, cleaner electron.
+      </p>
+
+      <div class="gs-cta-row">
+        <a class="btn btn-primary" href="https://github.com/divyamohan1993/greenscale" rel="noopener">View source</a>
+        <a class="btn btn-ghost" href="#how">How it works</a>
+        <a class="btn btn-ghost" href="#proof">Proof</a>
+      </div>
+    </div>
+
+    <aside class="carbon-card" aria-label="Live regional carbon snapshot (illustrative)">
+      <p class="label">Region · Carbon Intensity (gCO₂/kWh)</p>
+      <div class="region-row"><span class="name">europe-north1</span><span class="bar low" aria-hidden="true"><span></span></span><span class="val">158</span></div>
+      <div class="region-row"><span class="name">us-central1</span><span class="bar lowmid" aria-hidden="true"><span></span></span><span class="val">295</span></div>
+      <div class="region-row"><span class="name">asia-south1</span><span class="bar mid" aria-hidden="true"><span></span></span><span class="val">418</span></div>
+      <div class="region-row"><span class="name">us-east1</span><span class="bar high" aria-hidden="true"><span></span></span><span class="val">632</span></div>
+      <p class="carbon-foot">Decision: route to <strong>europe-north1</strong>. Latency cost +18ms. Carbon saved: 474 gCO₂/req.</p>
+    </aside>
+  </div>
+</section>
+
+<!-- ======= STATS ======= -->
+<section class="gs-stats" aria-label="At a glance">
+  <div class="gs-stat"><span class="num">3</span><span class="lbl">Cloud Run services</span></div>
+  <div class="gs-stat"><span class="num">4D</span><span class="lbl">Carbon · cold-start · latency · cost</span></div>
+  <div class="gs-stat"><span class="num">0</span><span class="lbl">Idle cost (min-instances=0)</span></div>
+  <div class="gs-stat"><span class="num">2</span><span class="lbl">Research gaps closed</span></div>
+  <div class="gs-stat"><span class="num">1</span><span class="lbl">Bash deploy.sh, idempotent</span></div>
+</section>
+
+<!-- ======= ACT I · PROBLEM ======= -->
+<section class="act" aria-labelledby="prob-h">
+  <div class="frame">
+    <p class="act-num">Act I · The Problem</p>
+    <h2 id="prob-h">Latency-aware routing was <em>solved.</em><br>Carbon-aware routing was <em>ignored.</em></h2>
+    <p class="act-lede">Every serverless platform from AWS Lambda to Cloud Run will pick the region with the fastest cold-start or the lowest list price. None of them ask: is this region's grid burning coal right now? GreenScale was built around the two gaps the literature still has.</p>
+
+    <div class="prob-grid">
+      <div class="prob-cell">
+        <p class="axis">Gap 01</p>
+        <h3>The four-axis decision is not made anywhere.</h3>
+        <p>Existing routers optimise one or two axes. Nobody combines carbon intensity, cold-start probability, p95 latency and per-request cost into a single ranked decision per request.</p>
+      </div>
+      <div class="prob-cell">
+        <p class="axis">Gap 02</p>
+        <h3>Carbon data is stale by the time it is used.</h3>
+        <p>Most "green cloud" tooling pulls daily averages. Grid intensity moves in fifteen-minute windows. By the time the dashboard updates, you have already paid the carbon.</p>
+      </div>
+      <div class="prob-cell">
+        <p class="axis">Reality 01</p>
+        <h3>Cold starts cost both seconds and watts.</h3>
+        <p>Routing a request to a cold region adds 800ms and a fresh container boot. That boot itself draws power. The router has to know which regions are warm right now.</p>
+      </div>
+      <div class="prob-cell">
+        <p class="axis">Reality 02</p>
+        <h3>Spot pricing changes the answer.</h3>
+        <p>A region that is dirty and expensive at 9am can be clean and cheap at 2pm. The decision must re-rank continuously, not at deploy time.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======= ACT II · PROMISE ======= -->
+<section class="act" style="background: linear-gradient(180deg, var(--paper-soft), var(--paper));" aria-labelledby="promise-h">
+  <div class="frame">
+    <p class="act-num">Act II · The Promise</p>
+    <h2 id="promise-h">One router. <em>Four signals.</em><br>Per request. Per second.</h2>
+    <p class="act-lede">A request comes in. GreenScale ranks every healthy region by carbon, cold-start risk, latency and cost. Picks one. Logs the decision. Shows it on a live world map at <code style="font-family:'JetBrains Mono',monospace;background:var(--paper-soft);padding:0.1rem 0.3rem;border:1px solid var(--paper-edge);">/</code>, with the trade-off broken down so anyone can audit it.</p>
+  </div>
+</section>
+
+<!-- ======= ACT III · HOW IT WORKS ======= -->
+<section class="act" id="how" aria-labelledby="how-h">
+  <div class="frame">
+    <p class="act-num">Act III · The Product</p>
+    <h2 id="how-h">Three services. <em>One decision.</em></h2>
+
+    <ol class="timeline">
+      <li class="tl-step">
+        <p class="tn">01 · Backend · FastAPI</p>
+        <h3>The routing engine itself.</h3>
+        <p>Combines a carbon model, a cold-start model and a latency probe into a multi-objective scorer. Picks one region per request. Runs on Cloud Run with <code>min-instances=0</code> so idle cost is zero rupees.</p>
+      </li>
+      <li class="tl-step">
+        <p class="tn">02 · Database · FastAPI + SQLite</p>
+        <h3>Persistence with a Cloud Storage round-trip.</h3>
+        <p>Decisions, regional snapshots and pitch slides persist to SQLite. The DB service syncs to a GCS bucket so a fresh cold start rebuilds state, not loses it.</p>
+      </li>
+      <li class="tl-step">
+        <p class="tn">03 · Frontend · nginx + Leaflet</p>
+        <h3>A live world map and a decision feed.</h3>
+        <p>Static HTML, CSS and JS over nginx. Leaflet for the map, Chart.js for the trade-off plots. Loads on a 2G connection. Includes a pitch deck with arrow-key navigation and a downloadable .docx report at <code>/report</code>.</p>
+      </li>
+      <li class="tl-step">
+        <p class="tn">04 · Deploy · one bash script</p>
+        <h3>All three services, idempotent, in minutes.</h3>
+        <p><code>bash deploy/deploy.sh</code> ships every service. Or piecewise: <code>deploy.sh db</code>, <code>deploy.sh backend</code>, <code>deploy.sh frontend</code>. The script regenerates the report (HTML + docx) before each frontend deploy.</p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- ======= ACT IV · STACK ======= -->
+<section class="act" aria-labelledby="stack-h">
+  <div class="frame">
+    <p class="act-num">Act IV · The Stack</p>
+    <h2 id="stack-h">What is inside.</h2>
+    <ul class="stack-list">
+      <li class="stack-tag">Python 3.11+</li>
+      <li class="stack-tag">FastAPI</li>
+      <li class="stack-tag">SQLite</li>
+      <li class="stack-tag">Google Cloud Run</li>
+      <li class="stack-tag">Cloud Storage</li>
+      <li class="stack-tag">nginx</li>
+      <li class="stack-tag">Leaflet</li>
+      <li class="stack-tag">Chart.js</li>
+      <li class="stack-tag">Docker</li>
+      <li class="stack-tag">Bash</li>
+    </ul>
+
+    <div class="comp-grid" style="margin-top: 2.5rem;">
+      <div class="comp"><p class="ct">Carbon Model</p><h4>Per-region intensity</h4><p>Maps each region to its grid carbon profile so the scorer can rank.</p></div>
+      <div class="comp"><p class="ct">Cold-start Model</p><h4>Probability per region</h4><p>Tracks recent invocations to estimate the chance the next request boots a cold container.</p></div>
+      <div class="comp"><p class="ct">Latency Probe</p><h4>p95 per region</h4><p>Continuous health probes feed an SLA-aware penalty into the score.</p></div>
+      <div class="comp"><p class="ct">Cost Layer</p><h4>List price per request</h4><p>Adds the egress and per-invocation cost so a "green" decision is also defensible to finance.</p></div>
+      <div class="comp"><p class="ct">Decision Feed</p><h4>Every choice, logged</h4><p>JSON line per request with the full trade-off breakdown. Auditable end-to-end.</p></div>
+      <div class="comp"><p class="ct">Report Generator</p><h4>HTML + docx</h4><p>One JSON source feeds both the in-app HTML report and the downloadable Word file at <code>/report</code>.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ======= CREDIT ======= -->
+<section class="credit" aria-labelledby="credit-h">
+  <div class="frame">
+    <p class="act-num" id="credit-h">Credits · Built by</p>
+    <div class="credit-grid">
+      <div class="credit-block">
+        <p class="role">Builder</p>
+        <h3>Anshuman Mohanty</h3>
+        <p>B.Tech CSE Cloud Computing, Yogananda School of AI, Computers and Data Sciences, Shoolini University. Roll number GF202217744. Capstone project.</p>
+      </div>
+      <div class="credit-block">
+        <p class="role">Capstone Mentor</p>
+        <h3>Mr. Ashish</h3>
+        <p>Faculty mentor, Shoolini University.</p>
+      </div>
+      <div class="credit-block">
+        <p class="role">Engineering Mentor</p>
+        <h3>Divya Mohan</h3>
+        <p>dmj.one. Architecture, deployment and the four-axis scorer design.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======= PROOF ======= -->
+<section class="proof-act act" id="proof" aria-labelledby="proof-h">
+  <div class="frame">
+    <p class="act-num">Act V · Proof</p>
+    <h2 id="proof-h">It already <em>ships.</em></h2>
+    <div class="proof-grid">
+      <div class="proof-item">
+        <h3>Repo · divyamohan1993/greenscale</h3>
+        <p>Public source. Backend, database service, frontend, build scripts, deploy script and the architecture document, all in one tree.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Live dashboard · / · /pitch · /report</h3>
+        <p>Three surfaces from one frontend: a live world map with the decision feed, an arrow-key slide deck and the full capstone report (with Download .docx).</p>
+      </div>
+      <div class="proof-item">
+        <h3>Cloud Run · min-instances=0</h3>
+        <p>All three services run cold-start-able. No always-on cost. Anyone can fork, run <code>bash deploy/deploy.sh</code> on their own GCP project, and have it live in minutes.</p>
+      </div>
+      <div class="proof-item">
+        <h3>Research framing · docs/research-gaps.md</h3>
+        <p>The two literature gaps that motivated the work, with cited evidence. Architecture decisions in <code>ARCHITECTURE.md</code>. Reproducible from the repo.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======= END CTA ======= -->
+<section class="endcta" aria-labelledby="cta-h">
+  <div class="frame">
+    <div>
+      <h2 id="cta-h">Want a router that is honest about <em>which electron it just burned?</em></h2>
+      <p>I mentor capstones, build carbon-aware infrastructure, and ship multi-region serverless that picks the cleanest region per request. Talk to me.</p>
+    </div>
+    <div class="actions">
+      <a class="btn btn-primary" href="../index.html#hire">Hire me</a>
+      <a class="btn btn-ghost" href="../index.html">Back to catalogue</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="frame">
+    <div>
+      <h2 style="font-family:'Fraunces',serif;font-size:var(--t-xl);margin:0 0 1rem;">dmj<span class="dot">.</span>one</h2>
+      <p>Dream, Manifest and Journey, Together as One.</p>
+      <p class="meta">© 2026 Divya Mohan. GreenScale: capstone of Anshuman Mohanty (Shoolini University, B.Tech CSE Cloud Computing). Mentor: Mr. Ashish. Engineering mentor: Divya Mohan.</p>
+    </div>
+    <div>
+      <p class="meta">Catalogue</p>
+      <p><a href="../index.html#catalogue">All 47 products</a></p>
+      <p><a href="../index.html#cat-cloud">Cloud and Infra</a></p>
+      <p><a href="../index.html#hire">Hire</a></p>
+    </div>
+    <div>
+      <p class="meta">GreenScale</p>
+      <p><a href="https://github.com/divyamohan1993/greenscale" rel="noopener">Source</a></p>
+      <p><a href="mailto:contact@dmj.one">contact@dmj.one</a></p>
+    </div>
+  </div>
+</footer>
+</body>
+</html>
