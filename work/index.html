@@ -626,9 +626,16 @@
 
 /* --- scroll hint --------------------------------------- */
 .scroll-hint {
+  position: fixed;
+  right: clamp(1.25rem, 3vw, 2.5rem);
+  bottom: clamp(1rem, 2.5vw, 2rem);
+  z-index: 5;
   display: flex; align-items: center; gap: 0.55rem;
-  width: fit-content;
-  margin-left: auto; margin-bottom: 1rem;
+  padding: 0.55rem 0.85rem;
+  background: color-mix(in srgb, var(--paper) 88%, transparent);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid color-mix(in srgb, var(--ink) 12%, transparent);
   font-family: 'JetBrains Mono', monospace;
   font-size: var(--t-xs);
   text-transform: uppercase;
@@ -636,8 +643,14 @@
   color: var(--ink-mute);
   text-decoration: none;
   white-space: nowrap;
+  transition: opacity .35s ease, transform .35s ease, color .15s;
 }
 .scroll-hint:hover { color: var(--ink); }
+.scroll-hint.is-hidden {
+  opacity: 0;
+  transform: translateY(8px);
+  pointer-events: none;
+}
 @media (max-width: 479px) { .scroll-hint { display: none; } }
 .scroll-hint::after {
   content: ""; width: 1px; height: 22px;
@@ -1319,20 +1332,20 @@
     <li class="entry" data-cat="ai">
       <div class="entry-num">28</div>
       <div class="entry-main">
-        <span class="entry-cat">AI · Agents · Emergency</span>
+        <span class="entry-cat">AI · Agents · Emergency · NDA</span>
         <h3 class="entry-name"><a href="products/cityguard-response-hub">CityGuard Response Hub</a></h3>
         <p class="entry-problem">When 112 (the Indian 911) gets a call, dispatchers juggle four screens, three radios and two databases. The call is queued. Lives are queued.</p>
-        <p class="entry-solution">An emergency response command centre · Google Maps + Gemini AI + Firebase Auth + Analytics · that fuses calls, units, and incidents into a single live map. One screen, one truth.</p>
-        <ul class="entry-tags"><li class="entry-tag">TypeScript</li><li class="entry-tag">Google Maps</li><li class="entry-tag">Gemini</li><li class="entry-tag">Firebase</li></ul>
+        <p class="entry-solution">An emergency response command centre that fuses calls, units, and incidents into a single live map · keyboard-first dispatch · sub-second AI tactical plan. One screen, one truth. Built under client NDA.</p>
+        <ul class="entry-tags"><li class="entry-tag">TypeScript</li><li class="entry-tag">Mapping</li><li class="entry-tag">AI plan</li><li class="entry-tag">WCAG AAA</li></ul>
         <div class="entry-actions">
           <a class="btn btn-primary" href="products/cityguard-response-hub">Open product</a>
-          <a class="btn btn-ghost" href="https://github.com/divyamohan1993/cityguard-response-hub" target="_blank" rel="noopener">Source</a>
+          <span class="btn btn-ghost" aria-label="Source code is private under NDA" style="opacity:.55;border-style:dashed;cursor:not-allowed;">Source · private (NDA)</span>
         </div>
       </div>
       <dl class="entry-side">
         <dt>Year</dt><dd>2026</dd>
         <dt>Surface</dt><dd>One screen</dd>
-        <dt>Pillar</dt><dd>Map + AI + Auth</dd>
+        <dt>Source</dt><dd>Private (NDA)</dd>
       </dl>
     </li>
 
@@ -2132,6 +2145,17 @@
   /* deep-link support */
   const hash = location.hash.replace('#cat-', '');
   if (['bharat','ai','enterprise','cloud','tools','research'].includes(hash)) apply(hash);
+})();
+
+/* scroll hint · hide once the hero leaves the viewport */
+(function () {
+  const hint = document.querySelector('.scroll-hint');
+  const hero = document.querySelector('.hero');
+  if (!hint || !hero || !('IntersectionObserver' in window)) return;
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries) hint.classList.toggle('is-hidden', !e.isIntersecting);
+  }, { threshold: 0.05 });
+  io.observe(hero);
 })();
 </script>
 </body>
