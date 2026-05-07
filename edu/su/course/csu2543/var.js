@@ -84,6 +84,13 @@ function get_menu_list(datetogen) {
                 codetype: "Concepts",
                 readtime: 8,
                 link: "frequency-domain-restoration"
+            },
+            {
+                title: "Color Processing and Compression",
+                desc: "Color image processing and compression: RGB and HSI color models, full-color vs. pseudocolor, intensity slicing, data redundancy types, fidelity criteria, encoder/decoder pipeline, and Huffman coding for lossless compression.",
+                codetype: "Concepts",
+                readtime: 7,
+                link: "color-processing-compression"
             }
         ];
         body_genmenu.processData(arr, def_date, def_author);
