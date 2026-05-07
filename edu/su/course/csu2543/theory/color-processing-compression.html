@@ -1,0 +1,327 @@
+<article>
+    <h3>1. Color Image Fundamentals</h3>
+    <p>Color image processing has two branches:</p>
+    <ul>
+        <li><strong>Full-color processing</strong> — images captured by sensors that record all color channels (e.g., a
+            digital camera). The color is physically real.</li>
+        <li><strong>Pseudocolor processing</strong> — artificial colors assigned to a grayscale image to make features
+            easier for humans to see. The color is invented, not captured.</li>
+    </ul>
+
+    <h4>1.1 How Humans See Color</h4>
+    <p>The human retina contains <strong>cones</strong> — photoreceptor cells sensitive to three overlapping wavelength
+        bands corresponding roughly to <strong>Red</strong>, <strong>Green</strong>, and <strong>Blue</strong>. Every
+        color we perceive is the brain's interpretation of the combined response of these three cone types. This is why
+        three channels are sufficient to represent virtually any visible color.</p>
+
+    <h4>1.2 Additive vs. Subtractive Color Mixing</h4>
+    <p>There are two fundamentally different mixing systems, depending on whether you are combining
+        <strong>light</strong> or <strong>pigments</strong>:</p>
+
+    <h5>1.2.1 Additive Primaries (Light)</h5>
+    <p>Used in monitors, projectors, cameras. You start with darkness and <em>add</em> light.</p>
+    <ul>
+        <li>Red + Green = <strong>Yellow</strong></li>
+        <li>Green + Blue = <strong>Cyan</strong></li>
+        <li>Red + Blue = <strong>Magenta</strong></li>
+        <li>Red + Green + Blue = <strong>White</strong></li>
+    </ul>
+
+    <h5>1.2.2 Subtractive Primaries (Pigments/Inks)</h5>
+    <p>Used in printing. You start with white paper and <em>subtract</em> light by adding ink.</p>
+    <ul>
+        <li>Yellow + Magenta = <strong>Red</strong></li>
+        <li>Yellow + Cyan = <strong>Green</strong></li>
+        <li>Magenta + Cyan = <strong>Blue</strong></li>
+        <li>Yellow + Magenta + Cyan = <strong>Black</strong></li>
+    </ul>
+    <p>The secondary colors of one system are the primary colors of the other. Additive secondaries (Yellow, Cyan,
+        Magenta) are subtractive primaries, and vice versa.</p>
+</article>
+
+<article>
+    <h3>2. The RGB Color Model</h3>
+    <p>RGB represents colors as points in a <strong>3D Cartesian coordinate system</strong> — a cube with Red, Green,
+        and Blue as the three axes, each normalized to the range $[0, 1]$.</p>
+
+    <h4>2.1 The Color Cube</h4>
+    <ul>
+        <li><strong>Origin $(0,0,0)$</strong> = Black (no light)</li>
+        <li><strong>$(1,0,0)$</strong> = pure Red; <strong>$(0,1,0)$</strong> = pure Green; <strong>$(0,0,1)$</strong> =
+            pure Blue</li>
+        <li><strong>$(1,1,0)$</strong> = Yellow; <strong>$(0,1,1)$</strong> = Cyan; <strong>$(1,0,1)$</strong> = Magenta
+        </li>
+        <li><strong>$(1,1,1)$</strong> = White (maximum of all channels)</li>
+        <li><strong>Main diagonal</strong> from $(0,0,0)$ to $(1,1,1)$ — where $R = G = B$ — represents all shades of
+            <strong>gray</strong>.</li>
+    </ul>
+    <p>An RGB color image is stored as <strong>three independent image planes</strong> (one per channel). Each plane is
+        a grayscale image representing that channel's intensity. The pixel at $(x,y)$ has three values: $(R, G, B)$.</p>
+    <p>RGB is the standard model for <strong>color monitors, cameras, and display hardware</strong>. Processing
+        (enhancement, filtering) can be applied independently to each channel.</p>
+</article>
+
+<article>
+    <h3>3. The HSI Color Model</h3>
+    <p>RGB is hardware-friendly but does not match human intuition about color. When you describe a color as "a pale,
+        bright orange," you are specifying three independent qualities — <strong>hue</strong>,
+        <strong>saturation</strong>, and <strong>intensity</strong>. The HSI model separates these explicitly:</p>
+    <ul>
+        <li><strong>Hue ($H$)</strong> — the <em>dominant wavelength</em>: what we colloquially call "the color" (red,
+            orange, green, etc.). Represented as an angle on a color wheel (0°–360°).</li>
+        <li><strong>Saturation ($S$)</strong> — <em>purity</em> of the color. How much white is mixed in? Pure spectral
+            color = fully saturated ($S=1$). Pastel/washed-out = low saturation. Pure gray = $S=0$.</li>
+        <li><strong>Intensity ($I$)</strong> — <em>overall brightness</em>, independent of color. Ranges from black
+            ($I=0$) to maximum brightness ($I=1$).</li>
+    </ul>
+    <p><strong>Key advantage:</strong> HSI <strong>decouples intensity from color information</strong>. This means you
+        can adjust brightness without altering the color, or modify color without changing brightness. In RGB, changing
+        one channel affects both color and brightness simultaneously.</p>
+    <p><strong>Practical use:</strong> Apply intensity-based operations (histogram equalization, contrast stretching)
+        only on the $I$ channel, leaving $H$ and $S$ unchanged. This avoids color shifts that would occur if you
+        equalized each RGB channel independently.</p>
+</article>
+
+<article>
+    <h3>4. Pseudocolor Image Processing</h3>
+    <p>Pseudocolor (false color) assigns <strong>arbitrary colors to gray levels</strong> in a monochrome image based on
+        a defined mapping rule. The image was never captured in color — the color is artificially added.</p>
+
+    <h4>4.1 Why Pseudocolor?</h4>
+    <p>The human eye can distinguish only about <strong>two dozen gray levels</strong> but can differentiate
+        <strong>thousands of color shades</strong>. By mapping gray levels to distinct colors, subtle intensity
+        differences that are invisible in grayscale become immediately obvious in color.</p>
+
+    <h4>4.2 Intensity Slicing</h4>
+    <p>The most common pseudocolor technique. Divide the grayscale range $[0, L-1]$ into a set of intervals (slices),
+        and assign a different color to each interval. This is a direct extension of the <strong>intensity-level
+            slicing</strong> concept from intensity transformations — but instead of highlighting one band, you
+        color-code the entire range.</p>
+    <p><strong>Application:</strong> Thermal imaging (temperature maps), medical imaging (highlighting tissue density
+        ranges), satellite imagery (land use classification).</p>
+</article>
+
+<article>
+    <h3>5. Fundamentals of Image Compression</h3>
+    <p><strong>Compression</strong> reduces the amount of data needed to represent an image. An uncompressed 1024×1024
+        RGB image at 8 bits per channel requires $1024 \times 1024 \times 3 = 3{,}145{,}728$ bytes ($\approx 3$ MB).
+        Compression can shrink this dramatically.</p>
+    <p>Two motivations:</p>
+    <ul>
+        <li><strong>Storage:</strong> Reduced file size means more images fit on disk.</li>
+        <li><strong>Transmission:</strong> Smaller files transfer faster across networks.</li>
+    </ul>
+    <p>Compression works by identifying and eliminating <strong>redundancy</strong> — data that is duplicated,
+        predictable, or irrelevant.</p>
+
+    <h4>5.1 Three Types of Data Redundancy</h4>
+
+    <h5>5.1.1 Coding Redundancy</h5>
+    <p>When the binary codes used to represent pixel values are longer than necessary. Example: using a fixed 8-bit code
+        for every intensity level, even if only 10 distinct levels actually occur in the image. Variable-length codes
+        (shorter codes for frequent values, longer for rare ones) eliminate this redundancy.</p>
+
+    <h5>5.1.2 Spatial (and Temporal) Redundancy</h5>
+    <p>Adjacent pixels in most images are <strong>highly correlated</strong> — they have similar intensities. Encoding
+        each pixel independently wastes bits on predictable information. Techniques like predictive coding or transform
+        coding exploit this by encoding only the <em>differences</em> between pixels or the transform coefficients.
+        Temporal redundancy extends this to video — consecutive frames are nearly identical.</p>
+
+    <h5>5.1.3 Irrelevant Information (Psychovisual Redundancy)</h5>
+    <p>The human visual system ignores certain information — fine intensity gradations, subtle color differences,
+        high-frequency textures beyond perception. Discarding this imperceptible data is safe for human viewing but
+        constitutes <strong>permanent information loss</strong>. This is the basis of lossy compression.</p>
+</article>
+
+<article>
+    <h3>6. Fidelity Criteria: Measuring Compression Quality</h3>
+    <p>Since compression (especially lossy) removes real data, we need to measure how much damage was done.</p>
+
+    <h4>6.1 Objective Criteria</h4>
+    <p>Mathematical metrics computed between the original image $f$ and the decompressed image $\hat{f}$:</p>
+    <ul>
+        <li><strong>Root-Mean-Square Error (RMSE):</strong></li>
+    </ul>
+    $$e_{\text{rms}} = \sqrt{\frac{1}{MN} \sum_{x=0}^{M-1} \sum_{y=0}^{N-1} \left[f(x,y) - \hat{f}(x,y)\right]^2}$$
+    <p>Lower RMSE = closer to original = better quality. RMSE = 0 means perfect (lossless) reconstruction.</p>
+
+    <h4>6.2 Subjective Criteria</h4>
+    <p>Human evaluators rate image quality on a scale (e.g., 1 = terrible, 5 = indistinguishable from original). This
+        matters because RMSE does not always correlate with perceived quality — a small mathematical error in a visually
+        important region (like a face) is worse than a larger error in a uniform background.</p>
+</article>
+
+<article>
+    <h3>7. Image Compression Model</h3>
+    <p>Every compression system has two halves: an <strong>encoder</strong> (compresses) and a <strong>decoder</strong>
+        (decompresses).</p>
+
+    <h4>7.1 Encoder: Three Stages</h4>
+    <ul>
+        <li><strong>Mapper</strong> — transforms the image to reduce <strong>spatial redundancy</strong>. Example:
+            computing pixel-to-pixel differences, or applying a transform (DCT, wavelet). The mapper is
+            <strong>reversible</strong> — no information is lost here.</li>
+        <li><strong>Quantizer</strong> — reduces <strong>psychovisual redundancy</strong> by rounding or discarding
+            perceptually irrelevant information. This is the <strong>only lossy stage</strong> — information is
+            permanently destroyed. Skipping this stage gives lossless compression.</li>
+        <li><strong>Symbol coder</strong> — reduces <strong>coding redundancy</strong> by assigning shorter codes to
+            more probable symbols. Example: Huffman coding. This stage is lossless.</li>
+    </ul>
+
+    <h4>7.2 Decoder</h4>
+    <p>Reverses the encoder: symbol decoder → inverse mapper → reconstructed image $\hat{f}$. The quantizer has no
+        inverse — quantized information cannot be recovered, which is why lossy compression is irreversible.</p>
+
+    <pre><code class="language-python"># Compression pipeline (conceptual)
+# Encoder
+mapped = transform(image)          # mapper (lossless)
+quantized = quantize(mapped, step) # quantizer (LOSSY)
+compressed = huffman_encode(quantized)  # symbol coder (lossless)
+
+# Decoder
+dequantized = huffman_decode(compressed)
+reconstructed = inverse_transform(dequantized)</code></pre>
+</article>
+
+<article>
+    <h3>8. Huffman Coding</h3>
+    <p>Huffman coding is the most widely taught lossless compression technique. It assigns <strong>variable-length
+            binary codes</strong> to symbols based on their probabilities: frequent symbols get short codes, rare
+        symbols get long codes.</p>
+
+    <h4>8.1 Why It Works</h4>
+    <p>A fixed-length code (e.g., 3 bits per symbol for 6 symbols) uses the same number of bits for every symbol. If
+        symbol $a_2$ appears 40% of the time and symbol $a_5$ appears only 4% of the time, assigning 1 bit to $a_2$ and
+        5 bits to $a_5$ saves enormous space overall, because the short code is used far more often than the long one.
+    </p>
+
+    <h4>8.2 Construction Algorithm</h4>
+    <ul>
+        <li><strong>Step 1:</strong> List all symbols sorted by probability in descending order.</li>
+        <li><strong>Step 2:</strong> Merge the two lowest-probability symbols into a single combined node. Their
+            combined probability is the sum.</li>
+        <li><strong>Step 3:</strong> Re-sort and repeat Step 2 until only one node remains (the root).</li>
+        <li><strong>Step 4:</strong> Trace back from the root to each symbol. At each branch, assign 0 to one branch and
+            1 to the other. The path from root to symbol gives its Huffman code.</li>
+    </ul>
+
+    <h4>8.3 Worked Example</h4>
+    <table>
+        <tr>
+            <th>Symbol</th>
+            <th>Probability</th>
+            <th>Huffman Code</th>
+            <th>Code Length</th>
+        </tr>
+        <tr>
+            <td>$a_2$</td>
+            <td>0.40</td>
+            <td><code>1</code></td>
+            <td>1 bit</td>
+        </tr>
+        <tr>
+            <td>$a_6$</td>
+            <td>0.30</td>
+            <td><code>00</code></td>
+            <td>2 bits</td>
+        </tr>
+        <tr>
+            <td>$a_1$</td>
+            <td>0.10</td>
+            <td><code>011</code></td>
+            <td>3 bits</td>
+        </tr>
+        <tr>
+            <td>$a_4$</td>
+            <td>0.10</td>
+            <td><code>0100</code></td>
+            <td>4 bits</td>
+        </tr>
+        <tr>
+            <td>$a_3$</td>
+            <td>0.06</td>
+            <td><code>01010</code></td>
+            <td>5 bits</td>
+        </tr>
+        <tr>
+            <td>$a_5$</td>
+            <td>0.04</td>
+            <td><code>01011</code></td>
+            <td>5 bits</td>
+        </tr>
+    </table>
+    <p><strong>Average code length:</strong> $0.40 \times 1 + 0.30 \times 2 + 0.10 \times 3 + 0.10 \times 4 + 0.06
+        \times 5 + 0.04 \times 5 = 2.2$ bits/symbol. A fixed-length code for 6 symbols would require $\lceil \log_2 6
+        \rceil = 3$ bits/symbol. Huffman achieves 2.2 — a $26.7\%$ savings.</p>
+    <p><strong>Guarantee:</strong> Huffman coding produces the <strong>smallest possible average code length</strong>
+        for any variable-length coding scheme where each symbol is coded independently (zero-memory source).</p>
+</article>
+
+<article>
+    <h3>9. Quick-Reference Table</h3>
+    <table>
+        <tr>
+            <th>If Asked</th>
+            <th>Write This</th>
+        </tr>
+        <tr>
+            <td>Full-color vs. pseudocolor</td>
+            <td>Full-color: captured by sensor with real color data. Pseudocolor: artificial colors assigned to
+                grayscale values for visualization.</td>
+        </tr>
+        <tr>
+            <td>Additive primaries</td>
+            <td>R + G + B = White. Used for light (monitors). R+G=Yellow, G+B=Cyan, R+B=Magenta.</td>
+        </tr>
+        <tr>
+            <td>Subtractive primaries</td>
+            <td>Y + M + C = Black. Used for pigments (printing). Y+M=Red, Y+C=Green, M+C=Blue.</td>
+        </tr>
+        <tr>
+            <td>RGB model</td>
+            <td>3D color cube. Three independent channels. Main diagonal = gray values. Standard for display hardware.
+            </td>
+        </tr>
+        <tr>
+            <td>HSI model components</td>
+            <td>Hue = dominant color (angle). Saturation = purity (0=gray, 1=pure). Intensity = brightness. Decouples
+                color from brightness.</td>
+        </tr>
+        <tr>
+            <td>HSI advantage over RGB</td>
+            <td>Can process intensity independently of color. Avoids color shifts during enhancement.</td>
+        </tr>
+        <tr>
+            <td>Pseudocolor: intensity slicing</td>
+            <td>Divide grayscale into intervals, assign a color to each. Exploits eye's ability to see thousands of
+                colors vs. dozens of grays.</td>
+        </tr>
+        <tr>
+            <td>Three types of redundancy</td>
+            <td>Coding (suboptimal codes), spatial/temporal (correlated neighbors), psychovisual (imperceptible detail).
+            </td>
+        </tr>
+        <tr>
+            <td>Objective fidelity</td>
+            <td>RMSE between original and compressed image. Lower = better.</td>
+        </tr>
+        <tr>
+            <td>Encoder three stages</td>
+            <td>Mapper (spatial redundancy, lossless) → Quantizer (psychovisual, LOSSY) → Symbol coder (coding
+                redundancy, lossless).</td>
+        </tr>
+        <tr>
+            <td>What makes compression lossy?</td>
+            <td>The quantizer. It permanently discards information. Remove it → lossless compression.</td>
+        </tr>
+        <tr>
+            <td>Huffman coding principle</td>
+            <td>Variable-length codes: short codes for frequent symbols, long codes for rare. Optimal for zero-memory
+                sources.</td>
+        </tr>
+        <tr>
+            <td>Huffman construction</td>
+            <td>Sort by probability → repeatedly merge two lowest → assign 0/1 at branches → trace paths for codes.</td>
+        </tr>
+    </table>
+</article>

@@ -1,0 +1,1010 @@
+<!-------------------------- © 2007 - present, dmj.one and contributors. ----------------------------------
+   Part of the dmjone project. Licensed under the GNU AGPL. Provided as-is, without warranty of any kind.
+-------------------- Redistribution and modifications must retain this notice. --------------------------->
+
+
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+    <!--<![endif]-->
+
+    <head>
+        <script src="/js/edu_su_common.js"></script>
+        <noscript>
+            <style>
+                html,
+                body {
+                    margin: 0;
+                    overflow: hidden;
+                }
+            </style>
+            <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+        </noscript>
+
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Spatial Filtering, Digital Image Processing</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+        <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+        <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=JetBrains+Mono:wght@400;500&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+
+        <meta property="og:image" content="/logo.png">
+        <meta property="og:type" content="article">
+
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:site" content="@divyamohan1993">
+        <meta name="twitter:creator" content="@divyamohan1993">
+        <meta name="twitter:image" content="/logo.png">
+
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+        <meta name="author" content="Divya Mohan">
+        <meta name="robots" content="index, follow">
+
+        <!-- JSON-LD Structured Data for SEO -->
+        <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "Course",
+          "name": "Spatial Filtering",
+          "description": "Spatial filtering in digital image processing: linear and nonlinear filters, correlation vs. convolution, separable kernels, smoothing (box, Gaussian, median), sharpening (Laplacian, Sobel, Roberts), unsharp masking, and highboost filtering.",
+          "url": "https://dmj.one/edu/su/course/csu2543/theory/spatial-filtering",
+           "datePublished": "2026-04-19",
+           "
+          "dateModified": "2026-04-19",
+           "keywords": "Spatial Filtering, Convolution, Correlation, Gaussian Filter, Box Filter, Median Filter, Laplacian, Sobel, Roberts, Unsharp Masking, Highboost Filtering, Separable Kernel",
+           "educationalLevel": "Undergraduate",
+           "learningResourceType": "Lecture Notes",
+          "provider": [
+            {
+              "@type": "EducationalOrganization",
+              "name": "dmj.one",
+              "url": "https://dmj.one"
+            },
+            {
+              "@type": "EducationalOrganization",
+              "name": "Shoolini University",
+              "url": "https://shooliniuniversity.com"
+            }
+          ],
+          "offers": {
+              "@type": "Offer",
+              "category": "Education",
+              "price": "0",
+              "priceCurrency": "USD",
+              "availability": "https://schema.org/InStock",
+              "url": "https://dmj.one/edu/su/course/csu2543/theory/spatial-filtering"
+          },
+          "hasCourseInstance": {
+              "@type": "CourseInstance",
+              "name": "Digital Image Processing - CSU2543",
+              "description": "Lecture on spatial filtering in digital image processing, covering linear/nonlinear filters, convolution, separable kernels, smoothing and sharpening operators.",
+              "courseMode": "online",
+              "startDate": "2026-04-19",
+              "courseWorkload": "PT4H",
+              "instructor": [
+                {
+                  "@type": "Person",
+                  "name": "Ishani Sharma",
+                  "url": "https://shooliniuniversity.com/faculty/profile/Ishani-Sharma"
+                },
+                {
+                  "@type": "Person",
+                  "name": "Divya Mohan",
+                  "url": "https://dmj.one/resume/",
+                    "sameAs": [
+                        "https://www.credly.com/users/divyamohan1993",
+                        "https://www.linkedin.com/in/divyamohan1993/",
+                        "https://hackerrank.com/divyamohan1993",
+                        "https://www.coursera.org/learner/divyamohan1993"
+                    ]
+                }
+              ],
+              "url": "https://dmj.one/edu/su/course/csu2543/"
+            }
+        }
+        </script>
+
+
+    </head>
+
+    <body>
+
+        <script> header_author("dm"); </script>
+
+        <main>
+            <article class="agen-tableofcontents">
+                <h2 class="text-center">
+                    Spatial Filtering
+                </h2>
+                <div class="d-none contentdate">2026, April 19</div>
+                <div class="mb-3 d-flex justify-content-center align-items-center">
+                    <a href="spatial-filtering-summary" class="btn btn-lg me-3 btn-outline-primary d-print-none">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i> View Summary
+                    </a>
+                </div>
+            </article>
+
+<article>
+    <h3>1. What is Spatial Filtering?</h3>
+    <p>In intensity transformations (previous topic), each pixel was modified based on <em>only its own value</em>.
+        Spatial filtering changes that: here, a pixel's new value depends on itself <strong>and its neighbors</strong>.
+        You define a small region around each pixel, perform some operation on that region, and write the result to the
+        center pixel.</p>
+    <p>Every spatial filter has exactly two components:</p>
+    <ul>
+        <li><strong>A neighborhood</strong>, the shape and size of the region around the pixel (e.g., 3×3, 5×5)</li>
+        <li><strong>An operation</strong>, what you do with the pixel values inside that neighborhood</li>
+    </ul>
+    <p>Spatial filters divide into two families based on the operation:</p>
+    <ul>
+        <li><strong>Linear spatial filters</strong>, the operation is a weighted sum (sum-of-products). Example: mean
+            filter (averaging).</li>
+        <li><strong>Nonlinear spatial filters</strong>, the operation is anything else. Example: median filter (sort
+            values, pick the middle one). Cannot be expressed as a sum-of-products.</li>
+    </ul>
+</article>
+
+<article>
+    <h3>2. Linear Spatial Filtering</h3>
+
+    <h4>2.1 The Core Mechanism: Sum-of-Products</h4>
+    <p>A linear spatial filter works by sliding a small array of numbers, called a <strong>kernel</strong>, across the
+        image. At each pixel position, you multiply every kernel coefficient by the image pixel it overlaps, then sum
+        all these products. That sum becomes the output value for the center pixel.</p>
+    <p>The kernel goes by many names: <strong>mask</strong>, <strong>template</strong>, <strong>window</strong>,
+        <strong>filter</strong>. They all refer to the same thing, a small array of weights that defines the filter's
+        behavior.</p>
+
+    <h4>2.2 How It Works for a 3×3 Kernel</h4>
+    <p>Consider a 3×3 kernel $w$ centered at pixel $(x, y)$ in image $f$. The kernel looks like:</p>
+    <div class="overflow-auto">
+        <table class="table table-bordered table-striped">
+            <tr>
+                <td>$w(-1,-1)$</td>
+                <td>$w(-1,0)$</td>
+                <td>$w(-1,1)$</td>
+            </tr>
+            <tr>
+                <td>$w(0,-1)$</td>
+                <td>$w(0,0)$</td>
+                <td>$w(0,1)$</td>
+            </tr>
+            <tr>
+                <td>$w(1,-1)$</td>
+                <td>$w(1,0)$</td>
+                <td>$w(1,1)$</td>
+            </tr>
+        </table>
+    </div>
+    <p>The center coefficient $w(0,0)$ sits on top of pixel $(x,y)$. The output at $(x,y)$ is:</p>
+    $$g(x,y) = w(-1,-1)\,f(x-1,y-1) + w(-1,0)\,f(x-1,y) + \cdots + w(0,0)\,f(x,y) + \cdots + w(1,1)\,f(x+1,y+1)$$
+    <p>You slide this kernel across every pixel in the image (raster scanning: left→right, top→bottom). At each
+        position, compute the sum-of-products, write the result. The collection of all results forms the filtered image
+        $g$.</p>
+
+    <h4>2.3 General Formula for Any Kernel Size</h4>
+    <p>For a kernel of size $m \times n$, where $m = 2a+1$ and $n = 2b+1$ (odd dimensions ensure a single center pixel),
+        the filtered output is:</p>
+    $$g(x,y) = \sum_{s=-a}^{a} \sum_{t=-b}^{b} w(s,t)\, f(x+s,\, y+t)$$
+    <ul>
+        <li><strong>$s$</strong> and <strong>$t$</strong>, offsets from the center of the kernel, ranging from $-a$ to
+            $+a$ and $-b$ to $+b$</li>
+        <li><strong>$w(s,t)$</strong>, kernel coefficient at offset $(s,t)$</li>
+        <li><strong>$f(x+s, y+t)$</strong>, image pixel at that offset from center $(x,y)$</li>
+    </ul>
+    <p>This formula is the definition of <strong>linear spatial filtering</strong>. The word "linear" comes from the
+        fact that the output is a <em>linear combination</em> (weighted sum) of the input pixels.</p>
+
+    <pre><code class="language-python"># Linear spatial filtering (correlation) with a generic kernel
+import numpy as np
+from scipy.signal import correlate2d
+
+kernel = np.array([[1, 1, 1],
+                   [1, 1, 1],
+                   [1, 1, 1]]) / 9.0  # 3x3 averaging kernel
+
+filtered = correlate2d(image, kernel, mode='same')</code></pre>
+</article>
+
+<article>
+    <h3>3. Correlation vs. Convolution</h3>
+    <p>These are the two fundamental operations in spatial filtering. They are mechanically almost identical, with one
+        critical difference.</p>
+
+    <h4>3.1 The Difference in One Line</h4>
+    <ul>
+        <li><strong>Correlation</strong>, slide the kernel as-is over the image, compute sum-of-products.</li>
+        <li><strong>Convolution</strong>, <strong>rotate the kernel by 180°</strong> first, then slide and compute
+            sum-of-products.</li>
+    </ul>
+    <p>Rotating by 180° means flipping the kernel both horizontally and vertically. If the kernel is symmetric (same
+        after rotation), correlation and convolution produce identical results.</p>
+
+    <h4>3.2 The 1D Formulas</h4>
+    <p>For a 1D signal $f$ and kernel $w$ of half-width $a$:</p>
+    <p><strong>Correlation</strong> (denoted $\oplus$ or $\star$):</p>
+    $$(w \oplus f)(x) = \sum_{s=-a}^{a} w(s)\, f(x+s)$$
+    <p><strong>Convolution</strong> (denoted $\otimes$ or $*$):</p>
+    $$(w \otimes f)(x) = \sum_{s=-a}^{a} w(s)\, f(x-s)$$
+    <p>The only difference: $f(x\mathbf{+}s)$ in correlation vs. $f(x\mathbf{-}s)$ in convolution. The sign flip on $s$
+        is equivalent to rotating the kernel by 180° before correlating.</p>
+
+    <h4>3.3 The Unit Impulse Test</h4>
+    <p>The discrete unit impulse (delta function) is:</p>
+    $$\delta(x - x_0) = \begin{cases} 1 & \text{if } x = x_0 \\ 0 & \text{otherwise} \end{cases}$$
+    <p>When you <strong>correlate</strong> a kernel with an impulse, the output is a <strong>reflected (flipped)
+            copy</strong> of the kernel centered at $x_0$. When you <strong>convolve</strong> a kernel with an impulse,
+        the output is an <strong>exact copy</strong> of the kernel centered at $x_0$. This is why convolution is
+        preferred in theory, it preserves the kernel's orientation.</p>
+    <p><strong>Key statement:</strong> <em>Linear spatial filtering and spatial convolution are synonymous.</em> When we
+        say "filter an image," we mean convolve (pre-rotate the kernel, then correlate).</p>
+
+    <h4>3.4 The 2D Formulas</h4>
+    <p>The same logic extends to two dimensions. For image $f$ and kernel $w$ of size $(2a+1) \times (2b+1)$:</p>
+    <p><strong>Correlation:</strong></p>
+    $$(w \oplus f)(x,y) = \sum_{s=-a}^{a} \sum_{t=-b}^{b} w(s,t)\, f(x+s,\, y+t)$$
+    <p><strong>Convolution:</strong></p>
+    $$(w \otimes f)(x,y) = \sum_{s=-a}^{a} \sum_{t=-b}^{b} w(s,t)\, f(x-s,\, y-t)$$
+    <p>Again, the only change: $+s, +t$ becomes $-s, -t$. And again, convolving with a 2D impulse $\delta(x-x_0, y-y_0)$
+        produces an exact copy of the kernel at $(x_0, y_0)$, while correlation produces a 180°-rotated copy.</p>
+
+    <pre><code class="language-python"># Correlation vs Convolution in Python
+from scipy.signal import correlate2d, convolve2d
+
+# Correlation: kernel slides as-is
+corr_result = correlate2d(image, kernel, mode='same')
+
+# Convolution: kernel is pre-rotated 180°
+conv_result = convolve2d(image, kernel, mode='same')
+
+# For symmetric kernels, both give identical output</code></pre>
+
+    <h4>3.5 Properties of Convolution vs. Correlation</h4>
+    <div class="overflow-auto">
+        <table class="table table-bordered table-striped">
+            <tr>
+                <th>Property</th>
+                <th>Convolution ($\otimes$)</th>
+                <th>Correlation ($\oplus$)</th>
+            </tr>
+            <tr>
+                <td>Commutative</td>
+                <td>$f \otimes g = g \otimes f$ ✓</td>
+                <td>Not commutative ✗</td>
+            </tr>
+            <tr>
+                <td>Associative</td>
+                <td>$f \otimes (g \otimes h) = (f \otimes g) \otimes h$ ✓</td>
+                <td>Not associative ✗</td>
+            </tr>
+            <tr>
+                <td>Distributive</td>
+                <td>$f \otimes (g + h) = (f \otimes g) + (f \otimes h)$ ✓</td>
+                <td>$f \oplus (g + h) = (f \oplus g) + (f \oplus h)$ ✓</td>
+            </tr>
+        </table>
+    </div>
+    <p>Convolution has all three properties; correlation only has distributivity. This matters for two practical
+        reasons:</p>
+
+    <h5>3.5.1 Commutativity: Rotation Doesn't Matter</h5>
+    <p>Since $f \otimes w = w \otimes f$, it does not matter whether you pre-rotate the kernel or the image. The result
+        is the same. This is only true for convolution, not correlation.</p>
+
+    <h5>3.5.2 Associativity: Multistage Filtering</h5>
+    <p>If you need to apply multiple filters $w_1, w_2, \ldots, w_N$ in sequence, associativity lets you <strong>combine
+            the kernels first</strong>, then apply a single combined kernel to the image:</p>
+    $$w = w_1 \otimes w_2 \otimes \cdots \otimes w_N$$
+    <p>Apply $w$ to $f$ once instead of applying $N$ kernels sequentially. This is faster because you only scan the
+        image once instead of $N$ times. This is only valid for convolution, not correlation.</p>
+</article>
+
+<article>
+    <h3>4. Separable Kernel Filters</h3>
+
+    <h4>4.1 What Makes a Kernel Separable?</h4>
+    <p>A 2D kernel $w$ of size $m \times n$ is <strong>separable</strong> if it can be written as the <strong>outer
+            product</strong> of two 1D vectors:</p>
+    $$w = \mathbf{v} \cdot \mathbf{u}^T$$
+    <p>where $\mathbf{v}$ is a column vector of size $m \times 1$ and $\mathbf{u}$ is a column vector of size $n \times
+        1$. Equivalently, a 2D function $G(x,y)$ is separable if $G(x,y) = G_1(x) \cdot G_2(y)$.</p>
+    <p>Example: the 2×3 all-ones kernel is separable:</p>
+    $$w = \begin{bmatrix} 1 & 1 & 1 \\ 1 & 1 & 1 \end{bmatrix} = \begin{bmatrix} 1 \\ 1 \end{bmatrix} \begin{bmatrix} 1
+    & 1 & 1 \end{bmatrix} = \mathbf{c} \cdot \mathbf{r}^T$$
+    <p>For a <strong>square</strong> symmetric kernel of size $m \times m$: $w = \mathbf{v} \cdot \mathbf{v}^T$.</p>
+
+    <h4>4.2 Why Separability Matters: Computational Speedup</h4>
+    <p>Using commutativity and associativity of convolution, a separable kernel $w = w_1 \otimes w_2$ (column vector
+        convolved with row vector) lets you split a single 2D convolution into <strong>two 1D convolutions</strong>:</p>
+    $$w \otimes f = (w_1 \otimes w_2) \otimes f = w_1 \otimes (w_2 \otimes f)$$
+    <p>First convolve the image with the row vector $w_2$ (1D operation along each row), then convolve the result with
+        the column vector $w_1$ (1D operation along each column). Two cheap passes instead of one expensive pass.</p>
+
+    <h5>4.2.1 The Speedup Factor</h5>
+    <p>For an image of size $M \times N$ and a kernel of size $m \times n$:</p>
+    <ul>
+        <li><strong>Non-separable:</strong> Each pixel requires $m \times n$ multiplications → total = $MN \cdot mn$
+        </li>
+        <li><strong>Separable:</strong> Each pixel requires $m + n$ multiplications (two 1D passes) → total = $MN \cdot
+            (m + n)$</li>
+    </ul>
+    <p>The speedup ratio is:</p>
+    $$C = \frac{mn}{m + n}$$
+    <ul>
+        <li>For an $11 \times 11$ kernel: $C = \frac{121}{22} = 5.5\times$ faster</li>
+        <li>For a $101 \times 101$ kernel: $C = \frac{10201}{202} \approx 50.5\times$ faster</li>
+    </ul>
+    <p>The larger the kernel, the greater the advantage. This is why separability is critical for large-kernel
+        operations like Gaussian blurring.</p>
+
+    <pre><code class="language-python"># Separable filtering: two 1D passes instead of one 2D pass
+import numpy as np
+from scipy.ndimage import convolve1d
+
+# Example: 2D Gaussian is separable into two 1D Gaussians
+gauss_1d = np.array([1, 2, 1]) / 4.0
+
+# Pass 1: convolve along rows (axis=1)
+temp = convolve1d(image, gauss_1d, axis=1)
+# Pass 2: convolve along columns (axis=0)
+output = convolve1d(temp, gauss_1d, axis=0)
+
+# Equivalent to 2D convolution with:
+# [[1,2,1],[2,4,2],[1,2,1]] / 16</code></pre>
+
+    <h4>4.3 How to Detect and Decompose a Separable Kernel</h4>
+    <p>A matrix formed by the outer product of a column vector and a row vector always has <strong>rank 1</strong>. This
+        means: all rows are scalar multiples of each other, and all columns are scalar multiples of each other.
+        Therefore, a kernel is separable <strong>if and only if its rank is 1</strong>.</p>
+
+    <h5>4.3.1 Decomposition Algorithm</h5>
+    <p>Given a kernel matrix $w$ with rank 1, extract the two 1D vectors:</p>
+    <ul>
+        <li><strong>Step 1:</strong> Find any non-zero element in $w$. Call its value $E$.</li>
+        <li><strong>Step 2:</strong> Extract the <strong>column</strong> containing $E$ → this is vector $\mathbf{c}$.
+        </li>
+        <li><strong>Step 3:</strong> Extract the <strong>row</strong> containing $E$ → this is row $\mathbf{r}$.</li>
+        <li><strong>Step 4:</strong> The separable decomposition is: $\mathbf{v} = \mathbf{c}$ and $\mathbf{u}^T =
+            \mathbf{r} / E$.</li>
+    </ul>
+    <p>Verify: $w = \mathbf{v} \cdot \mathbf{u}^T = \mathbf{c} \cdot (\mathbf{r}/E)$.</p>
+
+    <pre><code class="language-python"># Check if a kernel is separable and decompose it
+import numpy as np
+
+def decompose_separable(w):
+    if np.linalg.matrix_rank(w) != 1:
+        return None  # Not separable
+    # Find a non-zero element
+    idx = np.unravel_index(np.argmax(np.abs(w)), w.shape)
+    E = w[idx]
+    c = w[:, idx[1]:idx[1]+1]   # column vector
+    r = w[idx[0]:idx[0]+1, :]   # row vector
+    v = c
+    uT = r / E
+    return v, uT  # w ≈ v @ uT</code></pre>
+</article>
+
+<article>
+    <h3>5. Smoothing (Lowpass) Spatial Filters</h3>
+    <p>Smoothing filters replace each pixel with a weighted average of its neighbors, reducing sharp intensity
+        transitions. Since <strong>random noise</strong> consists of sharp, isolated spikes, averaging naturally
+        suppresses it. Additional uses: reducing <strong>aliasing</strong> before resampling and eliminating
+        <strong>false contouring</strong> in low-bit-depth images.</p>
+    <p>Two families:</p>
+    <ul>
+        <li><strong>Linear filters</strong>, output is a weighted sum: Box filter kernels, Gaussian filter kernels.
+        </li>
+        <li><strong>Nonlinear filters</strong>, output is not a weighted sum: Order-statistic filters (e.g., median).
+        </li>
+    </ul>
+
+    <h4>5.1 Box Filter Kernel</h4>
+    <p>The simplest lowpass filter. Every coefficient in the kernel is <strong>identical</strong> (all 1s), divided by a
+        normalizing constant equal to the number of elements. For a $3 \times 3$ box filter:</p>
+    $$w = \frac{1}{9} \begin{bmatrix} 1 & 1 & 1 \\ 1 & 1 & 1 \\ 1 & 1 & 1 \end{bmatrix}$$
+    <p>This replaces each pixel with the simple average of its $3 \times 3$ neighborhood. The box filter is
+        <strong>separable</strong> (rank 1), so it can be decomposed into two 1D passes for efficiency.</p>
+
+    <h5>5.1.1 Why Normalize?</h5>
+    <ul>
+        <li><strong>Constant regions stay constant:</strong> If all 9 pixels under the kernel have intensity 100, the
+            output should be 100, not $9 \times 100 = 900$. Dividing by 9 ensures this.</li>
+        <li><strong>No brightness bias:</strong> The sum of all pixel values in the filtered image equals the sum in the
+            original. Without normalization, the image would brighten artificially.</li>
+    </ul>
+    <p>Larger kernels ($11 \times 11$, $21 \times 21$) produce stronger blurring. A gray border appears in the output
+        due to <strong>zero-padding</strong> at image boundaries where the kernel extends outside the image.</p>
+
+    <h4>5.2 Lowpass Gaussian Filter Kernel</h4>
+
+    <h5>5.2.1 Why Not Just Use Box Filters?</h5>
+    <p>Box filters have three problems:</p>
+    <ul>
+        <li>They are poor approximations of real optical blur (lens defocus).</li>
+        <li>They blur unevenly, they favor the perpendicular (horizontal/vertical) directions over diagonals.</li>
+        <li>They produce visible artifacts at edges due to the abrupt cutoff (all weights are equal, then suddenly zero
+            outside the kernel).</li>
+    </ul>
+    <p>The fix: use a <strong>circularly symmetric (isotropic)</strong> kernel that weights nearby pixels more than
+        distant ones. The Gaussian function is exactly this.</p>
+
+    <h5>5.2.2 The Gaussian Kernel Formula</h5>
+    $$w(s,t) = G(s,t) = K \, e^{-\frac{s^2 + t^2}{2\sigma^2}}$$
+    <ul>
+        <li><strong>$s, t$</strong>, offsets from the kernel center</li>
+        <li><strong>$\sigma$</strong>, standard deviation, controls the width of the bell curve (larger $\sigma$ =
+            wider kernel = more blur)</li>
+        <li><strong>$K$</strong>, amplitude constant (usually set to 1; normalization is done separately)</li>
+    </ul>
+    <p>Using $r = \sqrt{s^2 + t^2}$ (distance from center), the formula simplifies to $G(r) = K \, e^{-r^2 /
+        2\sigma^2}$, making the circular symmetry explicit, the weight depends only on <em>distance</em> from center,
+        not direction.</p>
+
+    <h5>5.2.3 From Continuous Function to Discrete Kernel</h5>
+    <p>The Gaussian is a continuous function. To use it as a kernel:</p>
+    <ul>
+        <li><strong>Step 1:</strong> Sample $G(s,t)$ at integer positions $(s, t)$ within the kernel window.</li>
+        <li><strong>Step 2:</strong> Normalize by dividing every sampled coefficient by the sum of all coefficients.
+        </li>
+    </ul>
+    <p>Example for $K=1$, $\sigma=1$, $3 \times 3$:</p>
+    $$w = \frac{1}{4.8976} \begin{bmatrix} 0.3679 & 0.6065 & 0.3679 \\ 0.6065 & 1.0000 & 0.6065 \\ 0.3679 & 0.6065 &
+    0.3679 \end{bmatrix}$$
+    <p>The center pixel gets the highest weight; corner pixels get the least. This produces a smooth, artifact-free
+        blur.</p>
+
+    <h4>5.3 Gaussian Kernel Properties</h4>
+    <ul>
+        <li><strong>Separable:</strong> A 2D Gaussian is the outer product of two 1D Gaussians. So you can convolve
+            along rows first, then columns, same speedup as any separable kernel ($C = mn/(m+n)$).</li>
+        <li><strong>Kernel size rule:</strong> Gaussian values beyond $3\sigma$ from the center are negligibly small.
+            Therefore, the recommended kernel size is:</li>
+    </ul>
+    $$\text{Gaussian kernel size} = \lceil 6\sigma \rceil \times \lceil 6\sigma \rceil$$
+    <p>where $\lceil c \rceil$ denotes the ceiling function (round up). This captures $\approx 99.7\%$ of the Gaussian's
+        energy.</p>
+    <ul>
+        <li><strong>Product of two Gaussians</strong> is also Gaussian: mean $m_{f \times g} = \frac{m_f \sigma_g^2 +
+            m_g \sigma_f^2}{\sigma_f^2 + \sigma_g^2}$, standard deviation $\sigma_{f \times g} = \sqrt{\frac{\sigma_f^2
+            \sigma_g^2}{\sigma_f^2 + \sigma_g^2}}$.</li>
+        <li><strong>Convolution of two Gaussians</strong> is also Gaussian: mean $m_{f \star g} = m_f + m_g$, standard
+            deviation $\sigma_{f \star g} = \sqrt{\sigma_f^2 + \sigma_g^2}$.</li>
+    </ul>
+
+    <pre><code class="language-python"># Creating a Gaussian kernel
+import numpy as np
+
+def gaussian_kernel(sigma, K=1):
+    size = int(np.ceil(6 * sigma))
+    if size % 2 == 0:
+        size += 1  # ensure odd
+    a = size // 2
+    s, t = np.mgrid[-a:a+1, -a:a+1]
+    kernel = K * np.exp(-(s**2 + t**2) / (2 * sigma**2))
+    return kernel / kernel.sum()  # normalize</code></pre>
+
+    <h4>5.4 Image Padding Methods</h4>
+    <p>When the kernel is near the image boundary, part of it extends outside the image. The missing pixels must be
+        filled somehow. Three standard methods:</p>
+    <ul>
+        <li><strong>Zero-padding:</strong> Missing pixels set to 0. Simple but introduces dark borders in the output.
+        </li>
+        <li><strong>Mirror (symmetric) padding:</strong> Missing pixels are filled by reflecting the image across the
+            border. Produces seamless edges, the most visually natural method.</li>
+        <li><strong>Replicate padding:</strong> Missing pixels are set equal to the nearest border pixel value. Simple
+            and better than zero-padding, but can introduce subtle plateau artifacts.</li>
+    </ul>
+
+    <h4>5.5 Application: Shading Correction</h4>
+    <p>Nonuniform illumination (e.g., a light source brighter on one side) causes a smooth brightness gradient across
+        the image called <strong>shading</strong>. This degrades automated processing because the same object appears
+        brighter in one region and darker in another.</p>
+    <p><strong>Fix (flat-field correction):</strong></p>
+    <ul>
+        <li><strong>Step 1:</strong> Apply a very large Gaussian lowpass filter (e.g., $512 \times 512$, $\sigma = 128$)
+            to estimate the slowly varying shading pattern.</li>
+        <li><strong>Step 2:</strong> Divide the original image by this shading estimate, pixel by pixel.</li>
+    </ul>
+    <p>The large kernel averages out all the fine detail and captures only the smooth illumination gradient. Dividing by
+        it normalizes the illumination across the image.</p>
+
+    <h4>5.6 Order-Statistic (Nonlinear) Filters</h4>
+    <p>Order-statistic filters sort the pixel values in the neighborhood and pick a value from the sorted list. They are
+        <strong>nonlinear</strong> because sorting is not a weighted sum.</p>
+
+    <h5>5.6.1 The Median Filter</h5>
+    <p>Replace the center pixel with the <strong>median</strong> of all pixel values in the neighborhood. The median is
+        the middle value when all values are sorted, half the values are $\leq$ median, half are $\geq$ median.</p>
+    <p><strong>Why median, not mean?</strong> Median filters excel at removing <strong>salt-and-pepper noise</strong>
+        (isolated black or white pixels) while <strong>preserving edges</strong>. A mean filter averages the noise into
+        the surrounding pixels, blurring edges. A median filter ignores the extreme outlier values entirely, the
+        extreme noise pixel is simply not the middle value, so it gets replaced by a nearby normal value.</p>
+    <p>Comparison: For salt-and-pepper noise, a $7 \times 7$ median filter produces sharper results than a $19 \times
+        19$ Gaussian lowpass filter, less blurring, better noise removal.</p>
+
+    <pre><code class="language-python"># Median filter
+from scipy.ndimage import median_filter
+output = median_filter(image, size=7)  # 7x7 neighborhood</code></pre>
+</article>
+
+<article>
+    <h3>6. Sharpening (Highpass) Spatial Filters</h3>
+    <p>Smoothing blurs (averages), it is analogous to <strong>integration</strong>. Sharpening does the opposite: it
+        enhances transitions and edges, analogous to <strong>differentiation</strong>. Differentiation amplifies rapid
+        changes (edges, discontinuities, noise) and suppresses slowly varying regions (smooth areas).</p>
+
+    <h4>6.1 Properties of Derivatives in Images</h4>
+    <div class="overflow-auto">
+        <table class="table table-bordered table-striped">
+            <tr>
+                <th>Region Type</th>
+                <th>First Derivative</th>
+                <th>Second Derivative</th>
+            </tr>
+            <tr>
+                <td>Constant intensity</td>
+                <td>Zero</td>
+                <td>Zero</td>
+            </tr>
+            <tr>
+                <td>Onset of a step/ramp</td>
+                <td>Non-zero</td>
+                <td>Non-zero</td>
+            </tr>
+            <tr>
+                <td>Along a ramp</td>
+                <td>Non-zero (constant)</td>
+                <td>Zero</td>
+            </tr>
+            <tr>
+                <td>End of a step/ramp</td>
+                <td>Non-zero</td>
+                <td>Non-zero</td>
+            </tr>
+        </table>
+    </div>
+    <p>Key difference: the first derivative responds along the <em>entire</em> ramp. The second derivative responds only
+        at the <em>transitions</em> (onset and end), it produces a sharper, more localized response.</p>
+
+    <h4>6.2 Discrete Derivative Formulas (1D)</h4>
+    <p><strong>First-order derivative:</strong></p>
+    $$\frac{\partial f}{\partial x} = f(x+1) - f(x)$$
+    <p><strong>Second-order derivative:</strong></p>
+    $$\frac{\partial^2 f}{\partial x^2} = f(x+1) + f(x-1) - 2f(x)$$
+    <p>These are the building blocks for all sharpening kernels. The first derivative detects edges; the second
+        derivative highlights fine detail and produces a double-edge effect.</p>
+</article>
+
+<article>
+    <h3>7. The Laplacian (Second-Order Sharpening)</h3>
+
+    <h4>7.1 Derivation</h4>
+    <p>We want an <strong>isotropic</strong> (direction-independent) second-derivative operator. The Laplacian of a 2D
+        function sums the second partial derivatives in both directions:</p>
+    $$\nabla^2 f = \frac{\partial^2 f}{\partial x^2} + \frac{\partial^2 f}{\partial y^2}$$
+    <p>Substituting the discrete second-derivative formula for each direction:</p>
+    $$\nabla^2 f(x,y) = f(x+1,y) + f(x-1,y) + f(x,y+1) + f(x,y-1) - 4f(x,y)$$
+    <p>This gives the basic Laplacian kernel:</p>
+    <div class="overflow-auto">
+        <table class="table table-bordered table-striped">
+            <tr>
+                <td>0</td>
+                <td>1</td>
+                <td>0</td>
+            </tr>
+            <tr>
+                <td>1</td>
+                <td>$-4$</td>
+                <td>1</td>
+            </tr>
+            <tr>
+                <td>0</td>
+                <td>1</td>
+                <td>0</td>
+            </tr>
+        </table>
+    </div>
+
+    <h4>7.2 Variants of the Laplacian Kernel</h4>
+    <p>The basic kernel above is isotropic for 90° rotations only. To incorporate <strong>diagonal directions</strong>,
+        include the diagonal neighbors, yielding:</p>
+    <div class="overflow-auto">
+        <table class="table table-bordered table-striped">
+            <tr>
+                <td>1</td>
+                <td>1</td>
+                <td>1</td>
+            </tr>
+            <tr>
+                <td>1</td>
+                <td>$-8$</td>
+                <td>1</td>
+            </tr>
+            <tr>
+                <td>1</td>
+                <td>1</td>
+                <td>1</td>
+            </tr>
+        </table>
+    </div>
+    <p>Both kernels can also be defined with <strong>inverted signs</strong> (positive center, negative surround):</p>
+    <div class="overflow-auto">
+        <table class="table table-bordered table-striped">
+            <tr>
+                <td>0</td>
+                <td>$-1$</td>
+                <td>0</td>
+            </tr>
+            <tr>
+                <td>$-1$</td>
+                <td>4</td>
+                <td>$-1$</td>
+            </tr>
+            <tr>
+                <td>0</td>
+                <td>$-1$</td>
+                <td>0</td>
+            </tr>
+        </table>
+    </div>
+    <p>and equivalently the 8-neighbor version with center $+8$. All four are valid Laplacian kernels. Note: <strong>all
+            coefficients sum to zero</strong>, this is a fundamental property of any derivative kernel. It ensures
+        constant-intensity regions produce zero output (no bias).</p>
+
+    <h4>7.3 Sharpening with the Laplacian</h4>
+    <p>The Laplacian alone produces only edges (it is a second derivative, so it outputs near-zero in smooth regions).
+        To sharpen, <strong>add</strong> it back to the original:</p>
+    $$g(x,y) = f(x,y) + c \left[\nabla^2 f(x,y)\right]$$
+    <ul>
+        <li>If the Laplacian kernel has a <strong>negative center</strong> ($-4$ or $-8$): use $c = -1$</li>
+        <li>If the Laplacian kernel has a <strong>positive center</strong> ($+4$ or $+8$): use $c = +1$</li>
+    </ul>
+    <p>The sign of $c$ ensures that edges are added to (not subtracted from) the original image.</p>
+
+    <pre><code class="language-python"># Laplacian sharpening
+import numpy as np
+from scipy.signal import convolve2d
+
+# Laplacian kernel (negative center)
+laplacian = np.array([[0,  1, 0],
+                      [1, -4, 1],
+                      [0,  1, 0]])
+
+edges = convolve2d(image, laplacian, mode='same', boundary='symm')
+sharpened = image.astype(float) - edges  # c = -1
+sharpened = np.clip(sharpened, 0, 255).astype(np.uint8)</code></pre>
+</article>
+
+<article>
+    <h3>8. The Gradient (First-Order Sharpening)</h3>
+
+    <h4>8.1 Definition</h4>
+    <p>The gradient of an image $f$ at $(x,y)$ is a 2D vector pointing in the direction of the <strong>greatest rate of
+            intensity change</strong>:</p>
+    $$\nabla f = \begin{bmatrix} g_x \\ g_y \end{bmatrix} = \begin{bmatrix} \frac{\partial f}{\partial x} \\
+    \frac{\partial f}{\partial y} \end{bmatrix}$$
+    <p>The <strong>magnitude</strong> of this vector gives the edge strength at that point:</p>
+    $$M(x,y) = \|\nabla f\| = \sqrt{g_x^2 + g_y^2}$$
+    <p>A computationally cheaper approximation:</p>
+    $$M(x,y) \approx |g_x| + |g_y|$$
+
+    <h4>8.2 Gradient Kernels</h4>
+    <p>Two standard kernel pairs compute $g_x$ and $g_y$ using finite differences:</p>
+
+    <h5>8.2.1 Roberts Cross-Gradient Operators (2×2)</h5>
+    <p>Computes gradients along the two diagonal directions:</p>
+    <div class="overflow-auto">
+        <table class="table table-bordered table-striped">
+            <tr>
+                <td>$-1$</td>
+                <td>0</td>
+            </tr>
+            <tr>
+                <td>0</td>
+                <td>1</td>
+            </tr>
+        </table>
+    </div>
+    <p>and</p>
+    <div class="overflow-auto">
+        <table class="table table-bordered table-striped">
+            <tr>
+                <td>0</td>
+                <td>$-1$</td>
+            </tr>
+            <tr>
+                <td>1</td>
+                <td>0</td>
+            </tr>
+        </table>
+    </div>
+    <p>Small and fast, but sensitive to noise because they use only 4 pixels.</p>
+
+    <h5>8.2.2 Sobel Operators (3×3)</h5>
+    <p>Computes gradients along horizontal and vertical directions with built-in smoothing:</p>
+    <p>$g_x$ (vertical edges):</p>
+    <div class="overflow-auto">
+        <table class="table table-bordered table-striped">
+            <tr>
+                <td>$-1$</td>
+                <td>0</td>
+                <td>1</td>
+            </tr>
+            <tr>
+                <td>$-2$</td>
+                <td>0</td>
+                <td>2</td>
+            </tr>
+            <tr>
+                <td>$-1$</td>
+                <td>0</td>
+                <td>1</td>
+            </tr>
+        </table>
+    </div>
+    <p>$g_y$ (horizontal edges):</p>
+    <div class="overflow-auto">
+        <table class="table table-bordered table-striped">
+            <tr>
+                <td>$-1$</td>
+                <td>$-2$</td>
+                <td>$-1$</td>
+            </tr>
+            <tr>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+            </tr>
+            <tr>
+                <td>1</td>
+                <td>2</td>
+                <td>1</td>
+            </tr>
+        </table>
+    </div>
+    <p>The weights 2 in the center row/column provide <strong>smoothing perpendicular to the derivative
+            direction</strong>, making Sobel more noise-resistant than Roberts. All gradient kernel coefficients sum to
+        zero, the same derivative property as the Laplacian.</p>
+    <p><strong>Application:</strong> Defect detection. Converting an image to its Sobel gradient makes defects
+        (scratches, cracks, edge irregularities) visually prominent and easier to detect automatically.</p>
+
+    <pre><code class="language-python"># Sobel gradient
+from scipy.ndimage import sobel
+gx = sobel(image, axis=1)  # vertical edges
+gy = sobel(image, axis=0)  # horizontal edges
+magnitude = np.sqrt(gx**2 + gy**2)</code></pre>
+</article>
+
+<article>
+    <h3>9. Unsharp Masking and Highboost Filtering</h3>
+
+    <h4>9.1 The Procedure</h4>
+    <p>A classic sharpening technique that uses blurring as a stepping stone. Three steps:</p>
+    <p><strong>Step 1, Blur the original image:</strong></p>
+    $$f(x,y) \xrightarrow{\text{lowpass filter}} \bar{f}(x,y)$$
+    <p><strong>Step 2, Create the unsharp mask</strong> by subtracting the blur from the original:</p>
+    $$g_{\text{mask}}(x,y) = f(x,y) - \bar{f}(x,y)$$
+    <p>This mask contains only the high-frequency details (edges, textures), everything the blur removed.</p>
+    <p><strong>Step 3, Add the mask back</strong> to the original, scaled by factor $k$:</p>
+    $$g(x,y) = f(x,y) + k \cdot g_{\text{mask}}(x,y)$$
+
+    <h4>9.2 Choosing $k$</h4>
+    <ul>
+        <li><strong>$k = 1$</strong> → standard <strong>unsharp masking</strong>. Edges are enhanced by exactly the
+            amount they were blurred.</li>
+        <li><strong>$k > 1$</strong> → <strong>highboost filtering</strong>. Edges are amplified more aggressively. More
+            sharpening, but risk of <strong>overshoot artifacts</strong>, dark halos around bright edges caused by
+            clipping negative values.</li>
+    </ul>
+
+    <pre><code class="language-python"># Unsharp masking / highboost filtering
+from scipy.ndimage import gaussian_filter
+
+blurred = gaussian_filter(image, sigma=5)
+mask = image.astype(float) - blurred
+k = 1.0   # 1.0 = unsharp masking, >1 = highboost
+sharpened = image.astype(float) + k * mask
+sharpened = np.clip(sharpened, 0, 255).astype(np.uint8)</code></pre>
+</article>
+
+<article>
+    <h3>10. Constructing Filters from Lowpass Filters</h3>
+    <p>All four standard filter categories can be derived from a single lowpass filter, using two fundamental properties
+        of the Fourier Transform:</p>
+    <ul>
+        <li><strong>Property 1:</strong> Convolution in spatial domain = multiplication in frequency domain (and vice
+            versa).</li>
+        <li><strong>Property 2:</strong> An impulse of amplitude $A$ in spatial domain = a constant $A$ in frequency
+            domain (and vice versa).</li>
+    </ul>
+
+    <h4>10.1 The Four Filter Types</h4>
+    <div class="overflow-auto">
+        <table class="table table-bordered table-striped">
+            <tr>
+                <th>Filter Type</th>
+                <th>Spatial Domain</th>
+                <th>Frequency Domain</th>
+            </tr>
+            <tr>
+                <td>Lowpass</td>
+                <td>$lp(x,y)$</td>
+                <td>$LP(u,v)$</td>
+            </tr>
+            <tr>
+                <td>Highpass</td>
+                <td>$hp(x,y) = \delta(x,y) - lp(x,y)$</td>
+                <td>$HP(u,v) = 1 - LP(u,v)$</td>
+            </tr>
+            <tr>
+                <td>Bandreject</td>
+                <td>$br(x,y) = lp_1(x,y) + hp_2(x,y)$</td>
+                <td>$BR(u,v) = LP_1(u,v) + HP_2(u,v)$</td>
+            </tr>
+            <tr>
+                <td>Bandpass</td>
+                <td>$bp(x,y) = \delta(x,y) - br(x,y)$</td>
+                <td>$BP(u,v) = 1 - BR(u,v)$</td>
+            </tr>
+        </table>
+    </div>
+    <p><strong>Intuition:</strong> A highpass filter is "everything minus the lowpass", it keeps what the lowpass
+        removes. A bandreject passes low and high but blocks a band in between. A bandpass is "everything minus the
+        bandreject", it keeps only that middle band.</p>
+</article>
+
+<article>
+    <h3>11. Combining Spatial Enhancement Methods</h3>
+    <p>Real-world image enhancement rarely uses a single technique. A complete pipeline for enhancing a nuclear bone
+        scan image demonstrates how multiple methods chain together:</p>
+    <ul>
+        <li><strong>Step 1:</strong> Original image, the bone scan with poor contrast and detail.</li>
+        <li><strong>Step 2:</strong> Apply the <strong>Laplacian</strong> operator → extracts fine edges and bone
+            boundaries.</li>
+        <li><strong>Step 3:</strong> Add the Laplacian to the original → sharpened image (but noise is also amplified).
+        </li>
+        <li><strong>Step 4:</strong> Apply the <strong>Sobel gradient</strong> → produces an edge-strength map.</li>
+        <li><strong>Step 5:</strong> Smooth the Sobel image with a <strong>$5 \times 5$ box filter</strong> → removes
+            noise from the edge map.</li>
+        <li><strong>Step 6:</strong> <strong>Multiply</strong> the smoothed Sobel (Step 5) with the Laplacian (Step 2) →
+            a mask that enhances edges only where edges actually exist (avoids amplifying noise in flat regions).</li>
+        <li><strong>Step 7:</strong> Add this mask to the original → a cleanly sharpened image.</li>
+        <li><strong>Step 8:</strong> Apply a <strong>power-law (gamma) transformation</strong> → adjusts contrast for
+            the final output.</li>
+    </ul>
+    <p>This pipeline illustrates a core DIP principle: <strong>no single filter solves everything</strong>. You compose
+        a chain of complementary operations, each fixing a different aspect, to achieve the final result.</p>
+</article>
+
+<article>
+    <h3>12. Quick-Reference Table</h3>
+    <div class="overflow-auto">
+        <table class="table table-bordered table-striped">
+            <tr>
+                <th>If Asked</th>
+                <th>Write This</th>
+            </tr>
+            <tr>
+                <td>Two components of a spatial filter</td>
+                <td>A neighborhood (shape/size of region) and an operation (what to compute inside it).</td>
+            </tr>
+            <tr>
+                <td>Linear vs. nonlinear filter</td>
+                <td>Linear = weighted sum (sum-of-products). Nonlinear = any other operation (e.g., median).</td>
+            </tr>
+            <tr>
+                <td>General linear filtering formula</td>
+                <td>$g(x,y) = \sum_{s=-a}^{a} \sum_{t=-b}^{b} w(s,t)\, f(x+s, y+t)$</td>
+            </tr>
+            <tr>
+                <td>Difference between correlation and convolution</td>
+                <td>Identical mechanics, but convolution rotates the kernel 180° before sliding. In the formula: correlation
+                    uses $f(x+s)$, convolution uses $f(x-s)$.</td>
+            </tr>
+            <tr>
+                <td>Why convolution is preferred</td>
+                <td>It is commutative, associative, and distributive. Correlation is only distributive.</td>
+            </tr>
+            <tr>
+                <td>What associativity enables</td>
+                <td>Multistage filtering: combine $N$ kernels into one via $w = w_1 \otimes w_2 \otimes \cdots \otimes w_N$,
+                    then apply once.</td>
+            </tr>
+            <tr>
+                <td>What is a separable kernel?</td>
+                <td>A 2D kernel that can be expressed as the outer product of two 1D vectors: $w = \mathbf{v} \cdot
+                    \mathbf{u}^T$. Rank = 1.</td>
+            </tr>
+            <tr>
+                <td>Separable kernel speedup</td>
+                <td>$C = mn/(m+n)$. An $11 \times 11$ kernel is $5.5\times$ faster; a $101 \times 101$ kernel is $\approx
+                    50.5\times$ faster.</td>
+            </tr>
+            <tr>
+                <td>How to check separability</td>
+                <td>Compute the matrix rank. If rank = 1 → separable. Decompose using any non-zero element $E$, its column
+                    $\mathbf{c}$, its row $\mathbf{r}$: $\mathbf{v} = \mathbf{c}$, $\mathbf{u}^T = \mathbf{r}/E$.</td>
+            </tr>
+            <tr>
+                <td>Unit impulse + convolution</td>
+                <td>Convolving a kernel with an impulse produces an exact copy of the kernel at the impulse location.</td>
+            </tr>
+            <tr>
+                <td>Kernel size constraint</td>
+                <td>$m = 2a+1$, $n = 2b+1$, odd dimensions to ensure a unique center pixel.</td>
+            </tr>
+            <tr>
+                <td>Box filter kernel</td>
+                <td>All-1s matrix divided by $mn$. Simple averaging. Separable. Normalizing ensures constant regions stay
+                    constant.</td>
+            </tr>
+            <tr>
+                <td>Gaussian kernel formula</td>
+                <td>$w(s,t) = K e^{-(s^2+t^2)/2\sigma^2}$; circularly symmetric, separable. Kernel size $= \lceil 6\sigma
+                    \rceil \times \lceil 6\sigma \rceil$.</td>
+            </tr>
+            <tr>
+                <td>Gaussian vs. box filter</td>
+                <td>Gaussian is isotropic (no directional bias), better models real blur, and weights center pixels more
+                    than edges.</td>
+            </tr>
+            <tr>
+                <td>Three padding methods</td>
+                <td>Zero (dark borders), mirror (reflect across boundary), replicate (extend nearest border value).</td>
+            </tr>
+            <tr>
+                <td>Median filter purpose</td>
+                <td>Removes salt-and-pepper noise while preserving edges. Nonlinear, sorts pixels, picks middle value.</td>
+            </tr>
+            <tr>
+                <td>Shading correction</td>
+                <td>Estimate shading via large Gaussian lowpass → divide original by estimate.</td>
+            </tr>
+            <tr>
+                <td>First derivative (discrete)</td>
+                <td>$\partial f / \partial x = f(x+1) - f(x)$</td>
+            </tr>
+            <tr>
+                <td>Second derivative (discrete)</td>
+                <td>$\partial^2 f / \partial x^2 = f(x+1) + f(x-1) - 2f(x)$</td>
+            </tr>
+            <tr>
+                <td>Laplacian kernel (basic)</td>
+                <td>Center $= -4$, 4-connected neighbors $= 1$, diagonals $= 0$. Sum of all coefficients $= 0$.</td>
+            </tr>
+            <tr>
+                <td>Laplacian sharpening</td>
+                <td>$g = f + c[\nabla^2 f]$; $c = -1$ if center is negative, $c = +1$ if center is positive.</td>
+            </tr>
+            <tr>
+                <td>Gradient magnitude</td>
+                <td>$M = \sqrt{g_x^2 + g_y^2}$ or $\approx |g_x| + |g_y|$</td>
+            </tr>
+            <tr>
+                <td>Roberts vs. Sobel</td>
+                <td>Roberts: 2×2, fast, noise-sensitive. Sobel: 3×3, includes smoothing, more robust.</td>
+            </tr>
+            <tr>
+                <td>Unsharp masking</td>
+                <td>$g = f + k(f - \bar{f})$. $k=1$: unsharp masking. $k>1$: highboost filtering.</td>
+            </tr>
+            <tr>
+                <td>Highpass from lowpass</td>
+                <td>$hp = \delta - lp$ (spatial), $HP = 1 - LP$ (frequency).</td>
+            </tr>
+        </table>
+    </div>
+</article>
+
+        </main>
+
+        <script> copyright("all"); </script>
+
+    </body>
+
+</html>

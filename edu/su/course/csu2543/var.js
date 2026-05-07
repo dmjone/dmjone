@@ -63,6 +63,27 @@ function get_menu_list(datetogen) {
                 codetype: "Concepts",
                 readtime: 5,
                 link: "histogram-processing"
+            },
+            {
+                title: "Spatial Filtering",
+                desc: "Spatial filtering in digital image processing: linear and nonlinear filters, correlation vs. convolution, separable kernels, smoothing (box, Gaussian, median), sharpening (Laplacian, Sobel, Roberts), unsharp masking, and highboost filtering.",
+                codetype: "Concepts",
+                readtime: 8,
+                link: "spatial-filtering"
+            },
+            {
+                title: "Morphology and Segmentation",
+                desc: "Morphological image processing and segmentation: erosion, dilation, opening, closing, edge models, thresholding (global, variable, Otsu), and region growing. Set-theoretic foundations for shape analysis and region extraction.",
+                codetype: "Concepts",
+                readtime: 6,
+                link: "morphology-segmentation"
+            },
+            {
+                title: "Frequency Domain and Image Restoration",
+                desc: "Frequency domain processing and image restoration: 2D DFT, lowpass and highpass filters (Ideal, Butterworth, Gaussian), degradation/restoration model, noise models, mean and median filtering, periodic noise removal with notch filters, inverse and Wiener filtering.",
+                codetype: "Concepts",
+                readtime: 8,
+                link: "frequency-domain-restoration"
             }
         ];
         body_genmenu.processData(arr, def_date, def_author);

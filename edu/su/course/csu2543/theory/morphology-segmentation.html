@@ -1,0 +1,438 @@
+<!-------------------------- © 2007 - present, dmj.one and contributors. ----------------------------------
+   Part of the dmjone project. Licensed under the GNU AGPL. Provided as-is, without warranty of any kind.
+-------------------- Redistribution and modifications must retain this notice. --------------------------->
+
+
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+    <!--<![endif]-->
+
+    <head>
+        <script src="/js/edu_su_common.js"></script>
+        <noscript>
+            <style>
+                html,
+                body {
+                    margin: 0;
+                    overflow: hidden;
+                }
+            </style>
+            <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+        </noscript>
+
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Morphology and Segmentation, Digital Image Processing</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+        <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+        <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=JetBrains+Mono:wght@400;500&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+
+        <meta property="og:image" content="/logo.png">
+        <meta property="og:type" content="article">
+
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:site" content="@divyamohan1993">
+        <meta name="twitter:creator" content="@divyamohan1993">
+        <meta name="twitter:image" content="/logo.png">
+
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+        <meta name="author" content="Divya Mohan">
+        <meta name="robots" content="index, follow">
+
+        <!-- JSON-LD Structured Data for SEO -->
+        <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "Course",
+          "name": "Morphology and Segmentation",
+          "description": "Morphological image processing and segmentation: erosion, dilation, opening, closing, edge models, thresholding (global, variable, Otsu), and region growing. Set-theoretic foundations for shape analysis and region extraction.",
+          "url": "https://dmj.one/edu/su/course/csu2543/theory/morphology-segmentation",
+           "datePublished": "2026-04-26",
+           "
+          "dateModified": "2026-04-26",
+           "keywords": "Morphological Processing, Erosion, Dilation, Opening, Closing, Image Segmentation, Thresholding, Otsu's Method, Region Growing, Edge Detection, Structuring Element",
+           "educationalLevel": "Undergraduate",
+           "learningResourceType": "Lecture Notes",
+          "provider": [
+            {
+              "@type": "EducationalOrganization",
+              "name": "dmj.one",
+              "url": "https://dmj.one"
+            },
+            {
+              "@type": "EducationalOrganization",
+              "name": "Shoolini University",
+              "url": "https://shooliniuniversity.com"
+            }
+          ],
+          "offers": {
+              "@type": "Offer",
+              "category": "Education",
+              "price": "0",
+              "priceCurrency": "USD",
+              "availability": "https://schema.org/InStock",
+              "url": "https://dmj.one/edu/su/course/csu2543/theory/morphology-segmentation"
+          },
+          "hasCourseInstance": {
+              "@type": "CourseInstance",
+              "name": "Digital Image Processing - CSU2543",
+              "description": "Lecture on morphological image processing and segmentation, covering shape-based operations on binary images and methods to partition images into meaningful regions.",
+              "courseMode": "online",
+              "startDate": "2026-04-26",
+              "courseWorkload": "PT4H",
+              "instructor": [
+                {
+                  "@type": "Person",
+                  "name": "Ishani Sharma",
+                  "url": "https://shooliniuniversity.com/faculty/profile/Ishani-Sharma"
+                },
+                {
+                  "@type": "Person",
+                  "name": "Divya Mohan",
+                  "url": "https://dmj.one/resume/",
+                    "sameAs": [
+                        "https://www.credly.com/users/divyamohan1993",
+                        "https://www.linkedin.com/in/divyamohan1993/",
+                        "https://hackerrank.com/divyamohan1993",
+                        "https://www.coursera.org/learner/divyamohan1993"
+                    ]
+                }
+              ],
+              "url": "https://dmj.one/edu/su/course/csu2543/"
+            }
+        }
+        </script>
+
+
+    </head>
+
+    <body>
+
+        <script> header_author("dm"); </script>
+
+        <main>
+            <article class="agen-tableofcontents">
+                <h2 class="text-center">
+                    Morphology and Segmentation
+                </h2>
+                <div class="d-none contentdate">2026, April 26</div>
+                <div class="mb-3 d-flex justify-content-center align-items-center">
+                    <a href="morphology-segmentation-summary" class="btn btn-lg me-3 btn-outline-primary d-print-none">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i> View Summary
+                    </a>
+                </div>
+            </article>
+
+<article>
+    <h3>1. Morphological Processing: Preliminaries</h3>
+    <p>Everything covered so far, intensity transforms, filtering, frequency-domain operations, works at the <em>pixel
+            level</em>. Morphological processing moves one layer higher: it extracts and manipulates
+        <strong>shape-level</strong> information from binary images. It answers questions like: "Is this a thin line or
+        a thick blob? Does this object have holes? Are these two regions connected?"</p>
+    <p>The mathematical foundation is <strong>set theory</strong>. A binary image is treated as a set of foreground
+        pixel coordinates. Morphological operations probe this set by systematically moving a small, predefined shape
+        across it.</p>
+
+    <h4>1.1 The Structuring Element</h4>
+    <p>The <strong>structuring element (SE)</strong> is a small binary shape, a template, that defines <em>how</em>
+        the image is probed. Common shapes: a $3 \times 3$ square, a cross, a disk, a line. Think of it as a cookie
+        cutter: its shape determines which pixels are examined at each position, and its size controls the scale of the
+        operation.</p>
+    <p>The SE has a designated <strong>origin</strong> (center point). The origin is placed on each foreground pixel,
+        and the relationship between the SE and the underlying image determines the output.</p>
+</article>
+
+<article>
+    <h3>2. Erosion</h3>
+    <p>Erosion <strong>shrinks</strong> (thins) objects in a binary image. Conceptually: place the structuring element's
+        origin on every foreground pixel. If the <em>entire</em> SE fits within the foreground at that position, the
+        pixel survives. If any part of the SE falls outside the foreground, the pixel is removed.</p>
+
+    <h4>2.1 Effects</h4>
+    <ul>
+        <li><strong>Objects shrink</strong>, boundaries recede inward by an amount proportional to the SE size.</li>
+        <li><strong>Small objects disappear entirely</strong>, if an object is smaller than the SE, it cannot contain
+            the SE anywhere, so it is completely erased.</li>
+        <li><strong>Thin connections break</strong>, narrow bridges between objects get eroded away, separating
+            touching objects.</li>
+    </ul>
+
+    <h4>2.2 Primary Use</h4>
+    <p>Removing <strong>small irrelevant details and noise</strong> from a binary image. Noise in a binary image
+        typically appears as isolated small white pixels or tiny clusters, all smaller than the SE, so erosion
+        eliminates them.</p>
+</article>
+
+<article>
+    <h3>3. Dilation</h3>
+    <p>Dilation is the <strong>dual</strong> (opposite) of erosion. It <strong>grows</strong> (thickens) objects.
+        Conceptually: place the SE's origin on every foreground pixel and "stamp" the entire SE shape onto the output.
+        Every pixel touched by the SE at any foreground position becomes foreground.</p>
+
+    <h4>3.1 Effects</h4>
+    <ul>
+        <li><strong>Objects expand</strong>, boundaries push outward.</li>
+        <li><strong>Small gaps and holes fill in</strong>, if a gap is smaller than the SE, dilation bridges it.</li>
+        <li><strong>Nearby objects merge</strong>, close objects grow until they touch.</li>
+    </ul>
+
+    <h4>3.2 Primary Use</h4>
+    <p><strong>Bridging gaps</strong> in broken boundaries and <strong>filling small holes</strong> within objects. If
+        an edge detector produced a nearly-closed contour with a few pixel-wide breaks, dilation can close them.</p>
+</article>
+
+<article>
+    <h3>4. Opening and Closing</h3>
+    <p>Erosion and dilation are rarely used alone, they change the object's size. By combining them in specific
+        sequences, we get operations that <strong>clean shape features without significantly altering overall
+            size</strong>.</p>
+
+    <h4>4.1 Opening = Erosion → Dilation</h4>
+    <p>First erode (shrink), then dilate (grow back). The erosion removes small noise and thin protrusions. The
+        subsequent dilation restores the object approximately to its original size, but the removed features <em>don't
+            come back</em>, because they were completely eliminated by the erosion.</p>
+    <p><strong>Effects:</strong> Smooths object contours from the <em>outside</em>. Breaks narrow isthmuses (thin
+        connections). Eliminates thin protrusions and spurs. Removes noise smaller than the SE.</p>
+
+    <h4>4.2 Closing = Dilation → Erosion</h4>
+    <p>First dilate (grow), then erode (shrink back). The dilation fills small holes, gaps, and narrow breaks. The
+        subsequent erosion restores the object approximately to its original size, but the filled features <em>stay
+            filled</em>.</p>
+    <p><strong>Effects:</strong> Smooths object contours from the <em>inside</em>. Fuses narrow breaks and gaps. Fills
+        small holes. Connects nearby components.</p>
+
+    <h4>4.3 Morphological Noise Filtering</h4>
+    <p>A common pipeline: <strong>Opening followed by Closing</strong>. Opening removes external noise (small bright
+        spots on dark background). Closing removes internal noise (small dark holes inside objects). Together, they
+        clean both types without significantly distorting the original shapes.</p>
+
+    <pre><code class="language-python"># Morphological operations
+import cv2
+import numpy as np
+
+# Structuring element (3x3 square)
+SE = np.ones((3, 3), dtype=np.uint8)
+
+eroded  = cv2.erode(binary_image, SE, iterations=1)
+dilated = cv2.dilate(binary_image, SE, iterations=1)
+opened  = cv2.morphologyEx(binary_image, cv2.MORPH_OPEN, SE)
+closed  = cv2.morphologyEx(binary_image, cv2.MORPH_CLOSE, SE)</code></pre>
+</article>
+
+<article>
+    <h3>5. Image Segmentation Fundamentals</h3>
+    <p>Segmentation is the process of dividing an image into <strong>meaningful regions or objects</strong>. Everything
+        before this, enhancement, filtering, restoration, was about making the image look better or cleaner.
+        Segmentation is about <strong>understanding what is in the image</strong>: separating the foreground objects
+        from the background, identifying individual regions, locating boundaries.</p>
+    <p>Accurate segmentation is <strong>critical</strong>. All subsequent analysis (object recognition, measurement,
+        classification) depends on it. Over-segment (too many regions) → noise. Under-segment (too few) → lost objects.
+    </p>
+
+    <h4>5.1 Two Fundamental Approaches</h4>
+    <ul>
+        <li><strong>Discontinuity-based</strong>, detect abrupt changes in intensity (edges). The assumption: object
+            boundaries correspond to intensity discontinuities. Tools: gradient operators (Sobel, Roberts), Laplacian,
+            Canny edge detector.</li>
+        <li><strong>Similarity-based</strong>, group pixels that share similar properties (intensity, color, texture).
+            The assumption: pixels within the same object have similar values. Tools: thresholding, region growing,
+            clustering.</li>
+    </ul>
+</article>
+
+<article>
+    <h3>6. Edge Models and Gradients</h3>
+    <p>Edges are the most fundamental features for segmentation. An edge is a set of connected pixels that lie on the
+        <strong>boundary between two regions</strong> with different intensities.</p>
+
+    <h4>6.1 Edge Models</h4>
+    <ul>
+        <li><strong>Step edge:</strong> An idealized, instantaneous transition between two intensity levels, the change
+            occurs over exactly 1 pixel. Real images never produce perfect step edges.</li>
+        <li><strong>Ramp edge:</strong> A realistic model where the transition is gradual, spread over several pixels
+            due to optical blur, sampling, and noise. The edge has a finite width.</li>
+        <li><strong>Roof edge:</strong> A thin line structure, intensity rises from the background, remains elevated
+            for a few pixels, then falls back. Example: a thin wire against a uniform background.</li>
+    </ul>
+
+    <h4>6.2 Detecting Edges with Derivatives</h4>
+    <ul>
+        <li><strong>First-order derivative (gradient)</strong>, peaks at the midpoint of a ramp edge. Gives strong
+            response along the entire edge transition. Used for: Sobel, Roberts operators.</li>
+        <li><strong>Second-order derivative (Laplacian)</strong>, crosses zero at the midpoint of a ramp edge. Gives a
+            double response (positive and negative) at the onset and end of the transition. The
+            <strong>zero-crossing</strong> precisely locates the edge center.</li>
+    </ul>
+    <p>These are the same derivative operators from spatial filtering (Laplacian, Sobel), now applied specifically for
+        segmentation rather than enhancement.</p>
+</article>
+
+<article>
+    <h3>7. Image Thresholding</h3>
+    <p>The simplest and most direct segmentation method. Given a threshold value $T$, classify every pixel:</p>
+    $$g(x,y) = \begin{cases} 1 & \text{if } f(x,y) \geq T \quad (\text{object}) \\ 0 & \text{if } f(x,y) < T \quad (\text{background}) \end{cases}$$
+    <p>The result is a <strong>binary image</strong>, pixels are either object
+        (1/white) or background (0/black). Thresholding works best when the image contains <strong>light objects on a
+            dark background</strong> (or vice versa) and the histogram shows two distinct peaks (bimodal).</p>
+
+    <h4>7.1 Global Thresholding</h4>
+    <p>A <strong>single constant threshold</strong> $T$ is used for the entire image. Works well only under
+        <strong>controlled, uniform illumination</strong> where the histogram has clear, well-separated bimodal
+        peaks. If illumination is uneven, a single $T$ cannot correctly separate objects in both the bright and dark
+        regions of the image.</p>
+
+    <h4>7.2 Variable (Local/Adaptive) Thresholding</h4>
+    <p>The threshold <strong>varies across the image</strong>. The image is divided into sub-regions (or a sliding
+        window is used), and a different threshold is computed for each region based on local statistics. This
+        compensates for <strong>uneven illumination</strong> and <strong>shading</strong>, the same object may
+        require $T = 100$ in a dark region and $T = 180$ in a bright region.</p>
+
+    <h4>7.3 Otsu's Method (Optimum Global Thresholding)</h4>
+    <p>The most widely used automatic thresholding algorithm. It selects the threshold $T$ that <strong>maximizes the
+            between-class variance</strong>, the variance between the "object" class and the "background" class.</p>
+
+    <h5>7.3.1 Intuition</h5>
+    <p>A good threshold should make the two groups as different from each other as possible. The between-class variance
+        measures how far apart the mean intensities of the two groups are, weighted by how many pixels fall in each.
+        Maximizing this variance means finding the $T$ that most cleanly separates the two populations.</p>
+
+    <h5>7.3.2 Algorithm</h5>
+    <ul>
+        <li><strong>Step 1:</strong> Compute the normalized histogram $p(i)$ for all intensity levels $i = 0, 1, \ldots,
+            L-1$.</li>
+        <li><strong>Step 2:</strong> For every possible threshold $T$ from 0 to $L-1$:
+            <ul>
+                <li>Compute the probability of each class: $\omega_1(T) = \sum_{i=0}^{T} p(i)$ and $\omega_2(T) = 1 -
+                    \omega_1(T)$.</li>
+                <li>Compute the mean of each class: $\mu_1(T)$ and $\mu_2(T)$.</li>
+                <li>Compute the between-class variance: $\sigma_B^2(T) = \omega_1(T) \cdot \omega_2(T) \cdot [\mu_1(T) -
+                    \mu_2(T)]^2$.</li>
+            </ul>
+        </li>
+        <li><strong>Step 3:</strong> The optimal threshold $T^*$ is the one that maximizes $\sigma_B^2(T)$.</li>
+    </ul>
+    <p><strong>Key advantage:</strong> Fully automatic, no parameters, no manual tuning. Robust standard for automated
+        systems.</p>
+
+    <pre><code class="language-python"># Otsu's thresholding
+import cv2
+
+# Automatic threshold selection
+T, binary = cv2.threshold(gray_image, 0, 255,
+                          cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+print(f"Otsu's optimal threshold: {T}")</code></pre>
+</article>
+
+<article>
+    <h3>8. Region-Based Segmentation: Region Growing</h3>
+    <p>Edge-based methods find <em>boundaries</em>. Region-based methods find <em>areas</em>. Region growing takes the
+        similarity approach: instead of looking for where values change abruptly, it groups pixels that are
+        <strong>similar</strong> to each other.</p>
+
+    <h4>8.1 Algorithm</h4>
+    <ul>
+        <li><strong>Step 1, Choose seed points:</strong> Manually or automatically select one or more starting pixels
+            known to be inside the region of interest.</li>
+        <li><strong>Step 2, Define a similarity criterion:</strong> A rule for deciding whether a neighboring pixel
+            "belongs" to the same region. Common criteria: intensity difference $|f(x,y) - \text{mean}_{\text{region}}|
+            < \text{threshold}$, or color similarity, or texture similarity.</li>
+        <li><strong>Step 3, Grow:</strong> For each seed, examine its neighbors. If a neighbor satisfies the similarity
+            criterion, add it to the region and make it a new candidate for expansion. Repeat until no more pixels can
+            be added.</li>
+        <li><strong>Step 4, Stop:</strong> Growth stops when no neighboring pixel satisfies the criterion. The final
+            set of connected pixels is the segmented region.</li>
+    </ul>
+    <p><strong>Strength:</strong> Very effective when you have <strong>prior knowledge</strong> about the object, you
+        know approximately where it is (seed point) and what it looks like (similarity rule). Produces connected regions
+        by construction.</p>
+    <p><strong>Weakness:</strong> Sensitive to seed selection and the similarity threshold. Too loose a criterion →
+        regions leak into the background. Too strict → regions fragment.</p>
+</article>
+
+<article>
+    <h3>9. Quick-Reference Table</h3>
+    <div class="overflow-auto">
+        <table class="table table-bordered table-striped">
+            <tr>
+                <th>If Asked</th>
+                <th>Write This</th>
+            </tr>
+            <tr>
+                <td>What is morphology?</td>
+                <td>Set-theory-based framework for extracting shape information from binary images using a structuring
+                    element.</td>
+            </tr>
+            <tr>
+                <td>Structuring element</td>
+                <td>A small binary shape (e.g., 3×3 square) used as a probe. Its shape and size control the operation's
+                    effect.</td>
+            </tr>
+            <tr>
+                <td>Erosion</td>
+                <td>Shrinks objects. Pixel survives only if entire SE fits within foreground at that position. Removes small
+                    noise and thin connections.</td>
+            </tr>
+            <tr>
+                <td>Dilation</td>
+                <td>Grows objects. Stamps the SE at every foreground pixel. Fills gaps and bridges breaks.</td>
+            </tr>
+            <tr>
+                <td>Opening</td>
+                <td>Erosion → Dilation. Removes small protrusions and noise outside objects. Smooths outer contour.</td>
+            </tr>
+            <tr>
+                <td>Closing</td>
+                <td>Dilation → Erosion. Fills small holes and gaps inside objects. Smooths inner contour.</td>
+            </tr>
+            <tr>
+                <td>Two segmentation approaches</td>
+                <td>Discontinuity-based (detect edges/boundaries) and similarity-based (group similar pixels).</td>
+            </tr>
+            <tr>
+                <td>Step vs. ramp vs. roof edge</td>
+                <td>Step: idealized 1-pixel transition. Ramp: realistic gradual transition. Roof: thin line
+                    (rise-plateau-fall).</td>
+            </tr>
+            <tr>
+                <td>Thresholding formula</td>
+                <td>$g(x,y) = 1$ if $f(x,y) \geq T$, else $0$. Produces binary image.</td>
+            </tr>
+            <tr>
+                <td>Global vs. variable thresholding</td>
+                <td>Global: one $T$ for entire image (needs uniform illumination). Variable: $T$ changes spatially (handles
+                    uneven lighting).</td>
+            </tr>
+            <tr>
+                <td>Otsu's method</td>
+                <td>Selects $T$ that maximizes between-class variance $\sigma_B^2$. Fully automatic, no parameters.</td>
+            </tr>
+            <tr>
+                <td>Otsu's between-class variance</td>
+                <td>$\sigma_B^2 = \omega_1 \omega_2 (\mu_1 - \mu_2)^2$. Measures separation between object and background
+                    intensity distributions.</td>
+            </tr>
+            <tr>
+                <td>Region growing</td>
+                <td>Start from seeds, grow by appending neighbors that satisfy a similarity criterion. Produces connected
+                    regions.</td>
+            </tr>
+            <tr>
+                <td>Morphological noise filtering</td>
+                <td>Opening (remove external noise) followed by closing (fill internal holes).</td>
+            </tr>
+        </table>
+    </div>
+</article>
+
+        </main>
+
+        <script> copyright("all"); </script>
+
+    </body>
+
+</html>

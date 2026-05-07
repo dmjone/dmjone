@@ -1,0 +1,485 @@
+<!-------------------------- © 2007 - present, dmj.one and contributors. ----------------------------------
+   Part of the dmjone project. Licensed under the GNU AGPL. Provided as-is, without warranty of any kind.
+-------------------- Redistribution and modifications must retain this notice. --------------------------->
+
+
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!-->
+<html lang="en">
+    <!--<![endif]-->
+
+    <head>
+        <script src="/js/edu_su_common.js"></script>
+        <noscript>
+            <style>
+                html,
+                body {
+                    margin: 0;
+                    overflow: hidden;
+                }
+            </style>
+            <iframe src="/frame_noscript.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
+        </noscript>
+
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Frequency Domain and Image Restoration, Digital Image Processing</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+        <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+        <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=JetBrains+Mono:wght@400;500&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+
+        <meta property="og:image" content="/logo.png">
+        <meta property="og:type" content="article">
+
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:site" content="@divyamohan1993">
+        <meta name="twitter:creator" content="@divyamohan1993">
+        <meta name="twitter:image" content="/logo.png">
+
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+        <meta name="author" content="Divya Mohan">
+        <meta name="robots" content="index, follow">
+
+        <!-- JSON-LD Structured Data for SEO -->
+        <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "Course",
+          "name": "Frequency Domain and Image Restoration",
+          "description": "Frequency domain processing and image restoration: 2D DFT, lowpass and highpass filters (Ideal, Butterworth, Gaussian), degradation/restoration model, noise models, mean and median filtering, periodic noise removal with notch filters, inverse and Wiener filtering.",
+          "url": "https://dmj.one/edu/su/course/csu2543/theory/frequency-domain-restoration",
+           "datePublished": "2026-05-03",
+           "
+          "dateModified": "2026-05-03",
+           "keywords": "Frequency Domain, Fourier Transform, DFT, Lowpass Filter, Highpass Filter, Butterworth, Gaussian Filter, Image Restoration, Noise Models, Inverse Filter, Wiener Filter, Notch Filter",
+           "educationalLevel": "Undergraduate",
+           "learningResourceType": "Lecture Notes",
+          "provider": [
+            {
+              "@type": "EducationalOrganization",
+              "name": "dmj.one",
+              "url": "https://dmj.one"
+            },
+            {
+              "@type": "EducationalOrganization",
+              "name": "Shoolini University",
+              "url": "https://shooliniuniversity.com"
+            }
+          ],
+          "offers": {
+              "@type": "Offer",
+              "category": "Education",
+              "price": "0",
+              "priceCurrency": "USD",
+              "availability": "https://schema.org/InStock",
+              "url": "https://dmj.one/edu/su/course/csu2543/theory/frequency-domain-restoration"
+          },
+          "hasCourseInstance": {
+              "@type": "CourseInstance",
+              "name": "Digital Image Processing - CSU2543",
+              "description": "Lecture on frequency domain processing and image restoration, covering Fourier-based filtering and methods to recover images degraded by blur and noise.",
+              "courseMode": "online",
+              "startDate": "2026-05-03",
+              "courseWorkload": "PT4H",
+              "instructor": [
+                {
+                  "@type": "Person",
+                  "name": "Ishani Sharma",
+                  "url": "https://shooliniuniversity.com/faculty/profile/Ishani-Sharma"
+                },
+                {
+                  "@type": "Person",
+                  "name": "Divya Mohan",
+                  "url": "https://dmj.one/resume/",
+                    "sameAs": [
+                        "https://www.credly.com/users/divyamohan1993",
+                        "https://www.linkedin.com/in/divyamohan1993/",
+                        "https://hackerrank.com/divyamohan1993",
+                        "https://www.coursera.org/learner/divyamohan1993"
+                    ]
+                }
+              ],
+              "url": "https://dmj.one/edu/su/course/csu2543/"
+            }
+        }
+        </script>
+
+
+    </head>
+
+    <body>
+
+        <script> header_author("dm"); </script>
+
+        <main>
+            <article class="agen-tableofcontents">
+                <h2 class="text-center">
+                    Frequency Domain and Image Restoration
+                </h2>
+                <div class="d-none contentdate">2026, May 03</div>
+                <div class="mb-3 d-flex justify-content-center align-items-center">
+                    <a href="frequency-domain-restoration-summary" class="btn btn-lg me-3 btn-outline-primary d-print-none">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i> View Summary
+                    </a>
+                </div>
+            </article>
+
+<article>
+    <h3>1. Introduction to the Frequency Domain</h3>
+    <p>Until now, every operation (intensity transforms, spatial filtering) worked directly on pixel values, the
+        <strong>spatial domain</strong>. The frequency domain offers a completely different lens: instead of asking
+        "what brightness is at position $(x,y)$?", it asks <strong>"how fast does brightness change across the
+            image?"</strong></p>
+    <p>The foundation is the <strong>Fourier Transform</strong>: any signal, including a 2D image, can be decomposed
+        into a sum of sine and cosine waves of different frequencies. Each wave has a frequency, an amplitude
+        (strength), and a phase (shift).</p>
+
+    <h4>1.1 Frequency = Rate of Intensity Change</h4>
+    <ul>
+        <li><strong>Low frequencies</strong>, slowly varying intensity regions: smooth walls, gradual gradients, the
+            sky, uniform backgrounds. These carry the bulk image structure.</li>
+        <li><strong>High frequencies</strong>, rapid intensity changes: sharp edges, fine textures, noise. These carry
+            detail.</li>
+    </ul>
+    <p>This is why a <strong>lowpass filter</strong> (passes lows, blocks highs) smooths/blurs, and a <strong>highpass
+            filter</strong> (passes highs, blocks lows) sharpens. The spatial-domain smoothing and sharpening filters
+        from previous topics have exact frequency-domain counterparts.</p>
+</article>
+
+<article>
+    <h3>2. The 2D Discrete Fourier Transform (DFT)</h3>
+    <p>The <strong>2D DFT</strong> is the mathematical engine that converts an image from a grid of pixel intensities
+        (spatial domain) into a map of frequency components (frequency domain). Every pixel in the frequency-domain
+        output represents a specific 2D sinusoidal pattern present in the image.</p>
+
+    <h4>2.1 Two Components of the Transform</h4>
+    <p>At each frequency $(u,v)$, the DFT produces a complex number. From it, two quantities are extracted:</p>
+    <ul>
+        <li><strong>Magnitude (spectrum)</strong>, the <em>amplitude</em> of that frequency component. How strong is
+            this particular sinusoidal pattern in the image?</li>
+        <li><strong>Phase angle</strong>, the <em>spatial shift</em> of that component. Where in the image is this
+            pattern positioned?</li>
+    </ul>
+    <p>For visualization, the magnitude spectrum is what you typically display. The phase, though visually
+        uninterpretable, carries most of the structural information, swapping the phase of two images swaps their
+        appearance.</p>
+
+    <h4>2.2 The DC Term</h4>
+    <p>The frequency $(u,v) = (0,0)$ is called the <strong>DC (zero-frequency) term</strong>. It represents a constant
+        offset, the <strong>average intensity</strong> of the entire image. It dominates the spectrum (its value is
+        proportional to $M \times N \times \text{mean intensity}$), which is why a <strong>log transform</strong> is
+        applied before displaying the spectrum to compress this large value and reveal the rest.</p>
+
+    <h4>2.3 Centering the Spectrum</h4>
+    <p>By default, the DFT places the DC term at the corners. For intuitive visualization and filtering, the spectrum is
+        <strong>shifted</strong> so that DC sits at the <strong>center</strong>. Low frequencies cluster near the
+        center; high frequencies spread toward the edges.</p>
+
+    <pre><code class="language-python"># Computing and displaying the DFT
+import numpy as np
+
+# Compute 2D DFT
+F = np.fft.fft2(image)
+# Shift DC to center
+F_shifted = np.fft.fftshift(F)
+# Magnitude spectrum (log-transformed for display)
+spectrum = np.log(1 + np.abs(F_shifted))</code></pre>
+</article>
+
+<article>
+    <h3>3. Frequency Domain Filtering Steps</h3>
+    <p>Filtering in the frequency domain follows a fixed 5-step pipeline:</p>
+    <ul>
+        <li><strong>Step 1, Pad the image:</strong> Extend the image (typically to the next power of 2, or double the
+            size) using zero/mirror padding. This prevents circular convolution artifacts from the DFT's inherent
+            periodicity.</li>
+        <li><strong>Step 2, Compute the 2D DFT:</strong> Transform the padded image into the frequency domain.</li>
+        <li><strong>Step 3, Center the spectrum:</strong> Shift the zero-frequency component to the center of the
+            frequency rectangle.</li>
+        <li><strong>Step 4, Multiply by a filter function:</strong> Element-wise multiplication of the shifted DFT with
+            a filter $H(u,v)$. This is where the actual filtering happens, corresponding to convolution in the spatial
+            domain.</li>
+        <li><strong>Step 5, Inverse shift and inverse DFT:</strong> Undo the centering, compute the inverse 2D DFT,
+            discard the padded region, and take the real part as the output image.</li>
+    </ul>
+    <p>The key insight: <strong>multiplication in frequency domain = convolution in spatial domain</strong>. Multiplying
+        by $H(u,v)$ in frequency space is equivalent to convolving the image with the spatial-domain version of $H$.</p>
+
+    <pre><code class="language-python"># Frequency domain filtering pipeline
+import numpy as np
+
+# Step 1: Pad
+padded = np.zeros((2*M, 2*N))
+padded[:M, :N] = image
+
+# Step 2-3: DFT and center
+F = np.fft.fftshift(np.fft.fft2(padded))
+
+# Step 4: Multiply by filter H(u,v)
+G = F * H  # H is the frequency-domain filter
+
+# Step 5: Inverse
+result = np.real(np.fft.ifft2(np.fft.ifftshift(G)))
+output = result[:M, :N]  # crop to original size</code></pre>
+</article>
+
+<article>
+    <h3>4. Image Smoothing: Lowpass Filters in Frequency Domain</h3>
+    <p>Edges and sharp transitions produce high-frequency content. To smooth an image, <strong>attenuate the high
+            frequencies</strong> while preserving the low ones. Three common lowpass filter profiles:</p>
+
+    <h4>4.1 Ideal Lowpass Filter (ILPF)</h4>
+    <p>Passes all frequencies within a cutoff radius $D_0$ perfectly (multiplied by 1) and completely blocks everything
+        outside (multiplied by 0). The transition is a sharp step. While theoretically simple, this abrupt cutoff causes
+        <strong>ringing artifacts</strong> (ripples near edges) in the output, the spatial-domain equivalent of the
+        sinc function's oscillations.</p>
+
+    <h4>4.2 Butterworth Lowpass Filter (BLPF)</h4>
+    <p>Uses a smooth, gradual transition controlled by the filter <strong>order $n$</strong>. Higher order → steeper
+        transition → closer to ideal (but more ringing). Lower order → gentler roll-off → less ringing. A good practical
+        compromise between smoothing strength and artifact control.</p>
+
+    <h4>4.3 Gaussian Lowpass Filter (GLPF)</h4>
+    <p>The transition follows a Gaussian curve. <strong>No ringing artifacts at all</strong> because the Gaussian has no
+        sharp discontinuities. The smoothest possible transition. Its spatial-domain equivalent is also a Gaussian, the
+        only function that is its own Fourier transform. This makes it the most well-behaved filter for smoothing.</p>
+</article>
+
+<article>
+    <h3>5. Image Sharpening: Highpass Filters in Frequency Domain</h3>
+    <p>The exact complement of lowpass filtering. A highpass filter <strong>attenuates low frequencies</strong> (smooth
+        regions) while <strong>preserving high frequencies</strong> (edges, detail). The same three profiles exist:
+        Ideal, Butterworth, and Gaussian highpass filters.</p>
+    <p>The relationship is straightforward:</p>
+    $$H_{\text{HP}}(u,v) = 1 - H_{\text{LP}}(u,v)$$
+    <p>Subtract the lowpass filter from 1 (an all-pass filter) to get the corresponding highpass filter.</p>
+    <p><strong>Side effect:</strong> Because the DC term (average intensity) is a low-frequency component, highpass
+        filtering removes or attenuates it. This <strong>darkens the overall image tone</strong>. The detail is enhanced
+        but the image may appear unnaturally dark. To fix this, the DC component can be added back after filtering.</p>
+</article>
+
+<article>
+    <h3>6. The Image Degradation/Restoration Model</h3>
+    <p>Image <strong>enhancement</strong> (previous topics) is subjective, you adjust contrast or sharpen until it
+        "looks good." Image <strong>restoration</strong> is objective, you know (or estimate) <em>what went wrong</em>
+        and try to mathematically reverse it.</p>
+
+    <h4>6.1 The Degradation Model</h4>
+    <p>An original image $f(x,y)$ passes through a degradation process and produces an observed (degraded) image
+        $g(x,y)$:</p>
+    $$g(x,y) = h(x,y) * f(x,y) + \eta(x,y)$$
+    <p>In the frequency domain:</p>
+    $$G(u,v) = H(u,v) \cdot F(u,v) + N(u,v)$$
+    <ul>
+        <li><strong>$H$</strong>, the degradation function (e.g., motion blur, atmospheric turbulence, lens defocus).
+            Known or estimated.</li>
+        <li><strong>$\eta$ / $N$</strong>, additive noise (random, unpredictable).</li>
+        <li><strong>$f$ / $F$</strong>, the unknown original image we want to recover.</li>
+        <li><strong>$g$ / $G$</strong>, the degraded image we observe.</li>
+    </ul>
+    <p>The restoration goal: given $g$ (observed), $H$ (known/estimated), and statistical knowledge of $\eta$, find
+        $\hat{f}$, the best estimate of the original $f$.</p>
+</article>
+
+<article>
+    <h3>7. Noise Models</h3>
+    <p>Noise is any random variation in pixel values that is not part of the actual scene. It arises from two primary
+        sources:</p>
+    <ul>
+        <li><strong>Acquisition:</strong> Sensor imperfections, thermal fluctuations, photon counting errors,
+            environmental interference during capture.</li>
+        <li><strong>Transmission:</strong> Channel interference, bit errors, electromagnetic disturbances during data
+            transfer.</li>
+    </ul>
+
+    <h4>7.1 White Noise</h4>
+    <p>When the Fourier spectrum of the noise is <strong>constant across all frequencies</strong>, the noise is called
+        <strong>white noise</strong>, by analogy with white light containing all visible frequencies equally. White
+        noise contaminates every frequency band equally.</p>
+
+    <h4>7.2 Common Noise Types</h4>
+    <div class="overflow-auto">
+        <table class="table table-bordered table-striped">
+            <tr>
+                <th>Noise Type</th>
+                <th>Character</th>
+                <th>Typical Source</th>
+            </tr>
+            <tr>
+                <td>Gaussian</td>
+                <td>Bell-shaped distribution; most common model</td>
+                <td>Electronic sensor noise, thermal noise</td>
+            </tr>
+            <tr>
+                <td>Rayleigh</td>
+                <td>Skewed distribution; always positive</td>
+                <td>Range imaging, radar</td>
+            </tr>
+            <tr>
+                <td>Erlang (Gamma)</td>
+                <td>Skewed; generalizes exponential</td>
+                <td>Laser imaging</td>
+            </tr>
+            <tr>
+                <td>Exponential</td>
+                <td>Special case of Erlang</td>
+                <td>Laser imaging</td>
+            </tr>
+            <tr>
+                <td>Uniform</td>
+                <td>Equal probability across a range</td>
+                <td>Quantization noise, simulation</td>
+            </tr>
+            <tr>
+                <td>Salt-and-pepper (Impulse)</td>
+                <td>Random pure-black and pure-white pixels</td>
+                <td>Sensor malfunction, bit errors</td>
+            </tr>
+        </table>
+    </div>
+    <p>Each noise type has a distinct histogram shape. Salt-and-pepper is unique: it produces isolated extreme pixels (0
+        or $L-1$) rather than gradual intensity shifts.</p>
+</article>
+
+<article>
+    <h3>8. Restoration in the Presence of Noise Only</h3>
+    <p>When the degradation is <em>only</em> additive noise (no blur, no motion, just $g = f + \eta$), <strong>spatial
+            filtering</strong> is the most effective restoration method.</p>
+
+    <h4>8.1 Mean Filters</h4>
+    <ul>
+        <li><strong>Arithmetic mean:</strong> Standard averaging. Smooths noise but blurs edges.</li>
+        <li><strong>Geometric mean:</strong> Product of pixel values raised to the power $1/mn$. Less blurring than
+            arithmetic mean, but cannot handle zero-valued pixels.</li>
+    </ul>
+
+    <h4>8.2 Order-Statistic Filters</h4>
+    <p>The <strong>median filter</strong> is the primary tool for removing salt-and-pepper noise. It replaces the center
+        pixel with the median of the neighborhood, effectively ignoring the extreme outlier values (the "salt" and
+        "pepper" pixels). Multiple passes of a median filter can progressively clean heavily corrupted images while
+        preserving edges better than any mean filter.</p>
+</article>
+
+<article>
+    <h3>9. Periodic Noise Reduction</h3>
+    <p>Some degradation sources (e.g., electrical interference, scanning artifacts) produce <strong>periodic
+            noise</strong>, a repeating pattern superimposed on the image. In the spatial domain this looks like faint
+        stripes or grids. In the frequency domain, periodic noise appears as <strong>distinct spikes</strong> at
+        specific frequencies, easy to identify and remove.</p>
+
+    <h4>9.1 Bandreject Filters</h4>
+    <p>Block a specific <strong>band</strong> (range) of frequencies while passing everything else. If the periodic
+        noise occupies a known frequency band, a bandreject filter centered on that band eliminates it.</p>
+
+    <h4>9.2 Notch Filters</h4>
+    <p>More surgical than bandreject. A notch filter blocks frequencies in <strong>small, predefined
+            neighborhoods</strong> around specific frequency points (the noise spikes). This removes only the noise
+        frequencies while leaving nearly all other content intact. Notch filters always come in <strong>symmetric
+            pairs</strong>, if you block frequency $(u_0, v_0)$, you must also block $(-u_0, -v_0)$ to maintain a
+        real-valued output image.</p>
+</article>
+
+<article>
+    <h3>10. Inverse Filtering and Wiener Filtering</h3>
+
+    <h4>10.1 Inverse Filtering</h4>
+    <p>The simplest restoration approach. Given $G(u,v) = H(u,v) \cdot F(u,v) + N(u,v)$, estimate $F$ by dividing:</p>
+    $$\hat{F}(u,v) = \frac{G(u,v)}{H(u,v)} = F(u,v) + \frac{N(u,v)}{H(u,v)}$$
+    <p>The problem: wherever $H(u,v)$ is small (near zero), the noise term $N(u,v)/H(u,v)$ <strong>explodes</strong>. A
+        tiny amount of noise at a frequency where the degradation function is weak gets amplified enormously,
+        overwhelming the restoration. This makes inverse filtering <strong>highly sensitive to noise</strong> and often
+        impractical for real images.</p>
+
+    <h4>10.2 Wiener Filtering (Minimum Mean Square Error)</h4>
+    <p>Wiener filtering fixes the noise-explosion problem by incorporating <strong>statistical knowledge</strong> of
+        both the noise and the original image. Instead of blindly dividing by $H$, it minimizes the <strong>mean square
+            error</strong> between the estimate $\hat{f}$ and the true image $f$.</p>
+    <p>The Wiener filter balances two competing goals: undoing the degradation $H$ (which requires dividing by $H$) and
+        suppressing noise (which requires <em>not</em> dividing by $H$ when it's small). At frequencies where $H$ is
+        large (strong signal, little noise amplification), it behaves like inverse filtering. At frequencies where $H$
+        is small (noise would dominate), it damps the output to suppress noise. The result is a much more robust
+        restoration than inverse filtering.</p>
+</article>
+
+<article>
+    <h3>11. Quick-Reference Table</h3>
+    <div class="overflow-auto">
+        <table class="table table-bordered table-striped">
+            <tr>
+                <th>If Asked</th>
+                <th>Write This</th>
+            </tr>
+            <tr>
+                <td>Low frequencies in an image</td>
+                <td>Slowly varying regions: smooth backgrounds, gradual gradients. Carry bulk structure.</td>
+            </tr>
+            <tr>
+                <td>High frequencies in an image</td>
+                <td>Rapid changes: edges, textures, noise. Carry detail.</td>
+            </tr>
+            <tr>
+                <td>What is the DC term?</td>
+                <td>Zero-frequency component $(u,v)=(0,0)$. Proportional to the average intensity of the image.</td>
+            </tr>
+            <tr>
+                <td>DFT components</td>
+                <td>Magnitude (spectrum), amplitude of each frequency. Phase angle, spatial position of each pattern.</td>
+            </tr>
+            <tr>
+                <td>Frequency filtering steps</td>
+                <td>Pad → DFT → center shift → multiply by $H(u,v)$ → inverse shift → inverse DFT → crop.</td>
+            </tr>
+            <tr>
+                <td>Three lowpass filter types</td>
+                <td>Ideal (sharp cutoff, ringing), Butterworth (smooth, tunable order), Gaussian (smoothest, no ringing).
+                </td>
+            </tr>
+            <tr>
+                <td>Highpass from lowpass</td>
+                <td>$H_{HP} = 1 - H_{LP}$. Side effect: removes DC → darkens image.</td>
+            </tr>
+            <tr>
+                <td>Enhancement vs. restoration</td>
+                <td>Enhancement is subjective (looks better). Restoration is objective (mathematically reverse known
+                    degradation).</td>
+            </tr>
+            <tr>
+                <td>Degradation model</td>
+                <td>$g = H * f + \eta$ (spatial); $G = HF + N$ (frequency). $H$ = degradation, $\eta$ = noise.</td>
+            </tr>
+            <tr>
+                <td>White noise</td>
+                <td>Noise whose Fourier spectrum is constant across all frequencies.</td>
+            </tr>
+            <tr>
+                <td>Noise-only restoration</td>
+                <td>Use spatial filters: mean filters (smooth but blur) or median filter (best for salt-and-pepper).</td>
+            </tr>
+            <tr>
+                <td>Periodic noise removal</td>
+                <td>Appears as spikes in frequency domain. Use bandreject or notch filters to block those spikes.</td>
+            </tr>
+            <tr>
+                <td>Inverse filtering problem</td>
+                <td>$\hat{F} = G/H$; noise explodes where $H \approx 0$. Highly noise-sensitive.</td>
+            </tr>
+            <tr>
+                <td>Wiener filtering advantage</td>
+                <td>Minimizes mean square error by balancing deblurring and noise suppression using noise/signal statistics.
+                </td>
+            </tr>
+        </table>
+    </div>
+</article>
+
+        </main>
+
+        <script> copyright("all"); </script>
+
+    </body>
+
+</html>
