@@ -72,13 +72,6 @@ function get_menu_list(datetogen) {
                 link: "spatial-filtering"
             },
             {
-                title: "Morphology and Segmentation",
-                desc: "Morphological image processing and segmentation: erosion, dilation, opening, closing, edge models, thresholding (global, variable, Otsu), and region growing. Set-theoretic foundations for shape analysis and region extraction.",
-                codetype: "Concepts",
-                readtime: 6,
-                link: "morphology-segmentation"
-            },
-            {
                 title: "Frequency Domain and Image Restoration",
                 desc: "Frequency domain processing and image restoration: 2D DFT, lowpass and highpass filters (Ideal, Butterworth, Gaussian), degradation/restoration model, noise models, mean and median filtering, periodic noise removal with notch filters, inverse and Wiener filtering.",
                 codetype: "Concepts",
@@ -91,7 +84,14 @@ function get_menu_list(datetogen) {
                 codetype: "Concepts",
                 readtime: 7,
                 link: "color-processing-compression"
-            }
+            },
+            {
+                title: "Morphology and Segmentation",
+                desc: "Morphological image processing and segmentation: erosion, dilation, opening, closing, edge models, thresholding (global, variable, Otsu), and region growing. Set-theoretic foundations for shape analysis and region extraction.",
+                codetype: "Concepts",
+                readtime: 6,
+                link: "morphology-segmentation"
+            },
         ];
         body_genmenu.processData(arr, def_date, def_author);
     }
