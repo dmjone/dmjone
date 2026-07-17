@@ -399,17 +399,10 @@ body.board .res h3{font-size:clamp(32px,2.8vw,46px)}
 .mb .mi{font-size:clamp(19px,1.5vw,24px);line-height:1}
 .mb:hover{border-color:var(--river)}
 .mb[aria-selected="true"]{background:var(--river-deep);color:#fff;border-color:var(--river-deep)}
+/* the way out, and the only one. It sits first in the transport, bottom-left, in
+   thumb country. A second floating Back button used to hover here too and did
+   nothing this one doesn't — except cover the text underneath it. */
 .mb.back{flex:0 0 auto;background:var(--gold-fill);color:#3a2600;border-color:#e0a800}
-
-/* ---- the way out. Always on screen, always the same button, always bottom-left.
-        A teacher standing at a board must never hunt for the way back. ---- */
-#back{position:fixed;left:var(--edge);bottom:calc(var(--tap) + 22px);z-index:100;display:none;
-  align-items:center;gap:10px;min-height:var(--tap);padding:0 26px;border-radius:99px;
-  background:var(--gold-fill);color:#3a2600;font-family:'Baloo 2','Mukta',sans-serif;font-weight:800;
-  font-size:clamp(15px,1.2vw,19px);border:4px solid #3a2600}
-#back.on{display:inline-flex}
-#back:hover{background:#ffd76b}
-#back .ba{font-size:1.3em;line-height:1}
 
 /* ============================ TOOL SHEETS ============================ */
 .sheet{position:fixed;inset:0;z-index:80;display:none;align-items:flex-end;justify-content:center;background:rgba(11,58,53,.45)}
@@ -717,8 +710,6 @@ footer b{color:var(--ink)}
   <p class="vcr" id="vcr"></p>
   <button class="vx" id="vx" aria-label="Close film">✕</button>
 </div>
-
-<button id="back" aria-label="Go back to the previous screen"><span class="ba" aria-hidden="true">◀</span><span id="backTxt">Back</span></button>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
@@ -1732,7 +1723,7 @@ function closeCon(){
   $("con").classList.remove("open");
   document.body.style.overflow="";
   cur=null;
-  renderGrid(); renderRail(); paintProgress(); paintBack();
+  renderGrid(); renderRail(); paintProgress();
 }
 function renderModes(){
   const bar=$("modes"); bar.innerHTML="";
@@ -2080,28 +2071,6 @@ tap($("vx"),closeFilm);
 ["fullscreenchange","webkitfullscreenchange","msfullscreenchange"].forEach(e=>
   document.addEventListener(e,()=>{ if(!fsEl()) closeFilm(); }));
 
-/* ============================================================
-   BACK — one way out, always in the same place.
-   It always undoes exactly one layer: film -> chapter -> river.
-   A teacher standing at a board should never have to work out
-   which corner closes what.
-   ============================================================ */
-function backTarget(){
-  if(vp.classList.contains("open")) return {go:closeFilm, label:"Back to chapter"};
-  if(document.querySelector(".sheet.open")) return {go:closeSheets, label:"Close"};
-  if($("con").classList.contains("open")) return {go:closeCon, label:"All chapters"};
-  return null;
-}
-function paintBack(){
-  const t=backTarget(), b=$("back");
-  b.classList.toggle("on",!!t);
-  if(t) $("backTxt").textContent=t.label;
-}
-tap($("back"),()=>{ const t=backTarget(); if(t){ t.go(); paintBack(); } });
-/* every screen change repaints the button, so it can never point at the wrong layer */
-["click","keydown","fullscreenchange","webkitfullscreenchange"].forEach(e=>
-  document.addEventListener(e,()=>setTimeout(paintBack,0),true));
-
 /* ---------------- board mode ---------------- */
 const K_BOARD="kaveri_board_v1";
 function setBoard(on){
@@ -2150,7 +2119,7 @@ function toast(m){
 /* ---------------- boot ----------------
    No splash gate. A teacher opens this five days a week and a
    tap-to-enter screen is pure friction; the content is the door. */
-renderGrid(); renderRail(); paintProgress(); paintBack();
+renderGrid(); renderRail(); paintProgress();
 
 /* ============================================================
    LISTEN — the board reads the transcript aloud
