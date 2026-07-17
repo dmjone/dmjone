@@ -1,0 +1,19 @@
+# The masters (~289MB of .mp4 and .pdf) live in S3 and are streamed from there at
+# runtime — see VIDEO_BASE / LESSON_BASE in index.html. The page never reads them
+# locally, so the video/ and lesson/ folders are safe to delete.
+#
+# This rule sits HERE rather than inside those folders so it survives them being
+# deleted: drop the files back in to re-upload and git still won't swallow them.
+# Once committed, a 289MB blob is in history forever and every clone pays for it.
+#
+# Re-upload:
+#   aws s3 sync ./video   s3://<bucket>/videos/  --profile admin --region ap-south-1 \
+#     --exclude "*" --include "*.mp4" --content-type "video/mp4" \
+#     --cache-control "public, max-age=31536000, immutable"
+#   aws s3 sync ./lesson  s3://<bucket>/lessons/ --profile admin --region ap-south-1 \
+#     --exclude "*" --include "*.pdf" --content-type "application/pdf" \
+#     --content-disposition "inline" --cache-control "public, max-age=31536000, immutable"
+video/
+lesson/
+*.mp4
+*.pdf
