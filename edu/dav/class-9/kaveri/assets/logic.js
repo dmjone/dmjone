@@ -174,27 +174,30 @@ function has(ch,k){
 
 /* One card body, used on the bank and in the filtered grid alike. */
 function cardEl(ch){
-  const isDone=done.has(ch.id);
+  const isDone=done.has(ch.id), film=has(ch,"film");
   const el=document.createElement("article");
   el.className="card"+(isDone?" done":"");
   el.style.setProperty("--accent",accent(ch));
+  // every card shows the same eight base modes in the same order — a clean 4x2 grid.
+  // Film is not a tile; it is the featured bar below, so the grid never goes ragged.
+  const order=["read","text","listen","quiz","talk","words","do","connect"];
+  const tiles=order.map(k=>MODES.find(m=>m.k===k)).filter(m=>m&&has(ch,m.k));
   el.innerHTML=`
     <div class="hd">
       <span class="no mono">${String(ch.n).padStart(2,"0")}</span>
+      <span class="ctag">${ch.type==="poem"?"Poem":"Prose"}</span>
+      ${isDone?`<span class="cdone" title="Read">✓</span>`:``}
       <span class="em" aria-hidden="true">${ch.emoji}</span>
     </div>
     <h3>${ch.title}</h3>
-    ${ch.by?`<p class="by">${ch.by}</p>`:``}
-    <div class="meta">
-      <span class="tag ${ch.type}">${ch.genre}</span>
-      ${has(ch,"film")?`<span class="tag film">▶ Film</span>`:``}
-      ${isDone?`<span class="tag ok">✓ Read</span>`:``}
-    </div>
+    <p class="by${ch.by?"":" dim"}">${ch.by||"NCERT"}</p>
+    ${film?`<button class="cfilm" aria-label="${ch.title} — watch the film"><span aria-hidden="true">▶</span> Watch the film</button>`:``}
     <div class="jump"></div>`;
+  if(film) tap(el.querySelector(".cfilm"),()=>openCon(ch,"film"));
   const jump=el.querySelector(".jump");
-  MODES.filter(m=>has(ch,m.k)).forEach(m=>{
+  tiles.forEach(m=>{
     const b=document.createElement("button");
-    b.className="jbtn"+(m.k==="film"||m.k==="text"?" key":"");
+    b.className="jbtn";
     b.innerHTML=`<span class="ji" aria-hidden="true">${m.i}</span>${m.t}`;
     b.setAttribute("aria-label",`${ch.title} — ${m.t}`);
     tap(b,()=>openCon(ch,m.k));
@@ -718,6 +721,14 @@ tap($("vx"),closeFilm);
 ["fullscreenchange","webkitfullscreenchange","msfullscreenchange"].forEach(e=>
   document.addEventListener(e,()=>{ if(!fsEl()) closeFilm(); }));
 
+/* ---------------- classroom tools (the lower bars) ----------------
+   Hidden by default off-board so students get the full screen; shown on the board and
+   revealable anywhere. The teacher's choice persists. */
+const K_TOOLS="kaveri_tools_v1";
+function setTools(on){ document.body.classList.toggle("tools",on); }
+tap($("footpop"),()=>{ setTools(true); LS.set(K_TOOLS,true); sfx.tap(); });
+tap($("railHide"),()=>{ setTools(false); LS.set(K_TOOLS,false); sfx.tap(); });
+
 /* ---------------- board mode ---------------- */
 const K_BOARD="kaveri_board_v1";
 function setBoard(on){
@@ -728,10 +739,11 @@ function setBoard(on){
 tap($("dExam"),()=>openSheet("shExam"));
 tap($("dBoard"),()=>{
   const on=!document.body.classList.contains("board");
-  setBoard(on); sfx.tap();
+  setBoard(on); if(on){ setTools(true); LS.set(K_TOOLS,true); } sfx.tap();
   toast(on?"📺 Board mode on — sized for the back bench":"📺 Board mode off");
 });
 setBoard(LS.get(K_BOARD,false)===true);
+setTools(LS.get(K_TOOLS, false)===true || document.body.classList.contains("board"));
 
 /* ---------------- keyboard ---------------- */
 document.addEventListener("keydown",e=>{
