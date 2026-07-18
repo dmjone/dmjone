@@ -1,0 +1,535 @@
+/* ============================================================
+   KAVERI — a bright classroom board
+   Named for the river the textbook is named for: it rises at
+   Talakaveri in Kodagu and runs east to the Bay of Bengal, and
+   this page is that journey, top to bottom, in daylight.
+
+   THREE RULES, and they beat every aesthetic idea in here:
+
+   1. NOTHING ANIMATES. No transitions, no keyframes, no blur, no
+      backdrop-filter, no 3D transforms. A smartboard browser runs
+      on a low-power SoC and each of those repaints the whole
+      panel. A lesson that stutters is a lesson that loses the room.
+   2. LIGHT AND POSITIVE. Paper-bright ground, saturated happy
+      accents, ink-dark text. Nothing murky.
+   3. LEGIBLE FROM THE BACK BENCH. 72" panel, last bench 30 feet
+      (9.14m). Comfortable reading is ~20 arcmin of cap height; at
+      9.14m that is 5.3cm, about 92px on this panel. Board mode
+      does exactly that.
+
+   Every colour pair below was contrast-checked against the ground
+   it actually sits on. Nothing under 4.5:1 carries body text.
+   ============================================================ */
+:root{
+  /* --- ground: daylight --- */
+  --paper:#f2fbf8;      /* the page — bright, faintly green, never grey */
+  --card:#ffffff;
+  --sky:#cdeefb;
+  --sand:#fdf3dd;       /* the bank */
+  --line:#bcdcd5;
+
+  /* --- ink --- */
+  --ink:#0b3a35;        /* primary text     ~13.9:1 on paper */
+  --ink-soft:#4a6f6a;   /* secondary text    ~5.4:1 on paper */
+
+  /* --- the river's colours, at midday --- */
+  --river:#0f9c8a;      /* the water — fills and edges, large text only */
+  --river-deep:#0a6f62; /* the water as TEXT ~6.2:1 on paper */
+  --coral:#cf3f14;      /* laterite bank — prose ~5.6:1 */
+  --gold:#8a5f00;       /* Talakaveri gold as TEXT — 5.3:1; #9a6a00 measured 4.49 and missed AA by 0.01 */
+  --gold-fill:#ffc93f;  /* the same gold as a FILL, with ink on top */
+  --grape:#6b3fa0;      /* a happy accent ~7.4:1 */
+
+  /* --- board ergonomics: a 72" wall panel puts its top edge ~2.2m up, past the
+         reach of most teachers, so every CONTROL lives low. --- */
+  --tap:76px;           /* WCAG floor is 44; a wall board needs far more */
+  --gap:14px;           /* dead space between controls IS the mistouch defence */
+
+  --r:16px; --r-lg:22px;
+  --edge:clamp(12px,2vw,30px);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+/* rule 1, stated once, so nothing creeps back in */
+*,*::before,*::after{animation:none!important;transition:none!important}
+html{scroll-behavior:auto}
+body{
+  /* Mukta (Ek Type, Mumbai) — drawn for Devanagari first, so its Latin has the
+     open counters and tall x-height that survive a 72" panel at 30 feet */
+  font-family:'Mukta',system-ui,sans-serif;
+  color:var(--ink);background:var(--paper);
+  min-height:100dvh;overflow-x:hidden;
+  font-size:clamp(15px,.5vw + 13px,19px);
+  touch-action:manipulation;              /* kills double-tap zoom, the worst board mistouch */
+  -webkit-text-size-adjust:100%;
+}
+/* Baloo 2 (Ek Type) — rounded, warm, Indic-native. Friendly without being childish,
+   which is the line to walk for fourteen-year-olds. */
+h1,h2,h3,.dsp{font-family:'Baloo 2','Mukta',sans-serif;font-weight:800;line-height:1.15}
+.mono{font-variant-numeric:tabular-nums;font-weight:900}
+button{font:inherit;color:inherit;border:none;background:none;cursor:pointer}
+a{color:var(--river-deep)}
+:focus-visible{outline:4px solid var(--grape);outline-offset:2px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
+.hidden{display:none!important}
+
+/* ============================================================
+   BOARD MODE
+   Flipped once by the teacher, then it sticks. CSS cannot tell a
+   72" TV from a 1920 laptop, so this is a choice, not a guess.
+   zoom scales type AND touch targets together — right for a board.
+   ============================================================ */
+body.board{zoom:1.5}
+body.board .qq{font-size:clamp(40px,4.6vw,62px)}
+/* The options ARE the answer: a student who cannot read them cannot play. Stacked
+   full-width they measured 11.5 arcmin at 30ft and the question plus four of them
+   overflowed the panel (884px of content in 512px of board), so scrolling mid-
+   question was the only way to show the last option. Two columns halves the height,
+   which buys the size back — 4 options now sit at ~16 arcmin AND fit, unscrolled.
+   The answers are short ("Pottery", "Weaving"); the width was never the constraint. */
+body.board #opts{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:stretch}
+body.board .opt{font-size:clamp(30px,3.4vw,46px);min-height:112px;margin-bottom:0}
+body.board .opt .kx{width:62px;height:62px;font-size:29px}
+body.board #opts > .btn{grid-column:1/-1}   /* the Next button spans, never a half-width orphan */
+body.board .qhd .qn{font-size:clamp(15px,1.2vw,19px)}
+body.board .qtag{font-size:.62em}
+body.board .qsrc{font-size:clamp(17px,1.45vw,25px)}
+body.board .qcount{font-size:clamp(20px,1.7vw,30px)}
+body.board .qbarwrap{height:16px}
+body.board .cbody{padding:14px var(--edge)}
+body.board .comp .ncf{display:none}
+body.board .comp{margin-bottom:12px;padding:10px 14px}
+body.board .qbarwrap{margin-bottom:12px}
+body.board .qhd{margin-bottom:10px}
+body.board .qq{margin-bottom:14px}
+body.board .qfoot{margin-top:12px}
+body.board #opts{gap:12px}
+body.board .opt{min-height:78px}
+body.board .qfoot{margin-top:12px}
+body.board .qpause{min-height:58px}
+@media (max-width:1100px){ body.board #opts{grid-template-columns:1fr} }
+body.board .dq{font-size:clamp(26px,2.3vw,38px)}
+body.board .prose{font-size:clamp(21px,1.8vw,30px)}
+body.board .script{font-size:clamp(22px,1.9vw,32px)}
+body.board .act{font-size:clamp(21px,1.8vw,30px)}
+body.board .wc .w{font-size:clamp(22px,1.8vw,30px)}
+body.board .res h3{font-size:clamp(32px,2.8vw,46px)}
+
+/* ============================================================
+   THE VALLEY — daylight, painted once
+   One gradient and two flat SVG paths. No blur, no repeating
+   gradients, no animation.
+   ============================================================ */
+.chart{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:linear-gradient(180deg,var(--sky) 0%,#e3f5f0 26%,var(--paper) 52%)}
+.hills{position:fixed;top:0;left:0;right:0;height:min(38vh,300px);z-index:0;pointer-events:none}
+.hills svg{width:100%;height:100%;display:block}
+.sun{position:fixed;top:clamp(14px,3vh,40px);right:clamp(90px,14vw,260px);z-index:0;pointer-events:none;
+  width:clamp(52px,6vw,92px);aspect-ratio:1;border-radius:50%;background:#ffd76b;border:5px solid #ffe9a8}
+
+/* ============================ APP FRAME ============================ */
+.app{position:relative;z-index:1;min-height:100dvh;display:flex;flex-direction:column}
+
+/* ---- masthead: information only. Never a control up here. ---- */
+.mast{display:flex;align-items:center;gap:var(--edge);flex-wrap:wrap;padding:calc(var(--edge)*.7) var(--edge)}
+/* the wordmark is the way home. It lives in the masthead, which a teacher never has
+   to touch mid-lesson, so it cannot be hit by accident on the board. */
+.brand{display:flex;align-items:baseline;gap:12px;min-width:0;text-decoration:none;color:inherit;
+  border-radius:12px;padding:4px 8px;margin-left:-8px}
+.brand:hover{background:#fff}
+/* Yatra One for the wordmark alone — a Devanagari display face whose Latin reads
+   unmistakably Indian. One element carries the boldness; everything else stays calm. */
+.brand .wm{font-family:'Yatra One','Baloo 2',cursive;font-weight:400;font-size:clamp(30px,3.6vw,52px);line-height:1.25;color:var(--river-deep)}
+.brand .sub{font-size:clamp(11px,.9vw,14px);font-weight:900;color:var(--ink-soft);letter-spacing:.12em;text-transform:uppercase;white-space:nowrap}
+.mast .who{margin-left:auto;display:flex;align-items:center;gap:9px;font-size:clamp(12px,1vw,15px);font-weight:700;color:var(--ink-soft)}
+.mast .who b{color:var(--ink)}
+.gauge{display:flex;align-items:center;gap:12px;min-width:min(260px,40vw)}
+.gauge .track{flex:1;height:14px;border-radius:99px;background:#fff;border:2px solid var(--line);overflow:hidden}
+.gauge .track i{display:block;height:100%;background:var(--river)}
+.gauge .rd{font-size:clamp(12px,1vw,15px);font-weight:900;color:var(--river-deep);white-space:nowrap}
+.main{flex:1;padding:var(--edge);padding-bottom:10px}
+
+/* ---- filters ---- */
+.filters{display:flex;gap:var(--gap);flex-wrap:wrap;margin-bottom:var(--edge)}
+.chip{min-height:58px;padding:0 22px;border-radius:99px;display:inline-flex;align-items:center;gap:8px;
+  font-weight:800;font-size:clamp(13px,1.05vw,16px);color:var(--ink);background:var(--card);border:2.5px solid var(--line)}
+.chip:hover{border-color:var(--river)}
+.chip[aria-pressed="true"]{background:var(--river-deep);color:#fff;border-color:var(--river-deep)}
+.chip .ct{font-weight:900;opacity:.7}
+
+/* ============================================================
+   THE MEANDER
+   Left bank, water, right bank. Prose on one side and poems on the
+   other — not decoration: the book alternates prose, poem, prose,
+   poem, so the zigzag IS the table of contents. Under 900px the
+   water swings to the edge and the banks fold into one column:
+   the same 16 stops, nothing dropped.
+   ============================================================ */
+.valley{position:relative;display:grid;grid-template-columns:1fr clamp(50px,6vw,96px) 1fr;
+  align-items:center;column-gap:clamp(8px,1.4vw,22px);row-gap:clamp(10px,1.4vw,20px)}
+/* positioned, not a grid item: as a grid item its height resolved against an
+   indefinite area and collapsed to a 298px stub. Absolute pins it top to bottom. */
+.water{position:absolute;top:0;bottom:0;left:50%;transform:translateX(-50%);
+  width:clamp(50px,6vw,96px);pointer-events:none;border-radius:99px;
+  background:linear-gradient(180deg,#5ecfc0,var(--river) 40%,var(--river-deep));border:3px solid #fff}
+.stop{grid-column:1;justify-self:stretch;display:flex;align-items:center;gap:10px;position:relative;z-index:1}
+.stop.right{grid-column:3;flex-direction:row-reverse}
+.stop > .card{flex:1 1 auto;min-width:0}   /* without this the card keeps its content width and the jumps wrap */
+.node{flex:0 0 auto;width:30px;height:30px;border-radius:50%;background:#fff;
+  border:5px solid var(--accent,var(--river));position:relative;z-index:2}
+.stop.done .node{background:var(--accent,var(--river))}
+.jetty{flex:1 0 10px;height:5px;background:var(--accent,var(--river));max-width:clamp(8px,1.6vw,26px);border-radius:9px}
+@media (max-width:900px){
+  .valley{grid-template-columns:clamp(36px,8vw,54px) 1fr;column-gap:10px}
+  .water{left:clamp(18px,4vw,27px);transform:none;width:clamp(36px,8vw,54px)}
+  .stop,.stop.right{grid-column:2;flex-direction:row}
+}
+
+/* ---- the stop card ---- */
+.grid{display:grid;gap:var(--gap);grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr))}
+.card{position:relative;border-radius:var(--r-lg);padding:14px 16px;display:flex;flex-direction:column;gap:9px;
+  background:var(--card);border:3px solid var(--accent,var(--river));border-left-width:10px}
+.stop.right > .card{border-left-width:3px;border-right-width:10px}
+.card.done{background:#eefbf7}
+.card .hd{display:flex;align-items:center;gap:12px}
+.card .no{font-weight:900;font-size:clamp(20px,1.6vw,27px);color:var(--accent,var(--river));line-height:1}
+.card .em{font-size:clamp(24px,2vw,32px);line-height:1;margin-left:auto}
+.card h3{font-size:clamp(17px,1.3vw,22px)}
+.card .by{font-size:clamp(11px,.85vw,13px);font-weight:700;color:var(--ink-soft);margin-top:-4px}
+.byline{font-size:clamp(13px,1.05vw,17px);font-weight:700;color:var(--ink-soft);margin-bottom:14px}
+.byline b{color:var(--coral)}
+.card .meta{display:flex;align-items:center;gap:7px;flex-wrap:wrap;font-size:clamp(10px,.8vw,12px);font-weight:900}
+.tag{padding:5px 11px;border-radius:99px;background:#eef7f5;border:2px solid var(--line);color:var(--ink-soft);
+  letter-spacing:.05em;text-transform:uppercase}
+.tag.prose{color:#fff;background:var(--coral);border-color:var(--coral)}
+.tag.poem{color:#3a2600;background:var(--gold-fill);border-color:#e0a800}
+.tag.film{color:#fff;background:var(--river-deep);border-color:var(--river-deep)}
+.tag.ok{color:#fff;background:var(--grape);border-color:var(--grape)}
+
+/* THE ANTI-FUNNEL: every mode is one tap from the bank. One row, never a stacked
+   block — a 3x3 made each stop ~460px and turned 16 chapters into a 7,400px scroll. */
+.jump{display:grid;grid-template-columns:repeat(auto-fit,minmax(58px,1fr));gap:6px;margin-top:auto}
+.jbtn{min-height:62px;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  background:#eef7f5;border:2.5px solid var(--line);
+  font-size:clamp(9px,.62vw,11px);font-weight:900;letter-spacing:.03em;text-transform:uppercase;color:var(--ink)}
+.jbtn .ji{font-size:clamp(17px,1.25vw,21px);line-height:1}
+.jbtn:hover{border-color:var(--river);background:#e2f4f0}
+.jbtn.key{background:var(--river-deep);color:#fff;border-color:var(--river-deep)}
+.jbtn.key:hover{background:#0a5a50}
+.empty{grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--ink-soft)}
+.empty .eb{font-size:50px;margin-bottom:12px}
+
+/* ---- THE SIGNATURE: the river rail. 16 stations = nav AND progress gauge.
+        It rides at the bottom because that is where a standing teacher can reach,
+        and because it makes a 16-stop river practical: you never scroll the
+        journey, you tap the station and land there. ---- */
+.footbar{position:sticky;bottom:0;z-index:20;margin-top:auto;background:var(--sand);border-top:3px solid var(--line)}
+.river{padding:8px var(--edge) 4px}
+.river .lbl{display:flex;align-items:center;gap:10px;margin-bottom:7px;font-size:clamp(9px,.72vw,11px);font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}
+.river .lbl .src,.river .lbl .sea{color:var(--river-deep)}
+.river .lbl .ln{flex:1;height:3px;background:var(--river);border-radius:9px}
+.rail{display:flex;gap:6px;overflow-x:auto;padding:2px 2px 6px}
+.stn{flex:1 0 auto;min-width:50px;min-height:54px;border-radius:11px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  background:var(--card);border:2.5px solid var(--line);position:relative}
+.stn .sn{font-size:13px;font-weight:900;color:var(--ink)}
+.stn .sd{width:10px;height:10px;border-radius:50%;background:var(--line)}
+.stn:hover{border-color:var(--river)}
+.stn.done{background:var(--river-deep);border-color:var(--river-deep)}
+.stn.done .sn{color:#fff}
+.stn.done .sd{background:var(--gold-fill)}
+.stn.film::after{content:"▶";position:absolute;top:2px;right:4px;font-size:8px;color:var(--coral)}
+.stn.done.film::after{color:var(--gold-fill)}
+
+/* ---- teacher dock: the desk, bottom centre, thumb country ---- */
+.dock{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;
+  padding:8px var(--edge) calc(8px + env(safe-area-inset-bottom));border-top:2px solid var(--line)}
+.dbtn{min-height:64px;min-width:84px;padding:0 14px;border-radius:14px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  background:var(--card);border:2.5px solid var(--line);color:var(--ink);
+  font-size:clamp(9px,.72vw,11px);font-weight:900;letter-spacing:.04em;text-transform:uppercase}
+.dbtn .di{font-size:clamp(19px,1.5vw,24px);line-height:1}
+.dbtn:hover{border-color:var(--river)}
+.dbtn[aria-pressed="true"]{background:var(--grape);color:#fff;border-color:var(--grape)}
+
+/* ============================ CHAPTER CONSOLE ============================ */
+.console{position:fixed;inset:0;z-index:60;display:none;flex-direction:column;background:var(--paper)}
+.console.open{display:flex}
+.chd{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:calc(var(--edge)*.6) var(--edge);
+  background:var(--card);border-bottom:3px solid var(--accent,var(--river))}
+.chd .no{font-weight:900;font-size:clamp(20px,1.7vw,28px);color:var(--accent,var(--river))}
+.chd .em{font-size:clamp(26px,2.2vw,36px);line-height:1}
+.chd h2{font-size:clamp(19px,2vw,32px);min-width:0}
+.chd .meta{display:flex;gap:7px;flex-wrap:wrap;margin-left:auto}
+.cbody{flex:1;overflow-y:auto;overscroll-behavior:contain;padding:var(--edge)}
+.pane{max-width:74ch;margin:0 auto}
+.pane.wide{max-width:1180px}
+
+/* NEP/NCF: the competency this mode actually builds. It changes per mode and names
+   what the student is doing — a badge that just reads "NEP 2020" means nothing. */
+.comp{padding:14px 16px;border-radius:14px;margin-bottom:22px;background:var(--sand);border:2px solid #f0d894}
+.comp .cr{display:flex;align-items:center;gap:11px;flex-wrap:wrap}
+.comp .cl{flex:0 0 auto;font-size:.8em;font-weight:900;letter-spacing:.06em;text-transform:uppercase;color:#fff;
+  padding:5px 12px;border-radius:8px;background:var(--gold)}
+.comp .cd{flex:1 1 240px;font-weight:700;color:#4a3a10;font-size:clamp(12px,.95vw,15px);line-height:1.45}
+.comp b{color:#2f2408}
+/* NCF's own wording, quoted verbatim, given a rule of its own so it reads as a citation
+   and not as more running text. The student needs the plain line; the teacher needs this. */
+.comp .ncf{display:block;margin-top:10px;padding-left:13px;border-left:3px solid var(--gold-fill);
+  font-size:.86em;font-weight:600;font-style:italic;color:#5b4a1a;line-height:1.5}
+
+/* read */
+.prose{font-size:clamp(17px,1.35vw,23px);line-height:1.7}
+.prose b{color:var(--river-deep);font-weight:800}
+.prose i{color:var(--coral);font-style:normal;font-weight:700}
+.themes{display:flex;gap:9px;flex-wrap:wrap;margin-top:22px}
+.th{padding:8px 15px;border-radius:99px;background:var(--card);border:2.5px solid var(--line);
+  font-size:clamp(12px,.95vw,15px);font-weight:800;color:var(--ink)}
+
+/* quiz — the self-running set */
+.qstart{text-align:center;max-width:58ch;margin:0 auto;padding:16px 8px}
+.qstart .qs-em{font-size:clamp(42px,5vw,66px);line-height:1}
+.qstart h3{font-size:clamp(22px,2.1vw,32px);margin:8px 0 4px}
+.qstart p{color:var(--ink-soft);font-weight:600;font-size:clamp(14px,1.1vw,18px);line-height:1.6}
+.qs-pick{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:22px 0 14px}
+.qs-pick .qs-n{min-width:118px;font-size:clamp(17px,1.5vw,22px)}
+.qs-note{font-size:.85em;max-width:48ch;margin:0 auto}
+
+.qhd{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.qhd .qn{font-size:clamp(12px,.95vw,15px);font-weight:900;color:var(--ink-soft);letter-spacing:.04em}
+.qtag{padding:5px 12px;border-radius:99px;background:var(--grape);color:#fff;
+  font-size:.72em;font-weight:900;letter-spacing:.05em;text-transform:uppercase;white-space:nowrap}
+.qhd .qcount{margin-left:auto}
+.qhd .dots{flex-basis:100%;justify-content:flex-start}
+body.board .qhd .dots{display:none}
+.dots{display:flex;gap:6px;flex-wrap:wrap}
+.dots i{width:13px;height:13px;border-radius:50%;background:#fff;border:2.5px solid var(--line)}
+.dots i.now{background:var(--gold-fill);border-color:#e0a800}
+.dots i.ok{background:var(--river);border-color:var(--river-deep)}
+.dots i.no{background:var(--coral);border-color:var(--coral)}
+
+/* the answer countdown: a bar that drains left. Updated by JS, no CSS transition (board rule 1). */
+.qbarwrap{height:12px;border-radius:99px;background:#fff;border:2px solid var(--line);overflow:hidden;margin-bottom:20px}
+.qbar{display:block;height:100%;width:100%;background:var(--river);border-radius:99px}
+.qbar.held{background:var(--gold-fill)}
+
+.qq{font-family:'Baloo 2','Mukta',sans-serif;font-weight:700;font-size:clamp(21px,2vw,32px);line-height:1.25;margin-bottom:20px}
+#opts{display:grid;gap:12px}
+.opt{display:flex;align-items:center;gap:14px;width:100%;text-align:left;min-height:var(--tap);padding:15px 18px;
+  border-radius:16px;background:var(--card);border:3px solid var(--line);font-size:clamp(15px,1.2vw,20px);font-weight:700;color:var(--ink)}
+.opt .kx{flex:0 0 auto;width:44px;height:44px;border-radius:11px;display:grid;place-items:center;
+  font-weight:900;background:#eef7f5;border:2px solid var(--line);color:var(--ink)}
+.opt:hover{border-color:var(--river)}
+/* correctness carries a glyph AND a word, never colour alone */
+.opt.ok{background:#e6faf4;border-color:var(--river-deep)}
+.opt.ok .kx{background:var(--river-deep);color:#fff;border-color:var(--river-deep)}
+.opt.no{background:#fdeee9;border-color:var(--coral)}
+.opt.no .kx{background:var(--coral);color:#fff;border-color:var(--coral)}
+.opt .vd{margin-left:auto;font-size:.8em;font-weight:900;letter-spacing:.05em;text-transform:uppercase;white-space:nowrap}
+.opt.ok .vd{color:var(--river-deep)}
+.opt.no .vd{color:var(--coral)}
+.opt.dim{opacity:.5}
+.opt:disabled{cursor:default}
+
+/* the line from the book that proves the answer, shown to the class on reveal */
+.qsrc{margin-top:6px;padding:14px 16px;border-radius:13px;background:#eef7f5;border:2px solid var(--line);
+  border-left:6px solid var(--river);font-size:clamp(13px,1.05vw,17px);font-weight:600;line-height:1.55;color:var(--ink)}
+.qsrc b{color:var(--river-deep)}
+
+.qfoot{display:flex;margin-top:20px}
+.qpause{min-width:150px}
+.qcount{font-size:clamp(15px,1.3vw,20px);font-weight:900;color:var(--river-deep)}
+
+.res{text-align:center;padding:22px 0}
+.res .big{font-size:clamp(54px,5.5vw,80px);line-height:1}
+.res h3{font-size:clamp(23px,2.1vw,32px);margin-top:8px}
+.res p{color:var(--ink-soft);font-weight:700;margin-top:7px;font-size:clamp(14px,1.1vw,18px)}
+
+/* talk */
+.dq{padding:18px 20px;margin-bottom:12px;border-radius:14px;background:var(--card);
+  border:2.5px solid var(--line);border-left:9px solid var(--river);
+  font-size:clamp(16px,1.3vw,21px);line-height:1.5;font-weight:700}
+.dq .qi{font-weight:900;color:var(--river-deep);margin-right:7px}
+.dq.spot{background:var(--sand);border-color:#e0a800;border-left-color:var(--gold)}
+.tps{display:flex;gap:9px;flex-wrap:wrap;margin-top:18px;padding:14px;border-radius:12px;background:var(--card);border:2.5px dashed var(--line)}
+.tps .st{flex:1;min-width:120px;text-align:center;font-size:clamp(12px,.95vw,15px);font-weight:800;color:var(--ink-soft)}
+.tps .st b{display:block;font-size:1.4em;color:var(--river-deep);font-weight:900}
+
+/* words — a two-panel reveal, NOT a 3D flip: preserve-3d forces a GPU layer per
+   card, and a board with a dozen on screen drops frames on the first tap */
+.wgrid{display:grid;gap:var(--gap);grid-template-columns:repeat(auto-fill,minmax(min(100%,190px),1fr))}
+.wc{min-height:140px;border-radius:14px;padding:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;
+  text-align:center;background:var(--card);border:3px solid var(--gold-fill)}
+.wc .w{font-family:'Baloo 2','Mukta',sans-serif;font-weight:700;font-size:clamp(17px,1.4vw,22px);color:var(--ink)}
+.wc .h{font-size:10px;font-weight:900;letter-spacing:.1em;color:var(--ink-soft);text-transform:uppercase}
+.wc .m{font-size:clamp(13px,1.05vw,16px);line-height:1.45;font-weight:700;color:var(--ink);display:none}
+.wc.flip{background:#e6faf4;border-color:var(--river-deep)}
+.wc.flip .w{color:var(--river-deep)}
+.wc.flip .h{display:none}
+.wc.flip .m{display:block}
+
+/* listen */
+.script{margin-top:18px;padding:18px;border-radius:14px;background:var(--card);border:2.5px solid var(--line);
+  font-size:clamp(16px,1.3vw,21px);line-height:1.8;max-height:min(50dvh,600px);overflow-y:auto}
+.ln{border-radius:5px;padding:2px 3px;cursor:pointer}
+.ln:hover{background:#e2f4f0}
+/* the live line is marked by fill AND weight, never hue alone */
+.ln.said{background:var(--gold-fill);color:#3a2600;font-weight:900}
+
+/* text */
+.pdfw{width:100%;height:min(68dvh,860px);border-radius:14px;overflow:hidden;border:3px solid var(--line);background:#fff}
+.pdfw:fullscreen{height:100dvh;border-radius:0;border:none}
+.pdf{width:100%;height:100%;border:none;background:#fff;display:block}
+
+/* ---- connect: the multidisciplinary panel NEP 2020 asks for.
+        Flat cards, no animation, same board rules as everything else. ---- */
+.blk{margin-bottom:20px}
+.blk{margin-bottom:24px}
+.blk > h4{font-family:'Baloo 2','Mukta',sans-serif;font-size:clamp(14px,1.1vw,18px);font-weight:800;
+  letter-spacing:.04em;text-transform:uppercase;color:var(--river-deep);margin-bottom:12px;
+  display:flex;align-items:center;gap:9px}
+.subs{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr))}
+.sub-i{display:flex;align-items:flex-start;gap:11px;padding:14px 16px;border-radius:14px;
+  background:var(--card);border:2px solid var(--line);font-size:clamp(13px,1.05vw,17px);
+  font-weight:700;line-height:1.45;color:var(--ink)}
+.sub-i .sb{flex:0 0 auto;padding:4px 10px;border-radius:7px;font-size:.72em;font-weight:900;
+  letter-spacing:.05em;text-transform:uppercase;background:var(--grape);color:#fff;white-space:nowrap}
+.jobs{display:flex;gap:9px;flex-wrap:wrap}
+.job{padding:11px 18px;border-radius:99px;background:var(--card);border:2px solid var(--river);
+  font-size:clamp(13px,1.05vw,17px);font-weight:800;color:var(--ink)}
+.job::before{content:"→ ";color:var(--river-deep);font-weight:900}
+.fact{padding:18px 20px;border-radius:14px;background:var(--sand);border:3px solid #e0a800;
+  font-size:clamp(15px,1.25vw,20px);line-height:1.55;font-weight:700;color:#3a2600}
+.fact b{color:var(--coral)}
+.iks{padding:16px 18px;border-radius:14px;background:#f6f0ff;border:3px solid var(--grape);
+  font-size:clamp(14px,1.15vw,19px);line-height:1.55;font-weight:700;color:#2e1a4d}
+.iks b{color:var(--grape)}
+.src{margin-top:8px;font-size:clamp(10px,.78vw,12px);font-weight:700;color:var(--ink-soft);line-height:1.5}
+.src a{color:var(--river-deep)}
+
+/* do */
+.act{padding:20px;border-radius:14px;background:var(--sand);border:3px dashed #e0a800;
+  font-size:clamp(16px,1.3vw,21px);line-height:1.6;font-weight:700}
+.act b{color:var(--coral)}
+.act .al{font-size:11px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:10px}
+
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+.btn{min-height:var(--tap);padding:0 24px;border-radius:14px;display:inline-flex;align-items:center;justify-content:center;gap:9px;
+  font-weight:800;font-size:clamp(14px,1.1vw,18px);background:var(--card);border:3px solid var(--line);color:var(--ink);text-decoration:none}
+.btn:hover{border-color:var(--river)}
+.btn.go{background:var(--river-deep);color:#fff;border-color:var(--river-deep)}
+.btn.go:hover{background:#0a5a50}
+.btn.warm{background:var(--gold-fill);color:#3a2600;border-color:#e0a800}
+.btn.on{background:var(--grape);color:#fff;border-color:var(--grape)}
+
+/* ---- mode bar: the transport. Bottom = reachable. ---- */
+.modes{display:flex;gap:8px;padding:9px var(--edge) calc(9px + env(safe-area-inset-bottom));overflow-x:auto;
+  background:var(--sand);border-top:3px solid var(--line)}
+.mb{flex:1 0 auto;min-width:88px;min-height:var(--tap);border-radius:14px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  background:var(--card);border:2.5px solid var(--line);color:var(--ink);
+  font-size:clamp(9px,.7vw,11px);font-weight:900;letter-spacing:.05em;text-transform:uppercase}
+.mb .mi{font-size:clamp(19px,1.5vw,24px);line-height:1}
+.mb:hover{border-color:var(--river)}
+.mb[aria-selected="true"]{background:var(--river-deep);color:#fff;border-color:var(--river-deep)}
+/* the way out, and the only one. It sits first in the transport, bottom-left, in
+   thumb country. A second floating Back button used to hover here too and did
+   nothing this one doesn't — except cover the text underneath it. */
+.mb.back{flex:0 0 auto;background:var(--gold-fill);color:#3a2600;border-color:#e0a800}
+
+/* ============================ TOOL SHEETS ============================ */
+.sheet{position:fixed;inset:0;z-index:80;display:none;align-items:flex-end;justify-content:center;background:rgba(11,58,53,.45)}
+.sheet.open{display:flex}
+.sbox{width:min(660px,100%);max-height:88dvh;overflow-y:auto;border-radius:var(--r-lg) var(--r-lg) 0 0;
+  background:var(--paper);border:3px solid var(--line);border-bottom:none;
+  padding:20px var(--edge) calc(20px + env(safe-area-inset-bottom));text-align:center}
+.sbox h2{font-size:clamp(20px,1.8vw,27px)}
+.sbox .ss{color:var(--ink-soft);font-weight:700;font-size:clamp(12px,1vw,15px);margin:5px 0 18px}
+.sclose{width:100%;min-height:var(--tap);border-radius:14px;background:var(--gold-fill);color:#3a2600;font-weight:900;
+  letter-spacing:.06em;text-transform:uppercase;font-size:13px;margin-top:16px;border:3px solid #3a2600}
+
+.exam{width:100%;border-collapse:collapse;font-size:clamp(13px,1.05vw,17px);font-weight:700}
+.exam th,.exam td{padding:11px 12px;text-align:left;border-bottom:2px solid var(--line)}
+.exam th{font-size:.78em;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft)}
+.exam td:last-child,.exam th:last-child{text-align:right;font-variant-numeric:tabular-nums}
+.exam .tot td{border-bottom:none;color:var(--river-deep);font-weight:900;font-size:1.1em}
+.exam .sub td{background:#eef7f5;font-weight:900;color:var(--ink-soft)}
+.eh{font-size:clamp(13px,1.05vw,16px);font-weight:900;letter-spacing:.05em;text-transform:uppercase;
+  color:var(--river-deep);margin:18px 0 8px;text-align:left}
+
+/* timer */
+.ring{position:relative;width:min(210px,54vw);aspect-ratio:1;margin:0 auto}
+.ring svg{transform:rotate(-90deg);width:100%;height:100%}
+.ring .tk{stroke:var(--line)}
+.ring .pg{stroke:var(--river);stroke-linecap:round}
+.tnum{position:absolute;inset:0;display:grid;place-items:center;font-weight:900;font-size:clamp(38px,4.8vw,56px);color:var(--ink)}
+.tnum.end{color:var(--coral)}
+.presets{display:flex;gap:9px;justify-content:center;flex-wrap:wrap;margin-top:16px}
+.presets .btn{min-width:78px;padding:0 15px}
+
+/* picker */
+.stage{min-height:130px;display:grid;place-items:center;padding:10px 0}
+.pk{width:100%;padding:20px;border-radius:16px;background:var(--card);border:3px solid var(--line);
+  font-family:'Baloo 2','Mukta',sans-serif;font-weight:700;font-size:clamp(17px,1.6vw,25px);line-height:1.25}
+.pk .pe{display:block;font-size:1.7em;margin-bottom:6px}
+.pk.land{background:var(--river-deep);color:#fff;border-color:var(--river-deep)}
+
+/* teams */
+.teams{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tm{padding:16px 10px;border-radius:16px;border:3px solid var(--line);position:relative;background:var(--card)}
+.tm.a{border-color:var(--river-deep)}
+.tm.b{border-color:var(--coral)}
+.tm .tn{font-family:'Baloo 2','Mukta',sans-serif;font-weight:700;font-size:clamp(14px,1.2vw,18px)}
+.tm .tv{font-weight:900;font-size:clamp(44px,5vw,64px);line-height:1.1}
+.tm.a .tv{color:var(--river-deep)} .tm.b .tv{color:var(--coral)}
+.tm .cr{position:absolute;top:-14px;left:50%;transform:translateX(-50%);font-size:24px}
+.tbt{display:flex;gap:9px;justify-content:center;margin-top:10px}
+.tb{width:var(--tap);height:var(--tap);border-radius:14px;background:#eef7f5;border:2.5px solid var(--line);
+  font-size:26px;font-weight:900;color:var(--ink)}
+.tb:hover{border-color:var(--river)}
+/* wiping live scores is unrecoverable, so it takes two deliberate taps — no stray palm does it */
+.danger{background:var(--coral)!important;color:#fff!important;border-color:var(--coral)!important}
+
+/* ============================ VIDEO ============================ */
+#vp{position:fixed;inset:0;z-index:120;background:#0b3a35;display:none;align-items:center;justify-content:center}
+#vp.open{display:flex}
+#vp video{width:100%;height:100%;object-fit:contain;background:#0b3a35}
+.vx{position:absolute;top:12px;right:12px;z-index:3;width:60px;height:60px;border-radius:50%;
+  border:4px solid #3a2600;background:var(--gold-fill);color:#3a2600;font-size:24px;font-weight:900}
+.vld{position:absolute;z-index:2;display:flex;flex-direction:column;align-items:center;gap:12px;padding:0 22px;
+  font-family:'Baloo 2','Mukta',sans-serif;font-weight:700;font-size:clamp(15px,1.2vw,19px);color:#fff;text-align:center;pointer-events:none}
+.vld .vs{font-size:44px}
+/* credit rides the TOP so it never covers the native transport controls */
+.vcr{position:absolute;left:0;right:80px;top:0;z-index:2;padding:12px 16px;font-size:clamp(11px,.85vw,13.5px);
+  font-weight:700;line-height:1.45;color:#fff;background:rgba(11,58,53,.85)}
+.vcr b{color:var(--gold-fill)}
+
+/* ============================ MISC ============================ */
+.toast{position:fixed;left:50%;bottom:calc(var(--tap) + 28px);transform:translateX(-50%);z-index:130;
+  padding:14px 26px;border-radius:99px;background:var(--grape);color:#fff;
+  font-family:'Baloo 2','Mukta',sans-serif;font-weight:700;font-size:clamp(14px,1.1vw,17px);
+  border:3px solid #fff;display:none;max-width:92vw;text-align:center}
+.toast.show{display:block}
+footer{padding:22px var(--edge) 26px;text-align:center;color:var(--ink-soft);font-size:clamp(12px,.9vw,14px);font-weight:700;line-height:1.55}
+footer b{color:var(--ink)}
+.credit{max-width:70ch;margin:12px auto 0;font-size:clamp(11px,.8vw,12.5px);line-height:1.55}
+
+/* ============================================================
+   RESPONSIVE — nothing is removed at any width. The composition
+   reflows and rescales: the same 16 stops, the same modes, everywhere.
+   ============================================================ */
+@media (max-width:640px){
+  .teams{grid-template-columns:1fr}
+  .gauge{min-width:100%;order:3}
+}
+@media (min-width:1900px){
+  :root{--tap:84px;--gap:18px}
+  .grid{grid-template-columns:repeat(auto-fill,minmax(370px,1fr))}
+  .pane{max-width:84ch}
+}
+@media (min-width:2600px){
+  :root{--tap:96px;--gap:22px}
+  .pane{max-width:92ch}
+}
+@media (max-height:560px) and (orientation:landscape){
+  :root{--tap:62px}
+}
