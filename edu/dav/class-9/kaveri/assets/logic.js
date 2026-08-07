@@ -693,6 +693,7 @@ function fsOut(){ if(!fsEl()) return; const f=document.exitFullscreen||document.
 
 function playFilm(ch){
   const url=videoURL(ch.video); if(!url) return;
+  curTrim = Math.max(0, Number(ch.trimEnd) || 0);
   vcr.innerHTML=`🎬 <b>${ch.title}</b><br>Film courtesy of <b>The Learners' Deck</b> (YouTube · @TheLearnersDeck) · © original creator · shown for classroom teaching`;
   vldm.textContent="Loading the film…";
   vld.classList.remove("hidden");
@@ -702,16 +703,33 @@ function playFilm(ch){
      <video>, so fall back to that. If both are refused the player still fills the viewport. */
   fsReq(vp).catch(()=>{ if(vv.webkitEnterFullscreen) try{ vv.webkitEnterFullscreen(); }catch(e){} });
   vv.play().catch(()=>{});
+  if(curTrim>0) watchTrim();
 }
 function closeFilm(){
   if(!vp.classList.contains("open")) return;
+  stopTrim();
   vp.classList.remove("open");        /* dropped first so the fullscreenchange handler can't re-enter */
   vv.pause(); vv.removeAttribute("src"); vv.load();   /* stops the buffer — a half-watched 50MB film stops costing egress */
   fsOut();
   if(cur && mode==="film"){ mode="read"; renderModes(); renderMode("read"); }
 }
+/* SOFT TRIM — a chapter may declare trimEnd (seconds to cut from the tail, e.g. a
+   credit logo that shouldn't reach the board). The watcher stops the film just before
+   the cut and fires the normal end flow, so the player behaves exactly as if the film
+   had ended there. requestVideoFrameCallback is frame-accurate; polling is the fallback. */
+let curTrim=0, trimWatch=null;
+function filmEnd(){ closeFilm(); sfx.win(); confetti(30); toast("🎬 That's a wrap."); }
+function watchTrim(){
+  const d=vv.duration;
+  if(curTrim>0 && isFinite(d) && vv.currentTime>=d-curTrim-.08){ filmEnd(); return; }
+  trimWatch = vv.requestVideoFrameCallback ? vv.requestVideoFrameCallback(watchTrim) : setTimeout(watchTrim,60);
+}
+function stopTrim(){
+  if(trimWatch){ vv.cancelVideoFrameCallback ? vv.cancelVideoFrameCallback(trimWatch) : clearTimeout(trimWatch); }
+  trimWatch=null; curTrim=0;
+}
 vv.addEventListener("playing",()=>vld.classList.add("hidden"));
-vv.addEventListener("ended",()=>{ closeFilm(); sfx.win(); confetti(30); toast("🎬 That's a wrap."); });
+vv.addEventListener("ended",filmEnd);
 vv.addEventListener("error",()=>{
   if(!vv.getAttribute("src")) return;      /* our own load() on close fires one of these; ignore it */
   vld.classList.remove("hidden");

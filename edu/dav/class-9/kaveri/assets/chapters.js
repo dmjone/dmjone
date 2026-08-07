@@ -191,7 +191,8 @@ const CHAPTERS = [
       {w:"solemnly", m:"very seriously — often while hiding a smile"}
     ],
     activity:"🕵️ <b>The Vitamin-M test:</b> For one week, keep two tallies at home — every time an adult forgets something, and every time an elder remembers something you had forgotten. Bring the scores to class. Who really needs Vitamin-M?",
-    video:"",
+    video:"Vitamin-M.mp4",
+    trimEnd:4,  /* soft-trim: the story ends at 6:46; the last 4s (6:46–6:50) are the animated Google Notebook logo — keep it off the board */
     lesson:"Vitamin-M.pdf", page:1, unit:4
   },
   {
