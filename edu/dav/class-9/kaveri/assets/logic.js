@@ -63,6 +63,9 @@ const MODES = [
   { k:"quiz",  i:"🧠", t:"Quiz",  code:"C-3.1",
     ncf:"Analyses and evaluates the different audio and written material.",
     cd:"Check what you understood. Options reshuffle every attempt, so the answer is never in the same place twice." },
+  { k:"flash", i:"🃏", t:"Flash", code:"C-2.2",
+    ncf:"Analyses a literary text by close reading, critiquing form and style, and interpreting possible meanings.",
+    cd:"Recall it to keep it. Read the question, think, then flip to check yourself — the fastest way to make a story stick." },
   { k:"talk",  i:"💬", t:"Talk",  code:"C-3.2 + C-1.1",
     ncf:"Argues with proper rationale by carefully evaluating premises. · Uses language appropriate to social context, expresses agreement and disagreement with reasons, and arrives at conclusions through discussion and debate.",
     cd:"Think alone, pair up, then share. A view without a reason behind it does not count." },
@@ -169,6 +172,7 @@ function has(ch,k){
   if(k==="text")    return !!lessonURL(ch);
   if(k==="listen")  return !!TRANSCRIPTS[ch.id];
   if(k==="connect") return !!LINKS[ch.id];
+  if(k==="flash")   return !!(ch.cards && ch.cards.length);
   return true;
 }
 
@@ -176,11 +180,12 @@ function has(ch,k){
 function cardEl(ch){
   const isDone=done.has(ch.id), film=has(ch,"film");
   const el=document.createElement("article");
-  el.className="card"+(isDone?" done":"");
+  el.className="card"+(isDone?" done":"")+(has(ch,"flash")?" flash":"");
   el.style.setProperty("--accent",accent(ch));
-  // every card shows the same eight base modes in the same order — a clean 4x2 grid.
-  // Film is not a tile; it is the featured bar below, so the grid never goes ragged.
-  const order=["read","text","listen","quiz","talk","words","do","connect"];
+  // every card shows the same base modes in the same order — a clean 4x2 grid, or a 3x3
+  // when a flash deck adds a ninth tile (.card.flash). Film is not a tile; it is the
+  // featured bar below, so the grid never goes ragged.
+  const order=["read","text","listen","quiz","flash","talk","words","do","connect"];
   const tiles=order.map(k=>MODES.find(m=>m.k===k)).filter(m=>m&&has(ch,m.k));
   el.innerHTML=`
     <div class="hd">
@@ -378,6 +383,7 @@ function renderMode(k){
     tap($("dTps"),()=>{ openSheet("shTime"); setTimer(120); });
   }
   else if(k==="listen"){ renderListen(ch); return; }
+  else if(k==="flash"){ renderFlash(); return; }
   else if(k==="connect"){
     const L=LINKS[ch.id];
     b.innerHTML=`<div class="pane wide">${compBanner(k)}
@@ -411,6 +417,56 @@ function renderMode(k){
     tap($("aT"),()=>{ openSheet("shTime"); setTimer(300); });
     tap($("aTm"),()=>{ openSheet("shTeam"); paintTeams(); });
   }
+  b.scrollTop=0;
+}
+
+/* ============================================================
+   FLASH CARDS — one question, flip to check yourself
+   A per-chapter recall deck (ch.cards). Tap the card to flip it,
+   Next / Prev to move, Shuffle to mix. Question first, answer
+   second: the gap before the flip is the whole point.
+   ============================================================ */
+let fdeck=[], fIdx=0;
+function shuffleArr(a){
+  const r=a.slice();
+  for(let i=r.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [r[i],r[j]]=[r[j],r[i]]; }
+  return r;
+}
+function renderFlash(){
+  const ch=cur, b=$("conBody");
+  fdeck=shuffleArr(ch.cards||[]); fIdx=0;
+  if(!fdeck.length){
+    b.innerHTML=`<div class="pane">${compBanner("flash")}<p class="prose">No cards yet for this chapter.</p></div>`;
+    b.scrollTop=0; return;
+  }
+  const c=fdeck[0];
+  b.innerHTML=`<div class="pane wide">${compBanner("flash")}
+    <div class="fwrap">
+      <button class="fcard" id="fCard" aria-label="Question 1: ${c.q}. Tap to flip.">
+        <span class="ff"><span class="fl" aria-hidden="true">Q</span><span class="fq" id="fQ"></span><span class="fh">Tap to flip</span></span>
+        <span class="fb"><span class="fl" aria-hidden="true">A</span><span class="fa" id="fA"></span></span>
+      </button>
+      <div class="fbar"><span class="fpos mono" id="fPos"></span><button class="btn" id="fShuf">🎲 Shuffle</button></div>
+      <div class="row">
+        <button class="btn" id="fPrev">◀ Prev</button>
+        <button class="btn go" id="fNext">Next ▶</button>
+      </div>
+    </div></div>`;
+  const draw=()=>{
+    const cc=fdeck[fIdx];
+    $("fQ").textContent=cc.q; $("fA").textContent=cc.a;
+    $("fPos").textContent=`${fIdx+1} / ${fdeck.length}`;
+    $("fCard").setAttribute("aria-label",`Question ${fIdx+1}: ${cc.q}. Tap to flip.`);
+  };
+  draw();
+  tap($("fCard"),()=>{
+    const cc=fdeck[fIdx], card=$("fCard");
+    card.classList.toggle("flip"); sfx.tap();
+    card.setAttribute("aria-label",card.classList.contains("flip")?`Answer: ${cc.a}`:`Question ${fIdx+1}: ${cc.q}. Tap to flip.`);
+  });
+  tap($("fPrev"),()=>{ fIdx=(fIdx-1+fdeck.length)%fdeck.length; $("fCard").classList.remove("flip"); draw(); sfx.tap(); });
+  tap($("fNext"),()=>{ fIdx=(fIdx+1)%fdeck.length; $("fCard").classList.remove("flip"); draw(); sfx.tap(); });
+  tap($("fShuf"),()=>{ fdeck=shuffleArr(fdeck); fIdx=0; $("fCard").classList.remove("flip"); draw(); sfx.spin(); });
   b.scrollTop=0;
 }
 
