@@ -750,7 +750,7 @@ function fsOut(){ if(!fsEl()) return; const f=document.exitFullscreen||document.
 function playFilm(ch){
   const url=videoURL(ch.video); if(!url) return;
   curTrim = Math.max(0, Number(ch.trimEnd) || 0);
-  vcr.innerHTML=`🎬 <b>${ch.title}</b><br>Film courtesy of <b>The Learners' Deck</b> (YouTube · @TheLearnersDeck) · © original creator · shown for classroom teaching`;
+  vcr.innerHTML = ch.credit || `🎬 <b>${ch.title}</b><br>Film courtesy of <b>The Learners' Deck</b> (YouTube · @TheLearnersDeck) · © original creator · shown for classroom teaching`;
   vldm.textContent="Loading the film…";
   vld.classList.remove("hidden");
   vv.src=url;

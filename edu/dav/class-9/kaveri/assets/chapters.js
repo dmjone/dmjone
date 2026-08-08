@@ -274,6 +274,7 @@ const CHAPTERS = [
     activity:"🕵️ <b>The Vitamin-M test:</b> For one week, keep two tallies at home — every time an adult forgets something, and every time an elder remembers something you had forgotten. Bring the scores to class. Who really needs Vitamin-M?",
     video:"Vitamin-M.mp4",
     trimEnd:4,  /* soft-trim: the story ends at 6:46; the last 4s (6:46–6:50) are the animated Google Notebook logo — keep it off the board */
+    credit: "🎬 <b>Vitamin-M</b><br>A film made for this class · shown for classroom teaching",
     lesson:"Vitamin-M.pdf", page:1, unit:4
   },
   {
@@ -301,7 +302,9 @@ const CHAPTERS = [
       {w:"linger", m:"to stay on longer, refusing to fade away"}
     ],
     activity:"✍️ <b>Sense-poem:</b> Write 4 lines about a person you love using ONLY senses — a sound, a smell, a colour, a touch. No naming them! Class guesses who it might be.",
-    video:"",
+    video: "I_Cannot_Remember_My_Mother.mp4",
+    trimEnd: 4.2,  /* soft-trim: the Gemini logo starts at 3:30.5; the ~4.2s tail is the logo — keep it off the board */
+    credit: "🎬 <b>I Cannot Remember My Mother</b><br>A film made for this class · shown for classroom teaching",
     lesson:"Vitamin-M.pdf", page:30, unit:4
   },
   {
